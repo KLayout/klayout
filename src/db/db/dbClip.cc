@@ -22,7 +22,6 @@
 
 
 
-
 #include "dbClip.h"
 #include "dbLayout.h"
 #include "dbPolygonGenerators.h"
@@ -33,25 +32,24 @@ namespace db
 // ------------------------------------------------------------------------------
 //  clip_poly implementation
 
-struct EdgeCompareP1Func 
-{
-  bool operator () (const db::Edge &e1, const db::Edge &e2) const
+struct EdgeCompareP1Func {
+  bool operator() (const db::Edge &e1, const db::Edge &e2) const
   {
     return e1.p1 () < e2.p1 ();
   }
 };
 
-struct CoordSignPairCompareFunc
-{
+struct CoordSignPairCompareFunc {
   CoordSignPairCompareFunc (int s)
     : m_s (s)
-  { }
+  {
+  }
 
-  bool operator() (const std::pair <db::Coord, int> &a, const std::pair <db::Coord, int> &b) const
+  bool operator() (const std::pair<db::Coord, int> &a, const std::pair<db::Coord, int> &b) const
   {
     if (a.first != b.first) {
       return a.first < b.first;
-    } 
+    }
     return m_s > 0 ? (a.second < b.second) : (a.second > b.second);
   }
 
@@ -78,7 +76,7 @@ clip_poly (const P &poly, const db::Box &box, Sink &psink, bool resolve_holes)
   }
 
   //  first, extract and sort all edges
-  std::vector <db::Edge> edges;
+  std::vector<db::Edge> edges;
   edges.reserve (poly.hull ().size ());
 
   //  create a set of edges to consider
@@ -91,7 +89,7 @@ clip_poly (const P &poly, const db::Box &box, Sink &psink, bool resolve_holes)
 
     if (y1 < box.p2 ().y () && y2 > box.p1 ().y ()) {
 
-      std::pair <bool, db::Edge> ce = edge.clipped (box);
+      std::pair<bool, db::Edge> ce = edge.clipped (box);
       if (ce.first) {
 
         edges.push_back (ce.second);
@@ -131,17 +129,14 @@ clip_poly (const P &poly, const db::Box &box, Sink &psink, bool resolve_holes)
         if (ce.first) {
           edges.push_back (ce.second);
         }
-
       }
-
     }
-
   }
 
   //  synthesize horizontal edges at upper and lower boundary of the clip rectangle
-  std::vector <std::pair <db::Coord, int> > coord_values;
-  std::vector <db::Point> p1_stack;
-  std::vector <db::Point> p2_stack;
+  std::vector<std::pair<db::Coord, int>> coord_values;
+  std::vector<db::Point> p1_stack;
+  std::vector<db::Point> p2_stack;
 
   for (unsigned int l = 0; l <= 1; ++l) {
 
@@ -151,7 +146,7 @@ clip_poly (const P &poly, const db::Box &box, Sink &psink, bool resolve_holes)
     p1_stack.clear ();
     p2_stack.clear ();
 
-    for (std::vector <db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+    for (std::vector<db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
       if (e->p1 ().y () == y) {
         coord_values.push_back (std::make_pair (e->p1 ().x (), -1));
       }
@@ -162,7 +157,7 @@ clip_poly (const P &poly, const db::Box &box, Sink &psink, bool resolve_holes)
 
     std::sort (coord_values.begin (), coord_values.end (), CoordSignPairCompareFunc (l > 0 ? 1 : -1));
 
-    for (std::vector <std::pair <db::Coord, int> >::const_iterator xv = coord_values.begin (); xv != coord_values.end (); ++xv) {
+    for (std::vector<std::pair<db::Coord, int>>::const_iterator xv = coord_values.begin (); xv != coord_values.end (); ++xv) {
       db::Point p = db::Point (xv->first, y);
       if (xv->second < 0) {
         if (! p1_stack.empty ()) {
@@ -188,12 +183,11 @@ clip_poly (const P &poly, const db::Box &box, Sink &psink, bool resolve_holes)
     tl_assert (p1_stack.empty ());
     tl_assert (p2_stack.empty ());
     coord_values.clear ();
-
   }
 
   //  remove all edges being vertical and coincident with the clip box ..
-  std::vector <db::Edge>::iterator e_write = edges.begin ();
-  for (std::vector <db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+  std::vector<db::Edge>::iterator e_write = edges.begin ();
+  for (std::vector<db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
     if (e->dx () != 0 || (e->p1 ().x () > box.p1 ().x () && e->p1 ().x () < box.p2 ().x ())) {
       *e_write = *e;
       ++e_write;
@@ -202,7 +196,7 @@ clip_poly (const P &poly, const db::Box &box, Sink &psink, bool resolve_holes)
   edges.erase (e_write, edges.end ());
 
   //  and synthesize them again thus removing coincident edges ..
-  
+
   for (unsigned int l = 0; l <= 1; ++l) {
 
     db::Coord x = (l > 0 ? box.p2 ().x () : box.p1 ().x ());
@@ -211,7 +205,7 @@ clip_poly (const P &poly, const db::Box &box, Sink &psink, bool resolve_holes)
     p1_stack.clear ();
     p2_stack.clear ();
 
-    for (std::vector <db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+    for (std::vector<db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
       if (e->p1 ().x () == x) {
         coord_values.push_back (std::make_pair (e->p1 ().y (), -1));
       }
@@ -222,7 +216,7 @@ clip_poly (const P &poly, const db::Box &box, Sink &psink, bool resolve_holes)
 
     std::sort (coord_values.begin (), coord_values.end (), CoordSignPairCompareFunc (l > 0 ? -1 : 1));
 
-    for (std::vector <std::pair <db::Coord, int> >::const_iterator xv = coord_values.begin (); xv != coord_values.end (); ++xv) {
+    for (std::vector<std::pair<db::Coord, int>>::const_iterator xv = coord_values.begin (); xv != coord_values.end (); ++xv) {
       db::Point p = db::Point (x, xv->first);
       if (xv->second < 0) {
         if (! p1_stack.empty ()) {
@@ -248,11 +242,10 @@ clip_poly (const P &poly, const db::Box &box, Sink &psink, bool resolve_holes)
     tl_assert (p1_stack.empty ());
     tl_assert (p2_stack.empty ());
     coord_values.clear ();
-
   }
 
   //  Use the edge processor to merge and create the output polygons.
-  //  This is slow, but there is no good alternative for producing the holes and some situations are not well caught by the 
+  //  This is slow, but there is no good alternative for producing the holes and some situations are not well caught by the
   //  previous algorithm.
   //  Anyway it is faster that a pure AND.
 
@@ -265,34 +258,29 @@ clip_poly (const P &poly, const db::Box &box, Sink &psink, bool resolve_holes)
   poly_gen.min_coherence (false);
   poly_gen.resolve_holes (resolve_holes);
 
-  SimpleMerge sm; 
+  SimpleMerge sm;
   ep.process (poly_gen, sm);
-
 }
 
-void 
-clip_poly (const db::Polygon &poly, const db::Box &box, std::vector <db::Polygon> &clipped_poly, bool resolve_holes)
+void clip_poly (const db::Polygon &poly, const db::Box &box, std::vector<db::Polygon> &clipped_poly, bool resolve_holes)
 {
   db::PolygonContainer pc (clipped_poly);
   clip_poly (poly, box, pc, resolve_holes);
 }
 
-void 
-clip_poly (const db::SimplePolygon &poly, const db::Box &box, std::vector <db::SimplePolygon> &clipped_poly, bool resolve_holes)
+void clip_poly (const db::SimplePolygon &poly, const db::Box &box, std::vector<db::SimplePolygon> &clipped_poly, bool resolve_holes)
 {
   db::SimplePolygonContainer pc (clipped_poly);
   clip_poly (poly, box, pc, resolve_holes);
 }
 
-void
-clip_poly (const db::PolygonWithProperties &poly, const db::Box &box, std::vector <db::PolygonWithProperties> &clipped_poly, bool resolve_holes)
+void clip_poly (const db::PolygonWithProperties &poly, const db::Box &box, std::vector<db::PolygonWithProperties> &clipped_poly, bool resolve_holes)
 {
   db::PolygonContainerWithProperties pc (clipped_poly, poly.properties_id ());
   clip_poly (poly, box, pc, resolve_holes);
 }
 
-void
-clip_poly (const db::SimplePolygonWithProperties &poly, const db::Box &box, std::vector <db::SimplePolygonWithProperties> &clipped_poly, bool resolve_holes)
+void clip_poly (const db::SimplePolygonWithProperties &poly, const db::Box &box, std::vector<db::SimplePolygonWithProperties> &clipped_poly, bool resolve_holes)
 {
   db::SimplePolygonContainerWithProperties pc (clipped_poly, poly.properties_id ());
   clip_poly (poly, box, pc, resolve_holes);
@@ -301,13 +289,13 @@ clip_poly (const db::SimplePolygonWithProperties &poly, const db::Box &box, std:
 // ------------------------------------------------------------------------------
 //  helper method: clip a cell
 
-static void 
-clip_cell (const db::Layout &layout, 
-           db::cell_index_type cell_index, 
-           db::Layout &target_layout, 
-           db::cell_index_type target_cell_index, 
+static void
+clip_cell (const db::Layout &layout,
+           db::cell_index_type cell_index,
+           db::Layout &target_layout,
+           db::cell_index_type target_cell_index,
            const db::Box &clip_box,
-           std::map <std::pair <db::cell_index_type, db::Box>, db::cell_index_type> &variants)
+           std::map<std::pair<db::cell_index_type, db::Box>, db::cell_index_type> &variants)
 {
   const db::Cell &cell = layout.cell (cell_index);
   db::Cell &target_cell = target_layout.cell (target_cell_index);
@@ -331,18 +319,15 @@ clip_cell (const db::Layout &layout,
         const db::Cell &inst_cell = layout.cell (inst->cell_index ());
         if (! inst_cell.bbox ().empty ()) {
 
-          std::map <std::pair <db::cell_index_type, db::Box>, db::cell_index_type>::const_iterator vmp = variants.find (std::make_pair (inst->cell_index (), inst_cell.bbox ()));
+          std::map<std::pair<db::cell_index_type, db::Box>, db::cell_index_type>::const_iterator vmp = variants.find (std::make_pair (inst->cell_index (), inst_cell.bbox ()));
           tl_assert (vmp != variants.end ());
 
           new_inst.object () = db::CellInst (vmp->second);
 
-          //  TODO: keep properties 
+          //  TODO: keep properties
           target_cell.insert (new_inst);
-
         }
-
       }
-
     }
 
   } else {
@@ -350,7 +335,7 @@ clip_cell (const db::Layout &layout,
     tl_assert (&layout != &target_layout || target_cell_index != cell_index);
 
     for (unsigned int l = 0; l < layout.layers (); ++l) {
-      
+
       if (layout.is_valid_layer (l)) {
 
         for (db::ShapeIterator sh = cell.shapes (l).begin_touching (clip_box, db::ShapeIterator::All); ! sh.at_end (); ++sh) {
@@ -390,9 +375,9 @@ clip_cell (const db::Layout &layout,
             }
 
             if (! poly.box ().inside (clip_box)) {
-              std::vector <db::SimplePolygon> clipped_polygons;
+              std::vector<db::SimplePolygon> clipped_polygons;
               clip_poly (poly, clip_box, clipped_polygons);
-              for (std::vector <db::SimplePolygon>::const_iterator cp = clipped_polygons.begin (); cp != clipped_polygons.end (); ++cp) {
+              for (std::vector<db::SimplePolygon>::const_iterator cp = clipped_polygons.begin (); cp != clipped_polygons.end (); ++cp) {
                 if (sh->has_prop_id ()) {
                   target_cell.shapes (l).insert (db::SimplePolygonRefWithProperties (db::SimplePolygonRef (*cp, target_layout.shape_repository ()), sh->prop_id ()));
                 } else {
@@ -413,9 +398,9 @@ clip_cell (const db::Layout &layout,
             sh->polygon (poly);
 
             if (! poly.box ().inside (clip_box)) {
-              std::vector <db::Polygon> clipped_polygons;
+              std::vector<db::Polygon> clipped_polygons;
               clip_poly (poly, clip_box, clipped_polygons);
-              for (std::vector <db::Polygon>::const_iterator cp = clipped_polygons.begin (); cp != clipped_polygons.end (); ++cp) {
+              for (std::vector<db::Polygon>::const_iterator cp = clipped_polygons.begin (); cp != clipped_polygons.end (); ++cp) {
                 if (sh->has_prop_id ()) {
                   target_cell.shapes (l).insert (db::PolygonRefWithProperties (db::PolygonRef (*cp, target_layout.shape_repository ()), sh->prop_id ()));
                 } else {
@@ -445,14 +430,11 @@ clip_cell (const db::Layout &layout,
           } else {
             tl_assert (false); // invalid shape type encountered
           }
-
         }
-
       }
-
     }
 
-    db::box_convert <db::CellInst> bc (layout);
+    db::box_convert<db::CellInst> bc (layout);
 
     for (db::Cell::touching_iterator inst = cell.begin_touching (clip_box); ! inst.at_end (); ++inst) {
 
@@ -463,12 +445,12 @@ clip_cell (const db::Layout &layout,
 
         const db::Cell &inst_cell = layout.cell (inst->cell_index ());
 
-        std::map <std::pair <db::cell_index_type, db::Box>, db::cell_index_type>::const_iterator vmp = variants.find (std::make_pair (inst->cell_index (), inst_cell.bbox ()));
+        std::map<std::pair<db::cell_index_type, db::Box>, db::cell_index_type>::const_iterator vmp = variants.find (std::make_pair (inst->cell_index (), inst_cell.bbox ()));
         tl_assert (vmp != variants.end ());
 
         new_inst.object () = db::CellInst (vmp->second);
 
-        //  TODO: keep properties 
+        //  TODO: keep properties
         target_cell.insert (new_inst);
 
       } else {
@@ -482,7 +464,7 @@ clip_cell (const db::Layout &layout,
 
           if (! inst_clip_box.empty ()) {
 
-            std::map <std::pair <db::cell_index_type, db::Box>, db::cell_index_type>::const_iterator vmp = variants.find (std::make_pair (inst->cell_index (), inst_clip_box));
+            std::map<std::pair<db::cell_index_type, db::Box>, db::cell_index_type>::const_iterator vmp = variants.find (std::make_pair (inst->cell_index (), inst_clip_box));
             tl_assert (vmp != variants.end ());
 
             db::CellInstArray new_inst;
@@ -494,28 +476,22 @@ clip_cell (const db::Layout &layout,
             }
 
             target_cell.insert (new_inst);
-
           }
-
         }
-
       }
-
     }
-
   }
-
 }
 
 // ------------------------------------------------------------------------------
 //  collect_clip_boxes implementation
 
-static void 
-collect_clip_boxes (const db::Layout &layout, 
-                    db::cell_index_type cell_index, 
-                    unsigned int layer, 
-                    const db::CplxTrans &trans, 
-                    std::vector <db::Box> &boxes)
+static void
+collect_clip_boxes (const db::Layout &layout,
+                    db::cell_index_type cell_index,
+                    unsigned int layer,
+                    const db::CplxTrans &trans,
+                    std::vector<db::Box> &boxes)
 {
   const db::Cell &cell = layout.cell (cell_index);
   if (! cell.bbox (layer).empty ()) {
@@ -530,15 +506,13 @@ collect_clip_boxes (const db::Layout &layout,
         collect_clip_boxes (layout, inst->cell_index (), layer, trans * inst->cell_inst ().complex_trans (*a), boxes);
       }
     }
-
   }
 }
 
-void 
-collect_clip_boxes (const db::Layout &layout, 
-                    db::cell_index_type cell_index, 
-                    unsigned int layer, 
-                    std::vector <db::Box> &boxes)
+void collect_clip_boxes (const db::Layout &layout,
+                         db::cell_index_type cell_index,
+                         unsigned int layer,
+                         std::vector<db::Box> &boxes)
 {
   collect_clip_boxes (layout, cell_index, layer, db::CplxTrans (), boxes);
 }
@@ -546,16 +520,16 @@ collect_clip_boxes (const db::Layout &layout,
 // ------------------------------------------------------------------------------
 //  Helper function for the layout clipper
 
-static void 
+static void
 collect_clip_variants (const db::Layout &layout,
                        db::Layout &target_layout,
                        db::cell_index_type cell_index,
                        const db::Box &clip_box,
-                       std::map <std::pair <db::cell_index_type, db::Box>, db::cell_index_type> &variants,
+                       std::map<std::pair<db::cell_index_type, db::Box>, db::cell_index_type> &variants,
                        bool stable)
 {
   const db::Cell &cell = layout.cell (cell_index);
-  db::box_convert <db::CellInst> bc (layout);
+  db::box_convert<db::CellInst> bc (layout);
 
   db::Box cell_box;
   if (stable) {
@@ -567,7 +541,7 @@ collect_clip_variants (const db::Layout &layout,
     }
   }
 
-  std::pair <std::map <std::pair <db::cell_index_type, db::Box>, db::cell_index_type>::iterator, bool> vmp = variants.insert (std::make_pair (std::make_pair (cell_index, cell_box), 0));
+  std::pair<std::map<std::pair<db::cell_index_type, db::Box>, db::cell_index_type>::iterator, bool> vmp = variants.insert (std::make_pair (std::make_pair (cell_index, cell_box), 0));
   if (vmp.second) {
 
     for (db::Cell::touching_iterator inst = cell.begin_touching (cell_box); ! inst.at_end (); ++inst) {
@@ -576,16 +550,15 @@ collect_clip_variants (const db::Layout &layout,
         collect_clip_variants (layout, target_layout, inst->cell_index (), inst_clip_box, variants, false);
       }
     }
-
   }
 }
 
-static void 
+static void
 make_clip_variants (const db::Layout &layout,
                     db::Layout &target_layout,
-                    std::map <std::pair <db::cell_index_type, db::Box>, db::cell_index_type> &variants)
+                    std::map<std::pair<db::cell_index_type, db::Box>, db::cell_index_type> &variants)
 {
-  for (std::map <std::pair <db::cell_index_type, db::Box>, db::cell_index_type>::iterator v = variants.begin (); v != variants.end (); ++v) {
+  for (std::map<std::pair<db::cell_index_type, db::Box>, db::cell_index_type>::iterator v = variants.begin (); v != variants.end (); ++v) {
     if (v->first.second != layout.cell (v->first.first).bbox () || &layout != &target_layout) {
       //  need for a new cell
       v->second = target_layout.add_cell (layout, v->first.first);
@@ -598,41 +571,41 @@ make_clip_variants (const db::Layout &layout,
 // ------------------------------------------------------------------------------
 //  clip_layout implementation
 
-std::vector<db::cell_index_type> 
-clip_layout (const Layout &layout, 
-             Layout &target_layout, 
-             db::cell_index_type cell_index, 
-             const std::vector <db::Box> &clip_boxes,
+std::vector<db::cell_index_type>
+clip_layout (const Layout &layout,
+             Layout &target_layout,
+             db::cell_index_type cell_index,
+             const std::vector<db::Box> &clip_boxes,
              bool stable)
 {
   std::vector<db::cell_index_type> result;
 
-  //  since we know that we are not changing something on the cells we need as input, 
-  //  we can disable updates for the target layout after doing an explicit update. 
+  //  since we know that we are not changing something on the cells we need as input,
+  //  we can disable updates for the target layout after doing an explicit update.
   //  Otherwise this would cause recursion when target_layout == layout:
-  layout.update();
+  layout.update ();
   target_layout.start_changes ();
 
   try {
 
     //  create clip variants of cells
-    std::map <std::pair <db::cell_index_type, db::Box>, db::cell_index_type> variants;
+    std::map<std::pair<db::cell_index_type, db::Box>, db::cell_index_type> variants;
 
-    for (std::vector <db::Box>::const_iterator cbx = clip_boxes.begin (); cbx != clip_boxes.end (); ++cbx) {
+    for (std::vector<db::Box>::const_iterator cbx = clip_boxes.begin (); cbx != clip_boxes.end (); ++cbx) {
       collect_clip_variants (layout, target_layout, cell_index, *cbx, variants, stable);
     }
 
     make_clip_variants (layout, target_layout, variants);
 
     //  actually do the clipping by filling the variants
-    for (std::map <std::pair <db::cell_index_type, db::Box>, db::cell_index_type>::const_iterator var = variants.begin (); var != variants.end (); ++var) {
+    for (std::map<std::pair<db::cell_index_type, db::Box>, db::cell_index_type>::const_iterator var = variants.begin (); var != variants.end (); ++var) {
       clip_cell (layout, var->first.first, target_layout, var->second, var->first.second, variants);
     }
 
     //  prepare the result vector ..
     if (! stable) {
 
-      for (std::map <std::pair <db::cell_index_type, db::Box>, db::cell_index_type>::const_iterator var = variants.begin (); var != variants.end (); ++var) {
+      for (std::map<std::pair<db::cell_index_type, db::Box>, db::cell_index_type>::const_iterator var = variants.begin (); var != variants.end (); ++var) {
         if (var->first.first == cell_index) {
           result.push_back (var->second);
         }
@@ -641,12 +614,11 @@ clip_layout (const Layout &layout,
     } else {
 
       //  We have made sure before that there is a top-level entry for each clip box that was input
-      for (std::vector <db::Box>::const_iterator cbx = clip_boxes.begin (); cbx != clip_boxes.end (); ++cbx) {
-        std::map <std::pair <db::cell_index_type, db::Box>, db::cell_index_type>::const_iterator var = variants.find (std::make_pair (cell_index, *cbx));
+      for (std::vector<db::Box>::const_iterator cbx = clip_boxes.begin (); cbx != clip_boxes.end (); ++cbx) {
+        std::map<std::pair<db::cell_index_type, db::Box>, db::cell_index_type>::const_iterator var = variants.find (std::make_pair (cell_index, *cbx));
         tl_assert (var != variants.end ());
         result.push_back (var->second);
       }
-
     }
 
     //  release the under construction state
@@ -656,12 +628,9 @@ clip_layout (const Layout &layout,
     //  ensure we have a end_changes call corresponding to the start_changes call.
     target_layout.end_changes ();
     throw;
-  } 
+  }
 
   return result;
-
 }
 
 } // namespace db
-
-

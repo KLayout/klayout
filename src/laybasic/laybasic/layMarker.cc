@@ -75,7 +75,7 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
     draw_shapes = true;
 
     for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers () && draw_shapes; ++l) {
-      db::RecursiveShapeIterator shapes (layout, cell, (*l).first); 
+      db::RecursiveShapeIterator shapes (layout, cell, (*l).first);
       while (draw_shapes && ! shapes.at_end ()) {
         nshapes += n;
         if (nshapes > max_shapes) {
@@ -93,7 +93,7 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
 
     if (n > 1000) {
 
-      db::Vector av(a), bv(b);
+      db::Vector av (a), bv (b);
 
       //  fallback to simpler representation using a description text
       db::CplxTrans tbox (trans * inst.complex_trans ());
@@ -106,13 +106,13 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
 
       db::DBox cb (tbox * cell_box);
       db::DPolygon p;
-      db::DPoint points[] = {
-        db::DPoint (cb.lower_left ()), 
+      db::DPoint points [] = {
+        db::DPoint (cb.lower_left ()),
         db::DPoint (cb.lower_left () + trans * (av * long (amax - 1))),
         db::DPoint (cb.lower_left () + trans * (av * long (amax - 1) + bv * long (bmax - 1))),
         db::DPoint (cb.lower_left () + trans * (bv * long (bmax - 1))),
       };
-      p.assign_hull (points, points + sizeof (points) / sizeof (points[0]));
+      p.assign_hull (points, points + sizeof (points) / sizeof (points [0]));
       r.draw (p, fill, contour, 0, text);
 
       if (text) {
@@ -140,15 +140,11 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
                   db::VAlignCenter,
                   //  TODO: apply "real" transformation?
                   db::DFTrans (cell_name_text_transform ? tbox.fp_trans ().rot () : db::DFTrans::r0), 0, 0, 0, contour);
-
         }
-
       }
 
       render_origins = true;
-
     }
-
   }
 
   //  draw the interiour of the instance if required.
@@ -158,7 +154,7 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
 
     for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers () && draw_shapes; ++l) {
 
-      db::RecursiveShapeIterator shapes (layout, cell, (*l).first); 
+      db::RecursiveShapeIterator shapes (layout, cell, (*l).first);
       while (! shapes.at_end ()) {
 
         for (db::CellInstArray::iterator arr = inst.begin (); ! arr.at_end (); ++arr) {
@@ -166,11 +162,8 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
         }
 
         ++shapes;
-
       }
-
     }
-
   }
 
   // render the origins
@@ -180,7 +173,6 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
       db::DPoint dp = db::DPoint () + (trans * inst.complex_trans (*arr)).disp ();
       r.draw (db::DEdge (dp, dp), 0, 0, vertex, 0);
     }
-
   }
 }
 
@@ -189,12 +181,11 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
 MarkerBase::MarkerBase (lay::LayoutViewBase *view)
   : lay::ViewObject (view ? view->canvas () : 0),
     m_line_width (-1), m_vertex_size (-1), m_halo (-1), m_text_enabled (true), m_text_frame_enabled (true), m_vertex_shape (lay::ViewOp::Rect), m_line_style (-1), m_dither_pattern (-1), m_frame_pattern (0), mp_view (view)
-{ 
+{
   // .. nothing yet ..
 }
 
-void
-MarkerBase::set_view (LayoutViewBase *view)
+void MarkerBase::set_view (LayoutViewBase *view)
 {
   if (mp_view != view) {
     mp_view = view;
@@ -203,8 +194,7 @@ MarkerBase::set_view (LayoutViewBase *view)
   }
 }
 
-void
-MarkerBase::set_frame_color (tl::Color color)
+void MarkerBase::set_frame_color (tl::Color color)
 {
   if (color != m_frame_color) {
     m_frame_color = color;
@@ -212,8 +202,7 @@ MarkerBase::set_frame_color (tl::Color color)
   }
 }
 
-void 
-MarkerBase::set_color (tl::Color color)
+void MarkerBase::set_color (tl::Color color)
 {
   if (color != m_color) {
     m_color = color;
@@ -221,8 +210,7 @@ MarkerBase::set_color (tl::Color color)
   }
 }
 
-void 
-MarkerBase::set_line_width (int lw)
+void MarkerBase::set_line_width (int lw)
 {
   if (m_line_width != lw) {
     m_line_width = lw;
@@ -230,8 +218,7 @@ MarkerBase::set_line_width (int lw)
   }
 }
 
-void 
-MarkerBase::set_vertex_shape (lay::ViewOp::Shape vs)
+void MarkerBase::set_vertex_shape (lay::ViewOp::Shape vs)
 {
   if (m_vertex_shape != vs) {
     m_vertex_shape = vs;
@@ -239,8 +226,7 @@ MarkerBase::set_vertex_shape (lay::ViewOp::Shape vs)
   }
 }
 
-void 
-MarkerBase::set_vertex_size (int vs)
+void MarkerBase::set_vertex_size (int vs)
 {
   if (m_vertex_size != vs) {
     m_vertex_size = vs;
@@ -248,8 +234,7 @@ MarkerBase::set_vertex_size (int vs)
   }
 }
 
-void 
-MarkerBase::set_halo (int halo)
+void MarkerBase::set_halo (int halo)
 {
   if (m_halo != halo) {
     m_halo = halo;
@@ -257,8 +242,7 @@ MarkerBase::set_halo (int halo)
   }
 }
 
-void
-MarkerBase::set_text_enabled (bool en)
+void MarkerBase::set_text_enabled (bool en)
 {
   if (m_text_enabled != en) {
     m_text_enabled = en;
@@ -266,8 +250,7 @@ MarkerBase::set_text_enabled (bool en)
   }
 }
 
-void
-MarkerBase::set_text_frame_enabled (bool en)
+void MarkerBase::set_text_frame_enabled (bool en)
 {
   if (m_text_frame_enabled != en) {
     m_text_frame_enabled = en;
@@ -275,8 +258,7 @@ MarkerBase::set_text_frame_enabled (bool en)
   }
 }
 
-void
-MarkerBase::set_frame_pattern (int frame_pattern)
+void MarkerBase::set_frame_pattern (int frame_pattern)
 {
   if (m_frame_pattern != frame_pattern) {
     m_frame_pattern = frame_pattern;
@@ -284,8 +266,7 @@ MarkerBase::set_frame_pattern (int frame_pattern)
   }
 }
 
-void 
-MarkerBase::set_dither_pattern (int dither_pattern)
+void MarkerBase::set_dither_pattern (int dither_pattern)
 {
   if (m_dither_pattern != dither_pattern) {
     m_dither_pattern = dither_pattern;
@@ -293,8 +274,7 @@ MarkerBase::set_dither_pattern (int dither_pattern)
   }
 }
 
-void
-MarkerBase::set_line_style (int line_style)
+void MarkerBase::set_line_style (int line_style)
 {
   if (m_line_style != line_style) {
     m_line_style = line_style;
@@ -302,11 +282,10 @@ MarkerBase::set_line_style (int line_style)
   }
 }
 
-void
-MarkerBase::get_bitmaps (const Viewport & /*vp*/, ViewObjectCanvas &canvas, lay::CanvasPlane *&fill, lay::CanvasPlane *&contour, lay::CanvasPlane *&vertex, lay::CanvasPlane *&text)
+void MarkerBase::get_bitmaps (const Viewport & /*vp*/, ViewObjectCanvas &canvas, lay::CanvasPlane *&fill, lay::CanvasPlane *&contour, lay::CanvasPlane *&vertex, lay::CanvasPlane *&text)
 {
   double resolution = canvas.resolution ();
-  int basic_width = int(0.5 + 1.0 / resolution);
+  int basic_width = int (0.5 + 1.0 / resolution);
 
   //  obtain bitmaps
   tl::Color color = m_color;
@@ -330,19 +309,19 @@ MarkerBase::get_bitmaps (const Viewport & /*vp*/, ViewObjectCanvas &canvas, lay:
 
   if (halo) {
 
-    std::vector <lay::ViewOp> ops;
+    std::vector<lay::ViewOp> ops;
     ops.resize (2);
 
     if (dither_pattern >= 0) {
-      ops[0] = lay::ViewOp (canvas.background_color ().rgb (), lay::ViewOp::Copy, 0, (unsigned int) dither_pattern, 0, lay::ViewOp::Rect, 3 * basic_width, 0);
-      ops[1] = lay::ViewOp (color.rgb (), lay::ViewOp::Copy, 0, (unsigned int) dither_pattern, 0, lay::ViewOp::Rect, basic_width, 1);
+      ops [0] = lay::ViewOp (canvas.background_color ().rgb (), lay::ViewOp::Copy, 0, (unsigned int) dither_pattern, 0, lay::ViewOp::Rect, 3 * basic_width, 0);
+      ops [1] = lay::ViewOp (color.rgb (), lay::ViewOp::Copy, 0, (unsigned int) dither_pattern, 0, lay::ViewOp::Rect, basic_width, 1);
       fill = canvas.plane (ops);
     } else {
       fill = 0;
     }
 
-    ops[0] = lay::ViewOp (canvas.background_color ().rgb (), lay::ViewOp::Copy, (unsigned int) line_style, (unsigned int) m_frame_pattern, 0, lay::ViewOp::Rect, line_width > 0 ? (line_width + 2) * basic_width : 0, 0);
-    ops[1] = lay::ViewOp (frame_color.rgb (), lay::ViewOp::Copy, (unsigned int) line_style, (unsigned int) m_frame_pattern, 0, lay::ViewOp::Rect, line_width * basic_width, 1);
+    ops [0] = lay::ViewOp (canvas.background_color ().rgb (), lay::ViewOp::Copy, (unsigned int) line_style, (unsigned int) m_frame_pattern, 0, lay::ViewOp::Rect, line_width > 0 ? (line_width + 2) * basic_width : 0, 0);
+    ops [1] = lay::ViewOp (frame_color.rgb (), lay::ViewOp::Copy, (unsigned int) line_style, (unsigned int) m_frame_pattern, 0, lay::ViewOp::Rect, line_width * basic_width, 1);
     contour = canvas.plane (ops);
 
     if (! m_text_enabled) {
@@ -350,19 +329,19 @@ MarkerBase::get_bitmaps (const Viewport & /*vp*/, ViewObjectCanvas &canvas, lay:
     } else if (line_width == 1) {
       text = contour;
     } else {
-      ops[0] = lay::ViewOp (canvas.background_color ().rgb (), lay::ViewOp::Copy, 0, 0, 0, lay::ViewOp::Rect, 3 * basic_width, 0);
-      ops[1] = lay::ViewOp (frame_color.rgb (), lay::ViewOp::Copy, 0, 0, 0, lay::ViewOp::Rect, basic_width, 1);
+      ops [0] = lay::ViewOp (canvas.background_color ().rgb (), lay::ViewOp::Copy, 0, 0, 0, lay::ViewOp::Rect, 3 * basic_width, 0);
+      ops [1] = lay::ViewOp (frame_color.rgb (), lay::ViewOp::Copy, 0, 0, 0, lay::ViewOp::Rect, basic_width, 1);
       text = canvas.plane (ops);
     }
 
-    if (m_vertex_shape == lay::ViewOp::Rect) { 
-      ops[0] = lay::ViewOp (canvas.background_color ().rgb (), lay::ViewOp::Copy, 0, 0, 0, m_vertex_shape, vertex_size > 0 ? (vertex_size + 2) * basic_width : 0, 0);
-      ops[1] = lay::ViewOp (frame_color.rgb (), lay::ViewOp::Copy, 0, 0, 0, m_vertex_shape, vertex_size * basic_width, 1);
+    if (m_vertex_shape == lay::ViewOp::Rect) {
+      ops [0] = lay::ViewOp (canvas.background_color ().rgb (), lay::ViewOp::Copy, 0, 0, 0, m_vertex_shape, vertex_size > 0 ? (vertex_size + 2) * basic_width : 0, 0);
+      ops [1] = lay::ViewOp (frame_color.rgb (), lay::ViewOp::Copy, 0, 0, 0, m_vertex_shape, vertex_size * basic_width, 1);
       vertex = canvas.plane (ops);
     } else {
-      std::vector <lay::ViewOp> ops1;
+      std::vector<lay::ViewOp> ops1;
       ops1.resize (1);
-      ops1[0] = lay::ViewOp (frame_color.rgb (), lay::ViewOp::Copy, 0, 0, 0, m_vertex_shape, vertex_size * basic_width, 1);
+      ops1 [0] = lay::ViewOp (frame_color.rgb (), lay::ViewOp::Copy, 0, 0, 0, m_vertex_shape, vertex_size * basic_width, 1);
       vertex = canvas.plane (ops1);
     }
 
@@ -383,7 +362,6 @@ MarkerBase::get_bitmaps (const Viewport & /*vp*/, ViewObjectCanvas &canvas, lay:
     } else {
       text = canvas.plane (lay::ViewOp (frame_color.rgb (), lay::ViewOp::Copy, 0, 0, 0, lay::ViewOp::Rect, basic_width));
     }
-
   }
 }
 
@@ -391,7 +369,7 @@ MarkerBase::get_bitmaps (const Viewport & /*vp*/, ViewObjectCanvas &canvas, lay:
 
 GenericMarkerBase::GenericMarkerBase (lay::LayoutViewBase *view, unsigned int cv_index)
   : MarkerBase (view), mp_trans_vector (0), m_cv_index (cv_index)
-{ 
+{
   // .. nothing yet ..
 }
 
@@ -403,8 +381,7 @@ GenericMarkerBase::~GenericMarkerBase ()
   }
 }
 
-void
-GenericMarkerBase::set_trans (const db::CplxTrans &trans)
+void GenericMarkerBase::set_trans (const db::CplxTrans &trans)
 {
   if (! m_trans.equal (trans)) {
     m_trans = trans;
@@ -412,8 +389,7 @@ GenericMarkerBase::set_trans (const db::CplxTrans &trans)
   }
 }
 
-void 
-GenericMarkerBase::set (const db::ICplxTrans &t1)
+void GenericMarkerBase::set (const db::ICplxTrans &t1)
 {
   if (mp_trans_vector) {
     delete mp_trans_vector;
@@ -423,8 +399,7 @@ GenericMarkerBase::set (const db::ICplxTrans &t1)
   redraw ();
 }
 
-void
-GenericMarkerBase::set (const db::DCplxTrans &t1)
+void GenericMarkerBase::set (const db::DCplxTrans &t1)
 {
   if (mp_trans_vector) {
     delete mp_trans_vector;
@@ -435,8 +410,7 @@ GenericMarkerBase::set (const db::DCplxTrans &t1)
   redraw ();
 }
 
-void
-GenericMarkerBase::set (const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+void GenericMarkerBase::set (const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
 {
   if (mp_trans_vector) {
     delete mp_trans_vector;
@@ -451,8 +425,7 @@ GenericMarkerBase::set (const db::ICplxTrans &t1, const std::vector<db::DCplxTra
   redraw ();
 }
 
-void
-GenericMarkerBase::set (const db::DCplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+void GenericMarkerBase::set (const db::DCplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
 {
   if (mp_trans_vector) {
     delete mp_trans_vector;
@@ -476,7 +449,7 @@ GenericMarkerBase::bbox () const
   if (! cv.is_valid ()) {
     return db::DBox ();
   }
-  
+
   if (mp_trans_vector) {
     db::DBox b;
     db::DBox ib = item_bbox ();
@@ -515,7 +488,7 @@ GenericMarkerBase::dbu () const
 
 InstanceMarker::InstanceMarker (LayoutViewBase *view, unsigned int cv_index, bool draw_outline, size_t max_shapes)
   : GenericMarkerBase (view, cv_index), m_draw_outline (draw_outline), m_max_shapes (max_shapes), m_inst ()
-{ 
+{
   // .. nothing yet ..
 }
 
@@ -524,22 +497,19 @@ InstanceMarker::~InstanceMarker ()
   // .. nothing yet ..
 }
 
-void 
-InstanceMarker::set (const db::Instance &instance, const db::ICplxTrans &trans)
+void InstanceMarker::set (const db::Instance &instance, const db::ICplxTrans &trans)
 {
   m_inst = instance;
   GenericMarkerBase::set (trans);
 }
 
-void 
-InstanceMarker::set (const db::Instance &instance, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+void InstanceMarker::set (const db::Instance &instance, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
 {
   m_inst = instance;
   GenericMarkerBase::set (t1, trans);
 }
 
-void 
-InstanceMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
+void InstanceMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
 {
   const db::Layout *ly = layout ();
   if (! ly) {
@@ -567,8 +537,7 @@ InstanceMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
   }
 }
 
-void 
-InstanceMarker::set_draw_outline (bool d)
+void InstanceMarker::set_draw_outline (bool d)
 {
   if (d != m_draw_outline) {
     m_draw_outline = d;
@@ -576,8 +545,7 @@ InstanceMarker::set_draw_outline (bool d)
   }
 }
 
-void 
-InstanceMarker::set_max_shapes (size_t s)
+void InstanceMarker::set_max_shapes (size_t s)
 {
   if (s != m_max_shapes) {
     m_max_shapes = s;
@@ -586,7 +554,7 @@ InstanceMarker::set_max_shapes (size_t s)
 }
 
 db::DBox
-InstanceMarker::item_bbox () const 
+InstanceMarker::item_bbox () const
 {
   const db::Layout *ly = layout ();
   if (! ly) {
@@ -600,7 +568,7 @@ InstanceMarker::item_bbox () const
 
 ShapeMarker::ShapeMarker (LayoutViewBase *view, unsigned int cv_index)
   : GenericMarkerBase (view, cv_index), m_shape ()
-{ 
+{
   // .. nothing yet ..
 }
 
@@ -609,29 +577,26 @@ ShapeMarker::~ShapeMarker ()
   // .. nothing yet ..
 }
 
-void 
-ShapeMarker::set (const db::Shape &shape, const db::ICplxTrans &trans)
+void ShapeMarker::set (const db::Shape &shape, const db::ICplxTrans &trans)
 {
   m_shape = shape;
   GenericMarkerBase::set (trans);
 }
 
-void 
-ShapeMarker::set (const db::Shape &shape, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+void ShapeMarker::set (const db::Shape &shape, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
 {
   m_shape = shape;
   GenericMarkerBase::set (t1, trans);
 }
 
-void 
-ShapeMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
+void ShapeMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
 {
   const db::Layout *ly = layout ();
   if (! ly) {
     return;
   }
 
-  lay::CanvasPlane *fill, *contour, *vertex, *text; 
+  lay::CanvasPlane *fill, *contour, *vertex, *text;
   get_bitmaps (vp, canvas, fill, contour, vertex, text);
   if (contour == 0 && vertex == 0 && fill == 0 && text == 0) {
     return;
@@ -679,7 +644,7 @@ ShapeMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
 }
 
 db::DBox
-ShapeMarker::item_bbox () const 
+ShapeMarker::item_bbox () const
 {
   return db::DBox (m_shape.bbox ());
 }
@@ -687,8 +652,8 @@ ShapeMarker::item_bbox () const
 // ------------------------------------------------------------------------
 
 Marker::Marker (lay::LayoutViewBase *view, unsigned int cv_index, bool draw_outline, size_t max_shapes)
-  : GenericMarkerBase (view, cv_index), m_draw_outline (draw_outline), m_max_shapes (max_shapes) 
-{ 
+  : GenericMarkerBase (view, cv_index), m_draw_outline (draw_outline), m_max_shapes (max_shapes)
+{
   m_type = None;
   m_object.any = 0;
 }
@@ -698,15 +663,13 @@ Marker::~Marker ()
   remove_object ();
 }
 
-void
-Marker::set ()
+void Marker::set ()
 {
   remove_object ();
   redraw ();
 }
 
-void 
-Marker::set (const db::Box &box, const db::ICplxTrans &trans)
+void Marker::set (const db::Box &box, const db::ICplxTrans &trans)
 {
   remove_object ();
 
@@ -716,8 +679,7 @@ Marker::set (const db::Box &box, const db::ICplxTrans &trans)
   GenericMarkerBase::set (trans);
 }
 
-void 
-Marker::set (const db::DBox &box, const db::DCplxTrans &trans)
+void Marker::set (const db::DBox &box, const db::DCplxTrans &trans)
 {
   remove_object ();
 
@@ -727,8 +689,7 @@ Marker::set (const db::DBox &box, const db::DCplxTrans &trans)
   GenericMarkerBase::set (trans);
 }
 
-void 
-Marker::set (const db::DBox &box, const db::DCplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+void Marker::set (const db::DBox &box, const db::DCplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
 {
   remove_object ();
 
@@ -738,8 +699,7 @@ Marker::set (const db::DBox &box, const db::DCplxTrans &t1, const std::vector<db
   GenericMarkerBase::set (t1, trans);
 }
 
-void 
-Marker::set (const db::Box &box, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+void Marker::set (const db::Box &box, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
 {
   remove_object ();
 
@@ -749,8 +709,7 @@ Marker::set (const db::Box &box, const db::ICplxTrans &t1, const std::vector<db:
   GenericMarkerBase::set (t1, trans);
 }
 
-void 
-Marker::set (const db::Polygon &poly, const db::ICplxTrans &trans)
+void Marker::set (const db::Polygon &poly, const db::ICplxTrans &trans)
 {
   remove_object ();
 
@@ -760,8 +719,7 @@ Marker::set (const db::Polygon &poly, const db::ICplxTrans &trans)
   GenericMarkerBase::set (trans);
 }
 
-void 
-Marker::set (const db::Polygon &poly, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+void Marker::set (const db::Polygon &poly, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
 {
   remove_object ();
 
@@ -771,8 +729,7 @@ Marker::set (const db::Polygon &poly, const db::ICplxTrans &t1, const std::vecto
   GenericMarkerBase::set (t1, trans);
 }
 
-void
-Marker::set (const db::PolygonRef &poly, const db::ICplxTrans &trans)
+void Marker::set (const db::PolygonRef &poly, const db::ICplxTrans &trans)
 {
   remove_object ();
 
@@ -782,8 +739,7 @@ Marker::set (const db::PolygonRef &poly, const db::ICplxTrans &trans)
   GenericMarkerBase::set (trans);
 }
 
-void
-Marker::set (const db::PolygonRef &poly, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+void Marker::set (const db::PolygonRef &poly, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
 {
   remove_object ();
 
@@ -793,8 +749,7 @@ Marker::set (const db::PolygonRef &poly, const db::ICplxTrans &t1, const std::ve
   GenericMarkerBase::set (t1, trans);
 }
 
-void
-Marker::set (const db::DPolygon &poly, const db::DCplxTrans &trans)
+void Marker::set (const db::DPolygon &poly, const db::DCplxTrans &trans)
 {
   remove_object ();
 
@@ -804,8 +759,7 @@ Marker::set (const db::DPolygon &poly, const db::DCplxTrans &trans)
   GenericMarkerBase::set (trans);
 }
 
-void 
-Marker::set (const db::DPolygon &poly, const db::DCplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+void Marker::set (const db::DPolygon &poly, const db::DCplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
 {
   remove_object ();
 
@@ -815,8 +769,7 @@ Marker::set (const db::DPolygon &poly, const db::DCplxTrans &t1, const std::vect
   GenericMarkerBase::set (t1, trans);
 }
 
-void 
-Marker::set (const db::EdgePair &edge_pair, const db::ICplxTrans &trans)
+void Marker::set (const db::EdgePair &edge_pair, const db::ICplxTrans &trans)
 {
   remove_object ();
 
@@ -826,8 +779,7 @@ Marker::set (const db::EdgePair &edge_pair, const db::ICplxTrans &trans)
   GenericMarkerBase::set (trans);
 }
 
-void 
-Marker::set (const db::EdgePair &edge_pair, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+void Marker::set (const db::EdgePair &edge_pair, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
 {
   remove_object ();
 
@@ -837,8 +789,7 @@ Marker::set (const db::EdgePair &edge_pair, const db::ICplxTrans &t1, const std:
   GenericMarkerBase::set (t1, trans);
 }
 
-void 
-Marker::set (const db::DEdgePair &edge_pair, const db::DCplxTrans &trans)
+void Marker::set (const db::DEdgePair &edge_pair, const db::DCplxTrans &trans)
 {
   remove_object ();
 
@@ -848,8 +799,7 @@ Marker::set (const db::DEdgePair &edge_pair, const db::DCplxTrans &trans)
   GenericMarkerBase::set (trans);
 }
 
-void 
-Marker::set (const db::DEdgePair &edge_pair, const db::DCplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+void Marker::set (const db::DEdgePair &edge_pair, const db::DCplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
 {
   remove_object ();
 
@@ -859,8 +809,7 @@ Marker::set (const db::DEdgePair &edge_pair, const db::DCplxTrans &t1, const std
   GenericMarkerBase::set (t1, trans);
 }
 
-void 
-Marker::set (const db::Edge &edge, const db::ICplxTrans &trans)
+void Marker::set (const db::Edge &edge, const db::ICplxTrans &trans)
 {
   remove_object ();
 
@@ -870,8 +819,7 @@ Marker::set (const db::Edge &edge, const db::ICplxTrans &trans)
   GenericMarkerBase::set (trans);
 }
 
-void 
-Marker::set (const db::Edge &edge, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+void Marker::set (const db::Edge &edge, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
 {
   remove_object ();
 
@@ -881,8 +829,7 @@ Marker::set (const db::Edge &edge, const db::ICplxTrans &t1, const std::vector<d
   GenericMarkerBase::set (t1, trans);
 }
 
-void 
-Marker::set (const db::DEdge &edge, const db::DCplxTrans &trans)
+void Marker::set (const db::DEdge &edge, const db::DCplxTrans &trans)
 {
   remove_object ();
 
@@ -892,8 +839,7 @@ Marker::set (const db::DEdge &edge, const db::DCplxTrans &trans)
   GenericMarkerBase::set (trans);
 }
 
-void 
-Marker::set (const db::DEdge &edge, const db::DCplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+void Marker::set (const db::DEdge &edge, const db::DCplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
 {
   remove_object ();
 
@@ -903,8 +849,7 @@ Marker::set (const db::DEdge &edge, const db::DCplxTrans &t1, const std::vector<
   GenericMarkerBase::set (t1, trans);
 }
 
-void 
-Marker::set (const db::Path &path, const db::ICplxTrans &trans)
+void Marker::set (const db::Path &path, const db::ICplxTrans &trans)
 {
   remove_object ();
 
@@ -914,8 +859,7 @@ Marker::set (const db::Path &path, const db::ICplxTrans &trans)
   GenericMarkerBase::set (trans);
 }
 
-void 
-Marker::set (const db::Path &path, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+void Marker::set (const db::Path &path, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
 {
   remove_object ();
 
@@ -925,8 +869,7 @@ Marker::set (const db::Path &path, const db::ICplxTrans &t1, const std::vector<d
   GenericMarkerBase::set (t1, trans);
 }
 
-void 
-Marker::set (const db::DPath &path, const db::DCplxTrans &trans)
+void Marker::set (const db::DPath &path, const db::DCplxTrans &trans)
 {
   remove_object ();
 
@@ -936,8 +879,7 @@ Marker::set (const db::DPath &path, const db::DCplxTrans &trans)
   GenericMarkerBase::set (trans);
 }
 
-void 
-Marker::set (const db::DPath &path, const db::DCplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+void Marker::set (const db::DPath &path, const db::DCplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
 {
   remove_object ();
 
@@ -947,8 +889,7 @@ Marker::set (const db::DPath &path, const db::DCplxTrans &t1, const std::vector<
   GenericMarkerBase::set (t1, trans);
 }
 
-void 
-Marker::set (const db::Text &text, const db::ICplxTrans &trans)
+void Marker::set (const db::Text &text, const db::ICplxTrans &trans)
 {
   remove_object ();
 
@@ -958,8 +899,7 @@ Marker::set (const db::Text &text, const db::ICplxTrans &trans)
   GenericMarkerBase::set (trans);
 }
 
-void 
-Marker::set (const db::Text &text, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+void Marker::set (const db::Text &text, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
 {
   remove_object ();
 
@@ -969,8 +909,7 @@ Marker::set (const db::Text &text, const db::ICplxTrans &t1, const std::vector<d
   GenericMarkerBase::set (t1, trans);
 }
 
-void 
-Marker::set (const db::DText &text, const db::DCplxTrans &trans)
+void Marker::set (const db::DText &text, const db::DCplxTrans &trans)
 {
   remove_object ();
 
@@ -980,8 +919,7 @@ Marker::set (const db::DText &text, const db::DCplxTrans &trans)
   GenericMarkerBase::set (trans);
 }
 
-void 
-Marker::set (const db::DText &text, const db::DCplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+void Marker::set (const db::DText &text, const db::DCplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
 {
   remove_object ();
 
@@ -991,8 +929,7 @@ Marker::set (const db::DText &text, const db::DCplxTrans &t1, const std::vector<
   GenericMarkerBase::set (t1, trans);
 }
 
-void 
-Marker::set (const db::CellInstArray &instance, const db::ICplxTrans &trans)
+void Marker::set (const db::CellInstArray &instance, const db::ICplxTrans &trans)
 {
   remove_object ();
 
@@ -1002,8 +939,7 @@ Marker::set (const db::CellInstArray &instance, const db::ICplxTrans &trans)
   GenericMarkerBase::set (trans);
 }
 
-void 
-Marker::set (const db::CellInstArray &instance, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+void Marker::set (const db::CellInstArray &instance, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
 {
   remove_object ();
 
@@ -1013,8 +949,7 @@ Marker::set (const db::CellInstArray &instance, const db::ICplxTrans &t1, const 
   GenericMarkerBase::set (t1, trans);
 }
 
-void 
-Marker::set_draw_outline (bool d)
+void Marker::set_draw_outline (bool d)
 {
   if (d != m_draw_outline) {
     m_draw_outline = d;
@@ -1022,8 +957,7 @@ Marker::set_draw_outline (bool d)
   }
 }
 
-void 
-Marker::set_max_shapes (size_t s)
+void Marker::set_max_shapes (size_t s)
 {
   if (s != m_max_shapes) {
     m_max_shapes = s;
@@ -1063,14 +997,13 @@ Marker::item_bbox () const
   } else if (m_type == Instance) {
     const db::Layout *ly = layout ();
     if (ly) {
-      return db::DBox (m_object.inst->bbox (db::box_convert <db::CellInst, false> (*ly)));
+      return db::DBox (m_object.inst->bbox (db::box_convert<db::CellInst, false> (*ly)));
     }
   }
   return db::DBox ();
 }
 
-void
-Marker::remove_object ()
+void Marker::remove_object ()
 {
   if (m_type == Box) {
     delete m_object.box;
@@ -1100,14 +1033,13 @@ Marker::remove_object ()
     delete m_object.dtext;
   } else if (m_type == Instance) {
     delete m_object.inst;
-  } 
+  }
 
   m_type = None;
   m_object.any = 0;
 }
 
-void 
-Marker::draw (lay::Renderer &r, const db::CplxTrans &t, lay::CanvasPlane *fill, lay::CanvasPlane *contour, lay::CanvasPlane *vertex, lay::CanvasPlane *text)
+void Marker::draw (lay::Renderer &r, const db::CplxTrans &t, lay::CanvasPlane *fill, lay::CanvasPlane *contour, lay::CanvasPlane *vertex, lay::CanvasPlane *text)
 {
   if (m_type == Box) {
     r.draw (*m_object.box, t, fill, contour, vertex, text);
@@ -1159,10 +1091,9 @@ Marker::draw (lay::Renderer &r, const db::CplxTrans &t, lay::CanvasPlane *fill, 
   }
 }
 
-void 
-Marker::render (const Viewport &vp, ViewObjectCanvas &canvas)
-{ 
-  lay::CanvasPlane *fill, *contour, *vertex, *text; 
+void Marker::render (const Viewport &vp, ViewObjectCanvas &canvas)
+{
+  lay::CanvasPlane *fill, *contour, *vertex, *text;
   get_bitmaps (vp, canvas, fill, contour, vertex, text);
   if (contour == 0 && vertex == 0 && fill == 0 && text == 0) {
     return;
@@ -1190,7 +1121,7 @@ Marker::render (const Viewport &vp, ViewObjectCanvas &canvas)
 
 DMarker::DMarker (LayoutViewBase *view)
   : MarkerBase (view)
-{ 
+{
   m_type = None;
   m_object.any = 0;
 }
@@ -1200,8 +1131,7 @@ DMarker::~DMarker ()
   remove_object ();
 }
 
-void 
-DMarker::set (const db::DBox &box)
+void DMarker::set (const db::DBox &box)
 {
   remove_object ();
 
@@ -1211,8 +1141,7 @@ DMarker::set (const db::DBox &box)
   redraw ();
 }
 
-void 
-DMarker::set (const db::DPolygon &poly)
+void DMarker::set (const db::DPolygon &poly)
 {
   remove_object ();
 
@@ -1222,8 +1151,7 @@ DMarker::set (const db::DPolygon &poly)
   redraw ();
 }
 
-void 
-DMarker::set (const db::DEdgePair &edge_pair)
+void DMarker::set (const db::DEdgePair &edge_pair)
 {
   remove_object ();
 
@@ -1233,8 +1161,7 @@ DMarker::set (const db::DEdgePair &edge_pair)
   redraw ();
 }
 
-void 
-DMarker::set (const db::DEdge &edge)
+void DMarker::set (const db::DEdge &edge)
 {
   remove_object ();
 
@@ -1244,8 +1171,7 @@ DMarker::set (const db::DEdge &edge)
   redraw ();
 }
 
-void 
-DMarker::set (const db::DPath &path)
+void DMarker::set (const db::DPath &path)
 {
   remove_object ();
 
@@ -1255,8 +1181,7 @@ DMarker::set (const db::DPath &path)
   redraw ();
 }
 
-void 
-DMarker::set (const db::DText &text)
+void DMarker::set (const db::DText &text)
 {
   remove_object ();
 
@@ -1286,8 +1211,7 @@ DMarker::bbox () const
   }
 }
 
-void
-DMarker::remove_object ()
+void DMarker::remove_object ()
 {
   if (m_type == Box) {
     delete m_object.box;
@@ -1301,16 +1225,15 @@ DMarker::remove_object ()
     delete m_object.path;
   } else if (m_type == Text) {
     delete m_object.text;
-  } 
+  }
 
   m_type = None;
   m_object.any = 0;
 }
 
-void 
-DMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
-{ 
-  lay::CanvasPlane *fill, *contour, *vertex, *text; 
+void DMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
+{
+  lay::CanvasPlane *fill, *contour, *vertex, *text;
   get_bitmaps (vp, canvas, fill, contour, vertex, text);
   if (contour == 0 && vertex == 0 && fill == 0 && text == 0) {
     return;
@@ -1349,8 +1272,6 @@ DMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
     db::DPolygon poly = m_object.edge_pair->normalized ().to_polygon (0);
     r.draw (poly, t, fill, 0, 0, 0);
   }
-
 }
 
 }
-

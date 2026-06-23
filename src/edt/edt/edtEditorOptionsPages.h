@@ -40,22 +40,22 @@ class QHBoxLayout;
 
 namespace Ui
 {
-  class EditorOptionsDialog;
-  class EditorOptionsGeneric;
-  class EditorOptionsPolygon;
-  class EditorOptionsBox;
-  class EditorOptionsPath;
-  class EditorOptionsText;
-  class EditorOptionsInst;
-  class EditorOptionsInstPCellParam;
+class EditorOptionsDialog;
+class EditorOptionsGeneric;
+class EditorOptionsPolygon;
+class EditorOptionsBox;
+class EditorOptionsPath;
+class EditorOptionsText;
+class EditorOptionsInst;
+class EditorOptionsInstPCellParam;
 }
 
 namespace lay
 {
-  class Dispatcher;
-  class LayoutViewBase;
-  class Plugin;
-  class DecoratedLineEdit;
+class Dispatcher;
+class LayoutViewBase;
+class Plugin;
+class DecoratedLineEdit;
 }
 
 namespace edt
@@ -69,7 +69,7 @@ class PCellParametersPage;
 class EditorOptionsGeneric
   : public lay::EditorOptionsPageWidget
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   EditorOptionsGeneric (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
@@ -113,7 +113,7 @@ private:
 class EditorOptionsPath
   : public lay::EditorOptionsPageWidget
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
   EditorOptionsPath (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
@@ -137,7 +137,7 @@ private:
 class EditorOptionsInst
   : public lay::EditorOptionsPageWidget
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
   EditorOptionsInst (lay::LayoutViewBase *view, lay::Dispatcher *root);
@@ -169,7 +169,7 @@ private:
 class EditorOptionsInstPCellParam
   : public lay::EditorOptionsPageWidget
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   EditorOptionsInstPCellParam (lay::LayoutViewBase *view, lay::Dispatcher *root);
@@ -190,7 +190,7 @@ private:
   int m_cv_index;
   std::string m_lib_name, m_cell_name;
 
-  void update_pcell_parameters (const std::vector <tl::Variant> &parameters);
+  void update_pcell_parameters (const std::vector<tl::Variant> &parameters);
   virtual void technology_changed (const std::string &);
 };
 
@@ -200,7 +200,7 @@ private:
 class BoxToolboxWidget
   : public lay::EditorOptionsPageWidget
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   BoxToolboxWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
@@ -223,7 +223,7 @@ private:
 class ConnectionToolboxWidget
   : public lay::EditorOptionsPageWidget
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   ConnectionToolboxWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
@@ -247,7 +247,7 @@ private:
 class PathConnectionToolboxWidget
   : public lay::EditorOptionsPageWidget
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   PathConnectionToolboxWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
@@ -271,7 +271,7 @@ private:
 class TextToolboxWidget
   : public lay::EditorOptionsPageWidget
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   TextToolboxWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);

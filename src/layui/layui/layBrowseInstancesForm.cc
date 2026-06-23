@@ -59,7 +59,7 @@ class BrowseInstancesPluginDeclaration
   : public lay::PluginDeclaration
 {
 public:
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> &options) const
   {
     options.push_back (std::pair<std::string, std::string> (cfg_cib_context_cell, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_cib_context_mode, "any-top"));
@@ -72,7 +72,7 @@ public:
   virtual lay::ConfigPage *config_page (QWidget *parent, std::string &title) const
   {
     title = tl::to_string (QObject::tr ("Browsers|Cell Instance Browser"));
-    return new BrowseInstancesConfigPage (parent); 
+    return new BrowseInstancesConfigPage (parent);
   }
 
   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
@@ -99,10 +99,9 @@ static struct {
   BrowseInstancesForm::mode_type mode;
   const char *string;
 } context_modes [] = {
-  { BrowseInstancesForm::AnyTop,      "any-top"    },
-  { BrowseInstancesForm::Parent,      "parent"     },
-  { BrowseInstancesForm::ToCellView,  "given-cell" }
-};
+  {BrowseInstancesForm::AnyTop, "any-top"},
+  {BrowseInstancesForm::Parent, "parent"},
+  {BrowseInstancesForm::ToCellView, "given-cell"}};
 
 class BrowseInstancesContextModeConverter
 {
@@ -119,7 +118,7 @@ public:
     throw tl::Exception (tl::to_string (QObject::tr ("Invalid cell browser context mode: ")) + value);
   }
 
-  std::string 
+  std::string
   to_string (BrowseInstancesForm::mode_type mode)
   {
     for (unsigned int i = 0; i < sizeof (context_modes) / sizeof (context_modes [0]); ++i) {
@@ -135,12 +134,11 @@ static struct {
   BrowseInstancesForm::window_type mode;
   const char *string;
 } window_modes [] = {
-  { BrowseInstancesForm::DontChange,    "dont-change" },
-  { BrowseInstancesForm::FitCell,       "fit-cell"    },
-  { BrowseInstancesForm::FitMarker,     "fit-marker"  },
-  { BrowseInstancesForm::Center,        "center"      },
-  { BrowseInstancesForm::CenterSize,    "center-size" }
-};
+  {BrowseInstancesForm::DontChange, "dont-change"},
+  {BrowseInstancesForm::FitCell, "fit-cell"},
+  {BrowseInstancesForm::FitMarker, "fit-marker"},
+  {BrowseInstancesForm::Center, "center"},
+  {BrowseInstancesForm::CenterSize, "center-size"}};
 
 class BrowseInstancesWindowModeConverter
 {
@@ -157,7 +155,7 @@ public:
     throw tl::Exception (tl::to_string (QObject::tr ("Invalid cell browser window mode: ")) + value);
   }
 
-  std::string 
+  std::string
   to_string (BrowseInstancesForm::window_type mode)
   {
     for (unsigned int i = 0; i < sizeof (window_modes) / sizeof (window_modes [0]); ++i) {
@@ -180,8 +178,7 @@ BrowseInstancesConfigPage::BrowseInstancesConfigPage (QWidget *parent)
   connect (cbx_window, SIGNAL (currentIndexChanged (int)), this, SLOT (window_changed (int)));
 }
 
-void 
-BrowseInstancesConfigPage::setup (lay::Dispatcher *root)
+void BrowseInstancesConfigPage::setup (lay::Dispatcher *root)
 {
   std::string value;
 
@@ -203,7 +200,7 @@ BrowseInstancesConfigPage::setup (lay::Dispatcher *root)
   std::string wdim_str;
   root->config_get (cfg_cib_window_dim, wdim_str);
   mrg_window->set_margin (lay::Margin::from_string (wdim_str));
-    
+
   //  max. instance count
   unsigned int max_inst_count = 1000;
   root->config_get (cfg_cib_max_inst_count, max_inst_count);
@@ -214,20 +211,17 @@ BrowseInstancesConfigPage::setup (lay::Dispatcher *root)
   window_changed (int (wmode));
 }
 
-void
-BrowseInstancesConfigPage::context_changed (int m)
+void BrowseInstancesConfigPage::context_changed (int m)
 {
   le_cell_name->setEnabled (m == int (BrowseInstancesForm::ToCellView));
 }
 
-void
-BrowseInstancesConfigPage::window_changed (int m)
+void BrowseInstancesConfigPage::window_changed (int m)
 {
   mrg_window->setEnabled (m == int (BrowseInstancesForm::FitMarker) || m == int (BrowseInstancesForm::CenterSize));
 }
 
-void 
-BrowseInstancesConfigPage::commit (lay::Dispatcher *root)
+void BrowseInstancesConfigPage::commit (lay::Dispatcher *root)
 {
   unsigned int max_inst_count = 1000;
   tl::from_string_ext (tl::to_string (le_max_count->text ()), max_inst_count);
@@ -293,7 +287,7 @@ private:
 // ------------------------------------------------------------
 
 BrowseInstancesForm::BrowseInstancesForm (lay::Dispatcher *root, LayoutViewBase *vw)
-  : lay::Browser (root, vw), 
+  : lay::Browser (root, vw),
     Ui::BrowseInstancesForm (),
     m_cv_index (0),
     m_cell_index (0),
@@ -315,18 +309,17 @@ BrowseInstancesForm::BrowseInstancesForm (lay::Dispatcher *root, LayoutViewBase 
   lv_cell_instance->setUniformRowHeights (true);
 
   //  signals and slots connections
-  connect (lv_cell, SIGNAL (currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT (cell_changed(QTreeWidgetItem*, QTreeWidgetItem*)));
-  connect (lv_cell_instance, SIGNAL (itemSelectionChanged()), this, SLOT (cell_inst_changed()));
-  connect (pb_next_cell, SIGNAL (clicked()), this, SLOT (next_cell()));
-  connect (pb_prev_cell, SIGNAL (clicked()), this, SLOT (prev_cell()));
-  connect (pb_next_inst, SIGNAL (clicked()), this, SLOT (next_inst()));
-  connect (pb_prev_inst, SIGNAL (clicked()), this, SLOT (prev_inst()));
+  connect (lv_cell, SIGNAL (currentItemChanged (QTreeWidgetItem *, QTreeWidgetItem *)), this, SLOT (cell_changed (QTreeWidgetItem *, QTreeWidgetItem *)));
+  connect (lv_cell_instance, SIGNAL (itemSelectionChanged ()), this, SLOT (cell_inst_changed ()));
+  connect (pb_next_cell, SIGNAL (clicked ()), this, SLOT (next_cell ()));
+  connect (pb_prev_cell, SIGNAL (clicked ()), this, SLOT (prev_cell ()));
+  connect (pb_next_inst, SIGNAL (clicked ()), this, SLOT (next_inst ()));
+  connect (pb_prev_inst, SIGNAL (clicked ()), this, SLOT (prev_inst ()));
   connect (configureButton, SIGNAL (clicked ()), this, SLOT (configure ()));
   connect (chooseCellButton, SIGNAL (clicked ()), this, SLOT (choose_cell_pressed ()));
 }
 
-void 
-BrowseInstancesForm::menu_activated (const std::string &symbol)
+void BrowseInstancesForm::menu_activated (const std::string &symbol)
 {
   if (symbol == "browse_instances::show") {
     view ()->deactivate_all_browsers ();
@@ -336,8 +329,7 @@ BrowseInstancesForm::menu_activated (const std::string &symbol)
   }
 }
 
-void
-BrowseInstancesForm::configure ()
+void BrowseInstancesForm::configure ()
 {
   lay::ConfigurationDialog config_dialog (this, root (), "BrowseInstancesPlugin");
   config_dialog.exec ();
@@ -348,19 +340,17 @@ BrowseInstancesForm::~BrowseInstancesForm ()
   remove_marker ();
 }
 
-void
-BrowseInstancesForm::choose_cell_pressed ()
+void BrowseInstancesForm::choose_cell_pressed ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   CellSelectionForm form (this, view (), "browse_cell", true /*simple mode*/);
   if (form.exec ()) {
     change_cell (form.selected_cellview ().cell_index (), form.selected_cellview_index ());
   }
-END_PROTECTED
+  END_PROTECTED
 }
 
-bool 
-BrowseInstancesForm::configure (const std::string &name, const std::string &value)
+bool BrowseInstancesForm::configure (const std::string &name, const std::string &value)
 {
   bool need_update = false;
   bool taken = true;
@@ -413,8 +403,7 @@ BrowseInstancesForm::configure (const std::string &name, const std::string &valu
   return taken;
 }
 
-void
-BrowseInstancesForm::remove_marker ()
+void BrowseInstancesForm::remove_marker ()
 {
   for (std::vector<lay::Marker *>::const_iterator m = mp_markers.begin (); m != mp_markers.end (); ++m) {
     delete *m;
@@ -422,8 +411,7 @@ BrowseInstancesForm::remove_marker ()
   mp_markers.clear ();
 }
 
-void 
-BrowseInstancesForm::cell_changed (QTreeWidgetItem *item, QTreeWidgetItem *)
+void BrowseInstancesForm::cell_changed (QTreeWidgetItem *item, QTreeWidgetItem *)
 {
   lv_cell_instance->clear ();
 
@@ -431,24 +419,24 @@ BrowseInstancesForm::cell_changed (QTreeWidgetItem *item, QTreeWidgetItem *)
     return;
   }
 
-  std::vector <const db::Cell *> parents;
+  std::vector<const db::Cell *> parents;
 
   const db::Layout &layout = m_context_cv->layout ();
   const db::Cell &cell = layout.cell (m_cell_index);
 
-  BrowseInstancesFormCellLVI *it = dynamic_cast <BrowseInstancesFormCellLVI *> (item);
+  BrowseInstancesFormCellLVI *it = dynamic_cast<BrowseInstancesFormCellLVI *> (item);
   if (! it) {
 
     //  "All item" - fetch the parents of all other items
     for (QList<QTreeWidgetItem *>::const_iterator i = m_items.begin (); i != m_items.end (); ++i) {
-      BrowseInstancesFormCellLVI *it = dynamic_cast <BrowseInstancesFormCellLVI *> (*i);
+      BrowseInstancesFormCellLVI *it = dynamic_cast<BrowseInstancesFormCellLVI *> (*i);
       if (it) {
-        parents.push_back (& layout.cell (it->index ()));
+        parents.push_back (&layout.cell (it->index ()));
       }
     }
 
   } else {
-    parents.push_back (& layout.cell (it->index ()));
+    parents.push_back (&layout.cell (it->index ()));
   }
 
   m_cell_inst_changed_enabled = false;
@@ -459,7 +447,7 @@ BrowseInstancesForm::cell_changed (QTreeWidgetItem *item, QTreeWidgetItem *)
 
   bool shortened = false;
 
-  for (std::vector <const db::Cell *>::const_iterator parent = parents.begin (); parent != parents.end () && ! shortened; ++parent) {
+  for (std::vector<const db::Cell *>::const_iterator parent = parents.begin (); parent != parents.end () && ! shortened; ++parent) {
     if (m_mode == AnyTop) {
       shortened = fill_cell_instances (db::ICplxTrans (), layout, *parent, &cell, 0, false, std::string (), items);
     } else if (m_mode == ToCellView) {
@@ -489,11 +477,9 @@ BrowseInstancesForm::cell_changed (QTreeWidgetItem *item, QTreeWidgetItem *)
   m_cell_inst_changed_enabled = true;
 
   highlight_current ();
-
 }
 
-void 
-BrowseInstancesForm::cell_inst_changed ()
+void BrowseInstancesForm::cell_inst_changed ()
 {
   if (m_cell_inst_changed_enabled) {
     highlight_current ();
@@ -503,15 +489,14 @@ BrowseInstancesForm::cell_inst_changed ()
 //  A helper structure to hold all information relevant to the cells to
 //  show
 
-struct BrowseInstancesCellInfo 
-{
+struct BrowseInstancesCellInfo {
   BrowseInstancesCellInfo (const std::string &n, lay::CellView::cell_index_type i)
     : name (n), cell_index (i), count (0), count_flat (0)
   {
     // ..
   }
 
-  bool operator< (const BrowseInstancesCellInfo &d) const 
+  bool operator< (const BrowseInstancesCellInfo &d) const
   {
     return name < d.name;
   }
@@ -521,8 +506,7 @@ struct BrowseInstancesCellInfo
   size_t count, count_flat;
 };
 
-void 
-BrowseInstancesForm::activated ()
+void BrowseInstancesForm::activated ()
 {
   view ()->save_view (m_display_state);
 
@@ -545,8 +529,7 @@ BrowseInstancesForm::activated ()
   change_cell (path.back (), cv_index);
 }
 
-void 
-BrowseInstancesForm::change_cell (db::cell_index_type cell_index, int cv_index)
+void BrowseInstancesForm::change_cell (db::cell_index_type cell_index, int cv_index)
 {
   //  obtain active cellview index and cell index
   m_cv_index = cv_index;
@@ -576,8 +559,8 @@ BrowseInstancesForm::change_cell (db::cell_index_type cell_index, int cv_index)
 
   m_cell_changed_enabled = false;
 
-  //  obtain all cell names, sort and fill into the lv_cell  
-  std::vector <BrowseInstancesCellInfo> cell_info;
+  //  obtain all cell names, sort and fill into the lv_cell
+  std::vector<BrowseInstancesCellInfo> cell_info;
 
   db::CellCounter counter (&layout);
 
@@ -588,7 +571,7 @@ BrowseInstancesForm::change_cell (db::cell_index_type cell_index, int cv_index)
   size_t w = 0;
   lay::CellView::cell_index_type ci = 0;
   for (db::Cell::parent_inst_iterator p = cell.begin_parent_insts (); ! p.at_end (); ++p) {
-    if (! ci_set || p->parent_cell_index () != ci) { 
+    if (! ci_set || p->parent_cell_index () != ci) {
       ci = p->parent_cell_index ();
       ci_set = true;
       w = counter.weight (ci);
@@ -601,7 +584,7 @@ BrowseInstancesForm::change_cell (db::cell_index_type cell_index, int cv_index)
     tot_count_flat += c * w;
   }
 
-  tl::sort (cell_info.begin (), cell_info.end ()); 
+  tl::sort (cell_info.begin (), cell_info.end ());
 
   QTreeWidgetItem *all = new QTreeWidgetItem (lv_cell);
   all->setText (0, QObject::tr ("(All Instances)"));
@@ -655,12 +638,11 @@ BrowseInstancesForm::change_cell (db::cell_index_type cell_index, int cv_index)
   m_view_changed = false;
 }
 
-void
-BrowseInstancesForm::deactivated ()
+void BrowseInstancesForm::deactivated ()
 {
   root ()->config_set (cfg_cib_window_state, lay::save_dialog_state (this));
 
-  //  remove the cellview reference and clean up everything that could reference 
+  //  remove the cellview reference and clean up everything that could reference
   //  database objects
   lv_cell->clear ();
   lv_cell_instance->clear ();
@@ -673,8 +655,7 @@ BrowseInstancesForm::deactivated ()
   remove_marker ();
 }
 
-bool 
-BrowseInstancesForm::fill_cell_instances (const db::ICplxTrans &t, const db::Layout &layout, const db::Cell *parent, const db::Cell *from, const db::Cell *to, bool to_parent, const std::string &path, QList<QTreeWidgetItem *> &items)
+bool BrowseInstancesForm::fill_cell_instances (const db::ICplxTrans &t, const db::Layout &layout, const db::Cell *parent, const db::Cell *from, const db::Cell *to, bool to_parent, const std::string &path, QList<QTreeWidgetItem *> &items)
 {
   if (from == to || (! to_parent && to == 0 && from->is_top ())) {
 
@@ -727,21 +708,17 @@ BrowseInstancesForm::fill_cell_instances (const db::ICplxTrans &t, const db::Lay
       }
 
       db::ICplxTrans tt (parent_inst.complex_trans ());
-      const db::Cell *cell = & layout.cell (p->parent_cell_index ());
+      const db::Cell *cell = &layout.cell (p->parent_cell_index ());
       if (fill_cell_instances (tt.inverted () * t, layout, 0, cell, to_parent ? cell : to, false, new_path, items)) {
         return true; // list too long - no more entries possible
       }
-
     }
-
   }
 
   return false;
-
 }
 
-void 
-BrowseInstancesForm::highlight_current ()
+void BrowseInstancesForm::highlight_current ()
 {
   remove_marker ();
 
@@ -753,7 +730,7 @@ BrowseInstancesForm::highlight_current ()
   QList<QTreeWidgetItem *> selected_items = lv_cell_instance->selectedItems ();
   for (QList<QTreeWidgetItem *>::const_iterator s = selected_items.begin (); s != selected_items.end (); ++s) {
 
-    BrowseInstancesFormCellInstanceLVI *inst_item = dynamic_cast <BrowseInstancesFormCellInstanceLVI *> (*s);
+    BrowseInstancesFormCellInstanceLVI *inst_item = dynamic_cast<BrowseInstancesFormCellInstanceLVI *> (*s);
     if (inst_item) {
 
       if (! index_set) {
@@ -774,11 +751,8 @@ BrowseInstancesForm::highlight_current ()
         for (std::vector<db::DCplxTrans>::const_iterator gt = m_global_trans.begin (); gt != m_global_trans.end (); ++gt) {
           dbox += (*gt * db::CplxTrans (layout.dbu ()) * inst_item->trans ()) * box;
         }
-
       }
-   
     }
-
   }
 
   if (index_set) {
@@ -801,20 +775,17 @@ BrowseInstancesForm::highlight_current ()
     }
 
     m_view_changed = true;
-
   }
-
 }
 
 
-bool
-BrowseInstancesForm::adv_cell (bool up)
+bool BrowseInstancesForm::adv_cell (bool up)
 {
   QTreeWidgetItem *current = lv_cell->currentItem ();
   int i = lv_cell->indexOfTopLevelItem (current);
   if (i >= 0) {
     QTreeWidgetItem *next = lv_cell->topLevelItem (i + (up ? -1 : 1));
-    if (next && dynamic_cast <BrowseInstancesFormCellLVI *> (next)) {
+    if (next && dynamic_cast<BrowseInstancesFormCellLVI *> (next)) {
       lv_cell->setCurrentItem (next);
       lv_cell->scrollToItem (next);
       return true;
@@ -823,26 +794,23 @@ BrowseInstancesForm::adv_cell (bool up)
   return false;
 }
 
-void
-BrowseInstancesForm::next_cell ()
+void BrowseInstancesForm::next_cell ()
 {
   lv_cell->setFocus ();
   adv_cell (false);
 }
 
-void
-BrowseInstancesForm::prev_cell ()
+void BrowseInstancesForm::prev_cell ()
 {
   lv_cell->setFocus ();
   adv_cell (true);
 }
 
-bool 
-BrowseInstancesForm::eventFilter (QObject *watched, QEvent *event)
+bool BrowseInstancesForm::eventFilter (QObject *watched, QEvent *event)
 {
   if (m_ef_enabled && event->type () == QEvent::KeyPress) {
 
-    QKeyEvent *ke = dynamic_cast <QKeyEvent *> (event);
+    QKeyEvent *ke = dynamic_cast<QKeyEvent *> (event);
     if (ke && (ke->key () == Qt::Key_Up || ke->key () == Qt::Key_Down)) {
 
       bool up = ke->key () == Qt::Key_Up;
@@ -852,27 +820,24 @@ BrowseInstancesForm::eventFilter (QObject *watched, QEvent *event)
       }
 
       return true;
-
     }
-
-  } 
+  }
 
   return QDialog::eventFilter (watched, event);
 }
 
-bool
-BrowseInstancesForm::adv_cell_inst (bool up)
+bool BrowseInstancesForm::adv_cell_inst (bool up)
 {
   QTreeWidgetItem *current = lv_cell_instance->currentItem ();
 
   m_ef_enabled = false; // prevent recursion
   QKeyEvent ke (QEvent::KeyPress, up ? Qt::Key_Up : Qt::Key_Down, Qt::NoModifier);
-  ((QObject *)lv_cell_instance)->event (&ke);
+  ((QObject *) lv_cell_instance)->event (&ke);
   m_ef_enabled = true;
 
   if (lv_cell_instance->currentItem () == current) {
 
-    //  if we are at the end of the list, pass the event 
+    //  if we are at the end of the list, pass the event
     //  forward to the shape instance list
     if (adv_cell (up)) {
 
@@ -900,15 +865,13 @@ BrowseInstancesForm::adv_cell_inst (bool up)
   }
 }
 
-void
-BrowseInstancesForm::next_inst ()
+void BrowseInstancesForm::next_inst ()
 {
   lv_cell_instance->setFocus ();
   adv_cell_inst (false);
 }
 
-void
-BrowseInstancesForm::prev_inst ()
+void BrowseInstancesForm::prev_inst ()
 {
   lv_cell_instance->setFocus ();
   adv_cell_inst (true);
@@ -917,4 +880,3 @@ BrowseInstancesForm::prev_inst ()
 }
 
 #endif
-

@@ -52,7 +52,7 @@ public:
     set ();
   }
 
-  virtual ~DeepEdgePairsIterator () { }
+  virtual ~DeepEdgePairsIterator () {}
 
   virtual bool at_end () const
   {
@@ -65,7 +65,7 @@ public:
     set ();
   }
 
-  virtual bool is_addressable() const
+  virtual bool is_addressable () const
   {
     return false;
   }
@@ -188,13 +188,12 @@ static void transform_deep_layer (db::DeepLayer &deep_layer, const Trans &t)
     db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
 
     db::Shapes flat_shapes (layout.is_editable ());
-    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer.layer ()); !iter.at_end (); ++iter) {
+    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer.layer ()); ! iter.at_end (); ++iter) {
       flat_shapes.insert (iter->edge_pair ().transformed (iter.trans ()).transformed (t));
     }
 
     layout.clear_layer (deep_layer.layer ());
     top_cell.shapes (deep_layer.layer ()).swap (flat_shapes);
-
   }
 }
 
@@ -235,13 +234,12 @@ void DeepEdgePairs::flatten ()
     db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
 
     db::Shapes flat_shapes (layout.is_editable ());
-    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer ().layer ()); !iter.at_end (); ++iter) {
+    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer ().layer ()); ! iter.at_end (); ++iter) {
       flat_shapes.insert (iter->edge_pair ().transformed (iter.trans ()));
     }
 
     layout.clear_layer (deep_layer ().layer ());
     top_cell.shapes (deep_layer ().layer ()).swap (flat_shapes);
-
   }
 }
 
@@ -262,7 +260,6 @@ std::pair<db::RecursiveShapeIterator, db::ICplxTrans> DeepEdgePairs::begin_iter 
     const db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
     db::RecursiveShapeIterator iter (deep_layer ().layout (), top_cell, deep_layer ().layer ());
     return std::make_pair (iter, db::ICplxTrans ());
-
   }
 }
 
@@ -338,7 +335,7 @@ DeepEdgePairs::add_in_place (const EdgePairs &other)
     return this;
   }
 
-  const DeepEdgePairs *other_deep = dynamic_cast <const DeepEdgePairs *> (other.delegate ());
+  const DeepEdgePairs *other_deep = dynamic_cast<const DeepEdgePairs *> (other.delegate ());
   if (other_deep) {
 
     deep_layer ().add_from (other_deep->deep_layer ());
@@ -409,10 +406,9 @@ DeepEdgePairs::apply_filter (const EdgePairFilterBase &filter, bool with_true, b
     if (filter.wants_variants ()) {
       vars->separate_variants ();
     }
-
   }
 
-  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit_true, to_commit_false;
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes>> to_commit_true, to_commit_false;
 
   std::unique_ptr<db::DeepEdgePairs> res_true (with_true ? new db::DeepEdgePairs (edge_pairs.derived ()) : 0);
   std::unique_ptr<db::DeepEdgePairs> res_false (with_false ? new db::DeepEdgePairs (edge_pairs.derived ()) : 0);
@@ -428,17 +424,17 @@ DeepEdgePairs::apply_filter (const EdgePairFilterBase &filter, bool with_true, b
         db::Shapes *st_true = 0, *st_false = 0;
         if (vv.size () == 1) {
           if (with_true) {
-            st_true = & c->shapes (res_true->deep_layer ().layer ());
+            st_true = &c->shapes (res_true->deep_layer ().layer ());
           }
           if (with_false) {
-            st_false = & c->shapes (res_false->deep_layer ().layer ());
+            st_false = &c->shapes (res_false->deep_layer ().layer ());
           }
         } else {
           if (with_true) {
-            st_true = & to_commit_true [c->cell_index ()] [*v];
+            st_true = &to_commit_true [c->cell_index ()][*v];
           }
           if (with_false) {
-            st_false = & to_commit_false [c->cell_index ()] [*v];
+            st_false = &to_commit_false [c->cell_index ()][*v];
           }
         }
 
@@ -455,7 +451,6 @@ DeepEdgePairs::apply_filter (const EdgePairFilterBase &filter, bool with_true, b
             }
           }
         }
-
       }
 
     } else {
@@ -474,9 +469,7 @@ DeepEdgePairs::apply_filter (const EdgePairFilterBase &filter, bool with_true, b
           }
         }
       }
-
     }
-
   }
 
   if (! to_commit_true.empty () && vars.get ()) {
@@ -603,7 +596,7 @@ DeepEdgePairs::selected_interacting_generic (const Edges &other, bool inverse, s
   }
 
   min_count = std::max (size_t (1), min_count);
-  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+  bool counting = ! (min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   const db::DeepLayer &edge_pairs = deep_layer ();
 
@@ -633,7 +626,7 @@ DeepEdgePairs::selected_interacting_generic (const Region &other, EdgePairIntera
   }
 
   min_count = std::max (size_t (1), min_count);
-  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+  bool counting = ! (min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   const db::DeepLayer &edge_pairs = deep_layer ();
 
@@ -663,7 +656,7 @@ DeepEdgePairs::selected_interacting_pair_generic (const Edges &other, size_t min
   }
 
   min_count = std::max (size_t (1), min_count);
-  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+  bool counting = ! (min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   const db::DeepLayer &edge_pairs = deep_layer ();
 
@@ -699,7 +692,7 @@ DeepEdgePairs::selected_interacting_pair_generic (const Region &other, EdgePairI
   }
 
   min_count = std::max (size_t (1), min_count);
-  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+  bool counting = ! (min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   const db::DeepLayer &edge_pairs = deep_layer ();
 
@@ -776,8 +769,7 @@ EdgePairsDelegate *DeepEdgePairs::in (const EdgePairs &other, bool invert) const
 bool DeepEdgePairs::equals (const EdgePairs &other) const
 {
   const DeepEdgePairs *other_delegate = dynamic_cast<const DeepEdgePairs *> (other.delegate ());
-  if (other_delegate && &other_delegate->deep_layer ().layout () == &deep_layer ().layout ()
-      && other_delegate->deep_layer ().layer () == deep_layer ().layer ()) {
+  if (other_delegate && &other_delegate->deep_layer ().layout () == &deep_layer ().layout () && other_delegate->deep_layer ().layer () == deep_layer ().layer ()) {
     return true;
   } else {
     return AsIfFlatEdgePairs::equals (other);

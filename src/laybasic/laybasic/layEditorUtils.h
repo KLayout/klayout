@@ -76,19 +76,17 @@ LAYBASIC_PUBLIC std::map<std::string, tl::Variant> pcell_parameters_from_string 
  *  @param layout The layout object
  *  @param cell_index The index of the cell from which to fetch the parameters
  *  @param parameters_for_pcell Will receive the parameters
- *  @return true, if the cell is a PCell and parameters have been fetched 
+ *  @return true, if the cell is a PCell and parameters have been fetched
  */
 LAYBASIC_PUBLIC
-bool
-get_parameters_from_pcell_and_guiding_shapes (db::Layout *layout, db::cell_index_type cell_index, db::pcell_parameters_type &parameters_for_pcell);
+bool get_parameters_from_pcell_and_guiding_shapes (db::Layout *layout, db::cell_index_type cell_index, db::pcell_parameters_type &parameters_for_pcell);
 
 
 /**
  *  @brief Request to make the given layer the current one (asks whether to create the layer if needed)
  */
 LAYBASIC_PUBLIC
-bool
-set_or_request_current_layer (lay::LayoutViewBase *view, const db::LayerProperties &lp, unsigned int cv_index, bool make_current = true);
+bool set_or_request_current_layer (lay::LayoutViewBase *view, const db::LayerProperties &lp, unsigned int cv_index, bool make_current = true);
 
 /**
  *  @brief A cache for the transformation variants for a certain layer and cell view index for a lay::LayoutView
@@ -102,11 +100,10 @@ public:
   const std::vector<db::DCplxTrans> *per_cv (unsigned int cv) const;
 
 private:
-  std::map <unsigned int, std::vector<db::DCplxTrans> > m_per_cv_tv;
-  std::map < std::pair<unsigned int, unsigned int>, std::vector<db::DCplxTrans> > m_per_cv_and_layer_tv;
+  std::map<unsigned int, std::vector<db::DCplxTrans>> m_per_cv_tv;
+  std::map<std::pair<unsigned int, unsigned int>, std::vector<db::DCplxTrans>> m_per_cv_and_layer_tv;
 };
 
 } // namespace edt
 
 #endif
-

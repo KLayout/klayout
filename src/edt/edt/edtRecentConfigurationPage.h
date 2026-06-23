@@ -35,12 +35,12 @@
 
 namespace lay
 {
-  class LayoutViewBase;
+class LayoutViewBase;
 }
 
 namespace db
 {
-  struct LayerProperties;
+struct LayerProperties;
 }
 
 namespace edt
@@ -54,11 +54,10 @@ class PCellParametersPage;
 class EDT_PUBLIC RecentConfigurationPage
   : public lay::EditorOptionsPageWidget
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
-  enum ConfigurationRendering
-  {
+  enum ConfigurationRendering {
     Text = 0,
     Bool = 1,
     Double = 2,
@@ -72,11 +71,11 @@ public:
     IntIfArray = 10
   };
 
-  struct ConfigurationDescriptor
-  {
+  struct ConfigurationDescriptor {
     ConfigurationDescriptor (const std::string &_cfg_name, const std::string &_title, ConfigurationRendering _rendering)
       : cfg_name (_cfg_name), title (_title), rendering (_rendering)
-    { }
+    {
+    }
 
     std::string cfg_name, title;
     ConfigurationRendering rendering;
@@ -92,8 +91,8 @@ public:
 
   virtual std::string title () const;
   virtual int order () const;
-  virtual void apply (lay::Dispatcher * /*root*/) { }
-  virtual void setup (lay::Dispatcher * /*root*/) { }
+  virtual void apply (lay::Dispatcher * /*root*/) {}
+  virtual void setup (lay::Dispatcher * /*root*/) {}
   virtual void commit_recent (lay::Dispatcher *root);
   virtual void config_recent_for_layer (lay::Dispatcher *root, const db::LayerProperties &lp, int cv_index);
 
@@ -121,10 +120,10 @@ private:
   QTreeWidget *mp_tree_widget;
   tl::DeferredMethod<RecentConfigurationPage> dm_update_list;
 
-  void update_list (const std::list<std::vector<std::string> > &stored_values);
+  void update_list (const std::list<std::vector<std::string>> &stored_values);
   void update_list ();
-  std::list<std::vector<std::string> > get_stored_values () const;
-  void set_stored_values (const std::list<std::vector<std::string> > &values) const;
+  std::list<std::vector<std::string>> get_stored_values () const;
+  void set_stored_values (const std::list<std::vector<std::string>> &values) const;
   void render_to (QTreeWidgetItem *item, int column, const std::vector<std::string> &values, RecentConfigurationPage::ConfigurationRendering rendering);
   void layers_changed (int);
   virtual void technology_changed (const std::string &);

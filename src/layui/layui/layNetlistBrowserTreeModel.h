@@ -54,7 +54,7 @@ class NetlistObjectsPath;
 class LAYUI_PUBLIC NetlistBrowserTreeModel
   : public QAbstractItemModel
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   NetlistBrowserTreeModel (QWidget *parent, db::Netlist *netlist);
@@ -90,7 +90,7 @@ private:
   QVariant tooltip (const QModelIndex &index) const;
   QString search_text (const QModelIndex &index) const;
   db::NetlistCrossReference::Status status (const QModelIndex &index) const;
-  std::pair<std::pair<const db::Circuit *, const db::Circuit *>, std::pair<db::NetlistCrossReference::Status, std::string> > cp_status_from_index(const QModelIndex &index, size_t &nprod, size_t &nlast, size_t &nnlast) const;
+  std::pair<std::pair<const db::Circuit *, const db::Circuit *>, std::pair<db::NetlistCrossReference::Status, std::string>> cp_status_from_index (const QModelIndex &index, size_t &nprod, size_t &nlast, size_t &nnlast) const;
   void build_circuits_to_index (size_t nprod, const std::pair<const db::Circuit *, const db::Circuit *> &circuits, IndexedNetlistModel *model, const QModelIndex &index, std::map<std::pair<const db::Circuit *, const db::Circuit *>, QModelIndex> &map) const;
 
   db::LayoutToNetlist *mp_l2ndb;
@@ -105,4 +105,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

@@ -27,17 +27,19 @@
 #include "layViewObject.h"
 #include "layPlugin.h"
 #if defined(HAVE_QT)
-#  include "layPluginConfigPage.h"
+#include "layPluginConfigPage.h"
 #endif
 #include "tlColor.h"
 #include "dbTypes.h"
 #include "dbBox.h"
 
-namespace Ui {
-  class GridNetConfigPage;
+namespace Ui
+{
+class GridNetConfigPage;
 }
 
-namespace lay {
+namespace lay
+{
 
 class LayoutViewBase;
 class ColorButton;
@@ -46,7 +48,7 @@ class GridNetPluginDeclaration
   : public lay::PluginDeclaration
 {
 public:
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const;
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> &options) const;
 #if defined(HAVE_QT)
   virtual lay::ConfigPage *config_page (QWidget *parent, std::string &title) const;
 #endif
@@ -57,13 +59,18 @@ class GridNet
   : public lay::BackgroundViewObject,
     public lay::Plugin
 {
-public: 
+public:
   enum GridStyle {
-    Invisible = 0, 
+    Invisible = 0,
     //  dot styles:
-    Dots, DottedLines, LightDottedLines, TenthDottedLines,  
+    Dots,
+    DottedLines,
+    LightDottedLines,
+    TenthDottedLines,
     //  line styles:
-    Crosses, Lines, TenthMarkedLines, 
+    Crosses,
+    Lines,
+    TenthMarkedLines,
     //  others
     CheckerBoard
   };
@@ -107,4 +114,3 @@ public:
 }
 
 #endif
-

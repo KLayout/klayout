@@ -34,17 +34,18 @@
 
 #include <string>
 
-namespace ant {
-  
+namespace ant
+{
+
 class Template;
 
 /**
  *  @brief A ruler (database) object
- * 
+ *
  *  This class implements the actual rulers or markers.
  *  Since this class derives from db::UserObjectBase, these objects
  *  can be stored within the database.
- */  
+ */
 class ANT_PUBLIC Object
   : public db::DUserObjectBase
 {
@@ -52,8 +53,8 @@ public:
   typedef db::coord_traits<coord_type> coord_traits;
   typedef std::vector<db::DPoint> point_list;
 
-  /** 
-   *  @brief The ruler style 
+  /**
+   *  @brief The ruler style
    *
    *  STY_ruler: a ruler with tick marks
    *  STY_arrow_end: a line with an arrow at the end
@@ -65,7 +66,15 @@ public:
    *  STY_line: a simple line
    *  STY_none: used internally
    */
-  enum style_type { STY_ruler = 0, STY_arrow_end = 1, STY_arrow_start = 2, STY_arrow_both = 3, STY_line = 4, STY_cross_end = 5, STY_cross_start = 6, STY_cross_both = 7, STY_none = 8 };
+  enum style_type { STY_ruler = 0,
+                    STY_arrow_end = 1,
+                    STY_arrow_start = 2,
+                    STY_arrow_both = 3,
+                    STY_line = 4,
+                    STY_cross_end = 5,
+                    STY_cross_start = 6,
+                    STY_cross_both = 7,
+                    STY_none = 8 };
 
   /**
    *  @brief The outline modes
@@ -80,7 +89,15 @@ public:
    *  OL_angle: an angle measurement ruler (first vs. last segment)
    *  OL_radius: a radius measurement ruler
    */
-  enum outline_type { OL_diag = 0, OL_xy = 1, OL_diag_xy = 2, OL_yx = 3, OL_diag_yx = 4, OL_box = 5, OL_ellipse = 6, OL_angle = 7, OL_radius = 8 };
+  enum outline_type { OL_diag = 0,
+                      OL_xy = 1,
+                      OL_diag_xy = 2,
+                      OL_yx = 3,
+                      OL_diag_yx = 4,
+                      OL_box = 5,
+                      OL_ellipse = 6,
+                      OL_angle = 7,
+                      OL_radius = 8 };
 
   /**
    *  @brief The position type of the main label
@@ -90,7 +107,10 @@ public:
    *  POS_p2: at P2
    *  POS_center: at mid point between P1 and P2
    */
-  enum position_type { POS_auto = 0, POS_p1 = 1, POS_p2 = 2, POS_center = 3 };
+  enum position_type { POS_auto = 0,
+                       POS_p1 = 1,
+                       POS_p2 = 2,
+                       POS_center = 3 };
 
   /**
    *  @brief The alignment type
@@ -100,7 +120,14 @@ public:
    *  AL_left, AL_bottom, AL_down: left or bottom
    *  AL_right, AL_top, AL_up: right or top
    */
-  enum alignment_type { AL_auto = 0, AL_center = 1, AL_down = 2, AL_left = 2, AL_bottom = 2, AL_up = 3, AL_right = 3, AL_top = 3 };
+  enum alignment_type { AL_auto = 0,
+                        AL_center = 1,
+                        AL_down = 2,
+                        AL_left = 2,
+                        AL_bottom = 2,
+                        AL_up = 3,
+                        AL_right = 3,
+                        AL_top = 3 };
 
   /**
    *  @brief Default constructor
@@ -157,7 +184,7 @@ public:
    */
   bool operator!= (const ant::Object &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
 
   /**
@@ -638,7 +665,7 @@ public:
   /**
    *  @brief Gets the outline type
    */
-  void outline (outline_type s) 
+  void outline (outline_type s)
   {
     if (m_outline != s) {
       m_outline = s;
@@ -649,15 +676,15 @@ public:
   /**
    *  @brief Gets the snap mode
    *  See \snap for details about this attribute
-   */ 
+   */
   bool snap () const
   {
     return m_snap;
   }
-  
+
   /**
    *  @brief Sets snap mode
-   * 
+   *
    *  The snap flag controls whether snapping to objects (edges and vertices)
    *  is active when this template is selected.
    */
@@ -671,16 +698,16 @@ public:
 
   /**
    *  @brief Gets the angle constraint
-   */ 
+   */
   lay::angle_constraint_type angle_constraint () const
   {
     return m_angle_constraint;
   }
-  
+
   /**
    *  @brief Sets the angle constraint
-   * 
-   *  The angle constraint flag controls which angle constraint is to be used 
+   *
+   *  The angle constraint flag controls which angle constraint is to be used
    *  for this ruler or the global setting should be used
    *  (if ant::Service::Global is used for the angle constraint).
    */
@@ -812,4 +839,3 @@ private:
 }
 
 #endif
-

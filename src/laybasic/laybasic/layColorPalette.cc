@@ -30,7 +30,7 @@
 namespace lay
 {
 
-static const char *def_palette = 
+static const char *def_palette =
   "255,157,157[0] "
   "255,128,168[1] "
   "192,128,255[2] "
@@ -74,7 +74,7 @@ static const char *def_palette =
   "64,64,64 "
   "0,0,0";
 
-ColorPalette 
+ColorPalette
 ColorPalette::default_palette ()
 {
   ColorPalette p;
@@ -99,7 +99,7 @@ ColorPalette::ColorPalette (const ColorPalette &d)
   // .. nothing yet ..
 }
 
-ColorPalette 
+ColorPalette
 ColorPalette::operator= (const ColorPalette &d)
 {
   if (&d != this) {
@@ -109,19 +109,18 @@ ColorPalette::operator= (const ColorPalette &d)
   return *this;
 }
 
-bool 
-ColorPalette::operator== (const ColorPalette &d) const
+bool ColorPalette::operator== (const ColorPalette &d) const
 {
   return m_colors == d.m_colors && m_luminous_color_indices == d.m_luminous_color_indices;
 }
 
-tl::color_t 
+tl::color_t
 ColorPalette::color_by_index (unsigned int n) const
 {
   return m_colors [n % colors ()];
 }
 
-unsigned int 
+unsigned int
 ColorPalette::colors () const
 {
   return (unsigned int) m_colors.size ();
@@ -133,14 +132,13 @@ ColorPalette::luminous_color_index_by_index (unsigned int n) const
   return m_luminous_color_indices [n % luminous_colors ()];
 }
 
-unsigned int 
+unsigned int
 ColorPalette::luminous_colors () const
 {
   return (unsigned int) m_luminous_color_indices.size ();
 }
 
-void 
-ColorPalette::set_color (unsigned int n, tl::color_t c)
+void ColorPalette::set_color (unsigned int n, tl::color_t c)
 {
   while (m_colors.size () <= n) {
     m_colors.push_back (0);
@@ -148,14 +146,12 @@ ColorPalette::set_color (unsigned int n, tl::color_t c)
   m_colors [n] = c | 0xff000000;
 }
 
-void
-ColorPalette::clear_colors () 
+void ColorPalette::clear_colors ()
 {
   m_colors.clear ();
 }
 
-void 
-ColorPalette::set_luminous_color_index (unsigned int n, unsigned int ci)
+void ColorPalette::set_luminous_color_index (unsigned int n, unsigned int ci)
 {
   while (m_luminous_color_indices.size () <= n) {
     m_luminous_color_indices.push_back (0);
@@ -163,13 +159,12 @@ ColorPalette::set_luminous_color_index (unsigned int n, unsigned int ci)
   m_luminous_color_indices [n] = ci;
 }
 
-void 
-ColorPalette::clear_luminous_colors ()
+void ColorPalette::clear_luminous_colors ()
 {
   m_luminous_color_indices.clear ();
 }
 
-std::string 
+std::string
 ColorPalette::to_string () const
 {
   std::string res;
@@ -189,14 +184,12 @@ ColorPalette::to_string () const
         break;
       }
     }
-
   }
 
   return res;
 }
 
-void 
-ColorPalette::from_string (const std::string &s, bool simple)
+void ColorPalette::from_string (const std::string &s, bool simple)
 {
   try {
 
@@ -223,12 +216,11 @@ ColorPalette::from_string (const std::string &s, bool simple)
         x.read (lc).expect ("]");
         while (m_luminous_color_indices.size () <= lc) {
           m_luminous_color_indices.push_back (0);
-        } 
+        }
         m_luminous_color_indices [lc] = i;
       }
 
       ++i;
-
     }
 
     if (! x.at_end ()) {
@@ -246,4 +238,3 @@ ColorPalette::from_string (const std::string &s, bool simple)
 }
 
 }
-

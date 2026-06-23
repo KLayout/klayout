@@ -30,13 +30,13 @@
 #include "tlUnitTest.h"
 
 
-TEST(1) 
+TEST (1)
 {
   db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Polygon p1;
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (0, 0));
   c1.push_back (db::Point (0, 1000));
   c1.push_back (db::Point (100, 1000));
@@ -44,7 +44,7 @@ TEST(1)
   p1.assign_hull (c1.begin (), c1.end ());
 
   db::Polygon p2;
-  std::vector <db::Point> c2;
+  std::vector<db::Point> c2;
   c2.push_back (db::Point (2000, 0));
   c2.push_back (db::Point (2000, 1000));
   c2.push_back (db::Point (2100, 1000));
@@ -124,16 +124,15 @@ TEST(1)
   ++si;
 
   EXPECT_EQ (si.at_end (), true);
-
 }
 
-TEST(2) 
+TEST (2)
 {
   db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Polygon p1;
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (0, 0));
   c1.push_back (db::Point (0, 1000));
   c1.push_back (db::Point (100, 1000));
@@ -141,7 +140,7 @@ TEST(2)
   p1.assign_hull (c1.begin (), c1.end ());
 
   db::Polygon p2;
-  std::vector <db::Point> c2;
+  std::vector<db::Point> c2;
   c2.push_back (db::Point (2000, 0));
   c2.push_back (db::Point (2000, 1000));
   c2.push_back (db::Point (2100, 1000));
@@ -204,16 +203,15 @@ TEST(2)
   ++si;
 
   EXPECT_EQ (si.at_end (), true);
-
 }
 
-TEST(3) 
+TEST (3)
 {
   db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Polygon p1;
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (0, 0));
   c1.push_back (db::Point (0, 1000));
   c1.push_back (db::Point (100, 1000));
@@ -221,7 +219,7 @@ TEST(3)
   p1.assign_hull (c1.begin (), c1.end ());
 
   db::Polygon p2;
-  std::vector <db::Point> c2;
+  std::vector<db::Point> c2;
   c2.push_back (db::Point (2000, 0));
   c2.push_back (db::Point (2000, 1000));
   c2.push_back (db::Point (2100, 1000));
@@ -267,16 +265,15 @@ TEST(3)
   ++si;
 
   EXPECT_EQ (si.at_end (), true);
-
 }
 
-TEST(1BOX) 
+TEST (1BOX)
 {
   db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Polygon p1;
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (0, 0));
   c1.push_back (db::Point (0, 1000));
   c1.push_back (db::Point (100, 1000));
@@ -284,7 +281,7 @@ TEST(1BOX)
   p1.assign_hull (c1.begin (), c1.end ());
 
   db::Polygon p2;
-  std::vector <db::Point> c2;
+  std::vector<db::Point> c2;
   c2.push_back (db::Point (2000, 0));
   c2.push_back (db::Point (2000, 1000));
   c2.push_back (db::Point (2100, 1000));
@@ -337,16 +334,15 @@ TEST(1BOX)
   ++si;
 
   EXPECT_EQ (si.at_end (), true);
-
 }
 
-TEST(2BOX) 
+TEST (2BOX)
 {
   db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Polygon p1;
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (0, 0));
   c1.push_back (db::Point (0, 1000));
   c1.push_back (db::Point (100, 1000));
@@ -354,7 +350,7 @@ TEST(2BOX)
   p1.assign_hull (c1.begin (), c1.end ());
 
   db::Polygon p2;
-  std::vector <db::Point> c2;
+  std::vector<db::Point> c2;
   c2.push_back (db::Point (2000, 0));
   c2.push_back (db::Point (2000, 1000));
   c2.push_back (db::Point (2100, 1000));
@@ -395,16 +391,15 @@ TEST(2BOX)
   ++si;
 
   EXPECT_EQ (si.at_end (), true);
-
 }
 
-TEST(3BOX) 
+TEST (3BOX)
 {
   db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Polygon p1;
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (0, 0));
   c1.push_back (db::Point (0, 1000));
   c1.push_back (db::Point (100, 1000));
@@ -412,7 +407,7 @@ TEST(3BOX)
   p1.assign_hull (c1.begin (), c1.end ());
 
   db::Polygon p2;
-  std::vector <db::Point> c2;
+  std::vector<db::Point> c2;
   c2.push_back (db::Point (2000, 0));
   c2.push_back (db::Point (2000, 1000));
   c2.push_back (db::Point (2100, 1000));
@@ -458,16 +453,15 @@ TEST(3BOX)
   ++si;
 
   EXPECT_EQ (si.at_end (), true);
-
 }
 
-TEST(1SBOX) 
+TEST (1SBOX)
 {
   db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Polygon p1;
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (0, 0));
   c1.push_back (db::Point (0, 1000));
   c1.push_back (db::Point (100, 1000));
@@ -475,7 +469,7 @@ TEST(1SBOX)
   p1.assign_hull (c1.begin (), c1.end ());
 
   db::Polygon p2;
-  std::vector <db::Point> c2;
+  std::vector<db::Point> c2;
   c2.push_back (db::Point (2000, 0));
   c2.push_back (db::Point (2000, 1000));
   c2.push_back (db::Point (2100, 1000));
@@ -528,16 +522,15 @@ TEST(1SBOX)
   ++si;
 
   EXPECT_EQ (si.at_end (), true);
-
 }
 
-TEST(2SBOX) 
+TEST (2SBOX)
 {
   db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Polygon p1;
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (0, 0));
   c1.push_back (db::Point (0, 1000));
   c1.push_back (db::Point (100, 1000));
@@ -545,7 +538,7 @@ TEST(2SBOX)
   p1.assign_hull (c1.begin (), c1.end ());
 
   db::Polygon p2;
-  std::vector <db::Point> c2;
+  std::vector<db::Point> c2;
   c2.push_back (db::Point (2000, 0));
   c2.push_back (db::Point (2000, 1000));
   c2.push_back (db::Point (2100, 1000));
@@ -586,16 +579,15 @@ TEST(2SBOX)
   ++si;
 
   EXPECT_EQ (si.at_end (), true);
-
 }
 
-TEST(3SBOX) 
+TEST (3SBOX)
 {
   db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Polygon p1;
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (0, 0));
   c1.push_back (db::Point (0, 1000));
   c1.push_back (db::Point (100, 1000));
@@ -603,7 +595,7 @@ TEST(3SBOX)
   p1.assign_hull (c1.begin (), c1.end ());
 
   db::Polygon p2;
-  std::vector <db::Point> c2;
+  std::vector<db::Point> c2;
   c2.push_back (db::Point (2000, 0));
   c2.push_back (db::Point (2000, 1000));
   c2.push_back (db::Point (2100, 1000));
@@ -649,10 +641,9 @@ TEST(3SBOX)
   ++si;
 
   EXPECT_EQ (si.at_end (), true);
-
 }
 
-TEST(4) 
+TEST (4)
 {
   db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
@@ -670,36 +661,38 @@ TEST(4)
   EXPECT_EQ (si->perimeter (), bx1.perimeter ());
 
   ++si;
-  
+
   EXPECT_EQ (si->is_box (), true);
   EXPECT_EQ (si->box (), bx2);
   EXPECT_EQ (si->area (), bx2.area ());
   EXPECT_EQ (si->perimeter (), bx2.perimeter ());
 
   ++si;
-  
+
   EXPECT_EQ (si.at_end (), true);
 }
 
-TEST(5) 
+TEST (5)
 {
-  if (db::default_editable_mode ()) { return; } //  currently Boxes are treated as ones with properties
+  if (db::default_editable_mode ()) {
+    return;
+  } //  currently Boxes are treated as ones with properties
   db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Box bx1 (db::Point (0, 0), db::Point (1000, 100));
   db::Box bx2 (db::Point (0, 1000), db::Point (100, 2000));
-  s.insert (db::object_with_properties <db::Box> (bx1, 17));
+  s.insert (db::object_with_properties<db::Box> (bx1, 17));
   s.insert (bx2);
 
   db::ShapeIterator si (s.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Boxes));
-  
+
   EXPECT_EQ (si.at_end (), false);
 
   EXPECT_EQ (si->is_box (), true);
   EXPECT_EQ (si->box (), bx2);
-  EXPECT_EQ (si->area (), bx2.area());
-  EXPECT_EQ (si->perimeter (), bx2.perimeter());
+  EXPECT_EQ (si->area (), bx2.area ());
+  EXPECT_EQ (si->perimeter (), bx2.perimeter ());
   EXPECT_EQ (si->has_prop_id (), false);
 
   ++si;
@@ -708,23 +701,23 @@ TEST(5)
 
   EXPECT_EQ (si->is_box (), true);
   EXPECT_EQ (si->box (), bx1);
-  EXPECT_EQ (si->area (), bx1.area());
-  EXPECT_EQ (si->perimeter (), bx1.perimeter());
+  EXPECT_EQ (si->area (), bx1.area ());
+  EXPECT_EQ (si->perimeter (), bx1.perimeter ());
   EXPECT_EQ (si->has_prop_id (), true);
   EXPECT_EQ (si->prop_id (), size_t (17));
 
   ++si;
-  
+
   EXPECT_EQ (si.at_end (), true);
 }
 
-TEST(6) 
+TEST (6)
 {
   db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Box bx1 (db::Point (0, 0), db::Point (1000, 100));
-  s.insert (db::object_with_properties <db::Box> (bx1, 17));
+  s.insert (db::object_with_properties<db::Box> (bx1, 17));
 
   db::ShapeIterator si (s.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Boxes));
 
@@ -738,13 +731,15 @@ TEST(6)
   EXPECT_EQ (si->prop_id (), size_t (17));
 
   ++si;
-  
+
   EXPECT_EQ (si.at_end (), true);
 }
 
-TEST(7) 
+TEST (7)
 {
-  if (db::default_editable_mode ()) { return; } //  currently Boxes are treated as ones with properties
+  if (db::default_editable_mode ()) {
+    return;
+  } //  currently Boxes are treated as ones with properties
   db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
@@ -760,11 +755,11 @@ TEST(7)
   EXPECT_EQ (si->has_prop_id (), false);
 
   ++si;
-  
+
   EXPECT_EQ (si.at_end (), true);
 }
 
-TEST(8) 
+TEST (8)
 {
   db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
@@ -782,43 +777,42 @@ TEST(8)
 
   db::ShapeIterator si (s.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Boxes));
 
-  EXPECT_EQ (si.at_end (), false); 
+  EXPECT_EQ (si.at_end (), false);
 
   EXPECT_EQ (si->is_box (), true);
   EXPECT_EQ (si->box (), bx2);
   EXPECT_EQ (si->has_prop_id (), true);
 
   ++si;
-  
+
   EXPECT_EQ (si.at_end (), true);
 
   std::set<size_t> prop_sel;
   si = db::ShapeIterator (s.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Boxes, &prop_sel, false));
 
-  EXPECT_EQ (si.at_end (), true); 
+  EXPECT_EQ (si.at_end (), true);
 
   prop_sel.insert (id0);
   si = db::ShapeIterator (s.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Boxes, &prop_sel, false));
 
-  EXPECT_EQ (si.at_end (), true); 
+  EXPECT_EQ (si.at_end (), true);
 
   prop_sel.insert (id1);
   si = db::ShapeIterator (s.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Boxes, &prop_sel, false));
 
-  EXPECT_EQ (si.at_end (), false); 
+  EXPECT_EQ (si.at_end (), false);
 
   EXPECT_EQ (si->is_box (), true);
   EXPECT_EQ (si->box (), bx2);
   EXPECT_EQ (si->has_prop_id (), true);
 
   ++si;
-  
-  EXPECT_EQ (si.at_end (), true);
 
+  EXPECT_EQ (si.at_end (), true);
 }
 
 //  Edges, EdgePairs, Points
-TEST(9)
+TEST (9)
 {
   db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
@@ -962,7 +956,7 @@ TEST(9)
 }
 
 //  Rectangle
-TEST(10)
+TEST (10)
 {
   db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
@@ -1017,10 +1011,10 @@ TEST(10)
   si = s.begin (db::ShapeIterator::All);
   EXPECT_EQ (si->rectangle ().empty (), true);
 
-  db::Point pts1 [1] = { db::Point (0, 0) };
-  db::Point pts2 [2] = { db::Point (0, 0), db::Point (1000, 0) };
-  db::Point pts2b [2] = { db::Point (0, 0), db::Point (1000, 1000) };
-  db::Point pts3 [3] = { db::Point (0, 0), db::Point (1000, 0), db::Point (1000, 1000) };
+  db::Point pts1 [1] = {db::Point (0, 0)};
+  db::Point pts2 [2] = {db::Point (0, 0), db::Point (1000, 0)};
+  db::Point pts2b [2] = {db::Point (0, 0), db::Point (1000, 1000)};
+  db::Point pts3 [3] = {db::Point (0, 0), db::Point (1000, 0), db::Point (1000, 1000)};
 
   s.clear ();
   s.insert (db::Path (pts1 + 0, pts1 + 1, 1000, 500, 500));
@@ -1049,7 +1043,7 @@ TEST(10)
 }
 
 //  layer index setter/getter
-TEST(20)
+TEST (20)
 {
   db::Shape sh0;
   EXPECT_EQ (sh0.layer (), -1);

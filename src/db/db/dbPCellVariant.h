@@ -40,11 +40,11 @@ namespace db
 /**
  *  @brief A PCell variant
  */
-class DB_PUBLIC PCellVariant 
+class DB_PUBLIC PCellVariant
   : public db::Cell
 {
 public:
-  /** 
+  /**
    *  @brief The constructor
    *
    *  The constructor gets the parameters that are unique for this variant.
@@ -57,7 +57,7 @@ public:
   ~PCellVariant ();
 
   /**
-   *  @brief Cloning 
+   *  @brief Cloning
    */
   virtual Cell *clone (Layout &layout) const;
 
@@ -126,16 +126,16 @@ public:
   /**
    *  @brief Gets a value indicating if this cell is a proxy cell
    */
-  virtual bool is_proxy () const 
-  { 
-    return true; 
+  virtual bool is_proxy () const
+  {
+    return true;
   }
 
 protected:
   /**
    *  @brief Gets the PCell header for this variant
    */
-  PCellHeader *pcell_header () 
+  PCellHeader *pcell_header ()
   {
     return layout ()->pcell_header (m_pcell_id);
   }
@@ -155,8 +155,7 @@ private:
   db::pcell_id_type m_pcell_id;
   bool m_registered;
 };
-  
+
 }
 
 #endif
-

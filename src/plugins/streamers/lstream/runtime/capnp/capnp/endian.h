@@ -23,12 +23,14 @@
 
 #include "common.h"
 #include <inttypes.h>
-#include <string.h>  // memcpy
+#include <string.h> // memcpy
 
 CAPNP_BEGIN_HEADER
 
-namespace capnp {
-namespace _ {  // private
+namespace capnp
+{
+namespace _
+{ // private
 
 // WireValue
 //
@@ -66,16 +68,17 @@ namespace _ {  // private
 #define CAPNP_OPPOSITE_OF_WIRE_BYTE_ORDER __ORDER_BIG_ENDIAN__
 #endif
 
-#if defined(__BYTE_ORDER__) && \
-    __BYTE_ORDER__ == CAPNP_WIRE_BYTE_ORDER && \
-    !CAPNP_DISABLE_ENDIAN_DETECTION
+#if defined(__BYTE_ORDER__) &&               \
+  __BYTE_ORDER__ == CAPNP_WIRE_BYTE_ORDER && \
+  ! CAPNP_DISABLE_ENDIAN_DETECTION
 // CPU is little-endian.  We can just read/write the memory directly.
 
 template <typename T>
-class DirectWireValue {
+class DirectWireValue
+{
 public:
-  KJ_ALWAYS_INLINE(T get() const) { return value; }
-  KJ_ALWAYS_INLINE(void set(T newValue)) { value = newValue; }
+  KJ_ALWAYS_INLINE (T get () const) { return value; }
+  KJ_ALWAYS_INLINE (void set (T newValue)) { value = newValue; }
 
 private:
   T value;
@@ -87,9 +90,9 @@ using WireValue = DirectWireValue<T>;
 // linked together, we define each implementation with a different name and define an alias to the
 // one we want to use.
 
-#elif defined(__BYTE_ORDER__) && \
-      __BYTE_ORDER__ == CAPNP_OPPOSITE_OF_WIRE_BYTE_ORDER && \
-      defined(__GNUC__) && !CAPNP_DISABLE_ENDIAN_DETECTION
+#elif defined(__BYTE_ORDER__) &&                         \
+  __BYTE_ORDER__ == CAPNP_OPPOSITE_OF_WIRE_BYTE_ORDER && \
+  defined(__GNUC__) && ! CAPNP_DISABLE_ENDIAN_DETECTION
 // Big-endian, but GCC's __builtin_bswap() is available.
 
 // TODO(perf):  Use dedicated instructions to read little-endian data on big-endian CPUs that have
@@ -98,33 +101,37 @@ using WireValue = DirectWireValue<T>;
 // TODO(perf):  Verify that this code optimizes reasonably.  In particular, ensure that the
 //   compiler optimizes away the memcpy()s and keeps everything in registers.
 
-template <typename T, size_t size = sizeof(T)>
+template <typename T, size_t size = sizeof (T)>
 class SwappingWireValue;
 
 template <typename T>
-class SwappingWireValue<T, 1> {
+class SwappingWireValue<T, 1>
+{
 public:
-  KJ_ALWAYS_INLINE(T get() const) { return value; }
-  KJ_ALWAYS_INLINE(void set(T newValue)) { value = newValue; }
+  KJ_ALWAYS_INLINE (T get () const) { return value; }
+  KJ_ALWAYS_INLINE (void set (T newValue)) { value = newValue; }
 
 private:
   T value;
 };
 
 template <typename T>
-class SwappingWireValue<T, 2> {
+class SwappingWireValue<T, 2>
+{
 public:
-  KJ_ALWAYS_INLINE(T get() const) {
+  KJ_ALWAYS_INLINE (T get () const)
+  {
     // Not all platforms have __builtin_bswap16() for some reason.  In particular, it is missing
     // on gcc-4.7.3-cygwin32 (but present on gcc-4.8.1-cygwin64).
     uint16_t swapped = (value << 8) | (value >> 8);
     T result;
-    memcpy(&result, &swapped, sizeof(T));
+    memcpy (&result, &swapped, sizeof (T));
     return result;
   }
-  KJ_ALWAYS_INLINE(void set(T newValue)) {
+  KJ_ALWAYS_INLINE (void set (T newValue))
+  {
     uint16_t raw;
-    memcpy(&raw, &newValue, sizeof(T));
+    memcpy (&raw, &newValue, sizeof (T));
     // Not all platforms have __builtin_bswap16() for some reason.  In particular, it is missing
     // on gcc-4.7.3-cygwin32 (but present on gcc-4.8.1-cygwin64).
     value = (raw << 8) | (raw >> 8);
@@ -135,18 +142,21 @@ private:
 };
 
 template <typename T>
-class SwappingWireValue<T, 4> {
+class SwappingWireValue<T, 4>
+{
 public:
-  KJ_ALWAYS_INLINE(T get() const) {
-    uint32_t swapped = __builtin_bswap32(value);
+  KJ_ALWAYS_INLINE (T get () const)
+  {
+    uint32_t swapped = __builtin_bswap32 (value);
     T result;
-    memcpy(&result, &swapped, sizeof(T));
+    memcpy (&result, &swapped, sizeof (T));
     return result;
   }
-  KJ_ALWAYS_INLINE(void set(T newValue)) {
+  KJ_ALWAYS_INLINE (void set (T newValue))
+  {
     uint32_t raw;
-    memcpy(&raw, &newValue, sizeof(T));
-    value = __builtin_bswap32(raw);
+    memcpy (&raw, &newValue, sizeof (T));
+    value = __builtin_bswap32 (raw);
   }
 
 private:
@@ -154,18 +164,21 @@ private:
 };
 
 template <typename T>
-class SwappingWireValue<T, 8> {
+class SwappingWireValue<T, 8>
+{
 public:
-  KJ_ALWAYS_INLINE(T get() const) {
-    uint64_t swapped = __builtin_bswap64(value);
+  KJ_ALWAYS_INLINE (T get () const)
+  {
+    uint64_t swapped = __builtin_bswap64 (value);
     T result;
-    memcpy(&result, &swapped, sizeof(T));
+    memcpy (&result, &swapped, sizeof (T));
     return result;
   }
-  KJ_ALWAYS_INLINE(void set(T newValue)) {
+  KJ_ALWAYS_INLINE (void set (T newValue))
+  {
     uint64_t raw;
-    memcpy(&raw, &newValue, sizeof(T));
-    value = __builtin_bswap64(raw);
+    memcpy (&raw, &newValue, sizeof (T));
+    value = __builtin_bswap64 (raw);
   }
 
 private:
@@ -181,7 +194,7 @@ using WireValue = SwappingWireValue<T>;
 #else
 // Unknown endianness.  Fall back to bit shifts.
 
-#if !CAPNP_DISABLE_ENDIAN_DETECTION
+#if ! CAPNP_DISABLE_ENDIAN_DETECTION
 #if _MSC_VER
 #pragma message("Couldn't detect endianness of your platform.  Using unoptimized fallback implementation.")
 #pragma message("Consider changing this code to detect your platform and send us a patch!")
@@ -189,105 +202,115 @@ using WireValue = SwappingWireValue<T>;
 #warning "Couldn't detect endianness of your platform.  Using unoptimized fallback implementation."
 #warning "Consider changing this code to detect your platform and send us a patch!"
 #endif
-#endif  // !CAPNP_DISABLE_ENDIAN_DETECTION
+#endif // !CAPNP_DISABLE_ENDIAN_DETECTION
 
-template <typename T, size_t size = sizeof(T)>
+template <typename T, size_t size = sizeof (T)>
 class ShiftingWireValue;
 
 template <typename T>
-class ShiftingWireValue<T, 1> {
+class ShiftingWireValue<T, 1>
+{
 public:
-  KJ_ALWAYS_INLINE(T get() const) { return value; }
-  KJ_ALWAYS_INLINE(void set(T newValue)) { value = newValue; }
+  KJ_ALWAYS_INLINE (T get () const) { return value; }
+  KJ_ALWAYS_INLINE (void set (T newValue)) { value = newValue; }
 
 private:
   T value;
 };
 
 template <typename T>
-class ShiftingWireValue<T, 2> {
+class ShiftingWireValue<T, 2>
+{
 public:
-  KJ_ALWAYS_INLINE(T get() const) {
-    uint16_t raw = (static_cast<uint16_t>(bytes[0])     ) |
-                   (static_cast<uint16_t>(bytes[1]) << 8);
+  KJ_ALWAYS_INLINE (T get () const)
+  {
+    uint16_t raw = (static_cast<uint16_t> (bytes [0])) |
+                   (static_cast<uint16_t> (bytes [1]) << 8);
     T result;
-    memcpy(&result, &raw, sizeof(T));
+    memcpy (&result, &raw, sizeof (T));
     return result;
   }
-  KJ_ALWAYS_INLINE(void set(T newValue)) {
+  KJ_ALWAYS_INLINE (void set (T newValue))
+  {
     uint16_t raw;
-    memcpy(&raw, &newValue, sizeof(T));
-    bytes[0] = raw;
-    bytes[1] = raw >> 8;
+    memcpy (&raw, &newValue, sizeof (T));
+    bytes [0] = raw;
+    bytes [1] = raw >> 8;
   }
 
 private:
   union {
-    byte bytes[2];
+    byte bytes [2];
     uint16_t align;
   };
 };
 
 template <typename T>
-class ShiftingWireValue<T, 4> {
+class ShiftingWireValue<T, 4>
+{
 public:
-  KJ_ALWAYS_INLINE(T get() const) {
-    uint32_t raw = (static_cast<uint32_t>(bytes[0])      ) |
-                   (static_cast<uint32_t>(bytes[1]) <<  8) |
-                   (static_cast<uint32_t>(bytes[2]) << 16) |
-                   (static_cast<uint32_t>(bytes[3]) << 24);
+  KJ_ALWAYS_INLINE (T get () const)
+  {
+    uint32_t raw = (static_cast<uint32_t> (bytes [0])) |
+                   (static_cast<uint32_t> (bytes [1]) << 8) |
+                   (static_cast<uint32_t> (bytes [2]) << 16) |
+                   (static_cast<uint32_t> (bytes [3]) << 24);
     T result;
-    memcpy(&result, &raw, sizeof(T));
+    memcpy (&result, &raw, sizeof (T));
     return result;
   }
-  KJ_ALWAYS_INLINE(void set(T newValue)) {
+  KJ_ALWAYS_INLINE (void set (T newValue))
+  {
     uint32_t raw;
-    memcpy(&raw, &newValue, sizeof(T));
-    bytes[0] = raw;
-    bytes[1] = raw >> 8;
-    bytes[2] = raw >> 16;
-    bytes[3] = raw >> 24;
+    memcpy (&raw, &newValue, sizeof (T));
+    bytes [0] = raw;
+    bytes [1] = raw >> 8;
+    bytes [2] = raw >> 16;
+    bytes [3] = raw >> 24;
   }
 
 private:
   union {
-    byte bytes[4];
+    byte bytes [4];
     uint32_t align;
   };
 };
 
 template <typename T>
-class ShiftingWireValue<T, 8> {
+class ShiftingWireValue<T, 8>
+{
 public:
-  KJ_ALWAYS_INLINE(T get() const) {
-    uint64_t raw = (static_cast<uint64_t>(bytes[0])      ) |
-                   (static_cast<uint64_t>(bytes[1]) <<  8) |
-                   (static_cast<uint64_t>(bytes[2]) << 16) |
-                   (static_cast<uint64_t>(bytes[3]) << 24) |
-                   (static_cast<uint64_t>(bytes[4]) << 32) |
-                   (static_cast<uint64_t>(bytes[5]) << 40) |
-                   (static_cast<uint64_t>(bytes[6]) << 48) |
-                   (static_cast<uint64_t>(bytes[7]) << 56);
+  KJ_ALWAYS_INLINE (T get () const)
+  {
+    uint64_t raw = (static_cast<uint64_t> (bytes [0])) |
+                   (static_cast<uint64_t> (bytes [1]) << 8) |
+                   (static_cast<uint64_t> (bytes [2]) << 16) |
+                   (static_cast<uint64_t> (bytes [3]) << 24) |
+                   (static_cast<uint64_t> (bytes [4]) << 32) |
+                   (static_cast<uint64_t> (bytes [5]) << 40) |
+                   (static_cast<uint64_t> (bytes [6]) << 48) |
+                   (static_cast<uint64_t> (bytes [7]) << 56);
     T result;
-    memcpy(&result, &raw, sizeof(T));
+    memcpy (&result, &raw, sizeof (T));
     return result;
   }
-  KJ_ALWAYS_INLINE(void set(T newValue)) {
+  KJ_ALWAYS_INLINE (void set (T newValue))
+  {
     uint64_t raw;
-    memcpy(&raw, &newValue, sizeof(T));
-    bytes[0] = raw;
-    bytes[1] = raw >> 8;
-    bytes[2] = raw >> 16;
-    bytes[3] = raw >> 24;
-    bytes[4] = raw >> 32;
-    bytes[5] = raw >> 40;
-    bytes[6] = raw >> 48;
-    bytes[7] = raw >> 56;
+    memcpy (&raw, &newValue, sizeof (T));
+    bytes [0] = raw;
+    bytes [1] = raw >> 8;
+    bytes [2] = raw >> 16;
+    bytes [3] = raw >> 24;
+    bytes [4] = raw >> 32;
+    bytes [5] = raw >> 40;
+    bytes [6] = raw >> 48;
+    bytes [7] = raw >> 56;
   }
 
 private:
   union {
-    byte bytes[8];
+    byte bytes [8];
     uint64_t align;
   };
 };
@@ -300,7 +323,7 @@ using WireValue = ShiftingWireValue<T>;
 
 #endif
 
-}  // namespace _ (private)
-}  // namespace capnp
+} // namespace _ (private)
+} // namespace capnp
 
 CAPNP_END_HEADER

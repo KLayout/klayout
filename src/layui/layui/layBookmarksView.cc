@@ -73,7 +73,7 @@ public:
     }
   }
 
-  QModelIndex parent(const QModelIndex &) const
+  QModelIndex parent (const QModelIndex &) const
   {
     return QModelIndex ();
   }
@@ -128,30 +128,26 @@ BookmarksView::selected_bookmarks ()
   return res;
 }
 
-void
-BookmarksView::follow_selection (bool f)
+void BookmarksView::follow_selection (bool f)
 {
   m_follow_selection = f;
 }
 
-void
-BookmarksView::set_background_color (tl::Color c)
+void BookmarksView::set_background_color (tl::Color c)
 {
   QPalette pl (mp_bookmarks->palette ());
   pl.setColor (QPalette::Base, QColor (c.rgb ()));
   mp_bookmarks->setPalette (pl);
 }
 
-void
-BookmarksView::set_text_color (tl::Color c)
+void BookmarksView::set_text_color (tl::Color c)
 {
   QPalette pl (mp_bookmarks->palette ());
   pl.setColor (QPalette::Text, QColor (c.rgb ()));
   mp_bookmarks->setPalette (pl);
 }
 
-void
-BookmarksView::refresh ()
+void BookmarksView::refresh ()
 {
   BookmarkListModel *model = dynamic_cast<BookmarkListModel *> (mp_bookmarks->model ());
   if (model) {
@@ -159,8 +155,7 @@ BookmarksView::refresh ()
   }
 }
 
-void
-BookmarksView::context_menu (const QPoint &p)
+void BookmarksView::context_menu (const QPoint &p)
 {
   QListView *bm_list = dynamic_cast<QListView *> (sender ());
   if (bm_list) {
@@ -169,16 +164,14 @@ BookmarksView::context_menu (const QPoint &p)
   }
 }
 
-void
-BookmarksView::current_bookmark_changed (const QModelIndex &index)
+void BookmarksView::current_bookmark_changed (const QModelIndex &index)
 {
   if (m_follow_selection) {
     bookmark_triggered (index);
   }
 }
 
-void
-BookmarksView::bookmark_triggered (const QModelIndex &index)
+void BookmarksView::bookmark_triggered (const QModelIndex &index)
 {
   if (index.row () >= 0 && index.row () < int (mp_view->bookmarks ().size ())) {
     mp_view->goto_view (mp_view->bookmarks ().state (index.row ()));
@@ -201,7 +194,7 @@ public:
 
     at = "@bookmarks_context_menu.end";
     menu_entries.push_back (lay::config_menu_item ("follow_selection", at, tl::to_string (QObject::tr ("Follow Selection")), cfg_bookmarks_follow_selection, "?")),
-    menu_entries.push_back (lay::separator ("ops_group", at));
+      menu_entries.push_back (lay::separator ("ops_group", at));
     menu_entries.push_back (lay::menu_item ("cm_manage_bookmarks", "manage_bookmarks", at, tl::to_string (QObject::tr ("Manage Bookmarks"))));
     menu_entries.push_back (lay::menu_item ("cm_load_bookmarks", "load_bookmarks", at, tl::to_string (QObject::tr ("Load Bookmarks"))));
     menu_entries.push_back (lay::menu_item ("cm_save_bookmarks", "save_bookmarks", at, tl::to_string (QObject::tr ("Save Bookmarks"))));
@@ -213,4 +206,3 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new BookmarksVie
 }
 
 #endif
-

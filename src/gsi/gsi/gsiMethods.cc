@@ -34,14 +34,14 @@ namespace gsi
 
 MethodBase::MethodBase (const std::string &name, const std::string &doc, bool c, bool s)
   : m_doc (doc), m_const (c), m_static (s), m_protected (false), m_argsize (0)
-{ 
+{
   reset_called ();
   parse_name (name);
 }
 
 MethodBase::MethodBase (const std::string &name, const std::string &doc)
   : m_doc (doc), m_const (false), m_static (false), m_protected (false), m_argsize (0)
-{ 
+{
   reset_called ();
   parse_name (name);
 }
@@ -86,7 +86,7 @@ void MethodBase::parse_name (const std::string &name)
 {
   const char *n = name.c_str ();
 
-  if (*n == '*' && n[1] && n[1] != '*' && n[1] != '!' && n[1] != '=') {
+  if (*n == '*' && n [1] && n [1] != '*' && n [1] != '!' && n [1] != '=') {
     m_protected = true;
     ++n;
   }
@@ -95,7 +95,7 @@ void MethodBase::parse_name (const std::string &name)
 
     m_method_synonyms.push_back (MethodSynonym ());
 
-    if ((*n == '#' || *n == ':') && n[1]) {
+    if ((*n == '#' || *n == ':') && n [1]) {
       if (*n == '#') {
         m_method_synonyms.back ().deprecated = true;
       } else {
@@ -105,18 +105,18 @@ void MethodBase::parse_name (const std::string &name)
     }
 
     bool any = false;
-    while (*n && (*n != '|' || !any)) {
-      if (*n == '\\' && n[1]) {
+    while (*n && (*n != '|' || ! any)) {
+      if (*n == '\\' && n [1]) {
         ++n;
       }
       m_method_synonyms.back ().name += *n;
       any = true;
       if (isalnum (*n) || *n == '_') {
         ++n;
-        if (*n == '?' && (n[1] == '|' || !n[1])) {
+        if (*n == '?' && (n [1] == '|' || ! n [1])) {
           ++n;
           m_method_synonyms.back ().is_predicate = true;
-        } else if (*n == '=' && (n[1] == '|' || !n[1])) {
+        } else if (*n == '=' && (n [1] == '|' || ! n [1])) {
           ++n;
           m_method_synonyms.back ().is_setter = true;
         }
@@ -128,7 +128,6 @@ void MethodBase::parse_name (const std::string &name)
     if (*n == '|') {
       ++n;
     }
-
   }
 }
 
@@ -138,47 +137,67 @@ type_to_s (const gsi::ArgType &a, bool for_return)
   std::string s;
   switch (a.type ()) {
   case gsi::T_void_ptr:
-    s += "void *"; break;
+    s += "void *";
+    break;
   case gsi::T_void:
-    s += "void"; break;
+    s += "void";
+    break;
   case gsi::T_bool:
-    s += "bool"; break;
+    s += "bool";
+    break;
   case gsi::T_char:
-    s += "char"; break;
+    s += "char";
+    break;
   case gsi::T_schar:
-    s += "signed char"; break;
+    s += "signed char";
+    break;
   case gsi::T_uchar:
-    s += "unsigned char"; break;
+    s += "unsigned char";
+    break;
   case gsi::T_short:
-    s += "short"; break;
+    s += "short";
+    break;
   case gsi::T_ushort:
-    s += "unsigned short"; break;
+    s += "unsigned short";
+    break;
   case gsi::T_int:
-    s += "int"; break;
+    s += "int";
+    break;
 #if defined(HAVE_64BIT_COORD)
   case gsi::T_int128:
-    s += "int128"; break;
+    s += "int128";
+    break;
 #endif
   case gsi::T_uint:
-    s += "unsigned int"; break;
+    s += "unsigned int";
+    break;
   case gsi::T_long:
-    s += "long"; break;
+    s += "long";
+    break;
   case gsi::T_ulong:
-    s += "unsigned long"; break;
+    s += "unsigned long";
+    break;
   case gsi::T_longlong:
-    s += "long long"; break;
+    s += "long long";
+    break;
   case gsi::T_ulonglong:
-    s += "unsigned long long"; break;
+    s += "unsigned long long";
+    break;
   case gsi::T_double:
-    s += "double"; break;
+    s += "double";
+    break;
   case gsi::T_float:
-    s += "float"; break;
+    s += "float";
+    break;
   case gsi::T_string:
-    s += "string"; break;
+    s += "string";
+    break;
   case gsi::T_byte_array:
-    s += "bytes"; break;
+    s += "bytes";
+    break;
   case gsi::T_var:
-    s += "variant"; break;
+    s += "variant";
+    break;
   case gsi::T_object:
     if (a.is_cptr () || (! for_return && a.is_cref ())) {
       s = "const ";
@@ -263,7 +282,7 @@ MethodBase::to_string () const
   if (m_method_synonyms.size () == 1) {
     res += names ();
   } else {
-    res += "{" + names() + "}";
+    res += "{" + names () + "}";
   }
 
   res += "(";
@@ -287,7 +306,6 @@ MethodBase::to_string () const
           res += "?";
         }
       }
-
     }
   }
 
@@ -403,8 +421,7 @@ Methods::~Methods ()
   clear ();
 }
 
-void
-Methods::initialize ()
+void Methods::initialize ()
 {
   for (std::vector<MethodBase *>::iterator m = m_methods.begin (); m != m_methods.end (); ++m) {
     if (tl::verbosity () >= 60) {
@@ -414,8 +431,7 @@ Methods::initialize ()
   }
 }
 
-void
-Methods::clear ()
+void Methods::clear ()
 {
   for (std::vector<MethodBase *>::iterator m = m_methods.begin (); m != m_methods.end (); ++m) {
     delete *m;
@@ -440,8 +456,7 @@ Methods::operator+ (MethodBase *m)
 Methods &
 Methods::operator+= (const Methods &m)
 {
-  for (std::vector<MethodBase *>::const_iterator mm = m.m_methods.begin (); mm != m.m_methods.end (); ++mm)
-  {
+  for (std::vector<MethodBase *>::const_iterator mm = m.m_methods.begin (); mm != m.m_methods.end (); ++mm) {
     add_method ((*mm)->clone ());
   }
   return *this;
@@ -454,17 +469,14 @@ Methods::operator+= (MethodBase *m)
   return *this;
 }
 
-void
-Methods::add_method (MethodBase *method)
+void Methods::add_method (MethodBase *method)
 {
   m_methods.push_back (method);
 }
 
-void
-Methods::swap (Methods &other)
+void Methods::swap (Methods &other)
 {
   m_methods.swap (other.m_methods);
 }
 
 }
-

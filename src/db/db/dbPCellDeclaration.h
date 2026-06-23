@@ -37,7 +37,7 @@ namespace db
 {
 
 typedef std::vector<tl::Variant> pcell_parameters_type;
-    
+
 /**
  *  @brief A declaration for one PCell parameter
  *
@@ -64,7 +64,7 @@ public:
     t_shape,    //  a shape (a db::Point, db::Box, db::Polygon, db::Edge or db::Path) rendering a guiding shape
     t_list,     //  a list of strings
     t_callback, //  callback only (button)
-    t_none      //  no specific type 
+    t_none      //  no specific type
   };
 
   /**
@@ -132,7 +132,7 @@ public:
   /**
    *  @brief Setter for the name property
    */
-  void set_name (const std::string &name) 
+  void set_name (const std::string &name)
   {
     m_name = name;
   }
@@ -148,7 +148,7 @@ public:
   /**
    *  @brief Setter for the unit property
    */
-  void set_unit (const std::string &unit) 
+  void set_unit (const std::string &unit)
   {
     m_unit = unit;
   }
@@ -164,7 +164,7 @@ public:
   /**
    *  @brief Setter for the description property
    */
-  void set_description (const std::string &description) 
+  void set_description (const std::string &description)
   {
     m_description = description;
   }
@@ -196,7 +196,7 @@ public:
   /**
    *  @brief Setter for the type property
    */
-  void set_type (type t) 
+  void set_type (type t)
   {
     m_type = t;
   }
@@ -212,7 +212,7 @@ public:
   /**
    *  @brief Setter for the readonly property
    */
-  void set_readonly (bool readonly) 
+  void set_readonly (bool readonly)
   {
     m_readonly = readonly;
   }
@@ -228,7 +228,7 @@ public:
   /**
    *  @brief Setter for the hidden property
    */
-  void set_hidden (bool hidden) 
+  void set_hidden (bool hidden)
   {
     m_hidden = hidden;
   }
@@ -244,7 +244,7 @@ public:
   /**
    *  @brief Setter for the default value
    */
-  void set_default (const tl::Variant &def) 
+  void set_default (const tl::Variant &def)
   {
     m_default = def;
   }
@@ -260,7 +260,7 @@ public:
   /**
    *  @brief Setter for the choices
    */
-  void set_choices (const std::vector<tl::Variant> &choices) 
+  void set_choices (const std::vector<tl::Variant> &choices)
   {
     m_choices = choices;
   }
@@ -280,7 +280,7 @@ public:
   /**
    *  @brief Setter for the choice descriptions
    */
-  void set_choice_descriptions (const std::vector<std::string> &choice_descriptions) 
+  void set_choice_descriptions (const std::vector<std::string> &choice_descriptions)
   {
     m_choice_descriptions = choice_descriptions;
   }
@@ -607,7 +607,7 @@ public:
   /**
    *  @brief Return the layer declarations
    *
-   *  This method is supposed to return a set of layer declarations. When the 
+   *  This method is supposed to return a set of layer declarations. When the
    *  layout is produced, the production method will receive a vector of layer id's
    *  corresponding to the layer declarations delivered by this method.
    *  This method receives the current PCell parameters which allows it to deduce layers
@@ -655,7 +655,7 @@ public:
    *  @brief Produces a layout for the given parameter set and using the given layers.
    *
    *  A reimplementation of that method should produce the desired layout for the given parameter set.
-   *  The layout shall be put into the given cell. This code may create cell instances to other cells 
+   *  The layout shall be put into the given cell. This code may create cell instances to other cells
    *  inside the given layout.
    */
   virtual void produce (const db::Layout & /*layout*/, const std::vector<unsigned int> & /*layer_ids*/, const pcell_parameters_type & /*parameters*/, db::Cell & /*cell*/) const
@@ -699,7 +699,7 @@ public:
    *  @brief Returns true, if the PCell can be created from the given shape on the given layer
    *
    *  If this method returns true, KLayout allows this PCell to be created from the given shape.
-   *  It will use "parameters_from_shape" and "transformation_from_shape" to derive the 
+   *  It will use "parameters_from_shape" and "transformation_from_shape" to derive the
    *  parameters for the new instance.
    */
   virtual bool can_create_from_shape (const db::Layout & /*layout*/, const db::Shape & /*shape*/, unsigned int /*layer*/) const
@@ -770,7 +770,7 @@ public:
   /**
    *  @brief Add a reference to this object
    *
-   *  Since the declaration is supposed to be a static object, it can be shared between 
+   *  Since the declaration is supposed to be a static object, it can be shared between
    *  multiple PCellHeader instances. Using reference counting avoids having to create
    *  copies which would involve clone() methods.
    */
@@ -816,7 +816,7 @@ public:
   /**
    *  @brief Return the parameter declarations
    *
-   *  This method is supposed to return a set of parameter declarations. When the 
+   *  This method is supposed to return a set of parameter declarations. When the
    *  layout is produced, the production method will receive a vector of tl::Variant objects
    *  corresponding to the parameter declarations delivered by this method.
    */
@@ -866,4 +866,3 @@ private:
 }
 
 #endif
-

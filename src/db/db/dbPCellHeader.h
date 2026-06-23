@@ -37,8 +37,7 @@ namespace db
 
 class PCellVariant;
 
-struct DB_PUBLIC PCellParametersCompareFunc
-{
+struct DB_PUBLIC PCellParametersCompareFunc {
   bool operator() (const pcell_parameters_type *a, const pcell_parameters_type *b) const;
 };
 
@@ -56,7 +55,7 @@ public:
   /**
    *  @brief The default constructor
    */
-  PCellHeader(size_t pcell_id, const std::string &name, PCellDeclaration *declaration);
+  PCellHeader (size_t pcell_id, const std::string &name, PCellDeclaration *declaration);
 
   /**
    *  @brief The destructor
@@ -104,12 +103,12 @@ public:
   PCellVariant *get_variant (db::Layout &layout, const pcell_parameters_type &parameters);
 
   /**
-   *  @brief Register a variant 
+   *  @brief Register a variant
    */
   void unregister_variant (PCellVariant *variant);
 
   /**
-   *  @brief Unregister a variant 
+   *  @brief Unregister a variant
    */
   void register_variant (PCellVariant *variant);
 
@@ -143,8 +142,7 @@ private:
   size_t m_pcell_id;
   std::string m_name;
 };
-  
+
 }
 
 #endif
-

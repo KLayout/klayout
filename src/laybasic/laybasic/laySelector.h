@@ -31,29 +31,30 @@
 #include "layEditable.h"
 #include "layPlugin.h"
 
-#if defined (HAVE_QT)
-#  include <QTimer>
-#  include <QObject>
+#if defined(HAVE_QT)
+#include <QTimer>
+#include <QObject>
 #endif
 
-namespace lay {
+namespace lay
+{
 
 class RubberBox;
 class LayoutViewBase;
 class LayoutCanvas;
 
 class LAYBASIC_PUBLIC SelectionService :
-#if defined (HAVE_QT)
-    public QObject,
+#if defined(HAVE_QT)
+  public QObject,
 #endif
-    public lay::ViewService,
-    public lay::Plugin
+  public lay::ViewService,
+  public lay::Plugin
 {
-#if defined (HAVE_QT)
-Q_OBJECT
+#if defined(HAVE_QT)
+  Q_OBJECT
 #endif
 
-public: 
+public:
   SelectionService (lay::LayoutViewBase *view);
   ~SelectionService ();
 
@@ -78,7 +79,7 @@ public:
   virtual bool wheel_event (int delta, bool horizontal, const db::DPoint &p, unsigned int buttons, bool prio);
   virtual void hover_reset ();
 
-#if defined (HAVE_QT)
+#if defined(HAVE_QT)
 public slots:
   void timeout ();
 #endif
@@ -95,7 +96,7 @@ private:
   bool m_hover_wait;
   db::DPoint m_hover_point;
   bool m_mouse_in_window;
-#if defined (HAVE_QT)
+#if defined(HAVE_QT)
   QTimer m_timer;
 #endif
 
@@ -105,4 +106,3 @@ private:
 }
 
 #endif
-

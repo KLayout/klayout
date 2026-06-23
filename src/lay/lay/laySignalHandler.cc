@@ -31,20 +31,20 @@
 #include "tlStream.h"
 
 #ifdef _WIN32
-#  include <windows.h>
-#  include <DbgHelp.h>
-#  include <Psapi.h>
+#include <windows.h>
+#include <DbgHelp.h>
+#include <Psapi.h>
 //  get rid of these - we have std::min/max ..
-#  ifdef min
-#    undef min
-#  endif
-#  ifdef max
-#    undef max
-#  endif
+#ifdef min
+#undef min
+#endif
+#ifdef max
+#undef max
+#endif
 #else
-#  include <dlfcn.h>
-#  include <execinfo.h>
-#  include <unistd.h>
+#include <dlfcn.h>
+#include <execinfo.h>
+#include <unistd.h>
 #endif
 
 #include <signal.h>
@@ -79,7 +79,7 @@ addr2symname (DWORD64 addr)
   DWORD64 d;
   bool has_symbol = false;
   DWORD64 disp = addr;
-  if (SymFromAddr(process, addr, &d, symbol)) {
+  if (SymFromAddr (process, addr, &d, symbol)) {
     //  Symbols taken from the export table seem to be unreliable - skip these
     //  and report the module name + offset.
     if (! (symbol->Flags & SYMFLAG_EXPORT)) {
@@ -91,7 +91,7 @@ addr2symname (DWORD64 addr)
 
   //  find the module name from the module base address
 
-  HMODULE modules[1024];
+  HMODULE modules [1024];
   DWORD modules_size = 0;
   if (! EnumProcessModules (process, modules, sizeof (modules), &modules_size)) {
     modules_size = 0;
@@ -99,10 +99,10 @@ addr2symname (DWORD64 addr)
 
   QString mod_name;
   for (unsigned int i = 0; i < (modules_size / sizeof (HMODULE)); i++) {
-    TCHAR mn[MAX_PATH];
-    if (GetModuleFileName (modules[i], mn, sizeof (mn) / sizeof (TCHAR))) {
+    TCHAR mn [MAX_PATH];
+    if (GetModuleFileName (modules [i], mn, sizeof (mn) / sizeof (TCHAR))) {
       MODULEINFO mi;
-      if (GetModuleInformation (process, modules[i], &mi, sizeof (mi))) {
+      if (GetModuleInformation (process, modules [i], &mi, sizeof (mi))) {
         if ((DWORD64) mi.lpBaseOfDll <= addr && (DWORD64) mi.lpBaseOfDll + mi.SizeOfImage > addr) {
           mod_name = QFileInfo (QString::fromUtf16 ((unsigned short *) mn)).fileName ();
           if (! has_symbol) {
@@ -120,11 +120,7 @@ addr2symname (DWORD64 addr)
 
   free (symbol);
 
-  return QString::fromUtf8 ("0x%1 - %2%3+%4").
-            arg (addr, 0, 16).
-            arg (mod_name).
-            arg (sym_name).
-            arg (disp);
+  return QString::fromUtf8 ("0x%1 - %2%3+%4").arg (addr, 0, 16).arg (mod_name).arg (sym_name).arg (disp);
 }
 
 QString
@@ -136,18 +132,18 @@ get_symbol_name_from_address (const QString &mod_name, size_t addr)
   if (! mod_name.isEmpty ()) {
 
     //  find the module name from the module base address
-    HMODULE modules[1024];
+    HMODULE modules [1024];
     DWORD modules_size = 0;
     if (! EnumProcessModules (process, modules, sizeof (modules), &modules_size)) {
       modules_size = 0;
     }
 
     for (unsigned int i = 0; i < (modules_size / sizeof (HMODULE)); i++) {
-      TCHAR mn[MAX_PATH];
-      if (GetModuleFileName (modules[i], mn, sizeof (mn) / sizeof (TCHAR))) {
+      TCHAR mn [MAX_PATH];
+      if (GetModuleFileName (modules [i], mn, sizeof (mn) / sizeof (TCHAR))) {
         if (mod_name == QFileInfo (QString::fromUtf16 ((unsigned short *) mn)).fileName ()) {
           MODULEINFO mi;
-          if (GetModuleInformation (process, modules[i], &mi, sizeof (mi))) {
+          if (GetModuleInformation (process, modules [i], &mi, sizeof (mi))) {
             mod_base = (DWORD64) mi.lpBaseOfDll;
           }
         }
@@ -157,7 +153,6 @@ get_symbol_name_from_address (const QString &mod_name, size_t addr)
     if (mod_base == 0) {
       throw tl::Exception (tl::to_string (QObject::tr ("Unknown module name: ") + mod_name));
     }
-
   }
 
   SymInitialize (process, NULL, TRUE);
@@ -167,7 +162,7 @@ get_symbol_name_from_address (const QString &mod_name, size_t addr)
   return res;
 }
 
-LONG WINAPI ExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo)
+LONG WINAPI ExceptionHandler (PEXCEPTION_POINTERS pExceptionInfo)
 {
   HANDLE process = GetCurrentProcess ();
   SymInitialize (process, NULL, TRUE);
@@ -193,7 +188,7 @@ LONG WINAPI ExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo)
 
   // Initialize stack walking.
   STACKFRAME64 stack_frame;
-  memset(&stack_frame, 0, sizeof(stack_frame));
+  memset (&stack_frame, 0, sizeof (stack_frame));
 
 #if defined(_WIN64)
   int machine_type = IMAGE_FILE_MACHINE_AMD64;
@@ -211,8 +206,8 @@ LONG WINAPI ExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo)
   stack_frame.AddrStack.Mode = AddrModeFlat;
 
   while (StackWalk64 (machine_type,
-                      GetCurrentProcess(),
-                      GetCurrentThread(),
+                      GetCurrentProcess (),
+                      GetCurrentThread (),
                       &stack_frame,
                       &context_record,
                       NULL,
@@ -248,7 +243,6 @@ LONG WINAPI ExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo)
 
     tl::error << text << tl::noendl;
     return EXCEPTION_EXECUTE_HANDLER;
-
   }
 }
 
@@ -256,7 +250,7 @@ static void handle_signal (int signo)
 {
   signal (signo, handle_signal);
   int user_base = (1 << 29);
-  RaiseException(signo + user_base, 0, 0, NULL);
+  RaiseException (signo + user_base, 0, 0, NULL);
 }
 
 void install_signal_handlers ()
@@ -274,7 +268,7 @@ void install_signal_handlers ()
   _set_abort_behavior( 0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT );
 #endif
 
-  SetUnhandledExceptionFilter(ExceptionHandler);
+  SetUnhandledExceptionFilter (ExceptionHandler);
 }
 
 #else
@@ -290,14 +284,14 @@ void signal_handler (int signo, siginfo_t *si, void *)
 
   bool can_resume = (signo != SIGILL);
 
-  size_t nptrs = backtrace (array, sizeof (array) / sizeof (array[0]));
+  size_t nptrs = backtrace (array, sizeof (array) / sizeof (array [0]));
 
   std::string text;
   text += tl::sprintf ("Signal number: %d\n", signo);
   text += tl::sprintf ("Address: 0x%lx\n", (unsigned long) si->si_addr);
   text += std::string ("Program Version: ") +
-            lay::Version::name () + " " +
-            lay::Version::version () + " (" + lay::Version::subversion () + ")\n";
+          lay::Version::name () + " " +
+          lay::Version::version () + " (" + lay::Version::subversion () + ")\n";
 
   text += std::string ("\nBacktrace:\n");
 
@@ -330,8 +324,8 @@ void signal_handler (int signo, siginfo_t *si, void *)
     if (info.dli_fname) {
 
       char sym [1024], source [1024];
-      sym[0] = 0;
-      source[0] = 0;
+      sym [0] = 0;
+      source [0] = 0;
 
       if (has_addr2line) {
 
@@ -340,7 +334,7 @@ void signal_handler (int signo, siginfo_t *si, void *)
         //  TODO: is there a better way to decide how to use addr2line (with executables)?
         for (int abs_addr = 0; abs_addr < 2; ++abs_addr) {
 
-          std::string cmd = tl::sprintf (addr2line_call, info.dli_fname, size_t (array[i]) - (abs_addr ? 0 : size_t (info.dli_fbase)));
+          std::string cmd = tl::sprintf (addr2line_call, info.dli_fname, size_t (array [i]) - (abs_addr ? 0 : size_t (info.dli_fbase)));
           FILE *addr2line_out = popen (cmd.c_str (), "r");
           if (! addr2line_out) {
             has_addr2line = false;
@@ -355,12 +349,12 @@ void signal_handler (int signo, siginfo_t *si, void *)
 
           int l;
           l = strlen (sym);
-          if (l > 0 && sym[l - 1] == '\n') {
-            sym[l - 1] = 0;
+          if (l > 0 && sym [l - 1] == '\n') {
+            sym [l - 1] = 0;
           }
           l = strlen (source);
-          if (l > 0 && source[l - 1] == '\n') {
-            source[l - 1] = 0;
+          if (l > 0 && source [l - 1] == '\n') {
+            source [l - 1] = 0;
           }
 
           if (addr2line_out) {
@@ -368,24 +362,22 @@ void signal_handler (int signo, siginfo_t *si, void *)
           }
 
           //  addr2line returns '??' on missing symbol - in that case use absolute address mode
-          if (sym[0] != '?') {
+          if (sym [0] != '?') {
             break;
           }
-
         }
-
       }
 
       if (has_addr2line) {
-        text += tl::sprintf ("%s +0x%lx %s [%s]\n", info.dli_fname, size_t (array[i]) - size_t (info.dli_fbase), (const char *) sym, (const char *) source);
+        text += tl::sprintf ("%s +0x%lx %s [%s]\n", info.dli_fname, size_t (array [i]) - size_t (info.dli_fbase), (const char *) sym, (const char *) source);
       } else if (info.dli_sname) {
-        text += tl::sprintf ("%s +0x%lx %s\n", info.dli_fname, size_t (array[i]) - size_t (info.dli_fbase), info.dli_sname);
+        text += tl::sprintf ("%s +0x%lx %s\n", info.dli_fname, size_t (array [i]) - size_t (info.dli_fbase), info.dli_sname);
       } else {
-        text += tl::sprintf ("%s +0x%lx\n", info.dli_fname, size_t (array[i]) - size_t (info.dli_fbase));
+        text += tl::sprintf ("%s +0x%lx\n", info.dli_fname, size_t (array [i]) - size_t (info.dli_fbase));
       }
 
     } else {
-      text += tl::sprintf ("0x%lx\n", (unsigned long)array[i]);
+      text += tl::sprintf ("0x%lx\n", (unsigned long) array [i]);
     }
   }
 
@@ -431,24 +423,22 @@ void signal_handler (int signo, siginfo_t *si, void *)
 
       sigset_t x;
       sigemptyset (&x);
-      sigaddset(&x, signo);
-      sigprocmask(SIG_UNBLOCK, &x, NULL);
+      sigaddset (&x, signo);
+      sigprocmask (SIG_UNBLOCK, &x, NULL);
 
       throw tl::CancelException ();
-
     }
 
   } else {
 
     _exit (signo);
-
   }
 }
 
 void install_signal_handlers ()
 {
   struct sigaction act;
-  memset(&act, 0, sizeof(struct sigaction));
+  memset (&act, 0, sizeof (struct sigaction));
   act.sa_sigaction = signal_handler;
   sigemptyset (&act.sa_mask);
   act.sa_flags = SA_SIGINFO;

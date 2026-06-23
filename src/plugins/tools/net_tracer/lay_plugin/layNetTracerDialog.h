@@ -39,8 +39,8 @@
 
 namespace db
 {
-  class NetTracerNet;
-  class LayoutToNetlist;
+class NetTracerNet;
+class LayoutToNetlist;
 }
 
 namespace lay
@@ -54,7 +54,7 @@ class NetTracerDialog
     public Ui::NetTracerDialog,
     public lay::ViewService
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   NetTracerDialog (lay::Dispatcher *root, lay::LayoutViewBase *view);
@@ -87,8 +87,8 @@ protected slots:
   void redo_trace_clicked ();
 
 private:
-  std::vector <db::NetTracerNet *> mp_nets;
-  std::vector <lay::ShapeMarker *> mp_markers;
+  std::vector<db::NetTracerNet *> mp_nets;
+  std::vector<lay::ShapeMarker *> mp_markers;
   unsigned int m_cv_index;
   int m_net_index;
   nt_window_type m_window;
@@ -141,4 +141,3 @@ private:
 }
 
 #endif
-

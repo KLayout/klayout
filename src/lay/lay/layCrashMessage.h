@@ -35,10 +35,11 @@ namespace lay
 /**
  *  @brief A window showing a crash message
  */
-class LAY_PUBLIC CrashMessage  
-  : public QDialog, private Ui::CrashMessage
+class LAY_PUBLIC CrashMessage
+  : public QDialog,
+    private Ui::CrashMessage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -90,4 +91,3 @@ private:
 }
 
 #endif
-

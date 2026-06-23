@@ -39,7 +39,7 @@ class SaltGrain;
 class SaltGrainDetailsTextWidget
   : public QTextBrowser
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**

@@ -27,135 +27,154 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-namespace kj {
+namespace kj
+{
 
-namespace {
-bool isHex(const char *s) {
-  if (*s == '-') s++;
-  return s[0] == '0' && (s[1] == 'x' || s[1] == 'X');
+namespace
+{
+bool isHex (const char *s)
+{
+  if (*s == '-')
+    s++;
+  return s [0] == '0' && (s [1] == 'x' || s [1] == 'X');
 }
 
-long long parseSigned(const StringPtr& s, long long min, long long max) {
-  KJ_REQUIRE(s != nullptr, "String does not contain valid number", s) { return 0; }
+long long parseSigned (const StringPtr &s, long long min, long long max)
+{
+  KJ_REQUIRE (s != nullptr, "String does not contain valid number", s) { return 0; }
   char *endPtr;
   errno = 0;
-  auto value = strtoll(s.begin(), &endPtr, isHex(s.cStr()) ? 16 : 10);
-  KJ_REQUIRE(endPtr == s.end(), "String does not contain valid number", s) { return 0; }
-  KJ_REQUIRE(errno != ERANGE, "Value out-of-range", s) { return 0; }
-  KJ_REQUIRE(value >= min && value <= max, "Value out-of-range", value, min, max) { return 0; }
+  auto value = strtoll (s.begin (), &endPtr, isHex (s.cStr ()) ? 16 : 10);
+  KJ_REQUIRE (endPtr == s.end (), "String does not contain valid number", s) { return 0; }
+  KJ_REQUIRE (errno != ERANGE, "Value out-of-range", s) { return 0; }
+  KJ_REQUIRE (value >= min && value <= max, "Value out-of-range", value, min, max) { return 0; }
   return value;
 }
 
-Maybe<long long> tryParseSigned(const StringPtr& s, long long min, long long max) {
-  if (s == nullptr) { return nullptr; } // String does not contain valid number.
+Maybe<long long> tryParseSigned (const StringPtr &s, long long min, long long max)
+{
+  if (s == nullptr) {
+    return nullptr;
+  } // String does not contain valid number.
   char *endPtr;
   errno = 0;
-  auto value = strtoll(s.begin(), &endPtr, isHex(s.cStr()) ? 16 : 10);
-  if (endPtr != s.end() || errno == ERANGE || value < min || max < value) {
+  auto value = strtoll (s.begin (), &endPtr, isHex (s.cStr ()) ? 16 : 10);
+  if (endPtr != s.end () || errno == ERANGE || value < min || max < value) {
     return nullptr;
   }
   return value;
 }
 
-unsigned long long parseUnsigned(const StringPtr& s, unsigned long long max) {
-  KJ_REQUIRE(s != nullptr, "String does not contain valid number", s) { return 0; }
+unsigned long long parseUnsigned (const StringPtr &s, unsigned long long max)
+{
+  KJ_REQUIRE (s != nullptr, "String does not contain valid number", s) { return 0; }
   char *endPtr;
   errno = 0;
-  auto value = strtoull(s.begin(), &endPtr, isHex(s.cStr()) ? 16 : 10);
-  KJ_REQUIRE(endPtr == s.end(), "String does not contain valid number", s) { return 0; }
-  KJ_REQUIRE(errno != ERANGE, "Value out-of-range", s) { return 0; }
-  KJ_REQUIRE(value <= max, "Value out-of-range", value, max) { return 0; }
-  //strtoull("-1") does not fail with ERANGE
-  KJ_REQUIRE(s[0] != '-', "Value out-of-range", s) { return 0; }
+  auto value = strtoull (s.begin (), &endPtr, isHex (s.cStr ()) ? 16 : 10);
+  KJ_REQUIRE (endPtr == s.end (), "String does not contain valid number", s) { return 0; }
+  KJ_REQUIRE (errno != ERANGE, "Value out-of-range", s) { return 0; }
+  KJ_REQUIRE (value <= max, "Value out-of-range", value, max) { return 0; }
+  // strtoull("-1") does not fail with ERANGE
+  KJ_REQUIRE (s [0] != '-', "Value out-of-range", s) { return 0; }
   return value;
 }
 
-Maybe<unsigned long long> tryParseUnsigned(const StringPtr& s, unsigned long long max) {
-  if (s == nullptr) { return nullptr; } // String does not contain valid number.
+Maybe<unsigned long long> tryParseUnsigned (const StringPtr &s, unsigned long long max)
+{
+  if (s == nullptr) {
+    return nullptr;
+  } // String does not contain valid number.
   char *endPtr;
   errno = 0;
-  auto value = strtoull(s.begin(), &endPtr, isHex(s.cStr()) ? 16 : 10);
-  if (endPtr != s.end() || errno == ERANGE || max < value || s[0] == '-') { return nullptr; }
+  auto value = strtoull (s.begin (), &endPtr, isHex (s.cStr ()) ? 16 : 10);
+  if (endPtr != s.end () || errno == ERANGE || max < value || s [0] == '-') {
+    return nullptr;
+  }
   return value;
 }
 
 template <typename T>
-T parseInteger(const StringPtr& s) {
-  if (static_cast<T>(minValue) < 0) {
-    long long min = static_cast<T>(minValue);
-    long long max = static_cast<T>(maxValue);
-    return static_cast<T>(parseSigned(s, min, max));
+T parseInteger (const StringPtr &s)
+{
+  if (static_cast<T> (minValue) < 0) {
+    long long min = static_cast<T> (minValue);
+    long long max = static_cast<T> (maxValue);
+    return static_cast<T> (parseSigned (s, min, max));
   } else {
-    unsigned long long max = static_cast<T>(maxValue);
-    return static_cast<T>(parseUnsigned(s, max));
+    unsigned long long max = static_cast<T> (maxValue);
+    return static_cast<T> (parseUnsigned (s, max));
   }
 }
 
 template <typename T>
-Maybe<T> tryParseInteger(const StringPtr& s) {
-  if (static_cast<T>(minValue) < 0) {
-    long long min = static_cast<T>(minValue);
-    long long max = static_cast<T>(maxValue);
-    return static_cast<Maybe<T>>(tryParseSigned(s, min, max));
+Maybe<T> tryParseInteger (const StringPtr &s)
+{
+  if (static_cast<T> (minValue) < 0) {
+    long long min = static_cast<T> (minValue);
+    long long max = static_cast<T> (maxValue);
+    return static_cast<Maybe<T>> (tryParseSigned (s, min, max));
   } else {
-    unsigned long long max = static_cast<T>(maxValue);
-    return static_cast<Maybe<T>>(tryParseUnsigned(s, max));
+    unsigned long long max = static_cast<T> (maxValue);
+    return static_cast<Maybe<T>> (tryParseUnsigned (s, max));
   }
 }
 
 } // namespace
 
 #define PARSE_AS_INTEGER(T) \
-    template <> T StringPtr::parseAs<T>() const { return parseInteger<T>(*this); }
-PARSE_AS_INTEGER(char);
-PARSE_AS_INTEGER(signed char);
-PARSE_AS_INTEGER(unsigned char);
-PARSE_AS_INTEGER(short);
-PARSE_AS_INTEGER(unsigned short);
-PARSE_AS_INTEGER(int);
-PARSE_AS_INTEGER(unsigned int);
-PARSE_AS_INTEGER(long);
-PARSE_AS_INTEGER(unsigned long);
-PARSE_AS_INTEGER(long long);
-PARSE_AS_INTEGER(unsigned long long);
+  template <> T StringPtr::parseAs<T> () const { return parseInteger<T> (*this); }
+PARSE_AS_INTEGER (char);
+PARSE_AS_INTEGER (signed char);
+PARSE_AS_INTEGER (unsigned char);
+PARSE_AS_INTEGER (short);
+PARSE_AS_INTEGER (unsigned short);
+PARSE_AS_INTEGER (int);
+PARSE_AS_INTEGER (unsigned int);
+PARSE_AS_INTEGER (long);
+PARSE_AS_INTEGER (unsigned long);
+PARSE_AS_INTEGER (long long);
+PARSE_AS_INTEGER (unsigned long long);
 #undef PARSE_AS_INTEGER
 
 #define TRY_PARSE_AS_INTEGER(T) \
-    template <> Maybe<T> StringPtr::tryParseAs<T>() const { return tryParseInteger<T>(*this); }
-TRY_PARSE_AS_INTEGER(char);
-TRY_PARSE_AS_INTEGER(signed char);
-TRY_PARSE_AS_INTEGER(unsigned char);
-TRY_PARSE_AS_INTEGER(short);
-TRY_PARSE_AS_INTEGER(unsigned short);
-TRY_PARSE_AS_INTEGER(int);
-TRY_PARSE_AS_INTEGER(unsigned int);
-TRY_PARSE_AS_INTEGER(long);
-TRY_PARSE_AS_INTEGER(unsigned long);
-TRY_PARSE_AS_INTEGER(long long);
-TRY_PARSE_AS_INTEGER(unsigned long long);
+  template <> Maybe<T> StringPtr::tryParseAs<T> () const { return tryParseInteger<T> (*this); }
+TRY_PARSE_AS_INTEGER (char);
+TRY_PARSE_AS_INTEGER (signed char);
+TRY_PARSE_AS_INTEGER (unsigned char);
+TRY_PARSE_AS_INTEGER (short);
+TRY_PARSE_AS_INTEGER (unsigned short);
+TRY_PARSE_AS_INTEGER (int);
+TRY_PARSE_AS_INTEGER (unsigned int);
+TRY_PARSE_AS_INTEGER (long);
+TRY_PARSE_AS_INTEGER (unsigned long);
+TRY_PARSE_AS_INTEGER (long long);
+TRY_PARSE_AS_INTEGER (unsigned long long);
 #undef TRY_PARSE_AS_INTEGER
 
-String heapString(size_t size) {
-  char* buffer = _::HeapArrayDisposer::allocate<char>(size + 1);
-  buffer[size] = '\0';
-  return String(buffer, size, _::HeapArrayDisposer::instance);
+String heapString (size_t size)
+{
+  char *buffer = _::HeapArrayDisposer::allocate<char> (size + 1);
+  buffer [size] = '\0';
+  return String (buffer, size, _::HeapArrayDisposer::instance);
 }
 
-String heapString(const char* value, size_t size) {
-  char* buffer = _::HeapArrayDisposer::allocate<char>(size + 1);
+String heapString (const char *value, size_t size)
+{
+  char *buffer = _::HeapArrayDisposer::allocate<char> (size + 1);
   if (size != 0u) {
-    memcpy(buffer, value, size);
+    memcpy (buffer, value, size);
   }
-  buffer[size] = '\0';
-  return String(buffer, size, _::HeapArrayDisposer::instance);
+  buffer [size] = '\0';
+  return String (buffer, size, _::HeapArrayDisposer::instance);
 }
 
 template <typename T>
-static CappedArray<char, sizeof(T) * 2 + 1> hexImpl(T i) {
+static CappedArray<char, sizeof (T) * 2 + 1> hexImpl (T i)
+{
   // We don't use sprintf() because it's not async-signal-safe (for strPreallocated()).
-  CappedArray<char, sizeof(T) * 2 + 1> result;
-  uint8_t reverse[sizeof(T) * 2];
-  uint8_t* p = reverse;
+  CappedArray<char, sizeof (T) * 2 + 1> result;
+  uint8_t reverse [sizeof (T) * 2];
+  uint8_t *p = reverse;
   if (i == 0) {
     *p++ = 0;
   } else {
@@ -165,49 +184,55 @@ static CappedArray<char, sizeof(T) * 2 + 1> hexImpl(T i) {
     }
   }
 
-  char* p2 = result.begin();
+  char *p2 = result.begin ();
   while (p > reverse) {
-    *p2++ = "0123456789abcdef"[*--p];
+    *p2++ = "0123456789abcdef" [*--p];
   }
-  result.setSize(p2 - result.begin());
+  result.setSize (p2 - result.begin ());
   return result;
 }
 
-#define HEXIFY_INT(type) \
-CappedArray<char, sizeof(type) * 2 + 1> hex(type i) { \
-  return hexImpl<type>(i); \
-}
+#define HEXIFY_INT(type)                                \
+  CappedArray<char, sizeof (type) * 2 + 1> hex (type i) \
+  {                                                     \
+    return hexImpl<type> (i);                           \
+  }
 
-HEXIFY_INT(unsigned char);
-HEXIFY_INT(unsigned short);
-HEXIFY_INT(unsigned int);
-HEXIFY_INT(unsigned long);
-HEXIFY_INT(unsigned long long);
+HEXIFY_INT (unsigned char);
+HEXIFY_INT (unsigned short);
+HEXIFY_INT (unsigned int);
+HEXIFY_INT (unsigned long);
+HEXIFY_INT (unsigned long long);
 
 #undef HEXIFY_INT
 
-namespace _ {  // private
+namespace _
+{ // private
 
-StringPtr Stringifier::operator*(decltype(nullptr)) const {
+StringPtr Stringifier::operator* (decltype (nullptr)) const
+{
   return "nullptr";
 }
 
-StringPtr Stringifier::operator*(bool b) const {
-  return b ? StringPtr("true") : StringPtr("false");
+StringPtr Stringifier::operator* (bool b) const
+{
+  return b ? StringPtr ("true") : StringPtr ("false");
 }
 
 template <typename T, typename Unsigned>
-static CappedArray<char, sizeof(T) * 3 + 2> stringifyImpl(T i) {
+static CappedArray<char, sizeof (T) * 3 + 2> stringifyImpl (T i)
+{
   // We don't use sprintf() because it's not async-signal-safe (for strPreallocated()).
-  CappedArray<char, sizeof(T) * 3 + 2> result;
+  CappedArray<char, sizeof (T) * 3 + 2> result;
   bool negative = i < 0;
   // Note that if `i` is the most-negative value, negating it produces the same bit value. But
   // since it's a signed integer, this is considered an overflow. We therefore must make it
   // unsigned first, then negate it, to avoid ubsan complaining.
   Unsigned u = i;
-  if (negative) u = -u;
-  uint8_t reverse[sizeof(T) * 3 + 1];
-  uint8_t* p = reverse;
+  if (negative)
+    u = -u;
+  uint8_t reverse [sizeof (T) * 3 + 1];
+  uint8_t *p = reverse;
   if (u == 0) {
     *p++ = 0;
   } else {
@@ -217,38 +242,42 @@ static CappedArray<char, sizeof(T) * 3 + 2> stringifyImpl(T i) {
     }
   }
 
-  char* p2 = result.begin();
-  if (negative) *p2++ = '-';
+  char *p2 = result.begin ();
+  if (negative)
+    *p2++ = '-';
   while (p > reverse) {
     *p2++ = '0' + *--p;
   }
-  result.setSize(p2 - result.begin());
+  result.setSize (p2 - result.begin ());
   return result;
 }
 
-#define STRINGIFY_INT(type, unsigned) \
-CappedArray<char, sizeof(type) * 3 + 2> Stringifier::operator*(type i) const { \
-  return stringifyImpl<type, unsigned>(i); \
-}
+#define STRINGIFY_INT(type, unsigned)                                            \
+  CappedArray<char, sizeof (type) * 3 + 2> Stringifier::operator* (type i) const \
+  {                                                                              \
+    return stringifyImpl<type, unsigned> (i);                                    \
+  }
 
-STRINGIFY_INT(signed char, uint);
-STRINGIFY_INT(unsigned char, uint);
-STRINGIFY_INT(short, uint);
-STRINGIFY_INT(unsigned short, uint);
-STRINGIFY_INT(int, uint);
-STRINGIFY_INT(unsigned int, uint);
-STRINGIFY_INT(long, unsigned long);
-STRINGIFY_INT(unsigned long, unsigned long);
-STRINGIFY_INT(long long, unsigned long long);
-STRINGIFY_INT(unsigned long long, unsigned long long);
+STRINGIFY_INT (signed char, uint);
+STRINGIFY_INT (unsigned char, uint);
+STRINGIFY_INT (short, uint);
+STRINGIFY_INT (unsigned short, uint);
+STRINGIFY_INT (int, uint);
+STRINGIFY_INT (unsigned int, uint);
+STRINGIFY_INT (long, unsigned long);
+STRINGIFY_INT (unsigned long, unsigned long);
+STRINGIFY_INT (long long, unsigned long long);
+STRINGIFY_INT (unsigned long long, unsigned long long);
 
 #undef STRINGIFY_INT
 
-CappedArray<char, sizeof(const void*) * 2 + 1> Stringifier::operator*(const void* i) const { \
-  return hexImpl<uintptr_t>(reinterpret_cast<uintptr_t>(i));
+CappedArray<char, sizeof (const void *) * 2 + 1> Stringifier::operator* (const void *i) const
+{
+  return hexImpl<uintptr_t> (reinterpret_cast<uintptr_t> (i));
 }
 
-namespace {
+namespace
+{
 
 // ----------------------------------------------------------------------
 // DoubleToBuffer()
@@ -319,7 +348,8 @@ namespace {
 #define snprintf _snprintf
 #endif
 
-inline bool IsNaN(double value) {
+inline bool IsNaN (double value)
+{
   // NaN is never equal to anything, even itself.
   return value != value;
 }
@@ -330,19 +360,23 @@ inline bool IsNaN(double value) {
 static const int kDoubleToBufferSize = 32;
 static const int kFloatToBufferSize = 24;
 
-static inline bool IsValidFloatChar(char c) {
+static inline bool IsValidFloatChar (char c)
+{
   return ('0' <= c && c <= '9') ||
          c == 'e' || c == 'E' ||
          c == '+' || c == '-';
 }
 
-void DelocalizeRadix(char* buffer) {
+void DelocalizeRadix (char *buffer)
+{
   // Fast check:  if the buffer has a normal decimal point, assume no
   // translation is needed.
-  if (strchr(buffer, '.') != NULL) return;
+  if (strchr (buffer, '.') != NULL)
+    return;
 
   // Find the first unknown character.
-  while (IsValidFloatChar(*buffer)) ++buffer;
+  while (IsValidFloatChar (*buffer))
+    ++buffer;
 
   if (*buffer == '\0') {
     // No radix character found.
@@ -354,78 +388,87 @@ void DelocalizeRadix(char* buffer) {
   *buffer = '.';
   ++buffer;
 
-  if (!IsValidFloatChar(*buffer) && *buffer != '\0') {
+  if (! IsValidFloatChar (*buffer) && *buffer != '\0') {
     // It appears the radix was a multi-byte character.  We need to remove the
     // extra bytes.
-    char* target = buffer;
-    do { ++buffer; } while (!IsValidFloatChar(*buffer) && *buffer != '\0');
-    memmove(target, buffer, strlen(buffer) + 1);
+    char *target = buffer;
+    do {
+      ++buffer;
+    } while (! IsValidFloatChar (*buffer) && *buffer != '\0');
+    memmove (target, buffer, strlen (buffer) + 1);
   }
 }
 
-void RemovePlus(char* buffer) {
+void RemovePlus (char *buffer)
+{
   // Remove any + characters because they are redundant and ugly.
 
   for (;;) {
-    buffer = strchr(buffer, '+');
+    buffer = strchr (buffer, '+');
     if (buffer == NULL) {
       return;
     }
-    memmove(buffer, buffer + 1, strlen(buffer + 1) + 1);
+    memmove (buffer, buffer + 1, strlen (buffer + 1) + 1);
   }
 }
 
 #if _WIN32
-void RemoveE0(char* buffer) {
+void RemoveE0 (char *buffer)
+{
   // Remove redundant leading 0's after an e, e.g. 1e012. Seems to appear on
   // Windows.
 
   // Find and skip 'e'.
-  char* ptr = strchr(buffer, 'e');
-  if (ptr == nullptr) return;
+  char *ptr = strchr (buffer, 'e');
+  if (ptr == nullptr)
+    return;
   ++ptr;
 
   // Skip '-'.
-  if (*ptr == '-') ++ptr;
+  if (*ptr == '-')
+    ++ptr;
 
   // Skip '0's.
-  char* ptr2 = ptr;
-  while (*ptr2 == '0') ++ptr2;
+  char *ptr2 = ptr;
+  while (*ptr2 == '0')
+    ++ptr2;
 
   // If we went past the last digit, back up one.
-  if (*ptr2 < '0' || *ptr2 > '9') --ptr2;
+  if (*ptr2 < '0' || *ptr2 > '9')
+    --ptr2;
 
   // Move bytes backwards.
   if (ptr2 > ptr) {
-    memmove(ptr, ptr2, strlen(ptr2) + 1);
+    memmove (ptr, ptr2, strlen (ptr2) + 1);
   }
 }
 #endif
 
-char* DoubleToBuffer(double value, char* buffer) {
+char *DoubleToBuffer (double value, char *buffer)
+{
   // DBL_DIG is 15 for IEEE-754 doubles, which are used on almost all
   // platforms these days.  Just in case some system exists where DBL_DIG
   // is significantly larger -- and risks overflowing our buffer -- we have
   // this assert.
-  static_assert(DBL_DIG < 20, "DBL_DIG is too big.");
+  static_assert (DBL_DIG < 20, "DBL_DIG is too big.");
 
-  if (value == inf()) {
-    strcpy(buffer, "inf");
+  if (value == inf ()) {
+    strcpy (buffer, "inf");
     return buffer;
-  } else if (value == -inf()) {
-    strcpy(buffer, "-inf");
+  } else if (value == -inf ()) {
+    strcpy (buffer, "-inf");
     return buffer;
-  } else if (IsNaN(value)) {
-    strcpy(buffer, "nan");
+  } else if (IsNaN (value)) {
+    strcpy (buffer, "nan");
     return buffer;
   }
 
   int snprintf_result KJ_UNUSED =
-    snprintf(buffer, kDoubleToBufferSize, "%.*g", DBL_DIG, value);
+    snprintf (buffer, kDoubleToBufferSize, "%.*g", DBL_DIG, value);
 
   // The snprintf should never overflow because the buffer is significantly
   // larger than the precision we asked for.
-  KJ_DASSERT(snprintf_result > 0 && snprintf_result < kDoubleToBufferSize);
+  KJ_DASSERT (snprintf_result > 0 && snprintf_result < kDoubleToBufferSize);
 
   // We need to make parsed_value volatile in order to force the compiler to
   // write it out to the stack.  Otherwise, it may keep the value in a
@@ -433,72 +476,74 @@ char* DoubleToBuffer(double value, char* buffer) {
   // of a double.  This long double may have extra bits that make it compare
   // unequal to "value" even though it would be exactly equal if it were
   // truncated to a double.
-  volatile double parsed_value = strtod(buffer, NULL);
+  volatile double parsed_value = strtod (buffer, NULL);
   if (parsed_value != value) {
     int snprintf_result2 KJ_UNUSED =
-      snprintf(buffer, kDoubleToBufferSize, "%.*g", DBL_DIG+2, value);
+      snprintf (buffer, kDoubleToBufferSize, "%.*g", DBL_DIG + 2, value);
 
     // Should never overflow; see above.
-    KJ_DASSERT(snprintf_result2 > 0 && snprintf_result2 < kDoubleToBufferSize);
+    KJ_DASSERT (snprintf_result2 > 0 && snprintf_result2 < kDoubleToBufferSize);
   }
 
-  DelocalizeRadix(buffer);
-  RemovePlus(buffer);
+  DelocalizeRadix (buffer);
+  RemovePlus (buffer);
 #if _WIN32
-  RemoveE0(buffer);
+  RemoveE0 (buffer);
 #endif // _WIN32
   return buffer;
 }
 
-bool safe_strtof(const char* str, float* value) {
-  char* endptr;
-  errno = 0;  // errno only gets set on errors
-#if defined(_WIN32) || defined (__hpux)  // has no strtof()
-  *value = static_cast<float>(strtod(str, &endptr));
+bool safe_strtof (const char *str, float *value)
+{
+  char *endptr;
+  errno = 0;                           // errno only gets set on errors
+#if defined(_WIN32) || defined(__hpux) // has no strtof()
+  *value = static_cast<float> (strtod (str, &endptr));
 #else
-  *value = strtof(str, &endptr);
+  *value = strtof (str, &endptr);
 #endif
   return *str != 0 && *endptr == 0 && errno == 0;
 }
 
-char* FloatToBuffer(float value, char* buffer) {
+char *FloatToBuffer (float value, char *buffer)
+{
   // FLT_DIG is 6 for IEEE-754 floats, which are used on almost all
   // platforms these days.  Just in case some system exists where FLT_DIG
   // is significantly larger -- and risks overflowing our buffer -- we have
   // this assert.
-  static_assert(FLT_DIG < 10, "FLT_DIG is too big");
+  static_assert (FLT_DIG < 10, "FLT_DIG is too big");
 
-  if (value == inf()) {
-    strcpy(buffer, "inf");
+  if (value == inf ()) {
+    strcpy (buffer, "inf");
     return buffer;
-  } else if (value == -inf()) {
-    strcpy(buffer, "-inf");
+  } else if (value == -inf ()) {
+    strcpy (buffer, "-inf");
     return buffer;
-  } else if (IsNaN(value)) {
-    strcpy(buffer, "nan");
+  } else if (IsNaN (value)) {
+    strcpy (buffer, "nan");
     return buffer;
   }
 
   int snprintf_result KJ_UNUSED =
-    snprintf(buffer, kFloatToBufferSize, "%.*g", FLT_DIG, value);
+    snprintf (buffer, kFloatToBufferSize, "%.*g", FLT_DIG, value);
 
   // The snprintf should never overflow because the buffer is significantly
   // larger than the precision we asked for.
-  KJ_DASSERT(snprintf_result > 0 && snprintf_result < kFloatToBufferSize);
+  KJ_DASSERT (snprintf_result > 0 && snprintf_result < kFloatToBufferSize);
 
   float parsed_value;
-  if (!safe_strtof(buffer, &parsed_value) || parsed_value != value) {
+  if (! safe_strtof (buffer, &parsed_value) || parsed_value != value) {
     int snprintf_result2 KJ_UNUSED =
-      snprintf(buffer, kFloatToBufferSize, "%.*g", FLT_DIG+2, value);
+      snprintf (buffer, kFloatToBufferSize, "%.*g", FLT_DIG + 2, value);
 
     // Should never overflow; see above.
-    KJ_DASSERT(snprintf_result2 > 0 && snprintf_result2 < kFloatToBufferSize);
+    KJ_DASSERT (snprintf_result2 > 0 && snprintf_result2 < kFloatToBufferSize);
   }
 
-  DelocalizeRadix(buffer);
-  RemovePlus(buffer);
+  DelocalizeRadix (buffer);
+  RemovePlus (buffer);
 #if _WIN32
-  RemoveE0(buffer);
+  RemoveE0 (buffer);
 #endif // _WIN32
   return buffer;
 }
@@ -508,60 +553,65 @@ char* FloatToBuffer(float value, char* buffer) {
 //   This code will make you cry.
 // ----------------------------------------------------------------------
 
-namespace {
+namespace
+{
 
 // Returns a string identical to *input except that the character pointed to
 // by radix_pos (which should be '.') is replaced with the locale-specific
 // radix character.
-kj::String LocalizeRadix(const char* input, const char* radix_pos) {
+kj::String LocalizeRadix (const char *input, const char *radix_pos)
+{
   // Determine the locale-specific radix character by calling sprintf() to
   // print the number 1.5, then stripping off the digits.  As far as I can
   // tell, this is the only portable, thread-safe way to get the C library
   // to divuldge the locale's radix character.  No, localeconv() is NOT
   // thread-safe.
-  char temp[16];
-  int size = snprintf(temp, sizeof(temp), "%.1f", 1.5);
-  KJ_ASSERT(temp[0] == '1');
-  KJ_ASSERT(temp[size-1] == '5');
-  KJ_ASSERT(size <= 6);
+  char temp [16];
+  int size = snprintf (temp, sizeof (temp), "%.1f", 1.5);
+  KJ_ASSERT (temp [0] == '1');
+  KJ_ASSERT (temp [size - 1] == '5');
+  KJ_ASSERT (size <= 6);
 
   // Now replace the '.' in the input with it.
-  return kj::str(
-      kj::arrayPtr(input, radix_pos),
-      kj::arrayPtr(temp + 1, size - 2),
-      kj::StringPtr(radix_pos + 1));
+  return kj::str (
+    kj::arrayPtr (input, radix_pos),
+    kj::arrayPtr (temp + 1, size - 2),
+    kj::StringPtr (radix_pos + 1));
 }
 
-}  // namespace
+} // namespace
 
-double NoLocaleStrtod(const char* text, char** original_endptr) {
+double NoLocaleStrtod (const char *text, char **original_endptr)
+{
   // We cannot simply set the locale to "C" temporarily with setlocale()
   // as this is not thread-safe.  Instead, we try to parse in the current
   // locale first.  If parsing stops at a '.' character, then this is a
   // pretty good hint that we're actually in some other locale in which
   // '.' is not the radix character.
 
-  char* temp_endptr;
-  double result = strtod(text, &temp_endptr);
-  if (original_endptr != NULL) *original_endptr = temp_endptr;
-  if (*temp_endptr != '.') return result;
+  char *temp_endptr;
+  double result = strtod (text, &temp_endptr);
+  if (original_endptr != NULL)
+    *original_endptr = temp_endptr;
+  if (*temp_endptr != '.')
+    return result;
 
   // Parsing halted on a '.'.  Perhaps we're in a different locale?  Let's
   // try to replace the '.' with a locale-specific radix character and
   // try again.
-  kj::String localized = LocalizeRadix(text, temp_endptr);
-  const char* localized_cstr = localized.cStr();
-  char* localized_endptr;
-  result = strtod(localized_cstr, &localized_endptr);
+  kj::String localized = LocalizeRadix (text, temp_endptr);
+  const char *localized_cstr = localized.cStr ();
+  char *localized_endptr;
+  result = strtod (localized_cstr, &localized_endptr);
   if ((localized_endptr - localized_cstr) >
       (temp_endptr - text)) {
     // This attempt got further, so replacing the decimal must have helped.
     // Update original_endptr to point at the right location.
     if (original_endptr != NULL) {
       // size_diff is non-zero if the localized radix has multiple bytes.
-      int size_diff = localized.size() - strlen(text);
+      int size_diff = localized.size () - strlen (text);
       // const_cast is necessary to match the strtod() interface.
-      *original_endptr = const_cast<char*>(
+      *original_endptr = const_cast<char *> (
         text + (localized_endptr - localized_cstr - size_diff));
     }
   }
@@ -573,26 +623,29 @@ double NoLocaleStrtod(const char* text, char** original_endptr) {
 // End of code copied from Protobuf
 // ----------------------------------------------------------------------
 
-}  // namespace
+} // namespace
 
-CappedArray<char, kFloatToBufferSize> Stringifier::operator*(float f) const {
+CappedArray<char, kFloatToBufferSize> Stringifier::operator* (float f) const
+{
   CappedArray<char, kFloatToBufferSize> result;
-  result.setSize(strlen(FloatToBuffer(f, result.begin())));
+  result.setSize (strlen (FloatToBuffer (f, result.begin ())));
   return result;
 }
 
-CappedArray<char, kDoubleToBufferSize> Stringifier::operator*(double f) const {
+CappedArray<char, kDoubleToBufferSize> Stringifier::operator* (double f) const
+{
   CappedArray<char, kDoubleToBufferSize> result;
-  result.setSize(strlen(DoubleToBuffer(f, result.begin())));
+  result.setSize (strlen (DoubleToBuffer (f, result.begin ())));
   return result;
 }
 
-double parseDouble(const StringPtr& s) {
-  KJ_REQUIRE(s != nullptr, "String does not contain valid number", s) { return 0; }
+double parseDouble (const StringPtr &s)
+{
+  KJ_REQUIRE (s != nullptr, "String does not contain valid number", s) { return 0; }
   char *endPtr;
   errno = 0;
-  auto value = _::NoLocaleStrtod(s.begin(), &endPtr);
-  KJ_REQUIRE(endPtr == s.end(), "String does not contain valid floating number", s) { return 0; }
+  auto value = _::NoLocaleStrtod (s.begin (), &endPtr);
+  KJ_REQUIRE (endPtr == s.end (), "String does not contain valid floating number", s) { return 0; }
 #if _WIN32 || __CYGWIN__ || __BIONIC__
   // When Windows' strtod() parses "nan", it returns a value with the sign bit set. But, our
   // preferred canonical value for NaN does not have the sign bit set, and all other platforms
@@ -605,34 +658,39 @@ double parseDouble(const StringPtr& s) {
   //
   // Bionic (Android) failed the unit test and so I added it to the list without investigating
   // further.
-  if (isNaN(value)) {
+  if (isNaN (value)) {
     // NaN
-    return kj::nan();
+    return kj::nan ();
   }
 #endif
   return value;
 }
 
-Maybe<double> tryParseDouble(const StringPtr& s) {
-  if(s == nullptr) { return nullptr; }
+Maybe<double> tryParseDouble (const StringPtr &s)
+{
+  if (s == nullptr) {
+    return nullptr;
+  }
   char *endPtr;
   errno = 0;
-  auto value = _::NoLocaleStrtod(s.begin(), &endPtr);
-  if (endPtr != s.end()) { return nullptr; }
+  auto value = _::NoLocaleStrtod (s.begin (), &endPtr);
+  if (endPtr != s.end ()) {
+    return nullptr;
+  }
 #if _WIN32 || __CYGWIN__ || __BIONIC__
-  if (isNaN(value)) {
-    return kj::nan();
+  if (isNaN (value)) {
+    return kj::nan ();
   }
 #endif
   return value;
 }
 
-}  // namespace _ (private)
+} // namespace _ (private)
 
-template <> double StringPtr::parseAs<double>() const { return _::parseDouble(*this); }
-template <> float StringPtr::parseAs<float>() const { return _::parseDouble(*this); }
+template <> double StringPtr::parseAs<double> () const { return _::parseDouble (*this); }
+template <> float StringPtr::parseAs<float> () const { return _::parseDouble (*this); }
 
-template <> Maybe<double> StringPtr::tryParseAs<double>() const { return _::tryParseDouble(*this); }
-template <> Maybe<float> StringPtr::tryParseAs<float>() const { return _::tryParseDouble(*this); }
+template <> Maybe<double> StringPtr::tryParseAs<double> () const { return _::tryParseDouble (*this); }
+template <> Maybe<float> StringPtr::tryParseAs<float> () const { return _::tryParseDouble (*this); }
 
-}  // namespace kj
+} // namespace kj

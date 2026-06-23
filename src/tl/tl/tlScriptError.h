@@ -35,27 +35,26 @@ namespace tl
 /**
  *  @brief A piece of backtrace information
  */
-struct TL_PUBLIC BacktraceElement
-{
-  /**  
+struct TL_PUBLIC BacktraceElement {
+  /**
    *  @brief Constructor: create an element with a file and a line information
    */
-  BacktraceElement(const std::string &_file, int _line);
+  BacktraceElement (const std::string &_file, int _line);
 
-  /**  
+  /**
    *  @brief Constructor: create an element with a file, a line information and more information
    */
-  BacktraceElement(const std::string &_file, int _line, const std::string _more_info);
+  BacktraceElement (const std::string &_file, int _line, const std::string _more_info);
 
   /**
    *  @brief Default constructor
    */
-  BacktraceElement();
+  BacktraceElement ();
 
   /**
    *  @brief Convert the information to a string
    */
-  std::string to_string() const;
+  std::string to_string () const;
 
   std::string file;
   int line;
@@ -69,21 +68,22 @@ private:
  *  @brief A basic exception class
  */
 class TL_PUBLIC ScriptError
-  : public tl::Exception 
+  : public tl::Exception
 {
 public:
-  ScriptError (const char *msg, const char *cls, const std::vector <BacktraceElement> &backtrace);
+  ScriptError (const char *msg, const char *cls, const std::vector<BacktraceElement> &backtrace);
 
-  ScriptError (const char *msg, const char *sourcefile, int line, const char *cls, const std::vector <BacktraceElement> &backtrace);
+  ScriptError (const char *msg, const char *sourcefile, int line, const char *cls, const std::vector<BacktraceElement> &backtrace);
 
   ScriptError (const ScriptError &d);
 
   virtual ~ScriptError ()
-  { }
+  {
+  }
 
-  const std::string &sourcefile () const 
-  { 
-    return m_sourcefile; 
+  const std::string &sourcefile () const
+  {
+    return m_sourcefile;
   }
 
   void set_sourcefile (const std::string &sourcefile)
@@ -92,8 +92,8 @@ public:
   }
 
   int line () const
-  { 
-    return m_line; 
+  {
+    return m_line;
   }
 
   void set_line (int line)
@@ -102,8 +102,8 @@ public:
   }
 
   const std::string &cls () const
-  { 
-    return m_cls; 
+  {
+    return m_cls;
   }
 
   void set_cls (const std::string &cls)
@@ -112,8 +112,8 @@ public:
   }
 
   const std::string &context () const
-  { 
-    return m_context; 
+  {
+    return m_context;
   }
 
   void set_context (const std::string &context)
@@ -122,8 +122,8 @@ public:
   }
 
   const std::vector<BacktraceElement> &backtrace () const
-  { 
-    return m_backtrace; 
+  {
+    return m_backtrace;
   }
 
   virtual std::string msg () const;
@@ -139,9 +139,9 @@ private:
 };
 
 /**
- *  @brief An exception class indicating an exit  
+ *  @brief An exception class indicating an exit
  *
- *  This exception can be thrown by the C++ client code and is translated into the same exception 
+ *  This exception can be thrown by the C++ client code and is translated into the same exception
  *  on the user side.
  */
 class TL_PUBLIC ExitException
@@ -162,7 +162,7 @@ public:
     set_first_chance (false);
   }
 
-  int status() const { return m_status; }
+  int status () const { return m_status; }
 
 private:
   int m_status;
@@ -171,4 +171,3 @@ private:
 }
 
 #endif
-

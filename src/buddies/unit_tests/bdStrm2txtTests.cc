@@ -23,9 +23,9 @@
 #include "tlUnitTest.h"
 #include "bdCommon.h"
 
-BD_PUBLIC int strm2txt (int argc, char *argv[]);
+BD_PUBLIC int strm2txt (int argc, char *argv []);
 
-TEST(1)
+TEST (1)
 {
   std::string input = tl::testdata ();
   input += "/gds/t10.gds";
@@ -35,9 +35,9 @@ TEST(1)
 
   std::string output = this->tmp_file ();
 
-  const char *argv[] = { "x", input.c_str (), output.c_str () };
+  const char *argv [] = {"x", input.c_str (), output.c_str ()};
 
-  EXPECT_EQ (strm2txt (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
+  EXPECT_EQ (strm2txt (sizeof (argv) / sizeof (argv [0]), (char **) argv), 0);
 
   this->compare_text_files (output, au);
 }

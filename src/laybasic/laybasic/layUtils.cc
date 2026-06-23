@@ -23,13 +23,13 @@
 #include "layUtils.h"
 
 #if defined(HAVE_QT)
-#  include <QApplication>
+#include <QApplication>
 #endif
 
-namespace lay {
+namespace lay
+{
 
-bool
-has_gui ()
+bool has_gui ()
 {
 #if defined(HAVE_QT)
 #if QT_VERSION < 0x50000

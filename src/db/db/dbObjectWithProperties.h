@@ -64,8 +64,8 @@ inline db::object_with_properties<Obj> make_object_with_properties (const Obj &o
  *  with additional properties. For performance reasons, the properties are stored
  *  as an index within a lookup table. Each index refers to a set of properties.
  *  The "PropertiesRepository" class manages the properties available and associates
- *  a property set with an index. 
- *  The shape-with-properties template adds the properties repository index to a 
+ *  a property set with an index.
+ *  The shape-with-properties template adds the properties repository index to a
  *  shape and inherits all of the shape's methods.
  *  This template is not confined to be used with shapes. It can be used for
  *  instances as well.
@@ -82,7 +82,7 @@ public:
   typedef typename Obj::coord_type coord_type;
   typedef typename Obj::point_type point_type;
 
-  typedef db::object_tag< object_with_properties<Obj> > tag;
+  typedef db::object_tag<object_with_properties<Obj>> tag;
 
   /**
    *  @brief The default constructor
@@ -182,7 +182,7 @@ public:
   {
     if (! Obj::operator== (d)) {
       return Obj::operator< (d);
-    } 
+    }
     return db::properties_id_less (m_id, d.m_id);
   }
 
@@ -213,7 +213,7 @@ public:
   /**
    *  @brief Properties Id write accessor
    */
-  void properties_id (properties_id_type id) 
+  void properties_id (properties_id_type id)
   {
     m_id = id;
   }
@@ -221,7 +221,7 @@ public:
   /**
    *  @brief Returns the scaled object
    */
-  db::object_with_properties<typename tl::result_of_method<decltype (& Obj::scaled)>::type>
+  db::object_with_properties<typename tl::result_of_method<decltype (&Obj::scaled)>::type>
   scaled (double f) const
   {
     return make_object_with_properties (Obj::scaled (f), m_id);
@@ -231,7 +231,7 @@ public:
    *  @brief Returns the transformed object
    */
   template <class Trans>
-  db::object_with_properties<typename tl::result_of_method<decltype (& Obj::template transformed<Trans>)>::type>
+  db::object_with_properties<typename tl::result_of_method<decltype (&Obj::template transformed<Trans>)>::type>
   transformed (const Trans &tr) const
   {
     return make_object_with_properties (Obj::transformed (tr), m_id);
@@ -310,8 +310,8 @@ typedef object_with_properties<DTextRef> DTextRefWithProperties;
 typedef object_with_properties<Box> BoxWithProperties;
 typedef object_with_properties<DBox> DBoxWithProperties;
 
-typedef object_with_properties<db::array<db::CellInst, db::Trans> > CellInstArrayWithProperties;
-typedef object_with_properties<db::array<db::CellInst, db::DTrans> > DCellInstArrayWithProperties;
+typedef object_with_properties<db::array<db::CellInst, db::Trans>> CellInstArrayWithProperties;
+typedef object_with_properties<db::array<db::CellInst, db::DTrans>> DCellInstArrayWithProperties;
 
 /**
  *  @brief Binary * operator (transformation)
@@ -325,10 +325,10 @@ typedef object_with_properties<db::array<db::CellInst, db::DTrans> > DCellInstAr
  */
 
 template <class Tr, class Obj>
-inline db::object_with_properties<typename tl::result_of_method<decltype (& Obj::template transformed<Tr>)>::type>
+inline db::object_with_properties<typename tl::result_of_method<decltype (&Obj::template transformed<Tr>)>::type>
 operator* (const Tr &t, const db::object_with_properties<Obj> &obj)
 {
-  return db::object_with_properties<typename tl::result_of_method<decltype (& Obj::template transformed<Tr>)>::type> (obj.Obj::transformed (t), obj.properties_id ());
+  return db::object_with_properties<typename tl::result_of_method<decltype (&Obj::template transformed<Tr>)>::type> (obj.Obj::transformed (t), obj.properties_id ());
 }
 
 /**
@@ -340,10 +340,10 @@ operator* (const Tr &t, const db::object_with_properties<Obj> &obj)
  *  @return The scaled object
  */
 template <class Obj>
-inline db::object_with_properties<typename tl::result_of_method<decltype (& Obj::operator*)>::type>
+inline db::object_with_properties<typename tl::result_of_method<decltype (&Obj::operator*)>::type>
 operator* (const db::object_with_properties<Obj> &obj, double s)
 {
-  return db::object_with_properties<typename tl::result_of_method<decltype (& Obj::operator*)>::type> (obj * s, obj.properties_id ());
+  return db::object_with_properties<typename tl::result_of_method<decltype (&Obj::operator*)>::type> (obj * s, obj.properties_id ());
 }
 
 /**
@@ -409,4 +409,3 @@ template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_pr
 } // namespace tl
 
 #endif
-

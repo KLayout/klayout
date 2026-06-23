@@ -20,7 +20,7 @@
 
 */
 
-#if !defined(HDR_tlCommandLineParser_h)
+#if ! defined(HDR_tlCommandLineParser_h)
 #define HDR_tlCommandLineParser_h
 
 #include "tlCommon.h"
@@ -45,8 +45,7 @@ public:
   /**
    *  @brief A parsed version of the option string
    */
-  struct ParsedOption
-  {
+  struct ParsedOption {
     /**
      *  @brief Constructor
      *  This constructor populates the optional flag and
@@ -260,21 +259,19 @@ inline void invert_presence (T &)
 
 inline void invert_presence (bool &t)
 {
-  t = !t;
+  t = ! t;
 }
 
 /**
  *  @brief A helper template to extract the actual type from (T) or (const T &)
  */
 template <class T>
-struct type_without_const_ref
-{
+struct type_without_const_ref {
   typedef T inner_type;
 };
 
 template <class T>
-struct type_without_const_ref<const T &>
-{
+struct type_without_const_ref<const T &> {
   typedef T inner_type;
 };
 
@@ -282,14 +279,12 @@ struct type_without_const_ref<const T &>
  *  @brief A helper template to determine types that don't need a value
  */
 template <class T>
-struct wants_value_traits
-{
+struct wants_value_traits {
   bool operator() () const { return true; }
 };
 
 template <>
-struct wants_value_traits<bool>
-{
+struct wants_value_traits<bool> {
   bool operator() () const { return false; }
 };
 
@@ -346,7 +341,7 @@ class arg_method_setter
 public:
   typedef typename type_without_const_ref<T>::inner_type inner_type;
 
-  arg_method_setter (const std::string &option, C *object, void (C::*setter)(T), const std::string &brief_doc, const std::string &long_doc)
+  arg_method_setter (const std::string &option, C *object, void (C::*setter) (T), const std::string &brief_doc, const std::string &long_doc)
     : ArgBase (option, brief_doc, long_doc), m_value (), mp_object (object), mp_setter (setter)
   {
     //  .. nothing yet ..
@@ -383,14 +378,14 @@ public:
 private:
   inner_type m_value;
   C *mp_object;
-  void (C::*mp_setter)(T);
+  void (C::*mp_setter) (T);
 };
 
 /**
  *  @brief Polymorphic production methods for the argument getters
  */
 template <class C, class T>
-arg_method_setter<C, T> arg (const std::string &option, C *object, void (C::*setter)(T), const std::string &brief_doc, const std::string &long_doc = "")
+arg_method_setter<C, T> arg (const std::string &option, C *object, void (C::*setter) (T), const std::string &brief_doc, const std::string &long_doc = "")
 {
   return arg_method_setter<C, T> (option, object, setter, brief_doc, long_doc);
 }
@@ -468,7 +463,7 @@ public:
    *  It will throw other exceptions on syntax errors or if mandatory arguments are
    *  missing.
    */
-  void parse (int argc, char *argv[]);
+  void parse (int argc, char *argv []);
 
   /**
    *  @brief Produces the help text

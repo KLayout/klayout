@@ -67,15 +67,14 @@ AdaptorBase::~AdaptorBase ()
   //  .. nothing yet ..
 }
 
-void AdaptorBase::tie_copies (AdaptorBase *target, tl::Heap &heap) 
+void AdaptorBase::tie_copies (AdaptorBase *target, tl::Heap &heap)
 {
   std::unique_ptr<AdaptorBase> t (target);
   copy_to (target, heap);
 
-  //  This object (which will be destroyed before this is responsible for copying back 
+  //  This object (which will be destroyed before this is responsible for copying back
   //  the contents of target into this once the heap goes out of scope)
   heap.push (new AdaptorSynchronizer (t.release (), this, &heap));
 }
 
 }
-

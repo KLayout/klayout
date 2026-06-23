@@ -29,7 +29,7 @@
 #include "tlUnitTest.h"
 #include "tlStream.h"
 
-TEST(1)
+TEST (1)
 {
   db::Layout ly;
   {
@@ -48,11 +48,11 @@ TEST(1)
 
   db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, ly.cell (fill_cell).bbox (), db::Point (), false);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au1.gds");
 }
 
-TEST(2)
+TEST (2)
 {
   db::Layout ly;
   {
@@ -78,11 +78,11 @@ TEST(2)
   remaining_parts.insert_into (&ly, top_cell, l100);
   remaining_polygons.insert_into (&ly, top_cell, l101);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au2.gds");
 }
 
-TEST(3)
+TEST (3)
 {
   db::Layout ly;
   {
@@ -112,11 +112,11 @@ TEST(3)
   remaining_parts.insert_into (&ly, top_cell, l100);
   remaining_polygons.insert_into (&ly, top_cell, l101);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au3.gds");
 }
 
-TEST(3a)
+TEST (3a)
 {
   db::Layout ly;
   {
@@ -146,11 +146,11 @@ TEST(3a)
   remaining_parts.insert_into (&ly, top_cell, l100);
   remaining_polygons.insert_into (&ly, top_cell, l101);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au3a.gds");
 }
 
-TEST(3b)
+TEST (3b)
 {
   db::Layout ly;
   {
@@ -180,11 +180,11 @@ TEST(3b)
   remaining_parts.insert_into (&ly, top_cell, l100);
   remaining_polygons.insert_into (&ly, top_cell, l101);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au3b.gds");
 }
 
-TEST(3c)
+TEST (3c)
 {
   db::Layout ly;
   {
@@ -214,11 +214,11 @@ TEST(3c)
   remaining_parts.insert_into (&ly, top_cell, l100);
   remaining_polygons.insert_into (&ly, top_cell, l101);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au3c.gds");
 }
 
-TEST(4)
+TEST (4)
 {
   db::Layout ly;
   {
@@ -246,11 +246,11 @@ TEST(4)
   unsigned int l101 = ly.insert_layer (db::LayerProperties (101, 0));
   remaining_polygons.insert_into (&ly, top_cell, l101);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au4.gds");
 }
 
-TEST(4b)
+TEST (4b)
 {
   db::Layout ly;
   {
@@ -278,11 +278,11 @@ TEST(4b)
   unsigned int l101 = ly.insert_layer (db::LayerProperties (101, 0));
   remaining_polygons.insert_into (&ly, top_cell, l101);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au4b.gds");
 }
 
-TEST(4c)
+TEST (4c)
 {
   db::Layout ly;
   {
@@ -310,12 +310,12 @@ TEST(4c)
   unsigned int l101 = ly.insert_layer (db::LayerProperties (101, 0));
   remaining_polygons.insert_into (&ly, top_cell, l101);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au4c.gds");
 }
 
 //  issue #1309
-TEST(5)
+TEST (5)
 {
   db::Layout ly;
   {
@@ -342,12 +342,12 @@ TEST(5)
   unsigned int l100 = ly.insert_layer (db::LayerProperties (100, 0));
   remaining_polygons.insert_into (&ly, top_cell, l100);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au5.oas", db::WriteOAS);
 }
 
 //  issue #2087
-TEST(6)
+TEST (6)
 {
   db::Layout ly;
   {
@@ -374,12 +374,12 @@ TEST(6)
   unsigned int l100 = ly.insert_layer (db::LayerProperties (100, 0));
   remaining_polygons.insert_into (&ly, top_cell, l100);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au6.oas", db::WriteOAS);
 }
 
 //  exclude_area
-TEST(7)
+TEST (7)
 {
   db::Layout ly;
   {
@@ -409,12 +409,12 @@ TEST(7)
   unsigned int l100 = ly.insert_layer (db::LayerProperties (100, 0));
   remaining_polygons.insert_into (&ly, top_cell, l100);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au7.oas", db::WriteOAS);
 }
 
 //  exclude_area
-TEST(8)
+TEST (8)
 {
   db::Layout ly;
   {
@@ -439,12 +439,12 @@ TEST(8)
   db::Box fc_box = ly.cell (fill_cell).bbox ();
   db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, fc_box, rs, cs, db::Point (), false, 0, db::Vector (), 0, db::Box (), excl_region);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au8.oas", db::WriteOAS);
 }
 
 //  exclude_area
-TEST(9)
+TEST (9)
 {
   db::Layout ly;
   {
@@ -469,6 +469,6 @@ TEST(9)
   db::Box fc_box = ly.cell (fill_cell).bbox ();
   db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, fc_box, rs, cs, db::Point (), true, 0, db::Vector (), 0, db::Box (), excl_region);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au9.oas", db::WriteOAS);
 }

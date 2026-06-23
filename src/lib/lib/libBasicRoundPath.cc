@@ -42,8 +42,7 @@ BasicRoundPath::BasicRoundPath ()
   //  .. nothing yet ..
 }
 
-bool 
-BasicRoundPath::can_create_from_shape (const db::Layout & /*layout*/, const db::Shape &shape, unsigned int /*layer*/) const
+bool BasicRoundPath::can_create_from_shape (const db::Layout & /*layout*/, const db::Shape &shape, unsigned int /*layer*/) const
 {
   return shape.is_path ();
 }
@@ -63,7 +62,7 @@ BasicRoundPath::parameters_from_shape (const db::Layout &layout, const db::Shape
   return map_parameters (nm);
 }
 
-std::vector<db::PCellLayerDeclaration> 
+std::vector<db::PCellLayerDeclaration>
 BasicRoundPath::get_layer_declarations (const db::pcell_parameters_type &parameters) const
 {
   std::vector<db::PCellLayerDeclaration> layers;
@@ -76,8 +75,7 @@ BasicRoundPath::get_layer_declarations (const db::pcell_parameters_type &paramet
   return layers;
 }
 
-void 
-BasicRoundPath::produce (const db::Layout &layout, const std::vector<unsigned int> &layer_ids, const db::pcell_parameters_type &parameters, db::Cell &cell) const
+void BasicRoundPath::produce (const db::Layout &layout, const std::vector<unsigned int> &layer_ids, const db::pcell_parameters_type &parameters, db::Cell &cell) const
 {
   if (parameters.size () < p_total || layer_ids.size () < 1) {
     return;
@@ -105,27 +103,27 @@ BasicRoundPath::produce (const db::Layout &layout, const std::vector<unsigned in
   cell.shapes (layer_ids [p_layer]).insert (poly);
 }
 
-std::string 
+std::string
 BasicRoundPath::get_display_name (const db::pcell_parameters_type &parameters) const
 {
   return "ROUND_PATH(l=" + std::string (parameters [p_layer].to_string ()) +
-                   ",r=" + tl::to_string (parameters [p_radius].to_double ()) +
-                   ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
-                     ")";
+         ",r=" + tl::to_string (parameters [p_radius].to_double ()) +
+         ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
+         ")";
 }
 
-std::vector<db::PCellParameterDeclaration> 
+std::vector<db::PCellParameterDeclaration>
 BasicRoundPath::get_parameter_declarations () const
 {
   std::vector<db::PCellParameterDeclaration> parameters;
 
-  //  parameter #0: layer 
+  //  parameter #0: layer
   tl_assert (parameters.size () == p_layer);
   parameters.push_back (db::PCellParameterDeclaration ("layer"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_layer);
   parameters.back ().set_description (tl::to_string (tr ("Layer")));
 
-  //  parameter #1: radius 
+  //  parameter #1: radius
   tl_assert (parameters.size () == p_radius);
   parameters.push_back (db::PCellParameterDeclaration ("radius"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
@@ -133,17 +131,17 @@ BasicRoundPath::get_parameter_declarations () const
   parameters.back ().set_default (0.1);
   parameters.back ().set_unit (tl::to_string (tr ("micron")));
 
-  //  parameter #2: handle 
+  //  parameter #2: handle
   tl_assert (parameters.size () == p_path);
   parameters.push_back (db::PCellParameterDeclaration ("path"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
   db::DPath p;
   p.width (0.1);
-  db::DPoint pts[] = { db::DPoint(0, 0), db::DPoint(0.2, 0), db::DPoint (0.2, 0.2) };
-  p.assign (pts, pts + sizeof (pts) / sizeof (pts[0]));
+  db::DPoint pts [] = {db::DPoint (0, 0), db::DPoint (0.2, 0), db::DPoint (0.2, 0.2)};
+  p.assign (pts, pts + sizeof (pts) / sizeof (pts [0]));
   parameters.back ().set_default (p);
 
-  //  parameter #3: number of points 
+  //  parameter #3: number of points
   tl_assert (parameters.size () == p_npoints);
   parameters.push_back (db::PCellParameterDeclaration ("npoints"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_int);
@@ -154,6 +152,3 @@ BasicRoundPath::get_parameter_declarations () const
 }
 
 }
-
-
-

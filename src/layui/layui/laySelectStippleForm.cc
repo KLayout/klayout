@@ -45,7 +45,7 @@ SelectStippleForm::SelectStippleForm (QWidget *parent, const lay::DitherPattern 
 
   update ();
 
-  connect (mp_ui->stipple_items, SIGNAL (currentItemChanged(QListWidgetItem*, QListWidgetItem*)), 
+  connect (mp_ui->stipple_items, SIGNAL (currentItemChanged (QListWidgetItem *, QListWidgetItem *)),
            this, SLOT (sel_changed (QListWidgetItem *, QListWidgetItem *)));
 }
 
@@ -55,8 +55,7 @@ SelectStippleForm::~SelectStippleForm ()
   mp_ui = 0;
 }
 
-void 
-SelectStippleForm::set_selected (int selected)
+void SelectStippleForm::set_selected (int selected)
 {
   if (selected != m_selected) {
     m_selected = selected;
@@ -64,18 +63,17 @@ SelectStippleForm::set_selected (int selected)
   }
 }
 
-namespace {
-  struct display_order
+namespace
+{
+struct display_order {
+  bool operator() (lay::DitherPattern::iterator a, lay::DitherPattern::iterator b)
   {
-    bool operator () (lay::DitherPattern::iterator a, lay::DitherPattern::iterator b)
-    {
-      return a->order_index () < b->order_index ();
-    }
-  };
+    return a->order_index () < b->order_index ();
+  }
+};
 }
 
-void 
-SelectStippleForm::update ()
+void SelectStippleForm::update ()
 {
 #if QT_VERSION >= 0x050000
   double dpr = devicePixelRatio ();
@@ -91,7 +89,7 @@ SelectStippleForm::update ()
     new QListWidgetItem (QObject::tr ("None"), mp_ui->stipple_items);
   }
 
-  std::vector <lay::DitherPattern::iterator> iters; 
+  std::vector<lay::DitherPattern::iterator> iters;
   for (lay::DitherPattern::iterator i = m_pattern.begin_custom (); i != m_pattern.end (); ++i) {
     iters.push_back (i);
   }
@@ -111,10 +109,9 @@ SelectStippleForm::update ()
     bitmap.setDevicePixelRatio (dpr);
 #endif
     new QListWidgetItem (QIcon (bitmap), tl::to_qstring (name), mp_ui->stipple_items);
-
   }
 
-  for (std::vector <lay::DitherPattern::iterator>::const_iterator i = iters.begin (); i != iters.end (); ++i) {
+  for (std::vector<lay::DitherPattern::iterator>::const_iterator i = iters.begin (); i != iters.end (); ++i) {
 
     if ((*i)->order_index () > 0) {
 
@@ -129,14 +126,11 @@ SelectStippleForm::update ()
       bitmap.setDevicePixelRatio (dpr);
 #endif
       new QListWidgetItem (QIcon (bitmap), tl::to_qstring (name), mp_ui->stipple_items);
-
     }
-
   }
 }
 
-void 
-SelectStippleForm::sel_changed (QListWidgetItem *citem, QListWidgetItem *)
+void SelectStippleForm::sel_changed (QListWidgetItem *citem, QListWidgetItem *)
 {
   int row = mp_ui->stipple_items->row (citem);
   if (m_include_nil) {

@@ -39,17 +39,17 @@
 #include "tlObject.h"
 
 #if defined(HAVE_QT)
-# include <QString>
-# include <QByteArray>
-# include <QVariant>
+#include <QString>
+#include <QByteArray>
+#include <QVariant>
 #endif
 
 namespace gsi
 {
-  class GSI_PUBLIC ClassBase;
-  struct NoAdaptorTag;
-  template <class T, class A> class GSI_PUBLIC_TEMPLATE Class;
-  template <class X> const ClassBase *cls_decl ();
+class GSI_PUBLIC ClassBase;
+struct NoAdaptorTag;
+template <class T, class A> class GSI_PUBLIC_TEMPLATE Class;
+template <class X> const ClassBase *cls_decl ();
 }
 
 namespace tl
@@ -64,14 +64,14 @@ template <class T> bool test_extractor_impl (tl::Extractor &, T &);
 /**
  *  @brief A base class which describes a class, i.e. an object capable of converting and handling void *
  *
- *  There must be one particular class object per class. In particular the equality of the 
+ *  There must be one particular class object per class. In particular the equality of the
  *  class object pointer's must indicate that two object's share the same class.
  */
 class TL_PUBLIC VariantUserClassBase
 {
 public:
-  VariantUserClassBase () { }
-  virtual ~VariantUserClassBase () { }
+  VariantUserClassBase () {}
+  virtual ~VariantUserClassBase () {}
 
   virtual void *create () const = 0;
   virtual void destroy (void *) const = 0;
@@ -108,7 +108,7 @@ protected:
 };
 
 /**
- *  @brief A derived class encapsulating a certain user type 
+ *  @brief A derived class encapsulating a certain user type
  *
  *  We will employ RTTI to identify a type through that base class.
  */
@@ -117,7 +117,7 @@ class TL_PUBLIC_TEMPLATE VariantUserClass
   : public VariantUserClassBase
 {
 public:
-  VariantUserClass () { }
+  VariantUserClass () {}
 
   T *get (void *ptr) const { return reinterpret_cast<T *> (ptr); }
   const T *get (const void *ptr) const { return reinterpret_cast<const T *> (ptr); }
@@ -133,7 +133,7 @@ public:
   }
 
 private:
-  static const tl::VariantUserClassBase *ms_instances[4];
+  static const tl::VariantUserClassBase *ms_instances [4];
 
 protected:
   void register_instance (const tl::VariantUserClassBase *inst, bool is_const)
@@ -156,35 +156,35 @@ protected:
 class TL_PUBLIC Variant
 {
 public:
-  enum type { 
-    t_nil, 
-    t_bool, 
-    t_char, 
-    t_schar, 
-    t_uchar, 
-    t_short, 
-    t_ushort, 
-    t_int, 
-    t_uint, 
-    t_long, 
-    t_ulong, 
-    t_longlong, 
-    t_ulonglong, 
+  enum type {
+    t_nil,
+    t_bool,
+    t_char,
+    t_schar,
+    t_uchar,
+    t_short,
+    t_ushort,
+    t_int,
+    t_uint,
+    t_long,
+    t_ulong,
+    t_longlong,
+    t_ulonglong,
 #if defined(HAVE_64BIT_COORD)
-    t_int128, 
+    t_int128,
 #endif
-    t_id, 
-    t_float, 
-    t_double, 
-    t_string, 
-    t_stdstring, 
+    t_id,
+    t_float,
+    t_double,
+    t_string,
+    t_stdstring,
     t_bytearray,
 #if defined(HAVE_QT)
     t_qstring,
-    t_qbytearray, 
+    t_qbytearray,
 #endif
-    t_list, 
-    t_array, 
+    t_list,
+    t_array,
     t_user,
     t_user_ref
   };
@@ -313,7 +313,7 @@ public:
    *  @brief Initialize the Variant with "unsigned long"
    */
   Variant (unsigned long l);
- 
+
   /**
    *  @brief Initialize the Variant with "long long"
    */
@@ -323,7 +323,7 @@ public:
    *  @brief Initialize the Variant with "unsigned long long"
    */
   Variant (unsigned long long l);
- 
+
 #if defined(HAVE_64BIT_COORD)
   /**
    *  @brief Initialize the Variant with "__int128"
@@ -332,7 +332,7 @@ public:
 #endif
 
   /**
-   *  @brief Initialize the Variant with an "id" 
+   *  @brief Initialize the Variant with an "id"
    *
    *  The "id" type is basically a size_t, but is supposed to be used as a representative for another value.
    *  One application for that type is a placeholder for an OASIS name until it is associated with a real value.
@@ -562,9 +562,9 @@ public:
   template <class T>
   static tl::Variant make_variant (const T &t, bool is_const = false)
   {
-    const tl::VariantUserClassBase *c = gsi::cls_decl <T> ()->var_cls (is_const);
+    const tl::VariantUserClassBase *c = gsi::cls_decl<T> ()->var_cls (is_const);
     tl_assert (c != 0);
-    return tl::Variant ((void *) new T(t), c, true);
+    return tl::Variant ((void *) new T (t), c, true);
   }
 
 #if defined(HAVE_QT)
@@ -749,24 +749,24 @@ public:
     m_var.m_array = new std::map<tl::Variant, tl::Variant> ();
   }
 
-  /**  
+  /**
    *  @brief Equality
    *
    *  For user types, this is not implemented yet.
    */
   bool operator== (const Variant &d) const;
 
-  /**  
+  /**
    *  @brief Inequality
    *
    *  For user types, this is not implemented yet.
    */
   bool operator!= (const Variant &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
 
-  /**  
+  /**
    *  @brief Comparison
    *
    *  For user types, this is not implemented yet.
@@ -959,7 +959,7 @@ public:
   float to_float () const;
 
   /**
-   *  @brief conversion to a standard type 
+   *  @brief conversion to a standard type
    *
    *  This is a templatized version of the various to_... methods. This
    *  does also not include conversion to a user type.
@@ -1088,13 +1088,13 @@ public:
    */
   tl::Variant user_dup () const;
 
-  /** 
+  /**
    *  @brief Convert to the given user type (const version)
    */
-  template <class T> 
+  template <class T>
   const T &to_user () const
   {
-    if (is_user()) {
+    if (is_user ()) {
       const VariantUserClass<T> *tcls = dynamic_cast<const VariantUserClass<T> *> (user_cls ());
       tl_assert (tcls != 0);
       const T *t = tcls->get (to_user ());
@@ -1121,7 +1121,7 @@ public:
    *  The native pointer can be used to access the value then.
    *  A nil value is not morphed and remains nil. In that case, the native pointer will be 0.
    */
-  template<class T>
+  template <class T>
   tl::Variant &morph ()
   {
     if (! is_nil ()) {
@@ -1142,7 +1142,7 @@ public:
   }
 
   /**
-   *  @brief Access the native (internal) object 
+   *  @brief Access the native (internal) object
    *
    *  For nil, 0 is returned.
    */
@@ -1153,7 +1153,7 @@ public:
   }
 
   /**
-   *  @brief Access the native (internal) object 
+   *  @brief Access the native (internal) object
    *
    *  For nil, 0 is returned.
    */
@@ -1180,7 +1180,7 @@ public:
   /**
    *  @brief Get the list iterators, if it is one
    */
-  iterator begin () 
+  iterator begin ()
   {
     tl_assert (m_type == t_list);
     return m_var.m_list->begin ();
@@ -1189,7 +1189,7 @@ public:
   /**
    *  @brief Get the list iterators, if it is one
    */
-  iterator end () 
+  iterator end ()
   {
     tl_assert (m_type == t_list);
     return m_var.m_list->end ();
@@ -1197,8 +1197,8 @@ public:
 
   /**
    *  @brief Reserve some length for a list
-   */ 
-  void reserve (size_t n) 
+   */
+  void reserve (size_t n)
   {
     tl_assert (m_type == t_list);
     m_var.m_list->reserve (n);
@@ -1206,7 +1206,7 @@ public:
 
   /**
    *  @brief Get the length of the list if there is one, otherwise 0
-   */ 
+   */
   size_t size () const
   {
     return m_type == t_list ? m_var.m_list->size () : 0;
@@ -1305,7 +1305,7 @@ public:
   /**
    *  @brief Get the array iterators, if it is one
    */
-  array_iterator begin_array () 
+  array_iterator begin_array ()
   {
     tl_assert (m_type == t_array);
     return m_var.m_array->begin ();
@@ -1314,7 +1314,7 @@ public:
   /**
    *  @brief Get the array iterators, if it is one
    */
-  array_iterator end_array () 
+  array_iterator end_array ()
   {
     tl_assert (m_type == t_array);
     return m_var.m_array->end ();
@@ -1322,7 +1322,7 @@ public:
 
   /**
    *  @brief Get the length of the array if there is one, otherwise 0
-   */ 
+   */
   size_t array_size () const
   {
     return m_type == t_array ? m_var.m_array->size () : 0;
@@ -1494,7 +1494,7 @@ public:
   }
 
   /**
-   *  @brief Test, if it is a char 
+   *  @brief Test, if it is a char
    */
   bool is_char () const
   {
@@ -1680,7 +1680,7 @@ public:
     return m_type == t_user || m_type == t_user_ref;
   }
 
-  /** 
+  /**
    *  @brief Test, if this is a user type and can convert to the given type
    */
   template <class T>
@@ -1796,82 +1796,82 @@ private:
 };
 
 //  specializations of the to ... methods
-template<> inline bool Variant::to<bool> () const                                 { return to_bool (); }
-template<> inline char Variant::to<char> () const                                 { return to_char (); }
-template<> inline unsigned char Variant::to<unsigned char> () const               { return to_uchar (); }
-template<> inline signed char Variant::to<signed char> () const                   { return to_schar (); }
-template<> inline short Variant::to<short> () const                               { return to_short (); }
-template<> inline unsigned short Variant::to<unsigned short> () const             { return to_ushort (); }
-template<> inline int Variant::to<int> () const                                   { return to_int (); }
-template<> inline unsigned int Variant::to<unsigned int> () const                 { return to_uint (); }
-template<> inline long Variant::to<long> () const                                 { return to_long (); }
-template<> inline unsigned long Variant::to<unsigned long> () const               { return to_ulong (); }
-template<> inline long long Variant::to<long long> () const                       { return to_longlong (); }
-template<> inline unsigned long long Variant::to<unsigned long long> () const     { return to_ulonglong (); }
+template <> inline bool Variant::to<bool> () const { return to_bool (); }
+template <> inline char Variant::to<char> () const { return to_char (); }
+template <> inline unsigned char Variant::to<unsigned char> () const { return to_uchar (); }
+template <> inline signed char Variant::to<signed char> () const { return to_schar (); }
+template <> inline short Variant::to<short> () const { return to_short (); }
+template <> inline unsigned short Variant::to<unsigned short> () const { return to_ushort (); }
+template <> inline int Variant::to<int> () const { return to_int (); }
+template <> inline unsigned int Variant::to<unsigned int> () const { return to_uint (); }
+template <> inline long Variant::to<long> () const { return to_long (); }
+template <> inline unsigned long Variant::to<unsigned long> () const { return to_ulong (); }
+template <> inline long long Variant::to<long long> () const { return to_longlong (); }
+template <> inline unsigned long long Variant::to<unsigned long long> () const { return to_ulonglong (); }
 #if defined(HAVE_64BIT_COORD)
-template<> inline __int128 Variant::to<__int128> () const                         { return to_int128 (); }
+template <> inline __int128 Variant::to<__int128> () const { return to_int128 (); }
 #endif
-template<> inline double Variant::to<double> () const                             { return to_double (); }
-template<> inline float Variant::to<float> () const                               { return to_float (); }
-template<> inline std::string Variant::to<std::string> () const                   { return to_stdstring (); }
-template<> inline std::vector<char> Variant::to<std::vector<char> > () const      { return to_bytearray (); }
+template <> inline double Variant::to<double> () const { return to_double (); }
+template <> inline float Variant::to<float> () const { return to_float (); }
+template <> inline std::string Variant::to<std::string> () const { return to_stdstring (); }
+template <> inline std::vector<char> Variant::to<std::vector<char>> () const { return to_bytearray (); }
 #if defined(HAVE_QT)
-template<> inline QString Variant::to<QString> () const                           { return to_qstring (); }
-template<> inline QByteArray Variant::to<QByteArray> () const                     { return to_qbytearray (); }
+template <> inline QString Variant::to<QString> () const { return to_qstring (); }
+template <> inline QByteArray Variant::to<QByteArray> () const { return to_qbytearray (); }
 #endif
-template<> inline const char *Variant::to<const char *> () const                  { return to_string (); }
+template <> inline const char *Variant::to<const char *> () const { return to_string (); }
 
 //  specializations if the is.. methods
-template<> inline bool Variant::is<bool> () const                 { return m_type == t_bool; }
-template<> inline bool Variant::is<char> () const                 { return m_type == t_char; }
-template<> inline bool Variant::is<unsigned char> () const        { return m_type == t_uchar; }
-template<> inline bool Variant::is<signed char> () const          { return m_type == t_schar; }
-template<> inline bool Variant::is<short> () const                { return m_type == t_short; }
-template<> inline bool Variant::is<unsigned short> () const       { return m_type == t_ushort; }
-template<> inline bool Variant::is<int> () const                  { return m_type == t_int; }
-template<> inline bool Variant::is<unsigned int> () const         { return m_type == t_uint; }
-template<> inline bool Variant::is<long> () const                 { return m_type == t_long; }
-template<> inline bool Variant::is<unsigned long> () const        { return m_type == t_ulong; }
-template<> inline bool Variant::is<long long> () const            { return m_type == t_longlong; }
-template<> inline bool Variant::is<unsigned long long> () const   { return m_type == t_ulonglong; }
+template <> inline bool Variant::is<bool> () const { return m_type == t_bool; }
+template <> inline bool Variant::is<char> () const { return m_type == t_char; }
+template <> inline bool Variant::is<unsigned char> () const { return m_type == t_uchar; }
+template <> inline bool Variant::is<signed char> () const { return m_type == t_schar; }
+template <> inline bool Variant::is<short> () const { return m_type == t_short; }
+template <> inline bool Variant::is<unsigned short> () const { return m_type == t_ushort; }
+template <> inline bool Variant::is<int> () const { return m_type == t_int; }
+template <> inline bool Variant::is<unsigned int> () const { return m_type == t_uint; }
+template <> inline bool Variant::is<long> () const { return m_type == t_long; }
+template <> inline bool Variant::is<unsigned long> () const { return m_type == t_ulong; }
+template <> inline bool Variant::is<long long> () const { return m_type == t_longlong; }
+template <> inline bool Variant::is<unsigned long long> () const { return m_type == t_ulonglong; }
 #if defined(HAVE_64BIT_COORD)
-template<> inline bool Variant::is<__int128> () const             { return m_type == t_int128; }
+template <> inline bool Variant::is<__int128> () const { return m_type == t_int128; }
 #endif
-template<> inline bool Variant::is<double> () const               { return m_type == t_double; }
-template<> inline bool Variant::is<float> () const                { return m_type == t_float; }
-template<> inline bool Variant::is<std::string> () const          { return m_type == t_stdstring; }
-template<> inline bool Variant::is<std::vector<char> > () const   { return m_type == t_bytearray; }
+template <> inline bool Variant::is<double> () const { return m_type == t_double; }
+template <> inline bool Variant::is<float> () const { return m_type == t_float; }
+template <> inline bool Variant::is<std::string> () const { return m_type == t_stdstring; }
+template <> inline bool Variant::is<std::vector<char>> () const { return m_type == t_bytearray; }
 #if defined(HAVE_QT)
-template<> inline bool Variant::is<QString> () const              { return m_type == t_qstring; }
-template<> inline bool Variant::is<QByteArray> () const           { return m_type == t_qbytearray; }
+template <> inline bool Variant::is<QString> () const { return m_type == t_qstring; }
+template <> inline bool Variant::is<QByteArray> () const { return m_type == t_qbytearray; }
 #endif
-template<> inline bool Variant::is<const char *> () const         { return m_type == t_string; }
+template <> inline bool Variant::is<const char *> () const { return m_type == t_string; }
 
 //  specializations of the can_convert.. methods
-template<> inline bool Variant::can_convert_to<bool> () const                 { return true; }
-template<> inline bool Variant::can_convert_to<char> () const                 { return can_convert_to_char (); }
-template<> inline bool Variant::can_convert_to<unsigned char> () const        { return can_convert_to_uchar (); }
-template<> inline bool Variant::can_convert_to<signed char> () const          { return can_convert_to_schar (); }
-template<> inline bool Variant::can_convert_to<short> () const                { return can_convert_to_short (); }
-template<> inline bool Variant::can_convert_to<unsigned short> () const       { return can_convert_to_ushort (); }
-template<> inline bool Variant::can_convert_to<int> () const                  { return can_convert_to_int (); }
-template<> inline bool Variant::can_convert_to<unsigned int> () const         { return can_convert_to_uint (); }
-template<> inline bool Variant::can_convert_to<long> () const                 { return can_convert_to_long (); }
-template<> inline bool Variant::can_convert_to<unsigned long> () const        { return can_convert_to_ulong (); }
-template<> inline bool Variant::can_convert_to<long long> () const            { return can_convert_to_longlong (); }
-template<> inline bool Variant::can_convert_to<unsigned long long> () const   { return can_convert_to_ulonglong (); }
+template <> inline bool Variant::can_convert_to<bool> () const { return true; }
+template <> inline bool Variant::can_convert_to<char> () const { return can_convert_to_char (); }
+template <> inline bool Variant::can_convert_to<unsigned char> () const { return can_convert_to_uchar (); }
+template <> inline bool Variant::can_convert_to<signed char> () const { return can_convert_to_schar (); }
+template <> inline bool Variant::can_convert_to<short> () const { return can_convert_to_short (); }
+template <> inline bool Variant::can_convert_to<unsigned short> () const { return can_convert_to_ushort (); }
+template <> inline bool Variant::can_convert_to<int> () const { return can_convert_to_int (); }
+template <> inline bool Variant::can_convert_to<unsigned int> () const { return can_convert_to_uint (); }
+template <> inline bool Variant::can_convert_to<long> () const { return can_convert_to_long (); }
+template <> inline bool Variant::can_convert_to<unsigned long> () const { return can_convert_to_ulong (); }
+template <> inline bool Variant::can_convert_to<long long> () const { return can_convert_to_longlong (); }
+template <> inline bool Variant::can_convert_to<unsigned long long> () const { return can_convert_to_ulonglong (); }
 #if defined(HAVE_64BIT_COORD)
-template<> inline bool Variant::can_convert_to<__int128> () const             { return can_convert_to_int128 (); }
+template <> inline bool Variant::can_convert_to<__int128> () const { return can_convert_to_int128 (); }
 #endif
-template<> inline bool Variant::can_convert_to<double> () const               { return can_convert_to_double (); }
-template<> inline bool Variant::can_convert_to<float> () const                { return can_convert_to_float (); }
-template<> inline bool Variant::can_convert_to<std::string> () const          { return true; }
-template<> inline bool Variant::can_convert_to<std::vector<char> > () const   { return true; }
+template <> inline bool Variant::can_convert_to<double> () const { return can_convert_to_double (); }
+template <> inline bool Variant::can_convert_to<float> () const { return can_convert_to_float (); }
+template <> inline bool Variant::can_convert_to<std::string> () const { return true; }
+template <> inline bool Variant::can_convert_to<std::vector<char>> () const { return true; }
 #if defined(HAVE_QT)
-template<> inline bool Variant::can_convert_to<QString> () const              { return true; }
-template<> inline bool Variant::can_convert_to<QByteArray> () const           { return true; }
+template <> inline bool Variant::can_convert_to<QString> () const { return true; }
+template <> inline bool Variant::can_convert_to<QByteArray> () const { return true; }
 #endif
-template<> inline bool Variant::can_convert_to<const char *> () const         { return true; }
+template <> inline bool Variant::can_convert_to<const char *> () const { return true; }
 
 /**
  *  @brief Initialize the class table (must be called once)
@@ -1881,25 +1881,23 @@ void initialize_variant_class_table ();
 /**
  *  @brief Special extractors for Variant
  */
-template<> TL_PUBLIC void extractor_impl<Variant> (tl::Extractor &ex, Variant &v);
-template<> TL_PUBLIC bool test_extractor_impl<Variant> (tl::Extractor &ex, Variant &v);
+template <> TL_PUBLIC void extractor_impl<Variant> (tl::Extractor &ex, Variant &v);
+template <> TL_PUBLIC bool test_extractor_impl<Variant> (tl::Extractor &ex, Variant &v);
 
 } // namespace tl
 
 namespace std
 {
-  /**
-   *  @brief That hash function for tl::Variant
-   */
-  template <>
-  struct hash <tl::Variant>
+/**
+ *  @brief That hash function for tl::Variant
+ */
+template <>
+struct hash<tl::Variant> {
+  size_t operator() (const tl::Variant &o) const
   {
-    size_t operator() (const tl::Variant &o) const
-    {
-      return o.hash ();
-    }
-  };
+    return o.hash ();
+  }
+};
 }
 
 #endif
-

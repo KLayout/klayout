@@ -20,7 +20,7 @@
 
 */
 
-#if !defined(HAVE_QT)
+#if ! defined(HAVE_QT)
 
 #include "layLayoutView.h"
 
@@ -47,8 +47,7 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable
 }
 
 //  NOTE: this methods needs to be called "frequently"
-void
-LayoutView::timer ()
+void LayoutView::timer ()
 {
   LayoutViewBase::timer ();
 

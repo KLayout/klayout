@@ -36,8 +36,7 @@ namespace tl
 // -------------------------------------------------------------------------
 //  A compare operator comparing the first element of two double,double-pairs.
 
-struct compare_first_double_of_pair 
-{
+struct compare_first_double_of_pair {
   bool operator() (const std::pair<double, double> &a, const std::pair<double, double> &b) const
   {
     return a.first < b.first;
@@ -45,29 +44,29 @@ struct compare_first_double_of_pair
 };
 
 // -------------------------------------------------------------------------
-//  A helper method to interpolate a table entry at the given iterator 
+//  A helper method to interpolate a table entry at the given iterator
 //  (i[-1].first <= x, i->first >= x)
 
-inline double 
-interpolate (const std::vector< std::pair<double, double> > &v, std::vector< std::pair<double, double> >::const_iterator i, double x)
+inline double
+interpolate (const std::vector<std::pair<double, double>> &v, std::vector<std::pair<double, double>>::const_iterator i, double x)
 {
   if (i == v.end ()) {
     return v.back ().second;
   } else if (i == v.begin ()) {
     return v.front ().second;
   } else {
-    return i[-1].second + (x - i[-1].first) * (i->second - i[-1].second) / (i->first - i[-1].first);
+    return i [-1].second + (x - i [-1].first) * (i->second - i [-1].second) / (i->first - i [-1].first);
   }
 }
 
 // -------------------------------------------------------------------------
-//  A helper method to interpolate a table entry at the given iterator 
+//  A helper method to interpolate a table entry at the given iterator
 //  (i[-1].first <= x, i->first >= x)
 
-inline double 
-interpolate (const std::vector< std::pair<double, double> > &v, double x)
+inline double
+interpolate (const std::vector<std::pair<double, double>> &v, double x)
 {
-  std::vector< std::pair<double, double> >::const_iterator i = std::lower_bound (v.begin (), v.end (), std::make_pair (x, 0.0), compare_first_double_of_pair ());
+  std::vector<std::pair<double, double>>::const_iterator i = std::lower_bound (v.begin (), v.end (), std::make_pair (x, 0.0), compare_first_double_of_pair ());
   return interpolate (v, i, x);
 }
 
@@ -92,38 +91,37 @@ CombinedDataMapping::~CombinedDataMapping ()
   }
 }
 
-double 
+double
 CombinedDataMapping::xmin () const
 {
   return mp_i->xmin ();
 }
 
-double 
+double
 CombinedDataMapping::xmax () const
 {
   return mp_i->xmax ();
 }
 
-void 
-CombinedDataMapping::generate_table (std::vector< std::pair<double, double> > &table)
+void CombinedDataMapping::generate_table (std::vector<std::pair<double, double>> &table)
 {
-  std::vector< std::pair<double, double> > ti;
+  std::vector<std::pair<double, double>> ti;
   mp_i->generate_table (ti);
   tl_assert (ti.size () >= 2);
 
-  std::vector< std::pair<double, double> > to;
+  std::vector<std::pair<double, double>> to;
   mp_o->generate_table (to);
   tl_assert (to.size () >= 2);
 
   table.push_back (std::make_pair (ti.front ().first, interpolate (to, ti.front ().second)));
 
-  for (std::vector< std::pair<double, double> >::const_iterator t = ti.begin () + 1; t != ti.end (); ++t) {
+  for (std::vector<std::pair<double, double>>::const_iterator t = ti.begin () + 1; t != ti.end (); ++t) {
 
-    double x1 = t[-1].first, x2 = t->first;
-    double y1 = t[-1].second, y2 = t->second;
+    double x1 = t [-1].first, x2 = t->first;
+    double y1 = t [-1].second, y2 = t->second;
 
-    std::vector< std::pair<double, double> >::const_iterator tt1 = std::lower_bound (to.begin (), to.end (), std::make_pair (y1, 0.0), compare_first_double_of_pair ());
-    std::vector< std::pair<double, double> >::const_iterator tt2 = std::lower_bound (to.begin (), to.end (), std::make_pair (y2, 0.0), compare_first_double_of_pair ());
+    std::vector<std::pair<double, double>>::const_iterator tt1 = std::lower_bound (to.begin (), to.end (), std::make_pair (y1, 0.0), compare_first_double_of_pair ());
+    std::vector<std::pair<double, double>>::const_iterator tt2 = std::lower_bound (to.begin (), to.end (), std::make_pair (y2, 0.0), compare_first_double_of_pair ());
 
     while (tt1 < tt2) {
 
@@ -134,7 +132,6 @@ CombinedDataMapping::generate_table (std::vector< std::pair<double, double> > &t
       table.push_back (std::make_pair (x, tt1->second));
 
       ++tt1;
-
     }
 
     while (tt2 < tt1) {
@@ -146,20 +143,18 @@ CombinedDataMapping::generate_table (std::vector< std::pair<double, double> > &t
       table.push_back (std::make_pair (x, tt2->second));
 
       ++tt2;
-
     }
 
     table.push_back (std::make_pair (x2, interpolate (to, tt1, y2)));
-
   }
 
   //  sweep table and remove similar x values
   double epsilon = (table.back ().first - table.front ().first) * 1e-6;
-  std::vector< std::pair<double, double> >::iterator tw = table.begin ();
+  std::vector<std::pair<double, double>>::iterator tw = table.begin ();
 
-  for (std::vector< std::pair<double, double> >::const_iterator t = table.begin (); t != table.end (); ++t) {
-    if (t + 1 != table.end () && t->first + epsilon > t[1].first) {
-      *tw = std::make_pair (0.5 * (t->first + t[1].first), 0.5 * (t->second + t[1].second));
+  for (std::vector<std::pair<double, double>>::const_iterator t = table.begin (); t != table.end (); ++t) {
+    if (t + 1 != table.end () && t->first + epsilon > t [1].first) {
+      *tw = std::make_pair (0.5 * (t->first + t [1].first), 0.5 * (t->second + t [1].second));
       ++t;
     } else {
       *tw = *t;
@@ -170,8 +165,7 @@ CombinedDataMapping::generate_table (std::vector< std::pair<double, double> > &t
   table.erase (tw, table.end ());
 }
 
-void
-CombinedDataMapping::dump () const
+void CombinedDataMapping::dump () const
 {
   tl::info << "CombinedDataMapping(";
   tl::info << "outer=" << tl::noendl;
@@ -187,7 +181,7 @@ CombinedDataMapping::dump () const
 LinearCombinationDataMapping::LinearCombinationDataMapping (double c, DataMappingBase *a, double ca, DataMappingBase *b, double cb)
   : mp_a (a), mp_b (b), m_ca (ca), m_cb (cb), m_c (c)
 {
-  if (!mp_a && mp_b) {
+  if (! mp_a && mp_b) {
     std::swap (mp_a, mp_b);
     std::swap (m_ca, m_cb);
   }
@@ -205,63 +199,62 @@ LinearCombinationDataMapping::~LinearCombinationDataMapping ()
   }
 }
 
-double 
+double
 LinearCombinationDataMapping::xmin () const
 {
-  if (!mp_a) {
+  if (! mp_a) {
     return -1e23; // some large negative value
-  } else if (!mp_b) {
+  } else if (! mp_b) {
     return mp_a->xmin ();
   } else {
     return std::min (mp_a->xmin (), mp_b->xmin ());
   }
 }
 
-double 
+double
 LinearCombinationDataMapping::xmax () const
 {
-  if (!mp_a) {
+  if (! mp_a) {
     return 1e23; // some large positive value
-  } else if (!mp_b) {
+  } else if (! mp_b) {
     return mp_a->xmax ();
   } else {
     return std::max (mp_a->xmax (), mp_b->xmax ());
   }
 }
 
-void 
-LinearCombinationDataMapping::generate_table (std::vector< std::pair<double, double> > &table)
+void LinearCombinationDataMapping::generate_table (std::vector<std::pair<double, double>> &table)
 {
-  if (!mp_a) {
+  if (! mp_a) {
 
     table.push_back (std::make_pair (xmin (), m_c));
     table.push_back (std::make_pair (xmax (), m_c));
 
-  } else if (!mp_b) {
+  } else if (! mp_b) {
 
     mp_a->generate_table (table);
 
-    for (std::vector< std::pair<double, double> >::iterator t = table.begin (); t != table.end (); ++t) {
+    for (std::vector<std::pair<double, double>>::iterator t = table.begin (); t != table.end (); ++t) {
       t->second = m_c + m_ca * t->second;
     }
 
   } else {
 
-    std::vector< std::pair<double, double> > ta;
+    std::vector<std::pair<double, double>> ta;
     mp_a->generate_table (ta);
     tl_assert (ta.size () >= 2);
 
-    std::vector< std::pair<double, double> > tb;
+    std::vector<std::pair<double, double>> tb;
     mp_b->generate_table (tb);
     tl_assert (tb.size () >= 2);
 
-    std::vector< std::pair<double, double> >::const_iterator a = ta.begin (); 
-    std::vector< std::pair<double, double> >::const_iterator b = tb.begin (); 
+    std::vector<std::pair<double, double>>::const_iterator a = ta.begin ();
+    std::vector<std::pair<double, double>>::const_iterator b = tb.begin ();
 
     double epsilon = (xmax () - xmin ()) * 1e-6;
 
     while (a != ta.end () || b != tb.end ()) {
-      
+
       if (a == ta.end ()) {
         table.push_back (std::make_pair (b->first, m_c + m_ca * ta.back ().second + m_cb * b->second));
         ++b;
@@ -280,12 +273,10 @@ LinearCombinationDataMapping::generate_table (std::vector< std::pair<double, dou
         ++b;
       }
     }
-
   }
 }
 
-void
-LinearCombinationDataMapping::dump () const
+void LinearCombinationDataMapping::dump () const
 {
   tl::info << "LinearCombinationDataMapping(" << m_c << "+";
   tl::info << "a=" << m_ca << "*" << tl::noendl;
@@ -306,11 +297,10 @@ LinearCombinationDataMapping::dump () const
 // -------------------------------------------------------------------------
 //  TableDataMapping implementation
 
-void
-TableDataMapping::dump () const
+void TableDataMapping::dump () const
 {
   tl::info << "TableDataMapping(xmin=" << m_xmin << ", xmax=" << m_xmax << ",";
-  for (std::vector< std::pair<double, double> >::const_iterator p = m_table.begin (); p != m_table.end (); ++p) {
+  for (std::vector<std::pair<double, double>>::const_iterator p = m_table.begin (); p != m_table.end (); ++p) {
     tl::info << p->first << ":" << p->second << ";" << tl::noendl;
   }
   tl::info << "";
@@ -331,8 +321,7 @@ DataMappingLookupTable::~DataMappingLookupTable ()
   release ();
 }
 
-void
-DataMappingLookupTable::release ()
+void DataMappingLookupTable::release ()
 {
   if (mp_y) {
     delete [] mp_y;
@@ -349,15 +338,13 @@ DataMappingLookupTable::release ()
   }
 }
 
-void 
-DataMappingLookupTable::set_data_mapping (DataMappingBase *dm)
+void DataMappingLookupTable::set_data_mapping (DataMappingBase *dm)
 {
   release ();
   mp_dm = dm;
 }
 
-void 
-DataMappingLookupTable::update_table (double xmin, double xmax, double delta_y, unsigned int ifactor)
+void DataMappingLookupTable::update_table (double xmin, double xmax, double delta_y, unsigned int ifactor)
 {
   if (mp_y) {
     delete [] mp_y;
@@ -368,7 +355,7 @@ DataMappingLookupTable::update_table (double xmin, double xmax, double delta_y, 
     mp_c = 0;
   }
 
-  std::vector< std::pair<double, double> > table;
+  std::vector<std::pair<double, double>> table;
 
   if (mp_dm) {
     mp_dm->generate_table (table);
@@ -379,35 +366,34 @@ DataMappingLookupTable::update_table (double xmin, double xmax, double delta_y, 
     //  TODO: should mimic a linear behaviour by observing delta_y
     m_dxinv = 1.0 / (xmax - xmin);
     m_xmin = xmin;
-    mp_y = new double[3];
+    mp_y = new double [3];
     m_size = 2;
-    mp_y[0] = xmin;
-    mp_y[1] = xmax;
-    mp_y[2] = xmax;
+    mp_y [0] = xmin;
+    mp_y [1] = xmax;
+    mp_y [2] = xmax;
 
   } else if (table.size () < 2) {
 
-    double yconst = table[0].second;
+    double yconst = table [0].second;
 
     m_dxinv = 1.0 / (xmax - xmin);
     m_xmin = xmin;
-    mp_y = new double[3];
-    mp_y[0] = mp_y[1] = mp_y[2] = yconst;
+    mp_y = new double [3];
+    mp_y [0] = mp_y [1] = mp_y [2] = yconst;
     m_size = 2;
 
   } else {
 
     double delta_x = xmax - xmin;
 
-    for (std::vector< std::pair<double, double> >::const_iterator t = table.begin () + 1; t != table.end (); ++t) {
+    for (std::vector<std::pair<double, double>>::const_iterator t = table.begin () + 1; t != table.end (); ++t) {
 
-      double dx = fabs (t->first - t[-1].first);
-      double dy = fabs (t->second - t[-1].second);
-  
+      double dx = fabs (t->first - t [-1].first);
+      double dy = fabs (t->second - t [-1].second);
+
       if (dx > 1e-10 && dy > 1e-10 && dx * delta_y < delta_x * dy) {
         delta_x = dx / dy * delta_y;
       }
-
     }
 
     size_t nsteps = size_t (ceil ((xmax - xmin) / delta_x - 1e-6));
@@ -417,25 +403,24 @@ DataMappingLookupTable::update_table (double xmin, double xmax, double delta_y, 
 
     delta_x = (xmax - xmin) / double (nsteps);
 
-    mp_y = new double[nsteps + 1]; // plus one for safety
+    mp_y = new double [nsteps + 1]; // plus one for safety
     m_size = nsteps;
 
-    std::vector< std::pair<double, double> >::const_iterator t = table.begin ();
+    std::vector<std::pair<double, double>>::const_iterator t = table.begin ();
     size_t i = 0;
     double x;
-    for ( ; i < nsteps; ++i) {
+    for (; i < nsteps; ++i) {
       x = xmin + i * delta_x;
       while (t != table.end () && t->first <= x) {
         ++t;
       }
-      mp_y[i] = interpolate (table, t, x);
+      mp_y [i] = interpolate (table, t, x);
     }
 
     //  add one item for safety (rounding problems in operator[] implementation)
-    mp_y[i] = mp_y[i - 1];
+    mp_y [i] = mp_y [i - 1];
     m_xmin = xmin - delta_x * 0.5;
     m_dxinv = 1.0 / delta_x;
-
   }
 
   mp_c = new unsigned int [m_size + 1];

@@ -57,7 +57,7 @@ namespace lay
 
 static int firstLineNumber (const QTextBlock &b)
 {
-#if QT_VERSION >= 0x040500  
+#if QT_VERSION >= 0x040500
   return b.firstLineNumber ();
 #else
   return QTextCursor (b).blockNumber ();
@@ -69,11 +69,12 @@ static int firstLineNumber (const QTextBlock &b)
 
 MacroEditorTextWidget::MacroEditorTextWidget (QWidget *parent)
   : TextEditWidget (parent)
-{ }
+{
+}
 
 void MacroEditorTextWidget::paintEvent (QPaintEvent *event)
 {
-  //  lacking any other good way to detect scrolling, we catch the paint events of the viewport 
+  //  lacking any other good way to detect scrolling, we catch the paint events of the viewport
   //  to detect a change in the geometry
   QRect r (0, -verticalScrollBar ()->value (), 1, height ());
   if (r != m_r) {
@@ -110,7 +111,6 @@ MacroEditorNotificationWidget::MacroEditorNotificationWidget (MacroEditorPage *p
     pb->setText (tl::to_qstring (a->second));
     m_action_buttons.insert (std::make_pair (pb, a->first));
     connect (pb, SIGNAL (clicked ()), this, SLOT (action_triggered ()));
-
   }
 
   QToolButton *close_button = new QToolButton ();
@@ -121,8 +121,7 @@ MacroEditorNotificationWidget::MacroEditorNotificationWidget (MacroEditorPage *p
   connect (close_button, SIGNAL (clicked ()), this, SLOT (close_triggered ()));
 }
 
-void
-MacroEditorNotificationWidget::action_triggered ()
+void MacroEditorNotificationWidget::action_triggered ()
 {
   BEGIN_PROTECTED
 
@@ -134,8 +133,7 @@ MacroEditorNotificationWidget::action_triggered ()
   END_PROTECTED_W (this)
 }
 
-void
-MacroEditorNotificationWidget::close_triggered ()
+void MacroEditorNotificationWidget::close_triggered ()
 {
   mp_parent->remove_notification (*mp_notification);
 }
@@ -150,7 +148,7 @@ MacroEditorHighlighters::MacroEditorHighlighters (QObject *parent)
   m_attributes.push_back (std::make_pair ("ruby", GenericSyntaxHighlighterAttributes (&m_basic_attributes)));
   m_attributes.push_back (std::make_pair ("python", GenericSyntaxHighlighterAttributes (&m_basic_attributes)));
 
-  for (std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes> >::iterator a = m_attributes.begin (); a != m_attributes.end (); ++a) {
+  for (std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes>>::iterator a = m_attributes.begin (); a != m_attributes.end (); ++a) {
     //  Note: this loads and initializes the attributes
     delete highlighter_for_scheme (parent, a->first, &a->second, true);
   }
@@ -161,7 +159,7 @@ MacroEditorHighlighters::highlighter_for (QObject *parent, lym::Macro::Interpret
 {
   std::string scheme = scheme_for (lang, dsl_name);
 
-  for (std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes> >::iterator a = m_attributes.begin (); a != m_attributes.end (); ++a) {
+  for (std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes>>::iterator a = m_attributes.begin (); a != m_attributes.end (); ++a) {
     if (a->first == scheme) {
       return highlighter_for_scheme (parent, a->first, &a->second, initialize);
     }
@@ -183,9 +181,9 @@ MacroEditorHighlighters::highlighter_for_scheme (QObject *parent, const std::str
 #else
     if (res.isCompressed ()) {
 #endif
-      data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
+      data = qUncompress ((const unsigned char *) res.data (), (int) res.size ());
     } else {
-      data = QByteArray ((const char *)res.data (), (int)res.size ());
+      data = QByteArray ((const char *) res.data (), (int) res.size ());
     }
 
     QBuffer input (&data);
@@ -205,7 +203,7 @@ MacroEditorHighlighters::attributes_for (lym::Macro::Interpreter lang, const std
 {
   std::string scheme = scheme_for (lang, dsl_name);
 
-  for (std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes> >::iterator a = m_attributes.begin (); a != m_attributes.end (); ++a) {
+  for (std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes>>::iterator a = m_attributes.begin (); a != m_attributes.end (); ++a) {
     if (a->first == scheme) {
       return &a->second;
     }
@@ -220,20 +218,19 @@ MacroEditorHighlighters::basic_attributes ()
   return &m_basic_attributes;
 }
 
-std::string 
+std::string
 MacroEditorHighlighters::to_string () const
 {
   std::string s = "basic:" + m_basic_attributes.to_string ();
 
-  for (std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes> >::const_iterator a = m_attributes.begin (); a != m_attributes.end (); ++a) {
+  for (std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes>>::const_iterator a = m_attributes.begin (); a != m_attributes.end (); ++a) {
     s += tl::to_word_or_quoted_string (a->first) + ":" + a->second.to_string ();
   }
-  
+
   return s;
 }
 
-void 
-MacroEditorHighlighters::load (const std::string &s)
+void MacroEditorHighlighters::load (const std::string &s)
 {
   try {
 
@@ -251,7 +248,7 @@ MacroEditorHighlighters::load (const std::string &s)
       if (t == "basic") {
         attributes = &m_basic_attributes;
       } else {
-        for (std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes> >::iterator a = m_attributes.begin (); a != m_attributes.end (); ++a) {
+        for (std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes>>::iterator a = m_attributes.begin (); a != m_attributes.end (); ++a) {
           if (a->first == t) {
             attributes = &a->second;
             break;
@@ -260,7 +257,6 @@ MacroEditorHighlighters::load (const std::string &s)
       }
 
       attributes->read (ex);
-
     }
 
   } catch (...) {
@@ -268,7 +264,7 @@ MacroEditorHighlighters::load (const std::string &s)
   }
 }
 
-std::string 
+std::string
 MacroEditorHighlighters::scheme_for (lym::Macro::Interpreter lang, const std::string &dsl_name)
 {
   if (lang == lym::Macro::Ruby) {
@@ -374,12 +370,12 @@ void MacroEditorExecutionModel::set_run_mode (bool run_mode)
 }
 
 // ----------------------------------------------------------------------------------------------
-//  MacroEditorSidePanel implementation 
+//  MacroEditorSidePanel implementation
 
 const int sidePanelMargin = 4;
 
 MacroEditorSidePanel::MacroEditorSidePanel (QWidget *parent, MacroEditorTextWidget *text, MacroEditorExecutionModel *exec_model)
-  : QWidget (parent), mp_text (text), mp_exec_model (exec_model), 
+  : QWidget (parent), mp_text (text), mp_exec_model (exec_model),
     m_breakpoint_pixmap (QString::fromUtf8 (":/breakpointmark_16px.png")),
     m_breakpoint_disabled_pixmap (QString::fromUtf8 (":/breakpointmarkdisabled_16px.png")),
     m_exec_point_pixmap (QString::fromUtf8 (":/execmark_16px.png")),
@@ -433,13 +429,11 @@ void MacroEditorSidePanel::mousePressEvent (QMouseEvent *event)
       }
 
       b = b.next ();
-
     }
 
     if (line >= 0) {
       mp_exec_model->toggle_breakpoint (line);
     }
-
   }
 }
 
@@ -448,7 +442,7 @@ void MacroEditorSidePanel::redraw ()
   update ();
 }
 
-void MacroEditorSidePanel::set_watermark (const QString &wm) 
+void MacroEditorSidePanel::set_watermark (const QString &wm)
 {
   if (m_watermark != wm) {
     m_watermark = wm;
@@ -466,7 +460,7 @@ void MacroEditorSidePanel::paintEvent (QPaintEvent *)
 
   QRect rsel = mp_text->cursorRect (mp_text->textCursor ());
 
-  //  paint background 
+  //  paint background
   for (QTextBlock b = mp_text->cursorForPosition (QPoint (0, -mp_text->viewport ()->rect ().top ())).block (); b.isValid (); b = b.next ()) {
 
     QRect rc = mp_text->cursorRect (QTextCursor (b));
@@ -478,7 +472,6 @@ void MacroEditorSidePanel::paintEvent (QPaintEvent *)
     if (rc.top () < rsel_center && rc.bottom () > rsel_center) {
       p.fillRect (rt, hlBrush);
     }
-
   }
 
   //  paint watermark text
@@ -496,10 +489,9 @@ void MacroEditorSidePanel::paintEvent (QPaintEvent *)
     p.drawText (QRect (-height (), 0, height (), width ()), Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextDontClip | Qt::TextSingleLine, m_watermark);
 
     p.restore ();
-
   }
 
-  //  paint foreground 
+  //  paint foreground
   for (QTextBlock b = mp_text->cursorForPosition (QPoint (0, -mp_text->viewport ()->rect ().top ())).block (); b.isValid (); b = b.next ()) {
 
     int l = firstLineNumber (b) + 1;
@@ -526,7 +518,7 @@ void MacroEditorSidePanel::paintEvent (QPaintEvent *)
     }
 
     if (mp_exec_model->breakpoints ().find (l) != mp_exec_model->breakpoints ().end ()) {
-      int icon_size = std::min (m_breakpoint_pixmap.height (), rt.height ()); 
+      int icon_size = std::min (m_breakpoint_pixmap.height (), rt.height ());
       QRect rpt (0, rt.center ().y () - icon_size / 2 + 1, icon_size, icon_size);
       if (m_debugging_on) {
         p.drawPixmap (rpt, m_breakpoint_pixmap, m_breakpoint_pixmap.rect ());
@@ -536,11 +528,10 @@ void MacroEditorSidePanel::paintEvent (QPaintEvent *)
     }
 
     if (mp_exec_model->run_mode () && mp_exec_model->current_line () == l) {
-      int icon_size = std::min (m_exec_point_pixmap.height (), rt.height ()); 
+      int icon_size = std::min (m_exec_point_pixmap.height (), rt.height ());
       QRect rpt (sidePanelMargin, rt.center ().y () - icon_size / 2 + 1, icon_size, icon_size);
       p.drawPixmap (rpt, m_exec_point_pixmap, m_exec_point_pixmap.rect ());
     }
-
   }
 }
 
@@ -573,14 +564,14 @@ MacroEditorPage::MacroEditorPage (QWidget * /*parent*/, MacroEditorHighlighters 
   hlayout->addWidget (mp_side_panel);
   hlayout->addWidget (mp_text);
 
-  mp_text->setWordWrapMode(QTextOption::NoWrap);
+  mp_text->setWordWrapMode (QTextOption::NoWrap);
 #if QT_VERSION >= 0x60000
   mp_text->setTabStopDistance (m_ntab * QFontMetrics (mp_text->font ()).horizontalAdvance (QString::fromUtf8 ("x")));
 #else
   mp_text->setTabStopWidth (m_ntab * QFontMetrics (mp_text->font ()).width (QString::fromUtf8 ("x")));
 #endif
   m_is_modified = false;
- 
+
   connect (mp_text, SIGNAL (textChanged ()), this, SLOT (text_changed ()));
   connect (mp_text, SIGNAL (cursorPositionChanged ()), this, SLOT (cursor_position_changed ()));
   connect (mp_text->horizontalScrollBar (), SIGNAL (valueChanged (int)), this, SLOT (hide_completer ()));
@@ -614,7 +605,7 @@ void MacroEditorPage::update ()
 
     if (mt != et) {
 
-      //  Leave trailing lines as far as they are identical - that way we deal with the 
+      //  Leave trailing lines as far as they are identical - that way we deal with the
       //  "header changed" case gracefully and don't destroy breakpoints if we change macro properties
 
       int nm = mt.size ();
@@ -634,9 +625,7 @@ void MacroEditorPage::update ()
       cursor.endEditBlock ();
 
       mp_text->setTextCursor (c);
-
     }
-
   }
 }
 
@@ -695,7 +684,7 @@ void MacroEditorPage::breakpoints_changed ()
   m_breakpoints.clear ();
   if (! mp_exec_model->breakpoints ().empty ()) {
     const QTextDocument *doc = mp_text->document ();
-    for (QTextBlock b = doc->begin(); b != doc->end(); b = b.next()) {
+    for (QTextBlock b = doc->begin (); b != doc->end (); b = b.next ()) {
       if (mp_exec_model->breakpoints ().find (firstLineNumber (b) + 1) != mp_exec_model->breakpoints ().end ()) {
         m_breakpoints.insert (b);
         //  Right now, the user data is just used as a flag for a breakpoint
@@ -764,8 +753,8 @@ void MacroEditorPage::fill_completer_list ()
   QString ssel = c.selectedText ();
   QString s = ssel.mid (0, pos - pos0);
 
-  if (s.length () == 0 || (! s[0].isLetter () && s[0].toLatin1 () != '_')) {
-    return;  // not a word
+  if (s.length () == 0 || (! s [0].isLetter () && s [0].toLatin1 () != '_')) {
+    return; // not a word
   }
 
   QString text = mp_text->toPlainText ();
@@ -803,7 +792,6 @@ void MacroEditorPage::fill_completer_list ()
     } else if (! w.isEmpty () && w != s) {
       words.insert (w);
     }
-
   }
 
   for (std::set<QString>::const_iterator w = words.begin (); w != words.end (); ++w) {
@@ -868,7 +856,7 @@ void MacroEditorPage::cursor_position_changed ()
   fmt.setFont (f);
 
   QTextBlock b = cursor.block ();
-  SyntaxHighlighterUserData *user_data = dynamic_cast<SyntaxHighlighterUserData *> (b.userData());
+  SyntaxHighlighterUserData *user_data = dynamic_cast<SyntaxHighlighterUserData *> (b.userData ());
   if (user_data) {
 
     //  Look for matching brackets and highlight the other one
@@ -878,7 +866,7 @@ void MacroEditorPage::cursor_position_changed ()
     //  and over characters inside these elements.
 
 #if QT_VERSION < 0x40700
-    size_t pos = size_t (cursor.position() - cursor.block().position());
+    size_t pos = size_t (cursor.position () - cursor.block ().position ());
 #else
     size_t pos = size_t (cursor.positionInBlock ());
 #endif
@@ -902,7 +890,7 @@ void MacroEditorPage::cursor_position_changed ()
       QString t = b.text ().mid (int (pos), 1);
       forward = (t == open_rbracket || t == open_sqbracket || t == open_cbracket);
     }
-    if (e != user_data->elements ().begin () && e[-1].start_offset + e[-1].length >= pos && valid_element (e[-1])) {
+    if (e != user_data->elements ().begin () && e [-1].start_offset + e [-1].length >= pos && valid_element (e [-1])) {
       QString t = b.text ().mid (int (pos) - 1, 1);
       backward = (t == close_rbracket || t == close_sqbracket || t == close_cbracket);
     }
@@ -946,7 +934,7 @@ void MacroEditorPage::cursor_position_changed ()
 
           } else if (backward) {
 
-            for (int p = t.size (); p > 0 && found < 0; ) {
+            for (int p = t.size (); p > 0 && found < 0;) {
               --p;
               if (p + int (e->start_offset) < int (pos)) {
                 QString c = t.mid (p, 1);
@@ -964,9 +952,7 @@ void MacroEditorPage::cursor_position_changed ()
                 }
               }
             }
-
           }
-
         }
 
         if (found >= 0) {
@@ -984,13 +970,12 @@ void MacroEditorPage::cursor_position_changed ()
           }
           --e;
         }
-
       }
 
       if (found >= 0) {
 
         QList<QTextEdit::ExtraSelection> extra_selections = mp_text->extraSelections ();
-        for (QList<QTextEdit::ExtraSelection>::iterator i = extra_selections.begin (); i != extra_selections.end (); ) {
+        for (QList<QTextEdit::ExtraSelection>::iterator i = extra_selections.begin (); i != extra_selections.end ();) {
           if (i->format == fmt) {
             i = extra_selections.erase (i);
           } else {
@@ -1012,17 +997,14 @@ void MacroEditorPage::cursor_position_changed ()
         extra_selections.push_back (es);
 
         mp_text->setExtraSelections (extra_selections);
-
       }
-
     }
-
   }
 
   emit edit_trace (false);
 }
 
-void MacroEditorPage::text_changed () 
+void MacroEditorPage::text_changed ()
 {
   m_is_modified = true;
 
@@ -1040,7 +1022,7 @@ void MacroEditorPage::text_changed ()
 
 void MacroEditorPage::set_ntab (int n)
 {
-  if (n != m_ntab)  {
+  if (n != m_ntab) {
     m_ntab = n;
 #if QT_VERSION >= 0x60000
     mp_text->setTabStopDistance (m_ntab * QFontMetrics (mp_text->font ()).horizontalAdvance (QString::fromUtf8 ("x")));
@@ -1122,12 +1104,10 @@ void MacroEditorPage::connect_macro (lym::Macro *macro)
     }
 
     mp_side_panel->set_watermark (mp_macro ? tl::to_qstring (mp_macro->interpreter_name ()) : QString ());
-
   }
 }
 
-void
-MacroEditorPage::find_reset ()
+void MacroEditorPage::find_reset ()
 {
   /*
   Editor gets too jumpy if we try to reset after search:
@@ -1138,8 +1118,7 @@ MacroEditorPage::find_reset ()
   */
 }
 
-bool
-MacroEditorPage::find_prev ()
+bool MacroEditorPage::find_prev ()
 {
   update_extra_selections ();
 
@@ -1150,7 +1129,7 @@ MacroEditorPage::find_prev ()
   QTextCursor c = mp_text->textCursor ();
 
   bool first = true;
-  for (QTextBlock b = c.block (); true; ) {
+  for (QTextBlock b = c.block (); true;) {
 
     int o = (first ? c.position () - b.position () : -1);
     first = false;
@@ -1175,21 +1154,19 @@ MacroEditorPage::find_prev ()
       return true;
     }
 
-    if (b == mp_text->document ()->begin()) {
+    if (b == mp_text->document ()->begin ()) {
       b = mp_text->document ()->end ();
     }
     b = b.previous ();
     if (b == c.block ()) {
       break;
     }
-
   }
 
   return false;
 }
 
-bool
-MacroEditorPage::find_next ()
+bool MacroEditorPage::find_next ()
 {
   update_extra_selections ();
 
@@ -1204,7 +1181,7 @@ MacroEditorPage::find_next ()
   }
 
   bool first = true;
-  for (QTextBlock b = c.block (); true; ) {
+  for (QTextBlock b = c.block (); true;) {
 
     int o = (first ? std::max (0, c.position () + 1 - b.position ()) : 0);
     first = false;
@@ -1220,20 +1197,18 @@ MacroEditorPage::find_next ()
     }
 
     b = b.next ();
-    if (b == mp_text->document ()->end()) {
+    if (b == mp_text->document ()->end ()) {
       b = mp_text->document ()->begin ();
     }
     if (b == c.block ()) {
       break;
     }
-
   }
 
   return false;
 }
 
-bool
-MacroEditorPage::select_match_here ()
+bool MacroEditorPage::select_match_here ()
 {
   if (m_current_search == QRegExp ()) {
     return false;
@@ -1264,8 +1239,7 @@ MacroEditorPage::select_match_here ()
   }
 }
 
-void
-MacroEditorPage::set_editor_focus ()
+void MacroEditorPage::set_editor_focus ()
 {
   mp_text->setFocus (Qt::OtherFocusReason);
 }
@@ -1291,12 +1265,10 @@ static QString interpolate_string (const QString &replace, const QRegExp &re)
     r.replace (QString::fromUtf8 ("\\ "), QString::fromUtf8 ("\\"));
 
     return r;
-
   }
 }
 
-void 
-MacroEditorPage::replace_and_find_next (const QString &replace)
+void MacroEditorPage::replace_and_find_next (const QString &replace)
 {
   if (! mp_macro || mp_macro->is_readonly ()) {
     return;
@@ -1308,8 +1280,7 @@ MacroEditorPage::replace_and_find_next (const QString &replace)
   find_next ();
 }
 
-void
-MacroEditorPage::replace_all (const QString &replace)
+void MacroEditorPage::replace_all (const QString &replace)
 {
   if (! mp_macro || mp_macro->is_readonly ()) {
     return;
@@ -1318,8 +1289,7 @@ MacroEditorPage::replace_all (const QString &replace)
   replace_in_selection (replace, false);
 }
 
-void
-MacroEditorPage::replace_in_selection (const QString &replace, bool first)
+void MacroEditorPage::replace_in_selection (const QString &replace, bool first)
 {
   const QTextDocument *doc = mp_text->document ();
 
@@ -1345,7 +1315,6 @@ MacroEditorPage::replace_in_selection (const QString &replace, bool first)
 
     //  don't replace first entry without selection
     return;
-
   }
 
   ps -= bs.position ();
@@ -1355,11 +1324,11 @@ MacroEditorPage::replace_in_selection (const QString &replace, bool first)
 
   bool done = false;
 
-  for (QTextBlock b = bs; ; b = b.next()) {
+  for (QTextBlock b = bs;; b = b.next ()) {
 
     int o = 0;
 
-    while (!done) {
+    while (! done) {
 
       bool substitute = false;
 
@@ -1367,7 +1336,7 @@ MacroEditorPage::replace_in_selection (const QString &replace, bool first)
       if (i < 0) {
         break;
       } else if (m_current_search.matchedLength () == 0) {
-        break;  //  avoid an infinite loop
+        break; //  avoid an infinite loop
       } else if (b == bs && i < ps) {
         //  ignore
       } else if (b == be && i + m_current_search.matchedLength () > pe) {
@@ -1397,49 +1366,43 @@ MacroEditorPage::replace_in_selection (const QString &replace, bool first)
       } else {
 
         o = i + m_current_search.matchedLength ();
-
       }
-
     }
 
     if (b == be || done) {
       break;
     }
-
   }
 
   if (has_selection) {
     //  restore selection which might have changed due to insert
     c.setPosition (anchor_at_end ? be.position () + pe : bs.position () + ps);
-    c.setPosition (!anchor_at_end ? be.position () + pe : bs.position () + ps, QTextCursor::KeepAnchor);
+    c.setPosition (! anchor_at_end ? be.position () + pe : bs.position () + ps, QTextCursor::KeepAnchor);
     mp_text->setTextCursor (c);
   }
 
   c.endEditBlock ();
 }
 
-void 
-MacroEditorPage::set_search (const QRegExp &text)
+void MacroEditorPage::set_search (const QRegExp &text)
 {
   m_current_search = text;
   m_error_line = -1;
   update_extra_selections ();
 }
 
-void 
-MacroEditorPage::set_error_line (int line)
+void MacroEditorPage::set_error_line (int line)
 {
   m_error_line = line - 1;
   goto_line (line);
   update_extra_selections ();
 }
 
-void
-MacroEditorPage::goto_line (int line)
+void MacroEditorPage::goto_line (int line)
 {
   if (line > 0) {
     const QTextDocument *doc = mp_text->document ();
-    for (QTextBlock b = doc->begin(); b != doc->end(); b = b.next()) {
+    for (QTextBlock b = doc->begin (); b != doc->end (); b = b.next ()) {
       if (firstLineNumber (b) + 1 == line) {
         mp_text->setTextCursor (QTextCursor (b));
         mp_text->ensureCursorVisible ();
@@ -1449,12 +1412,11 @@ MacroEditorPage::goto_line (int line)
   }
 }
 
-void
-MacroEditorPage::goto_position (int line, int pos)
+void MacroEditorPage::goto_position (int line, int pos)
 {
   if (line > 0) {
     const QTextDocument *doc = mp_text->document ();
-    for (QTextBlock b = doc->begin(); b != doc->end(); b = b.next()) {
+    for (QTextBlock b = doc->begin (); b != doc->end (); b = b.next ()) {
       if (firstLineNumber (b) + 1 == line) {
         QTextCursor cursor (b);
         cursor.movePosition (QTextCursor::Right, QTextCursor::MoveAnchor, pos);
@@ -1466,15 +1428,14 @@ MacroEditorPage::goto_position (int line, int pos)
   }
 }
 
-void
-MacroEditorPage::update_extra_selections ()
+void MacroEditorPage::update_extra_selections ()
 {
   QList<QTextEdit::ExtraSelection> extra_selections;
 
   if (m_error_line >= 0) {
 
     const QTextDocument *doc = mp_text->document ();
-    for (QTextBlock b = doc->begin(); b != doc->end(); b = b.next()) {
+    for (QTextBlock b = doc->begin (); b != doc->end (); b = b.next ()) {
       if (firstLineNumber (b) == m_error_line) {
         QTextEdit::ExtraSelection es;
         es.cursor = QTextCursor (b);
@@ -1488,7 +1449,7 @@ MacroEditorPage::update_extra_selections ()
   } else if (mp_exec_model->run_mode () && mp_exec_model->current_line () >= 0) {
 
     const QTextDocument *doc = mp_text->document ();
-    for (QTextBlock b = doc->begin(); b != doc->end(); b = b.next()) {
+    for (QTextBlock b = doc->begin (); b != doc->end (); b = b.next ()) {
       if (firstLineNumber (b) == mp_exec_model->current_line () - 1) {
         QTextEdit::ExtraSelection es;
         es.cursor = QTextCursor (b);
@@ -1502,7 +1463,7 @@ MacroEditorPage::update_extra_selections ()
   } else if (m_current_search != QRegExp ()) {
 
     const QTextDocument *doc = mp_text->document ();
-    for (QTextBlock b = doc->begin(); b != doc->end(); b = b.next()) {
+    for (QTextBlock b = doc->begin (); b != doc->end (); b = b.next ()) {
       QString t = b.text ();
       int o = 0;
       int i = 0;
@@ -1522,26 +1483,22 @@ MacroEditorPage::update_extra_selections ()
         }
       }
     }
-
   }
 
   mp_text->setExtraSelections (extra_selections);
 }
 
-int
-MacroEditorPage::current_line () const
+int MacroEditorPage::current_line () const
 {
   return firstLineNumber (mp_text->textCursor ().block ()) + 1;
 }
 
-int
-MacroEditorPage::current_pos () const
+int MacroEditorPage::current_pos () const
 {
   return mp_text->textCursor ().position () - mp_text->textCursor ().block ().position ();
 }
 
-bool
-MacroEditorPage::has_multi_block_selection () const
+bool MacroEditorPage::has_multi_block_selection () const
 {
   QTextCursor c = mp_text->textCursor ();
   if (c.selectionStart () != c.selectionEnd ()) {
@@ -1553,8 +1510,7 @@ MacroEditorPage::has_multi_block_selection () const
   }
 }
 
-bool
-MacroEditorPage::tab_key_pressed ()
+bool MacroEditorPage::tab_key_pressed ()
 {
   if (mp_text->isReadOnly ()) {
     return false;
@@ -1585,7 +1541,7 @@ MacroEditorPage::tab_key_pressed ()
     c.setPosition (bs.position ());
     c.beginEditBlock ();
 
-    for (QTextBlock b = bs; ; b = b.next()) {
+    for (QTextBlock b = bs;; b = b.next ()) {
 
       c.setPosition (b.position ());
       QString text = b.text ();
@@ -1605,7 +1561,7 @@ MacroEditorPage::tab_key_pressed ()
       }
 
       if (has_tabs) {
-        for ( ; i > 0; --i) {
+        for (; i > 0; --i) {
           c.deleteChar ();
         }
         c.insertText (QString (m_nindent + p, QChar::fromLatin1 (' ')));
@@ -1616,7 +1572,6 @@ MacroEditorPage::tab_key_pressed ()
       if (b == be) {
         break;
       }
-
     }
 
     c.endEditBlock ();
@@ -1646,16 +1601,14 @@ MacroEditorPage::tab_key_pressed ()
 
     c.insertText (QString (m_nindent - p % m_nindent, QChar::fromLatin1 (' ')));
     mp_text->setTextCursor (c);
-
   }
 
   return true;
 }
 
-bool
-MacroEditorPage::back_tab_key_pressed ()
+bool MacroEditorPage::back_tab_key_pressed ()
 {
-  if (!mp_text->textCursor ().hasSelection () || mp_text->isReadOnly ()) {
+  if (! mp_text->textCursor ().hasSelection () || mp_text->isReadOnly ()) {
     return false;
   }
 
@@ -1676,7 +1629,7 @@ MacroEditorPage::back_tab_key_pressed ()
   c.setPosition (bs.position ());
   c.beginEditBlock ();
 
-  for (QTextBlock b = bs; ; b = b.next()) {
+  for (QTextBlock b = bs;; b = b.next ()) {
 
     c.setPosition (b.position ());
     QString text = b.text ();
@@ -1707,7 +1660,6 @@ MacroEditorPage::back_tab_key_pressed ()
     if (b == be) {
       break;
     }
-
   }
 
   c.endEditBlock ();
@@ -1723,10 +1675,9 @@ MacroEditorPage::back_tab_key_pressed ()
   return true;
 }
 
-bool
-MacroEditorPage::backspace_pressed ()
+bool MacroEditorPage::backspace_pressed ()
 {
-  if (mp_text->textCursor ().hasSelection () || mp_text->isReadOnly()) {
+  if (mp_text->textCursor ().hasSelection () || mp_text->isReadOnly ()) {
     return false;
   }
 
@@ -1758,16 +1709,13 @@ MacroEditorPage::backspace_pressed ()
       mp_text->setTextCursor (c);
 
       return true;
-
     }
-
   }
 
   return false;
 }
 
-bool
-MacroEditorPage::return_pressed ()
+bool MacroEditorPage::return_pressed ()
 {
   if (mp_text->isReadOnly ()) {
     return false;
@@ -1869,8 +1817,7 @@ static bool is_any_known_key (QKeyEvent *ke)
          is_down_key (ke);
 }
 
-bool
-MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
+bool MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
 {
   if (watched == mp_text) {
 
@@ -1879,7 +1826,7 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
       //  override shortcuts if the collide with keys we accept ourselves
       QKeyEvent *ke = dynamic_cast<QKeyEvent *> (event);
       if (! ke) {
-        return false;  //  should not happen
+        return false; //  should not happen
       }
 
       if (is_any_known_key (ke)) {
@@ -1899,7 +1846,7 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
 
       QKeyEvent *ke = dynamic_cast<QKeyEvent *> (event);
       if (! ke) {
-        return false;  //  should not happen
+        return false; //  should not happen
       }
 
       if (is_tab_key (ke)) {
@@ -1991,18 +1938,14 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
         }
 
         return true;
-
       }
-
     }
-
   }
 
   return false;
 }
 
-void
-MacroEditorPage::add_notification (const MacroEditorNotification &notification)
+void MacroEditorPage::add_notification (const MacroEditorNotification &notification)
 {
   if (m_notification_widgets.find (&notification) == m_notification_widgets.end ()) {
     m_notifications.push_back (notification);
@@ -2012,8 +1955,7 @@ MacroEditorPage::add_notification (const MacroEditorNotification &notification)
   }
 }
 
-void
-MacroEditorPage::remove_notification (const MacroEditorNotification &notification)
+void MacroEditorPage::remove_notification (const MacroEditorNotification &notification)
 {
   auto nw = m_notification_widgets.find (&notification);
   if (nw != m_notification_widgets.end ()) {
@@ -2027,12 +1969,10 @@ MacroEditorPage::remove_notification (const MacroEditorNotification &notificatio
         break;
       }
     }
-
   }
 }
 
-void
-MacroEditorPage::notification_action (const MacroEditorNotification &notification, const std::string &action)
+void MacroEditorPage::notification_action (const MacroEditorNotification &notification, const std::string &action)
 {
   if (action == "close") {
 
@@ -2046,9 +1986,7 @@ MacroEditorPage::notification_action (const MacroEditorNotification &notificatio
 
     mp_macro->load ();
     mp_macro->reset_modified ();
-
   }
 }
 
 }
-

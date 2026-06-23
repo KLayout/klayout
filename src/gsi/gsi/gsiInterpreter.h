@@ -47,20 +47,23 @@ public:
    *  @brief The output stream designator
    *  Usually the console will not send the output to different streams but use
    *  the stream information to format the output properly.
-   *  OS_stdout is normal output, OS_stderr is error output, 
+   *  OS_stdout is normal output, OS_stderr is error output,
    *  OS_echo is user feedback, specifically used for echoing any input.
    */
-  enum output_stream { OS_none, OS_stdout, OS_stderr, OS_echo };
+  enum output_stream { OS_none,
+                       OS_stdout,
+                       OS_stderr,
+                       OS_echo };
 
   /**
    *  @brief Constructor
    */
-  Console () { }
+  Console () {}
 
   /**
    *  @brief Destructor
    */
-  virtual ~Console () { }
+  virtual ~Console () {}
 
   /**
    *  @brief Writes the given string to the console using the given stream
@@ -96,8 +99,8 @@ public:
 class GSI_PUBLIC StackTraceProvider
 {
 public:
-  StackTraceProvider () { }
-  virtual ~StackTraceProvider () { }
+  StackTraceProvider () {}
+  virtual ~StackTraceProvider () {}
   virtual std::vector<tl::BacktraceElement> stack_trace () const = 0;
   virtual int stack_depth () const = 0;
   virtual size_t scope_index () const = 0;
@@ -116,46 +119,46 @@ public:
   /**
    *  @brief The constructor
    */
-  ExecutionHandler () { }
+  ExecutionHandler () {}
 
   /**
-   *  @brief The destructor 
+   *  @brief The destructor
    */
-  virtual ~ExecutionHandler () { }
+  virtual ~ExecutionHandler () {}
 
   /**
    *  @brief Indicates the start of the execution of a block of code
    *
    *  This method is called when the execution begins. It can be used to clear any caches for example.
    */
-  virtual void start_exec (Interpreter * /*interpreter*/) { }
+  virtual void start_exec (Interpreter * /*interpreter*/) {}
 
   /**
    *  @brief Indicates then end of the execution of a block of code
    *
    *  This method is called after the execution has finished.
    */
-  virtual void end_exec (Interpreter * /*interpreter*/) { }
+  virtual void end_exec (Interpreter * /*interpreter*/) {}
 
   /**
    *  @brief Indicates that we descend into a call
    */
-  virtual void push_call_stack (Interpreter * /*interpreter*/) { }
+  virtual void push_call_stack (Interpreter * /*interpreter*/) {}
 
   /**
    *  @brief Indicates that we ascend into a call
    */
-  virtual void pop_call_stack (Interpreter * /*interpreter*/) { }
+  virtual void pop_call_stack (Interpreter * /*interpreter*/) {}
 
   /**
    *  @brief Indicates that an exception is thrown
    */
-  virtual void exception_thrown (Interpreter * /*interpreter*/, size_t /*file_id*/, int /*line*/, const std::string & /*eclass*/, const std::string & /*emsg*/, const StackTraceProvider * /*stack_trace_provider*/) { }
+  virtual void exception_thrown (Interpreter * /*interpreter*/, size_t /*file_id*/, int /*line*/, const std::string & /*eclass*/, const std::string & /*emsg*/, const StackTraceProvider * /*stack_trace_provider*/) {}
 
   /**
    *  @brief This method is called during execution
    */
-  virtual void trace (Interpreter * /*interpreter*/, size_t /*file_id*/, int /*line*/, const StackTraceProvider * /*stack_trace_provider*/) { }
+  virtual void trace (Interpreter * /*interpreter*/, size_t /*file_id*/, int /*line*/, const StackTraceProvider * /*stack_trace_provider*/) {}
 
   /**
    *  @brief Associate a file path with an ID
@@ -164,7 +167,10 @@ public:
    *  example) for a given file path string. When the trace method is called, this ID is used to
    *  identify the file instead of the heavy file path.
    */
-  virtual size_t id_for_path (Interpreter * /*interpreter*/, const std::string & /*path*/) { return 0; }
+  virtual size_t id_for_path (Interpreter * /*interpreter*/, const std::string & /*path*/)
+  {
+    return 0;
+  }
 };
 
 /**
@@ -221,7 +227,7 @@ public:
   virtual void load_file (const std::string &filename) = 0;
 
   /**
-   *  @brief Evaluates the given string 
+   *  @brief Evaluates the given string
    *
    *  The filename and line gives the location at which the evaluation should begin.
    *  This location is indicated in the stack trace and error messages
@@ -236,14 +242,14 @@ public:
    *
    *  The filename and line gives the location at which the evaluation should begin.
    *  This location is indicated in the stack trace and error messages
-   *  The result is converted to a variant and returned. When that is not possible, the 
+   *  The result is converted to a variant and returned. When that is not possible, the
    *  result is converted to a string and then put into the variant.
    *
    *  "context" is the evaluation context index: -1 is the global context, 0 is the first
    *  context on the call stack, 1 the second and so on.
    */
   virtual tl::Variant eval_expr (const char *string, const char *filename = 0, int line = 1, int context = -1) = 0;
- 
+
   /**
    *  @brief Evaluates the given string and prints the result to stdout
    *
@@ -252,7 +258,7 @@ public:
    *
    *  "context" is the evaluation context index: -1 is the global context, 0 is the first
    *  context on the call stack, 1 the second and so on.
-   */ 
+   */
   virtual void eval_string_and_print (const char *string, const char *filename = 0, int line = 1, int context = -1) = 0;
 
   /**
@@ -266,7 +272,7 @@ public:
   virtual Inspector *inspector (int context = -1) = 0;
 
   /**
-   *  @brief Defines a global variable with the given name and value 
+   *  @brief Defines a global variable with the given name and value
    */
   virtual void define_variable (const std::string &name, const tl::Variant &value) = 0;
 
@@ -328,8 +334,6 @@ public:
  *  @brief The interpreter registry
  */
 extern GSI_PUBLIC tl::Registrar<Interpreter> interpreters;
-
 }
 
 #endif
-

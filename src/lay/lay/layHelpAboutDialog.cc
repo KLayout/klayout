@@ -118,7 +118,6 @@ HelpAboutDialog::HelpAboutDialog (QWidget *parent)
     }
 
     s += "</ul>";
-
   }
 
   s += "</body></html>";

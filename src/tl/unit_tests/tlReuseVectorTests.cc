@@ -43,7 +43,7 @@ std::string to_string (const tl::reuse_vector<std::string> &x)
   return r;
 }
 
-tl::reuse_vector<std::string>::iterator 
+tl::reuse_vector<std::string>::iterator
 test_insert (tl::TestBase *_this, tl::reuse_vector<std::string> &rv, const std::string &s)
 {
   tl::reuse_vector<std::string>::iterator si = rv.insert (s);
@@ -51,7 +51,7 @@ test_insert (tl::TestBase *_this, tl::reuse_vector<std::string> &rv, const std::
   return si;
 }
 
-TEST(1) 
+TEST (1)
 {
   tl::reuse_vector<std::string> rv;
   tl::reuse_vector<std::string> rv_copy;
@@ -94,7 +94,7 @@ TEST(1)
   EXPECT_EQ (rv < rv_copy, false);
 }
 
-TEST(2) 
+TEST (2)
 {
   tl::reuse_vector<std::string> rv;
   tl::reuse_vector<std::string> rv_copy;
@@ -155,7 +155,7 @@ TEST(2)
 }
 
 //  Test: reallocation of special element if no more are available
-TEST(3) 
+TEST (3)
 {
   tl::reuse_vector<std::string> rv;
   tl::reuse_vector<std::string>::iterator a, b, c, d;
@@ -189,18 +189,20 @@ TEST(3)
   EXPECT_EQ (to_string (rv), "")
 }
 
-namespace {
+namespace
+{
 
-class A {
+class A
+{
 public:
   static int cc;
   static int ccc;
   static int dc;
   static void reset () { cc = ccc = dc = 0; }
-  A() : x(0) { ++cc; }
-  A(int n) : x(n) { ++cc; }
-  A(const A &d) : x(d.x) { ++ccc; }
-  ~A() { ++dc; }
+  A () : x (0) { ++cc; }
+  A (int n) : x (n) { ++cc; }
+  A (const A &d) : x (d.x) { ++ccc; }
+  ~A () { ++dc; }
   int x;
 };
 
@@ -210,18 +212,20 @@ int A::dc = 0;
 
 }
 
-namespace {
+namespace
+{
 
-class B {
+class B
+{
 public:
   static int cc;
   static int ccc;
   static int dc;
   static void reset () { cc = ccc = dc = 0; }
-  B() : x(0) { ++cc; }
-  B(int n) : x(n) { ++cc; }
-  B(const B &d) : x(d.x) { ++ccc; }
-  ~B() { ++dc; }
+  B () : x (0) { ++cc; }
+  B (int n) : x (n) { ++cc; }
+  B (const B &d) : x (d.x) { ++ccc; }
+  ~B () { ++dc; }
   int x;
 };
 
@@ -232,7 +236,7 @@ int B::dc = 0;
 }
 
 //  Test: relocate strategy
-TEST(4) 
+TEST (4)
 {
   tl::reuse_vector<A, true> va;
   tl::reuse_vector<B, false> vb;
@@ -273,7 +277,7 @@ TEST(4)
 }
 
 //  destroy while iterate
-TEST(5)
+TEST (5)
 {
   tl::reuse_vector<A> v;
   v.insert (A (1));
@@ -301,7 +305,7 @@ TEST(5)
   v.insert (A (2));
   v.insert (A (3));
 
-  for (i = v.begin (); !i.at_end (); ++i) {
+  for (i = v.begin (); ! i.at_end (); ++i) {
     if (i->x == 2) {
       v.erase (i);
     }
@@ -336,7 +340,7 @@ TEST(5)
   v.insert (A (2));
   v.insert (A (3));
 
-  for (i = v.begin (); !i.at_end (); ++i) {
+  for (i = v.begin (); ! i.at_end (); ++i) {
     if (i->x == 3) {
       v.erase (i);
     }
@@ -365,10 +369,9 @@ TEST(5)
   v.insert (A (2));
   v.insert (A (3));
 
-  for (i = v.begin (); !i.at_end (); ++i) {
+  for (i = v.begin (); ! i.at_end (); ++i) {
     v.erase (i);
   }
   EXPECT_EQ (v.size (), size_t (0));
   EXPECT_EQ (v.empty (), true);
 }
-

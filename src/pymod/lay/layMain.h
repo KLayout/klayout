@@ -22,9 +22,9 @@
 
 //  to force linking of the layview module
 #if defined(HAVE_QT)
-#  include "../../lay/lay/layForceLink.h"
+#include "../../lay/lay/layForceLink.h"
 #else
-#  include "../../layview/layview/layviewForceLink.h"
+#include "../../layview/layview/layviewForceLink.h"
 #endif
 
 //  Force-include other dependencies

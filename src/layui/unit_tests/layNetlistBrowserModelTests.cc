@@ -448,7 +448,7 @@ TEST (4)
   lay::NetlistObjectsPath path;
   path.root.first = root;
 
-  db::SubCircuit *sc1 = root->begin_subcircuits ().operator-> ();
+  db::SubCircuit *sc1 = root->begin_subcircuits ().operator->();
   EXPECT_EQ (sc1 != 0, true);
   path.path.push_back (std::make_pair (sc1, (db::SubCircuit *) 0));
 

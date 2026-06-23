@@ -79,14 +79,12 @@ ToolkitWidget::name () const
   return ant::Service::editor_options_name ();
 }
 
-void
-ToolkitWidget::deactivated ()
+void ToolkitWidget::deactivated ()
 {
   hide ();
 }
 
-void
-ToolkitWidget::commit (lay::Dispatcher *dispatcher)
+void ToolkitWidget::commit (lay::Dispatcher *dispatcher)
 {
   try {
 
@@ -106,15 +104,13 @@ ToolkitWidget::commit (lay::Dispatcher *dispatcher)
       tl::from_string (tl::to_string (mp_y_le->text ()), dy);
 
       dispatcher->call_function (ant::Service::xy_function_name (), db::DVector (dx, dy).to_string ());
-
     }
 
   } catch (...) {
   }
 }
 
-void
-ToolkitWidget::configure (const std::string &name, const std::string &value)
+void ToolkitWidget::configure (const std::string &name, const std::string &value)
 {
   if (name == ant::Service::xy_configure_name () && ! mp_x_le->hasFocus () && ! mp_y_le->hasFocus ()) {
 
@@ -140,7 +136,6 @@ ToolkitWidget::configure (const std::string &name, const std::string &value)
 
     } catch (...) {
     }
-
   }
 }
 

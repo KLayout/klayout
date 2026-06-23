@@ -25,15 +25,17 @@
 
 #include <memory>
 
-namespace {
-  class MyClass : public tl::UniqueId {
-  public:
-    MyClass () { }
-  };
+namespace
+{
+class MyClass : public tl::UniqueId
+{
+public:
+  MyClass () {}
+};
 }
 
 //  basic parsing ability
-TEST(1)
+TEST (1)
 {
   tl::id_type id, id0;
 

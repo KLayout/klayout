@@ -59,7 +59,8 @@ public:
   void write (const db::Layout &layout);
 
 protected:
-  struct endl_t { };
+  struct endl_t {
+  };
 
   TextWriter &operator<< (endl_t em);
   TextWriter &operator<< (const std::string &s);
@@ -77,7 +78,7 @@ private:
   std::vector<std::string> m_cc;
   std::string m_cc_line;
   bool m_in_cell;
-  
+
   void write_props (const db::Layout &layout, size_t prop_id);
   void begin_sorted_section ();
   void end_sorted_section ();
@@ -86,4 +87,3 @@ private:
 } // namespace db
 
 #endif
-

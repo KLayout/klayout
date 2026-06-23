@@ -46,7 +46,7 @@ class LAY_PUBLIC TechnologyController
   : public PluginDeclaration,
     public tl::Object
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -58,7 +58,7 @@ public:
   void initialized (lay::Dispatcher *root);
   void uninitialize (lay::Dispatcher *root);
 
-  void get_options (std::vector < std::pair<std::string, std::string> > &options) const;
+  void get_options (std::vector<std::pair<std::string, std::string>> &options) const;
   void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const;
 
   void show_editor ();
@@ -125,7 +125,7 @@ private slots:
   void sync_with_external_sources ();
 
 private:
-  std::vector <lay::Action *> m_tech_actions;
+  std::vector<lay::Action *> m_tech_actions;
   std::string m_current_technology;
   bool m_configure_enabled;
   bool m_current_technology_updated;
@@ -152,4 +152,3 @@ private:
 }
 
 #endif
-

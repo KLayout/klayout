@@ -26,7 +26,7 @@
 #include "tlUnitTest.h"
 
 
-TEST(1) 
+TEST (1)
 {
   db::Edge e (0, 0, 100, 200);
   db::Edge ee;
@@ -48,14 +48,14 @@ TEST(1)
   EXPECT_EQ (e == db::Edge (db::Point (0, 0), db::Point (100, 200)), true);
   EXPECT_EQ (e.moved (db::Vector (10, 20)), db::Edge (db::Point (10, 20), db::Point (110, 220)));
   EXPECT_EQ (e.enlarged (db::Vector (10, 20)), db::Edge (db::Point (-10, -20), db::Point (110, 220)));
-  EXPECT_EQ (e.length (), db::coord_traits <db::Coord>::rounded_distance (sqrt (double (100*100+200*200))));
-  EXPECT_EQ (e.sq_length (), 100*100+200*200);
-  EXPECT_EQ (e.ortho_length (), size_t (100+200));
+  EXPECT_EQ (e.length (), db::coord_traits<db::Coord>::rounded_distance (sqrt (double (100 * 100 + 200 * 200))));
+  EXPECT_EQ (e.sq_length (), 100 * 100 + 200 * 200);
+  EXPECT_EQ (e.ortho_length (), size_t (100 + 200));
   EXPECT_EQ (e.to_string (), "(0,0;100,200)");
   EXPECT_EQ (e.swapped_points ().to_string (), "(100,200;0,0)");
   EXPECT_EQ (e.to_string (), "(0,0;100,200)");
   EXPECT_EQ (e.transformed (db::Trans (1)).to_string (), "(0,0;-200,100)");
-  EXPECT_EQ (e.transformed (db::Trans (5)).to_string (), "(200,100;0,0)");   //  mirroring transformations swap points
+  EXPECT_EQ (e.transformed (db::Trans (5)).to_string (), "(200,100;0,0)"); //  mirroring transformations swap points
   ee = e;
   ee.transform (db::Trans (5));
   EXPECT_EQ (ee.to_string (), "(200,100;0,0)");
@@ -85,82 +85,82 @@ TEST(1)
   EXPECT_EQ (db::Edge ().shifted (2).to_string (), "(0,0;0,0)");
 }
 
-TEST(2) 
+TEST (2)
 {
   db::Edge e (0, 0, 100, 200);
 
-  EXPECT_EQ (e.parallel (db::Edge (10,20,110,220)), true);
-  EXPECT_EQ (e.parallel (db::Edge (10,20,110,221)), false);
-  EXPECT_EQ (e.parallel (db::Edge (10,20,110,219)), false);
-  EXPECT_EQ (e.contains (db::Point (10,20)), true);
-  EXPECT_EQ (e.contains (db::Point (100,200)), true);
-  EXPECT_EQ (e.contains (db::Point (101,200)), false);
-  EXPECT_EQ (e.contains (db::Point (50,100)), true);
-  EXPECT_EQ (e.contains (db::Point (200,400)), false);
-  EXPECT_EQ (e.contains (db::Point (-200,-400)), false);
-  EXPECT_EQ (e.contains (db::Point (0,0)), true);
-  EXPECT_EQ (db::Edge (10,20,110,230).distance (db::Point (100, 200)), -4);
-  EXPECT_EQ (db::Edge (10,20,110,230).distance_abs (db::Point (100, 200)), db::Edge::distance_type (4));
-  EXPECT_EQ (db::Edge (10,20,110,210).distance (db::Point (100, 200)), 4);
-  EXPECT_EQ (db::Edge (10,20,110,222).distance (db::Point (100, 200)), -1);
-  EXPECT_EQ (db::Edge (10,20,110,222).distance_abs (db::Point (100, 200)), db::Edge::distance_type (1));
-  EXPECT_EQ (db::Edge (10,20,110,222).contains (db::Point (0, 0)), false);
-  EXPECT_EQ (db::Edge (10,20,110,222).contains (db::Point (100, 200)), false);
+  EXPECT_EQ (e.parallel (db::Edge (10, 20, 110, 220)), true);
+  EXPECT_EQ (e.parallel (db::Edge (10, 20, 110, 221)), false);
+  EXPECT_EQ (e.parallel (db::Edge (10, 20, 110, 219)), false);
+  EXPECT_EQ (e.contains (db::Point (10, 20)), true);
+  EXPECT_EQ (e.contains (db::Point (100, 200)), true);
+  EXPECT_EQ (e.contains (db::Point (101, 200)), false);
+  EXPECT_EQ (e.contains (db::Point (50, 100)), true);
+  EXPECT_EQ (e.contains (db::Point (200, 400)), false);
+  EXPECT_EQ (e.contains (db::Point (-200, -400)), false);
+  EXPECT_EQ (e.contains (db::Point (0, 0)), true);
+  EXPECT_EQ (db::Edge (10, 20, 110, 230).distance (db::Point (100, 200)), -4);
+  EXPECT_EQ (db::Edge (10, 20, 110, 230).distance_abs (db::Point (100, 200)), db::Edge::distance_type (4));
+  EXPECT_EQ (db::Edge (10, 20, 110, 210).distance (db::Point (100, 200)), 4);
+  EXPECT_EQ (db::Edge (10, 20, 110, 222).distance (db::Point (100, 200)), -1);
+  EXPECT_EQ (db::Edge (10, 20, 110, 222).distance_abs (db::Point (100, 200)), db::Edge::distance_type (1));
+  EXPECT_EQ (db::Edge (10, 20, 110, 222).contains (db::Point (0, 0)), false);
+  EXPECT_EQ (db::Edge (10, 20, 110, 222).contains (db::Point (100, 200)), false);
 
-  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (100, 120)), 100u);
-  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (100, -80)), 100u);
-  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (-90, 120)), 141u);
-  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (-90, -80)), 141u);
-  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (210, 120)), 141u);
-  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (210, -80)), 141u);
-  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (-90, 20)), 100u);
-  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (10, 20)), 0u);
-  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (50, 20)), 0u);
-  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (110, 20)), 0u);
+  EXPECT_EQ (db::Edge (10, 20, 110, 20).euclidian_distance (db::Point (100, 120)), 100u);
+  EXPECT_EQ (db::Edge (10, 20, 110, 20).euclidian_distance (db::Point (100, -80)), 100u);
+  EXPECT_EQ (db::Edge (10, 20, 110, 20).euclidian_distance (db::Point (-90, 120)), 141u);
+  EXPECT_EQ (db::Edge (10, 20, 110, 20).euclidian_distance (db::Point (-90, -80)), 141u);
+  EXPECT_EQ (db::Edge (10, 20, 110, 20).euclidian_distance (db::Point (210, 120)), 141u);
+  EXPECT_EQ (db::Edge (10, 20, 110, 20).euclidian_distance (db::Point (210, -80)), 141u);
+  EXPECT_EQ (db::Edge (10, 20, 110, 20).euclidian_distance (db::Point (-90, 20)), 100u);
+  EXPECT_EQ (db::Edge (10, 20, 110, 20).euclidian_distance (db::Point (10, 20)), 0u);
+  EXPECT_EQ (db::Edge (10, 20, 110, 20).euclidian_distance (db::Point (50, 20)), 0u);
+  EXPECT_EQ (db::Edge (10, 20, 110, 20).euclidian_distance (db::Point (110, 20)), 0u);
 }
 
-TEST(3) 
+TEST (3)
 {
   db::Edge e (0, 0, 100, 200);
   db::Edge empty;
 
-  EXPECT_EQ (e.coincident (db::Edge (10,20,110,220)), true);
-  EXPECT_EQ (e.coincident (db::Edge (10,20,110,222)), false);
-  EXPECT_EQ (e.coincident (db::Edge (10,20,110,218)), false);
-  EXPECT_EQ (e.coincident (db::Edge (110,220,220,440)), false);
-  EXPECT_EQ (e.coincident (db::Edge (-110,-220,-220,-440)), false);
-  EXPECT_EQ (e.coincident (db::Edge (100,200,100,400)), false);
-  EXPECT_EQ (e.coincident (db::Edge (-100,-200,10,20)), true);
-  EXPECT_EQ (e.coincident (db::Edge (-100,-200,0,0)), false);
+  EXPECT_EQ (e.coincident (db::Edge (10, 20, 110, 220)), true);
+  EXPECT_EQ (e.coincident (db::Edge (10, 20, 110, 222)), false);
+  EXPECT_EQ (e.coincident (db::Edge (10, 20, 110, 218)), false);
+  EXPECT_EQ (e.coincident (db::Edge (110, 220, 220, 440)), false);
+  EXPECT_EQ (e.coincident (db::Edge (-110, -220, -220, -440)), false);
+  EXPECT_EQ (e.coincident (db::Edge (100, 200, 100, 400)), false);
+  EXPECT_EQ (e.coincident (db::Edge (-100, -200, 10, 20)), true);
+  EXPECT_EQ (e.coincident (db::Edge (-100, -200, 0, 0)), false);
 }
 
-TEST(4) 
+TEST (4)
 {
   db::Edge e (0, 0, 100, 200);
 
-  EXPECT_EQ (e.intersect (db::Edge (10,20,110,220)), true);
-  EXPECT_EQ (e.intersect (db::Edge (10,-20,-110,220)), true);
-  EXPECT_EQ (e.intersect (db::Edge (8,-20,-110,220)), false);
-  EXPECT_EQ (e.intersect (db::Edge (20,0,-80,200)), true);
-  EXPECT_EQ (e.intersect (db::Edge (20,10,-80,200)), true);
-  EXPECT_EQ (e.intersect (db::Edge (10,20,-80,200)), true);
-  EXPECT_EQ (e.intersect (db::Edge (8,20,-80,200)), false);
-  EXPECT_EQ (e.intersect_point (db::Edge (10,20,110,220)).first, true);
-  EXPECT_EQ (e.intersect_point (db::Edge (10,-20,-110,220)).first, true);
-  EXPECT_EQ (e.intersect_point (db::Edge (8,-20,-110,220)).first, false);
-  EXPECT_EQ (e.intersect_point (db::Edge (20,0,-80,200)).first, true);
-  EXPECT_EQ (e.intersect_point (db::Edge (20,10,-80,200)).first, true);
-  EXPECT_EQ (e.intersect_point (db::Edge (10,20,-80,200)).first, true);
-  EXPECT_EQ (e.intersect_point (db::Edge (8,20,-80,200)).first, false);
-  EXPECT_EQ (e.intersect_point (db::Edge (10,20,110,220)).first, true);
-  EXPECT_EQ (e.intersect_point (db::Edge (10,20,110,220)).second, db::Point (10, 20));
-  EXPECT_EQ (e.intersect_point (db::Edge (10,-20,-110,220)).second, db::Point (0, 0));
-  EXPECT_EQ (e.intersect_point (db::Edge (20,0,-80,200)).second, db::Point (10, 20));
-  EXPECT_EQ (e.intersect_point (db::Edge (20,10,-80,200)).second, db::Point (12, 25));
-  EXPECT_EQ (e.intersect_point (db::Edge (10,20,-80,200)).second, db::Point (10, 20));
+  EXPECT_EQ (e.intersect (db::Edge (10, 20, 110, 220)), true);
+  EXPECT_EQ (e.intersect (db::Edge (10, -20, -110, 220)), true);
+  EXPECT_EQ (e.intersect (db::Edge (8, -20, -110, 220)), false);
+  EXPECT_EQ (e.intersect (db::Edge (20, 0, -80, 200)), true);
+  EXPECT_EQ (e.intersect (db::Edge (20, 10, -80, 200)), true);
+  EXPECT_EQ (e.intersect (db::Edge (10, 20, -80, 200)), true);
+  EXPECT_EQ (e.intersect (db::Edge (8, 20, -80, 200)), false);
+  EXPECT_EQ (e.intersect_point (db::Edge (10, 20, 110, 220)).first, true);
+  EXPECT_EQ (e.intersect_point (db::Edge (10, -20, -110, 220)).first, true);
+  EXPECT_EQ (e.intersect_point (db::Edge (8, -20, -110, 220)).first, false);
+  EXPECT_EQ (e.intersect_point (db::Edge (20, 0, -80, 200)).first, true);
+  EXPECT_EQ (e.intersect_point (db::Edge (20, 10, -80, 200)).first, true);
+  EXPECT_EQ (e.intersect_point (db::Edge (10, 20, -80, 200)).first, true);
+  EXPECT_EQ (e.intersect_point (db::Edge (8, 20, -80, 200)).first, false);
+  EXPECT_EQ (e.intersect_point (db::Edge (10, 20, 110, 220)).first, true);
+  EXPECT_EQ (e.intersect_point (db::Edge (10, 20, 110, 220)).second, db::Point (10, 20));
+  EXPECT_EQ (e.intersect_point (db::Edge (10, -20, -110, 220)).second, db::Point (0, 0));
+  EXPECT_EQ (e.intersect_point (db::Edge (20, 0, -80, 200)).second, db::Point (10, 20));
+  EXPECT_EQ (e.intersect_point (db::Edge (20, 10, -80, 200)).second, db::Point (12, 25));
+  EXPECT_EQ (e.intersect_point (db::Edge (10, 20, -80, 200)).second, db::Point (10, 20));
 }
 
-TEST(4a) 
+TEST (4a)
 {
   db::Edge e1 (db::Point (-134, 3629), db::Point (-130, 3649));
   db::Edge e2 (db::Point (-129, 3710), db::Point (-134, 3631));
@@ -171,7 +171,7 @@ TEST(4a)
   EXPECT_EQ (e1.intersect_point (e2).first, false);
 }
 
-TEST(4b) 
+TEST (4b)
 {
   db::Edge e1 (db::Point (-133, 3629), db::Point (-129, 3649));
   db::Edge e2 (db::Point (-129, 3710), db::Point (-134, 3631));
@@ -182,7 +182,7 @@ TEST(4b)
   EXPECT_EQ (e1.intersect_point (e2).first, false);
 }
 
-TEST(4c) 
+TEST (4c)
 {
   db::Edge e1 (db::Point (-135, 3629), db::Point (-129, 3649));
   db::Edge e2 (db::Point (-129, 3710), db::Point (-134, 3631));
@@ -194,7 +194,7 @@ TEST(4c)
   EXPECT_EQ (e1.intersect_point (e2).first, true);
 }
 
-TEST(4d) 
+TEST (4d)
 {
   db::Edge e1 (db::Point (-100, 1000), db::Point (100, 1000));
   db::Edge e2 (db::Point (101, 1000), db::Point (200, 1000));
@@ -216,33 +216,33 @@ TEST(4d)
   EXPECT_EQ (e1.intersect_point (e6).first, true);
 }
 
-TEST(5) 
+TEST (5)
 {
   db::Edge e (0, 0, 1000000, 2000000);
 
-  EXPECT_EQ (e.intersect (db::Edge (100000,200000,1100000,2200000)), true);
-  EXPECT_EQ (e.intersect (db::Edge (100000,-200000,-1100000,2200000)), true);
-  EXPECT_EQ (e.intersect (db::Edge (80000,-200000,-1100000,2200000)), false);
-  EXPECT_EQ (e.intersect (db::Edge (200000,0,-800000,2000000)), true);
-  EXPECT_EQ (e.intersect (db::Edge (200000,100000,-800000,2000000)), true);
-  EXPECT_EQ (e.intersect (db::Edge (100000,200000,-800000,2000000)), true);
-  EXPECT_EQ (e.intersect (db::Edge (80000,200000,-800000,2000000)), false);
-  EXPECT_EQ (e.intersect_point (db::Edge (100000,200000,1100000,2200000)).first, true);
-  EXPECT_EQ (e.intersect_point (db::Edge (100000,-200000,-1100000,2200000)).first, true);
-  EXPECT_EQ (e.intersect_point (db::Edge (80000,-200000,-1100000,2200000)).first, false);
-  EXPECT_EQ (e.intersect_point (db::Edge (200000,0,-800000,2000000)).first, true);
-  EXPECT_EQ (e.intersect_point (db::Edge (200000,100000,-800000,2000000)).first, true);
-  EXPECT_EQ (e.intersect_point (db::Edge (100000,200000,-800000,2000000)).first, true);
-  EXPECT_EQ (e.intersect_point (db::Edge (80000,200000,-800000,2000000)).first, false);
-  EXPECT_EQ (e.intersect_point (db::Edge (100000,200000,1100000,2200000)).first, true);
-  EXPECT_EQ (e.intersect_point (db::Edge (100000,200000,1100000,2200000)).second, db::Point (100000,200000));
-  EXPECT_EQ (e.intersect_point (db::Edge (100000,-200000,-1100000,2200000)).second, db::Point (0, 0));
-  EXPECT_EQ (e.intersect_point (db::Edge (200000,0,-800000,2000000)).second, db::Point (100000, 200000));
-  EXPECT_EQ (e.intersect_point (db::Edge (200000,100000,-800000,2000000)).second, db::Point (123077,246154));
-  EXPECT_EQ (e.intersect_point (db::Edge (100000,200000,-800000,2000000)).second, db::Point (100000, 200000));
+  EXPECT_EQ (e.intersect (db::Edge (100000, 200000, 1100000, 2200000)), true);
+  EXPECT_EQ (e.intersect (db::Edge (100000, -200000, -1100000, 2200000)), true);
+  EXPECT_EQ (e.intersect (db::Edge (80000, -200000, -1100000, 2200000)), false);
+  EXPECT_EQ (e.intersect (db::Edge (200000, 0, -800000, 2000000)), true);
+  EXPECT_EQ (e.intersect (db::Edge (200000, 100000, -800000, 2000000)), true);
+  EXPECT_EQ (e.intersect (db::Edge (100000, 200000, -800000, 2000000)), true);
+  EXPECT_EQ (e.intersect (db::Edge (80000, 200000, -800000, 2000000)), false);
+  EXPECT_EQ (e.intersect_point (db::Edge (100000, 200000, 1100000, 2200000)).first, true);
+  EXPECT_EQ (e.intersect_point (db::Edge (100000, -200000, -1100000, 2200000)).first, true);
+  EXPECT_EQ (e.intersect_point (db::Edge (80000, -200000, -1100000, 2200000)).first, false);
+  EXPECT_EQ (e.intersect_point (db::Edge (200000, 0, -800000, 2000000)).first, true);
+  EXPECT_EQ (e.intersect_point (db::Edge (200000, 100000, -800000, 2000000)).first, true);
+  EXPECT_EQ (e.intersect_point (db::Edge (100000, 200000, -800000, 2000000)).first, true);
+  EXPECT_EQ (e.intersect_point (db::Edge (80000, 200000, -800000, 2000000)).first, false);
+  EXPECT_EQ (e.intersect_point (db::Edge (100000, 200000, 1100000, 2200000)).first, true);
+  EXPECT_EQ (e.intersect_point (db::Edge (100000, 200000, 1100000, 2200000)).second, db::Point (100000, 200000));
+  EXPECT_EQ (e.intersect_point (db::Edge (100000, -200000, -1100000, 2200000)).second, db::Point (0, 0));
+  EXPECT_EQ (e.intersect_point (db::Edge (200000, 0, -800000, 2000000)).second, db::Point (100000, 200000));
+  EXPECT_EQ (e.intersect_point (db::Edge (200000, 100000, -800000, 2000000)).second, db::Point (123077, 246154));
+  EXPECT_EQ (e.intersect_point (db::Edge (100000, 200000, -800000, 2000000)).second, db::Point (100000, 200000));
 }
 
-TEST(6) 
+TEST (6)
 {
   db::Edge e (0, 0, 1000, 2000);
 
@@ -260,7 +260,7 @@ TEST(6)
   EXPECT_EQ (ret.second, db::Point (80, 160));
 }
 
-TEST(7) 
+TEST (7)
 {
   db::Edge e1 (100, 200, 1000, 2000);
   db::Edge e2 (100, 200, 1000, 2000);
@@ -283,11 +283,11 @@ TEST(7)
 TEST (8)
 {
   db::DEdge e1 (-10.0, 0.0, 10.0, 0.0);
-  db::DEdge e2 (-sqrt(2.0), -1.0, 2.0 - sqrt(2.0), 1.0);
+  db::DEdge e2 (-sqrt (2.0), -1.0, 2.0 - sqrt (2.0), 1.0);
   db::DEdge e3 (0.0, -100.0, 0.0, 10.0);
-  db::DEdge e4 (-sqrt(2.0), 1.0, 2.0 - sqrt(2.0), -1.0);
+  db::DEdge e4 (-sqrt (2.0), 1.0, 2.0 - sqrt (2.0), -1.0);
 
-  std::pair <bool, db::DPoint> i;
+  std::pair<bool, db::DPoint> i;
   db::Point ii;
 
   i = e1.intersect_point (e2);
@@ -329,17 +329,16 @@ TEST (8)
   EXPECT_EQ (i.first, true);
   ii = db::Point (i.second);
   EXPECT_EQ (ii, db::Point (0, 0));
-
 }
 
 TEST (9)
 {
   db::DEdge e1 (10.0, 0.0, -10.0, 0.0);
-  db::DEdge e2 (-sqrt(2.0), -1.0, 2.0 - sqrt(2.0), 1.0);
+  db::DEdge e2 (-sqrt (2.0), -1.0, 2.0 - sqrt (2.0), 1.0);
   db::DEdge e3 (0.0, 10.0, 0.0, -10.0);
-  db::DEdge e4 (-sqrt(2.0), 1.0, 2.0 - sqrt(2.0), -1.0);
+  db::DEdge e4 (-sqrt (2.0), 1.0, 2.0 - sqrt (2.0), -1.0);
 
-  std::pair <bool, db::DPoint> i;
+  std::pair<bool, db::DPoint> i;
   db::Point ii;
 
   i = e1.intersect_point (e2);
@@ -381,10 +380,9 @@ TEST (9)
   EXPECT_EQ (i.first, true);
   ii = db::Point (i.second);
   EXPECT_EQ (ii, db::Point (0, 0));
-
 }
 
-TEST(10)
+TEST (10)
 {
   db::Edge b (db::Point (10, 20), db::Point (45, 60));
   db::Edge bc (db::Point (0, 1), db::Point (2, 3));
@@ -397,7 +395,7 @@ TEST(10)
   EXPECT_EQ (bc.to_string (), s);
 }
 
-TEST(11)
+TEST (11)
 {
   db::DEdge b (db::DPoint (10, 20), db::DPoint (45, 60));
   db::DEdge bc (db::DPoint (0, 1), db::DPoint (2, 3));
@@ -410,7 +408,7 @@ TEST(11)
   EXPECT_EQ (bc.to_string (), s);
 }
 
-TEST(12)
+TEST (12)
 {
   db::Edge a (db::DPoint (368, 726), db::DPoint (363, 734));
   db::Edge b (db::DPoint (353, 733), db::DPoint (375, 733));
@@ -438,41 +436,41 @@ TEST(12)
   EXPECT_EQ (s, "364,733");
 }
 
-TEST(13)
+TEST (13)
 {
   std::pair<bool, db::Edge> cl;
-  cl = db::Edge (db::Point (0, 0), db::Point (100, 0)).clipped(db::Box (db::Point (50, -20), db::Point (60, 20)));
+  cl = db::Edge (db::Point (0, 0), db::Point (100, 0)).clipped (db::Box (db::Point (50, -20), db::Point (60, 20)));
   EXPECT_EQ (cl.first, true);
   EXPECT_EQ (cl.second.to_string (), "(50,0;60,0)");
-  cl = db::Edge (db::Point (0, 0), db::Point (100, 0)).clipped(db::Box (db::Point (50, 0), db::Point (60, 20)));
+  cl = db::Edge (db::Point (0, 0), db::Point (100, 0)).clipped (db::Box (db::Point (50, 0), db::Point (60, 20)));
   EXPECT_EQ (cl.first, true);
   EXPECT_EQ (cl.second.to_string (), "(50,0;60,0)");
-  cl = db::Edge (db::Point (0, 0), db::Point (100, 0)).clipped(db::Box (db::Point (50, 10), db::Point (60, 20)));
+  cl = db::Edge (db::Point (0, 0), db::Point (100, 0)).clipped (db::Box (db::Point (50, 10), db::Point (60, 20)));
   EXPECT_EQ (cl.first, false);
-  cl = db::Edge (db::Point (0, 0), db::Point (100, 0)).clipped(db::Box (db::Point (100, 0), db::Point (160, 20)));
+  cl = db::Edge (db::Point (0, 0), db::Point (100, 0)).clipped (db::Box (db::Point (100, 0), db::Point (160, 20)));
   EXPECT_EQ (cl.first, true);
   EXPECT_EQ (cl.second.to_string (), "(100,0;100,0)");
-  cl = db::Edge (db::Point (0, 0), db::Point (100, 0)).clipped(db::Box (db::Point (80, 0), db::Point (160, 20)));
+  cl = db::Edge (db::Point (0, 0), db::Point (100, 0)).clipped (db::Box (db::Point (80, 0), db::Point (160, 20)));
   EXPECT_EQ (cl.first, true);
   EXPECT_EQ (cl.second.to_string (), "(80,0;100,0)");
-  cl = db::Edge (db::Point (0, 0), db::Point (100, 0)).clipped(db::Box (db::Point (-100, 0), db::Point (0, 20)));
+  cl = db::Edge (db::Point (0, 0), db::Point (100, 0)).clipped (db::Box (db::Point (-100, 0), db::Point (0, 20)));
   EXPECT_EQ (cl.first, true);
   EXPECT_EQ (cl.second.to_string (), "(0,0;0,0)");
-  cl = db::Edge (db::Point (0, 0), db::Point (100, 0)).clipped(db::Box (db::Point (-100, 0), db::Point (20, 20)));
+  cl = db::Edge (db::Point (0, 0), db::Point (100, 0)).clipped (db::Box (db::Point (-100, 0), db::Point (20, 20)));
   EXPECT_EQ (cl.first, true);
   EXPECT_EQ (cl.second.to_string (), "(0,0;20,0)");
-  cl = db::Edge (db::Point (0, 0), db::Point (0, 0)).clipped(db::Box (db::Point (-100, 0), db::Point (20, 20)));
+  cl = db::Edge (db::Point (0, 0), db::Point (0, 0)).clipped (db::Box (db::Point (-100, 0), db::Point (20, 20)));
   EXPECT_EQ (cl.first, true);
   EXPECT_EQ (cl.second.to_string (), "(0,0;0,0)");
-  cl = db::Edge (db::Point (0, 0), db::Point (0, 0)).clipped(db::Box (db::Point (-100, 0), db::Point (0, 20)));
+  cl = db::Edge (db::Point (0, 0), db::Point (0, 0)).clipped (db::Box (db::Point (-100, 0), db::Point (0, 20)));
   EXPECT_EQ (cl.first, true);
   EXPECT_EQ (cl.second.to_string (), "(0,0;0,0)");
 
-  cl = db::Edge (db::Point (851, 98), db::Point (343, 466)).clipped(db::Box (db::Point (48, 134), db::Point (555, 438)));
+  cl = db::Edge (db::Point (851, 98), db::Point (343, 466)).clipped (db::Box (db::Point (48, 134), db::Point (555, 438)));
   EXPECT_EQ (cl.first, true);
   EXPECT_EQ (cl.second.to_string (), "(555,312;382,438)");
 
-  cl = db::Edge (db::Point (4, 0), db::Point (9, 2)).clipped(db::Box (db::Point (1, 2), db::Point (8, 6)));
+  cl = db::Edge (db::Point (4, 0), db::Point (9, 2)).clipped (db::Box (db::Point (1, 2), db::Point (8, 6)));
   EXPECT_EQ (cl.first, true);
   //  Not nice but correct if you imagine that clipping "attracts" an edge:
   EXPECT_EQ (cl.second.to_string (), "(8,2;8,2)");
@@ -482,7 +480,7 @@ TEST(13)
   EXPECT_EQ (db::Edge (db::Point (0, 100), db::Point (600, 500)).clipped (db::Box (db::Point (200, 200), db::Point (300, 300))).second.to_string (), "(200,233;300,300)");
 }
 
-TEST(14)
+TEST (14)
 {
   db::Edge e = db::Edge (db::Point (0, 0), db::Point (100, 0));
   EXPECT_EQ (e.coincident (db::Edge (db::Point (0, 0), db::Point (100, 0))), true);
@@ -532,7 +530,7 @@ TEST(14)
 }
 
 //  exact rounding behaviour
-TEST(15)
+TEST (15)
 {
   typedef db::coord_traits<db::Coord>::area_type area_type;
   //  div_exact(a, b, d) computes a*b/d with exact rounding behaviour

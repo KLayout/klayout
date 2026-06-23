@@ -26,15 +26,15 @@
 namespace
 {
 
-TEST(1_Basic)
+TEST (1_Basic)
 {
   tl::optional<int> opt;
 
   //  value not set
 
   EXPECT_EQ (opt.has_value (), false);
-  EXPECT_EQ (opt.operator-> (), (int *) 0);
-  EXPECT_EQ (((const tl::optional<int> &) opt).operator-> (), (const int *) 0);
+  EXPECT_EQ (opt.operator->(), (int *) 0);
+  EXPECT_EQ (((const tl::optional<int> &) opt).operator->(), (const int *) 0);
   EXPECT_EQ (tl::to_string (opt), "");
 
   try {
@@ -55,8 +55,8 @@ TEST(1_Basic)
   EXPECT_EQ (((const tl::optional<int> &) opt).value (), 17);
   EXPECT_EQ (*opt, 17);
   EXPECT_EQ (*((const tl::optional<int> &) opt), 17);
-  EXPECT_EQ (*(opt.operator-> ()), 17);
-  EXPECT_EQ (*(((const tl::optional<int> &) opt).operator-> ()), 17);
+  EXPECT_EQ (*(opt.operator->()), 17);
+  EXPECT_EQ (*(((const tl::optional<int> &) opt).operator->()), 17);
 
   //  compare operators
 

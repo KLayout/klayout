@@ -26,7 +26,7 @@
 
 #include <cstdlib>
 
-TEST(1)
+TEST (1)
 {
   db::LEFDEFReaderOptions options;
   EXPECT_EQ (options.max_mask_number (), (unsigned int) 0);
@@ -324,4 +324,3 @@ TEST(1)
   options.set_macro_resolution_mode (2);
   EXPECT_EQ (options.macro_resolution_mode (), (unsigned int) 2);
 }
-

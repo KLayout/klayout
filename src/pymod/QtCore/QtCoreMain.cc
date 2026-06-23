@@ -23,5 +23,4 @@
 #include "../pymodHelper.h"
 
 #include "QtCoreMain.h"
-DEFINE_PYMOD(QtCore, "QtCore", "KLayout/Qt module 'QtCore'")
-
+DEFINE_PYMOD (QtCore, "QtCore", "KLayout/Qt module 'QtCore'")

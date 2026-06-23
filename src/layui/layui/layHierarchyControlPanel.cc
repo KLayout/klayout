@@ -60,13 +60,13 @@ namespace lay
 {
 
 // --------------------------------------------------------------------
-//  A helper class the identifies clipboard data 
+//  A helper class the identifies clipboard data
 
 class CellClipboardData
   : public db::ClipboardData
 {
 public:
-  CellClipboardData () { }
+  CellClipboardData () {}
 };
 
 // --------------------------------------------------------------------
@@ -75,7 +75,7 @@ public:
 HCPCellTreeWidget::HCPCellTreeWidget (QWidget *parent, const char *name, QWidget *key_event_receiver)
   : QTreeView (parent), mp_key_event_receiver (key_event_receiver)
 {
-  //  Allow dragging from here to 
+  //  Allow dragging from here to
   setDragDropMode (QAbstractItemView::DragOnly);
 
   setObjectName (QString::fromUtf8 (name));
@@ -93,8 +93,7 @@ HCPCellTreeWidget::~HCPCellTreeWidget ()
   }
 }
 
-bool
-HCPCellTreeWidget::event (QEvent *event)
+bool HCPCellTreeWidget::event (QEvent *event)
 {
 #if 0
   //  Handling this event makes the widget receive all keystrokes.
@@ -110,17 +109,15 @@ HCPCellTreeWidget::event (QEvent *event)
   return QTreeView::event (event);
 }
 
-bool
-HCPCellTreeWidget::focusNextPrevChild (bool /*next*/)
+bool HCPCellTreeWidget::focusNextPrevChild (bool /*next*/)
 {
   return false;
 }
 
-void
-HCPCellTreeWidget::keyPressEvent (QKeyEvent *event)
+void HCPCellTreeWidget::keyPressEvent (QKeyEvent *event)
 {
   QString t = event->text ();
-  if (! t.isEmpty () && t[0].isPrint ()) {
+  if (! t.isEmpty () && t [0].isPrint ()) {
     // "/" is a search initiator
     if (t == QString::fromUtf8 ("/")) {
       t.clear ();
@@ -135,8 +132,7 @@ HCPCellTreeWidget::keyPressEvent (QKeyEvent *event)
   }
 }
 
-void
-HCPCellTreeWidget::startDrag (Qt::DropActions supportedActions)
+void HCPCellTreeWidget::startDrag (Qt::DropActions supportedActions)
 {
   QModelIndex index = selectionModel ()->currentIndex ();
   if (index.isValid ()) {
@@ -144,14 +140,14 @@ HCPCellTreeWidget::startDrag (Qt::DropActions supportedActions)
     QModelIndexList indexes;
     indexes << index;
     QMimeData *data = model ()->mimeData (indexes);
-    if (!data) {
+    if (! data) {
       return;
     }
 
     lay::BusySection busy_section; // issue 984
 
     QDrag *drag = new QDrag (this);
-    drag->setMimeData(data);
+    drag->setMimeData (data);
     QPixmap px (1, 1);
     px.fill (QColor (0, 0, 0));
     px.createMaskFromColor (QColor (0, 0, 0), Qt::MaskOutColor);
@@ -160,15 +156,13 @@ HCPCellTreeWidget::startDrag (Qt::DropActions supportedActions)
     Qt::DropAction defaultDropAction = Qt::IgnoreAction;
     if (supportedActions & Qt::CopyAction) {
       defaultDropAction = Qt::CopyAction;
-    } 
+    }
 
-    drag->exec(supportedActions, defaultDropAction);
-
+    drag->exec (supportedActions, defaultDropAction);
   }
 }
 
-void 
-HCPCellTreeWidget::mouseDoubleClickEvent (QMouseEvent *event)
+void HCPCellTreeWidget::mouseDoubleClickEvent (QMouseEvent *event)
 {
   QModelIndex index (indexAt (event->pos ()));
   if (index.isValid ()) {
@@ -176,8 +170,7 @@ HCPCellTreeWidget::mouseDoubleClickEvent (QMouseEvent *event)
   }
 }
 
-void 
-HCPCellTreeWidget::mousePressEvent (QMouseEvent *event)
+void HCPCellTreeWidget::mousePressEvent (QMouseEvent *event)
 {
   if (event->button () == Qt::MiddleButton) {
     //  eat this event.
@@ -190,8 +183,7 @@ HCPCellTreeWidget::mousePressEvent (QMouseEvent *event)
   }
 }
 
-void 
-HCPCellTreeWidget::mouseReleaseEvent (QMouseEvent *event)
+void HCPCellTreeWidget::mouseReleaseEvent (QMouseEvent *event)
 {
   if (event->button () == Qt::MiddleButton) {
     QModelIndex index (indexAt (event->pos ()));
@@ -210,8 +202,8 @@ HCPCellTreeWidget::mouseReleaseEvent (QMouseEvent *event)
 const int max_cellviews_in_split_mode = 5;
 
 HierarchyControlPanel::HierarchyControlPanel (lay::LayoutViewBase *view, QWidget *parent, const char *name)
-  : QFrame (parent), 
-    m_enable_cb (true), 
+  : QFrame (parent),
+    m_enable_cb (true),
     mp_view (view),
     m_visibility_needs_update (true),
     m_active_index (0),
@@ -325,15 +317,13 @@ HierarchyControlPanel::~HierarchyControlPanel ()
   //  .. nothing yet ..
 }
 
-QSize
-HierarchyControlPanel::sizeHint () const
+QSize HierarchyControlPanel::sizeHint () const
 {
   int w = 120; // TODO: better(?): mp_cell_list->sizeHint ().width ();
   return QSize (w, 0);
 }
 
-bool 
-HierarchyControlPanel::event (QEvent *e)
+bool HierarchyControlPanel::event (QEvent *e)
 {
   if (e->type () == QEvent::MaxUser) {
     //  GTF probe event
@@ -344,8 +334,7 @@ HierarchyControlPanel::event (QEvent *e)
   }
 }
 
-void 
-HierarchyControlPanel::context_menu (const QPoint &p)
+void HierarchyControlPanel::context_menu (const QPoint &p)
 {
   QTreeView *cell_list = dynamic_cast<QTreeView *> (sender ());
   if (cell_list) {
@@ -355,15 +344,14 @@ HierarchyControlPanel::context_menu (const QPoint &p)
   }
 }
 
-void
-HierarchyControlPanel::set_sorting (CellTreeModel::Sorting sorting)
+void HierarchyControlPanel::set_sorting (CellTreeModel::Sorting sorting)
 {
   if (sorting != m_sorting) {
 
     m_sorting = sorting;
 
     for (size_t i = 0; i < mp_cell_lists.size (); ++i) {
-      CellTreeModel *model = dynamic_cast <CellTreeModel *> (mp_cell_lists [i]->model ());
+      CellTreeModel *model = dynamic_cast<CellTreeModel *> (mp_cell_lists [i]->model ());
       if (model) {
         model->set_sorting (m_sorting);
       }
@@ -371,12 +359,10 @@ HierarchyControlPanel::set_sorting (CellTreeModel::Sorting sorting)
 
     m_needs_update.clear ();
     m_do_update_content_dm ();
-
   }
 }
 
-void
-HierarchyControlPanel::set_split_mode (bool f)
+void HierarchyControlPanel::set_split_mode (bool f)
 {
   if (f != m_split_mode) {
     m_split_mode = f;
@@ -384,8 +370,7 @@ HierarchyControlPanel::set_split_mode (bool f)
   }
 }
 
-void
-HierarchyControlPanel::clear_all ()
+void HierarchyControlPanel::clear_all ()
 {
   m_cellviews.clear ();
   m_needs_update.clear ();
@@ -399,14 +384,12 @@ HierarchyControlPanel::clear_all ()
   mp_cell_lists.clear ();
 }
 
-void
-HierarchyControlPanel::set_cell_copy_mode (int m)
+void HierarchyControlPanel::set_cell_copy_mode (int m)
 {
   m_cell_copy_mode = m;
 }
 
-void
-HierarchyControlPanel::set_flat (bool f)
+void HierarchyControlPanel::set_flat (bool f)
 {
   if (f != m_flat) {
 
@@ -415,20 +398,17 @@ HierarchyControlPanel::set_flat (bool f)
     //  do a complete rebuild
     clear_all ();
     m_do_update_content_dm ();
-
   }
 }
 
-void
-HierarchyControlPanel::cm_cell_select ()
+void HierarchyControlPanel::cm_cell_select ()
 {
   cell_path_type path;
   current_cell (active (), path);
   emit cell_selected (path, active ());
 }
 
-void
-HierarchyControlPanel::search_triggered (const QString &t)
+void HierarchyControlPanel::search_triggered (const QString &t)
 {
   m_search_index = -1;
   lay::HCPCellTreeWidget *w = dynamic_cast<lay::HCPCellTreeWidget *> (sender ());
@@ -452,8 +432,7 @@ HierarchyControlPanel::search_triggered (const QString &t)
   }
 }
 
-void
-HierarchyControlPanel::set_search_as_filter (bool f)
+void HierarchyControlPanel::set_search_as_filter (bool f)
 {
   if (f != search_as_filter ()) {
     mp_filter->setChecked (f);
@@ -461,8 +440,7 @@ HierarchyControlPanel::set_search_as_filter (bool f)
   }
 }
 
-void
-HierarchyControlPanel::set_search_case_sensitive (bool f)
+void HierarchyControlPanel::set_search_case_sensitive (bool f)
 {
   if (f != search_case_sensitive ()) {
     mp_case_sensitive->setChecked (f);
@@ -470,8 +448,7 @@ HierarchyControlPanel::set_search_case_sensitive (bool f)
   }
 }
 
-void
-HierarchyControlPanel::set_search_as_expression (bool f)
+void HierarchyControlPanel::set_search_as_expression (bool f)
 {
   if (f != search_as_expression ()) {
     mp_use_regular_expressions->setChecked (f);
@@ -479,15 +456,13 @@ HierarchyControlPanel::set_search_as_expression (bool f)
   }
 }
 
-void
-HierarchyControlPanel::search_edited ()
+void HierarchyControlPanel::search_edited ()
 {
   search_edited_no_signal ();
   emit search_options_changed ();
 }
 
-void
-HierarchyControlPanel::search_edited_no_signal ()
+void HierarchyControlPanel::search_edited_no_signal ()
 {
   bool filter_invalid = false;
 
@@ -511,15 +486,13 @@ HierarchyControlPanel::search_edited_no_signal ()
         filter_invalid = true;
       }
     }
-
   }
 
   lay::indicate_error (mp_search_edit_box, filter_invalid);
 }
 
-void
-HierarchyControlPanel::search_next ()
-{  
+void HierarchyControlPanel::search_next ()
+{
   if (m_search_index >= 0 && m_search_index < int (mp_cell_lists.size ())) {
     lay::CellTreeModel *search_model = dynamic_cast<lay::CellTreeModel *> (mp_cell_lists [m_search_index]->model ());
     QModelIndex found = search_model->locate_next (mp_cell_lists [m_search_index]->currentIndex ());
@@ -530,8 +503,7 @@ HierarchyControlPanel::search_next ()
   }
 }
 
-void
-HierarchyControlPanel::search_prev ()
+void HierarchyControlPanel::search_prev ()
 {
   if (m_search_index >= 0 && m_search_index < int (mp_cell_lists.size ())) {
     lay::CellTreeModel *search_model = dynamic_cast<lay::CellTreeModel *> (mp_cell_lists [m_search_index]->model ());
@@ -543,14 +515,13 @@ HierarchyControlPanel::search_prev ()
   }
 }
 
-void
-HierarchyControlPanel::search_editing_finished ()
+void HierarchyControlPanel::search_editing_finished ()
 {
   if (! mp_search_frame->isVisible ()) {
     return;
   }
 
-  for (std::vector <QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
+  for (std::vector<QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
     CellTreeModel *m = dynamic_cast<CellTreeModel *> ((*v)->model ());
     if (m) {
       m->clear_locate ();
@@ -566,8 +537,7 @@ HierarchyControlPanel::search_editing_finished ()
   m_search_index = -1;
 }
 
-void 
-HierarchyControlPanel::middle_clicked (const QModelIndex &index)
+void HierarchyControlPanel::middle_clicked (const QModelIndex &index)
 {
   BEGIN_PROTECTED
   if (index.isValid ()) {
@@ -579,8 +549,7 @@ HierarchyControlPanel::middle_clicked (const QModelIndex &index)
   END_PROTECTED
 }
 
-void
-HierarchyControlPanel::path_from_index (const QModelIndex &index, int cv_index, cell_path_type &path) const
+void HierarchyControlPanel::path_from_index (const QModelIndex &index, int cv_index, cell_path_type &path) const
 {
   //  build the path to the cell given by the index
   path.clear ();
@@ -606,14 +575,11 @@ HierarchyControlPanel::path_from_index (const QModelIndex &index, int cv_index, 
       if (! path.empty ()) {
         std::reverse (path.begin (), path.end ());
       }
-
     }
-
   }
 }
 
-void
-HierarchyControlPanel::set_active_celltree_from_sender ()
+void HierarchyControlPanel::set_active_celltree_from_sender ()
 {
   for (int i = 0; i < int (mp_cell_lists.size ()); ++i) {
     if (mp_cell_lists [i] == sender ()) {
@@ -627,8 +593,7 @@ HierarchyControlPanel::set_active_celltree_from_sender ()
   }
 }
 
-void 
-HierarchyControlPanel::header_clicked ()
+void HierarchyControlPanel::header_clicked ()
 {
   QToolButton *cb = dynamic_cast<QToolButton *> (sender ());
   if (cb) {
@@ -637,14 +602,12 @@ HierarchyControlPanel::header_clicked ()
   }
 }
 
-void 
-HierarchyControlPanel::clicked (const QModelIndex & /*index*/)
+void HierarchyControlPanel::clicked (const QModelIndex & /*index*/)
 {
   set_active_celltree_from_sender ();
 }
 
-void 
-HierarchyControlPanel::double_clicked (const QModelIndex &index)
+void HierarchyControlPanel::double_clicked (const QModelIndex &index)
 {
   BEGIN_PROTECTED
   if (index.isValid ()) {
@@ -661,8 +624,7 @@ HierarchyControlPanel::double_clicked (const QModelIndex &index)
   END_PROTECTED
 }
 
-void 
-HierarchyControlPanel::set_current_cell (int cv_index, const cell_path_type &path)
+void HierarchyControlPanel::set_current_cell (int cv_index, const cell_path_type &path)
 {
   if (cv_index < 0 || cv_index >= int (mp_cell_lists.size ())) {
     return;
@@ -676,8 +638,7 @@ HierarchyControlPanel::set_current_cell (int cv_index, const cell_path_type &pat
   }
 }
 
-void
-HierarchyControlPanel::selected_cells (int cv_index, std::vector<HierarchyControlPanel::cell_path_type> &paths) const
+void HierarchyControlPanel::selected_cells (int cv_index, std::vector<HierarchyControlPanel::cell_path_type> &paths) const
 {
   if (cv_index >= 0 && cv_index < int (mp_cell_lists.size ())) {
     QModelIndexList sel = mp_cell_lists [cv_index]->selectionModel ()->selectedIndexes ();
@@ -688,60 +649,54 @@ HierarchyControlPanel::selected_cells (int cv_index, std::vector<HierarchyContro
   }
 }
 
-void
-HierarchyControlPanel::current_cell (int cv_index, HierarchyControlPanel::cell_path_type &path) const
+void HierarchyControlPanel::current_cell (int cv_index, HierarchyControlPanel::cell_path_type &path) const
 {
   if (cv_index >= 0 && cv_index < int (mp_cell_lists.size ())) {
     path_from_index (mp_cell_lists [cv_index]->currentIndex (), cv_index, path);
   }
 }
 
-void
-HierarchyControlPanel::set_background_color (tl::Color c)
+void HierarchyControlPanel::set_background_color (tl::Color c)
 {
   m_background_color = c;
-  for (std::vector <QTreeView *>::const_iterator f = mp_cell_lists.begin (); f != mp_cell_lists.end (); ++f) {
+  for (std::vector<QTreeView *>::const_iterator f = mp_cell_lists.begin (); f != mp_cell_lists.end (); ++f) {
     QPalette pl ((*f)->palette ());
     pl.setColor (QPalette::Base, QColor (c.rgb ()));
     (*f)->setPalette (pl);
   }
 }
 
-void
-HierarchyControlPanel::set_text_color (tl::Color c)
+void HierarchyControlPanel::set_text_color (tl::Color c)
 {
   m_text_color = c;
-  for (std::vector <QTreeView *>::const_iterator f = mp_cell_lists.begin (); f != mp_cell_lists.end (); ++f) {
+  for (std::vector<QTreeView *>::const_iterator f = mp_cell_lists.begin (); f != mp_cell_lists.end (); ++f) {
     QPalette pl ((*f)->palette ());
     pl.setColor (QPalette::Text, QColor (c.rgb ()));
     (*f)->setPalette (pl);
   }
 }
 
-void
-HierarchyControlPanel::do_full_update_content ()
+void HierarchyControlPanel::do_full_update_content ()
 {
   size_t i = 0;
-  for (std::vector <lay::CellView>::const_iterator cv = m_cellviews.begin (); cv != m_cellviews.end (); ++cv, ++i) {
+  for (std::vector<lay::CellView>::const_iterator cv = m_cellviews.begin (); cv != m_cellviews.end (); ++cv, ++i) {
     if (m_needs_update.size () > i) {
-      m_needs_update [i] = true; 
+      m_needs_update [i] = true;
     }
     if (m_force_close.size () > i) {
-      m_force_close [i] = true; 
+      m_force_close [i] = true;
     }
   }
 
   do_update_content ();
 }
 
-void
-HierarchyControlPanel::update_required ()
+void HierarchyControlPanel::update_required ()
 {
   m_do_full_update_content_dm ();
 }
 
-void 
-HierarchyControlPanel::select_active (int cellview_index, bool silent)
+void HierarchyControlPanel::select_active (int cellview_index, bool silent)
 {
   if (cellview_index != m_active_index) {
     mp_selector->setCurrentIndex (cellview_index);
@@ -752,8 +707,7 @@ HierarchyControlPanel::select_active (int cellview_index, bool silent)
   }
 }
 
-void
-HierarchyControlPanel::change_active_cellview (int index)
+void HierarchyControlPanel::change_active_cellview (int index)
 {
   search_editing_finished ();
 
@@ -766,7 +720,7 @@ HierarchyControlPanel::change_active_cellview (int index)
   }
 
   int i = 0;
-  for (std::vector <QFrame *>::const_iterator f = mp_cell_list_frames.begin (); f != mp_cell_list_frames.end (); ++f, ++i) {
+  for (std::vector<QFrame *>::const_iterator f = mp_cell_list_frames.begin (); f != mp_cell_list_frames.end (); ++f, ++i) {
     (*f)->setVisible (i == index || split_mode);
     if (i == index) {
       mp_cell_lists [i]->setFocus ();
@@ -774,13 +728,12 @@ HierarchyControlPanel::change_active_cellview (int index)
   }
 
   i = 0;
-  for (std::vector <QToolButton *>::const_iterator f = mp_cell_list_headers.begin (); f != mp_cell_list_headers.end (); ++f, ++i) {
+  for (std::vector<QToolButton *>::const_iterator f = mp_cell_list_headers.begin (); f != mp_cell_list_headers.end (); ++f, ++i) {
     (*f)->setChecked (i == index);
   }
 }
 
-void
-HierarchyControlPanel::selection_changed (int index)
+void HierarchyControlPanel::selection_changed (int index)
 {
   if (index != m_active_index) {
     change_active_cellview (index);
@@ -788,12 +741,12 @@ HierarchyControlPanel::selection_changed (int index)
   }
 }
 
-QModelIndex 
+QModelIndex
 HierarchyControlPanel::index_from_path (const cell_path_type &path, int cv_index)
 {
   if (cv_index >= 0 && cv_index < int (mp_cell_lists.size ()) && ! path.empty ()) {
 
-    CellTreeModel *model = dynamic_cast <CellTreeModel *> (mp_cell_lists [cv_index]->model ());
+    CellTreeModel *model = dynamic_cast<CellTreeModel *> (mp_cell_lists [cv_index]->model ());
     if (! model) {
       return QModelIndex ();
     }
@@ -818,10 +771,8 @@ HierarchyControlPanel::index_from_path (const cell_path_type &path, int cv_index
             return model->model_index (item);
           }
         }
-      } 
-
+      }
     }
-
   }
 
   return QModelIndex ();
@@ -843,18 +794,16 @@ HierarchyControlPanel::find_child_item (cell_path_type::const_iterator start, ce
 
     //  not found
     return 0;
-
   }
 }
 
-std::string 
+std::string
 HierarchyControlPanel::display_string (int n) const
 {
   return m_cellviews [n]->name () + " (@" + tl::to_string (n + 1) + ")";
 }
 
-void
-HierarchyControlPanel::do_update_content (int cv_index)
+void HierarchyControlPanel::do_update_content (int cv_index)
 {
   //  close the search box since we will modify the model
   if (m_search_index >= 0 && m_search_index < int (mp_cell_lists.size ())) {
@@ -865,7 +814,7 @@ HierarchyControlPanel::do_update_content (int cv_index)
   m_search_index = -1;
 
   unsigned int imin = (cv_index < 0 ? 0 : (unsigned int) cv_index);
-  unsigned int imax = (cv_index < 0 ? std::numeric_limits <unsigned int>::max () : (unsigned int) cv_index);
+  unsigned int imax = (cv_index < 0 ? std::numeric_limits<unsigned int>::max () : (unsigned int) cv_index);
 
   for (unsigned int i = imin; i < mp_view->cellviews () && i <= imax; ++i) {
     if (i >= m_force_close.size ()) {
@@ -893,11 +842,10 @@ HierarchyControlPanel::do_update_content (int cv_index)
     }
 
     if (m_needs_update [i]) {
-      mp_cell_lists [i]->doItemsLayout (); //  this schedules a redraw 
+      mp_cell_lists [i]->doItemsLayout (); //  this schedules a redraw
     }
 
     m_cellviews [i] = mp_view->cellview (i);
-
   }
 
   if (m_cellviews.size () < mp_view->cellviews ()) {
@@ -905,7 +853,7 @@ HierarchyControlPanel::do_update_content (int cv_index)
       m_cellviews.push_back (mp_view->cellview (i));
     }
   } else if (m_cellviews.size () > mp_view->cellviews ()) {
-    m_cellviews.erase (m_cellviews.begin () + mp_view->cellviews (), m_cellviews.end ()); 
+    m_cellviews.erase (m_cellviews.begin () + mp_view->cellviews (), m_cellviews.end ());
   }
 
   bool split_mode = m_split_mode;
@@ -966,9 +914,8 @@ HierarchyControlPanel::do_update_content (int cv_index)
     mp_cell_lists.push_back (cell_list);
     mp_cell_list_frames.push_back (cl_frame);
     mp_cell_list_headers.push_back (header);
-    
-    mp_splitter->addWidget (cl_frame);
 
+    mp_splitter->addWidget (cl_frame);
   }
 
   while (mp_cell_lists.size () > m_cellviews.size ()) {
@@ -976,17 +923,17 @@ HierarchyControlPanel::do_update_content (int cv_index)
     mp_cell_list_frames.pop_back ();
     mp_cell_list_headers.pop_back ();
     mp_cell_lists.pop_back ();
-  } 
+  }
 
   for (unsigned int i = imin; i < m_cellviews.size () && i < (unsigned int) mp_selector->count () && i <= imax; ++i) {
-    mp_selector->setItemText (i, tl::to_qstring (display_string (i))); 
+    mp_selector->setItemText (i, tl::to_qstring (display_string (i)));
   }
   while (mp_selector->count () < int (m_cellviews.size ())) {
     mp_selector->addItem (tl::to_qstring (display_string (mp_selector->count ())));
   }
   while (mp_selector->count () > int (m_cellviews.size ())) {
     mp_selector->removeItem (mp_selector->count () - 1);
-  } 
+  }
 
   if (m_active_index >= int (m_cellviews.size ())) {
     m_active_index = int (m_cellviews.size ()) - 1;
@@ -997,36 +944,33 @@ HierarchyControlPanel::do_update_content (int cv_index)
   mp_selector->setVisible (mp_cell_lists.size () > 1 && ! split_mode);
 
   for (unsigned int i = imin; i < m_cellviews.size () && i <= imax; ++i) {
-    
+
     if (m_needs_update [i]) {
 
       mp_cell_list_headers [i]->setText (tl::to_qstring (display_string (i)));
 
       //  draw the cells in the level of the current cell,
       //  add an "above" entry if there is a level above.
-      //  highlight the current entry. If the index is 
+      //  highlight the current entry. If the index is
       //  invalid, just clear the list.
 
       if (m_force_close [i]) {
 
         m_force_close [i] = false;
 
-        CellTreeModel *model = dynamic_cast <CellTreeModel *> (mp_cell_lists [i]->model ());
+        CellTreeModel *model = dynamic_cast<CellTreeModel *> (mp_cell_lists [i]->model ());
         if (model) {
           model->configure (mp_view, i, m_flat ? CellTreeModel::Flat : 0, 0, m_sorting);
         }
-
       }
 
       m_needs_update [i] = false;
-
     }
 
     mp_cell_list_headers [i]->setVisible (split_mode && m_cellviews.size () > 1);
     mp_cell_list_headers [i]->setChecked (int (i) == m_active_index);
 
     mp_cell_list_frames [i]->setVisible (int (i) == m_active_index || split_mode);
-
   }
 }
 
@@ -1043,19 +987,17 @@ HierarchyControlPanel::current_item () const
   }
 }
 
-bool 
-HierarchyControlPanel::has_focus () const
+bool HierarchyControlPanel::has_focus () const
 {
   return m_active_index >= 0 && m_active_index < int (mp_cell_lists.size ()) && mp_cell_lists [m_active_index]->hasFocus ();
 }
 
-bool
-HierarchyControlPanel::ask_for_cell_copy_mode (const db::Layout &layout, const std::vector<cell_path_type> &paths, int &cell_copy_mode)
+bool HierarchyControlPanel::ask_for_cell_copy_mode (const db::Layout &layout, const std::vector<cell_path_type> &paths, int &cell_copy_mode)
 {
   bool needs_to_ask = false;
   cell_copy_mode = 0;
 
-  if (m_cell_copy_mode < 0) {  //  ask
+  if (m_cell_copy_mode < 0) { //  ask
 
     //  check if there is a cell that we have to ask for
     for (std::vector<cell_path_type>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
@@ -1084,14 +1026,12 @@ HierarchyControlPanel::ask_for_cell_copy_mode (const db::Layout &layout, const s
       view ()->dispatcher ()->config_set (cfg_copy_cell_mode, tl::to_string (cell_copy_mode));
       view ()->dispatcher ()->config_end ();
     }
-
   }
 
   return true;
 }
 
-void
-HierarchyControlPanel::cut () 
+void HierarchyControlPanel::cut ()
 {
   if (m_active_index < 0 || m_active_index >= int (mp_cell_lists.size ())) {
     return;
@@ -1161,7 +1101,7 @@ HierarchyControlPanel::cut ()
   //  If one of the cells in the path was deleted, establish a valid path
 
   bool needs_update = false;
-  for (size_t i = cell_path.size (); i > 0; ) {
+  for (size_t i = cell_path.size (); i > 0;) {
     --i;
     if (! layout.is_valid_cell_index (cell_path [i])) {
       cell_path.erase (cell_path.begin () + i, cell_path.end ());
@@ -1174,14 +1114,12 @@ HierarchyControlPanel::cut ()
   }
 }
 
-bool
-HierarchyControlPanel::has_selection ()
+bool HierarchyControlPanel::has_selection ()
 {
   return (current_item () != 0);
 }
 
-void
-HierarchyControlPanel::copy () 
+void HierarchyControlPanel::copy ()
 {
   if (m_active_index < 0 || m_active_index >= int (mp_cell_lists.size ())) {
     return;
@@ -1222,8 +1160,7 @@ HierarchyControlPanel::copy ()
   }
 }
 
-void
-HierarchyControlPanel::paste () 
+void HierarchyControlPanel::paste ()
 {
   if (m_active_index < 0 || m_active_index >= int (mp_cell_lists.size ())) {
     return;
@@ -1237,7 +1174,7 @@ HierarchyControlPanel::paste ()
   std::vector<unsigned int> new_layers;
 
   //  paste the content into the active cellview.
-  std::vector <db::cell_index_type> new_tops;
+  std::vector<db::cell_index_type> new_tops;
   for (db::Clipboard::iterator c = db::Clipboard::instance ().begin (); c != db::Clipboard::instance ().end (); ++c) {
     const db::ClipboardValue<lay::CellClipboardData> *value = dynamic_cast<const db::ClipboardValue<lay::CellClipboardData> *> (*c);
     if (value) {
@@ -1279,8 +1216,8 @@ public:
     at = "@hcp_context_menu.end";
 
     menu_entries.push_back (lay::config_menu_item ("flat_mode", at, tl::to_string (QObject::tr ("Flat Cell List")), cfg_flat_cell_list, "?")),
-    menu_entries.push_back (lay::config_menu_item ("split_mode", at, tl::to_string (QObject::tr ("Split Mode")), cfg_split_cell_list, "?")),
-    menu_entries.push_back (lay::submenu ("sorting", at, tl::to_string (QObject::tr ("Sorting"))));
+      menu_entries.push_back (lay::config_menu_item ("split_mode", at, tl::to_string (QObject::tr ("Split Mode")), cfg_split_cell_list, "?")),
+      menu_entries.push_back (lay::submenu ("sorting", at, tl::to_string (QObject::tr ("Sorting"))));
 
     {
       std::string at = "@hcp_context_menu.sorting.end";
@@ -1315,6 +1252,6 @@ public:
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new HierarchyControlPanelPluginDeclaration (), -8, "HierarchyControlPanelPlugin");
 
-} // namespace lay 
+} // namespace lay
 
 #endif

@@ -28,7 +28,7 @@
 #include "tlUnitTest.h"
 #include "tlStream.h"
 
-TEST(1)
+TEST (1)
 {
   db::Layout ly;
   {
@@ -52,14 +52,13 @@ TEST(1)
     db::RecursiveShapeIterator iter (ly, ly.cell (top_cell_index), li1);
 
     iter.push (&builder);
-
   }
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au1.gds");
 }
 
-TEST(1_WithEmptyLayer)
+TEST (1_WithEmptyLayer)
 {
   db::Layout ly;
   {
@@ -87,14 +86,13 @@ TEST(1_WithEmptyLayer)
     db::RecursiveShapeIterator iter (ly, ly.cell (top_cell_index), li1);
 
     iter.push (&builder);
-
   }
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au1.gds");
 }
 
-TEST(2_WithoutClip)
+TEST (2_WithoutClip)
 {
   db::Layout ly;
   {
@@ -124,14 +122,13 @@ TEST(2_WithoutClip)
     iter.push (&builder);
 
     target.cell (target_top).insert (db::CellInstArray (db::CellInst (builder.initial_cell ()->cell_index ()), db::Trans ()));
-
   }
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au2a.gds");
 }
 
-TEST(2_WithClip)
+TEST (2_WithClip)
 {
   db::Layout ly;
   {
@@ -162,14 +159,13 @@ TEST(2_WithClip)
     iter.push (&builder);
 
     target.cell (target_top).insert (db::CellInstArray (db::CellInst (builder.initial_cell ()->cell_index ()), db::Trans ()));
-
   }
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au2b.gds");
 }
 
-TEST(2_WithClipAndSimplification)
+TEST (2_WithClipAndSimplification)
 {
   db::Layout ly;
   {
@@ -181,8 +177,8 @@ TEST(2_WithClipAndSimplification)
   }
 
   db::Layout target;
-  db::ReducingHierarchyBuilderShapeReceiver red(0, 1.2, 4);
-  db::ClippingHierarchyBuilderShapeReceiver clip(&red);
+  db::ReducingHierarchyBuilderShapeReceiver red (0, 1.2, 4);
+  db::ClippingHierarchyBuilderShapeReceiver clip (&red);
   db::HierarchyBuilder builder (&target, db::ICplxTrans (), &clip);
 
   db::cell_index_type target_top = target.add_cell ("CLIP_TOP");
@@ -201,14 +197,13 @@ TEST(2_WithClipAndSimplification)
     iter.push (&builder);
 
     target.cell (target_top).insert (db::CellInstArray (db::CellInst (builder.initial_cell ()->cell_index ()), db::Trans ()));
-
   }
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au2c.gds");
 }
 
-TEST(2_WithClipAndRefGeneration)
+TEST (2_WithClipAndRefGeneration)
 {
   db::Layout ly;
   {
@@ -220,8 +215,8 @@ TEST(2_WithClipAndRefGeneration)
   }
 
   db::Layout target;
-  db::PolygonReferenceHierarchyBuilderShapeReceiver ref(&target, 0);
-  db::ClippingHierarchyBuilderShapeReceiver clip(&ref);
+  db::PolygonReferenceHierarchyBuilderShapeReceiver ref (&target, 0);
+  db::ClippingHierarchyBuilderShapeReceiver clip (&ref);
   db::HierarchyBuilder builder (&target, db::ICplxTrans (), &clip);
 
   db::cell_index_type target_top = target.add_cell ("CLIP_TOP");
@@ -240,14 +235,13 @@ TEST(2_WithClipAndRefGeneration)
     iter.push (&builder);
 
     target.cell (target_top).insert (db::CellInstArray (db::CellInst (builder.initial_cell ()->cell_index ()), db::Trans ()));
-
   }
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au2d.gds");
 }
 
-TEST(2_WithEmptyResult)
+TEST (2_WithEmptyResult)
 {
   db::Layout ly;
   {
@@ -259,8 +253,8 @@ TEST(2_WithEmptyResult)
   }
 
   db::Layout target;
-  db::PolygonReferenceHierarchyBuilderShapeReceiver ref(&target, 0);
-  db::ClippingHierarchyBuilderShapeReceiver clip(&ref);
+  db::PolygonReferenceHierarchyBuilderShapeReceiver ref (&target, 0);
+  db::ClippingHierarchyBuilderShapeReceiver clip (&ref);
   db::HierarchyBuilder builder (&target, db::ICplxTrans (), &clip);
 
   db::cell_index_type target_top = target.add_cell ("CLIP_TOP");
@@ -279,14 +273,13 @@ TEST(2_WithEmptyResult)
     iter.push (&builder);
 
     target.cell (target_top).insert (db::CellInstArray (db::CellInst (builder.initial_cell ()->cell_index ()), db::Trans ()));
-
   }
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au2e.gds");
 }
 
-TEST(2_WithClipAndSimplificationAndEmptyLayer)
+TEST (2_WithClipAndSimplificationAndEmptyLayer)
 {
   db::Layout ly;
   {
@@ -298,8 +291,8 @@ TEST(2_WithClipAndSimplificationAndEmptyLayer)
   }
 
   db::Layout target;
-  db::ReducingHierarchyBuilderShapeReceiver red(0, 1.2, 4);
-  db::ClippingHierarchyBuilderShapeReceiver clip(&red);
+  db::ReducingHierarchyBuilderShapeReceiver red (0, 1.2, 4);
+  db::ClippingHierarchyBuilderShapeReceiver clip (&red);
   db::HierarchyBuilder builder (&target, db::ICplxTrans (), &clip);
 
   db::cell_index_type target_top = target.add_cell ("CLIP_TOP");
@@ -329,14 +322,13 @@ TEST(2_WithClipAndSimplificationAndEmptyLayer)
     iter.push (&builder);
 
     target.cell (target_top).insert (db::CellInstArray (db::CellInst (builder.initial_cell ()->cell_index ()), db::Trans ()));
-
   }
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au2f.gds");
 }
 
-TEST(3_ComplexRegionWithClip)
+TEST (3_ComplexRegionWithClip)
 {
   db::Layout ly;
   {
@@ -371,14 +363,13 @@ TEST(3_ComplexRegionWithClip)
     iter.push (&builder);
 
     target.cell (target_top).insert (db::CellInstArray (db::CellInst (builder.initial_cell ()->cell_index ()), db::Trans ()));
-
   }
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au3a.gds");
 }
 
-TEST(4_ComplexRegionAndLayoutWithClip)
+TEST (4_ComplexRegionAndLayoutWithClip)
 {
   db::Layout ly;
   {
@@ -413,14 +404,13 @@ TEST(4_ComplexRegionAndLayoutWithClip)
     iter.push (&builder);
 
     target.cell (target_top).insert (db::CellInstArray (db::CellInst (builder.initial_cell ()->cell_index ()), db::Trans ()));
-
   }
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au4a.gds");
 }
 
-TEST(5_CompareRecursiveShapeIterators)
+TEST (5_CompareRecursiveShapeIterators)
 {
   db::Layout ly;
   db::cell_index_type ci = ly.add_cell ("TOP");
@@ -552,7 +542,7 @@ TEST(5_CompareRecursiveShapeIterators)
   }
 }
 
-TEST(6_DisjunctLayersPerHierarchyBranch)
+TEST (6_DisjunctLayersPerHierarchyBranch)
 {
   db::Layout ly;
   {
@@ -576,14 +566,13 @@ TEST(6_DisjunctLayersPerHierarchyBranch)
     db::RecursiveShapeIterator iter (ly, ly.cell (top_cell_index), li1);
 
     iter.push (&builder);
-
   }
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au_l4.gds");
 }
 
-TEST(7_DetachFromOriginalLayout)
+TEST (7_DetachFromOriginalLayout)
 {
   //  using OASIS means we create a lot of references to array
   //  and shape repo - we check here whether these references get
@@ -610,17 +599,16 @@ TEST(7_DetachFromOriginalLayout)
     db::RecursiveShapeIterator iter (*ly, ly->cell (top_cell_index), li1);
 
     iter.push (&builder);
-
   }
 
   //  make sure there is no connection to original layout
   ly.reset (0);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au_l5.gds");
 }
 
-TEST(8a_SimpleWithTrans)
+TEST (8a_SimpleWithTrans)
 {
   db::Layout ly;
   {
@@ -644,14 +632,13 @@ TEST(8a_SimpleWithTrans)
     db::RecursiveShapeIterator iter (ly, ly.cell (top_cell_index), li1);
 
     iter.push (&builder);
-
   }
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au8a.gds");
 }
 
-TEST(8b_ComplexRegionWithTransformation)
+TEST (8b_ComplexRegionWithTransformation)
 {
   db::Layout ly;
   {
@@ -686,10 +673,8 @@ TEST(8b_ComplexRegionWithTransformation)
     iter.push (&builder);
 
     target.cell (target_top).insert (db::CellInstArray (db::CellInst (builder.initial_cell ()->cell_index ()), db::Trans ()));
-
   }
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au8b.gds");
 }
-

@@ -42,7 +42,7 @@ class QFrame;
 
 namespace tl
 {
-  class Progress;
+class Progress;
 }
 
 namespace lay
@@ -53,7 +53,7 @@ class ProgressBarWidget;
 class ProgressWidget
   : public QFrame
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   ProgressWidget (ProgressReporter *pr, QWidget *parent, bool full_width = false);
@@ -92,4 +92,3 @@ private:
 }
 
 #endif
-

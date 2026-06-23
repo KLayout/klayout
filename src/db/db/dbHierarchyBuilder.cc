@@ -36,8 +36,7 @@ static HierarchyBuilder::cell_map_type::const_iterator null_iterator = Hierarchy
 
 // -------------------------------------------------------------------------------------------
 
-int
-compare_iterators_with_respect_to_target_hierarchy (const db::RecursiveShapeIterator &iter1, const db::RecursiveShapeIterator &iter2)
+int compare_iterators_with_respect_to_target_hierarchy (const db::RecursiveShapeIterator &iter1, const db::RecursiveShapeIterator &iter2)
 {
   if ((iter1.layout () == 0) != (iter2.layout () == 0)) {
     return (iter1.layout () == 0) < (iter2.layout () == 0) ? -1 : 1;
@@ -113,7 +112,7 @@ compare_iterators_with_respect_to_target_hierarchy (const db::RecursiveShapeIter
 /**
  *  @brief Computes the clip variant (a box set) from a cell bbox, a region and a complex region (optional)
  */
-static std::pair<bool, std::set<db::Box> > compute_clip_variant (const db::Box &cell_bbox, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region)
+static std::pair<bool, std::set<db::Box>> compute_clip_variant (const db::Box &cell_bbox, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region)
 {
   if (region == db::Box::world ()) {
     return std::make_pair (true, std::set<db::Box> ());
@@ -170,14 +169,12 @@ HierarchyBuilder::~HierarchyBuilder ()
   //  .. nothing yet ..
 }
 
-void
-HierarchyBuilder::set_shape_receiver (HierarchyBuilderShapeReceiver *pipe)
+void HierarchyBuilder::set_shape_receiver (HierarchyBuilderShapeReceiver *pipe)
 {
   mp_pipe = pipe ? pipe : &def_inserter;
 }
 
-void
-HierarchyBuilder::reset ()
+void HierarchyBuilder::reset ()
 {
   m_initial_pass = true;
   m_cm_new_entry = false;
@@ -201,8 +198,7 @@ HierarchyBuilder::variant_of_source (db::cell_index_type target) const
   return vs != m_variants_of_sources_map.end () ? vs->second : def;
 }
 
-void
-HierarchyBuilder::register_variant (db::cell_index_type non_var, db::cell_index_type var, const std::string &description)
+void HierarchyBuilder::register_variant (db::cell_index_type non_var, db::cell_index_type var, const std::string &description)
 {
   //  non_var (despite its name) may be a variant created previously.
   variant_to_original_target_map_type::const_iterator v = m_variants_to_original_target_map.find (non_var);
@@ -224,8 +220,7 @@ HierarchyBuilder::register_variant (db::cell_index_type non_var, db::cell_index_
   }
 }
 
-void
-HierarchyBuilder::unregister_variant (db::cell_index_type var)
+void HierarchyBuilder::unregister_variant (db::cell_index_type var)
 {
   m_variants_of_sources_map.erase (var);
 
@@ -260,8 +255,7 @@ HierarchyBuilder::original_target_for_variant (db::cell_index_type ci) const
   }
 }
 
-void
-HierarchyBuilder::begin (const RecursiveShapeIterator *iter)
+void HierarchyBuilder::begin (const RecursiveShapeIterator *iter)
 {
   if (m_initial_pass) {
     m_source = *iter;
@@ -296,8 +290,7 @@ HierarchyBuilder::begin (const RecursiveShapeIterator *iter)
   m_cell_stack.back ().second.push_back (&new_top);
 }
 
-void
-HierarchyBuilder::end (const RecursiveShapeIterator *iter)
+void HierarchyBuilder::end (const RecursiveShapeIterator *iter)
 {
   tl_assert (! iter->layout () || ! iter->top_cell () || m_cell_stack.size () == 1);
 
@@ -309,8 +302,7 @@ HierarchyBuilder::end (const RecursiveShapeIterator *iter)
   m_cm_new_entry = false;
 }
 
-void
-HierarchyBuilder::enter_cell (const RecursiveShapeIterator * /*iter*/, const db::Cell * /*cell*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
+void HierarchyBuilder::enter_cell (const RecursiveShapeIterator * /*iter*/, const db::Cell * /*cell*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
 {
   tl_assert (! tl::is_equal_iterator_unchecked (m_cm_entry, null_iterator) && m_cm_entry != m_cell_map.end ());
 
@@ -333,8 +325,7 @@ HierarchyBuilder::enter_cell (const RecursiveShapeIterator * /*iter*/, const db:
   }
 }
 
-void
-HierarchyBuilder::leave_cell (const RecursiveShapeIterator * /*iter*/, const db::Cell * /*cell*/)
+void HierarchyBuilder::leave_cell (const RecursiveShapeIterator * /*iter*/, const db::Cell * /*cell*/)
 {
   m_cell_stack.pop_back ();
 }
@@ -412,13 +403,12 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
             resolve = true;
           }
         }
-
       }
 
       if (resolve) {
 
         //  resolve the instances of the array
-        for (auto i = inst.begin (); !i.at_end (); ++i) {
+        for (auto i = inst.begin (); ! i.at_end (); ++i) {
 
           db::CellInstArray new_inst;
           if (inst.is_complex ()) {
@@ -431,7 +421,6 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
           for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {
             (*c)->insert (new_inst);
           }
-
         }
 
       } else {
@@ -443,9 +432,7 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
         for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {
           (*c)->insert (new_inst);
         }
-
       }
-
     }
 
     //  To see the cell once, use NI_single. If we did see the cell already, skip the whole instance array.
@@ -455,12 +442,10 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
 
     //  Iterate by instance array members
     return NI_all;
-
   }
 }
 
-bool
-HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::ICplxTrans &trans, const db::Box &region, const box_tree_type *complex_region, bool all, bool skip_shapes)
+bool HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::ICplxTrans &trans, const db::Box &region, const box_tree_type *complex_region, bool all, bool skip_shapes)
 {
   if (all) {
 
@@ -471,7 +456,7 @@ HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db:
     db::cell_index_type inst_cell = inst.object ().cell_index ();
 
     db::Box cell_bbox = iter->cell_bbox (inst_cell);
-    std::pair<bool, std::set<db::Box> > clip_variant = compute_clip_variant (cell_bbox, trans, region, complex_region);
+    std::pair<bool, std::set<db::Box>> clip_variant = compute_clip_variant (cell_bbox, trans, region, complex_region);
     if (! clip_variant.first) {
       return false;
     }
@@ -491,12 +476,10 @@ HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db:
     }
 
     return ! skip_shapes && m_cells_seen.find (key) == m_cells_seen.end ();
-
   }
 }
 
-void
-HierarchyBuilder::shape (const RecursiveShapeIterator *iter, const db::Shape &shape, const db::ICplxTrans &apply_always, const db::ICplxTrans & /*trans*/, const db::Box &region, const box_tree_type *complex_region)
+void HierarchyBuilder::shape (const RecursiveShapeIterator *iter, const db::Shape &shape, const db::ICplxTrans &apply_always, const db::ICplxTrans & /*trans*/, const db::Box &region, const box_tree_type *complex_region)
 {
   for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {
     db::Shapes &shapes = (*c)->shapes (m_target_layer);
@@ -512,8 +495,7 @@ ClippingHierarchyBuilderShapeReceiver::ClippingHierarchyBuilderShapeReceiver (Hi
   //  .. nothing yet ..
 }
 
-void
-ClippingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+void ClippingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
   static db::Box world = db::Box::world ();
 
@@ -533,18 +515,16 @@ ClippingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, db::propert
       shape.polygon (poly);
       insert_clipped (poly, prop_id, trans, region, complex_region, target);
     }
-
   }
 }
 
-void
-ClippingHierarchyBuilderShapeReceiver::push (const db::Box &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+void ClippingHierarchyBuilderShapeReceiver::push (const db::Box &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
   static db::Box world = db::Box::world ();
 
   if (! complex_region) {
     db::Box r = shape & region;
-    if (! r.empty()) {
+    if (! r.empty ()) {
       mp_pipe->push (r, prop_id, trans, world, 0, target);
     }
   } else {
@@ -552,8 +532,7 @@ ClippingHierarchyBuilderShapeReceiver::push (const db::Box &shape, db::propertie
   }
 }
 
-void
-ClippingHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+void ClippingHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
   static db::Box world = db::Box::world ();
 
@@ -564,8 +543,7 @@ ClippingHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, db::prope
   }
 }
 
-bool
-ClippingHierarchyBuilderShapeReceiver::is_inside (const db::Box &box, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region)
+bool ClippingHierarchyBuilderShapeReceiver::is_inside (const db::Box &box, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region)
 {
   if (region == db::Box::world ()) {
     return true;
@@ -583,16 +561,13 @@ ClippingHierarchyBuilderShapeReceiver::is_inside (const db::Box &box, const db::
           return true;
         }
       }
-
     }
-
   }
 
   return false;
 }
 
-bool
-ClippingHierarchyBuilderShapeReceiver::is_outside (const db::Box &box, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region)
+bool ClippingHierarchyBuilderShapeReceiver::is_outside (const db::Box &box, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region)
 {
   if (region == db::Box::world ()) {
     return false;
@@ -611,14 +586,12 @@ ClippingHierarchyBuilderShapeReceiver::is_outside (const db::Box &box, const db:
     } else {
       return false;
     }
-
   }
 
   return true;
 }
 
-void
-ClippingHierarchyBuilderShapeReceiver::insert_clipped (const db::Box &box, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+void ClippingHierarchyBuilderShapeReceiver::insert_clipped (const db::Box &box, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
   db::Box bb = box & region;
   static db::Box world = db::Box::world ();
@@ -635,8 +608,7 @@ ClippingHierarchyBuilderShapeReceiver::insert_clipped (const db::Box &box, db::p
   }
 }
 
-void
-ClippingHierarchyBuilderShapeReceiver::insert_clipped (const db::Polygon &poly, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+void ClippingHierarchyBuilderShapeReceiver::insert_clipped (const db::Polygon &poly, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
   std::vector<db::Polygon> clipped_poly;
   static db::Box world = db::Box::world ();
@@ -663,8 +635,7 @@ ReducingHierarchyBuilderShapeReceiver::ReducingHierarchyBuilderShapeReceiver (Hi
   //  .. nothing yet ..
 }
 
-void
-ReducingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+void ReducingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
   if (shape.is_text () || shape.is_edge () || shape.is_edge_pair ()) {
     mp_pipe->push (shape, prop_id, trans, region, complex_region, target);
@@ -677,20 +648,17 @@ ReducingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, db::propert
   }
 }
 
-void
-ReducingHierarchyBuilderShapeReceiver::push (const db::Box &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+void ReducingHierarchyBuilderShapeReceiver::push (const db::Box &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
   mp_pipe->push (shape, prop_id, trans, region, complex_region, target);
 }
 
-void
-ReducingHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+void ReducingHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
   reduce (shape, prop_id, trans, region, complex_region, target);
 }
 
-void
-ReducingHierarchyBuilderShapeReceiver::reduce (const db::Polygon &poly, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target, bool check)
+void ReducingHierarchyBuilderShapeReceiver::reduce (const db::Polygon &poly, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target, bool check)
 {
   if (check && m_reject_odd_polygons && is_non_orientable_polygon (poly)) {
     //  non-orientable polygons generate an error
@@ -705,10 +673,10 @@ ReducingHierarchyBuilderShapeReceiver::reduce (const db::Polygon &poly, db::prop
   //  This is important to maintain the connection integrity of shape clusters.
   if (poly.is_halfmanhattan () && db::suggest_split_polygon (poly, m_max_vertex_count, m_area_ratio)) {
 
-    std::vector <db::Polygon> split_polygons;
+    std::vector<db::Polygon> split_polygons;
     db::split_polygon (poly, split_polygons);
 
-    for (std::vector <db::Polygon>::const_iterator sp = split_polygons.begin (); sp != split_polygons.end (); ++sp) {
+    for (std::vector<db::Polygon>::const_iterator sp = split_polygons.begin (); sp != split_polygons.end (); ++sp) {
       reduce (*sp, prop_id, trans, region, complex_region, target, false);
     }
 
@@ -782,7 +750,6 @@ void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Shape &shape
     } else {
       target->insert (pref);
     }
-
   }
 }
 

@@ -27,8 +27,7 @@
 namespace db
 {
 
-void
-ViaType::init ()
+void ViaType::init ()
 {
   wbmin = 0.0;
   wbmax = -1.0;
@@ -71,9 +70,7 @@ find_via_definitions_impl (const std::string &technology, const db::LayerPropert
           via_defs.push_back (SelectedViaDefinition (lib, pc->second, *vt));
         }
       }
-
     }
-
   }
 
   return via_defs;

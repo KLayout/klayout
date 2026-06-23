@@ -23,4 +23,4 @@
 #include "../pymodHelper.h"
 
 #include "QtMultimediaMain.h"
-DEFINE_PYMOD(QtMultimedia, "QtMultimedia", "KLayout/Qt module 'QtMultimedia'")
+DEFINE_PYMOD (QtMultimedia, "QtMultimedia", "KLayout/Qt module 'QtMultimedia'")

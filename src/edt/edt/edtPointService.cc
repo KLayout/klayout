@@ -26,7 +26,7 @@
 #include "layLayoutViewBase.h"
 
 #if defined(HAVE_QT)
-#  include "edtPropertiesPages.h"
+#include "edtPropertiesPages.h"
 #endif
 
 namespace edt
@@ -51,8 +51,7 @@ PointService::properties_pages (db::Manager *manager, QWidget *parent)
 }
 #endif
 
-void
-PointService::do_begin_edit (const db::DPoint &p)
+void PointService::do_begin_edit (const db::DPoint &p)
 {
   get_edit_layer ();
 
@@ -71,8 +70,7 @@ PointService::get_point () const
   return db::Point (trans () * m_p);
 }
 
-void
-PointService::update_marker ()
+void PointService::update_marker ()
 {
   lay::Marker *marker = dynamic_cast<lay::Marker *> (edit_marker ());
   if (marker) {
@@ -84,7 +82,6 @@ PointService::update_marker ()
                       tl::micron_to_string (m_p.x ()) +
                       std::string ("  y: ") +
                       tl::micron_to_string (m_p.y ()));
-
   }
 
   //  call hooks with new shape
@@ -99,15 +96,13 @@ PointService::update_marker ()
   }
 }
 
-void
-PointService::do_mouse_move_inactive (const db::DPoint &p)
+void PointService::do_mouse_move_inactive (const db::DPoint &p)
 {
   lay::PointSnapToObjectResult snap_details = snap2_details (p);
   mouse_cursor_from_snap_details (snap_details);
 }
 
-void
-PointService::do_mouse_move (const db::DPoint &p)
+void PointService::do_mouse_move (const db::DPoint &p)
 {
   do_mouse_move_inactive (p);
 
@@ -116,31 +111,27 @@ PointService::do_mouse_move (const db::DPoint &p)
   update_marker ();
 }
 
-bool
-PointService::do_mouse_click (const db::DPoint &p)
+bool PointService::do_mouse_click (const db::DPoint &p)
 {
   do_mouse_move (p);
   return true;
 }
 
-void
-PointService::do_finish_edit (bool /*accept*/)
+void PointService::do_finish_edit (bool /*accept*/)
 {
   deliver_shape (get_point ());
   commit_recent ();
   close_editor_hooks (true);
 }
 
-void
-PointService::do_cancel_edit ()
+void PointService::do_cancel_edit ()
 {
   close_editor_hooks (false);
 }
 
-bool
-PointService::selection_applies (const lay::ObjectInstPath &sel) const
+bool PointService::selection_applies (const lay::ObjectInstPath &sel) const
 {
-  return !sel.is_cell_inst () && sel.shape ().is_point ();
+  return ! sel.is_cell_inst () && sel.shape ().is_point ();
 }
 
 } // namespace edt

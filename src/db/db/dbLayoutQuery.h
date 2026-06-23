@@ -36,7 +36,7 @@
 
 namespace tl
 {
-  class Variant;
+class Variant;
 }
 
 namespace db
@@ -45,8 +45,7 @@ namespace db
 /**
  *  @brief Enum to identify the type of a property
  */
-enum LayoutQueryPropertyType
-{
+enum LayoutQueryPropertyType {
   LQ_none = 0,
   LQ_variant,
   LQ_shape,
@@ -71,7 +70,7 @@ class LayoutQuery;
 /**
  *  @brief A base class for a filter component
  *
- *  A filter component is one stage in the query path. It defines what items to look for below a given item. 
+ *  A filter component is one stage in the query path. It defines what items to look for below a given item.
  *  This is the base class for all filters.
  */
 class DB_PUBLIC FilterBase
@@ -85,7 +84,7 @@ public:
   /**
    *  @brief Destructor
    */
-  virtual ~FilterBase () { }
+  virtual ~FilterBase () {}
 
   /**
    *  @brief Create the state object for this filter
@@ -93,7 +92,7 @@ public:
    *  This method must be implemented by a filter to provide the state object.
    *  The state object is basically the selector and acts as a iterator for the property that this
    *  filter represents.
-   *  This method is provided for implementation by FilterBracket mainly. 
+   *  This method is provided for implementation by FilterBracket mainly.
    *  Custom classes should implement do_create_state.
    */
   virtual FilterStateBase *create_state (const std::vector<FilterStateBase *> &followers, db::Layout *layout, tl::Eval &eval, bool single) const;
@@ -121,19 +120,19 @@ public:
   /**
    *  @brief Gets the follower filters (non-const version)
    */
-  std::vector<FilterBase *> &followers () 
+  std::vector<FilterBase *> &followers ()
   {
     return m_followers;
   }
 
-  /** 
+  /**
    *  @brief Connect this filter to the given follower filter
    *
    *  Connections form a graph of filters that are evaluated to render the sequence of results.
    */
   void connect (FilterBase *follower);
 
-  /** 
+  /**
    *  @brief Connect this filter to the given follower filters
    */
   void connect (const std::vector<FilterBase *> &followers);
@@ -157,7 +156,7 @@ protected:
    *  Derived classes can use this method to register properties.
    *  These properties are made available to the query.
    *  The method will return a property ID.
-   *  Filter specific state objects must report a value if they are asked for the property 
+   *  Filter specific state objects must report a value if they are asked for the property
    *  with the returned property ID.
    *
    *  @param name The property name
@@ -170,17 +169,16 @@ private:
   LayoutQuery *mp_q;
 };
 
-/** 
+/**
  *  @brief A filter bracket
  *
  *  A bracket is a bracket around a filter graph. In addition, brackets can specify a multiplicity
- *  (loopmin to loopmax). 
- *  A bracket defines two virtual nodes: the entry and the exit node. 
+ *  (loopmin to loopmax).
+ *  A bracket defines two virtual nodes: the entry and the exit node.
  *  The entry node is the input of the filter and internally connected to the inputs of the children.
  *  The exit node is the output of the filter and the node the children connect to.
  */
-class DB_PUBLIC FilterBracket : 
-  public FilterBase
+class DB_PUBLIC FilterBracket : public FilterBase
 {
 public:
   /**
@@ -265,8 +263,7 @@ private:
 /**
  *  @brief A structure representing optimization hints for the states
  */
-struct DB_PUBLIC FilterStateObjectives
-{
+struct DB_PUBLIC FilterStateObjectives {
 public:
   typedef std::set<db::cell_index_type>::const_iterator cell_iterator;
 
@@ -305,7 +302,7 @@ private:
  *
  *  See \FilterBase for a brief description of the state objects.
  */
-class DB_PUBLIC FilterStateBase 
+class DB_PUBLIC FilterStateBase
 {
 public:
   /**
@@ -319,7 +316,7 @@ public:
   /**
    *  @brief Destructor
    */
-  virtual ~FilterStateBase () { }
+  virtual ~FilterStateBase () {}
 
   /**
    *  @brief Initializes the filter state object
@@ -335,7 +332,7 @@ public:
    *  This method can be overloaded to reset the iterator for a new sequence.
    *  Make sure that the base implementation is called.
    */
-  virtual void reset (FilterStateBase *previous) 
+  virtual void reset (FilterStateBase *previous)
   {
     mp_previous = previous;
   }
@@ -351,7 +348,7 @@ public:
   virtual void next (bool skip) = 0;
 
   /**
-   *  @brief End test of the iterator 
+   *  @brief End test of the iterator
    *
    *  Implement this method to return true, if the iterator is at the end of the sequence.
    */
@@ -360,7 +357,7 @@ public:
   /**
    *  @brief Implementation of the get method (override to implement the actual getter)
    */
-  virtual bool get_property (unsigned int id, tl::Variant &v) 
+  virtual bool get_property (unsigned int id, tl::Variant &v)
   {
     return mp_previous && mp_previous->get_property (id, v);
   }
@@ -448,7 +445,7 @@ private:
   FilterStateBase *mp_previous;
   //  Hint: this member is mutable because the child method may dynamically add items to create
   //  a recursion
-  mutable std::vector <FilterStateBase *> m_followers;
+  mutable std::vector<FilterStateBase *> m_followers;
   const FilterBase *mp_filter;
   db::Layout *mp_layout;
   size_t m_follower;
@@ -481,16 +478,16 @@ public:
    *  @brief Gets the root bracket of the query
    */
   FilterBracket &root ()
-  { 
-    return *mp_root; 
+  {
+    return *mp_root;
   }
-  
+
   /**
    *  @brief Gets the root bracket of the query (const)
    */
-  const FilterBracket &root () const 
-  { 
-    return *mp_root; 
+  const FilterBracket &root () const
+  {
+    return *mp_root;
   }
 
   /**
@@ -529,7 +526,7 @@ public:
   /**
    *  @brief Executes the query
    *
-   *  This method can be used to execute "active" queries such 
+   *  This method can be used to execute "active" queries such
    *  as "delete" or "with ... do".
    *  It is basically equivalent to iterating over the query until it is
    *  done.
@@ -537,15 +534,14 @@ public:
    *  The context provides a way to define variables and functions.
    */
   void execute (db::Layout &layout, db::Cell *cell = 0, tl::Eval *context = 0);
-  
+
   /**
    *  @brief A dump method (for debugging)
    */
   void dump () const;
-  
+
 private:
-  struct PropertyDescriptor
-  {
+  struct PropertyDescriptor {
     PropertyDescriptor (LayoutQueryPropertyType t, unsigned int i, const std::string &n)
       : type (t), id (i), name (n)
     {
@@ -557,8 +553,8 @@ private:
   };
 
   FilterBracket *mp_root;
-  std::vector <PropertyDescriptor> m_properties;
-  std::map <std::string, unsigned int> m_property_ids_by_name;
+  std::vector<PropertyDescriptor> m_properties;
+  std::map<std::string, unsigned int> m_property_ids_by_name;
 
   //  no copying currently (requires a clone method for the filter object)
   LayoutQuery (const LayoutQuery &d);
@@ -594,7 +590,7 @@ public:
   ~LayoutQueryIterator ();
 
   /**
-   *  @brief Reset the iterator to the initial state 
+   *  @brief Reset the iterator to the initial state
    */
   void reset ();
 
@@ -693,4 +689,3 @@ private:
 }
 
 #endif
-

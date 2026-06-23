@@ -27,7 +27,7 @@
 
 #include <cstdio>
 
-TEST(1) 
+TEST (1)
 {
   EXPECT_EQ (tl::to_string (__int128 (0)), "0");
   EXPECT_EQ (tl::to_string (__int128 (42)), "42");
@@ -35,7 +35,7 @@ TEST(1)
 
   __int128 x = 1;
   for (int i = 0; i < 30; ++i) {
-     x *= 10;
+    x *= 10;
   }
 
   EXPECT_EQ (tl::to_string (x), "1000000000000000000000000000000");
@@ -44,14 +44,14 @@ TEST(1)
   EXPECT_EQ (tl::to_string (x - 1), "999999999999999999999999999999");
 }
 
-TEST(2)
+TEST (2)
 {
   EXPECT_EQ (tl::to_string ((unsigned __int128) 0), "0");
   EXPECT_EQ (tl::to_string ((unsigned __int128) 42), "42");
 
   unsigned __int128 x = 1;
   for (int i = 0; i < 30; ++i) {
-     x *= 10;
+    x *= 10;
   }
 
   EXPECT_EQ (tl::to_string (x), "1000000000000000000000000000000");

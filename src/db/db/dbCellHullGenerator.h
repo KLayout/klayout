@@ -28,7 +28,8 @@
 #include "dbPolygon.h"
 #include "dbCommon.h"
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief A cell hull generator
@@ -42,9 +43,9 @@ class DB_PUBLIC CellHullGenerator
 public:
   CellHullGenerator (const db::Layout &layout);
 
-  CellHullGenerator (const db::Layout &layout, const std::vector <unsigned int> &layers);
+  CellHullGenerator (const db::Layout &layout, const std::vector<unsigned int> &layers);
 
-  void generate_hull (const db::Cell &cell, std::vector <db::Polygon> &hull);
+  void generate_hull (const db::Cell &cell, std::vector<db::Polygon> &hull);
 
   void set_small_cell_size (db::Coord sms);
 
@@ -61,7 +62,7 @@ public:
   }
 
 private:
-  std::vector <unsigned int> m_layers;
+  std::vector<unsigned int> m_layers;
   bool m_all_layers;
   db::Coord m_small_cell_size;
   size_t m_complexity;
@@ -70,4 +71,3 @@ private:
 }
 
 #endif
-

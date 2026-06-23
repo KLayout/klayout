@@ -24,10 +24,10 @@
 #include "dbObject.h"
 #include "tlUnitTest.h"
 
-namespace {
-
-struct AO : public db::Op
+namespace
 {
+
+struct AO : public db::Op {
   AO (int dd) : d (dd) { ++ao_inst; }
   ~AO () { --ao_inst; }
   int d;
@@ -37,9 +37,8 @@ struct AO : public db::Op
 
 int AO::ao_inst = 0;
 
-struct A : public db::Object 
-{
-  A (db::Manager *m) : db::Object (m), x (0) { }
+struct A : public db::Object {
+  A (db::Manager *m) : db::Object (m), x (0) {}
 
   void add (int d)
   {
@@ -48,7 +47,7 @@ struct A : public db::Object
     }
     x += d;
   }
-  
+
   void undo (db::Op *op)
   {
     AO *aop = dynamic_cast<AO *> (op);
@@ -67,7 +66,7 @@ struct A : public db::Object
 
 }
 
-TEST(1) 
+TEST (1)
 {
   db::Manager *man = new db::Manager (true);
   {
@@ -114,7 +113,7 @@ TEST(1)
     EXPECT_EQ (a.x, 3);
     EXPECT_EQ (man->available_undo ().first, true);
     EXPECT_EQ (man->available_redo ().first, true);
-    
+
     man->undo ();
     EXPECT_EQ (a.x, 0);
     EXPECT_EQ (man->available_undo ().first, false);
@@ -132,8 +131,7 @@ TEST(1)
 namespace
 {
 
-struct BO : public db::Op
-{
+struct BO : public db::Op {
   BO (int dd) : db::Op (false), d (dd) { ++bo_inst; }
   ~BO () { --bo_inst; }
   int d;
@@ -143,19 +141,18 @@ struct BO : public db::Op
 
 int BO::bo_inst = 0;
 
-struct B : public db::Object 
-{
-  B (db::Manager *m) : db::Object (m), x (0) { }
+struct B : public db::Object {
+  B (db::Manager *m) : db::Object (m), x (0) {}
 
   void add (int d)
   {
     if (transacting ()) {
       manager ()->queue (this, new BO (d));
     } else {
-       x += d;
+      x += d;
     }
   }
-  
+
   void undo (db::Op *op)
   {
     BO *bop = dynamic_cast<BO *> (op);
@@ -174,7 +171,7 @@ struct B : public db::Object
 
 }
 
-TEST(2) 
+TEST (2)
 {
   db::Manager *man = new db::Manager (true);
   {
@@ -221,7 +218,7 @@ TEST(2)
     EXPECT_EQ (b.x, 3);
     EXPECT_EQ (man->available_undo ().first, true);
     EXPECT_EQ (man->available_redo ().first, true);
-    
+
     man->undo ();
     EXPECT_EQ (b.x, 0);
     EXPECT_EQ (man->available_undo ().first, false);
@@ -232,7 +229,7 @@ TEST(2)
   EXPECT_EQ (BO::inst_count (), 0);
 }
 
-TEST(3) 
+TEST (3)
 {
   db::Manager *man = new db::Manager (true);
   {
@@ -266,7 +263,7 @@ TEST(3)
   EXPECT_EQ (BO::inst_count (), 0);
 }
 
-TEST(4)
+TEST (4)
 {
   db::Manager *man = new db::Manager (true);
   {
@@ -290,7 +287,7 @@ TEST(4)
       EXPECT_EQ (man->transacting (), true);
       t.close ();
       EXPECT_EQ (man->transacting (), false);
-      b.add (1);  //  after close -> not undone!
+      b.add (1); //  after close -> not undone!
       EXPECT_EQ (b.x, 3);
       t.open ();
       EXPECT_EQ (man->transacting (), true);
@@ -312,4 +309,3 @@ TEST(4)
   delete man;
   EXPECT_EQ (BO::inst_count (), 0);
 }
-

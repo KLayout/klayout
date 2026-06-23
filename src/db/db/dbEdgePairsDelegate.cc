@@ -72,4 +72,3 @@ void EdgePairsDelegate::disable_progress ()
 }
 
 }
-

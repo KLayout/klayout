@@ -38,7 +38,7 @@ class SearchReplacePluginDeclaration
   : public lay::PluginDeclaration
 {
 public:
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> &options) const
   {
     options.push_back (std::pair<std::string, std::string> (cfg_sr_window_mode, "fit-marker"));
     options.push_back (std::pair<std::string, std::string> (cfg_sr_window_state, ""));
@@ -49,7 +49,7 @@ public:
   virtual lay::ConfigPage *config_page (QWidget *parent, std::string &title) const
   {
     title = tl::to_string (QObject::tr ("Browsers|Search Result Browser"));
-    return new SearchReplaceConfigPage (parent); 
+    return new SearchReplaceConfigPage (parent);
   }
 
   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
@@ -63,7 +63,7 @@ public:
     menu_entries.push_back (lay::menu_item ("search_replace::show", "search_replace_editor:edit:edit_mode", "edit_menu.utils_group+", tl::to_string (QObject::tr ("Search and Replace"))));
     menu_entries.push_back (lay::menu_item ("search_replace::show", "search_replace_viewer:edit:view_mode", "edit_menu.utils_group+", tl::to_string (QObject::tr ("Search"))));
   }
- 
+
   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
     if (lay::has_gui ()) {
@@ -77,4 +77,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new SearchReplacePluginDeclaration (), 20000, "SearchReplacePlugin");
 
 }
-

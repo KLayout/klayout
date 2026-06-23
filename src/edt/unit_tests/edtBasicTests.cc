@@ -23,11 +23,10 @@
 
 #include "tlUnitTest.h"
 
-TEST(1) 
+TEST (1)
 {
-  EXPECT_EQ (1, 1);  //  avoids a compiler warning because of unreferenced _this
+  EXPECT_EQ (1, 1); //  avoids a compiler warning because of unreferenced _this
 
   //  TODO: add tests for edt specific things
-  throw tl::CancelException ();  //  skip this test to indicate that there is nothing yet
+  throw tl::CancelException (); //  skip this test to indicate that there is nothing yet
 }
-

@@ -43,8 +43,7 @@ SaltGrainDetailsTextWidget::SaltGrainDetailsTextWidget (QWidget *w)
   connect (this, SIGNAL (anchorClicked (const QUrl &)), this, SLOT (open_link (const QUrl &)));
 }
 
-void
-SaltGrainDetailsTextWidget::set_grain (const SaltGrain *g)
+void SaltGrainDetailsTextWidget::set_grain (const SaltGrain *g)
 {
   if (g) {
     mp_grain.reset (new SaltGrain (*g));
@@ -54,8 +53,7 @@ SaltGrainDetailsTextWidget::set_grain (const SaltGrain *g)
   setHtml (details_text ());
 }
 
-void
-SaltGrainDetailsTextWidget::show_detailed_view (bool f)
+void SaltGrainDetailsTextWidget::show_detailed_view (bool f)
 {
   if (m_detailed_view != f) {
     m_detailed_view = f;
@@ -63,8 +61,7 @@ SaltGrainDetailsTextWidget::show_detailed_view (bool f)
   }
 }
 
-void
-SaltGrainDetailsTextWidget::open_link (const QUrl &url)
+void SaltGrainDetailsTextWidget::open_link (const QUrl &url)
 {
   QDesktopServices::openUrl (url);
 }
@@ -76,7 +73,7 @@ SaltGrainDetailsTextWidget::loadResource (int type, const QUrl &url)
 
     int icon_dim = 64;
 
-    if (!mp_grain.get () || mp_grain->icon ().isNull ()) {
+    if (! mp_grain.get () || mp_grain->icon ().isNull ()) {
 
       return QImage (":/salt_icon.png");
 
@@ -101,7 +98,6 @@ SaltGrainDetailsTextWidget::loadResource (int type, const QUrl &url)
       } else {
         return img;
       }
-
     }
 
   } else if (url.path () == QString::fromUtf8 ("/screenshot")) {
@@ -176,7 +172,6 @@ static void produce_listing (QTextStream &stream, QDir dir, int level)
       }
       stream << "<img src=\":/file_12px.png\"/>&nbsp;&nbsp;" << tl::escaped_to_html (tl::to_string (*e)).c_str () << "<br/>\n";
     }
-
   }
 }
 
@@ -206,7 +201,7 @@ SaltGrainDetailsTextWidget::details_text ()
   stream << "<h1>";
   stream << tl::to_qstring (tl::escaped_to_html (g->name ())) << " " << tl::to_qstring (tl::escaped_to_html (g->version ()));
   stream << "</h1>";
-  if (! g->title ().empty()) {
+  if (! g->title ().empty ()) {
     stream << "<h3>" << tl::to_qstring (tl::escaped_to_html (g->title ())) << "</h3>";
   }
 
@@ -241,7 +236,7 @@ SaltGrainDetailsTextWidget::details_text ()
     if (! g->author_contact ().empty ()) {
       stream << "(" << tl::to_qstring (tl::escaped_to_html (g->author_contact ())) << ")";
     }
-    if (!g->authored_time ().isNull ()) {
+    if (! g->authored_time ().isNull ()) {
       stream << "<br/>";
       stream << "<b>" << QObject::tr ("Released") << ":</b> " << g->authored_time ().date ().toString (Qt::ISODate);
     }
@@ -315,7 +310,6 @@ SaltGrainDetailsTextWidget::details_text ()
       produce_listing (stream, QDir (tl::to_qstring (g->path ())), 0);
       stream << "</p>";
     }
-
   }
 
   stream << "</td></tr></table>";
@@ -324,7 +318,7 @@ SaltGrainDetailsTextWidget::details_text ()
 
   stream.flush ();
 
-  return QString::fromUtf8 (buffer.buffer());
+  return QString::fromUtf8 (buffer.buffer ());
 }
 
 }

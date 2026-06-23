@@ -136,7 +136,6 @@ TextsDelegate *FlatTexts::add (const Texts &other) const
         new_texts->raw_texts ().insert (db::TextWithProperties (*p, p.prop_id ()));
       }
     }
-
   }
 
   return new_texts.release ();
@@ -163,7 +162,6 @@ TextsDelegate *FlatTexts::add_in_place (const Texts &other)
         texts.insert (db::TextWithProperties (*p, p.prop_id ()));
       }
     }
-
   }
 
   return this;
@@ -232,12 +230,10 @@ void FlatTexts::apply_property_translator (const db::PropertiesTranslator &pt)
     mp_texts->swap (new_texts);
 
     invalidate_cache ();
-
   }
 }
 
-void
-FlatTexts::insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const
+void FlatTexts::insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const
 {
   db::Shapes &out = layout->cell (into_cell).shapes (into_layer);
   for (TextsIterator p (begin ()); ! p.at_end (); ++p) {
@@ -247,14 +243,12 @@ FlatTexts::insert_into_as_polygons (Layout *layout, db::cell_index_type into_cel
   }
 }
 
-void
-FlatTexts::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
+void FlatTexts::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
   layout->cell (into_cell).shapes (into_layer).insert (*mp_texts);
 }
 
-void
-FlatTexts::do_insert (const db::Text &t, db::properties_id_type prop_id)
+void FlatTexts::do_insert (const db::Text &t, db::properties_id_type prop_id)
 {
   if (prop_id != 0) {
     mp_texts->insert (db::TextWithProperties (t, prop_id));
@@ -265,4 +259,3 @@ FlatTexts::do_insert (const db::Text &t, db::properties_id_type prop_id)
 }
 
 }
-

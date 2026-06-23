@@ -43,11 +43,12 @@ class Layout;
  *
  *  A library is basically a wrapper around a layout object.
  *  A library is additionally associated with an id, a name and a description.
- *  A library must provide a layout. This class does not specify how the layout 
+ *  A library must provide a layout. This class does not specify how the layout
  *  is provided. To do so, this class must be reimplemented.
  */
 class DB_PUBLIC Library
-  : public gsi::ObjectBase, public tl::Object
+  : public gsi::ObjectBase,
+    public tl::Object
 {
 public:
   /**
@@ -85,7 +86,7 @@ public:
    *  This method must be reimplemented by some derived class to actually provide the
    *  layout or the derived class fills the layout.
    */
-  virtual db::Layout &layout () 
+  virtual db::Layout &layout ()
   {
     return m_layout;
   }
@@ -112,7 +113,7 @@ public:
   /**
    *  @brief Setter for the name property
    */
-  void set_name (const std::string &name) 
+  void set_name (const std::string &name)
   {
     m_name = name;
   }
@@ -174,7 +175,7 @@ public:
   /**
    *  @brief Setter for the description property
    */
-  void set_description (const std::string &description) 
+  void set_description (const std::string &description)
   {
     m_description = description;
   }
@@ -211,7 +212,7 @@ public:
   /**
    *  @brief Setter for the library Id property
    */
-  void set_id (lib_id_type id) 
+  void set_id (lib_id_type id)
   {
     m_id = id;
   }
@@ -220,7 +221,7 @@ public:
    *  @brief Register a LibraryProxy in the given layout
    */
   void register_proxy (db::LibraryProxy *lib_proxy, db::Layout *layout);
-  
+
   /**
    *  @brief Unregister the Library proxy
    */
@@ -294,11 +295,9 @@ private:
   bool m_replicate;
 
   // no copying.
-  Library &operator=(const Library &);
+  Library &operator= (const Library &);
 };
 
 }
 
 #endif
-
-

@@ -48,7 +48,7 @@
 #include <QRegExp>
 #include <QKeyEvent>
 #if QT_VERSION >= 0x050000
-#  include <QUrlQuery>
+#include <QUrlQuery>
 #endif
 
 namespace lay
@@ -150,11 +150,11 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
     log_view->addAction (expand_all);
   }
 
-  QTreeView *dt[] = { nl_directory_tree, sch_directory_tree, xref_directory_tree };
+  QTreeView *dt [] = {nl_directory_tree, sch_directory_tree, xref_directory_tree};
 
-  for (int m = 0; m < int (sizeof (dt) / sizeof (dt[0])); ++m) {
+  for (int m = 0; m < int (sizeof (dt) / sizeof (dt [0])); ++m) {
 
-    QTreeView *directory_tree = dt[m];
+    QTreeView *directory_tree = dt [m];
 
     QAction *color_action = new QAction (QObject::tr ("Colorize Nets"), directory_tree);
     QMenu *menu = new QMenu (directory_tree);
@@ -195,14 +195,13 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
     }
 
     directory_tree->installEventFilter (this);
-
   }
 
-  QTreeView *ht[] = { nl_hierarchy_tree, sch_hierarchy_tree, xref_hierarchy_tree };
+  QTreeView *ht [] = {nl_hierarchy_tree, sch_hierarchy_tree, xref_hierarchy_tree};
 
-  for (int m = 0; m < int (sizeof (ht) / sizeof (ht[0])); ++m) {
+  for (int m = 0; m < int (sizeof (ht) / sizeof (ht [0])); ++m) {
 
-    QTreeView *hierarchy_tree = ht[m];
+    QTreeView *hierarchy_tree = ht [m];
 
     for (int i = 0; i < 2; ++i) {
       lay::HTMLItemDelegate *delegate = new lay::HTMLItemDelegate (this);
@@ -211,7 +210,6 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
       connect (delegate, SIGNAL (anchor_clicked (const QString &)), this, SLOT (anchor_clicked (const QString &)));
       hierarchy_tree->setItemDelegateForColumn (i, delegate);
     }
-
   }
 
   QMenu *find_edit_menu = new QMenu (find_text);
@@ -246,20 +244,17 @@ NetlistBrowserPage::~NetlistBrowserPage ()
   clear_markers ();
 }
 
-bool
-NetlistBrowserPage::is_netlist_mode ()
+bool NetlistBrowserPage::is_netlist_mode ()
 {
   return mode_tab->currentIndex () == 0;
 }
 
-void
-NetlistBrowserPage::set_dispatcher (lay::Dispatcher *pr)
+void NetlistBrowserPage::set_dispatcher (lay::Dispatcher *pr)
 {
   mp_plugin_root = pr;
 }
 
-void
-NetlistBrowserPage::set_highlight_style (tl::Color color, int line_width, int vertex_size, int halo, int dither_pattern, int marker_intensity, bool use_original_colors, const lay::ColorPalette *auto_colors)
+void NetlistBrowserPage::set_highlight_style (tl::Color color, int line_width, int vertex_size, int halo, int dither_pattern, int marker_intensity, bool use_original_colors, const lay::ColorPalette *auto_colors)
 {
   m_colorizer.configure (color, auto_colors);
   m_marker_line_width = line_width;
@@ -271,8 +266,7 @@ NetlistBrowserPage::set_highlight_style (tl::Color color, int line_width, int ve
   update_highlights ();
 }
 
-void
-NetlistBrowserPage::set_view (lay::LayoutViewBase *view, int cv_index)
+void NetlistBrowserPage::set_view (lay::LayoutViewBase *view, int cv_index)
 {
   if (mp_view) {
     mp_view->layer_list_changed_event.remove (this, &NetlistBrowserPage::layer_list_changed);
@@ -293,8 +287,7 @@ NetlistBrowserPage::set_view (lay::LayoutViewBase *view, int cv_index)
   update_highlights ();
 }
 
-void
-NetlistBrowserPage::set_window (lay::NetlistBrowserConfig::net_window_type window, double window_dim)
+void NetlistBrowserPage::set_window (lay::NetlistBrowserConfig::net_window_type window, double window_dim)
 {
   if (window != m_window || window_dim != m_window_dim) {
     m_window = window;
@@ -302,8 +295,7 @@ NetlistBrowserPage::set_window (lay::NetlistBrowserConfig::net_window_type windo
   }
 }
 
-void
-NetlistBrowserPage::set_max_shape_count (size_t max_shape_count)
+void NetlistBrowserPage::set_max_shape_count (size_t max_shape_count)
 {
   if (m_max_shape_count != max_shape_count) {
     m_max_shape_count = max_shape_count;
@@ -311,8 +303,7 @@ NetlistBrowserPage::set_max_shape_count (size_t max_shape_count)
   }
 }
 
-bool
-NetlistBrowserPage::eventFilter (QObject *watched, QEvent *event)
+bool NetlistBrowserPage::eventFilter (QObject *watched, QEvent *event)
 {
   QTreeView *tree = dynamic_cast<QTreeView *> (watched);
   if (tree != nl_directory_tree && tree != sch_directory_tree && tree != xref_directory_tree) {
@@ -332,15 +323,13 @@ NetlistBrowserPage::eventFilter (QObject *watched, QEvent *event)
   }
 }
 
-void
-NetlistBrowserPage::mode_tab_changed (int)
+void NetlistBrowserPage::mode_tab_changed (int)
 {
   clear_highlights ();
   dm_update_highlights ();
 }
 
-void
-NetlistBrowserPage::layer_list_changed (int)
+void NetlistBrowserPage::layer_list_changed (int)
 {
   dm_update_highlights ();
 }
@@ -375,8 +364,7 @@ NetlistBrowserPage::current_directory_tree ()
   }
 }
 
-void
-NetlistBrowserPage::anchor_clicked (const QString &a)
+void NetlistBrowserPage::anchor_clicked (const QString &a)
 {
   QTreeView *directory_tree = current_directory_tree ();
   NetlistBrowserModel *netlist_model = 0;
@@ -388,26 +376,22 @@ NetlistBrowserPage::anchor_clicked (const QString &a)
   }
 }
 
-void
-NetlistBrowserPage::nl_current_tree_index_changed (const QModelIndex &index)
+void NetlistBrowserPage::nl_current_tree_index_changed (const QModelIndex &index)
 {
   current_tree_index_changed (nl_hierarchy_tree, nl_directory_tree, index);
 }
 
-void
-NetlistBrowserPage::sch_current_tree_index_changed (const QModelIndex &index)
+void NetlistBrowserPage::sch_current_tree_index_changed (const QModelIndex &index)
 {
   current_tree_index_changed (sch_hierarchy_tree, sch_directory_tree, index);
 }
 
-void
-NetlistBrowserPage::xref_current_tree_index_changed (const QModelIndex &index)
+void NetlistBrowserPage::xref_current_tree_index_changed (const QModelIndex &index)
 {
   current_tree_index_changed (xref_hierarchy_tree, xref_directory_tree, index);
 }
 
-void
-NetlistBrowserPage::current_tree_index_changed (QTreeView *hierarchy_tree, QTreeView *directory_tree, const QModelIndex &index)
+void NetlistBrowserPage::current_tree_index_changed (QTreeView *hierarchy_tree, QTreeView *directory_tree, const QModelIndex &index)
 {
   if (index.isValid () && m_signals_enabled) {
 
@@ -424,30 +408,25 @@ NetlistBrowserPage::current_tree_index_changed (QTreeView *hierarchy_tree, QTree
     m_signals_enabled = false;
     directory_tree->setCurrentIndex (circuit_index);
     m_signals_enabled = true;
-
   }
 }
 
-void
-NetlistBrowserPage::nl_current_index_changed (const QModelIndex &index)
+void NetlistBrowserPage::nl_current_index_changed (const QModelIndex &index)
 {
   current_index_changed (nl_hierarchy_tree, nl_directory_tree, index);
 }
 
-void
-NetlistBrowserPage::sch_current_index_changed (const QModelIndex &index)
+void NetlistBrowserPage::sch_current_index_changed (const QModelIndex &index)
 {
   current_index_changed (sch_hierarchy_tree, sch_directory_tree, index);
 }
 
-void
-NetlistBrowserPage::xref_current_index_changed (const QModelIndex &index)
+void NetlistBrowserPage::xref_current_index_changed (const QModelIndex &index)
 {
   current_index_changed (xref_hierarchy_tree, xref_directory_tree, index);
 }
 
-void
-NetlistBrowserPage::current_index_changed (QTreeView *hierarchy_tree, QTreeView *directory_tree, const QModelIndex &index)
+void NetlistBrowserPage::current_index_changed (QTreeView *hierarchy_tree, QTreeView *directory_tree, const QModelIndex &index)
 {
   if (index.isValid () && m_signals_enabled) {
 
@@ -465,12 +444,10 @@ NetlistBrowserPage::current_index_changed (QTreeView *hierarchy_tree, QTreeView 
     m_signals_enabled = false;
     hierarchy_tree->setCurrentIndex (circuit_index);
     m_signals_enabled = true;
-
   }
 }
 
-void
-NetlistBrowserPage::select_net (const db::Net *net)
+void NetlistBrowserPage::select_net (const db::Net *net)
 {
   if (! net || ! net->circuit ()) {
 
@@ -493,12 +470,10 @@ NetlistBrowserPage::select_net (const db::Net *net)
     model = dynamic_cast<NetlistBrowserModel *> (xref_directory_tree->model ());
     tl_assert (model != 0);
     xref_directory_tree->setCurrentIndex (model->index_from_net (net));
-
   }
 }
 
-void
-NetlistBrowserPage::select_path (const lay::NetlistObjectsPath &path)
+void NetlistBrowserPage::select_path (const lay::NetlistObjectsPath &path)
 {
   if (path.is_null ()) {
 
@@ -548,7 +523,6 @@ NetlistBrowserPage::select_path (const lay::NetlistObjectsPath &path)
     if (model) {
       xref_directory_tree->setCurrentIndex (model->index_from_path (path));
     }
-
   }
 }
 
@@ -656,14 +630,12 @@ NetlistBrowserPage::selected_devices ()
   return devices;
 }
 
-void
-NetlistBrowserPage::nl_selection_changed ()
+void NetlistBrowserPage::nl_selection_changed ()
 {
   selection_changed (nl_hierarchy_tree, nl_directory_tree);
 }
 
-void
-NetlistBrowserPage::sch_selection_changed ()
+void NetlistBrowserPage::sch_selection_changed ()
 {
   QTreeView *directory_tree = sch_directory_tree;
 
@@ -696,14 +668,12 @@ NetlistBrowserPage::sch_selection_changed ()
   selection_changed_event ();
 }
 
-void
-NetlistBrowserPage::xref_selection_changed ()
+void NetlistBrowserPage::xref_selection_changed ()
 {
   selection_changed (xref_hierarchy_tree, xref_directory_tree);
 }
 
-void
-NetlistBrowserPage::selection_changed (QTreeView * /*hierarchy_tree*/, QTreeView *directory_tree)
+void NetlistBrowserPage::selection_changed (QTreeView * /*hierarchy_tree*/, QTreeView *directory_tree)
 {
   NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
   tl_assert (model != 0);
@@ -724,8 +694,7 @@ NetlistBrowserPage::selection_changed (QTreeView * /*hierarchy_tree*/, QTreeView
   selection_changed_event ();
 }
 
-void
-NetlistBrowserPage::set_color_for_selected_nets (const tl::Color &color)
+void NetlistBrowserPage::set_color_for_selected_nets (const tl::Color &color)
 {
   std::vector<const db::Net *> nets = selected_nets ();
 
@@ -742,8 +711,7 @@ NetlistBrowserPage::set_color_for_selected_nets (const tl::Color &color)
   update_highlights ();
 }
 
-void
-NetlistBrowserPage::browse_color_for_net ()
+void NetlistBrowserPage::browse_color_for_net ()
 {
   QColor c = QColorDialog::getColor (QColor (), this);
   if (c.isValid ()) {
@@ -751,8 +719,7 @@ NetlistBrowserPage::browse_color_for_net ()
   }
 }
 
-void
-NetlistBrowserPage::select_color_for_net ()
+void NetlistBrowserPage::select_color_for_net ()
 {
   QAction *action = dynamic_cast<QAction *> (sender ());
   if (action) {
@@ -760,8 +727,7 @@ NetlistBrowserPage::select_color_for_net ()
   }
 }
 
-void
-NetlistBrowserPage::navigate_to (const QModelIndex &index, bool fwd)
+void NetlistBrowserPage::navigate_to (const QModelIndex &index, bool fwd)
 {
   if (! index.isValid () || ! index.model ()) {
     return;
@@ -818,8 +784,7 @@ NetlistBrowserPage::navigate_to (const QModelIndex &index, bool fwd)
   selection_changed (hierarchy_tree, directory_tree);
 }
 
-void
-NetlistBrowserPage::log_selection_changed ()
+void NetlistBrowserPage::log_selection_changed ()
 {
   clear_highlights ();
 
@@ -856,15 +821,13 @@ NetlistBrowserPage::log_selection_changed ()
         m_net_markers.push_back (std::make_pair (c, net));
       }
     }
-
   }
 
   update_highlights ();
   adjust_view ();
 }
 
-void
-NetlistBrowserPage::add_to_history (const QModelIndex &index, bool fwd)
+void NetlistBrowserPage::add_to_history (const QModelIndex &index, bool fwd)
 {
   if (! fwd) {
     if (m_history_ptr > 1) {
@@ -886,33 +849,29 @@ NetlistBrowserPage::add_to_history (const QModelIndex &index, bool fwd)
   forward->setEnabled (m_history_ptr < m_history.size ());
 }
 
-void
-NetlistBrowserPage::navigate_back ()
+void NetlistBrowserPage::navigate_back ()
 {
   if (m_history_ptr > 1) {
     navigate_to (m_history [m_history_ptr - 2], false);
   }
 }
 
-void
-NetlistBrowserPage::navigate_forward ()
+void NetlistBrowserPage::navigate_forward ()
 {
   if (m_history_ptr < m_history.size ()) {
     navigate_to (m_history [m_history_ptr]);
   }
 }
 
-void
-NetlistBrowserPage::rerun_button_pressed ()
+void NetlistBrowserPage::rerun_button_pressed ()
 {
   //  NOTE: we use deferred execution, because otherwise the button won't get repainted properly
   dm_rerun_macro ();
 }
 
-void
-NetlistBrowserPage::rerun_macro ()
+void NetlistBrowserPage::rerun_macro ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (mp_database.get () && ! mp_database->generator ().empty ()) {
 
@@ -920,20 +879,18 @@ BEGIN_PROTECTED
 
     for (unsigned int i = 0; i < mp_view->num_l2ndbs (); ++i) {
       if (mp_view->get_l2ndb (i) == mp_database.get ()) {
-        add_pars["l2ndb_index"] = tl::Variant (int (i));
+        add_pars ["l2ndb_index"] = tl::Variant (int (i));
         break;
       }
     }
 
     tl::Recipe::make (mp_database->generator (), add_pars);
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-NetlistBrowserPage::info_button_pressed ()
+void NetlistBrowserPage::info_button_pressed ()
 {
   if (! mp_info_dialog) {
     mp_info_dialog = new lay::NetInfoDialog (this);
@@ -959,7 +916,7 @@ static QModelIndex find_next (QTreeView *view, QAbstractItemModel *model, const 
   QModelIndex current = index;
 
   std::vector<QModelIndex> parent_stack;
-  std::vector<std::pair<int, int> > rows_stack;
+  std::vector<std::pair<int, int>> rows_stack;
 
   while (index.isValid ()) {
 
@@ -967,7 +924,6 @@ static QModelIndex find_next (QTreeView *view, QAbstractItemModel *model, const 
     rows_stack.push_back (std::make_pair (index.row (), model->rowCount (parent_stack.back ())));
 
     index = parent_stack.back ();
-
   }
 
   std::reverse (parent_stack.begin (), parent_stack.end ());
@@ -978,7 +934,7 @@ static QModelIndex find_next (QTreeView *view, QAbstractItemModel *model, const 
     parent_stack.pop_back ();
   }
 
-  std::vector<std::pair<int, int> > initial_rows_stack = rows_stack;
+  std::vector<std::pair<int, int>> initial_rows_stack = rows_stack;
 
   tl::AbsoluteProgress progress (tl::to_string (tr ("Searching ...")));
 
@@ -998,9 +954,7 @@ static QModelIndex find_next (QTreeView *view, QAbstractItemModel *model, const 
 
         current = model->index (0, 0, current);
         has_next = true;
-
       }
-
     }
 
     while (! has_next && ! rows_stack.empty ()) {
@@ -1018,9 +972,7 @@ static QModelIndex find_next (QTreeView *view, QAbstractItemModel *model, const 
 
         current = model->index (rows_stack.back ().first, 0, parent_stack.back ());
         has_next = true;
-
       }
-
     }
 
     if (has_next) {
@@ -1029,7 +981,6 @@ static QModelIndex find_next (QTreeView *view, QAbstractItemModel *model, const 
       if (to_find.indexIn (text) >= 0 && ! view->isRowHidden (rows_stack.back ().first, parent_stack.back ())) {
         return current;
       }
-
     }
 
   } while (rows_stack != initial_rows_stack);
@@ -1037,8 +988,7 @@ static QModelIndex find_next (QTreeView *view, QAbstractItemModel *model, const 
   return QModelIndex ();
 }
 
-void
-NetlistBrowserPage::find_button_pressed ()
+void NetlistBrowserPage::find_button_pressed ()
 {
   QRegExp re (find_text->text (),
               actionCaseSensitive->isChecked () ? Qt::CaseSensitive : Qt::CaseInsensitive,
@@ -1055,16 +1005,14 @@ NetlistBrowserPage::find_button_pressed ()
   }
 }
 
-void
-NetlistBrowserPage::show_all_clicked ()
+void NetlistBrowserPage::show_all_clicked ()
 {
   if (mp_plugin_root) {
     mp_plugin_root->config_set (cfg_l2ndb_show_all, tl::to_string (m_show_all_action->isChecked ()));
   }
 }
 
-void
-NetlistBrowserPage::show_all (bool f)
+void NetlistBrowserPage::show_all (bool f)
 {
   if (f != m_show_all) {
 
@@ -1075,12 +1023,10 @@ NetlistBrowserPage::show_all (bool f)
     if (model) {
       model->set_item_visibility (xref_directory_tree, m_show_all, false /*show warnings only with 'show all'*/);
     }
-
   }
 }
 
-bool
-NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
+bool NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
 {
   //  NOTE: mp_last_db mirrors mp_database, but does not automatically fall back to 0 when the DB is deleted. This way we can call
   //  set_db(0) with the correct behavior after the DB has been destroyed.
@@ -1175,8 +1121,7 @@ set_tree_model (QTreeView *view, NetlistBrowserTreeModel *new_model)
   view->header ()->setSectionHidden (1, new_model->status_column () < 0);
 }
 
-void
-NetlistBrowserPage::setup_trees ()
+void NetlistBrowserPage::setup_trees ()
 {
   if (! mp_database.get ()) {
 
@@ -1196,7 +1141,6 @@ NetlistBrowserPage::setup_trees ()
     log_view->setModel (0);
 
     return;
-
   }
 
   db::LayoutToNetlist *l2ndb = mp_database.get ();
@@ -1218,7 +1162,6 @@ NetlistBrowserPage::setup_trees ()
 
     delete log_view->model ();
     log_view->setModel (0);
-
   }
 
   mode_tab->setTabIcon (3, log_tab_icon);
@@ -1253,7 +1196,6 @@ NetlistBrowserPage::setup_trees ()
 
     delete sch_directory_tree->model ();
     sch_directory_tree->setModel (0);
-
   }
 
   if (lvsdb) {
@@ -1273,7 +1215,6 @@ NetlistBrowserPage::setup_trees ()
 
     delete xref_directory_tree->model ();
     xref_directory_tree->setModel (0);
-
   }
 
   {
@@ -1296,7 +1237,6 @@ NetlistBrowserPage::setup_trees ()
 
     delete sch_hierarchy_tree->model ();
     sch_hierarchy_tree->setModel (0);
-
   }
 
   if (lvsdb) {
@@ -1311,14 +1251,12 @@ NetlistBrowserPage::setup_trees ()
 
     delete xref_hierarchy_tree->model ();
     xref_hierarchy_tree->setModel (0);
-
   }
 
   find_text->setText (QString ());
 }
 
-void
-NetlistBrowserPage::clear_highlights ()
+void NetlistBrowserPage::clear_highlights ()
 {
   m_current_path = lay::NetlistObjectsPath ();
   m_selected_paths.clear ();
@@ -1328,8 +1266,7 @@ NetlistBrowserPage::clear_highlights ()
   update_highlights ();
 }
 
-void
-NetlistBrowserPage::highlight (const NetlistObjectsPath &current_path, const std::vector<NetlistObjectsPath> &selected_paths)
+void NetlistBrowserPage::highlight (const NetlistObjectsPath &current_path, const std::vector<NetlistObjectsPath> &selected_paths)
 {
   if (current_path != m_current_path || selected_paths != m_selected_paths) {
 
@@ -1338,12 +1275,10 @@ NetlistBrowserPage::highlight (const NetlistObjectsPath &current_path, const std
 
     update_highlights ();
     adjust_view ();
-
   }
 }
 
-void
-NetlistBrowserPage::enable_updates (bool f)
+void NetlistBrowserPage::enable_updates (bool f)
 {
   if (f != m_enable_updates) {
 
@@ -1354,7 +1289,6 @@ NetlistBrowserPage::enable_updates (bool f)
     }
 
     m_update_needed = false;
-
   }
 }
 
@@ -1402,14 +1336,12 @@ bbox_for_net (const db::LayoutToNetlist *db, const db::Circuit *circuit, const d
     }
 
     bbox += layer_bbox;
-
   }
 
   return bbox;
 }
 
-void
-NetlistBrowserPage::adjust_view ()
+void NetlistBrowserPage::adjust_view ()
 {
   if (! mp_database.get () || ! mp_database->netlist () || ! mp_view) {
     return;
@@ -1452,7 +1384,7 @@ NetlistBrowserPage::adjust_view ()
 
     db::DCplxTrans trans = tr.second;
 
-    for (std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *> >::const_iterator p = path->path.begin (); p != path->path.end () && circuit; ++p) {
+    for (std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *>>::const_iterator p = path->path.begin (); p != path->path.end () && circuit; ++p) {
       if (p->first) {
         circuit = p->first->circuit_ref ();
         trans = trans * p->first->trans ();
@@ -1490,7 +1422,6 @@ NetlistBrowserPage::adjust_view ()
     }
 
     bbox += trans * db::CplxTrans (layout->dbu ()) * ebox;
-
   }
 
   //  add markers boxes
@@ -1501,7 +1432,6 @@ NetlistBrowserPage::adjust_view ()
     if (tr.first) {
       bbox += (tr.second * marker->second).box ();
     }
-
   }
 
   //  add net markers boxes
@@ -1512,7 +1442,6 @@ NetlistBrowserPage::adjust_view ()
     if (tr.first) {
       bbox += tr.second * db::CplxTrans (layout->dbu ()) * bbox_for_net (mp_database.get (), marker->first, marker->second);
     }
-
   }
 
   if (! bbox.empty ()) {
@@ -1536,12 +1465,10 @@ NetlistBrowserPage::adjust_view ()
 
       double w = std::max (tv_bbox.width (), m_window_dim);
       double h = std::max (tv_bbox.height (), m_window_dim);
-      db::DPoint center (tv_bbox.p1() + (tv_bbox.p2 () - tv_bbox.p1 ()) * 0.5);
+      db::DPoint center (tv_bbox.p1 () + (tv_bbox.p2 () - tv_bbox.p1 ()) * 0.5);
       db::DVector d (w * 0.5, h * 0.5);
       mp_view->zoom_box (db::DBox (center - d, center + d));
-
     }
-
   }
 }
 
@@ -1555,8 +1482,7 @@ NetlistBrowserPage::make_valid_color (const tl::Color &color)
   }
 }
 
-bool
-NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, size_t &n_markers, const std::vector<db::DCplxTrans> &tv)
+bool NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, size_t &n_markers, const std::vector<db::DCplxTrans> &tv)
 {
   const db::Layout *layout = mp_database->internal_layout ();
 
@@ -1576,7 +1502,6 @@ NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, siz
     mp_markers.back ()->set_color (color);
     mp_markers.back ()->set_frame_color (color);
     configure_marker (mp_markers.back (), false);
-
   }
 
   const std::vector<db::DeviceAbstractRef> &oda = device->other_abstracts ();
@@ -1596,16 +1521,13 @@ NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, siz
       mp_markers.back ()->set_color (color);
       mp_markers.back ()->set_frame_color (color);
       configure_marker (mp_markers.back (), false);
-
     }
-
   }
 
   return false;
 }
 
-bool
-NetlistBrowserPage::produce_highlights_for_circuit (const db::Circuit *circuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv)
+bool NetlistBrowserPage::produce_highlights_for_circuit (const db::Circuit *circuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv)
 {
   const db::Layout *layout = mp_database->internal_layout ();
 
@@ -1630,8 +1552,7 @@ NetlistBrowserPage::produce_highlights_for_circuit (const db::Circuit *circuit, 
   return false;
 }
 
-bool
-NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_markers, const std::map<db::LayerProperties, lay::LayerPropertiesConstIterator> &display_by_lp, const std::vector<db::DCplxTrans> &tv)
+bool NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_markers, const std::map<db::LayerProperties, lay::LayerPropertiesConstIterator> &display_by_lp, const std::vector<db::DCplxTrans> &tv)
 {
   const db::Layout *layout = mp_database->internal_layout ();
 
@@ -1684,23 +1605,19 @@ NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_ma
           mp_markers.back ()->set_color (display->second->eff_fill_color_brighter (true, (-m_marker_intensity * 255) / 100));
           mp_markers.back ()->set_frame_color (display->second->eff_frame_color_brighter (true, (-m_marker_intensity * 255) / 100));
         }
-
       }
 
       configure_marker (mp_markers.back (), true);
 
       ++shapes;
       ++n_markers;
-
     }
-
   }
 
   return false;
 }
 
-void
-NetlistBrowserPage::configure_marker (Marker *marker, bool with_fill)
+void NetlistBrowserPage::configure_marker (Marker *marker, bool with_fill)
 {
   if (m_marker_line_width >= 0) {
     marker->set_line_width (m_marker_line_width);
@@ -1719,8 +1636,7 @@ NetlistBrowserPage::configure_marker (Marker *marker, bool with_fill)
   }
 }
 
-void
-NetlistBrowserPage::update_highlights ()
+void NetlistBrowserPage::update_highlights ()
 {
   if (! m_enable_updates) {
     m_update_needed = true;
@@ -1777,7 +1693,7 @@ NetlistBrowserPage::update_highlights ()
 
     db::DCplxTrans trans = tr.second;
 
-    for (std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *> >::const_iterator p = path->path.begin (); p != path->path.end () && circuit; ++p) {
+    for (std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *>>::const_iterator p = path->path.begin (); p != path->path.end () && circuit; ++p) {
       if (p->first) {
         circuit = p->first->circuit_ref ();
         trans = trans * p->first->trans ();
@@ -1811,7 +1727,6 @@ NetlistBrowserPage::update_highlights ()
         not_all_shapes_are_shown = true;
       }
     }
-
   }
 
   for (auto marker = m_net_markers.begin (); marker != m_net_markers.end (); ++marker) {
@@ -1836,7 +1751,6 @@ NetlistBrowserPage::update_highlights ()
     if (produce_highlights_for_net (marker->second, n_markers, display_by_lp, tvt)) {
       not_all_shapes_are_shown = true;
     }
-
   }
 
   for (auto marker = m_markers.begin (); marker != m_markers.end (); ++marker) {
@@ -1858,33 +1772,30 @@ NetlistBrowserPage::update_highlights ()
     mp_markers.back ()->set_frame_color (color);
 
     configure_marker (mp_markers.back (), true);
-
   }
 
   if (not_all_shapes_are_shown) {
     info_label->setText (tl::to_qstring ("<html><p style=\"color:red; font-weight: bold\">" +
-        tl::to_string (QObject::tr ("Not all shapes are highlighted")) +
-        "</p></html>"));
+                                         tl::to_string (QObject::tr ("Not all shapes are highlighted")) +
+                                         "</p></html>"));
     info_label->show ();
   } else {
     info_label->hide ();
   }
 }
 
-void
-NetlistBrowserPage::clear_markers ()
+void NetlistBrowserPage::clear_markers ()
 {
-  for (std::vector <lay::Marker *>::iterator m = mp_markers.begin (); m != mp_markers.end (); ++m) {
+  for (std::vector<lay::Marker *>::iterator m = mp_markers.begin (); m != mp_markers.end (); ++m) {
     delete *m;
   }
 
   mp_markers.clear ();
 }
 
-void
-NetlistBrowserPage::export_selected ()
+void NetlistBrowserPage::export_selected ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   std::vector<const db::Net *> nets = selected_nets ();
   if (nets.empty ()) {
@@ -1893,19 +1804,17 @@ BEGIN_PROTECTED
 
   export_nets (&nets);
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-NetlistBrowserPage::export_all ()
+void NetlistBrowserPage::export_all ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   export_nets (0);
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-NetlistBrowserPage::export_nets (const std::vector<const db::Net *> *nets)
+void NetlistBrowserPage::export_nets (const std::vector<const db::Net *> *nets)
 {
   if (! mp_view || ! mp_database.get () || ! mp_database->internal_layout ()) {
     return;
@@ -1952,7 +1861,6 @@ NetlistBrowserPage::export_nets (const std::vector<const db::Net *> *nets)
     view->max_hier ();
     view->add_missing_layers ();
     view->select_cell (target_top_index, cv_index);
-
   }
 }
 

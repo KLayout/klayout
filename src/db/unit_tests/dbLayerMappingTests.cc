@@ -52,7 +52,7 @@ std::string m2s (const db::LayerMapping &lm, const db::Layout &a, const db::Layo
   return res;
 }
 
-TEST(1) 
+TEST (1)
 {
   // some basic example
 
@@ -91,6 +91,4 @@ TEST(1)
   nl = lm.create_full (hh, g);
   EXPECT_EQ (m2s (lm, hh, g), "1/0->1/0;2/0->2/0;L1->L1;L2->L2;L10D17 (10/17)->L10D17 (10/17);L11D17 (11/17)->L11D17 (11/17)");
   EXPECT_EQ (nl2s (nl, hh), "2/0;L2;L11D17 (11/17)");
-
 }
-

@@ -33,7 +33,8 @@
 
 #include <string>
 
-namespace db {
+namespace db
+{
 
 template <class C> class point;
 
@@ -51,10 +52,10 @@ public:
   typedef C coord_type;
   typedef db::coord_traits<C> coord_traits;
   typedef db::point<C> point_type;
-  typedef typename coord_traits::distance_type distance_type; 
-  typedef typename coord_traits::area_type area_type; 
+  typedef typename coord_traits::distance_type distance_type;
+  typedef typename coord_traits::area_type area_type;
 
-  /** 
+  /**
    *  @brief Default constructor
    *
    *  Creates a vector at 0,0
@@ -116,7 +117,7 @@ public:
   }
 
   /**
-   *  @brief The copy constructor 
+   *  @brief The copy constructor
    *
    *  @param d The source from which to copy
    */
@@ -131,7 +132,7 @@ public:
    *
    *  @param d The source from which to take the data
    */
-  vector &operator= (const vector<C> &d) 
+  vector &operator= (const vector<C> &d)
   {
     m_x = d.x ();
     m_y = d.y ();
@@ -161,7 +162,7 @@ public:
    *  @param d The source from which to take the data
    */
   template <class D>
-  vector &operator= (const point<C> &d) 
+  vector &operator= (const point<C> &d)
   {
     m_x = coord_traits::rounded (d.x ());
     m_y = coord_traits::rounded (d.y ());
@@ -197,7 +198,7 @@ public:
     m_y -= p.y ();
     return *this;
   }
-  
+
   /**
    *  @brief method version of operator- (mainly for automation purposes)
    */
@@ -232,7 +233,7 @@ public:
    */
   bool operator!= (const vector<C> &p) const
   {
-    return !operator== (p);
+    return ! operator== (p);
   }
 
   /**
@@ -312,7 +313,7 @@ public:
    */
   bool not_equal (const vector<C> &p) const
   {
-    return !equal (p);
+    return ! equal (p);
   }
 
   /**
@@ -378,7 +379,7 @@ public:
 
   vector<C> &operator/= (double s)
   {
-    double mult = 1.0 / static_cast<double>(s);
+    double mult = 1.0 / static_cast<double> (s);
     *this *= mult;
     return *this;
   }
@@ -388,13 +389,13 @@ public:
    */
   vector<C> &operator/= (long s)
   {
-    double mult = 1.0 / static_cast<double>(s);
+    double mult = 1.0 / static_cast<double> (s);
     *this *= mult;
     return *this;
   }
 
   /**
-   *  @brief The euclidian length 
+   *  @brief The euclidian length
    */
   distance_type length () const
   {
@@ -457,7 +458,7 @@ template <class C, typename Number>
 inline vector<C>
 operator/ (const db::vector<C> &p, Number s)
 {
-  double mult = 1.0 / static_cast<double>(s);
+  double mult = 1.0 / static_cast<double> (s);
   return vector<C> (p.x () * mult, p.y () * mult);
 }
 
@@ -494,13 +495,13 @@ operator- (const vector<C> &p1, const vector<C> &p2)
 }
 
 /**
- *  @brief The unary - operator 
+ *  @brief The unary - operator
  *
- *  @param p The vector 
+ *  @param p The vector
  *  @return -p = (-p.x, -p.y)
  */
 template <class C>
-inline vector<C> 
+inline vector<C>
 operator- (const vector<C> &p)
 {
   return vector<C> (-p.x (), -p.y ());
@@ -519,17 +520,17 @@ operator<< (std::ostream &os, const vector<C> &p)
 /**
  *  @brief The short integer vector
  */
-typedef vector <short> ShortVector;
+typedef vector<short> ShortVector;
 
 /**
  *  @brief The standard vector
  */
-typedef vector <db::Coord> Vector;
+typedef vector<db::Coord> Vector;
 
 /**
  *  @brief The standard double coordinate vector
  */
-typedef vector <db::DCoord> DVector;
+typedef vector<db::DCoord> DVector;
 
 /**
  *  @brief Convenience wrappers for coord_traits functions: vector product: 0->p x 0->q
@@ -589,8 +590,7 @@ std::pair<typename db::coord_traits<C>::area_type, int> sprod_with_sign (const d
  *  @brief A generic conversion operator from double vector to any type
  */
 template <class C>
-struct from_double_vector 
-{
+struct from_double_vector {
   db::vector<C> operator() (const DVector &dp) const
   {
     return db::vector<C> (dp);
@@ -603,15 +603,14 @@ struct from_double_vector
  *  @brief Special extractors for the vectors
  */
 
-namespace tl 
+namespace tl
 {
-  template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Vector &p);
-  template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DVector &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Vector &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DVector &p);
 
-  template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Vector &p);
-  template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DVector &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Vector &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DVector &p);
 
 } // namespace tl
 
 #endif
-

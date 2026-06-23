@@ -74,7 +74,7 @@ std::string uri2string (const tl::URI &uri)
 }
 
 //  basic parsing ability
-TEST(1)
+TEST (1)
 {
   tl::URI uri;
   EXPECT_EQ (uri2string (uri), "");
@@ -155,7 +155,7 @@ TEST(1)
 }
 
 //  windows file paths compatibility
-TEST(2)
+TEST (2)
 {
   try {
 
@@ -182,7 +182,7 @@ TEST(2)
 }
 
 //  issue #733
-TEST(3_pathsWithPlus)
+TEST (3_pathsWithPlus)
 {
   EXPECT_EQ (tl::URI ("/users/a_plus_b").resolved (tl::URI ("file.txt")).to_string (), "/users/a_plus_b/file.txt");
   EXPECT_EQ (tl::URI ("/users/a+b").resolved (tl::URI ("file.txt")).to_string (), "/users/a%2Bb/file.txt");

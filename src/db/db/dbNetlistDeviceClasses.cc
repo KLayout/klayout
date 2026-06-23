@@ -52,7 +52,7 @@ class TwoTerminalDeviceCombiner
   : public db::DeviceCombiner
 {
 public:
-  bool combine_devices(db::Device *a, db::Device *b) const
+  bool combine_devices (db::Device *a, db::Device *b) const
   {
     db::Net *na1 = a->net_for_terminal (0);
     db::Net *na2 = a->net_for_terminal (1);
@@ -330,9 +330,7 @@ public:
         a->join_terminals (1, b, 1);
 
         return true;
-
       }
-
     }
 
     return false;
@@ -383,9 +381,7 @@ public:
         a->join_terminals (3, b, 3);
 
         return true;
-
       }
-
     }
 
     return false;
@@ -415,7 +411,6 @@ public:
       a->join_terminals (2, b, 2);
 
       return true;
-
     }
 
     return false;
@@ -455,7 +450,6 @@ public:
       a->join_terminals (3, b, 3);
 
       return true;
-
     }
 
     return false;
@@ -616,8 +610,7 @@ DeviceClassMOS3Transistor::DeviceClassMOS3Transistor ()
   add_parameter_definition (db::DeviceParameterDefinition ("PD", "Drain perimeter (micrometer)", 0.0, false, 1e-6, 1.0));
 }
 
-bool
-DeviceClassMOS3Transistor::is_source_terminal (size_t tid) const
+bool DeviceClassMOS3Transistor::is_source_terminal (size_t tid) const
 {
   if (is_strict ()) {
     return tid == DeviceClassMOS3Transistor::terminal_id_S;
@@ -626,8 +619,7 @@ DeviceClassMOS3Transistor::is_source_terminal (size_t tid) const
   }
 }
 
-bool
-DeviceClassMOS3Transistor::is_drain_terminal (size_t tid) const
+bool DeviceClassMOS3Transistor::is_drain_terminal (size_t tid) const
 {
   if (is_strict ()) {
     return tid == DeviceClassMOS3Transistor::terminal_id_D;
@@ -636,14 +628,12 @@ DeviceClassMOS3Transistor::is_drain_terminal (size_t tid) const
   }
 }
 
-bool
-DeviceClassMOS3Transistor::lengths_are_identical (const db::Device *a, const db::Device *b)
+bool DeviceClassMOS3Transistor::lengths_are_identical (const db::Device *a, const db::Device *b)
 {
   return (fabs (a->parameter_value (DeviceClassMOS3Transistor::param_id_L) - b->parameter_value (DeviceClassMOS3Transistor::param_id_L)) < 1e-6);
 }
 
-bool
-DeviceClassMOS3Transistor::net_is_source_drain_connection (const db::Net *net) const
+bool DeviceClassMOS3Transistor::net_is_source_drain_connection (const db::Net *net) const
 {
   if (net->pin_count () > 0) {
     return false;
@@ -667,7 +657,8 @@ DeviceClassMOS3Transistor::net_is_source_drain_connection (const db::Net *net) c
           (is_drain_terminal (t1->terminal_id ()) && is_source_terminal (t2->terminal_id ())));
 }
 
-namespace {
+namespace
+{
 
 class SplitGateDeviceChain
 {
@@ -675,7 +666,7 @@ public:
   typedef std::vector<const db::Device *>::const_iterator device_iterator;
   typedef std::vector<const db::Net *>::const_iterator net_iterator;
 
-  SplitGateDeviceChain () { }
+  SplitGateDeviceChain () {}
 
   void add_device (const db::Device *device) { m_devices.push_back (device); }
   void add_net (const db::Net *net) { m_nets.push_back (net); }
@@ -699,7 +690,7 @@ public:
     }
 
     device_iterator d = begin_devices (), dd = other.begin_devices ();
-    for ( ; d != end_devices (); ++d, ++dd) {
+    for (; d != end_devices (); ++d, ++dd) {
       if ((*d)->net_for_terminal (DeviceClassMOS3Transistor::terminal_id_G) != (*dd)->net_for_terminal (DeviceClassMOS3Transistor::terminal_id_G)) {
         return false;
       }
@@ -717,7 +708,7 @@ public:
   void join_nets (const SplitGateDeviceChain &other, db::Circuit *circuit) const
   {
     net_iterator n = begin_nets (), nn = other.begin_nets ();
-    for ( ; n != end_nets (); ++n, ++nn) {
+    for (; n != end_nets (); ++n, ++nn) {
       if (tl::verbosity () >= 40) {
         tl::log << "Joining nets: " << (*n)->expanded_name () << " and " << (*nn)->expanded_name ();
       }
@@ -732,8 +723,7 @@ private:
 
 }
 
-void
-DeviceClassMOS3Transistor::join_split_gates (db::Circuit *circuit) const
+void DeviceClassMOS3Transistor::join_split_gates (db::Circuit *circuit) const
 {
   tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("join split gates ")) + name () + " (" + circuit->name () + ")");
 
@@ -741,16 +731,16 @@ DeviceClassMOS3Transistor::join_split_gates (db::Circuit *circuit) const
 
   for (db::Circuit::net_iterator n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
 
-    if (seen_nets.find (n.operator-> ()) != seen_nets.end ()) {
+    if (seen_nets.find (n.operator->()) != seen_nets.end ()) {
       continue;
     }
-    seen_nets.insert (n.operator-> ());
+    seen_nets.insert (n.operator->());
 
-    if (net_is_source_drain_connection (n.operator-> ())) {
+    if (net_is_source_drain_connection (n.operator->())) {
       continue;
     }
 
-    std::map<const db::Net *, std::list<SplitGateDeviceChain> > chains;
+    std::map<const db::Net *, std::list<SplitGateDeviceChain>> chains;
     SplitGateDeviceChain chain;
 
     for (db::Net::const_terminal_iterator t = n->begin_terminals (); t != n->end_terminals (); ++t) {
@@ -794,20 +784,17 @@ DeviceClassMOS3Transistor::join_split_gates (db::Circuit *circuit) const
           tid = other_tid;
           d = other_device;
           chain.add_net (nn);
-
         }
 
         if (nn && chain.begin_nets () != chain.end_nets ()) {
           chains [nn].push_back (chain);
         }
-
       }
-
     }
 
     //  identify compatible chains and join their S/D nodes
 
-    for (std::map<const db::Net *, std::list<SplitGateDeviceChain> >::iterator cs = chains.begin (); cs != chains.end (); ++cs) {
+    for (std::map<const db::Net *, std::list<SplitGateDeviceChain>>::iterator cs = chains.begin (); cs != chains.end (); ++cs) {
 
       std::vector<std::list<SplitGateDeviceChain>::iterator> compatibles;
 
@@ -830,16 +817,12 @@ DeviceClassMOS3Transistor::join_split_gates (db::Circuit *circuit) const
           cs->second.erase (*i);
         }
         cs->second.erase (c);
-
       }
-
     }
-
   }
 }
 
-bool
-DeviceClassMOS3Transistor::has_bulk_pin () const
+bool DeviceClassMOS3Transistor::has_bulk_pin () const
 {
   return false;
 }
@@ -855,8 +838,7 @@ DeviceClassMOS4Transistor::DeviceClassMOS4Transistor ()
   add_terminal_definition (db::DeviceTerminalDefinition ("B", "Bulk"));
 }
 
-bool
-DeviceClassMOS4Transistor::has_bulk_pin () const
+bool DeviceClassMOS4Transistor::has_bulk_pin () const
 {
   return true;
 }

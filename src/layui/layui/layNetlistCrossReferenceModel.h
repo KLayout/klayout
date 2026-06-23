@@ -60,24 +60,24 @@ public:
   virtual circuit_pair parent_of (const device_pair &device_pair) const;
   virtual circuit_pair parent_of (const subcircuit_pair &subcircuit_pair) const;
 
-  virtual std::pair<circuit_pair, std::pair<Status, std::string> > top_circuit_from_index(size_t index) const;
-  virtual std::pair<circuit_pair, std::pair<Status, std::string> > circuit_from_index (size_t index) const;
-  virtual std::pair<circuit_pair, std::pair<Status, std::string> > child_circuit_from_index(const circuit_pair &circuits, size_t index) const;
-  virtual std::pair<net_pair, std::pair<Status, std::string> > net_from_index (const circuit_pair &circuits, size_t index) const;
+  virtual std::pair<circuit_pair, std::pair<Status, std::string>> top_circuit_from_index (size_t index) const;
+  virtual std::pair<circuit_pair, std::pair<Status, std::string>> circuit_from_index (size_t index) const;
+  virtual std::pair<circuit_pair, std::pair<Status, std::string>> child_circuit_from_index (const circuit_pair &circuits, size_t index) const;
+  virtual std::pair<net_pair, std::pair<Status, std::string>> net_from_index (const circuit_pair &circuits, size_t index) const;
   virtual const db::Net *second_net_for (const db::Net *first) const;
   virtual const db::Circuit *second_circuit_for (const db::Circuit *first) const;
   virtual net_subcircuit_pin_pair net_subcircuit_pinref_from_index (const net_pair &nets, size_t index) const;
   virtual net_subcircuit_pin_pair subcircuit_pinref_from_index (const subcircuit_pair &nets, size_t index) const;
   virtual net_terminal_pair net_terminalref_from_index (const net_pair &nets, size_t index) const;
   virtual net_pin_pair net_pinref_from_index (const net_pair &nets, size_t index) const;
-  virtual std::pair<device_pair, std::pair<Status, std::string> > device_from_index (const circuit_pair &circuits, size_t index) const;
-  virtual std::pair<pin_pair, std::pair<Status, std::string> > pin_from_index (const circuit_pair &circuits, size_t index) const;
-  virtual std::pair<subcircuit_pair, std::pair<Status, std::string> > subcircuit_from_index (const circuit_pair &circuits, size_t index) const;
+  virtual std::pair<device_pair, std::pair<Status, std::string>> device_from_index (const circuit_pair &circuits, size_t index) const;
+  virtual std::pair<pin_pair, std::pair<Status, std::string>> pin_from_index (const circuit_pair &circuits, size_t index) const;
+  virtual std::pair<subcircuit_pair, std::pair<Status, std::string>> subcircuit_from_index (const circuit_pair &circuits, size_t index) const;
 
   virtual std::string top_circuit_status_hint (size_t index) const;
   virtual std::string circuit_status_hint (size_t index) const;
   virtual std::string child_circuit_status_hint (const circuit_pair &circuits, size_t index) const;
-  virtual std::string circuit_pair_status_hint (const std::pair<circuit_pair, std::pair<Status, std::string> > &cp) const;
+  virtual std::string circuit_pair_status_hint (const std::pair<circuit_pair, std::pair<Status, std::string>> &cp) const;
   virtual std::string net_status_hint (const circuit_pair &circuits, size_t index) const;
   virtual std::string device_status_hint (const circuit_pair &circuits, size_t index) const;
   virtual std::string pin_status_hint (const circuit_pair &circuits, size_t index) const;
@@ -90,17 +90,15 @@ public:
   virtual size_t subcircuit_index (const subcircuit_pair &subcircuits) const;
 
 public:
-  struct PerCircuitCacheData
-  {
+  struct PerCircuitCacheData {
     std::map<std::pair<const db::Net *, const db::Net *>, size_t> index_of_nets;
     std::map<std::pair<const db::Device *, const db::Device *>, size_t> index_of_devices;
     std::map<std::pair<const db::Pin *, const db::Pin *>, size_t> index_of_pins;
     std::map<std::pair<const db::SubCircuit *, const db::SubCircuit *>, size_t> index_of_subcircuits;
   };
 
-  struct PerSubCircuitCacheData
-  {
-    std::vector<std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *> > nets_per_pins;
+  struct PerSubCircuitCacheData {
+    std::vector<std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *>> nets_per_pins;
   };
 
   tl::weak_ptr<db::NetlistCrossReference> mp_cross_ref;
@@ -108,7 +106,7 @@ public:
   mutable std::map<device_pair, circuit_pair> m_parents_of_devices;
   mutable std::map<pin_pair, circuit_pair> m_parents_of_pins;
   mutable std::map<subcircuit_pair, circuit_pair> m_parents_of_subcircuits;
-  mutable std::map<circuit_pair, std::vector<circuit_pair> > m_child_circuits;
+  mutable std::map<circuit_pair, std::vector<circuit_pair>> m_child_circuits;
   mutable std::vector<circuit_pair> m_top_level_circuits;
   mutable std::map<std::pair<const db::Circuit *, const db::Circuit *>, PerCircuitCacheData> m_per_circuit_data;
   mutable std::map<std::pair<const db::Circuit *, const db::Circuit *>, size_t> m_index_of_circuits;
@@ -121,4 +119,4 @@ public:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

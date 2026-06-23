@@ -75,7 +75,7 @@ static int compare_parameters (double pa, double pb, double absolute = default_a
 
   //  NOTE: parameter values may be small (e.g. pF for caps) -> no fixed epsilon
 
-  double eps = (fabs (pa_max) + fabs(pa_min)) * 0.5e-10;
+  double eps = (fabs (pa_max) + fabs (pa_min)) * 0.5e-10;
 
   if (pa_max < pb - eps) {
     return -1;
@@ -104,8 +104,8 @@ EqualDeviceParameters::EqualDeviceParameters (size_t parameter_id, double absolu
 std::string EqualDeviceParameters::to_string () const
 {
   std::string res;
-  for (std::vector<std::pair<size_t, std::pair<double, double> > >::const_iterator c = m_compare_set.begin (); c != m_compare_set.end (); ++c) {
-    if (!res.empty ()) {
+  for (std::vector<std::pair<size_t, std::pair<double, double>>>::const_iterator c = m_compare_set.begin (); c != m_compare_set.end (); ++c) {
+    if (! res.empty ()) {
       res += ";";
     }
     res += "#" + tl::to_string (c->first) + ":";
@@ -120,7 +120,7 @@ std::string EqualDeviceParameters::to_string () const
 
 bool EqualDeviceParameters::less (const db::Device &a, const db::Device &b) const
 {
-  for (std::vector<std::pair<size_t, std::pair<double, double> > >::const_iterator c = m_compare_set.begin (); c != m_compare_set.end (); ++c) {
+  for (std::vector<std::pair<size_t, std::pair<double, double>>>::const_iterator c = m_compare_set.begin (); c != m_compare_set.end (); ++c) {
     int cmp = compare_parameters (a.parameter_value (c->first), b.parameter_value (c->first), c->second.first, c->second.second);
     if (cmp != 0) {
       return cmp < 0;
@@ -130,7 +130,7 @@ bool EqualDeviceParameters::less (const db::Device &a, const db::Device &b) cons
   //  compare the remaining parameters with a default precision
 
   std::set<size_t> seen;
-  for (std::vector<std::pair<size_t, std::pair<double, double> > >::const_iterator c = m_compare_set.begin (); c != m_compare_set.end (); ++c) {
+  for (std::vector<std::pair<size_t, std::pair<double, double>>>::const_iterator c = m_compare_set.begin (); c != m_compare_set.end (); ++c) {
     seen.insert (c->first);
   }
 
@@ -149,7 +149,7 @@ bool EqualDeviceParameters::less (const db::Device &a, const db::Device &b) cons
 
 EqualDeviceParameters &EqualDeviceParameters::operator+= (const EqualDeviceParameters &other)
 {
-  for (std::vector<std::pair<size_t, std::pair<double, double> > >::const_iterator c = other.m_compare_set.begin (); c != other.m_compare_set.end (); ++c) {
+  for (std::vector<std::pair<size_t, std::pair<double, double>>>::const_iterator c = other.m_compare_set.begin (); c != other.m_compare_set.end (); ++c) {
     m_compare_set.push_back (*c);
   }
   return *this;
@@ -206,7 +206,6 @@ DeviceClass &DeviceClass::operator= (const DeviceClass &other)
     m_supports_serial_combination = other.m_supports_serial_combination;
     m_supports_parallel_combination = other.m_supports_parallel_combination;
     m_equivalent_terminal_ids = other.m_equivalent_terminal_ids;
-
   }
   return *this;
 }
@@ -226,7 +225,7 @@ void DeviceClass::clear_terminal_definitions ()
 const DeviceTerminalDefinition *DeviceClass::terminal_definition (size_t id) const
 {
   if (id < m_terminal_definitions.size ()) {
-    return & m_terminal_definitions [id];
+    return &m_terminal_definitions [id];
   } else {
     return 0;
   }
@@ -247,7 +246,7 @@ void DeviceClass::clear_parameter_definitions ()
 const DeviceParameterDefinition *DeviceClass::parameter_definition (size_t id) const
 {
   if (id < m_parameter_definitions.size ()) {
-    return & m_parameter_definitions [id];
+    return &m_parameter_definitions [id];
   } else {
     return 0;
   }
@@ -256,7 +255,7 @@ const DeviceParameterDefinition *DeviceClass::parameter_definition (size_t id) c
 DeviceParameterDefinition *DeviceClass::parameter_definition_non_const (size_t id)
 {
   if (id < m_parameter_definitions.size ()) {
-    return & m_parameter_definitions [id];
+    return &m_parameter_definitions [id];
   } else {
     return 0;
   }
@@ -343,7 +342,7 @@ DeviceClassTemplateBase::template_by_name (const std::string &name)
 {
   for (tl::Registrar<db::DeviceClassTemplateBase>::iterator i = tl::Registrar<db::DeviceClassTemplateBase>::begin (); i != tl::Registrar<db::DeviceClassTemplateBase>::end (); ++i) {
     if (i->name () == name) {
-      return i.operator-> ();
+      return i.operator->();
     }
   }
   return 0;
@@ -354,7 +353,7 @@ DeviceClassTemplateBase::is_a (const db::DeviceClass *dc)
 {
   for (tl::Registrar<db::DeviceClassTemplateBase>::iterator i = tl::Registrar<db::DeviceClassTemplateBase>::begin (); i != tl::Registrar<db::DeviceClassTemplateBase>::end (); ++i) {
     if (i->is_of (dc)) {
-      return i.operator-> ();
+      return i.operator->();
     }
   }
   return 0;

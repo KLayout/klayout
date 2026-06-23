@@ -26,7 +26,7 @@
 
 #include "dbCommon.h"
 
-#include "dbTypes.h" 
+#include "dbTypes.h"
 
 #include <map>
 #include <set>
@@ -59,7 +59,7 @@ public:
   /**
    *  @brief Specify the replacement characters.
    *
-   *  This method specifies the replacement character which will replace all 
+   *  This method specifies the replacement character which will replace all
    *  non-specified characters.
    *  If the replacement character is 0, characters not allowed are ignored.
    *  If the replacement character is \t, a hex sequence will be inserted for
@@ -70,7 +70,7 @@ public:
   /**
    *  @brief Specify character transformation
    *
-   *  Replaces all of the characters in the first string by the ones in the second 
+   *  Replaces all of the characters in the first string by the ones in the second
    *  string. Both strings must have the same length.
    *  By specifying a replacement character of \t, a hex sequence will be inserted for
    *  the original characters.
@@ -127,8 +127,8 @@ public:
   const std::string &cell_name (db::cell_index_type id) const;
 
 private:
-  std::map <db::cell_index_type, std::string> m_map;
-  std::set <std::string> m_cell_names;
+  std::map<db::cell_index_type, std::string> m_map;
+  std::set<std::string> m_cell_names;
   char m_character_trans [256];
   char m_default_char;
   size_t m_max_cellname_length;
@@ -137,5 +137,3 @@ private:
 }
 
 #endif
-
-

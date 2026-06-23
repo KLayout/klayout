@@ -30,7 +30,7 @@
 namespace lay
 {
 
-static const char *def_palette = 
+static const char *def_palette =
   "0 1 2 3 "
   "4 5[1] 6 7 "
   "8 9[0] 10 11 "
@@ -38,7 +38,7 @@ static const char *def_palette =
 
 static StipplePalette def_palette_object = StipplePalette::default_palette ();
 
-StipplePalette 
+StipplePalette
 StipplePalette::default_palette ()
 {
   StipplePalette p;
@@ -63,7 +63,7 @@ StipplePalette::StipplePalette (const StipplePalette &d)
   // .. nothing yet ..
 }
 
-StipplePalette 
+StipplePalette
 StipplePalette::operator= (const StipplePalette &d)
 {
   if (&d != this) {
@@ -73,8 +73,7 @@ StipplePalette::operator= (const StipplePalette &d)
   return *this;
 }
 
-bool 
-StipplePalette::operator== (const StipplePalette &d) const
+bool StipplePalette::operator== (const StipplePalette &d) const
 {
   return m_stipples == d.m_stipples && m_standard == d.m_standard;
 }
@@ -90,7 +89,7 @@ StipplePalette::stipple_by_index (unsigned int n) const
   }
 }
 
-unsigned int 
+unsigned int
 StipplePalette::stipples () const
 {
   return (unsigned int) m_stipples.size ();
@@ -107,14 +106,13 @@ StipplePalette::standard_stipple_index_by_index (unsigned int n) const
   }
 }
 
-unsigned int 
+unsigned int
 StipplePalette::standard_stipples () const
 {
   return (unsigned int) m_standard.size ();
 }
 
-void 
-StipplePalette::set_stipple (unsigned int n, unsigned int s)
+void StipplePalette::set_stipple (unsigned int n, unsigned int s)
 {
   while (m_stipples.size () <= n) {
     m_stipples.push_back (0);
@@ -122,14 +120,12 @@ StipplePalette::set_stipple (unsigned int n, unsigned int s)
   m_stipples [n] = s;
 }
 
-void
-StipplePalette::clear_stipples () 
+void StipplePalette::clear_stipples ()
 {
   m_stipples.clear ();
 }
 
-void 
-StipplePalette::set_standard_stipple_index (unsigned int n, unsigned int si)
+void StipplePalette::set_standard_stipple_index (unsigned int n, unsigned int si)
 {
   while (m_standard.size () <= n) {
     m_standard.push_back (0);
@@ -137,13 +133,12 @@ StipplePalette::set_standard_stipple_index (unsigned int n, unsigned int si)
   m_standard [n] = si;
 }
 
-void 
-StipplePalette::clear_standard_stipples ()
+void StipplePalette::clear_standard_stipples ()
 {
   m_standard.clear ();
 }
 
-std::string 
+std::string
 StipplePalette::to_string () const
 {
   std::string res;
@@ -163,14 +158,12 @@ StipplePalette::to_string () const
         break;
       }
     }
-
   }
 
   return res;
 }
 
-void 
-StipplePalette::from_string (const std::string &s)
+void StipplePalette::from_string (const std::string &s)
 {
   try {
 
@@ -196,12 +189,11 @@ StipplePalette::from_string (const std::string &s)
         x.read (st).expect ("]");
         while (m_standard.size () <= st) {
           m_standard.push_back (0);
-        } 
+        }
         m_standard [st] = i;
       }
 
       ++i;
-
     }
 
     if (! x.at_end ()) {
@@ -219,4 +211,3 @@ StipplePalette::from_string (const std::string &s)
 }
 
 }
-

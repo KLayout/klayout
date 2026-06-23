@@ -70,7 +70,7 @@ void register_help_handler (QObject *object, const char *slot, const char *modal
 
 // --------------------------------------------------------------------------------
 
-std::string 
+std::string
 save_dialog_state (QWidget *w, bool with_section_sizes)
 {
   std::string s;
@@ -97,13 +97,12 @@ save_dialog_state (QWidget *w, bool with_section_sizes)
     s += (dynamic_cast<QTreeView *> (w))->header ()->saveState ().toBase64 ().constData ();
 #endif
     s += "\";";
-
   }
 
   if (w) {
     for (QList<QObject *>::const_iterator c = w->children ().begin (); c != w->children ().end (); ++c) {
-      if (dynamic_cast <QWidget *> (*c)) {
-        std::string cs = save_dialog_state (dynamic_cast <QWidget *> (*c));
+      if (dynamic_cast<QWidget *> (*c)) {
+        std::string cs = save_dialog_state (dynamic_cast<QWidget *> (*c));
         if (! cs.empty ()) {
           s += cs;
         }
@@ -114,8 +113,7 @@ save_dialog_state (QWidget *w, bool with_section_sizes)
   return s;
 }
 
-void 
-restore_dialog_state (QWidget *dialog, const std::string &s, bool with_section_sizes)
+void restore_dialog_state (QWidget *dialog, const std::string &s, bool with_section_sizes)
 {
   if (! dialog) {
     return;
@@ -135,7 +133,7 @@ restore_dialog_state (QWidget *dialog, const std::string &s, bool with_section_s
     if (dialog->objectName () == tl::to_qstring (name)) {
       widgets.push_back (dialog);
     } else {
-      widgets = dialog->findChildren<QWidget *>(tl::to_qstring (name));
+      widgets = dialog->findChildren<QWidget *> (tl::to_qstring (name));
     }
 
     if (widgets.size () == 1) {
@@ -153,17 +151,12 @@ restore_dialog_state (QWidget *dialog, const std::string &s, bool with_section_s
 #if QT_VERSION >= 0x040500
         (dynamic_cast<QTreeView *> (widgets.front ()))->header ()->restoreState (QByteArray::fromBase64 (value.c_str ()));
 #endif
-
       }
-
-
     }
-
   }
 }
 
-void
-indicate_error (QWidget *le, const tl::Exception *ex)
+void indicate_error (QWidget *le, const tl::Exception *ex)
 {
   if (ex) {
     indicate_error (le, true);
@@ -174,8 +167,7 @@ indicate_error (QWidget *le, const tl::Exception *ex)
   }
 }
 
-void
-indicate_error (QWidget *le, bool f)
+void indicate_error (QWidget *le, bool f)
 {
   //  by the way, update the foreground color of the cell edit box as well (red, if not valid)
   QPalette pl = le->palette ();

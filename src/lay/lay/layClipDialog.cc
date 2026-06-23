@@ -40,7 +40,7 @@ class ClipDialogPluginDeclaration
   : public lay::PluginDeclaration
 {
 public:
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > & /*options*/) const
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> & /*options*/) const
   {
     //  .. no options yet ..
   }
@@ -55,7 +55,7 @@ public:
     lay::PluginDeclaration::get_menu_entries (menu_entries);
     menu_entries.push_back (lay::menu_item ("clip_tool::show", "clip_tool:edit_mode", "edit_menu.utils_menu.end", tl::to_string (QObject::tr ("Clip Tool"))));
   }
- 
+
   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
     if (lay::has_gui ()) {
@@ -72,7 +72,7 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new ClipDialogPl
 // ------------------------------------------------------------
 
 ClipDialog::ClipDialog (lay::Dispatcher *root, LayoutViewBase *vw)
-  : lay::Browser (root, vw), 
+  : lay::Browser (root, vw),
     Ui::ClipDialog ()
 {
   Ui::ClipDialog::setupUi (this);
@@ -86,8 +86,7 @@ ClipDialog::ClipDialog (lay::Dispatcher *root, LayoutViewBase *vw)
   box1_clicked ();
 }
 
-void 
-ClipDialog::menu_activated (const std::string &symbol)
+void ClipDialog::menu_activated (const std::string &symbol)
 {
   if (symbol == "clip_tool::show") {
 
@@ -110,17 +109,16 @@ ClipDialog::~ClipDialog ()
   //  .. nothing yet ..
 }
 
-void 
-ClipDialog::ok_pressed ()
+void ClipDialog::ok_pressed ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   std::string clip_cell_name (tl::to_string (le_cell_name->text ()));
   if (clip_cell_name.empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Clip cell name must not be empty")));
   }
 
-  std::vector <db::Box> clip_boxes;
+  std::vector<db::Box> clip_boxes;
   lay::CellView cv = view ()->cellview (view ()->active_cellview_index ());
 
   if (rb_box1->isChecked ()) {
@@ -157,7 +155,7 @@ BEGIN_PROTECTED
 
   } else if (rb_rulers->isChecked ()) {
 
-    ant::Service *ant_service = view ()->get_plugin <ant::Service> ();
+    ant::Service *ant_service = view ()->get_plugin<ant::Service> ();
     if (ant_service) {
       ant::AnnotationIterator ant = ant_service->begin_annotations ();
       while (! ant.at_end ()) {
@@ -176,7 +174,6 @@ BEGIN_PROTECTED
     }
 
     db::collect_clip_boxes (ccv->layout (), ccv.cell_index (), (unsigned int) sel_layer, clip_boxes);
-
   }
 
   //  large scale operation - do not provide undo (TODO: warn about that?)
@@ -195,7 +192,7 @@ BEGIN_PROTECTED
       db::cell_index_type clip_top = cv->layout ().add_cell (clip_cell_name.c_str ());
       db::Cell &clip_top_cell = cv->layout ().cell (clip_top);
 
-      for (std::vector <db::cell_index_type>::const_iterator cc = new_cells.begin (); cc != new_cells.end (); ++cc) {
+      for (std::vector<db::cell_index_type>::const_iterator cc = new_cells.begin (); cc != new_cells.end (); ++cc) {
         clip_top_cell.insert (db::CellInstArray (db::CellInst (*cc), db::Trans ()));
       }
 
@@ -209,19 +206,16 @@ BEGIN_PROTECTED
 
       //  select that cell as new cell
       view ()->select_cell (new_cells [0], view ()->active_cellview_index ());
-
-    } 
-
+    }
   }
 
   //  close this dialog
   QDialog::accept ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void 
-ClipDialog::box1_clicked ()
+void ClipDialog::box1_clicked ()
 {
   rb_box2->setChecked (false);
   rb_shapes->setChecked (false);
@@ -231,8 +225,7 @@ ClipDialog::box1_clicked ()
   grp_box2->setEnabled (false);
 }
 
-void 
-ClipDialog::box2_clicked ()
+void ClipDialog::box2_clicked ()
 {
   rb_box1->setChecked (false);
   rb_shapes->setChecked (false);
@@ -242,8 +235,7 @@ ClipDialog::box2_clicked ()
   grp_box2->setEnabled (true);
 }
 
-void 
-ClipDialog::rulers_clicked ()
+void ClipDialog::rulers_clicked ()
 {
   rb_box1->setChecked (false);
   rb_box2->setChecked (false);
@@ -253,8 +245,7 @@ ClipDialog::rulers_clicked ()
   grp_box2->setEnabled (false);
 }
 
-void 
-ClipDialog::shapes_clicked ()
+void ClipDialog::shapes_clicked ()
 {
   rb_box1->setChecked (false);
   rb_box2->setChecked (false);
@@ -264,12 +255,10 @@ ClipDialog::shapes_clicked ()
   grp_box2->setEnabled (false);
 }
 
-bool 
-ClipDialog::configure (const std::string & /*name*/, const std::string & /*value*/)
+bool ClipDialog::configure (const std::string & /*name*/, const std::string & /*value*/)
 {
   //  .. nothing yet ..
   return false;
 }
 
 }
-

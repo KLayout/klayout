@@ -50,12 +50,12 @@ class LEFDEFImportPluginDeclaration
   : public lay::PluginDeclaration
 {
 public:
-  LEFDEFImportPluginDeclaration () 
+  LEFDEFImportPluginDeclaration ()
   {
     //  .. nothing yet ..
   }
-  
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
+
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> &options) const
   {
     options.push_back (std::pair<std::string, std::string> (cfg_lef_import_spec, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_def_import_spec, ""));
@@ -112,7 +112,7 @@ public:
       LEFDEFImportOptionsDialog import_dialog (QApplication::activeWindow (), import_lef);
       if (import_dialog.exec_dialog (data)) {
 
-        //  clear selection 
+        //  clear selection
         lay::MainWindow::instance ()->cancel ();
 
         //  store configuration
@@ -158,7 +158,6 @@ public:
         handle->rename (tl::to_string (QFileInfo (tl::to_qstring (data.file)).fileName ()));
         handle->set_tech_name (tech_name);
         view->add_layout (handle, data.mode == 2);
-
       }
 
       return true;
@@ -176,4 +175,3 @@ private:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new lay::LEFDEFImportPluginDeclaration (), 1400, "db::LEFDEFImportPlugin");
 
 }
-

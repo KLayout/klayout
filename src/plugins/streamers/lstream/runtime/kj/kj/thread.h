@@ -27,56 +27,58 @@
 
 KJ_BEGIN_HEADER
 
-namespace kj {
+namespace kj
+{
 
-class Thread {
+class Thread
+{
   // A thread!  Pass a lambda to the constructor, and it runs in the thread.  The destructor joins
   // the thread.  If the function throws an exception, it is rethrown from the thread's destructor
   // (if not unwinding from another exception).
 
 public:
-  explicit Thread(Function<void()> func);
-  KJ_DISALLOW_COPY_AND_MOVE(Thread);
+  explicit Thread (Function<void ()> func);
+  KJ_DISALLOW_COPY_AND_MOVE (Thread);
 
-  ~Thread() noexcept(false);
+  ~Thread () noexcept (false);
 
-#if !_WIN32
-  void sendSignal(int signo);
+#if ! _WIN32
+  void sendSignal (int signo);
   // Send a Unix signal to the given thread, using pthread_kill or an equivalent.
 #endif
 
-  void detach();
+  void detach ();
   // Don't join the thread in ~Thread().
 
 private:
   struct ThreadState {
-    ThreadState(Function<void()> func);
+    ThreadState (Function<void ()> func);
 
-    Function<void()> func;
-    Function<void(Function<void()>)> initializer;
+    Function<void ()> func;
+    Function<void (Function<void ()>)> initializer;
     kj::Maybe<kj::Exception> exception;
 
     unsigned int refcount;
     // Owned by the parent thread and the child thread.
 
-    void unref();
+    void unref ();
   };
-  ThreadState* state;
+  ThreadState *state;
 
 #if _WIN32
-  void* threadHandle;
+  void *threadHandle;
 #else
-  unsigned long long threadId;  // actually pthread_t
+  unsigned long long threadId; // actually pthread_t
 #endif
   bool detached = false;
 
 #if _WIN32
-  static unsigned long __stdcall runThread(void* ptr);
+  static unsigned long __stdcall runThread (void *ptr);
 #else
-  static void* runThread(void* ptr);
+  static void *runThread (void *ptr);
 #endif
 };
 
-}  // namespace kj
+} // namespace kj
 
 KJ_END_HEADER

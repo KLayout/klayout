@@ -84,8 +84,7 @@ Transition::make_key () const
   }
 }
 
-bool
-Transition::operator< (const Transition &other) const
+bool Transition::operator< (const Transition &other) const
 {
   if (is_for_subcircuit () != other.is_for_subcircuit ()) {
     return is_for_subcircuit () < other.is_for_subcircuit ();
@@ -123,12 +122,10 @@ Transition::operator< (const Transition &other) const
       return m_id1 < other.m_id1;
     }
     return m_id2 < other.m_id2;
-
   }
 }
 
-bool
-Transition::operator== (const Transition &other) const
+bool Transition::operator== (const Transition &other) const
 {
   if (is_for_subcircuit () != other.is_for_subcircuit ()) {
     return false;
@@ -163,7 +160,6 @@ Transition::operator== (const Transition &other) const
     }
 
     return (m_id1 == other.m_id1 && m_id2 == other.m_id2);
-
   }
 }
 
@@ -174,13 +170,12 @@ Transition::to_string () const
     const db::SubCircuit *sc = subcircuit ();
     const db::Circuit *c = sc->circuit_ref ();
     return std::string ("X") + sc->expanded_name () + " " + c->name () + " " + c->pin_by_id (m_id2)->expanded_name () + " (virtual)";
- } else {
+  } else {
     size_t term_id1 = m_id1;
     size_t term_id2 = m_id2;
     const db::Device *d = device ();
     const db::DeviceClass *dc = d->device_class ();
-    return std::string ("D") + d->expanded_name () + " " + dc->name () + " "
-      + "(" + dc->terminal_definitions () [term_id1].name () + ")->(" + dc->terminal_definitions () [term_id2].name () + ")";
+    return std::string ("D") + d->expanded_name () + " " + dc->name () + " " + "(" + dc->terminal_definitions () [term_id1].name () + ")->(" + dc->terminal_definitions () [term_id2].name () + ")";
   }
 }
 
@@ -215,7 +210,7 @@ NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_catego
       continue;
     }
 
-    const CircuitMapper *cm = & icm->second;
+    const CircuitMapper *cm = &icm->second;
 
     //  A pin assignment may be missing because there is no (real) net for a pin -> skip this pin
 
@@ -240,7 +235,6 @@ NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_catego
       //  realize pin swapping by normalization of pin ID
 
       pin_id = pin_map->normalize_pin_id (cm->other (), pin_id);
-
     }
 
     //  Subcircuits are routed to a null node and descend from a virtual node inside the subcircuit.
@@ -255,7 +249,6 @@ NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_catego
     }
 
     m_edges [in->second].first.push_back (ed);
-
   }
 
   for (db::Net::const_terminal_iterator i = net->begin_terminals (); i != net->end_terminals (); ++i) {
@@ -296,11 +289,8 @@ NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_catego
         }
 
         m_edges [in->second].first.push_back (ed2);
-
       }
-
     }
-
   }
 }
 
@@ -318,7 +308,7 @@ NetGraphNode::NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circui
   std::map<const db::Circuit *, CircuitMapper>::const_iterator icm = circuit_map->find (cr);
   tl_assert (icm != circuit_map->end ());
 
-  const CircuitMapper *cm = & icm->second;
+  const CircuitMapper *cm = &icm->second;
 
   for (db::Circuit::const_pin_iterator p = cr->begin_pins (); p != cr->end_pins (); ++p) {
 
@@ -351,7 +341,6 @@ NetGraphNode::NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circui
       //  realize pin swapping by normalization of pin ID
 
       pin_id = pin_map->normalize_pin_id (cm->other (), pin_id);
-
     }
 
     //  Make the other endpoint
@@ -365,12 +354,10 @@ NetGraphNode::NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circui
     }
 
     m_edges [in->second].first.push_back (ed);
-
   }
 }
 
-void
-NetGraphNode::expand_subcircuit_nodes (NetGraph *graph)
+void NetGraphNode::expand_subcircuit_nodes (NetGraph *graph)
 {
   std::map<const db::Net *, size_t> n2entry;
 
@@ -419,9 +406,7 @@ NetGraphNode::expand_subcircuit_nodes (NetGraph *graph)
       }
 
       m_edges [in->second].first.insert (m_edges [in->second].first.end (), de->first.begin (), de->first.end ());
-
     }
-
   }
 
   //  "deep sorting" of the edge descriptor
@@ -463,8 +448,7 @@ NetGraphNode::to_string () const
   return res;
 }
 
-void
-NetGraphNode::apply_net_index (const std::map<const db::Net *, size_t> &ni)
+void NetGraphNode::apply_net_index (const std::map<const db::Net *, size_t> &ni)
 {
   for (std::vector<edge_type>::iterator i = m_edges.begin (); i != m_edges.end (); ++i) {
     std::map<const db::Net *, size_t>::const_iterator j = ni.find (i->second.second);
@@ -480,8 +464,7 @@ NetGraphNode::apply_net_index (const std::map<const db::Net *, size_t> &ni)
   std::sort (m_edges.begin (), m_edges.end ());
 }
 
-bool
-NetGraphNode::less (const NetGraphNode &node, bool with_name) const
+bool NetGraphNode::less (const NetGraphNode &node, bool with_name) const
 {
   if (m_edges.size () != node.m_edges.size ()) {
     return m_edges.size () < node.m_edges.size ();
@@ -498,8 +481,7 @@ NetGraphNode::less (const NetGraphNode &node, bool with_name) const
   return false;
 }
 
-bool
-NetGraphNode::equal (const NetGraphNode &node, bool with_name) const
+bool NetGraphNode::equal (const NetGraphNode &node, bool with_name) const
 {
   if (m_edges.size () != node.m_edges.size ()) {
     return false;
@@ -516,8 +498,7 @@ NetGraphNode::equal (const NetGraphNode &node, bool with_name) const
   return true;
 }
 
-bool
-NetGraphNode::net_less (const db::Net *a, const db::Net *b, bool with_name)
+bool NetGraphNode::net_less (const db::Net *a, const db::Net *b, bool with_name)
 {
   if ((a != 0) != (b != 0)) {
     return (a != 0) < (b != 0);
@@ -531,8 +512,7 @@ NetGraphNode::net_less (const db::Net *a, const db::Net *b, bool with_name)
   return with_name ? name_compare (a, b) < 0 : false;
 }
 
-bool
-NetGraphNode::net_equal (const db::Net *a, const db::Net *b, bool with_name)
+bool NetGraphNode::net_equal (const db::Net *a, const db::Net *b, bool with_name)
 {
   if ((a != 0) != (b != 0)) {
     return false;
@@ -554,8 +534,7 @@ NetGraph::NetGraph ()
   //  .. nothing yet ..
 }
 
-void
-NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const db::DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_and_pin_mapping, const CircuitPinCategorizer *circuit_pin_mapper, size_t *unique_pin_id)
+void NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const db::DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_and_pin_mapping, const CircuitPinCategorizer *circuit_pin_mapper, size_t *unique_pin_id)
 {
   tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("Building net graph for circuit: ")) + c->name ());
 
@@ -574,7 +553,7 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
   m_nodes.reserve (nets);
 
   for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
-    NetGraphNode node (n.operator-> (), device_categorizer, circuit_categorizer, device_filter, circuit_and_pin_mapping, circuit_pin_mapper, unique_pin_id);
+    NetGraphNode node (n.operator->(), device_categorizer, circuit_categorizer, device_filter, circuit_and_pin_mapping, circuit_pin_mapper, unique_pin_id);
     if (! node.empty () || n->pin_count () > 0) {
       m_nodes.push_back (node);
     }
@@ -598,7 +577,7 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
 
   for (db::Circuit::const_subcircuit_iterator i = c->begin_subcircuits (); i != c->end_subcircuits (); ++i) {
 
-    size_t circuit_cat = circuit_categorizer.cat_for_subcircuit (i.operator-> ());
+    size_t circuit_cat = circuit_categorizer.cat_for_subcircuit (i.operator->());
     if (! circuit_cat) {
       continue;
     }
@@ -609,8 +588,7 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
       continue;
     }
 
-    m_virtual_nodes.insert (std::make_pair (i.operator-> (), NetGraphNode (i.operator-> (), circuit_categorizer, circuit_and_pin_mapping, circuit_pin_mapper, unique_pin_id)));
-
+    m_virtual_nodes.insert (std::make_pair (i.operator->(), NetGraphNode (i.operator->(), circuit_categorizer, circuit_and_pin_mapping, circuit_pin_mapper, unique_pin_id)));
   }
 
   for (std::map<const db::SubCircuit *, NetGraphNode>::iterator i = m_virtual_nodes.begin (); i != m_virtual_nodes.end (); ++i) {
@@ -655,9 +633,7 @@ NetGraph::joined (const NetGraphNode &a, const NetGraphNode &b) const
       } else {
         nj.edges ().push_back (*i);
       }
-
     }
-
   }
 
   for (auto i = joined.begin (); i != joined.end (); ++i) {

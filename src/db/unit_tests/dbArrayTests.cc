@@ -25,10 +25,10 @@
 #include "dbBoxConvert.h"
 #include "tlUnitTest.h"
 
-typedef db::array <db::Box, db::Trans> BoxArray;
+typedef db::array<db::Box, db::Trans> BoxArray;
 
 class MyBoxConvert
-  : public db::box_convert<db::Box> 
+  : public db::box_convert<db::Box>
 {
   // ...
 };
@@ -48,7 +48,7 @@ std::string positions (const BoxArray &arr, const db::Point &pt, BoxArray::itera
   return s;
 }
 
-TEST(1) 
+TEST (1)
 {
   db::Vector a (0, 100);
   db::Vector b (200, 0);
@@ -67,7 +67,7 @@ TEST(1)
   EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin_touching (db::Box (31, 40, 210, 130), MyBoxConvert ())), "200,0;200,100");
 }
 
-TEST(2) 
+TEST (2)
 {
   db::Vector a (10, 100);
   db::Vector b (-200, 20);
@@ -100,7 +100,7 @@ TEST(2)
   EXPECT_EQ (positions (ba, db::Point (-10, -40), ba.begin (), (t2 * t1).inverted ()), "0,0;10,100;-200,20;-190,120;-400,40;-390,140");
 }
 
-TEST(3) 
+TEST (3)
 {
   db::Vector a (10, 100);
   db::Vector b (-200, 20);
@@ -110,7 +110,7 @@ TEST(3)
   EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin_touching (db::Box (-180, 10, 10, 160), MyBoxConvert ())), "");
 }
 
-TEST(4) 
+TEST (4)
 {
   db::Vector a (10, 100);
   db::Vector b (-200, 20);
@@ -134,38 +134,38 @@ TEST(4)
   }
 }
 
-TEST(4a) 
+TEST (4a)
 {
   db::Vector a (10, 100);
   db::Vector b (-200, 20);
-  BoxArray ba (db::Box (80, 0, 240, 80), db::Trans (db::Vector (0, 30)), new db::regular_complex_array<db::Coord> (sqrt(0.5), 1.0, a, b, 2, 3));
+  BoxArray ba (db::Box (80, 0, 240, 80), db::Trans (db::Vector (0, 30)), new db::regular_complex_array<db::Coord> (sqrt (0.5), 1.0, a, b, 2, 3));
 
-  EXPECT_EQ (ba.complex_trans().to_string(), "r45 *1 0,30");
+  EXPECT_EQ (ba.complex_trans ().to_string (), "r45 *1 0,30");
   EXPECT_EQ (positions (ba, db::Point (0, 100), ba.begin ()), "-71,101;-61,201;-271,121;-261,221;-471,141;-461,241");
 
   ba.transform (db::ICplxTrans (1.0, 45.0, false, db::Vector (21, 9)), 0);
 
-  EXPECT_EQ (ba.complex_trans().to_string(), "r90 *1 0,30");
+  EXPECT_EQ (ba.complex_trans ().to_string (), "r90 *1 0,30");
   EXPECT_EQ (positions (ba, db::Point (0, 100), ba.begin ()), "-100,30;-164,108;-256,-97;-320,-19;-412,-224;-476,-146");
 }
 
-TEST(4b) 
+TEST (4b)
 {
-  BoxArray ba (db::Box (80, 0, 240, 80), db::Trans (db::Vector (0, 30)), new db::single_complex_inst<db::Coord> (sqrt(0.5), 1.0));
+  BoxArray ba (db::Box (80, 0, 240, 80), db::Trans (db::Vector (0, 30)), new db::single_complex_inst<db::Coord> (sqrt (0.5), 1.0));
 
   std::vector<db::Vector> v;
   EXPECT_EQ (ba.is_iterated_array (&v), false);
 
-  EXPECT_EQ (ba.complex_trans().to_string(), "r45 *1 0,30");
+  EXPECT_EQ (ba.complex_trans ().to_string (), "r45 *1 0,30");
   EXPECT_EQ (positions (ba, db::Point (0, 100), ba.begin ()), "-71,101");
 
   ba.transform (db::ICplxTrans (1.0, 45.0, false, db::Vector (21, 9)), 0);
 
-  EXPECT_EQ (ba.complex_trans().to_string(), "r90 *1 0,30");
+  EXPECT_EQ (ba.complex_trans ().to_string (), "r90 *1 0,30");
   EXPECT_EQ (positions (ba, db::Point (0, 100), ba.begin ()), "-100,30");
 }
 
-TEST(5) 
+TEST (5)
 {
   BoxArray ba (db::Box (-9, 3, -7, 4), db::Trans (db::Vector (100, 0)), new db::single_complex_inst<db::Coord> (1.0, 10.0));
 
@@ -182,7 +182,7 @@ TEST(5)
   EXPECT_EQ (positions (ba, db::Point (-10, 0), ba.begin_touching (db::Box (31, 40, 210, 130), MyBoxConvert ())), "");
 }
 
-TEST(6) 
+TEST (6)
 {
   BoxArray ba (db::Box (-90, 0, -70, 10), db::Trans (db::Vector (100, 30)));
 
@@ -227,7 +227,7 @@ TEST(6)
   }
 }
 
-TEST(7) 
+TEST (7)
 {
   db::Vector a (0, 100);
   db::Vector b (200, 0);
@@ -282,7 +282,7 @@ TEST(7)
   EXPECT_EQ (positions (ba1, db::Point (0, 0), ba1.begin ()), "0,0;0,-100;-200,0;-200,-100;-400,0;-400,-100");
 }
 
-TEST(8) 
+TEST (8)
 {
   db::Vector a (0, 100);
   db::Vector b (200, 0);
@@ -304,7 +304,7 @@ TEST(8)
   EXPECT_EQ (ba.bbox_from_raw_bbox (ba.raw_bbox (), db::box_convert<db::Box> ()).to_string (), "(-65,308;547,620)");
 }
 
-TEST(9)
+TEST (9)
 {
   db::Vector a1 (100, 500);
   db::Vector a2 (-100, 200);
@@ -318,26 +318,26 @@ TEST(9)
 
   BoxArray ba (db::Box (10, 10, 50, 50), db::Trans (db::Vector (10, 10)), ia);
   EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin ()), "110,510;-90,210;-190,-90");
-  EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin_touching (db::Box (-200, -1000, 200, 1000), MyBoxConvert ())), 
-    "110,510;-90,210;-190,-90");
+  EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin_touching (db::Box (-200, -1000, 200, 1000), MyBoxConvert ())),
+             "110,510;-90,210;-190,-90");
 
   BoxArray ba2 (ba);
   EXPECT_EQ (ba2 == ba, true);
   EXPECT_EQ (ba2 < ba, false);
 
   EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin ()), "110,510;-90,210;-190,-90");
-  EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin_touching (db::Box (-200, -1000, 200, 1000), MyBoxConvert ())), 
-    "110,510;-90,210;-190,-90");
-  EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin_touching (db::Box (0, 0, 200, 1000), MyBoxConvert ())), 
-    "110,510");
-  EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin_touching (db::Box (0, 0, 200, 100), MyBoxConvert ())), 
-    "");
+  EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin_touching (db::Box (-200, -1000, 200, 1000), MyBoxConvert ())),
+             "110,510;-90,210;-190,-90");
+  EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin_touching (db::Box (0, 0, 200, 1000), MyBoxConvert ())),
+             "110,510");
+  EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin_touching (db::Box (0, 0, 200, 100), MyBoxConvert ())),
+             "");
   EXPECT_EQ (ba2.bbox (db::box_convert<db::Box> ()).to_string (), "(-180,-80;160,560)");
 
   ba2.invert ();
   EXPECT_EQ (ba2 == ba, false);
   EXPECT_EQ (ba2 < ba, ! (ba < ba2));
-  
+
   EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin ()), "-110,-510;90,-210;190,90");
   EXPECT_EQ (ba2.bbox (db::box_convert<db::Box> ()).to_string (), "(-100,-500;240,140)");
 
@@ -349,7 +349,7 @@ TEST(9)
   EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin ()), "100,500;-100,200;-200,-100");
 }
 
-TEST(10)
+TEST (10)
 {
   db::Vector a1 (100, 500);
   db::Vector a2 (-100, 200);
@@ -363,8 +363,8 @@ TEST(10)
 
   BoxArray ba (db::Box (10, 10, 50, 50), db::Trans (db::Vector (10, 10)), ia);
   EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin ()), "110,510;-90,210;-190,-90");
-  EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin_touching (db::Box (-200, -1000, 200, 1000), MyBoxConvert ())), 
-    "110,510;-90,210;-190,-90");
+  EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin_touching (db::Box (-200, -1000, 200, 1000), MyBoxConvert ())),
+             "110,510;-90,210;-190,-90");
 
   EXPECT_EQ (ba.is_complex (), true);
   std::vector<db::Vector> v;
@@ -375,18 +375,18 @@ TEST(10)
   EXPECT_EQ (ba2 < ba, false);
 
   EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin ()), "110,510;-90,210;-190,-90");
-  EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin_touching (db::Box (-200, -1000, 200, 1000), MyBoxConvert ())), 
-    "110,510;-90,210;-190,-90");
-  EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin_touching (db::Box (0, 0, 200, 1000), MyBoxConvert ())), 
-    "110,510;-90,210");
-  EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin_touching (db::Box (0, 0, 200, 100), MyBoxConvert ())), 
-    "");
+  EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin_touching (db::Box (-200, -1000, 200, 1000), MyBoxConvert ())),
+             "110,510;-90,210;-190,-90");
+  EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin_touching (db::Box (0, 0, 200, 1000), MyBoxConvert ())),
+             "110,510;-90,210");
+  EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin_touching (db::Box (0, 0, 200, 100), MyBoxConvert ())),
+             "");
   EXPECT_EQ (ba2.bbox (db::box_convert<db::Box> ()).to_string (), "(-170,-70;210,610)");
 
   ba2.invert ();
   EXPECT_EQ (ba2 == ba, false);
   EXPECT_EQ (ba2 < ba, ! (ba < ba2));
-  
+
   EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin ()), "-55,-255;45,-105;95,45");
   EXPECT_EQ (ba2.bbox (db::box_convert<db::Box> ()).to_string (), "(-50,-250;120,70)");
 
@@ -404,7 +404,7 @@ TEST(10)
   EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin ()), "100,500;-100,200;-200,-100");
 }
 
-TEST(11)
+TEST (11)
 {
   BoxArray ba1 (db::Box (10, 10, 50, 50), db::Trans (db::Vector (10, 10)));
   BoxArray ba2x3 (db::Box (10, 10, 50, 50), db::Trans (db::Vector (10, 20)), db::Vector (0, 1), db::Vector (1, 0), 2, 3);
@@ -463,7 +463,7 @@ TEST(11)
   EXPECT_EQ (ba1cplx == ba2x3cplx, false);
 }
 
-TEST(12_1dArraysX)
+TEST (12_1dArraysX)
 {
   db::Vector a (0, 0);
   db::Vector b (200, 0);

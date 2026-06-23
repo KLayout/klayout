@@ -25,7 +25,7 @@
 #include "dbTestSupport.h"
 #include "lymMacro.h"
 
-TEST(1_IHPMetal1Fill)
+TEST (1_IHPMetal1Fill)
 {
   test_is_long_runner ();
 
@@ -44,11 +44,10 @@ TEST(1_IHPMetal1Fill)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -68,7 +67,7 @@ TEST(1_IHPMetal1Fill)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(1b_IHPMetal1FillAutoOrigin)
+TEST (1b_IHPMetal1FillAutoOrigin)
 {
   test_is_long_runner ();
 
@@ -87,11 +86,10 @@ TEST(1b_IHPMetal1FillAutoOrigin)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -111,7 +109,7 @@ TEST(1b_IHPMetal1FillAutoOrigin)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(1c_IHPMetal1FillSingleOrigin)
+TEST (1c_IHPMetal1FillSingleOrigin)
 {
   test_is_long_runner ();
 
@@ -130,11 +128,10 @@ TEST(1c_IHPMetal1FillSingleOrigin)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -153,4 +150,3 @@ TEST(1c_IHPMetal1FillSingleOrigin)
 
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
-

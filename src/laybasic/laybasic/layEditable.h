@@ -52,7 +52,7 @@ class PropertiesPage;
 /**
  *  @brief The "editable" interface
  *
- *  An "editable" object is providing an interface with the 
+ *  An "editable" object is providing an interface with the
  *  common editing operations like "delete", "copy", "select" etc.
  *  The "editable" objects are maintained in an lay::Editables collection.
  */
@@ -60,13 +60,18 @@ class LAYBASIC_PUBLIC Editable
   : virtual public tl::Object
 {
 public:
-  enum SelectionMode { Replace = 0, Reset, Add, Invert };
-  enum MoveMode { Any = 0, Selected, Partial };
+  enum SelectionMode { Replace = 0,
+                       Reset,
+                       Add,
+                       Invert };
+  enum MoveMode { Any = 0,
+                  Selected,
+                  Partial };
 
   /**
    *  @brief The constructor
    *
-   *  @param editables The collection in which to insert the 
+   *  @param editables The collection in which to insert the
    *                   object. Can be 0 for not inserting it somewhere.
    */
   Editable (Editables *editables = 0);
@@ -108,7 +113,7 @@ public:
   /**
    *  @brief Deliver the bbox of the selection
    *
-   *  This bounding box is used to compute the center of the 
+   *  This bounding box is used to compute the center of the
    *  selection for transformation by an angle (it is better
    *  to do this around der center of the selection bbox).
    *  The bbox must either be empty (if no selection is present)
@@ -118,7 +123,7 @@ public:
   {
     return db::DBox ();
   }
-  
+
   /**
    *  @brief transform the selection
    *
@@ -149,7 +154,7 @@ public:
    *  a negative value. If the plugin is only weakly interested in a selection,
    *  it should return the value provided by the default implementation.
    *  The click_proximity method can be used to implement cycling through
-   *  several objects on the same location by delivering the proximity for 
+   *  several objects on the same location by delivering the proximity for
    *  "new" objects only by remembering the objects already selected.
    *  If the client of the plugin finds no plugin that has anything to select,
    *  it will try to reset the selected and do a new scan over all plugins.
@@ -189,7 +194,7 @@ public:
    *  @brief transient selection
    *
    *  The transient selection is triggered when the mouse does not move for
-   *  some time interval ("hover mode"). 
+   *  some time interval ("hover mode").
    *  This method is supposed to create a transient selection on a single object
    *  at the given point.
    *
@@ -222,10 +227,10 @@ public:
   /**
    *  @brief Clears the previous selection state
    *
-   *  This method is used by the single-point selection cycling protocol to clear the 
+   *  This method is used by the single-point selection cycling protocol to clear the
    *  plugin's single-point selection state. The cycling protocol is used when a certain
    *  point is clicked at multiple times. A plugin is supposed to remember such selections and
-   *  exclude them from further checks. If all objects in question are selected, no further 
+   *  exclude them from further checks. If all objects in question are selected, no further
    *  object would be selected. clear_previous_selection is called in that case to indicate that
    *  the previous selection should be cleared and a new cycle is about to begin
    */
@@ -239,9 +244,9 @@ public:
    *
    *  This is geometrical selection of objects. Selection can be
    *  either by a box or by a point. In the latter case, a degenerated
-   *  box must be provided which is a single-point box. 
+   *  box must be provided which is a single-point box.
    *  An empty box equals "all".
-   *  The return value is basically used by the point selection mode 
+   *  The return value is basically used by the point selection mode
    *  to determine the first editable that gets the selection.
    *
    *  @param box The box within which to select in micron space.
@@ -260,23 +265,23 @@ public:
    *  can decide whether it wants to catch a move request and return true.
    *  In "Selected" mode, the plugin is supposed to move all selected objects.
    *  In "Partial" mode, the plugin is supposed to pick an object from the selected
-   *  ones and perform a move that modifies that object. In "Any" or "Selected" mode, 
+   *  ones and perform a move that modifies that object. In "Any" or "Selected" mode,
    *  the plugin must return true to catch the selection. Only one plugin will receive
    *  the selection.
    *
    *  All move operations start from point p.
-   *    
+   *
    *  A move operation is continued by "move" events and terminated
    *  by either a "cancel" or a "end_move" event.
    *
    *  The basic algorithm used for the move implementation is this:
    *    1.) if anything is selected, call begin_move on every Editable with sel=Partial.
    *        If a plugin returns true, the method returns.
-   *    2.) else if anything is selected, call begin_move on every Editable with sel=Selected. 
+   *    2.) else if anything is selected, call begin_move on every Editable with sel=Selected.
    *    3.) if nothing is selected, call begin_move on every Editable with sel=Any. Stop if one of
    *        these returns true.
    *    4.) if none returned true, select pointwise around "p" and proceed as in 2.)
-   *  
+   *
    *  @param sel See above.
    *  @param p The point at which the mouse was clicked
    *  @param ac The angle constraint imposed (lay::AC_Global if no specific is requested)
@@ -291,7 +296,7 @@ public:
    *  @brief Continue a "move" operation
    *
    *  These events are sent whenever the mouse is moved.
-   *  
+   *
    *  @param p The current mouse location
    *  @param ac The angle constraint imposed (lay::AC_Global if no specific is requested)
    */
@@ -303,7 +308,7 @@ public:
   /**
    *  @brief Transform the moved object/set while in a move operation
    *
-   *  These events are sent whenever the right mouse button is clicked in order to request a 
+   *  These events are sent whenever the right mouse button is clicked in order to request a
    *  rotation of the content currently moved.
    *
    *  @param p The current point
@@ -321,7 +326,7 @@ public:
    *  @param p The last mouse location
    *  @param ac The angle constraint imposed (lay::AC_Global if no specific is requested)
    */
-  virtual void end_move (const db::DPoint & /*p*/, lay::angle_constraint_type  /*ac*/)
+  virtual void end_move (const db::DPoint & /*p*/, lay::angle_constraint_type /*ac*/)
   {
     //  .. by default, nothing is implemented ..
   }
@@ -339,7 +344,7 @@ public:
   /**
    *  @brief Cancel any pending operations
    *
-   *  This event is sent whenever a pending operation such as 
+   *  This event is sent whenever a pending operation such as
    *  a move operation should be canceled.
    */
   virtual void edit_cancel ()
@@ -393,7 +398,7 @@ public:
    *  that is acting as a proxy to a certain selected editable object.
    *  It acts as the communication link between the Editable object and
    *  the properties dialog by displaying and applying properties.
-   *  The object returned by this method is newed and must be deleted 
+   *  The object returned by this method is newed and must be deleted
    *  by the caller. The return value is 0 if the Editable object does
    *  not support a properties page.
    */
@@ -409,7 +414,7 @@ public:
    *  The properties page object calls this method if it is destroyed
    *  on the Editable object that it was issued from.
    */
-  virtual void properties_page_deleted () 
+  virtual void properties_page_deleted ()
   {
     //  .. nothing yet.
   }
@@ -512,7 +517,7 @@ public:
   /**
    *  @brief Deliver the bbox of the selection
    *
-   *  This bounding box is used to compute the center of the 
+   *  This bounding box is used to compute the center of the
    *  selection for transformation by an angle (it is better
    *  to do this around der center of the selection bbox).
    *  The bbox must either be empty (if no selection is present)
@@ -544,7 +549,7 @@ public:
    *  @brief Establish a transient selection
    *
    *  The transient selection is supposed to highlight the object which would be scope of the next
-   *  select or move operation. Since move is usually defined to move the current selection, the 
+   *  select or move operation. Since move is usually defined to move the current selection, the
    *  transient selection should not be done if the view is in move mode and something is selected.
    *  Exceptions are: highlighting an object within the current selection.
    */
@@ -563,7 +568,7 @@ public:
   /**
    *  @brief Clear the previous selection
    *
-   *  The previous selection is used to implement the cycling protocol for single-point 
+   *  The previous selection is used to implement the cycling protocol for single-point
    *  selections.
    */
   void clear_previous_selection ();
@@ -636,7 +641,7 @@ public:
    *  This method will return the number of selected objects.
    */
   size_t selection_size ();
-  
+
   /**
    *  @brief Indicates whether any object is selected.
    */
@@ -659,7 +664,7 @@ public:
   /**
    *  @brief Editable iterator: begin
    */
-  iterator begin () 
+  iterator begin ()
   {
     return m_editables.begin ();
   }
@@ -667,7 +672,7 @@ public:
   /**
    *  @brief Editable iterator: end
    */
-  iterator end () 
+  iterator end ()
   {
     return m_editables.end ();
   }
@@ -707,8 +712,8 @@ public:
   /**
    *  @brief Enable or disable edit operations
    *
-   *  This method is called when the client code wishes to (temporarily) enable to disable 
-   *  user functions that may cause an edit operation. This method can be reimplemented to 
+   *  This method is called when the client code wishes to (temporarily) enable to disable
+   *  user functions that may cause an edit operation. This method can be reimplemented to
    *  disable menu entries etc.
    */
   virtual void enable_edits (bool /*enable*/)
@@ -753,4 +758,3 @@ private:
 }
 
 #endif
-

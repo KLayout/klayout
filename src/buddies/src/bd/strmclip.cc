@@ -32,18 +32,18 @@
 #include "tlTimer.h"
 
 
-struct ClipData
-{
-  ClipData () 
+struct ClipData {
+  ClipData ()
     : file_in (), file_out (), clip_layer ()
-  { }
+  {
+  }
 
   bd::GenericReaderOptions reader_options;
   bd::GenericWriterOptions writer_options;
   std::string file_in;
   std::string file_out;
   db::LayerProperties clip_layer;
-  std::vector <db::DBox> clip_boxes;
+  std::vector<db::DBox> clip_boxes;
   std::string result;
   std::string top;
 
@@ -97,7 +97,7 @@ void clip (ClipData &data)
   tl::log << "Clip layer index is " << clip_layer_index;
 
   //  get top cells
-  std::vector <db::cell_index_type> top_cells;
+  std::vector<db::cell_index_type> top_cells;
   if (data.top.empty ()) {
     top_cells.assign (layout.begin_top_down (), layout.end_top_cells ());
   } else {
@@ -109,12 +109,12 @@ void clip (ClipData &data)
   }
 
   //  go through the top cells
-  for (std::vector <db::cell_index_type>::const_iterator tc = top_cells.begin (); tc != top_cells.end (); ++tc) {
+  for (std::vector<db::cell_index_type>::const_iterator tc = top_cells.begin (); tc != top_cells.end (); ++tc) {
 
-    std::vector <db::Box> clip_boxes;
+    std::vector<db::Box> clip_boxes;
 
     //  add the explicit boxes first
-    for (std::vector <db::DBox>::const_iterator b = data.clip_boxes.begin (); b != data.clip_boxes.end (); ++b) {
+    for (std::vector<db::DBox>::const_iterator b = data.clip_boxes.begin (); b != data.clip_boxes.end (); ++b) {
       clip_boxes.push_back (db::VCplxTrans (1.0 / layout.dbu ()) * *b);
     }
 
@@ -128,7 +128,7 @@ void clip (ClipData &data)
     clip_boxes.erase (std::unique (clip_boxes.begin (), clip_boxes.end ()), clip_boxes.end ());
 
     tl::log << "Clip boxes are:";
-    for (std::vector <db::Box>::const_iterator cbx = clip_boxes.begin (); cbx != clip_boxes.end (); ++cbx) {
+    for (std::vector<db::Box>::const_iterator cbx = clip_boxes.begin (); cbx != clip_boxes.end (); ++cbx) {
       tl::log << "  " << cbx->to_string ();
     }
 
@@ -144,10 +144,9 @@ void clip (ClipData &data)
     db::cell_index_type clip_top = target_layout.add_cell (result_top.c_str ());
     db::Cell &clip_top_cell = target_layout.cell (clip_top);
 
-    for (std::vector <db::cell_index_type>::const_iterator cc = new_cells.begin (); cc != new_cells.end (); ++cc) {
+    for (std::vector<db::cell_index_type>::const_iterator cc = new_cells.begin (); cc != new_cells.end (); ++cc) {
       clip_top_cell.insert (db::CellInstArray (db::CellInst (*cc), db::Trans ()));
     }
-
   }
 
   //  write the layout
@@ -161,7 +160,7 @@ void clip (ClipData &data)
   writer.write (target_layout, stream);
 }
 
-BD_PUBLIC int strmclip (int argc, char *argv[])
+BD_PUBLIC int strmclip (int argc, char *argv [])
 {
   ClipData data;
 
@@ -169,35 +168,28 @@ BD_PUBLIC int strmclip (int argc, char *argv[])
   data.reader_options.add_options (cmd);
   data.writer_options.add_options (cmd);
 
-  cmd << tl::arg ("input",                     &data.file_in, "The input file",
+  cmd << tl::arg ("input", &data.file_in, "The input file",
                   "The input file can be any supported format. It can be gzip compressed and will "
-                  "be uncompressed automatically in this case."
-                 )
-      << tl::arg ("output",                    &data.file_out, "The output file",
+                  "be uncompressed automatically in this case.")
+      << tl::arg ("output", &data.file_out, "The output file",
                   "The output format is determined from the suffix of the file. If the suffix indicates "
                   "gzip compression, the file will be compressed on output. Examples for recognized suffixes are "
                   "\".oas\", \".gds.gz\", \".dxf\" or \".gds2\". You can also use any name, and specify the "
                   "desired suffix in square brackets after the file name. For example, 'file.clip[oas]' will "
-                  "create an OASIS file called 'file.clip'."
-                 )
-      << tl::arg ("-l|--clip-layer=spec",      &data, &ClipData::set_clip_layer, "Specifies a layer to take the clip regions from",
+                  "create an OASIS file called 'file.clip'.")
+      << tl::arg ("-l|--clip-layer=spec", &data, &ClipData::set_clip_layer, "Specifies a layer to take the clip regions from",
                   "If this option is given, the clip rectangles are taken from the given layer."
                   "The layer specification is of the \"layer/datatype\" form or a plain layer name if named layers "
-                  "are available."
-                 )
-      << tl::arg ("-t|--top-in=cellname",      &data.top, "Specifies the top cell for input",
-                  "If this option is given, it specifies the cell to use as top cell from the input."
-                 )
-      << tl::arg ("-x|--top-out=cellname",     &data.result, "Specifies the top cell for output",
+                  "are available.")
+      << tl::arg ("-t|--top-in=cellname", &data.top, "Specifies the top cell for input",
+                  "If this option is given, it specifies the cell to use as top cell from the input.")
+      << tl::arg ("-x|--top-out=cellname", &data.result, "Specifies the top cell for output",
                   "If given, this name will be used as the top cell name in the output file. "
-                  "By default the output's top cell will be \"CLIPPED_\" plus the input's top cell name."
-                 )
-      << tl::arg ("*-r|--rect=\"l,b,r,t\"",    &data, &ClipData::add_box, "Specifies a clip box",
+                  "By default the output's top cell will be \"CLIPPED_\" plus the input's top cell name.")
+      << tl::arg ("*-r|--rect=\"l,b,r,t\"", &data, &ClipData::add_box, "Specifies a clip box",
                   "This option specifies the box to clip in micrometer units. The box is given "
                   "by left, bottom, right and top coordinates. This option can be used multiple times "
-                  "to produce a clip covering more than one rectangle."
-                 )
-    ;
+                  "to produce a clip covering more than one rectangle.");
 
   cmd.brief ("This program will produce clips from an input layout and writes them to another layout");
 

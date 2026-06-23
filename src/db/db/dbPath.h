@@ -45,18 +45,19 @@
 #include <algorithm>
 #include <cmath>
 
-namespace db {
+namespace db
+{
 
 template <class Coord> class generic_repository;
 class ArrayRepository;
 
-/** 
+/**
  *  @brief A point iterator for paths
  *
  *  The point iterator delivers all points of the path.
  *  It is based on the random access operator of the point list.
  */
- 
+
 template <class Path, class Tr>
 class path_point_iterator
 {
@@ -64,41 +65,41 @@ public:
   typedef typename Path::pointlist_type pointlist_type;
   typedef typename pointlist_type::value_type point_type;
   typedef typename point_type::coord_type coord_type;
-  typedef void pointer;           //  no operator->
-  typedef point_type reference;   //  operator* returns a value
+  typedef void pointer;         //  no operator->
+  typedef point_type reference; //  operator* returns a value
   typedef point_type value_type;
   typedef std::bidirectional_iterator_tag iterator_category;
   typedef size_t difference_type;
   typedef Tr trans_type;
 
-  /** 
-   *  @brief The default constructor 
+  /**
+   *  @brief The default constructor
    */
   path_point_iterator ()
     : mp_pointlist (0), m_index (0)
   {
-    //  .. nothing yet .. 
+    //  .. nothing yet ..
   }
-  
-  /** 
-   *  @brief The standard constructor 
+
+  /**
+   *  @brief The standard constructor
    */
   path_point_iterator (const pointlist_type &pointlist, size_t n)
     : mp_pointlist (&pointlist), m_index (n)
   {
-    //  .. nothing yet .. 
+    //  .. nothing yet ..
   }
-  
-  /** 
+
+  /**
    *  @brief The standard constructor with a transformation
    */
   template <class T>
-  path_point_iterator (const path_point_iterator<Path, T> &d, const trans_type &trans) 
+  path_point_iterator (const path_point_iterator<Path, T> &d, const trans_type &trans)
     : mp_pointlist (d.mp_pointlist), m_index (d.m_index), m_trans (trans)
   {
-    //  .. nothing yet .. 
+    //  .. nothing yet ..
   }
-  
+
   /**
    *  @brief Sorting order
    */
@@ -126,7 +127,7 @@ public:
   /**
    *  @brief Point access
    */
-  point_type operator* () const 
+  point_type operator* () const
   {
     return m_trans ((*mp_pointlist) [m_index]);
   }
@@ -142,7 +143,7 @@ public:
   /**
    *  @brief Addition of distances
    */
-  path_point_iterator &operator+= (difference_type d) 
+  path_point_iterator &operator+= (difference_type d)
   {
     m_index += d;
     return *this;
@@ -159,7 +160,7 @@ public:
   /**
    *  @brief Subtraction of distances
    */
-  path_point_iterator &operator-= (difference_type d) 
+  path_point_iterator &operator-= (difference_type d)
   {
     m_index -= d;
     return *this;
@@ -176,7 +177,7 @@ public:
   /**
    *  @brief Increment operator
    */
-  path_point_iterator &operator++ () 
+  path_point_iterator &operator++ ()
   {
     ++m_index;
     return *this;
@@ -185,7 +186,7 @@ public:
   /**
    *  @brief Decrement operator
    */
-  path_point_iterator &operator-- () 
+  path_point_iterator &operator-- ()
   {
     --m_index;
     return *this;
@@ -199,10 +200,10 @@ private:
   trans_type m_trans;
 };
 
-/** 
+/**
  *  @brief A path class
  *
- *  A path consists of an sequence of line segments 
+ *  A path consists of an sequence of line segments
  *  and a width.
  *  The path can be converted to a polygon.
  */
@@ -219,16 +220,16 @@ public:
   typedef db::vector<coord_type> vector_type;
   typedef db::box<coord_type> box_type;
   typedef db::coord_traits<coord_type> coord_traits;
-  typedef typename coord_traits::distance_type distance_type; 
-  typedef typename coord_traits::perimeter_type perimeter_type; 
-  typedef typename coord_traits::area_type area_type; 
-  typedef object_tag< path<C> > tag;
+  typedef typename coord_traits::distance_type distance_type;
+  typedef typename coord_traits::perimeter_type perimeter_type;
+  typedef typename coord_traits::area_type area_type;
+  typedef object_tag<path<C>> tag;
   typedef tl::vector<point_type> pointlist_type;
-  typedef db::path_point_iterator<path <C>, db::unit_trans<C> > iterator;
+  typedef db::path_point_iterator<path<C>, db::unit_trans<C>> iterator;
 
   /**
    *  @brief The default constructor.
-   *  
+   *
    *  The default constructor creates a empty path with a width
    *  a zero.
    */
@@ -238,7 +239,7 @@ public:
     // .. nothing yet ..
   }
 
-  /** 
+  /**
    *  @brief Standard constructor
    *
    *  The standard ctor creates a path from a sequence of points
@@ -334,26 +335,26 @@ public:
   bool operator< (const path<C> &b) const
   {
     return (m_width < b.m_width || (m_width == b.m_width &&
-           (m_bgn_ext < b.m_bgn_ext || (m_bgn_ext == b.m_bgn_ext &&  
-           (m_end_ext < b.m_end_ext || (m_end_ext == b.m_end_ext &&  
-           (m_points < b.m_points)))))));
+                                    (m_bgn_ext < b.m_bgn_ext || (m_bgn_ext == b.m_bgn_ext &&
+                                                                 (m_end_ext < b.m_end_ext || (m_end_ext == b.m_end_ext &&
+                                                                                              (m_points < b.m_points)))))));
   }
 
-  /** 
+  /**
    *  @brief Equality test
    */
   bool operator== (const path<C> &b) const
   {
-    return m_width == b.m_width && m_bgn_ext == b.m_bgn_ext && 
+    return m_width == b.m_width && m_bgn_ext == b.m_bgn_ext &&
            m_end_ext == b.m_end_ext && m_points == b.m_points;
   }
 
-  /** 
+  /**
    *  @brief Inequality test
    */
   bool operator!= (const path<C> &b) const
   {
-    return !operator== (b);
+    return ! operator== (b);
   }
 
   /**
@@ -395,7 +396,7 @@ public:
    */
   bool not_equal (const path<C> &b) const
   {
-    return !equal (b);
+    return ! equal (b);
   }
 
   /**
@@ -536,7 +537,7 @@ public:
   {
     return iterator (m_points, 0);
   }
-  
+
   /**
    *  @brief Access to the points through the iterator
    *
@@ -560,7 +561,7 @@ public:
    *
    *  Transforms the path with the given transformation.
    *  Modifies the path with the transformed path.
-   *  
+   *
    *  @param t The transformation to apply.
    *
    *  @return The transformed path.
@@ -587,7 +588,7 @@ public:
     for (typename pointlist_type::iterator p = m_points.begin (); p != m_points.end (); ++p) {
       p->transform (t);
     }
-    
+
     return *this;
   }
 
@@ -596,7 +597,7 @@ public:
    *
    *  Transforms the path with the given transformation.
    *  Does not modify the path but returns the transformed path.
-   *  
+   *
    *  @param t The transformation to apply.
    *
    *  @return The transformed path.
@@ -644,11 +645,11 @@ public:
   /**
    *  @brief Returns the moved path
    *
-   *  Moves the path by the given offset and returns the 
+   *  Moves the path by the given offset and returns the
    *  moved path. The path is not modified.
    *
    *  @param p The distance to move the path.
-   * 
+   *
    *  @return The moved path.
    */
   path<C> moved (const vector<C> &p) const
@@ -661,11 +662,11 @@ public:
   /**
    *  @brief Moves the path.
    *
-   *  Moves the path by the given offset and returns the 
+   *  Moves the path by the given offset and returns the
    *  moved path. The path is overwritten.
    *
    *  @param p The distance to move the path.
-   * 
+   *
    *  @return The moved path.
    */
   path<C> &move (const vector<C> &d)
@@ -679,25 +680,25 @@ public:
     return *this;
   }
 
-  /** 
+  /**
    *  @brief The length of the path
    */
   distance_type length () const;
 
-  /** 
+  /**
    *  @brief The perimeter of the path
    *
-   *  This method returns the approximate perimeter of the path. 
-   *  It is basically two times the length plus width. Extensions are taken into account but 
+   *  This method returns the approximate perimeter of the path.
+   *  It is basically two times the length plus width. Extensions are taken into account but
    *  the precise effect of the corner treatment is not.
    */
   perimeter_type perimeter () const;
 
-  /** 
+  /**
    *  @brief The area of the path
    *
-   *  This method returns the approximate area of the path. 
-   *  It is basically the length times the width. Extensions are taken into account but 
+   *  This method returns the approximate area of the path.
+   *  It is basically the length times the width. Extensions are taken into account but
    *  the precise effect of the corner treatment is not.
    */
   area_type area () const;
@@ -741,12 +742,12 @@ public:
    *
    *  The path is converted to a pointlist describing the
    *  hull polygon. The resulting pointlist is not guaranteed not to
-   *  be self-overlapping. 
+   *  be self-overlapping.
    */
   template <class PointList>
   void hull (PointList &pts, int semi_circ_pts = db::num_circle_points () / 2) const
   {
-    pts.reserve (m_points.size () * 2);  //  minimum number of points required
+    pts.reserve (m_points.size () * 2); //  minimum number of points required
 
     //  use the real points
     pointlist_type tmp_points;
@@ -761,7 +762,7 @@ public:
    *
    *  The path is converted to a pointlist describing the
    *  hull polygon. The resulting pointlist is not guaranteed not to
-   *  be self-overlapping. 
+   *  be self-overlapping.
    *
    *  This version allows one to override the left and right side's width hence creating
    *  asymmetric paths. dleft is the shift to the left (as seen in the direction of the
@@ -770,7 +771,7 @@ public:
   template <class PointList>
   void hull (PointList &pts, C dleft, C dright, int semi_circ_pts = db::num_circle_points () / 2) const
   {
-    pts.reserve (m_points.size () * 2);  //  minimum number of points required
+    pts.reserve (m_points.size () * 2); //  minimum number of points required
 
     //  use the real points
     pointlist_type tmp_points;
@@ -786,7 +787,7 @@ public:
    *  This function basically uses the hull method with the same
    *  constraints.
    *  Because of the overhead of creating a canonical representation
-   *  and copying of the polygon, this method is somewhat slower than 
+   *  and copying of the polygon, this method is somewhat slower than
    *  the hull method.
    */
   db::polygon<C> polygon () const
@@ -805,7 +806,7 @@ public:
    *  This function basically uses the hull method with the same
    *  constraints.
    *  Because of the overhead of creating a canonical representation
-   *  and copying of the polygon, this method is somewhat slower than 
+   *  and copying of the polygon, this method is somewhat slower than
    *  the hull method.
    */
   db::simple_polygon<C> simple_polygon () const
@@ -820,7 +821,7 @@ public:
 
   /**
    *  @brief Swap the path with another one
-   * 
+   *
    *  The global std::swap function injected into the std namespace
    *  is redirected to this implementation.
    */
@@ -887,7 +888,7 @@ public:
 
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
-    if (!no_self) {
+    if (! no_self) {
       stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
     }
     db::mem_stat (stat, purpose, cat, m_points, true, (void *) this);
@@ -931,7 +932,7 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
 /**
  *  @brief Binary * operator (transformation)
  *
- *  Transforms the path with the given transformation and 
+ *  Transforms the path with the given transformation and
  *  returns the result.
  *
  *  @param t The transformation to apply
@@ -939,7 +940,7 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
  *  @return t * p
  */
 template <class Tr>
-inline path<typename Tr::target_coord_type> 
+inline path<typename Tr::target_coord_type>
 operator* (const Tr &t, const path<typename Tr::coord_type> &p)
 {
   return p.transformed (t);
@@ -980,7 +981,7 @@ typedef path<db::Coord> Path;
  */
 typedef path<db::DCoord> DPath;
 
-/** 
+/**
  *  @brief A path reference
  *
  *  A path reference is basically a proxy to a path and
@@ -989,8 +990,7 @@ typedef path<db::DCoord> DPath;
 
 template <class Path, class Trans>
 struct path_ref
-  : public shape_ref<Path, Trans>
-{
+  : public shape_ref<Path, Trans> {
   typedef typename Path::coord_type coord_type;
   typedef typename Path::point_type point_type;
   typedef typename Path::box_type box_type;
@@ -998,11 +998,11 @@ struct path_ref
   typedef Path path_type;
   typedef db::path_point_iterator<Path, trans_type> iterator;
   typedef db::generic_repository<coord_type> repository_type;
-  typedef db::object_tag< path_ref<Path, Trans> > tag;
+  typedef db::object_tag<path_ref<Path, Trans>> tag;
 
   /**
    *  @brief The default constructor.
-   *  
+   *
    *  The default constructor creates a invalid path reference
    */
   path_ref ()
@@ -1033,7 +1033,7 @@ struct path_ref
 
   /**
    *  @brief The translation constructor.
-   *  
+   *
    *  This constructor allows one to copy a path reference from one
    *  repository to another
    */
@@ -1043,33 +1043,33 @@ struct path_ref
     // .. nothing yet ..
   }
 
-  /** 
+  /**
    *  @brief The point iterator begin function
    *
    *  The point iterator delivers all points of the path.
    *
    *  @return the begin value of the iterator
    */
-  iterator begin () const 
-  { 
+  iterator begin () const
+  {
     return iterator (this->obj ().begin (), this->trans ());
   }
-  
-  /** 
+
+  /**
    *  @brief The point iterator begin function
    *
    *  The point iterator delivers all points of the path.
    *
    *  @return the end value of the iterator
    */
-  iterator end () const 
-  { 
+  iterator end () const
+  {
     return iterator (this->obj ().end (), this->trans ());
   }
-  
-  /** 
+
+  /**
    *  @brief Return the transformed object
-   * 
+   *
    *  This version does not change the object and is const.
    */
   template <class TargetTrans>
@@ -1093,7 +1093,7 @@ struct path_ref
 /**
  *  @brief Binary * operator (transformation)
  *
- *  Transforms the path reference with the given transformation and 
+ *  Transforms the path reference with the given transformation and
  *  returns the result.
  *
  *  @param t The transformation to apply
@@ -1149,23 +1149,23 @@ Path round_path_corners (const Path &input, int rad, int npoints);
 
 } // namespace db
 
-namespace tl 
+namespace tl
 {
-  /**
-   *  @brief Special extractors for the paths
-   */
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Path &p);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DPath &p);
+/**
+ *  @brief Special extractors for the paths
+ */
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Path &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DPath &p);
 
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Path &p);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DPath &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Path &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DPath &p);
 
 } // namespace tl
 
 namespace std
 {
 
-//  injecting a global std::swap for polygons into the 
+//  injecting a global std::swap for polygons into the
 //  std namespace
 template <class C>
 void swap (db::path<C> &a, db::path<C> &b)
@@ -1177,4 +1177,3 @@ void swap (db::path<C> &a, db::path<C> &b)
 
 
 #endif
-

@@ -41,14 +41,12 @@ ShapeProcessor::ShapeProcessor (bool report_progress, const std::string &progres
   // .. nothing yet ..
 }
 
-void 
-ShapeProcessor::clear ()
+void ShapeProcessor::clear ()
 {
   m_processor.clear ();
 }
 
-void 
-ShapeProcessor::reserve (size_t n)
+void ShapeProcessor::reserve (size_t n)
 {
   m_processor.reserve (n);
 }
@@ -59,8 +57,7 @@ ShapeProcessor::count () const
   return m_processor.count ();
 }
 
-void 
-ShapeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
+void ShapeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
 {
   m_processor.process (es, op);
 }
@@ -93,8 +90,7 @@ ShapeProcessor::count_edges (const db::Shape &shape) const
   return n;
 }
 
-void
-ShapeProcessor::merge (const std::vector<db::Shape> &in, const std::vector<db::CplxTrans> &trans, std::vector <db::Edge> &out_edges, unsigned int min_wc)
+void ShapeProcessor::merge (const std::vector<db::Shape> &in, const std::vector<db::CplxTrans> &trans, std::vector<db::Edge> &out_edges, unsigned int min_wc)
 {
   clear ();
 
@@ -118,8 +114,7 @@ ShapeProcessor::merge (const std::vector<db::Shape> &in, const std::vector<db::C
   process (out, op);
 }
 
-void
-ShapeProcessor::merge (const std::vector<db::Shape> &in, const std::vector<db::CplxTrans> &trans, std::vector <db::Polygon> &out_polygons, unsigned int min_wc, bool resolve_holes, bool min_coherence)
+void ShapeProcessor::merge (const std::vector<db::Shape> &in, const std::vector<db::CplxTrans> &trans, std::vector<db::Polygon> &out_polygons, unsigned int min_wc, bool resolve_holes, bool min_coherence)
 {
   clear ();
 
@@ -144,10 +139,9 @@ ShapeProcessor::merge (const std::vector<db::Shape> &in, const std::vector<db::C
   process (out, op);
 }
 
-void
-ShapeProcessor::boolean (const std::vector<db::Shape> &in_a, const std::vector<db::CplxTrans> &trans_a,
-                         const std::vector<db::Shape> &in_b, const std::vector<db::CplxTrans> &trans_b,
-                         int mode, std::vector <db::Edge> &out_edges)
+void ShapeProcessor::boolean (const std::vector<db::Shape> &in_a, const std::vector<db::CplxTrans> &trans_a,
+                              const std::vector<db::Shape> &in_b, const std::vector<db::CplxTrans> &trans_b,
+                              int mode, std::vector<db::Edge> &out_edges)
 {
   clear ();
 
@@ -183,10 +177,9 @@ ShapeProcessor::boolean (const std::vector<db::Shape> &in_a, const std::vector<d
   process (out, op);
 }
 
-void
-ShapeProcessor::boolean (const std::vector<db::Shape> &in_a, const std::vector<db::CplxTrans> &trans_a,
-                         const std::vector<db::Shape> &in_b, const std::vector<db::CplxTrans> &trans_b,
-                         int mode, std::vector <db::Polygon> &out_polygons, bool resolve_holes, bool min_coherence)
+void ShapeProcessor::boolean (const std::vector<db::Shape> &in_a, const std::vector<db::CplxTrans> &trans_a,
+                              const std::vector<db::Shape> &in_b, const std::vector<db::CplxTrans> &trans_b,
+                              int mode, std::vector<db::Polygon> &out_polygons, bool resolve_holes, bool min_coherence)
 {
   clear ();
 
@@ -223,9 +216,8 @@ ShapeProcessor::boolean (const std::vector<db::Shape> &in_a, const std::vector<d
   process (out, op);
 }
 
-void 
-ShapeProcessor::size (const std::vector<db::Shape> &in, const std::vector<db::CplxTrans> &trans,
-                      db::Coord dx, db::Coord dy, std::vector <db::Polygon> &out, unsigned int mode, bool resolve_holes, bool min_coherence)
+void ShapeProcessor::size (const std::vector<db::Shape> &in, const std::vector<db::CplxTrans> &trans,
+                           db::Coord dx, db::Coord dy, std::vector<db::Polygon> &out, unsigned int mode, bool resolve_holes, bool min_coherence)
 {
   //  1st step: merge input
   clear ();
@@ -255,20 +247,19 @@ ShapeProcessor::size (const std::vector<db::Shape> &in, const std::vector<db::Cp
   db::BooleanOp op (db::BooleanOp::Or);
   process (pg, op);
 #else
-  //  Intermediate output for debugging 
+  //  Intermediate output for debugging
   db::PolygonContainer pc (out);
   db::PolygonGenerator pg2 (pc, false, false);
   db::BooleanOp op (db::BooleanOp::Or);
   process (pg2, op);
-  for (std::vector <db::Polygon>::iterator p = out.begin (); p != out.end (); ++p) {
+  for (std::vector<db::Polygon>::iterator p = out.begin (); p != out.end (); ++p) {
     *p = p->sized (dx, dy, mode);
   }
 #endif
 }
 
-void 
-ShapeProcessor::size (const std::vector<db::Shape> &in, const std::vector<db::CplxTrans> &trans,
-                      db::Coord dx, db::Coord dy, std::vector <db::Edge> &out, unsigned int mode)
+void ShapeProcessor::size (const std::vector<db::Shape> &in, const std::vector<db::CplxTrans> &trans,
+                           db::Coord dx, db::Coord dy, std::vector<db::Edge> &out, unsigned int mode)
 {
   //  1st step: merge input
   clear ();
@@ -297,8 +288,7 @@ ShapeProcessor::size (const std::vector<db::Shape> &in, const std::vector<db::Cp
   process (pg, op);
 }
 
-void 
-ShapeProcessor::collect_shapes_hier (const db::CplxTrans &tr, const db::Layout &layout, const db::Cell &cell, unsigned int layer, int hier_levels, size_t &pn, size_t pdelta) 
+void ShapeProcessor::collect_shapes_hier (const db::CplxTrans &tr, const db::Layout &layout, const db::Cell &cell, unsigned int layer, int hier_levels, size_t &pn, size_t pdelta)
 {
   db::ICplxTrans tri (tr);
   for (db::Shapes::shape_iterator s = cell.shapes (layer).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
@@ -313,7 +303,6 @@ ShapeProcessor::collect_shapes_hier (const db::CplxTrans &tr, const db::Layout &
         collect_shapes_hier (tr * i->complex_trans (*a), layout, layout.cell (i->cell_index ()), layer, hier_levels > 0 ? hier_levels - 1 : hier_levels, pn, pdelta);
       }
     }
-
   }
 }
 
@@ -339,14 +328,12 @@ ShapeProcessor::count_edges_hier (const db::Layout &layout, const db::Cell &cell
 
     cache.insert (std::make_pair (std::make_pair (cell.cell_index (), hier_levels), n));
     return n;
-
   }
 }
 
-void 
-ShapeProcessor::boolean (const db::Layout &layout_in_a, const db::Cell &cell_in_a, const std::vector<unsigned int> &layers_in_a, 
-                         const db::Layout &layout_in_b, const db::Cell &cell_in_b, const std::vector<unsigned int> &layers_in_b, 
-                         db::Shapes &shapes, int mode, bool with_sub_hierarchy, bool resolve_holes, bool min_coherence)
+void ShapeProcessor::boolean (const db::Layout &layout_in_a, const db::Cell &cell_in_a, const std::vector<unsigned int> &layers_in_a,
+                              const db::Layout &layout_in_b, const db::Cell &cell_in_b, const std::vector<unsigned int> &layers_in_b,
+                              db::Shapes &shapes, int mode, bool with_sub_hierarchy, bool resolve_holes, bool min_coherence)
 {
   double fa = 1.0, fb = 1.0;
   if (shapes.cell () && shapes.cell ()->layout ()) {
@@ -390,9 +377,8 @@ ShapeProcessor::boolean (const db::Layout &layout_in_a, const db::Cell &cell_in_
   process (out, op);
 }
 
-void 
-ShapeProcessor::size (const db::Layout &layout_in, const db::Cell &cell_in, const std::vector<unsigned int> &layers_in, 
-                      db::Shapes &out, db::Coord dx, db::Coord dy, unsigned int mode, bool with_sub_hierarchy, bool resolve_holes, bool min_coherence)
+void ShapeProcessor::size (const db::Layout &layout_in, const db::Cell &cell_in, const std::vector<unsigned int> &layers_in,
+                           db::Shapes &out, db::Coord dx, db::Coord dy, unsigned int mode, bool with_sub_hierarchy, bool resolve_holes, bool min_coherence)
 {
   double f = 1.0;
   if (out.cell () && out.cell ()->layout ()) {
@@ -429,23 +415,22 @@ ShapeProcessor::size (const db::Layout &layout_in, const db::Cell &cell_in, cons
   db::BooleanOp op (db::BooleanOp::Or);
   process (pg, op);
 #else
-  //  Intermediate output for debugging 
+  //  Intermediate output for debugging
   db::ShapeGenerator sg (out, true /*clear shapes*/);
-  std::vector <db::Polygon> out2;
+  std::vector<db::Polygon> out2;
   db::PolygonContainer pc (out2);
   db::PolygonGenerator pg2 (pc, false, false);
   db::BooleanOp op (db::BooleanOp::Or);
   process (pg2, op);
   sg.start ();
-  for (std::vector <db::Polygon>::iterator p = out2.begin (); p != out2.end (); ++p) {
+  for (std::vector<db::Polygon>::iterator p = out2.begin (); p != out2.end (); ++p) {
     sg.put (p->sized (dx, dy, mode));
   }
 #endif
 }
 
-void 
-ShapeProcessor::merge (const db::Layout &layout_in, const db::Cell &cell_in, const std::vector<unsigned int> &layers_in, 
-                       db::Shapes &shapes, bool with_sub_hierarchy, unsigned int min_wc, bool resolve_holes, bool min_coherence)
+void ShapeProcessor::merge (const db::Layout &layout_in, const db::Cell &cell_in, const std::vector<unsigned int> &layers_in,
+                            db::Shapes &shapes, bool with_sub_hierarchy, unsigned int min_wc, bool resolve_holes, bool min_coherence)
 {
   double f = 1.0;
   if (shapes.cell () && shapes.cell ()->layout ()) {
@@ -464,7 +449,7 @@ ShapeProcessor::merge (const db::Layout &layout_in, const db::Cell &cell_in, con
   clear ();
   reserve (ne + ne / 4); // heuristic reserve for crossing points
 
-  //  collect all shapes of layout a into property ID's 0, 1, 2, 3, ... 
+  //  collect all shapes of layout a into property ID's 0, 1, 2, 3, ...
   size_t pn = 0;
   for (std::vector<unsigned int>::const_iterator l = layers_in.begin (); l != layers_in.end (); ++l) {
     collect_shapes_hier (db::CplxTrans (f), layout_in, cell_in, *l, with_sub_hierarchy ? -1 : 0, pn, 1);
@@ -477,4 +462,3 @@ ShapeProcessor::merge (const db::Layout &layout_in, const db::Cell &cell_in, con
 }
 
 } // namespace db
-

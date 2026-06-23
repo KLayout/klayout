@@ -26,7 +26,7 @@
 #include <stdio.h>
 
 #if defined(HAVE_QT)
-#  include "tlDeferredExecutionQt.h"
+#include "tlDeferredExecutionQt.h"
 #endif
 
 namespace tl
@@ -43,8 +43,8 @@ class DefaultDeferredMethodScheduler
   : public DeferredMethodScheduler
 {
 public:
-  DefaultDeferredMethodScheduler () : DeferredMethodScheduler () { }
-  void queue_event() {}
+  DefaultDeferredMethodScheduler () : DeferredMethodScheduler () {}
+  void queue_event () {}
 };
 
 // -----------------------------------------------------------------------------------
@@ -76,16 +76,14 @@ DeferredMethodScheduler::instance ()
   return s_inst;
 }
 
-void
-DeferredMethodScheduler::enable (bool en)
+void DeferredMethodScheduler::enable (bool en)
 {
   if (instance ()) {
     instance ()->do_enable (en);
   }
 }
 
-void
-DeferredMethodScheduler::execute ()
+void DeferredMethodScheduler::execute ()
 {
   if (instance ()) {
     while (instance ()->do_execute ())
@@ -93,14 +91,12 @@ DeferredMethodScheduler::execute ()
   }
 }
 
-bool
-DeferredMethodScheduler::is_disabled () const
+bool DeferredMethodScheduler::is_disabled () const
 {
   return m_disabled;
 }
 
-void 
-DeferredMethodScheduler::schedule (DeferredMethodBase *method)
+void DeferredMethodScheduler::schedule (DeferredMethodBase *method)
 {
   tl::MutexLocker locker (&m_lock);
   if (! method->m_scheduled || ! method->m_compressed) {
@@ -113,11 +109,10 @@ DeferredMethodScheduler::schedule (DeferredMethodBase *method)
   }
 }
 
-void 
-DeferredMethodScheduler::unqueue (DeferredMethodBase *method)
+void DeferredMethodScheduler::unqueue (DeferredMethodBase *method)
 {
   tl::MutexLocker locker (&m_lock);
-  for (std::list<DeferredMethodBase *>::iterator m = m_methods.begin (); m != m_methods.end (); ) {
+  for (std::list<DeferredMethodBase *>::iterator m = m_methods.begin (); m != m_methods.end ();) {
     std::list<DeferredMethodBase *>::iterator mm = m;
     ++mm;
     if (*m == method) {
@@ -134,8 +129,7 @@ DeferredMethodScheduler::unqueue (DeferredMethodBase *method)
   }
 }
 
-void 
-DeferredMethodScheduler::do_enable (bool en)
+void DeferredMethodScheduler::do_enable (bool en)
 {
   tl::MutexLocker locker (&m_lock);
   if (en) {
@@ -146,8 +140,7 @@ DeferredMethodScheduler::do_enable (bool en)
   }
 }
 
-bool
-DeferredMethodScheduler::do_execute ()
+bool DeferredMethodScheduler::do_execute ()
 {
   m_lock.lock ();
 
@@ -184,15 +177,13 @@ DeferredMethodScheduler::do_execute ()
       if (m_executing.empty ()) {
         break;
       }
-
     }
-
   }
 
   m_lock.lock ();
   m_unqueued.clear ();
   m_executing.clear ();
-  any_pending = !m_methods.empty ();
+  any_pending = ! m_methods.empty ();
   m_lock.unlock ();
 
   return any_pending;

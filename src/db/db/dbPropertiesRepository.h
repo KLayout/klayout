@@ -72,8 +72,7 @@ DB_PUBLIC bool properties_id_less (properties_id_type a, properties_id_type b);
 /**
  *  @brief A compare function for property IDs
  */
-struct ComparePropertiesIds
-{
+struct ComparePropertiesIds {
   bool operator() (properties_id_type a, properties_id_type b) const
   {
     return properties_id_less (a, b);
@@ -323,7 +322,7 @@ DB_PUBLIC db::properties_id_type properties_id (const std::map<tl::Variant, tl::
 /**
  *  @brief The properties repository
  *
- *  This repository associates a set of property name/value pairs with 
+ *  This repository associates a set of property name/value pairs with
  *  an unique Id which can be stored with a object_with_properties element.
  *  For performance reasons property names (which are strings) are not
  *  stored as such but as integers.
@@ -332,7 +331,7 @@ DB_PUBLIC db::properties_id_type properties_id (const std::map<tl::Variant, tl::
 class DB_PUBLIC PropertiesRepository
 {
 public:
-  typedef std::set <properties_id_type> properties_id_set;
+  typedef std::set<properties_id_type> properties_id_set;
 
   /**
    *  @brief Default constructor
@@ -356,12 +355,12 @@ public:
 
   /**
    *  @brief Gets the name ID for a property name
-   * 
+   *
    *  This method will assign a new ID to the given name if required and
    *  return the ID associated with it.
    */
   property_names_id_type prop_name_id (const tl::Variant &name);
-  
+
   /**
    *  @brief Gets the value ID for a property value
    *
@@ -372,13 +371,13 @@ public:
 
   /**
    *  @brief Get the ID for a name
-   * 
-   *  This method checks whether the given name is present as a name and returns the 
+   *
+   *  This method checks whether the given name is present as a name and returns the
    *  ID in the second member of the pair. The first member is true, if the name is
    *  present.
    */
   std::pair<bool, property_names_id_type> get_id_of_name (const tl::Variant &name) const;
-  
+
   /**
    *  @brief Get the ID for a value
    *
@@ -390,13 +389,13 @@ public:
 
   /**
    *  @brief Associate a properties set with a properties Id
-   * 
+   *
    *  This method will assign a new Id to the given set if required and
    *  return the Id associated with it.
    *  An empty property set is associated with property Id 0.
    */
   properties_id_type properties_id (const PropertiesSet &props);
-  
+
   /**
    *  @brief Determine if the given ID is a valid properties ID
    *
@@ -447,7 +446,7 @@ public:
    */
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
   {
-    if (!no_self) {
+    if (! no_self) {
       stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
     }
 
@@ -462,8 +461,7 @@ public:
   }
 
 private:
-  struct CompareVariantPtrByValue
-  {
+  struct CompareVariantPtrByValue {
     bool operator() (const tl::Variant *a, const tl::Variant *b) const
     {
       //  NOTE: for values and names, the type should matter, so 2.0 is different from 2 (integer).
@@ -472,23 +470,22 @@ private:
     }
   };
 
-  struct ComparePropertiesPtrByValue
-  {
+  struct ComparePropertiesPtrByValue {
     bool operator() (const PropertiesSet *a, const PropertiesSet *b) const
     {
       return *a < *b;
     }
   };
 
-  std::set <const tl::Variant *, CompareVariantPtrByValue> m_propnames;
-  std::list <tl::Variant> m_property_names_heap;
-  std::set <const tl::Variant *, CompareVariantPtrByValue> m_propvalues;
-  std::list <tl::Variant> m_property_values_heap;
-  std::set <const PropertiesSet *, ComparePropertiesPtrByValue> m_properties;
-  std::list <PropertiesSet> m_properties_heap;
+  std::set<const tl::Variant *, CompareVariantPtrByValue> m_propnames;
+  std::list<tl::Variant> m_property_names_heap;
+  std::set<const tl::Variant *, CompareVariantPtrByValue> m_propvalues;
+  std::list<tl::Variant> m_property_values_heap;
+  std::set<const PropertiesSet *, ComparePropertiesPtrByValue> m_properties;
+  std::list<PropertiesSet> m_properties_heap;
 
-  std::map <property_names_id_type, properties_id_set> m_properties_by_name_table;
-  std::map <property_values_id_type, properties_id_set> m_properties_by_value_table;
+  std::map<property_names_id_type, properties_id_set> m_properties_by_name_table;
+  std::map<property_values_id_type, properties_id_set> m_properties_by_value_table;
 
   mutable tl::Mutex m_lock;
 };
@@ -619,4 +616,3 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
 } // namespace db
 
 #endif
-

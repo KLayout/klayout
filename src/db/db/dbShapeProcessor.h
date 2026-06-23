@@ -62,7 +62,8 @@ public:
    */
   ShapeGenerator (db::Shapes &shapes, bool clear_shapes = false, db::properties_id_type prop_id = 0)
     : PolygonSink (), mp_shapes (&shapes), m_clear_shapes (clear_shapes), m_prop_id (prop_id)
-  { }
+  {
+  }
 
   /**
    *  @brief Sets the properties ID to be used for the next polygon
@@ -75,7 +76,7 @@ public:
   /**
    *  @brief Implementation of the PolygonSink interface
    */
-  virtual void put (const db::Polygon &polygon) 
+  virtual void put (const db::Polygon &polygon)
   {
     if (m_prop_id) {
       mp_shapes->insert (db::PolygonWithProperties (polygon, m_prop_id));
@@ -87,8 +88,8 @@ public:
   /**
    *  @brief Implementation of the PolygonSink interface
    */
-  virtual void start () 
-  { 
+  virtual void start ()
+  {
     if (m_clear_shapes) {
       mp_shapes->clear ();
       //  The single-shot scheme is a easy way to overcome problems with multiple start/flush brackets (i.e. on size filter)
@@ -122,12 +123,13 @@ public:
    */
   EdgeShapeGenerator (db::Shapes &shapes, bool clear_shapes = false, int tag = 0, EdgeShapeGenerator *chained = 0)
     : EdgeSink (), mp_shapes (&shapes), m_clear_shapes (clear_shapes), m_tag (tag), mp_chained (chained)
-  { }
+  {
+  }
 
   /**
    *  @brief Implementation of the EdgeSink interface
    */
-  virtual void put (const db::Edge &edge) 
+  virtual void put (const db::Edge &edge)
   {
     mp_shapes->insert (edge);
     if (mp_chained) {
@@ -151,8 +153,8 @@ public:
   /**
    *  @brief Implementation of the PolygonSink interface
    */
-  virtual void start () 
-  { 
+  virtual void start ()
+  {
     if (m_clear_shapes) {
       mp_shapes->clear ();
       //  The single-shot scheme is a easy way to overcome problems with multiple start/flush brackets (i.e. on size filter)
@@ -173,10 +175,10 @@ private:
 /**
  *  @brief A processor for shape objects
  *
- *  Similar to the edge processor, this class deals with shape objects and shape containers 
+ *  Similar to the edge processor, this class deals with shape objects and shape containers
  *  instead of polygons.
  */
-class DB_PUBLIC ShapeProcessor 
+class DB_PUBLIC ShapeProcessor
 {
 public:
   /**
@@ -271,7 +273,6 @@ public:
       m_processor.insert (db::Edge (b.upper_left (), b.upper_right ()).transform (trans), p);
       m_processor.insert (db::Edge (b.upper_right (), b.lower_right ()).transform (trans), p);
       m_processor.insert (db::Edge (b.lower_right (), b.lower_left ()).transform (trans), p);
-
     }
   }
 
@@ -303,13 +304,13 @@ public:
   template <class Iter>
   void insert_sequence (Iter i, db::EdgeProcessor::property_type p = 0)
   {
-    for ( ; !i.at_end (); ++i) {
+    for (; ! i.at_end (); ++i) {
       insert (*i, p);
     }
   }
 
   /**
-   *  @brief Process the given edges 
+   *  @brief Process the given edges
    *
    *  This method uses the given sink as target and the given evaluator for defining
    *  the method to use
@@ -330,7 +331,7 @@ public:
    *  @param min_coherence true, if minimum polygons should be created for touching corners
    */
   void merge (const std::vector<db::Shape> &in, const std::vector<db::CplxTrans> &trans,
-              std::vector <db::Polygon> &out, unsigned int min_wc = 0, bool resolve_holes = true, bool min_coherence = true);
+              std::vector<db::Polygon> &out, unsigned int min_wc = 0, bool resolve_holes = true, bool min_coherence = true);
 
   /**
    *  @brief Merge the given shapes
@@ -343,7 +344,7 @@ public:
    *  @param resolve_holes true, if holes should be resolved into the hull
    *  @param min_coherence true, if minimum polygons should be created for touching corners
    */
-  void merge (const std::vector<db::Shape> &in, std::vector <db::Polygon> &out, unsigned int min_wc = 0, bool resolve_holes = true, bool min_coherence = true)
+  void merge (const std::vector<db::Shape> &in, std::vector<db::Polygon> &out, unsigned int min_wc = 0, bool resolve_holes = true, bool min_coherence = true)
   {
     merge (in, std::vector<db::CplxTrans> (), out, min_wc, resolve_holes, min_coherence);
   }
@@ -359,7 +360,7 @@ public:
    *  @param min_wc The minimum wrap count for output (0: all polygons, 1: at least two overlapping)
    */
   void merge (const std::vector<db::Shape> &in, const std::vector<db::CplxTrans> &trans,
-              std::vector <db::Edge> &out, unsigned int min_wc = 0);
+              std::vector<db::Edge> &out, unsigned int min_wc = 0);
 
   /**
    *  @brief Merge the given shapes into an edge set
@@ -380,19 +381,19 @@ public:
    *  @brief Merge the given shapes from a layout to a shape container
    *
    *  This is basically a "or" operation on a single layer.
-   *  The input can be taken from a layout and the result is delivered to a 
+   *  The input can be taken from a layout and the result is delivered to a
    *  shape container.
    *
    *  @param layout_in The layout from which to take the input
    *  @param cell_in The cell from which to take the input
    *  @param layer_in The layer from which to take the input
-   *  @param out Where to store the results 
+   *  @param out Where to store the results
    *  @param with_sub_hierarchy Take shapes from the cell and subcells
    *  @param min_wc The minimum wrap count for output (0: all polygons, 1: at least two overlapping)
    *  @param resolve_holes true, if holes should be resolved into the hull
    *  @param min_coherence true, if minimum polygons should be created for touching corners
    */
-  void merge (const db::Layout &layout_in, const db::Cell &cell_in, unsigned int layer_in, 
+  void merge (const db::Layout &layout_in, const db::Cell &cell_in, unsigned int layer_in,
               db::Shapes &out, bool with_sub_hierarchy, unsigned int min_wc = 0, bool resolve_holes = true, bool min_coherence = true)
   {
     std::vector<unsigned int> layers_in;
@@ -404,19 +405,19 @@ public:
    *  @brief Merge the given shapes from a layout to a shape container
    *
    *  This is basically a "or" operation on a single layer.
-   *  The input can be taken from a layout and the result is delivered to a 
+   *  The input can be taken from a layout and the result is delivered to a
    *  shape container.
    *
    *  @param layout_in The layout from which to take the input
    *  @param cell_in The cell from which to take the input
    *  @param layers_in The layers from which to take the input
-   *  @param out Where to store the results 
+   *  @param out Where to store the results
    *  @param with_sub_hierarchy Take shapes from the cell and subcells
    *  @param min_wc The minimum wrap count for output (0: all polygons, 1: at least two overlapping)
    *  @param resolve_holes true, if holes should be resolved into the hull
    *  @param min_coherence true, if minimum polygons should be created for touching corners
    */
-  void merge (const db::Layout &layout_in, const db::Cell &cell_in, const std::vector<unsigned int> &layers_in, 
+  void merge (const db::Layout &layout_in, const db::Cell &cell_in, const std::vector<unsigned int> &layers_in,
               db::Shapes &out, bool with_sub_hierarchy, unsigned int min_wc = 0, bool resolve_holes = true, bool min_coherence = true);
 
   /**
@@ -433,7 +434,7 @@ public:
    */
   void boolean (const std::vector<db::Shape> &in_a, const std::vector<db::CplxTrans> &trans_a,
                 const std::vector<db::Shape> &in_b, const std::vector<db::CplxTrans> &trans_b,
-                int mode, std::vector <db::Polygon> &out, bool resolve_holes = true, bool min_coherence = true);
+                int mode, std::vector<db::Polygon> &out, bool resolve_holes = true, bool min_coherence = true);
 
   /**
    *  @brief Boolean operation on two given shape sets into a polygon set
@@ -445,8 +446,8 @@ public:
    *  @param resolve_holes true, if holes should be resolved into the hull
    *  @param min_coherence true, if minimum polygons should be created for touching corners
    */
-  void boolean (const std::vector<db::Shape> &in_a, const std::vector<db::Shape> &in_b, 
-                int mode, std::vector <db::Polygon> &out, bool resolve_holes = true, bool min_coherence = true)
+  void boolean (const std::vector<db::Shape> &in_a, const std::vector<db::Shape> &in_b,
+                int mode, std::vector<db::Polygon> &out, bool resolve_holes = true, bool min_coherence = true)
   {
     boolean (in_a, std::vector<db::CplxTrans> (), in_b, std::vector<db::CplxTrans> (), mode, out, resolve_holes, min_coherence);
   }
@@ -463,7 +464,7 @@ public:
    */
   void boolean (const std::vector<db::Shape> &in_a, const std::vector<db::CplxTrans> &trans_a,
                 const std::vector<db::Shape> &in_b, const std::vector<db::CplxTrans> &trans_b,
-                int mode, std::vector <db::Edge> &out);
+                int mode, std::vector<db::Edge> &out);
 
   /**
    *  @brief Boolean operation on two given shape sets into an edge set
@@ -473,8 +474,8 @@ public:
    *  @param mode The boolean operation
    *  @param out The result (an edge vector)
    */
-  void boolean (const std::vector<db::Shape> &in_a, const std::vector<db::Shape> &in_b, 
-                int mode, std::vector <db::Edge> &out)
+  void boolean (const std::vector<db::Shape> &in_a, const std::vector<db::Shape> &in_b,
+                int mode, std::vector<db::Edge> &out)
   {
     boolean (in_a, std::vector<db::CplxTrans> (), in_b, std::vector<db::CplxTrans> (), mode, out);
   }
@@ -482,7 +483,7 @@ public:
   /**
    *  @brief Boolean operation on the given shapes from a layout to a shape container
    *
-   *  The input can be taken from separate layouts and the result is delivered to a 
+   *  The input can be taken from separate layouts and the result is delivered to a
    *  shape container.
    *
    *  @param layout_in_a The layout from which to take the input for source A
@@ -491,14 +492,14 @@ public:
    *  @param layout_in_b The layout from which to take the input for source B
    *  @param cell_in_b The cell from which to take the input for source B
    *  @param layer_in_b The layer from which to take the input for source B
-   *  @param out Where to store the results 
+   *  @param out Where to store the results
    *  @param mode The boolean operation to apply
    *  @param with_sub_hierarchy Take shapes from the cell and subcells
    *  @param resolve_holes true, if holes should be resolved into the hull
    *  @param min_coherence true, if minimum polygons should be created for touching corners
    */
-  void boolean (const db::Layout &layout_in_a, const db::Cell &cell_in_a, unsigned int layer_in_a, 
-                const db::Layout &layout_in_b, const db::Cell &cell_in_b, unsigned int layer_in_b, 
+  void boolean (const db::Layout &layout_in_a, const db::Cell &cell_in_a, unsigned int layer_in_a,
+                const db::Layout &layout_in_b, const db::Cell &cell_in_b, unsigned int layer_in_b,
                 db::Shapes &out, int mode, bool with_sub_hierarchy = false, bool resolve_holes = true, bool min_coherence = true)
   {
     std::vector<unsigned int> layers_in_a;
@@ -511,7 +512,7 @@ public:
   /**
    *  @brief Boolean operation on the given shapes from a layout to a shape container
    *
-   *  The input can be taken from separate layouts and the result is delivered to a 
+   *  The input can be taken from separate layouts and the result is delivered to a
    *  shape container.
    *
    *  @param layout_in_a The layout from which to take the input for source A
@@ -520,14 +521,14 @@ public:
    *  @param layout_in_b The layout from which to take the input for source B
    *  @param cell_in_b The cell from which to take the input for source B
    *  @param layers_in_b The layer from which to take the input for source B
-   *  @param out Where to store the results 
+   *  @param out Where to store the results
    *  @param mode The boolean operation to apply
    *  @param with_sub_hierarchy Take shapes from the cell and subcells
    *  @param resolve_holes true, if holes should be resolved into the hull
    *  @param min_coherence true, if minimum polygons should be created for touching corners
    */
-  void boolean (const db::Layout &layout_in_a, const db::Cell &cell_in_a, const std::vector<unsigned int> &layers_in_a, 
-                const db::Layout &layout_in_b, const db::Cell &cell_in_b, const std::vector<unsigned int> &layers_in_b, 
+  void boolean (const db::Layout &layout_in_a, const db::Cell &cell_in_a, const std::vector<unsigned int> &layers_in_a,
+                const db::Layout &layout_in_b, const db::Cell &cell_in_b, const std::vector<unsigned int> &layers_in_b,
                 db::Shapes &out, int mode, bool with_sub_hierarchy = false, bool resolve_holes = true, bool min_coherence = true);
 
   /**
@@ -545,7 +546,7 @@ public:
    *  @param min_coherence true, if minimum polygons should be created for touching corners
    */
   void size (const std::vector<db::Shape> &in, const std::vector<db::CplxTrans> &trans,
-             db::Coord dx, db::Coord dy, std::vector <db::Polygon> &out, unsigned int mode = 2, bool resolve_holes = true, bool min_coherence = true);
+             db::Coord dx, db::Coord dy, std::vector<db::Polygon> &out, unsigned int mode = 2, bool resolve_holes = true, bool min_coherence = true);
 
   /**
    *  @brief Size the given shapes into an polygon set
@@ -554,14 +555,14 @@ public:
    *
    *  @param in The set of shapes to size
    *  @param trans A set of transformations to apply before the shapes are used
-   *  @param d The sizing to apply 
+   *  @param d The sizing to apply
    *  @param out The result (an edge vector)
    *  @param mode The sizing mode (see db::Polygon for a description)
    *  @param resolve_holes true, if holes should be resolved into the hull
    *  @param min_coherence true, if minimum polygons should be created for touching corners
    */
   void size (const std::vector<db::Shape> &in, const std::vector<db::CplxTrans> &trans,
-             db::Coord d, std::vector <db::Polygon> &out, unsigned int mode = 2, bool resolve_holes = true, bool min_coherence = true)
+             db::Coord d, std::vector<db::Polygon> &out, unsigned int mode = 2, bool resolve_holes = true, bool min_coherence = true)
   {
     size (in, trans, d, d, out, mode, resolve_holes, min_coherence);
   }
@@ -572,14 +573,14 @@ public:
    *  This is equivalent to the previous method except that no transformations can be specified.
    *
    *  @param in The set of shapes to size
-   *  @param d The sizing to apply 
+   *  @param d The sizing to apply
    *  @param out The result (an edge vector)
    *  @param mode The sizing mode (see db::Polygon for a description)
    *  @param resolve_holes true, if holes should be resolved into the hull
    *  @param min_coherence true, if minimum polygons should be created for touching corners
    */
-  void size (const std::vector<db::Shape> &in, 
-             db::Coord d, std::vector <db::Polygon> &out, unsigned int mode = 2, bool resolve_holes = true, bool min_coherence = true)
+  void size (const std::vector<db::Shape> &in,
+             db::Coord d, std::vector<db::Polygon> &out, unsigned int mode = 2, bool resolve_holes = true, bool min_coherence = true)
   {
     size (in, std::vector<db::CplxTrans> (), d, out, mode, resolve_holes, min_coherence);
   }
@@ -597,8 +598,8 @@ public:
    *  @param resolve_holes true, if holes should be resolved into the hull
    *  @param min_coherence true, if minimum polygons should be created for touching corners
    */
-  void size (const std::vector<db::Shape> &in, 
-             db::Coord dx, db::Coord dy, std::vector <db::Polygon> &out, unsigned int mode = 2, bool resolve_holes = true, bool min_coherence = true)
+  void size (const std::vector<db::Shape> &in,
+             db::Coord dx, db::Coord dy, std::vector<db::Polygon> &out, unsigned int mode = 2, bool resolve_holes = true, bool min_coherence = true)
   {
     size (in, std::vector<db::CplxTrans> (), dx, dy, out, mode, resolve_holes, min_coherence);
   }
@@ -616,7 +617,7 @@ public:
    *  @param mode The sizing mode (see db::Polygon for a description)
    */
   void size (const std::vector<db::Shape> &in, const std::vector<db::CplxTrans> &trans,
-             db::Coord dx, db::Coord dy, std::vector <db::Edge> &out, unsigned int mode = 2);
+             db::Coord dx, db::Coord dy, std::vector<db::Edge> &out, unsigned int mode = 2);
 
   /**
    *  @brief Size the given shapes into an edge set
@@ -625,12 +626,12 @@ public:
    *
    *  @param in The set of shapes to size
    *  @param trans A set of transformations to apply before the shapes are used
-   *  @param d The sizing to apply 
+   *  @param d The sizing to apply
    *  @param out The result (an edge vector)
    *  @param mode The sizing mode (see db::Polygon for a description)
    */
   void size (const std::vector<db::Shape> &in, const std::vector<db::CplxTrans> &trans,
-             db::Coord d, std::vector <db::Edge> &out, unsigned int mode = 2)
+             db::Coord d, std::vector<db::Edge> &out, unsigned int mode = 2)
   {
     size (in, trans, d, d, out, mode);
   }
@@ -641,12 +642,12 @@ public:
    *  This is equivalent to the previous method except that no transformations can be specified.
    *
    *  @param in The set of shapes to size
-   *  @param d The sizing to apply 
+   *  @param d The sizing to apply
    *  @param out The result (an edge vector)
    *  @param mode The sizing mode (see db::Polygon for a description)
    */
-  void size (const std::vector<db::Shape> &in, 
-             db::Coord d, std::vector <db::Edge> &out, unsigned int mode = 2)
+  void size (const std::vector<db::Shape> &in,
+             db::Coord d, std::vector<db::Edge> &out, unsigned int mode = 2)
   {
     size (in, std::vector<db::CplxTrans> (), d, out, mode);
   }
@@ -662,8 +663,8 @@ public:
    *  @param out The result (an edge vector)
    *  @param mode The sizing mode (see db::Polygon for a description)
    */
-  void size (const std::vector<db::Shape> &in, 
-             db::Coord dx, db::Coord dy, std::vector <db::Edge> &out, unsigned int mode = 2)
+  void size (const std::vector<db::Shape> &in,
+             db::Coord dx, db::Coord dy, std::vector<db::Edge> &out, unsigned int mode = 2)
   {
     size (in, std::vector<db::CplxTrans> (), dx, dy, out, mode);
   }
@@ -671,57 +672,57 @@ public:
   /**
    *  @brief Size operation on the given shapes from a layout to a shape container
    *
-   *  The input can be taken from a layout and the result is delivered to a 
+   *  The input can be taken from a layout and the result is delivered to a
    *  shape container.
    *
    *  @param layout_in The layout from which to take the input for source A
    *  @param cell_in The cell from which to take the input for source A
    *  @param layer_in The layer from which to take the input for source A
-   *  @param out Where to store the results 
+   *  @param out Where to store the results
    *  @param d The sizing to apply
    *  @param mode The sizing mode (see db::Polygon for a description)
    *  @param with_sub_hierarchy Take shapes from the cell and subcells
    *  @param resolve_holes true, if holes should be resolved into the hull
    *  @param min_coherence true, if minimum polygons should be created for touching corners
    */
-  void size (const db::Layout &layout_in, const db::Cell &cell_in, unsigned int layer_in, 
+  void size (const db::Layout &layout_in, const db::Cell &cell_in, unsigned int layer_in,
              db::Shapes &out, db::Coord d, unsigned int mode = 2, bool with_sub_hierarchy = false, bool resolve_holes = true, bool min_coherence = true)
   {
     size (layout_in, cell_in, layer_in, out, d, d, mode, with_sub_hierarchy, resolve_holes, min_coherence);
   }
-             
+
   /**
    *  @brief Size operation on the given shapes from a layout to a shape container
    *
-   *  The input can be taken from a layout and the result is delivered to a 
+   *  The input can be taken from a layout and the result is delivered to a
    *  shape container.
    *
    *  @param layout_in The layout from which to take the input for source A
    *  @param cell_in The cell from which to take the input for source A
    *  @param layers_in The layers from which to take the input for source A
-   *  @param out Where to store the results 
+   *  @param out Where to store the results
    *  @param d The sizing to apply
    *  @param mode The sizing mode (see db::Polygon for a description)
    *  @param with_sub_hierarchy Take shapes from the cell and subcells
    *  @param resolve_holes true, if holes should be resolved into the hull
    *  @param min_coherence true, if minimum polygons should be created for touching corners
    */
-  void size (const db::Layout &layout_in, const db::Cell &cell_in, const std::vector<unsigned int> &layers_in, 
+  void size (const db::Layout &layout_in, const db::Cell &cell_in, const std::vector<unsigned int> &layers_in,
              db::Shapes &out, db::Coord d, unsigned int mode = 2, bool with_sub_hierarchy = false, bool resolve_holes = true, bool min_coherence = true)
   {
     size (layout_in, cell_in, layers_in, out, d, d, mode, with_sub_hierarchy, resolve_holes, min_coherence);
   }
-             
+
   /**
    *  @brief Size operation on the given shapes from a layout to a shape container
    *
-   *  The input can be taken from a layout and the result is delivered to a 
+   *  The input can be taken from a layout and the result is delivered to a
    *  shape container.
    *
    *  @param layout_in The layout from which to take the input for source A
    *  @param cell_in The cell from which to take the input for source A
    *  @param layer_in The layer from which to take the input for source A
-   *  @param out Where to store the results 
+   *  @param out Where to store the results
    *  @param dx The sizing to apply (x-direction)
    *  @param dy The sizing to apply (y-direction)
    *  @param mode The sizing mode (see db::Polygon for a description)
@@ -729,7 +730,7 @@ public:
    *  @param resolve_holes true, if holes should be resolved into the hull
    *  @param min_coherence true, if minimum polygons should be created for touching corners
    */
-  void size (const db::Layout &layout_in, const db::Cell &cell_in, unsigned int layer_in, 
+  void size (const db::Layout &layout_in, const db::Cell &cell_in, unsigned int layer_in,
              db::Shapes &out, db::Coord dx, db::Coord dy, unsigned int mode = 2, bool with_sub_hierarchy = false, bool resolve_holes = true, bool min_coherence = true)
   {
     std::vector<unsigned int> layers_in;
@@ -740,13 +741,13 @@ public:
   /**
    *  @brief Size operation on the given shapes from a layout to a shape container
    *
-   *  The input can be taken from a layout and the result is delivered to a 
+   *  The input can be taken from a layout and the result is delivered to a
    *  shape container.
    *
    *  @param layout_in The layout from which to take the input for source A
    *  @param cell_in The cell from which to take the input for source A
    *  @param layers_in The layers from which to take the input for source A
-   *  @param out Where to store the results 
+   *  @param out Where to store the results
    *  @param dx The sizing to apply (x-direction)
    *  @param dy The sizing to apply (y-direction)
    *  @param mode The sizing mode (see db::Polygon for a description)
@@ -754,7 +755,7 @@ public:
    *  @param resolve_holes true, if holes should be resolved into the hull
    *  @param min_coherence true, if minimum polygons should be created for touching corners
    */
-  void size (const db::Layout &layout_in, const db::Cell &cell_in, const std::vector<unsigned int> &layers_in, 
+  void size (const db::Layout &layout_in, const db::Cell &cell_in, const std::vector<unsigned int> &layers_in,
              db::Shapes &out, db::Coord dx, db::Coord dy, unsigned int mode = 2, bool with_sub_hierarchy = false, bool resolve_holes = true, bool min_coherence = true);
 
 private:
@@ -767,5 +768,3 @@ private:
 }
 
 #endif
-
-

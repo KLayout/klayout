@@ -24,23 +24,23 @@
 #include "dbTrans.h"
 #include "tlUnitTest.h"
 
-TEST(1) 
+TEST (1)
 {
   db::Trans unity;
   db::Trans t;
-  db::Point p(100,200);
+  db::Point p (100, 200);
   EXPECT_EQ (unity.is_unity (), true);
   EXPECT_EQ (t.is_unity (), true);
-  EXPECT_EQ (t * p, db::Point(100, 200));
+  EXPECT_EQ (t * p, db::Point (100, 200));
   t = db::Trans (0, false, db::Vector (-100, -200));
   EXPECT_EQ (t.is_unity (), false);
-  EXPECT_EQ (t * p, db::Point(0, 0));
+  EXPECT_EQ (t * p, db::Point (0, 0));
   db::Trans tt = t.inverted ();
   EXPECT_EQ (tt * t, unity);
   EXPECT_EQ ((tt * t).is_unity (), true);
 }
 
-TEST(2) 
+TEST (2)
 {
   db::Trans unity;
   db::Point p;
@@ -60,7 +60,7 @@ TEST(2)
   EXPECT_EQ ((t1 * t2) * (t1 * t2).inverted (), unity);
 }
 
-TEST(5) 
+TEST (5)
 {
   db::Point p (100, 200);
   db::Trans t1 (1, false, db::Vector (0, 100));
@@ -69,7 +69,7 @@ TEST(5)
   EXPECT_EQ ((t2 * t1) * p, t2 * (t1 * p));
 }
 
-TEST(6) 
+TEST (6)
 {
   db::Trans t1 (1, false, db::Vector (0, 100));
   EXPECT_EQ (t1.to_string (), "r90 0,100");
@@ -116,8 +116,8 @@ T recomposed (const T &t)
   return r;
 }
 
-//  complex_trans tests 
-TEST(10)
+//  complex_trans tests
+TEST (10)
 {
   db::DCplxTrans t;
   db::CplxTrans tt;
@@ -314,10 +314,9 @@ TEST(10)
     EXPECT_EQ (t.is_unity (), true);
     EXPECT_EQ (t.to_string (), recomposed (t).to_string ());
   }
-
 }
 
-TEST(11) 
+TEST (11)
 {
   db::CplxTrans t1 (db::Trans (1, false, db::Vector (0, 100)));
   t1.mag (1.2);
@@ -360,7 +359,7 @@ TEST(11)
   EXPECT_EQ (tt2.to_string (), t3.to_string ());
 }
 
-TEST(12) 
+TEST (12)
 {
   db::CplxTrans t1;
   t1 = db::CplxTrans (db::Trans (1, false, db::Vector (0, 100)));
@@ -378,7 +377,7 @@ TEST(12)
   EXPECT_EQ (t1.to_string (), "m48.75 *1.2 0,100");
 }
 
-TEST(13) 
+TEST (13)
 {
   db::Disp t;
   EXPECT_EQ (t.to_string (), "0,0");
@@ -393,7 +392,7 @@ TEST(13)
   EXPECT_EQ (t.is_unity (), false);
 }
 
-TEST(14) 
+TEST (14)
 {
   db::FTrans t;
   EXPECT_EQ (db::Trans (t).to_string (), "r0 0,0");
@@ -410,7 +409,7 @@ TEST(14)
   EXPECT_EQ (t.is_unity (), false);
 }
 
-TEST(15) 
+TEST (15)
 {
   db::UnitTrans t;
   EXPECT_EQ (t.to_string (), "");
@@ -419,5 +418,3 @@ TEST(15)
   EXPECT_EQ (t.to_matrix3d ().to_string (), db::Matrix3d (1.0).to_string ());
   EXPECT_EQ (db::Trans (t).to_string (), "r0 0,0");
 }
-
-

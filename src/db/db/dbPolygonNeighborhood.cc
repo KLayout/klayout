@@ -33,16 +33,14 @@ PolygonNeighborhoodVisitor::PolygonNeighborhoodVisitor ()
   disconnect_outputs ();
 }
 
-void
-PolygonNeighborhoodVisitor::connect_output (Layout * /*layout*/, std::unordered_set<db::PolygonWithProperties> *polygons, const db::ICplxTrans &trans) const
+void PolygonNeighborhoodVisitor::connect_output (Layout * /*layout*/, std::unordered_set<db::PolygonWithProperties> *polygons, const db::ICplxTrans &trans) const
 {
   disconnect_outputs ();
   mp_polygons = polygons;
   m_trans = trans;
 }
 
-void
-PolygonNeighborhoodVisitor::connect_output (db::Layout *layout, std::unordered_set<db::PolygonRefWithProperties> *polygons, const db::ICplxTrans &trans) const
+void PolygonNeighborhoodVisitor::connect_output (db::Layout *layout, std::unordered_set<db::PolygonRefWithProperties> *polygons, const db::ICplxTrans &trans) const
 {
   disconnect_outputs ();
   mp_layout = layout;
@@ -50,24 +48,21 @@ PolygonNeighborhoodVisitor::connect_output (db::Layout *layout, std::unordered_s
   m_trans = trans;
 }
 
-void
-PolygonNeighborhoodVisitor::connect_output (db::Layout * /*layout*/, std::unordered_set<db::EdgeWithProperties> *edges, const db::ICplxTrans &trans) const
+void PolygonNeighborhoodVisitor::connect_output (db::Layout * /*layout*/, std::unordered_set<db::EdgeWithProperties> *edges, const db::ICplxTrans &trans) const
 {
   disconnect_outputs ();
   mp_edges = edges;
   m_trans = trans;
 }
 
-void
-PolygonNeighborhoodVisitor::connect_output (Layout * /*layout*/, std::unordered_set<db::EdgePairWithProperties> *edge_pairs, const db::ICplxTrans &trans) const
+void PolygonNeighborhoodVisitor::connect_output (Layout * /*layout*/, std::unordered_set<db::EdgePairWithProperties> *edge_pairs, const db::ICplxTrans &trans) const
 {
   disconnect_outputs ();
   mp_edge_pairs = edge_pairs;
   m_trans = trans;
 }
 
-void
-PolygonNeighborhoodVisitor::disconnect_outputs () const
+void PolygonNeighborhoodVisitor::disconnect_outputs () const
 {
   mp_layout = 0;
   mp_polygons = 0;
@@ -76,8 +71,7 @@ PolygonNeighborhoodVisitor::disconnect_outputs () const
   mp_edge_pairs = 0;
 }
 
-void
-PolygonNeighborhoodVisitor::output_polygon (const db::PolygonWithProperties &poly)
+void PolygonNeighborhoodVisitor::output_polygon (const db::PolygonWithProperties &poly)
 {
   if (mp_polygons) {
     mp_polygons->insert (poly.transformed (m_trans));
@@ -89,8 +83,7 @@ PolygonNeighborhoodVisitor::output_polygon (const db::PolygonWithProperties &pol
   }
 }
 
-void
-PolygonNeighborhoodVisitor::output_edge (const db::EdgeWithProperties &edge)
+void PolygonNeighborhoodVisitor::output_edge (const db::EdgeWithProperties &edge)
 {
   if (mp_edges == 0) {
     throw tl::Exception (tl::to_string (tr ("PolygonNeighborhoodVisitor is not configured for edge output (use 'result_type=Edges')")));
@@ -98,8 +91,7 @@ PolygonNeighborhoodVisitor::output_edge (const db::EdgeWithProperties &edge)
   mp_edges->insert (edge.transformed (m_trans));
 }
 
-void
-PolygonNeighborhoodVisitor::output_edge_pair (const db::EdgePairWithProperties &edge_pair)
+void PolygonNeighborhoodVisitor::output_edge_pair (const db::EdgePairWithProperties &edge_pair)
 {
   if (mp_edge_pairs == 0) {
     throw tl::Exception (tl::to_string (tr ("PolygonNeighborhoodVisitor is not configured for edge pair output (use 'result_type=EdgePairs')")));
@@ -134,45 +126,38 @@ PolygonNeighborhoodCompoundOperationNode::generated_description () const
   return tl::to_string (tr ("Polygon neighborhood collector"));
 }
 
-void
-PolygonNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::EdgeWithProperties> > &results, const db::LocalProcessorBase *proc) const
+void PolygonNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::EdgeWithProperties>> &results, const db::LocalProcessorBase *proc) const
 {
   compute_local_impl<db::PolygonRefWithProperties, db::EdgeWithProperties> (cache, layout, cell, interactions, results, proc);
 }
 
-void
-PolygonNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonWithProperties, db::PolygonWithProperties> &interactions, std::vector<std::unordered_set<db::EdgeWithProperties> > &results, const db::LocalProcessorBase *proc) const
+void PolygonNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonWithProperties, db::PolygonWithProperties> &interactions, std::vector<std::unordered_set<db::EdgeWithProperties>> &results, const db::LocalProcessorBase *proc) const
 {
   compute_local_impl<db::PolygonWithProperties, db::EdgeWithProperties> (cache, layout, cell, interactions, results, proc);
 }
 
-void
-PolygonNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonWithProperties, db::PolygonWithProperties> &interactions, std::vector<std::unordered_set<db::PolygonWithProperties> > &results, const db::LocalProcessorBase *proc) const
+void PolygonNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonWithProperties, db::PolygonWithProperties> &interactions, std::vector<std::unordered_set<db::PolygonWithProperties>> &results, const db::LocalProcessorBase *proc) const
 {
   compute_local_impl<db::PolygonWithProperties, db::PolygonWithProperties> (cache, layout, cell, interactions, results, proc);
 }
 
-void
-PolygonNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonWithProperties, db::PolygonWithProperties> &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties> > &results, const db::LocalProcessorBase *proc) const
+void PolygonNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonWithProperties, db::PolygonWithProperties> &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties>> &results, const db::LocalProcessorBase *proc) const
 {
   compute_local_impl<db::PolygonWithProperties, db::EdgePairWithProperties> (cache, layout, cell, interactions, results, proc);
 }
 
-void
-PolygonNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::PolygonRefWithProperties> > &results, const db::LocalProcessorBase *proc) const
+void PolygonNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::PolygonRefWithProperties>> &results, const db::LocalProcessorBase *proc) const
 {
   compute_local_impl<db::PolygonRefWithProperties, db::PolygonRefWithProperties> (cache, layout, cell, interactions, results, proc);
 }
 
-void
-PolygonNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties> > &results, const db::LocalProcessorBase *proc) const
+void PolygonNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties>> &results, const db::LocalProcessorBase *proc) const
 {
   compute_local_impl<db::PolygonRefWithProperties, db::EdgePairWithProperties> (cache, layout, cell, interactions, results, proc);
 }
 
 template <class T, class TR>
-void
-PolygonNeighborhoodCompoundOperationNode::compute_local_impl (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase *proc) const
+void PolygonNeighborhoodCompoundOperationNode::compute_local_impl (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase *proc) const
 {
   if (! mp_visitor) {
     return;
@@ -200,7 +185,7 @@ PolygonNeighborhoodCompoundOperationNode::compute_local_impl (CompoundRegionOper
 
       std::vector<db::PolygonWithProperties> &n = neighbors [i];
 
-      std::vector<std::unordered_set<T> > others;
+      std::vector<std::unordered_set<T>> others;
       others.push_back (std::unordered_set<T> ());
 
       shape_interactions<T, T> computed_interactions;
@@ -210,7 +195,6 @@ PolygonNeighborhoodCompoundOperationNode::compute_local_impl (CompoundRegionOper
         n.push_back (db::PolygonWithProperties (p->instantiate (), p->properties_id ()));
         n.back ().transform (var_trans);
       }
-
     }
 
     const_cast<db::PolygonNeighborhoodVisitor *> (mp_visitor.get ())->neighbors (layout, cell, subject, neighbors);
@@ -224,4 +208,3 @@ PolygonNeighborhoodCompoundOperationNode::compute_local_impl (CompoundRegionOper
 }
 
 }
-

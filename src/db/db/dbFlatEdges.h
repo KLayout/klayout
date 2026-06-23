@@ -32,7 +32,8 @@
 #include "dbGenericShapeIterator.h"
 #include "tlCopyOnWrite.h"
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief An iterator delegate for the flat edge set
@@ -67,7 +68,7 @@ public:
   }
 
   void reserve (size_t);
-  void flatten () { }
+  void flatten () {}
 
   virtual EdgesIteratorDelegate *begin () const;
   virtual EdgesIteratorDelegate *begin_merged () const;
@@ -159,4 +160,3 @@ private:
 }
 
 #endif
-

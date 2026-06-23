@@ -40,7 +40,7 @@ class PythonPtr;
  *  This reference represents stolen references. Upon destruction, this
  *  object will automatically decrement the reference count.
  *  The constructor has a parameter which allows using that class for
- *  borrowed references too. 
+ *  borrowed references too.
  *  PythonRef will basically become the owner of the referred object.
  */
 class PYA_PUBLIC PythonRef
@@ -59,10 +59,10 @@ public:
    */
   PythonRef (const PythonPtr &ptr);
 
-  /** 
+  /**
    *  @brief Creates a reference for the given object
    *  If new_ref is false, the reference is regarded a borrowed reference and
-   *  the reference count is incremented initially to compensate for the 
+   *  the reference count is incremented initially to compensate for the
    *  decrement in the destructor
    */
   PythonRef (PyObject *obj, bool new_ref = true);
@@ -102,7 +102,7 @@ public:
   /**
    *  @brief Dereferencing operator
    */
-  PyObject *operator-> () const;
+  PyObject *operator->() const;
 
   /**
    *  @brief Gets the pointer to the referred object
@@ -111,7 +111,7 @@ public:
 
   /**
    *  @brief Takes the pointer
-   *  After that operation, the PythonRef object is no longer the owner 
+   *  After that operation, the PythonRef object is no longer the owner
    *  of the referred object.
    */
   PyObject *release ();
@@ -197,7 +197,7 @@ public:
   /**
    *  @brief Dereferencing operator
    */
-  PyObject *operator-> () const;
+  PyObject *operator->() const;
 
   /**
    *  @brief Gets the pointer to the referred object
@@ -234,5 +234,4 @@ private:
 
 }
 
-#endif 
-
+#endif

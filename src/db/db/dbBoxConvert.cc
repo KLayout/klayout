@@ -51,10 +51,9 @@ DB_PUBLIC db::Box cell_box_convert_impl (const db::Cell &c, int layer, bool allo
   }
 }
 
-template struct box_convert <db::CellInst, true>;
-template struct box_convert <db::CellInst, false>;
-template struct box_convert <db::Cell, true>;
-template struct box_convert <db::Cell, false>;
+template struct box_convert<db::CellInst, true>;
+template struct box_convert<db::CellInst, false>;
+template struct box_convert<db::Cell, true>;
+template struct box_convert<db::Cell, false>;
 
 }
-

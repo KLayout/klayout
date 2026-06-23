@@ -26,7 +26,7 @@
 #include "tlAlgorithm.h"
 #include "tlUnitTest.h"
 
-std::string to_string (const tl::stable_vector<std::string> &v) 
+std::string to_string (const tl::stable_vector<std::string> &v)
 {
   std::string t;
   for (tl::stable_vector<std::string>::const_iterator s = v.begin (); s != v.end (); ++s) {
@@ -47,7 +47,7 @@ struct test_compare {
   }
 };
 
-TEST(1) 
+TEST (1)
 {
   tl::stable_vector<std::string> v;
   EXPECT_EQ (v.size (), size_t (0));
@@ -97,7 +97,7 @@ TEST(1)
 
   tl::sort (v.begin (), v.end ());
   EXPECT_EQ (to_string (v), "a ba bx d ");
-  
+
   tl::sort (v.begin (), v.end (), test_compare ());
   EXPECT_EQ (to_string (v), "d bx ba a ");
 
@@ -138,10 +138,9 @@ TEST(1)
   EXPECT_EQ (to_string (v), "");
   EXPECT_EQ (v.size (), size_t (0));
   EXPECT_EQ (v.empty (), true);
-
 }
 
-TEST(2) 
+TEST (2)
 {
   tl::stable_vector<std::string> u;
   u.push_back ("d");
@@ -182,20 +181,20 @@ TEST(2)
   EXPECT_EQ (v.end () [-4], "d");
 }
 
-TEST(3) 
+TEST (3)
 {
   tl::stable_vector<int> v;
   tl::stable_vector<int>::stable_const_iterator i1 = v.begin_stable ();
   tl::stable_vector<int>::stable_iterator i2 = v.begin_stable ();
-  EXPECT_EQ (((const tl::stable_vector<int> &)v).begin_stable () == i1, true);
+  EXPECT_EQ (((const tl::stable_vector<int> &) v).begin_stable () == i1, true);
   EXPECT_EQ (v.begin_stable () == i2, true);
-  EXPECT_EQ (((const tl::stable_vector<int> &)v).end_stable () == i1, true);
+  EXPECT_EQ (((const tl::stable_vector<int> &) v).end_stable () == i1, true);
   EXPECT_EQ (v.end_stable () == i2, true);
 
   v.push_back (123);
-  EXPECT_EQ (((const tl::stable_vector<int> &)v).end_stable () == i1, false);
+  EXPECT_EQ (((const tl::stable_vector<int> &) v).end_stable () == i1, false);
   EXPECT_EQ (v.end_stable () == i2, false);
-  EXPECT_EQ (((const tl::stable_vector<int> &)v).end_stable () != i1, true);
+  EXPECT_EQ (((const tl::stable_vector<int> &) v).end_stable () != i1, true);
   EXPECT_EQ (v.end_stable () != i2, true);
   EXPECT_EQ (*i1, 123);
   EXPECT_EQ (*i2, 123);
@@ -212,4 +211,3 @@ TEST(3)
   EXPECT_EQ (*i1, 123);
   EXPECT_EQ (*i2, 123);
 }
-

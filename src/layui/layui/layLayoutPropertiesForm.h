@@ -34,14 +34,16 @@
 
 #include <vector>
 
-namespace lay {
+namespace lay
+{
 
 class LayoutViewBase;
 
 class LAYUI_PUBLIC LayoutPropertiesForm
-  : public QDialog, private Ui::LayoutPropertiesForm
+  : public QDialog,
+    private Ui::LayoutPropertiesForm
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   LayoutPropertiesForm (QWidget *parent, lay::LayoutViewBase *view, const char *name);
@@ -56,7 +58,7 @@ private slots:
   void prop_pb_clicked ();
 
 private:
-  std::vector <lay::LayoutHandleRef> m_handles;
+  std::vector<lay::LayoutHandleRef> m_handles;
   lay::LayoutViewBase *mp_view;
   int m_index;
   bool m_editable;
@@ -66,4 +68,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

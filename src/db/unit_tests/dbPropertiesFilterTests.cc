@@ -23,7 +23,8 @@
 #include "dbPropertiesFilter.h"
 #include "tlUnitTest.h"
 
-namespace {
+namespace
+{
 
 /**
  *  @brief Installs a temporary repository instance for testing
@@ -49,7 +50,7 @@ private:
 
 }
 
-TEST(1)
+TEST (1)
 {
   TempPropertiesRepository temp_pr;
 

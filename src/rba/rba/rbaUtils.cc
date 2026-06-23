@@ -29,7 +29,7 @@
 #include "tlInclude.h"
 
 #if HAVE_RUBY_VERSION_CODE >= 20200
-#  include <ruby/debug.h>
+#include <ruby/debug.h>
 #endif
 
 static VALUE ruby_top_self = Qnil;
@@ -60,12 +60,12 @@ rba_split_bt_information (const char *m, size_t l)
 {
   for (size_t i = 0; i + 1 < l; ++i) {
 
-    if (m[i] == ':' && isdigit (m[i + 1])) {
+    if (m [i] == ':' && isdigit (m [i + 1])) {
 
       size_t j = i + 1;
       int line = 0;
-      while (j < l && isdigit (m[j])) {
-        line = (line * 10) + (int)(m[j] - '0');
+      while (j < l && isdigit (m [j])) {
+        line = (line * 10) + (int) (m [j] - '0');
         ++j;
       }
 
@@ -75,24 +75,21 @@ rba_split_bt_information (const char *m, size_t l)
       }
       if (j == l) {
         return tl::BacktraceElement (file, line);
-      } else if (m[j] == ':') {
+      } else if (m [j] == ':') {
         return tl::BacktraceElement (file, line, std::string (m, j + 1, l - (j + 1)));
       }
-
     }
-
   }
 
   return tl::BacktraceElement (std::string (), 0, std::string (m, 0, l));
 }
 
-void
-rba_get_backtrace_from_array (VALUE backtrace, std::vector<tl::BacktraceElement> &bt, unsigned int skip)
+void rba_get_backtrace_from_array (VALUE backtrace, std::vector<tl::BacktraceElement> &bt, unsigned int skip)
 {
   if (TYPE (backtrace) == T_ARRAY) {
 
-    unsigned int len = RARRAY_LEN(backtrace);
-    VALUE *el = RARRAY_PTR(backtrace);
+    unsigned int len = RARRAY_LEN (backtrace);
+    VALUE *el = RARRAY_PTR (backtrace);
     bt.reserve (bt.size () + (len >= skip ? len - skip : 0));
     while (len-- > 0) {
       if (skip > 0) {
@@ -100,7 +97,7 @@ rba_get_backtrace_from_array (VALUE backtrace, std::vector<tl::BacktraceElement>
         --skip;
       } else {
         VALUE str = StringValue (*el++);
-        bt.push_back (rba_split_bt_information (RSTRING_PTR(str), RSTRING_LEN(str)));
+        bt.push_back (rba_split_bt_information (RSTRING_PTR (str), RSTRING_LEN (str)));
       }
     }
 
@@ -108,26 +105,22 @@ rba_get_backtrace_from_array (VALUE backtrace, std::vector<tl::BacktraceElement>
     while (! bt.empty () && bt.back ().file == "-e") {
       bt.pop_back ();
     }
-
   }
 }
 
-void
-block_exceptions (bool f)
+void block_exceptions (bool f)
 {
   if (RubyInterpreter::instance ()) {
     RubyInterpreter::instance ()->block_exceptions (f);
   }
 }
 
-bool
-exceptions_blocked ()
+bool exceptions_blocked ()
 {
   return RubyInterpreter::instance () ? RubyInterpreter::instance ()->exceptions_blocked () : false;
 }
 
-void
-rba_check_error (int state)
+void rba_check_error (int state)
 {
   VALUE lasterr = rb_errinfo ();
 
@@ -153,11 +146,11 @@ rba_check_error (int state)
   }
 
   VALUE klass = rb_class_path (CLASS_OF (lasterr));
-  std::string eclass = std::string (RSTRING_PTR(klass), RSTRING_LEN(klass));
-  VALUE message = rba_safe_obj_as_string(lasterr);
-  std::string emsg = std::string (RSTRING_PTR(message), RSTRING_LEN(message));
+  std::string eclass = std::string (RSTRING_PTR (klass), RSTRING_LEN (klass));
+  VALUE message = rba_safe_obj_as_string (lasterr);
+  std::string emsg = std::string (RSTRING_PTR (message), RSTRING_LEN (message));
 
-  std::vector <tl::BacktraceElement> bt;
+  std::vector<tl::BacktraceElement> bt;
   rba_get_backtrace_from_array (rb_funcall (lasterr, rb_intern ("backtrace"), 0), bt, 0);
 
   if (RubyInterpreter::instance ()) {
@@ -212,7 +205,7 @@ rba_safe_string_value (VALUE obj)
 VALUE
 rba_safe_obj_as_string (VALUE obj)
 {
-  if (TYPE(obj) == T_STRING) {
+  if (TYPE (obj) == T_STRING) {
     return obj;
   } else {
     return rba_safe_func (rb_obj_as_string, obj);
@@ -231,8 +224,7 @@ rba_safe_inspect (VALUE obj)
 /**
  *  @brief needed because NUM2INT may be a macro:
  */
-int
-rba_num2int_f (VALUE obj)
+int rba_num2int_f (VALUE obj)
 {
   return NUM2INT (obj);
 }
@@ -240,8 +232,7 @@ rba_num2int_f (VALUE obj)
 /**
  *  @brief A safe NUM2INT implementation
  */
-int
-rba_safe_num2int (VALUE obj)
+int rba_safe_num2int (VALUE obj)
 {
   return rba_safe_func (rba_num2int_f, obj);
 }
@@ -267,8 +258,7 @@ rba_safe_num2uint (VALUE obj)
 /**
  *  @brief needed because NUM2LONG may be a macro:
  */
-long
-rba_num2long_f (VALUE obj)
+long rba_num2long_f (VALUE obj)
 {
   return NUM2LONG (obj);
 }
@@ -276,8 +266,7 @@ rba_num2long_f (VALUE obj)
 /**
  *  @brief A safe NUM2LONG implementation
  */
-long
-rba_safe_num2long (VALUE obj)
+long rba_safe_num2long (VALUE obj)
 {
   return rba_safe_func (rba_num2long_f, obj);
 }
@@ -368,8 +357,7 @@ rba_class_name (VALUE self)
   return std::string (RSTRING_PTR (str), RSTRING_LEN (str));
 }
 
-struct rb_class_new_instance_param
-{
+struct rb_class_new_instance_param {
   int argc;
   VALUE *argv;
   VALUE klass;
@@ -398,7 +386,7 @@ rba_class_new_instance_checked (int argc, VALUE *argv, VALUE klass)
   rb_protect_init (); // see above
 
   RUBY_BEGIN_EXEC
-    ret = rb_protect (&rb_class_new_instance_wrap, (VALUE) &p, &error);
+  ret = rb_protect (&rb_class_new_instance_wrap, (VALUE) &p, &error);
   RUBY_END_EXEC
 
   if (error) {
@@ -409,8 +397,7 @@ rba_class_new_instance_checked (int argc, VALUE *argv, VALUE klass)
 
 //  A protect wrapper for rb_funcall2
 
-struct rb_funcall2_params
-{
+struct rb_funcall2_params {
   VALUE obj;
   ID id;
   int argc;
@@ -427,7 +414,7 @@ rb_funcall2_wrap (VALUE args)
 
 VALUE rba_funcall2_checked (VALUE obj, ID id, int argc, VALUE *args)
 {
-#if HAVE_RUBY_VERSION_CODE>=10900
+#if HAVE_RUBY_VERSION_CODE >= 10900
   //  Hint: calling of methods on terminated objects cannot really be avoided in all cases -
   //  for example when the destructor triggers some callback as is the case in Qt events
   //  (i.e. childEvent is triggered when a child is removed and may happen on a parent which
@@ -441,8 +428,8 @@ VALUE rba_funcall2_checked (VALUE obj, ID id, int argc, VALUE *args)
   VALUE ret = Qnil;
 
   rb_funcall2_params p;
-  p.obj  = obj;
-  p.id   = id;
+  p.obj = obj;
+  p.id = id;
   p.argc = argc;
   p.args = args;
 
@@ -455,7 +442,7 @@ VALUE rba_funcall2_checked (VALUE obj, ID id, int argc, VALUE *args)
   }
 
   RUBY_BEGIN_EXEC
-    ret = rb_protect (&rb_funcall2_wrap, (VALUE) &p, &error);
+  ret = rb_protect (&rb_funcall2_wrap, (VALUE) &p, &error);
   RUBY_END_EXEC
 
   if (error) {
@@ -464,8 +451,7 @@ VALUE rba_funcall2_checked (VALUE obj, ID id, int argc, VALUE *args)
   return ret;
 }
 
-struct rb_f_eval_params
-{
+struct rb_f_eval_params {
   int argc;
   VALUE *argv;
   VALUE self;
@@ -494,7 +480,7 @@ rba_f_eval_checked (int argc, VALUE *argv, VALUE self)
   rb_protect_init (); // see above
 
   RUBY_BEGIN_EXEC
-    ret = rb_protect (&rb_f_eval_wrap, (VALUE) &p, &error);
+  ret = rb_protect (&rb_f_eval_wrap, (VALUE) &p, &error);
   RUBY_END_EXEC
 
   if (error) {
@@ -503,14 +489,13 @@ rba_f_eval_checked (int argc, VALUE *argv, VALUE self)
   return ret;
 }
 
-void
-rba_yield_checked (VALUE value)
+void rba_yield_checked (VALUE value)
 {
   int error = 0;
   rb_protect_init (); // see above
 
   RUBY_BEGIN_EXEC
-    rb_protect (&rb_yield, value, &error);
+  rb_protect (&rb_yield, value, &error);
   RUBY_END_EXEC
 
   if (error) {
@@ -522,7 +507,7 @@ rba_yield_checked (VALUE value)
 static VALUE debug_inspector_get_binding (const rb_debug_inspector_t *dbg_context, void *data)
 {
   long context = long (reinterpret_cast<size_t> (data));
-  return rb_debug_inspector_frame_binding_get(dbg_context, context);
+  return rb_debug_inspector_frame_binding_get (dbg_context, context);
 }
 #endif
 
@@ -538,25 +523,25 @@ VALUE rba_eval_string_in_context (const char *expr, const char *file, int line, 
   }
 
   int argc;
-  VALUE args[4];
-  args[0] = rb_str_new (expr, long (strlen (expr)));
+  VALUE args [4];
+  args [0] = rb_str_new (expr, long (strlen (expr)));
   //  use the current binding if there is one. This allows using "eval" in the context of a current trace callback
   //  when eval is called from the trace handler.
   if (context < 0) {
-    args[1] = rb_const_get (rb_cObject, rb_intern ("TOPLEVEL_BINDING")); // taken from ruby.c
+    args [1] = rb_const_get (rb_cObject, rb_intern ("TOPLEVEL_BINDING")); // taken from ruby.c
   }
 #if HAVE_RUBY_VERSION_CODE >= 20200
   else if (context > 0) {
-    args[1] = rb_debug_inspector_open (debug_inspector_get_binding, reinterpret_cast<void *> (long (context)));
+    args [1] = rb_debug_inspector_open (debug_inspector_get_binding, reinterpret_cast<void *> (long (context)));
   }
 #endif
   else {
     //  TODO: throw an exception if context > 0 - for Ruby 1.x
-    args[1] = rb_binding_new ();
+    args [1] = rb_binding_new ();
   }
   if (file) {
-    args[2] = rb_str_new (file, long (strlen (file)));
-    args[3] = INT2NUM(line);
+    args [2] = rb_str_new (file, long (strlen (file)));
+    args [3] = INT2NUM (line);
     argc = 4;
   } else {
     argc = 2;

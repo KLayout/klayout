@@ -39,10 +39,10 @@ static void compare_netlists (tl::TestBase *_this, const std::string &path, cons
   std::string netlist_au = is_au.read_all ();
 
   //  normalize "1.0e-005" to "1.0e-05" for compatibility
-  netlist = tl::replaced (netlist, "\r\n", "\n");   //  for Windows
+  netlist = tl::replaced (netlist, "\r\n", "\n"); //  for Windows
   netlist = tl::replaced (netlist, "e-00", "e-0");
   netlist = tl::replaced (netlist, "e-0", "e-");
-  netlist_au = tl::replaced (netlist_au, "\r\n", "\n");   //  for Windows
+  netlist_au = tl::replaced (netlist_au, "\r\n", "\n"); //  for Windows
   netlist_au = tl::replaced (netlist_au, "e-00", "e-0");
   netlist_au = tl::replaced (netlist_au, "e-0", "e-");
 
@@ -53,7 +53,7 @@ static void compare_netlists (tl::TestBase *_this, const std::string &path, cons
   }
 }
 
-TEST(1_WriterResistorDevices)
+TEST (1_WriterResistorDevices)
 {
   db::Netlist nl;
 
@@ -109,7 +109,7 @@ TEST(1_WriterResistorDevices)
   compare_netlists (_this, path, au_path);
 }
 
-TEST(1_WriterResistorDevicesWithBulk)
+TEST (1_WriterResistorDevicesWithBulk)
 {
   db::Netlist nl;
 
@@ -167,7 +167,7 @@ TEST(1_WriterResistorDevicesWithBulk)
   compare_netlists (_this, path, au_path);
 }
 
-TEST(2_WriterCapacitorDevices)
+TEST (2_WriterCapacitorDevices)
 {
   db::Netlist nl;
 
@@ -224,7 +224,7 @@ TEST(2_WriterCapacitorDevices)
   compare_netlists (_this, path, au_path);
 }
 
-TEST(2_WriterCapacitorDevicesNoName)
+TEST (2_WriterCapacitorDevicesNoName)
 {
   db::Netlist nl;
 
@@ -279,7 +279,7 @@ TEST(2_WriterCapacitorDevicesNoName)
   compare_netlists (_this, path, au_path);
 }
 
-TEST(2_WriterCapacitorDevicesWithBulk)
+TEST (2_WriterCapacitorDevicesWithBulk)
 {
   db::Netlist nl;
 
@@ -338,7 +338,7 @@ TEST(2_WriterCapacitorDevicesWithBulk)
   compare_netlists (_this, path, au_path);
 }
 
-TEST(2_WriterCapacitorDevicesWithBulkNoName)
+TEST (2_WriterCapacitorDevicesWithBulkNoName)
 {
   db::Netlist nl;
 
@@ -395,7 +395,7 @@ TEST(2_WriterCapacitorDevicesWithBulkNoName)
   compare_netlists (_this, path, au_path);
 }
 
-TEST(3_WriterInductorDevices)
+TEST (3_WriterInductorDevices)
 {
   db::Netlist nl;
 
@@ -467,7 +467,7 @@ TEST(3_WriterInductorDevices)
   compare_netlists (_this, path, au_path);
 }
 
-TEST(4_WriterDiodeDevices)
+TEST (4_WriterDiodeDevices)
 {
   db::Netlist nl;
 
@@ -539,7 +539,7 @@ TEST(4_WriterDiodeDevices)
   compare_netlists (_this, path, au_path);
 }
 
-TEST(5_WriterMOS3Devices)
+TEST (5_WriterMOS3Devices)
 {
   db::Netlist nl;
 
@@ -628,7 +628,7 @@ TEST(5_WriterMOS3Devices)
   compare_netlists (_this, path, au_path);
 }
 
-TEST(6_WriterMOS4Devices)
+TEST (6_WriterMOS4Devices)
 {
   db::Netlist nl;
 
@@ -724,7 +724,7 @@ TEST(6_WriterMOS4Devices)
   compare_netlists (_this, path, au_path);
 }
 
-TEST(7_WriterAnyDevices)
+TEST (7_WriterAnyDevices)
 {
   db::Netlist nl;
 
@@ -786,7 +786,7 @@ TEST(7_WriterAnyDevices)
   compare_netlists (_this, path, au_path);
 }
 
-TEST(8_WriterSubcircuits)
+TEST (8_WriterSubcircuits)
 {
   db::Netlist nl;
 
@@ -929,7 +929,7 @@ TEST(8_WriterSubcircuits)
   compare_netlists (_this, path, au_path);
 }
 
-TEST(9_WriterNetNamesInsteadOfNumbers)
+TEST (9_WriterNetNamesInsteadOfNumbers)
 {
   db::Netlist nl;
 
@@ -1019,7 +1019,7 @@ TEST(9_WriterNetNamesInsteadOfNumbers)
   compare_netlists (_this, path, au_path);
 }
 
-TEST(10_WriterLongLines)
+TEST (10_WriterLongLines)
 {
   db::Netlist nl;
 
@@ -1050,7 +1050,6 @@ TEST(10_WriterLongLines)
     circuit1->add_device (ddev);
     ddev->connect_terminal (db::DeviceClassResistor::terminal_id_A, n0);
     ddev->connect_terminal (db::DeviceClassResistor::terminal_id_B, n);
-
   }
 
   //  verify against the input
@@ -1067,7 +1066,7 @@ TEST(10_WriterLongLines)
   compare_netlists (_this, path, au_path);
 }
 
-TEST(11_WriterNonConnectedPins)
+TEST (11_WriterNonConnectedPins)
 {
   db::Netlist nl;
 
@@ -1224,7 +1223,7 @@ TEST(11_WriterNonConnectedPins)
   compare_netlists (_this, path, au_path);
 }
 
-TEST(12_UniqueNetNames)
+TEST (12_UniqueNetNames)
 {
   db::LayoutToNetlist l2n;
   std::string l2n_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "same_net_names.l2n");
@@ -1256,7 +1255,7 @@ TEST(12_UniqueNetNames)
   compare_netlists (_this, path, au_path);
 }
 
-TEST(13_WriterBJT3Devices)
+TEST (13_WriterBJT3Devices)
 {
   db::Netlist nl;
 
@@ -1345,7 +1344,7 @@ TEST(13_WriterBJT3Devices)
   compare_netlists (_this, path, au_path);
 }
 
-TEST(14_WriterBJT4Devices)
+TEST (14_WriterBJT4Devices)
 {
   db::Netlist nl;
 
@@ -1442,7 +1441,8 @@ TEST(14_WriterBJT4Devices)
 }
 
 
-namespace {
+namespace
+{
 
 class MyDelegate
   : public db::NetlistSpiceWriterDelegate
@@ -1450,7 +1450,8 @@ class MyDelegate
 public:
   MyDelegate ()
     : db::NetlistSpiceWriterDelegate ()
-  { }
+  {
+  }
 
   void write_header () const
   {
@@ -1472,7 +1473,7 @@ public:
 
 }
 
-TEST(20_Delegate)
+TEST (20_Delegate)
 {
   db::Netlist nl;
 

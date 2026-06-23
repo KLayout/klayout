@@ -75,7 +75,8 @@ class TL_PUBLIC ExecutableWithParameters
 public:
   ExecutableWithParameters (const std::map<std::string, tl::Variant> &params)
     : m_params (params)
-  { }
+  {
+  }
 
   /**
    *  @brief An utility function to get a parameter
@@ -110,17 +111,17 @@ private:
  *  @brief A facility for providing reproducible recipes
  *
  *  The idea of this facility is to provide a service by which an object
- *  can be reproduced in a parametrized way. The intended use case is a 
- *  DRC report for example, where the DRC script is the generator. 
- *  
- *  In this use case, the DRC engine will register a recipe. It will 
- *  put the serialized version of the recipe into the DRC report. If the 
- *  user requests a re-run of the DRC, the recipe will be called and 
+ *  can be reproduced in a parametrized way. The intended use case is a
+ *  DRC report for example, where the DRC script is the generator.
+ *
+ *  In this use case, the DRC engine will register a recipe. It will
+ *  put the serialized version of the recipe into the DRC report. If the
+ *  user requests a re-run of the DRC, the recipe will be called and
  *  the implementation is supposed to deliver a new database.
  *
  *  To register a recipe, reimplement tl::Recipe and create a singleton
  *  instance. To serialize a recipe, use "generator", to execute the
- *  recipe, use "make". 
+ *  recipe, use "make".
  *
  *  Parameters are kept as a generic key/value map.
  */
@@ -136,7 +137,7 @@ public:
   /**
    *  @brief Destructor
    */
-  virtual ~Recipe () { }
+  virtual ~Recipe () {}
 
   /**
    *  @brief Gets the recipes name (a unique identifier)
@@ -176,7 +177,7 @@ public:
   virtual Executable *executable (const std::map<std::string, tl::Variant> &params) const = 0;
 
 private:
-  Recipe (const Recipe &) : tl::RegisteredClass<tl::Recipe> (this) { }
+  Recipe (const Recipe &) : tl::RegisteredClass<tl::Recipe> (this) {}
   Recipe &operator= (const Recipe &) { return *this; }
 
   std::string m_name;
@@ -186,4 +187,3 @@ private:
 } // namespace tl
 
 #endif
-

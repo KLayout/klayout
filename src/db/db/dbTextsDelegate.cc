@@ -65,4 +65,3 @@ void TextsDelegate::disable_progress ()
 }
 
 }
-

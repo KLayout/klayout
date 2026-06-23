@@ -38,18 +38,18 @@ namespace tl
  *  @brief A threaded worker framework
  *
  *  The threaded worker framework provides a way to control multiple workers performing operations
- *  on some database or data repository object. The framework provides a way to control the workers, in 
+ *  on some database or data repository object. The framework provides a way to control the workers, in
  *  particular kick off and shut down worker threads. It does not deal with the issue of the database
- *  object being thread-safe. 
+ *  object being thread-safe.
  *
- *  The general concept involves 
- *  1.) A boss (tl::Boss class). There is one boss instance per "database" instance. The boss must be 
+ *  The general concept involves
+ *  1.) A boss (tl::Boss class). There is one boss instance per "database" instance. The boss must be
  *      in some way associated with the database.
- *      The boss provides a way to control several jobs, i.e. stop them if required. 
- *  2.) Jobs: multiple jobs (tl::Job objects) can be registered under one boss. 
- *      A job is not necessarily running or terminated. It can be started, 
+ *      The boss provides a way to control several jobs, i.e. stop them if required.
+ *  2.) Jobs: multiple jobs (tl::Job objects) can be registered under one boss.
+ *      A job is not necessarily running or terminated. It can be started,
  *      stopped, restarted or terminated. A job is initialized in the main thread and
- *      sets up the threads which actually do the job (workers). 
+ *      sets up the threads which actually do the job (workers).
  *      A job may be associated with multiple boss instances.
  *  3.) Workers: a job can be split into multiple tasks which are executed by the workers. A worker is
  *      a thread which receives tasks through a task queue.
@@ -74,18 +74,18 @@ public:
   TaskList ();
 
   /**
-   *  @brief Destructor 
+   *  @brief Destructor
    */
   ~TaskList ();
 
   /**
    *  @brief Returns true if the list is empty.
    */
-  bool is_empty () const 
+  bool is_empty () const
   {
     return mp_first == 0;
   }
-  
+
   /**
    *  @brief Fetch the next task
    */
@@ -124,7 +124,7 @@ private:
 /**
  *  @brief This object represents a job
  *
- *  A job can be delegated to multiple workers. 
+ *  A job can be delegated to multiple workers.
  *  A job is organized in tasks, which are scheduled to the job. Upon \start,
  *  the job takes the tasks from a queue and sends them to the workers for
  *  being processed.
@@ -162,7 +162,7 @@ public:
    *  This does not trigger the actual operation yet. It should be done separately before
    *  \start is called. However, it is possible to schedule jobs while the job is running and
    *  even from within other tasks.
-   *  It is guaranteed that the order of processing of the tasks is maintained. However, 
+   *  It is guaranteed that the order of processing of the tasks is maintained. However,
    *  it is not guaranteed that previous tasks have been processed already because they
    *  might be send to a different thread.
    */
@@ -192,8 +192,8 @@ public:
    *  @brief Terminate all threads in this job.
    *
    *  After the job has been terminated, it can be started again using \start.
-   *  The difference between \stop and \terminate is that \terminate will 
-   *  stop the threads. 
+   *  The difference between \stop and \terminate is that \terminate will
+   *  stop the threads.
    */
   void terminate ();
 
@@ -234,21 +234,21 @@ protected:
   /**
    *  @brief Sets up a worker before the first task in performed
    *
-   *  This method is called from the main thread where start() is being called to 
+   *  This method is called from the main thread where start() is being called to
    *  set up all workers.
    *  This method is called from the main thread from which start () was called.
    */
-  virtual void setup_worker (Worker * /*worker*/) { }
+  virtual void setup_worker (Worker * /*worker*/) {}
 
   /**
    *  @brief This method is called before the given task is started in sync mode (workers == 0)
    */
-  virtual void before_sync_task (Task * /*task*/) { }
+  virtual void before_sync_task (Task * /*task*/) {}
 
   /**
    *  @brief This method is called after the given task has finished in sync mode (workers == 0)
    */
-  virtual void after_sync_task (Task * /*task*/) { }
+  virtual void after_sync_task (Task * /*task*/) {}
 
   /**
    *  @brief Indicates that the job has finished
@@ -258,7 +258,7 @@ protected:
    *  Caution: this method is called from the thread that was executing the last task. It is called
    *  before the controlling thread is awakened inside wait().
    */
-  virtual void finished () { }
+  virtual void finished () {}
 
   /**
    *  @brief Indicates that a job has stopped
@@ -266,10 +266,10 @@ protected:
    *  This method is called when a job is stopped rather than finished
    *  normally. This method is called from the main thread.
    */
-  virtual void stopped () { }
+  virtual void stopped () {}
 
   /**
-   *  @brief Get the nth worker 
+   *  @brief Get the nth worker
    */
   tl::Worker *worker (int n)
   {
@@ -317,17 +317,18 @@ public:
    */
   Job (int nworkers = 1)
     : JobBase (nworkers)
-  { }
+  {
+  }
 
 protected:
-  virtual Worker *create_worker () 
+  virtual Worker *create_worker ()
   {
-    return new W();
+    return new W ();
   }
 };
 
 /**
- *  @brief A worker 
+ *  @brief A worker
  *
  *  The worker is the thread doing the actual work. A worker must be reimplemented to
  *  provide the operation implementation by implementing "perform_task".
@@ -350,10 +351,10 @@ public:
    */
   virtual ~Worker ();
 
-  /** 
-   *  @brief Returns the index of the worker 
+  /**
+   *  @brief Returns the index of the worker
    */
-  int worker_index () const 
+  int worker_index () const
   {
     return m_worker_index;
   }
@@ -371,7 +372,7 @@ protected:
   /**
    *  @brief Check for stop requests
    *
-   *  This method should be called regularly. It does nothing if no stop request if present. 
+   *  This method should be called regularly. It does nothing if no stop request if present.
    *  Otherwise it throws an exception which is supposed to make \perform_task exit.
    */
   void checkpoint ();
@@ -385,7 +386,7 @@ protected:
   {
     return m_stop_requested;
   }
-  
+
   /**
    *  @brief Returns true, if the worker is waiting for a task
    */
@@ -427,15 +428,17 @@ public:
   /**
    *  @brief Default ctor
    */
-  Task () 
+  Task ()
     : mp_next (0), mp_last (0)
-  { }
+  {
+  }
 
   /**
    *  @brief Constructor
    */
   virtual ~Task ()
-  { }
+  {
+  }
 
 private:
   friend class TaskList;
@@ -448,16 +451,16 @@ private:
  *
  *  The Boss object controls multiple jobs.
  *  Job must be registered at the Boss with register_job and must
- *  be unregistered with unregister_job. 
+ *  be unregistered with unregister_job.
  *  The Boss provides services for stopping all jobs and iterating
  *  over them.
  *  If a job is deleted, it is automatically unregistered at the Boss.
- *  Vice versa, the Boss unregisters itself at all jobs registered 
+ *  Vice versa, the Boss unregisters itself at all jobs registered
  *  within it.
  */
 class TL_PUBLIC Boss
 {
-public: 
+public:
   typedef std::set<JobBase *>::iterator iterator;
 
   /**
@@ -473,7 +476,7 @@ public:
   virtual ~Boss ();
 
   /**
-   *  @brief Register the job at the Boss. 
+   *  @brief Register the job at the Boss.
    *
    *  After registering, the job is known to the Boss and can be
    *  controlled by it.
@@ -482,7 +485,7 @@ public:
   void register_job (JobBase *job);
 
   /**
-   *  @brief Unregister the job at the Boss. 
+   *  @brief Unregister the job at the Boss.
    *
    *  After unregistering, the job is no longer known to the Boss and cannot be
    *  controlled by it.
@@ -492,7 +495,7 @@ public:
   /**
    *  @brief Iterate over all jobs: begin iterator
    */
-  iterator begin () 
+  iterator begin ()
   {
     return m_jobs.begin ();
   }
@@ -500,7 +503,7 @@ public:
   /**
    *  @brief Iterate over all jobs: end iterator
    */
-  iterator end () 
+  iterator end ()
   {
     return m_jobs.end ();
   }
@@ -517,4 +520,3 @@ private:
 }
 
 #endif
-

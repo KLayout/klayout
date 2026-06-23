@@ -47,17 +47,17 @@ class SimplePolygonSink;
 /**
  *  @brief Forms polygons from a edge set
  *
- *  This class implements EdgeSink. It builds polygons from the edges delivered to it 
- *  and outputs the polygons to another receiver (PolygonSink). 
+ *  This class implements EdgeSink. It builds polygons from the edges delivered to it
+ *  and outputs the polygons to another receiver (PolygonSink).
  *  The way how touching corners are resolved can be specified (minimum and maximum coherence).
- *  In addition, it can be specified if the resulting polygons contain holes are whether the 
+ *  In addition, it can be specified if the resulting polygons contain holes are whether the
  *  holes are attached to the hull contour by stich lines.
  */
 class DB_PUBLIC PolygonGenerator
   : public EdgeSink
 {
 public:
-  typedef std::list <PGPoint> open_map_type;
+  typedef std::list<PGPoint> open_map_type;
   typedef open_map_type::iterator open_map_iterator_type;
 
   /**
@@ -70,7 +70,7 @@ public:
    *  @param resolve_holes true, if holes should be resolved into the hull using stich lines
    *  @param min_coherence true, if the resulting polygons should be minimized (less holes, more polygons)
    */
-  PolygonGenerator (PolygonSink &psink, bool resolve_holes = true, bool min_coherence = true); 
+  PolygonGenerator (PolygonSink &psink, bool resolve_holes = true, bool min_coherence = true);
 
   /**
    *  @brief Constructor
@@ -83,7 +83,7 @@ public:
    *  @param resolve_holes true, if holes should be resolved into the hull using stich lines
    *  @param min_coherence true, if the resulting polygons should be minimized (less holes, more polygons)
    */
-  PolygonGenerator (SimplePolygonSink &spsink, bool min_coherence = true); 
+  PolygonGenerator (SimplePolygonSink &spsink, bool min_coherence = true);
 
   /**
    *  @brief Destructor
@@ -128,7 +128,7 @@ public:
   /**
    *  @brief Implementation of the EdgeSink interface
    */
-  virtual void put (const db::Edge & /*e*/, int /*tag*/) { }
+  virtual void put (const db::Edge & /*e*/, int /*tag*/) {}
 
   /**
    *  @brief Sets the way how holes are resolved dynamically
@@ -204,7 +204,7 @@ class DB_PUBLIC TrapezoidGenerator
   : public EdgeSink
 {
 public:
-  typedef std::vector <std::pair<db::Edge, db::Edge> > edge_map_type;
+  typedef std::vector<std::pair<db::Edge, db::Edge>> edge_map_type;
   typedef edge_map_type::iterator edge_map_type_iterator;
 
   /**
@@ -270,7 +270,7 @@ public:
   /**
    *  @brief Implementation of the EdgeSink interface
    */
-  virtual void put (const db::Edge & /*e*/, int /*tag*/) { }
+  virtual void put (const db::Edge & /*e*/, int /*tag*/) {}
 
 private:
   db::Coord m_y;
@@ -285,7 +285,7 @@ private:
   TrapezoidGenerator &operator= (const TrapezoidGenerator &);
   TrapezoidGenerator (const TrapezoidGenerator &);
 
-  void make_trap (const db::Point (&pts)[4]);
+  void make_trap (const db::Point (&pts) [4]);
 };
 
 /**
@@ -297,36 +297,36 @@ public:
   /**
    *  @brief Constructor
    */
-  SimplePolygonSink () { }
+  SimplePolygonSink () {}
 
   /**
    *  @brief Destructor
    */
-  virtual ~SimplePolygonSink () { }
+  virtual ~SimplePolygonSink () {}
 
   /**
    *  @brief Deliver a simple polygon
    *
    *  This method is called to deliver a new polygon
    */
-  virtual void put (const db::SimplePolygon & /*polygon*/) { }
+  virtual void put (const db::SimplePolygon & /*polygon*/) {}
 
   /**
    *  @brief Start event
    *
-   *  This method is called before the first polygon is delivered. 
+   *  This method is called before the first polygon is delivered.
    *  The PolygonGenerator will simply forward the EdgeSink's start method to the
    *  polygon sink.
    */
-  virtual void start () { }
+  virtual void start () {}
 
   /**
    *  @brief End event
    *
-   *  This method is called after the last polygon was delivered. 
+   *  This method is called after the last polygon was delivered.
    *  The PolygonGenerator will deliver all remaining polygons and call flush then.
    */
-  virtual void flush () { }
+  virtual void flush () {}
 };
 
 /**
@@ -343,16 +343,18 @@ public:
   /**
    *  @brief Constructor specifying an external vector for storing the polygons
    */
-  SimplePolygonContainer (std::vector<db::SimplePolygon> &polygons, bool clear = false) 
-    : SimplePolygonSink (), mp_polygons (&polygons), m_clear (clear) 
-  { }
+  SimplePolygonContainer (std::vector<db::SimplePolygon> &polygons, bool clear = false)
+    : SimplePolygonSink (), mp_polygons (&polygons), m_clear (clear)
+  {
+  }
 
   /**
    *  @brief Constructor which tells the container to use the internal vector for storing the polygons
    */
-  SimplePolygonContainer () 
-    : SimplePolygonSink (), mp_polygons (&m_polygons), m_clear (false) 
-  { }
+  SimplePolygonContainer ()
+    : SimplePolygonSink (), mp_polygons (&m_polygons), m_clear (false)
+  {
+  }
 
   /**
    *  @brief Start the sequence
@@ -370,22 +372,22 @@ public:
    *  @brief The polygons collected so far (const version)
    */
   const std::vector<db::SimplePolygon> &polygons () const
-  { 
-    return *mp_polygons; 
+  {
+    return *mp_polygons;
   }
 
   /**
    *  @brief The polygons collected so far (non-const version)
    */
-  std::vector<db::SimplePolygon> &polygons () 
-  { 
-    return *mp_polygons; 
+  std::vector<db::SimplePolygon> &polygons ()
+  {
+    return *mp_polygons;
   }
 
   /**
    *  @brief Implementation of the PolygonSink interface
    */
-  virtual void put (const db::SimplePolygon &polygon) 
+  virtual void put (const db::SimplePolygon &polygon)
   {
     mp_polygons->push_back (polygon);
   }
@@ -412,14 +414,16 @@ public:
    */
   SimplePolygonContainerWithProperties (std::vector<db::SimplePolygonWithProperties> &polygons, db::properties_id_type prop_id, bool clear = false)
     : SimplePolygonSink (), mp_polygons (&polygons), m_prop_id (prop_id), m_clear (clear)
-  { }
+  {
+  }
 
   /**
    *  @brief Constructor which tells the container to use the internal vector for storing the polygons
    */
   SimplePolygonContainerWithProperties ()
     : SimplePolygonSink (), mp_polygons (&m_polygons), m_prop_id (0), m_clear (false)
-  { }
+  {
+  }
 
   /**
    *  @brief Start the sequence
@@ -473,36 +477,36 @@ public:
   /**
    *  @brief Constructor
    */
-  PolygonSink () { }
+  PolygonSink () {}
 
   /**
    *  @brief Destructor
    */
-  virtual ~PolygonSink () { }
+  virtual ~PolygonSink () {}
 
   /**
    *  @brief Deliver a polygons
    *
    *  This method is called to deliver a new polygon
    */
-  virtual void put (const db::Polygon &) { }
+  virtual void put (const db::Polygon &) {}
 
   /**
    *  @brief Start event
    *
-   *  This method is called before the first polygon is delivered. 
+   *  This method is called before the first polygon is delivered.
    *  The PolygonGenerator will simply forward the EdgeSink's start method to the
    *  polygon sink.
    */
-  virtual void start () { }
+  virtual void start () {}
 
   /**
    *  @brief End event
    *
-   *  This method is called after the last polygon was delivered. 
+   *  This method is called after the last polygon was delivered.
    *  The PolygonGenerator will deliver all remaining polygons and call flush then.
    */
-  virtual void flush () { }
+  virtual void flush () {}
 };
 
 /**
@@ -519,31 +523,33 @@ public:
   /**
    *  @brief Constructor specifying an external vector for storing the polygons
    */
-  PolygonContainer (std::vector<db::Polygon> &polygons, bool clear = false) 
+  PolygonContainer (std::vector<db::Polygon> &polygons, bool clear = false)
     : PolygonSink (), mp_polygons (&polygons), m_clear (clear)
-  { }
+  {
+  }
 
   /**
    *  @brief Constructor which tells the container to use the internal vector for storing the polygons
    */
-  PolygonContainer () 
-    : PolygonSink (), mp_polygons (&m_polygons), m_clear (false) 
-  { }
+  PolygonContainer ()
+    : PolygonSink (), mp_polygons (&m_polygons), m_clear (false)
+  {
+  }
 
   /**
    *  @brief The polygons collected so far (const version)
    */
   const std::vector<db::Polygon> &polygons () const
-  { 
-    return *mp_polygons; 
+  {
+    return *mp_polygons;
   }
 
   /**
    *  @brief The polygons collected so far (non-const version)
    */
-  std::vector<db::Polygon> &polygons () 
-  { 
-    return *mp_polygons; 
+  std::vector<db::Polygon> &polygons ()
+  {
+    return *mp_polygons;
   }
 
   /**
@@ -561,7 +567,7 @@ public:
   /**
    *  @brief Implementation of the PolygonSink interface
    */
-  virtual void put (const db::Polygon &polygon) 
+  virtual void put (const db::Polygon &polygon)
   {
     mp_polygons->push_back (polygon);
   }
@@ -588,14 +594,16 @@ public:
    */
   PolygonContainerWithProperties (std::vector<db::PolygonWithProperties> &polygons, db::properties_id_type prop_id, bool clear = false)
     : PolygonSink (), mp_polygons (&polygons), m_prop_id (prop_id), m_clear (clear)
-  { }
+  {
+  }
 
   /**
    *  @brief Constructor which tells the container to use the internal vector for storing the polygons
    */
   PolygonContainerWithProperties ()
     : PolygonSink (), mp_polygons (&m_polygons), m_prop_id (0), m_clear (false)
-  { }
+  {
+  }
 
   /**
    *  @brief The polygons collected so far (const version)
@@ -641,7 +649,7 @@ private:
 };
 
 /**
- *  @brief A polygon filter that sizes the polygons 
+ *  @brief A polygon filter that sizes the polygons
  *
  *  This class implements the PolygonSink interface and delivers the sized polygons to an EdgeSink.
  */
@@ -650,11 +658,12 @@ class DB_PUBLIC SizingPolygonFilter
 {
 public:
   /**
-   *  @brief Constructor 
+   *  @brief Constructor
    */
   SizingPolygonFilter (EdgeSink &output, Coord dx, Coord dy, unsigned int mode)
     : PolygonSink (), mp_output (&output), m_dx (dx), m_dy (dy), m_mode (mode)
-  { }
+  {
+  }
 
   /**
    *  @brief Implementation of the PolygonSink interface
@@ -695,5 +704,3 @@ private:
 }
 
 #endif
-
-

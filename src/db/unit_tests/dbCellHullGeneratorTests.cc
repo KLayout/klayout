@@ -30,7 +30,7 @@ static std::string h2s (const std::vector<db::Polygon> &hull)
 {
   std::string r;
   for (std::vector<db::Polygon>::const_iterator h = hull.begin (); h != hull.end (); ++h) {
-    if (!r.empty ()) {
+    if (! r.empty ()) {
       r += ";";
     }
     r += h->to_string ();
@@ -59,12 +59,12 @@ static bool check_hull (const std::vector<db::Polygon> &hull, const db::Shapes &
   return out.empty ();
 }
 
-TEST(1) 
+TEST (1)
 {
   db::Manager m (true);
   db::Layout g (&m);
-  unsigned int l1 = g.insert_layer (db::LayerProperties (1, 0)); 
-  unsigned int l2 = g.insert_layer (db::LayerProperties (2, 0)); 
+  unsigned int l1 = g.insert_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = g.insert_layer (db::LayerProperties (2, 0));
   db::Cell &c1 (g.cell (g.add_cell ()));
 
   c1.shapes (l1).insert (db::Box (0, 0, 2100, 2100));
@@ -72,7 +72,7 @@ TEST(1)
 
   db::CellHullGenerator chg (g);
 
-  std::vector <db::Polygon> hull;
+  std::vector<db::Polygon> hull;
   chg.generate_hull (c1, hull);
   EXPECT_EQ (h2s (hull), "(-100,-100;-100,2000;0,2000;0,2100;2100,2100;2100,0;2000,0;2000,-100)");
   EXPECT_EQ (check_hull (hull, c1.shapes (l1)), true);
@@ -151,15 +151,15 @@ TEST(1)
   c1.shapes (l2).clear ();
 
   {
-    db::Point pts[3] = { db::Point(0, 0), db::Point(0, 200), db::Point(200, 200) };
+    db::Point pts [3] = {db::Point (0, 0), db::Point (0, 200), db::Point (200, 200)};
     db::Polygon poly;
-    poly.assign_hull (&pts[0], &pts[0] + 3);
+    poly.assign_hull (&pts [0], &pts [0] + 3);
     c1.shapes (l1).insert (poly);
   }
   {
-    db::Point pts[3] = { db::Point(1800, 1800), db::Point(1800, 2000), db::Point(2000, 2000) };
+    db::Point pts [3] = {db::Point (1800, 1800), db::Point (1800, 2000), db::Point (2000, 2000)};
     db::Polygon poly;
-    poly.assign_hull (&pts[0], &pts[0] + 3);
+    poly.assign_hull (&pts [0], &pts [0] + 3);
     c1.shapes (l1).insert (poly);
   }
 
@@ -196,16 +196,16 @@ TEST(1)
   c1.shapes (l1).insert (db::Box (1200, 0, 1300, 1750));
   c1.shapes (l1).insert (db::Box (1100, 0, 1200, 1800));
   c1.shapes (l1).insert (db::Box (1000, 0, 1100, 1950));
-  c1.shapes (l1).insert (db::Box ( 900, 0, 1000, 1800));
-  c1.shapes (l1).insert (db::Box ( 800, 0,  900, 1750));
-  c1.shapes (l1).insert (db::Box ( 700, 0,  800, 1700));
-  c1.shapes (l1).insert (db::Box ( 600, 0,  700, 1750));
-  c1.shapes (l1).insert (db::Box ( 500, 0,  600, 1850));
-  c1.shapes (l1).insert (db::Box ( 400, 0,  500, 1900));
-  c1.shapes (l1).insert (db::Box ( 300, 0,  400, 1950));
-  c1.shapes (l1).insert (db::Box ( 200, 0,  300, 1750));
-  c1.shapes (l1).insert (db::Box ( 100, 0,  200, 1800));
-  c1.shapes (l1).insert (db::Box (   0, 0,  100, 1950));
+  c1.shapes (l1).insert (db::Box (900, 0, 1000, 1800));
+  c1.shapes (l1).insert (db::Box (800, 0, 900, 1750));
+  c1.shapes (l1).insert (db::Box (700, 0, 800, 1700));
+  c1.shapes (l1).insert (db::Box (600, 0, 700, 1750));
+  c1.shapes (l1).insert (db::Box (500, 0, 600, 1850));
+  c1.shapes (l1).insert (db::Box (400, 0, 500, 1900));
+  c1.shapes (l1).insert (db::Box (300, 0, 400, 1950));
+  c1.shapes (l1).insert (db::Box (200, 0, 300, 1750));
+  c1.shapes (l1).insert (db::Box (100, 0, 200, 1800));
+  c1.shapes (l1).insert (db::Box (0, 0, 100, 1950));
 
   hull.clear ();
   chg.set_complexity (0);
@@ -236,11 +236,11 @@ TEST(1)
   EXPECT_EQ (check_hull (hull, c1.shapes (l2)), true);
 }
 
-TEST(2) 
+TEST (2)
 {
   db::Manager m (true);
   db::Layout g (&m);
-  unsigned int l1 = g.insert_layer (db::LayerProperties (1, 0)); 
+  unsigned int l1 = g.insert_layer (db::LayerProperties (1, 0));
   db::Cell &c1 (g.cell (g.add_cell ()));
 
   for (size_t i = 0; i < 10000; ++i) {
@@ -251,7 +251,7 @@ TEST(2)
 
   db::CellHullGenerator chg (g);
 
-  std::vector <db::Polygon> hull;
+  std::vector<db::Polygon> hull;
   chg.generate_hull (c1, hull);
   EXPECT_EQ (check_hull (hull, c1.shapes (l1)), true);
 
@@ -263,6 +263,3 @@ TEST(2)
   EXPECT_EQ (hull.front ().hull ().size () <= 10, true);
   EXPECT_EQ (check_hull (hull, c1.shapes (l1)), true);
 }
-
-
-

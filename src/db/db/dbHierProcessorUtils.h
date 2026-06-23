@@ -36,14 +36,12 @@ namespace db
 //  determines the default boolean core flag per result type
 
 template <class TR>
-struct default_boolean_core
-{
+struct default_boolean_core {
   bool operator() () const { return false; }
 };
 
 template <>
-struct default_boolean_core<db::PolygonRef>
-{
+struct default_boolean_core<db::PolygonRef> {
   bool operator() () const { return true; }
 };
 
@@ -81,9 +79,8 @@ public:
         ptr = mp_layout->shape_repository ().repository (typename shape_type::tag ()).insert (ref.obj ());
       }
 
-      m_cache[ref.ptr ()] = ptr;
+      m_cache [ref.ptr ()] = ptr;
       return Ref (ptr, ref.trans ());
-
     }
   }
 
@@ -107,9 +104,8 @@ public:
         ptr = mp_layout->shape_repository ().repository (typename shape_type::tag ()).insert (sh);
       }
 
-      m_cache_by_shape[sh] = ptr;
+      m_cache_by_shape [sh] = ptr;
       return Ref (ptr, red_trans);
-
     }
   }
 
@@ -147,7 +143,7 @@ class shape_reference_translator<db::Edge>
   : public simple_shape_reference_translator<db::Edge>
 {
 public:
-  shape_reference_translator (db::Layout * /*target_layout*/) { }
+  shape_reference_translator (db::Layout * /*target_layout*/) {}
 };
 
 template <>
@@ -155,7 +151,7 @@ class shape_reference_translator<db::Polygon>
   : public simple_shape_reference_translator<db::Polygon>
 {
 public:
-  shape_reference_translator (db::Layout * /*target_layout*/) { }
+  shape_reference_translator (db::Layout * /*target_layout*/) {}
 };
 
 template <>
@@ -163,11 +159,11 @@ class shape_reference_translator<db::Text>
   : public simple_shape_reference_translator<db::Text>
 {
 public:
-  shape_reference_translator (db::Layout * /*target_layout*/) { }
+  shape_reference_translator (db::Layout * /*target_layout*/) {}
 };
 
-template<class Basic>
-class shape_reference_translator<db::object_with_properties<Basic> >
+template <class Basic>
+class shape_reference_translator<db::object_with_properties<Basic>>
   : public shape_reference_translator<Basic>
 {
 public:
@@ -181,13 +177,13 @@ public:
 
   shape_type operator() (const shape_type &s) const
   {
-    return shape_type (shape_reference_translator<Basic>::operator () (s), s.properties_id ());
+    return shape_type (shape_reference_translator<Basic>::operator() (s), s.properties_id ());
   }
 
   template <class Trans>
   shape_type operator() (const shape_type &s, const Trans &tr) const
   {
-    return shape_type (shape_reference_translator<Basic>::operator () (s, tr), s.properties_id ());
+    return shape_type (shape_reference_translator<Basic>::operator() (s, tr), s.properties_id ());
   }
 };
 
@@ -230,10 +226,9 @@ public:
         ptr = mp_layout->shape_repository ().repository (typename shape_type::tag ()).insert (sh);
       }
 
-      m_cache[std::make_pair (ref.ptr (), m_bare_trans)] = std::make_pair (ptr, red_trans);
+      m_cache [std::make_pair (ref.ptr (), m_bare_trans)] = std::make_pair (ptr, red_trans);
 
       return Ref (ptr, ref_trans_type (m_trans * Trans (ref.trans ())) * red_trans);
-
     }
   }
 
@@ -242,7 +237,7 @@ private:
   Trans m_trans;
   ref_trans_type m_ref_trans;
   Trans m_bare_trans;
-  mutable std::unordered_map<std::pair<const shape_type *, Trans>, std::pair<const shape_type *, ref_trans_type> > m_cache;
+  mutable std::unordered_map<std::pair<const shape_type *, Trans>, std::pair<const shape_type *, ref_trans_type>> m_cache;
 };
 
 template <class Trans>
@@ -310,11 +305,10 @@ public:
   shape_type operator() (const shape_type &s) const
   {
     //  CAUTION: no property ID translation happens here (reasoning: the main use case is fake ID for net tagging)
-    return shape_type (shape_reference_translator_with_trans<Basic, Trans>::operator () (s), s.properties_id ());
+    return shape_type (shape_reference_translator_with_trans<Basic, Trans>::operator() (s), s.properties_id ());
   }
 };
 
 }
 
 #endif
-

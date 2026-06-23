@@ -23,4 +23,4 @@
 #include "../pymodHelper.h"
 
 #include "QtPrintSupportMain.h"
-DEFINE_PYMOD(QtPrintSupport, "QtPrintSupport", "KLayout/Qt module 'QtPrintSupport'")
+DEFINE_PYMOD (QtPrintSupport, "QtPrintSupport", "KLayout/Qt module 'QtPrintSupport'")

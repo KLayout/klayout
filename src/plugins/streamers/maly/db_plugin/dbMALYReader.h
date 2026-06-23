@@ -54,7 +54,8 @@ class DB_PLUGIN_PUBLIC MALYReaderException
 public:
   MALYReaderException (const std::string &msg, size_t l, const std::string &file)
     : ReaderException (tl::sprintf (tl::to_string (tr ("%s (line=%ld, file=%s)")), msg, l, file))
-  { }
+  {
+  }
 };
 
 /**
@@ -64,7 +65,7 @@ class DB_PLUGIN_PUBLIC MALYReader
   : public NamedLayerReader,
     public MALYDiagnostics
 {
-public: 
+public:
   typedef std::vector<tl::Variant> property_value_list;
 
   /**
@@ -86,8 +87,8 @@ public:
    */
   bool test ();
 
-  /** 
-   *  @brief The basic read method 
+  /**
+   *  @brief The basic read method
    *
    *  This method will read the stream data and translate this to
    *  insert calls into the layout object. This will not do much
@@ -104,7 +105,7 @@ public:
    */
   virtual const LayerMap &read (db::Layout &layout, const LoadLayoutOptions &options);
 
-  /** 
+  /**
    *  @brief The basic read method (without mapping)
    *
    *  This method will read the stream data and translate this to
@@ -146,11 +147,11 @@ public:
   MALYData read_maly_file ();
 
 private:
-  struct MALYReaderTitleSpec
-  {
+  struct MALYReaderTitleSpec {
     MALYReaderTitleSpec ()
       : given (false), enabled (false), width (1.0), height (1.0), pitch (1.0)
-    { }
+    {
+    }
 
     bool given;
     bool enabled;
@@ -158,24 +159,23 @@ private:
     double width, height, pitch;
   };
 
-  struct MALYReaderTitleData
-  {
+  struct MALYReaderTitleData {
     MALYReaderTitleData ()
-    { }
+    {
+    }
 
     MALYReaderTitleSpec date_spec;
     MALYReaderTitleSpec serial_spec;
-    std::list<std::pair<std::string, MALYReaderTitleSpec> > string_titles;
+    std::list<std::pair<std::string, MALYReaderTitleSpec>> string_titles;
   };
 
-  struct MALYReaderParametersData
-  {
+  struct MALYReaderParametersData {
     MALYReaderParametersData ()
       : base (BaseNotSet), array_base (BaseNotSet), masksize (0.0), maskmirror (false), font (MALYTitle::FontNotSet)
-    { }
-
-    enum Base
     {
+    }
+
+    enum Base {
       BaseNotSet,
       Origin,
       Center,
@@ -187,14 +187,14 @@ private:
     double masksize;
     bool maskmirror;
     MALYTitle::Font font;
-    std::list<std::pair<std::string, std::string> > roots;
+    std::list<std::pair<std::string, std::string>> roots;
   };
 
-  struct MALYReaderStrRefData
-  {
+  struct MALYReaderStrRefData {
     MALYReaderStrRefData ()
       : layer (-1), scale (1.0), nx (1), ny (1), dx (0.0), dy (0.0)
-    { }
+    {
+    }
 
     std::string file;
     std::string name;
@@ -207,14 +207,12 @@ private:
     double dx, dy;
   };
 
-  struct MALYReaderStrGroupData
-  {
+  struct MALYReaderStrGroupData {
     std::string name;
     std::list<MALYReaderStrRefData> refs;
   };
 
-  struct MALYReaderMaskData
-  {
+  struct MALYReaderMaskData {
     std::string name;
     MALYReaderParametersData parameters;
     MALYReaderTitleData title;
@@ -254,4 +252,3 @@ private:
 }
 
 #endif
-

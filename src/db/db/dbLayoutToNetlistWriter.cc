@@ -149,7 +149,6 @@ static void write_point (TokenizedOutput &out, const db::Point &pt, db::Point &r
     } else {
       out << "*";
     }
-
   }
 
   ref = pt;
@@ -262,7 +261,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n)
 }
 
 template <class Keys>
-void std_writer_impl<Keys>::write (TokenizedOutput &stream, bool nested, const db::Netlist *netlist, const db::LayoutToNetlist *l2n, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > *net2id_per_circuit)
+void std_writer_impl<Keys>::write (TokenizedOutput &stream, bool nested, const db::Netlist *netlist, const db::LayoutToNetlist *l2n, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int>> *net2id_per_circuit)
 {
   try {
 
@@ -320,7 +319,7 @@ void std_writer_impl<Keys>::write_device_class (TokenizedOutput &stream, const d
 
   const std::vector<DeviceParameterDefinition> &pd = cls->parameter_definitions ();
   for (auto p = pd.begin (); p != pd.end (); ++p) {
-    if (full_specs || ! temp_class->has_parameter_with_name (p->name ()) || !same_parameter (*p, *temp_class->parameter_definition (temp_class->parameter_id_for_name (p->name ())))) {
+    if (full_specs || ! temp_class->has_parameter_with_name (p->name ()) || ! same_parameter (*p, *temp_class->parameter_definition (temp_class->parameter_id_for_name (p->name ())))) {
       if (! any_def) {
         out << endl;
       }
@@ -342,7 +341,7 @@ void std_writer_impl<Keys>::write_device_class (TokenizedOutput &stream, const d
 }
 
 template <class Keys>
-void std_writer_impl<Keys>::write (bool nested, TokenizedOutput &stream, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > *net2id_per_circuit)
+void std_writer_impl<Keys>::write (bool nested, TokenizedOutput &stream, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int>> *net2id_per_circuit)
 {
   const int version = 0;
 
@@ -366,12 +365,14 @@ void std_writer_impl<Keys>::write (bool nested, TokenizedOutput &stream, std::ma
   if (mp_l2n) {
 
     if (! Keys::is_short ()) {
-      stream << endl << "# Layer section" << endl;
+      stream << endl
+             << "# Layer section" << endl;
       stream << "# This section lists the mask layers (drawing or derived) and their connections." << endl;
     }
 
     if (! Keys::is_short ()) {
-      stream << endl << "# Mask layers" << endl;
+      stream << endl
+             << "# Mask layers" << endl;
     }
     for (db::Connectivity::all_layer_iterator l = mp_l2n->connectivity ().begin_layers (); l != mp_l2n->connectivity ().end_layers (); ++l) {
       TokenizedOutput out (stream, Keys::layer_key);
@@ -384,7 +385,8 @@ void std_writer_impl<Keys>::write (bool nested, TokenizedOutput &stream, std::ma
     }
 
     if (! Keys::is_short ()) {
-      stream << endl << "# Mask layer connectivity" << endl;
+      stream << endl
+             << "# Mask layer connectivity" << endl;
     }
     for (db::Connectivity::all_layer_iterator l = mp_l2n->connectivity ().begin_layers (); l != mp_l2n->connectivity ().end_layers (); ++l) {
 
@@ -415,7 +417,6 @@ void std_writer_impl<Keys>::write (bool nested, TokenizedOutput &stream, std::ma
         }
         m_progress.set (mp_stream->pos ());
       }
-
     }
 
     any = false;
@@ -426,7 +427,8 @@ void std_writer_impl<Keys>::write (bool nested, TokenizedOutput &stream, std::ma
       if (gb != ge) {
         if (! any) {
           if (! Keys::is_short ()) {
-            stream << endl << "# Global nets and connectivity" << endl;
+            stream << endl
+                   << "# Global nets and connectivity" << endl;
           }
           any = true;
         }
@@ -454,12 +456,12 @@ void std_writer_impl<Keys>::write (bool nested, TokenizedOutput &stream, std::ma
         }
         m_progress.set (mp_stream->pos ());
       }
-
     }
 
     if (! mp_l2n->log_entries ().empty ()) {
       if (! Keys::is_short ()) {
-        stream << endl << "# Log entries" << endl;
+        stream << endl
+               << "# Log entries" << endl;
       }
       for (auto l = mp_l2n->begin_log_entries (); l != mp_l2n->end_log_entries (); ++l) {
         TokenizedOutput out (stream, Keys::message_key);
@@ -467,26 +469,27 @@ void std_writer_impl<Keys>::write (bool nested, TokenizedOutput &stream, std::ma
         m_progress.set (mp_stream->pos ());
       }
     }
-
   }
 
   if (mp_netlist->begin_device_classes () != mp_netlist->end_device_classes () && ! Keys::is_short ()) {
-    stream << endl << "# Device class section" << endl;
+    stream << endl
+           << "# Device class section" << endl;
   }
   for (db::Netlist::const_device_class_iterator c = mp_netlist->begin_device_classes (); c != mp_netlist->end_device_classes (); ++c) {
-    db::DeviceClassTemplateBase *temp = db::DeviceClassTemplateBase::is_a (c.operator-> ());
+    db::DeviceClassTemplateBase *temp = db::DeviceClassTemplateBase::is_a (c.operator->());
     if (temp) {
       std::unique_ptr<db::DeviceClass> temp_class (temp->create ());
-      write_device_class (stream, c.operator-> (), temp->name (), temp_class.get ());
+      write_device_class (stream, c.operator->(), temp->name (), temp_class.get ());
     } else {
       db::DeviceClass empty;
-      write_device_class (stream, c.operator-> (), std::string (), &empty);
+      write_device_class (stream, c.operator->(), std::string (), &empty);
     }
     m_progress.set (mp_stream->pos ());
   }
 
   if (mp_netlist->begin_device_abstracts () != mp_netlist->end_device_abstracts () && ! Keys::is_short ()) {
-    stream << endl << "# Device abstracts section" << endl;
+    stream << endl
+           << "# Device abstracts section" << endl;
     stream << "# Device abstracts list the pin shapes of the devices." << endl;
   }
   for (db::Netlist::const_abstract_model_iterator m = mp_netlist->begin_device_abstracts (); m != mp_netlist->end_device_abstracts (); ++m) {
@@ -499,11 +502,12 @@ void std_writer_impl<Keys>::write (bool nested, TokenizedOutput &stream, std::ma
   }
 
   if (! Keys::is_short ()) {
-    stream << endl << "# Circuit section" << endl;
+    stream << endl
+           << "# Circuit section" << endl;
     stream << "# Circuits are the hierarchical building blocks of the netlist." << endl;
   }
   for (db::Netlist::const_bottom_up_circuit_iterator i = mp_netlist->begin_bottom_up (); i != mp_netlist->end_bottom_up (); ++i) {
-    const db::Circuit *x = i.operator-> ();
+    const db::Circuit *x = i.operator->();
     TokenizedOutput out (stream, Keys::circuit_key);
     out << tl::to_word_or_quoted_string (x->name ()) << endl;
     write (out, *x, net2id_per_circuit);
@@ -512,12 +516,13 @@ void std_writer_impl<Keys>::write (bool nested, TokenizedOutput &stream, std::ma
 }
 
 template <class Keys>
-void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Circuit &circuit, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > *net2id_per_circuit)
+void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Circuit &circuit, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int>> *net2id_per_circuit)
 {
   if (circuit.boundary ().vertices () > 0) {
 
     if (! Keys::is_short ()) {
-      stream << endl << "# Circuit boundary" << endl;
+      stream << endl
+             << "# Circuit boundary" << endl;
     }
 
     reset_geometry_ref ();
@@ -540,14 +545,13 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Circuit &c
       } else {
         write_points (out, poly, db::UnitTrans (), m_ref, true);
       }
-
     }
-
   }
 
   for (db::NetlistObject::property_iterator p = circuit.begin_properties (); p != circuit.end_properties (); ++p) {
-    if (p == circuit.begin_properties() && ! Keys::is_short ()) {
-      stream << endl << "# Properties" << endl;
+    if (p == circuit.begin_properties () && ! Keys::is_short ()) {
+      stream << endl
+             << "# Properties" << endl;
     }
     TokenizedOutput (stream, Keys::property_key) << p->first.to_parsable_string () << p->second.to_parsable_string ();
   }
@@ -560,26 +564,29 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Circuit &c
 
   unsigned int id = 0;
   for (db::Circuit::const_net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
-    net2id->insert (std::make_pair (n.operator-> (), ++id));
+    net2id->insert (std::make_pair (n.operator->(), ++id));
   }
 
   if (circuit.begin_nets () != circuit.end_nets ()) {
     if (! Keys::is_short ()) {
       if (mp_l2n) {
-        stream << endl << "# Nets with their geometries" << endl;
+        stream << endl
+               << "# Nets with their geometries" << endl;
       } else {
-        stream << endl << "# Nets" << endl;
+        stream << endl
+               << "# Nets" << endl;
       }
     }
     for (db::Circuit::const_net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
-      write (stream, *n, (*net2id) [n.operator-> ()]);
+      write (stream, *n, (*net2id) [n.operator->()]);
       m_progress.set (mp_stream->pos ());
     }
   }
 
   if (circuit.begin_pins () != circuit.end_pins ()) {
     if (! Keys::is_short ()) {
-      stream << endl << "# Outgoing pins and their connections to nets" << endl;
+      stream << endl
+             << "# Outgoing pins and their connections to nets" << endl;
     }
     for (db::Circuit::const_pin_iterator p = circuit.begin_pins (); p != circuit.end_pins (); ++p) {
       TokenizedOutput out (stream, Keys::pin_key);
@@ -596,7 +603,8 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Circuit &c
 
   if (circuit.begin_devices () != circuit.end_devices ()) {
     if (! Keys::is_short ()) {
-      stream << endl << "# Devices and their connections" << endl;
+      stream << endl
+             << "# Devices and their connections" << endl;
     }
     for (db::Circuit::const_device_iterator d = circuit.begin_devices (); d != circuit.end_devices (); ++d) {
       write (stream, *d, *net2id);
@@ -606,7 +614,8 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Circuit &c
 
   if (circuit.begin_subcircuits () != circuit.end_subcircuits ()) {
     if (! Keys::is_short ()) {
-      stream << endl << "# Subcircuits and their connections" << endl;
+      stream << endl
+             << "# Subcircuits and their connections" << endl;
     }
     for (db::Circuit::const_subcircuit_iterator x = circuit.begin_subcircuits (); x != circuit.end_subcircuits (); ++x) {
       write (stream, *x, *net2id);
@@ -652,7 +661,6 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::NetShape *
       } else {
         write_points (out, poly, t, m_ref, relative);
       }
-
     }
 
   } else if (s->type () == db::NetShape::Text) {
@@ -667,7 +675,6 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::NetShape *
 
     db::Point pt = t * (db::Point () + txtr.obj ().trans ().disp ());
     write_point (out, pt, m_ref, relative);
-
   }
 }
 
@@ -695,7 +702,7 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Net &net, 
       db::cell_index_type cci = circuit->cell_index ();
       db::cell_index_type prev_ci = cci;
 
-      for (db::recursive_cluster_shape_iterator<db::NetShape> si (clusters, *l, cci, net.cluster_id (), this); ! si.at_end (); ) {
+      for (db::recursive_cluster_shape_iterator<db::NetShape> si (clusters, *l, cci, net.cluster_id (), this); ! si.at_end ();) {
 
         //  NOTE: we don't recursive into circuits which will later be output. However, as circuits may
         //  vanish in "purge" but the clusters will still be there we need to recursive into clusters from
@@ -720,22 +727,17 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Net &net, 
             for (db::NetlistObject::property_iterator p = net.begin_properties (); p != net.end_properties (); ++p) {
               TokenizedOutput (*outp, Keys::property_key) << p->first.to_parsable_string () << p->second.to_parsable_string ();
             }
-
           }
 
-          write (*outp, si.operator-> (), si.trans (), name_for_layer (mp_l2n, *l), true);
+          write (*outp, si.operator->(), si.trans (), name_for_layer (mp_l2n, *l), true);
           m_progress.set (mp_stream->pos ());
 
           prev_ci = ci;
 
           ++si;
-
         }
-
       }
-
     }
-
   }
 
   if (! outp) {
@@ -752,7 +754,6 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Net &net, 
         TokenizedOutput (*outp, Keys::property_key) << p->first.to_parsable_string () << p->second.to_parsable_string ();
       }
     }
-
   }
 }
 
@@ -826,17 +827,14 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::DeviceAbst
           out << endl;
         }
 
-        write (out, s.operator-> (), db::ICplxTrans (), name_for_layer (mp_l2n, *l), true);
+        write (out, s.operator->(), db::ICplxTrans (), name_for_layer (mp_l2n, *l), true);
         m_progress.set (mp_stream->pos ());
 
         any = true;
-
       }
-
     }
 
     m_progress.set (mp_stream->pos ());
-
   }
 }
 
@@ -878,16 +876,14 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Device &de
       TokenizedOutput o (out, Keys::device_key);
       o << tl::to_word_or_quoted_string (a->device_abstract->name ());
       write (o, a->trans);
-
     }
 
-    const std::map<unsigned int, std::vector<db::DeviceReconnectedTerminal> > &reconnected_terminals = device.reconnected_terminals ();
-    for (std::map<unsigned int, std::vector<db::DeviceReconnectedTerminal> >::const_iterator t = reconnected_terminals.begin (); t != reconnected_terminals.end (); ++t) {
+    const std::map<unsigned int, std::vector<db::DeviceReconnectedTerminal>> &reconnected_terminals = device.reconnected_terminals ();
+    for (std::map<unsigned int, std::vector<db::DeviceReconnectedTerminal>>::const_iterator t = reconnected_terminals.begin (); t != reconnected_terminals.end (); ++t) {
 
       for (std::vector<db::DeviceReconnectedTerminal>::const_iterator c = t->second.begin (); c != t->second.end (); ++c) {
         TokenizedOutput (out, Keys::connect_key) << tl::to_string (c->device_index) << tl::to_word_or_quoted_string (td [t->first].name ()) << tl::to_word_or_quoted_string (td [c->other_terminal_id].name ());
       }
-
     }
 
     write (out, device.trans ());
@@ -920,8 +916,8 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Device &de
 }
 
 //  explicit instantiation
-template class std_writer_impl<l2n_std_format::keys<false> >;
-template class std_writer_impl<l2n_std_format::keys<true> >;
+template class std_writer_impl<l2n_std_format::keys<false>>;
+template class std_writer_impl<l2n_std_format::keys<true>>;
 
 }
 
@@ -946,10 +942,10 @@ void LayoutToNetlistStandardWriter::do_write (const db::LayoutToNetlist *l2n)
   double dbu = l2n->internal_layout ()->dbu ();
 
   if (m_short_version) {
-    l2n_std_format::std_writer_impl<l2n_std_format::keys<true> > writer (*mp_stream, dbu);
+    l2n_std_format::std_writer_impl<l2n_std_format::keys<true>> writer (*mp_stream, dbu);
     writer.write (l2n);
   } else {
-    l2n_std_format::std_writer_impl<l2n_std_format::keys<false> > writer (*mp_stream, dbu);
+    l2n_std_format::std_writer_impl<l2n_std_format::keys<false>> writer (*mp_stream, dbu);
     writer.write (l2n);
   }
 }

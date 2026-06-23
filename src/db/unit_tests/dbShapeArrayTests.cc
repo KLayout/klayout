@@ -28,13 +28,15 @@
 #include "dbLayout.h"
 #include "tlUnitTest.h"
 
-TEST(1)
+TEST (1)
 {
-  if (db::default_editable_mode ()) { return; } // does not work in editable mode because polygon arrays are expanded
+  if (db::default_editable_mode ()) {
+    return;
+  } // does not work in editable mode because polygon arrays are expanded
 
   db::GenericRepository *rep = new db::GenericRepository ();
 
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (100, 0));
   c1.push_back (db::Point (100, 1000));
   c1.push_back (db::Point (200, 2000));
@@ -56,7 +58,9 @@ TEST(1)
   db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::All);
 
   db::Polygon pref [9] = {
-    p1, p1, p1, 
+    p1,
+    p1,
+    p1,
     db::Trans (0, false, db::Vector (0, 0) + db::Vector (100, -200)) * p1,
     db::Trans (0, false, db::Vector (2000, 0) + db::Vector (100, -200)) * p1,
     db::Trans (0, false, db::Vector (0, -2500) + db::Vector (100, -200)) * p1,
@@ -71,12 +75,12 @@ TEST(1)
   while (! s.at_end ()) {
 
     EXPECT_EQ (n < 9, true);
-    
-    scopy[n] = s;
+
+    scopy [n] = s;
 
     db::Polygon px;
     s->polygon (px);
-    EXPECT_EQ (px == pref[n], true);
+    EXPECT_EQ (px == pref [n], true);
 
     ++s;
     ++n;
@@ -87,8 +91,8 @@ TEST(1)
 
   for (unsigned int i = 0; i < n; ++i) {
     db::Polygon px;
-    scopy[i]->polygon (px);
-    EXPECT_EQ (px == pref[i], true);
+    scopy [i]->polygon (px);
+    EXPECT_EQ (px == pref [i], true);
   }
 
   delete rep;
@@ -96,11 +100,11 @@ TEST(1)
 }
 
 
-TEST(2)
+TEST (2)
 {
   db::GenericRepository *rep = new db::GenericRepository ();
 
-  std::vector <db::Point> c1;
+  std::vector<db::Point> c1;
   c1.push_back (db::Point (100, 0));
   c1.push_back (db::Point (100, 1000));
   c1.push_back (db::Point (200, 2000));
@@ -120,7 +124,7 @@ TEST(2)
   shapes.insert (db::SimplePolygonRef (p2, *rep));
   shapes.sort ();
 
-  EXPECT_EQ (shapes.bbox () == db::Box (100,-5200,2300,2000), true);
+  EXPECT_EQ (shapes.bbox () == db::Box (100, -5200, 2300, 2000), true);
 
   db::Box box (0, -3000, 100, 3000);
 
@@ -134,7 +138,9 @@ TEST(2)
     }
 
     db::Polygon pref_org [9] = {
-      p1, p1, p1, 
+      p1,
+      p1,
+      p1,
       db::Trans (0, false, db::Vector (0, 0) + db::Vector (100, -200)) * p1,
       db::Trans (0, false, db::Vector (2000, 0) + db::Vector (100, -200)) * p1,
       db::Trans (0, false, db::Vector (0, -2500) + db::Vector (100, -200)) * p1,
@@ -159,12 +165,12 @@ TEST(2)
     while (! s.at_end ()) {
 
       EXPECT_EQ (n < nref, true);
-      
-      scopy[n] = s;
+
+      scopy [n] = s;
 
       db::Polygon px;
       s->polygon (px);
-      EXPECT_EQ (px == pref[n], true);
+      EXPECT_EQ (px == pref [n], true);
 
       ++s;
       ++n;
@@ -175,15 +181,11 @@ TEST(2)
 
     for (unsigned int i = 0; i < n; ++i) {
       db::Polygon px;
-      scopy[i]->polygon (px);
-      EXPECT_EQ (px == pref[i], true);
+      scopy [i]->polygon (px);
+      EXPECT_EQ (px == pref [i], true);
     }
-
   }
 
   delete rep;
   rep = 0;
-
 }
-
-

@@ -30,7 +30,7 @@ namespace db
 /**
  *  @brief A class to switch GDS2 markers from binary to text
  *
- */ 
+ */
 class Gds2ConstantConverter
 {
 private:
@@ -42,24 +42,23 @@ private:
   /**
    *  @brief Initialize the structure
    *
-   */ 
-  void vInitialize();
+   */
+  void vInitialize ();
 
 public:
-
-  Gds2ConstantConverter():bIsInitialized(false){vInitialize();};
+  Gds2ConstantConverter () : bIsInitialized (false) { vInitialize (); };
 
   /**
    *  @brief Return the corresponding text marker
    *
-   */ 
-  const char* to_char   (short sConstValue);
-  
+   */
+  const char *to_char (short sConstValue);
+
   /**
    *  @brief Return the corresponding short marker
    *
-   */ 
-  short          to_short  (const char * cstrConstName);
+   */
+  short to_short (const char *cstrConstName);
 }
 
 static gds2_converter;
@@ -67,4 +66,3 @@ static gds2_converter;
 }
 
 #endif
-

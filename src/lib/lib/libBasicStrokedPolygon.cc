@@ -46,8 +46,7 @@ BasicStrokedPolygon::BasicStrokedPolygon (bool box)
   //  .. nothing yet ..
 }
 
-bool 
-BasicStrokedPolygon::can_create_from_shape (const db::Layout & /*layout*/, const db::Shape &shape, unsigned int /*layer*/) const
+bool BasicStrokedPolygon::can_create_from_shape (const db::Layout & /*layout*/, const db::Shape &shape, unsigned int /*layer*/) const
 {
   return (shape.is_polygon () || shape.is_box () || shape.is_path ());
 }
@@ -72,7 +71,7 @@ BasicStrokedPolygon::parameters_from_shape (const db::Layout &layout, const db::
   return map_parameters (nm);
 }
 
-std::vector<db::PCellLayerDeclaration> 
+std::vector<db::PCellLayerDeclaration>
 BasicStrokedPolygon::get_layer_declarations (const db::pcell_parameters_type &parameters) const
 {
   std::vector<db::PCellLayerDeclaration> layers;
@@ -85,8 +84,7 @@ BasicStrokedPolygon::get_layer_declarations (const db::pcell_parameters_type &pa
   return layers;
 }
 
-void 
-BasicStrokedPolygon::produce (const db::Layout &layout, const std::vector<unsigned int> &layer_ids, const db::pcell_parameters_type &parameters, db::Cell &cell) const
+void BasicStrokedPolygon::produce (const db::Layout &layout, const std::vector<unsigned int> &layer_ids, const db::pcell_parameters_type &parameters, db::Cell &cell) const
 {
   if (parameters.size () < p_total || layer_ids.size () < 1) {
     return;
@@ -96,7 +94,7 @@ BasicStrokedPolygon::produce (const db::Layout &layout, const std::vector<unsign
   double w = parameters [p_width].to_double () / layout.dbu ();
   int n = std::max (3, parameters [p_npoints].to_int ());
 
-  std::vector <db::Polygon> shapes;
+  std::vector<db::Polygon> shapes;
   db::EdgeProcessor ep;
 
   //  fetch the input
@@ -109,51 +107,51 @@ BasicStrokedPolygon::produce (const db::Layout &layout, const std::vector<unsign
   }
 
   //  create the outer contour
-  std::vector <db::Polygon> outer;
-  ep.size (shapes, db::coord_traits<db::Coord>::rounded (w * 0.5), db::coord_traits<db::Coord>::rounded (w * 0.5), outer, 4, false); 
+  std::vector<db::Polygon> outer;
+  ep.size (shapes, db::coord_traits<db::Coord>::rounded (w * 0.5), db::coord_traits<db::Coord>::rounded (w * 0.5), outer, 4, false);
   if (r > 0.5) {
-    for (std::vector <db::Polygon>::iterator p = outer.begin (); p != outer.end (); ++p) {
+    for (std::vector<db::Polygon>::iterator p = outer.begin (); p != outer.end (); ++p) {
       *p = compute_rounded (*p, std::max (0.0, r - w * 0.5), r + w * 0.5, n);
     }
   }
 
   //  create the inner contour
-  std::vector <db::Polygon> inner;
-  ep.size (outer, -db::coord_traits<db::Coord>::rounded (w), -db::coord_traits<db::Coord>::rounded (w), inner, 4, false); 
+  std::vector<db::Polygon> inner;
+  ep.size (outer, -db::coord_traits<db::Coord>::rounded (w), -db::coord_traits<db::Coord>::rounded (w), inner, 4, false);
 
   //  subtract inner from outer
   shapes.clear ();
   ep.boolean (outer, inner, shapes, db::BooleanOp::ANotB, true /*resolve holes*/);
 
   //  Produce the shapes
-  for (std::vector <db::Polygon>::const_iterator p = shapes.begin (); p != shapes.end (); ++p) {
+  for (std::vector<db::Polygon>::const_iterator p = shapes.begin (); p != shapes.end (); ++p) {
     cell.shapes (layer_ids [p_layer]).insert (*p);
   }
 }
 
-std::string 
+std::string
 BasicStrokedPolygon::get_display_name (const db::pcell_parameters_type &parameters) const
 {
-  return std::string(m_box ? "STROKED_BOX" : "STROKED_POLYGON") +
-                      "(l=" + std::string (parameters [p_layer].to_string ()) +
-                      ",w=" + tl::to_string (parameters [p_width].to_double ()) +
-                      ",r=" + tl::to_string (parameters [p_radius].to_double ()) +
-                      ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
-                        ")";
+  return std::string (m_box ? "STROKED_BOX" : "STROKED_POLYGON") +
+         "(l=" + std::string (parameters [p_layer].to_string ()) +
+         ",w=" + tl::to_string (parameters [p_width].to_double ()) +
+         ",r=" + tl::to_string (parameters [p_radius].to_double ()) +
+         ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
+         ")";
 }
 
-std::vector<db::PCellParameterDeclaration> 
+std::vector<db::PCellParameterDeclaration>
 BasicStrokedPolygon::get_parameter_declarations () const
 {
   std::vector<db::PCellParameterDeclaration> parameters;
 
-  //  parameter #0: layer 
+  //  parameter #0: layer
   tl_assert (parameters.size () == p_layer);
   parameters.push_back (db::PCellParameterDeclaration ("layer"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_layer);
   parameters.back ().set_description (tl::to_string (tr ("Layer")));
 
-  //  parameter #1: radius 
+  //  parameter #1: radius
   tl_assert (parameters.size () == p_radius);
   parameters.push_back (db::PCellParameterDeclaration ("radius"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
@@ -161,7 +159,7 @@ BasicStrokedPolygon::get_parameter_declarations () const
   parameters.back ().set_default (0.0);
   parameters.back ().set_unit (tl::to_string (tr ("micron")));
 
-  //  parameter #2: width 
+  //  parameter #2: width
   tl_assert (parameters.size () == p_width);
   parameters.push_back (db::PCellParameterDeclaration ("width"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
@@ -169,7 +167,7 @@ BasicStrokedPolygon::get_parameter_declarations () const
   parameters.back ().set_default (0.1);
   parameters.back ().set_unit (tl::to_string (tr ("micron")));
 
-  //  parameter #3: handle 
+  //  parameter #3: handle
   tl_assert (parameters.size () == p_shape);
   parameters.push_back (db::PCellParameterDeclaration ("shape"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
@@ -177,12 +175,12 @@ BasicStrokedPolygon::get_parameter_declarations () const
     parameters.back ().set_default (db::DBox (db::DPoint (-0.2, -0.2), db::DPoint (0.2, 0.2)));
   } else {
     db::DPolygon p;
-    db::DPoint pts[] = { db::DPoint(-0.2, -0.2), db::DPoint(0.2, -0.2), db::DPoint (0.2, 0.2), db::DPoint (-0.2, 0.2) };
-    p.assign_hull (pts, pts + sizeof (pts) / sizeof (pts[0]));
+    db::DPoint pts [] = {db::DPoint (-0.2, -0.2), db::DPoint (0.2, -0.2), db::DPoint (0.2, 0.2), db::DPoint (-0.2, 0.2)};
+    p.assign_hull (pts, pts + sizeof (pts) / sizeof (pts [0]));
     parameters.back ().set_default (p);
   }
 
-  //  parameter #4: number of points 
+  //  parameter #4: number of points
   tl_assert (parameters.size () == p_npoints);
   parameters.push_back (db::PCellParameterDeclaration ("npoints"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_int);
@@ -193,6 +191,3 @@ BasicStrokedPolygon::get_parameter_declarations () const
 }
 
 }
-
-
-

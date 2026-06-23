@@ -29,16 +29,16 @@
 
 #include <map>
 
-#if !defined(HAVE_QT) || defined(HAVE_PTHREADS)
+#if ! defined(HAVE_QT) || defined(HAVE_PTHREADS)
 
-#define _TIMESPEC_DEFINED   //  avoids errors with pthread-win and MSVC2017
+#define _TIMESPEC_DEFINED //  avoids errors with pthread-win and MSVC2017
 #include <pthread.h>
 #include <errno.h>
 #if defined(_WIN32)
-#  define NOMINMAX
-#  include <Windows.h>
+#define NOMINMAX
+#include <Windows.h>
 #else
-#  include <unistd.h>
+#include <unistd.h>
 #endif
 
 #endif
@@ -49,7 +49,7 @@ namespace tl
 // -------------------------------------------------------------------------------
 //  WaitCondition implementation
 
-#if defined(HAVE_CPP20) || !defined(HAVE_QT) || defined(HAVE_PTHREADS)
+#if defined(HAVE_CPP20) || ! defined(HAVE_QT) || defined(HAVE_PTHREADS)
 
 #if defined(HAVE_CPP20)
 
@@ -115,7 +115,7 @@ public:
   {
     if (pthread_mutex_init (&m_mutex, NULL) != 0) {
       tl::error << tr ("Unable to create pthread Mutex for WaitCondition");
-    } else if (pthread_cond_init(&m_cond, NULL) != 0) {
+    } else if (pthread_cond_init (&m_cond, NULL) != 0) {
       tl::error << tr ("Unable to create pthread Condition for WaitCondition");
     } else {
       m_initialized = true;
@@ -168,7 +168,6 @@ public:
       if (pthread_cond_wait (&m_cond, &m_mutex) != 0) {
         tl::error << tr ("Error waiting for pthread Condition (timed)");
       }
-
     }
 
     //  transfers the lock back
@@ -233,7 +232,7 @@ void WaitCondition::wakeOne ()
 // -------------------------------------------------------------------------------
 //  Thread implementation
 
-#if !defined(HAVE_QT) || defined(HAVE_PTHREADS)
+#if ! defined(HAVE_QT) || defined(HAVE_PTHREADS)
 
 class ThreadPrivateData
 {
@@ -366,7 +365,6 @@ bool Thread::wait (unsigned long time)
 #else
       usleep (1000);
 #endif
-
     }
 
 #else
@@ -389,7 +387,6 @@ bool Thread::wait (unsigned long time)
     }
 
     return true;
-
   }
 }
 
@@ -399,7 +396,7 @@ bool Thread::wait (unsigned long time)
 class ThreadStorageObjectList
 {
 public:
-  ThreadStorageObjectList () { }
+  ThreadStorageObjectList () {}
 
   ~ThreadStorageObjectList ()
   {

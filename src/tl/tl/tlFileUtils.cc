@@ -35,35 +35,35 @@
 
 #if defined(_MSC_VER)
 
-#  include <sys/types.h>
-#  include <sys/stat.h>
-#  include <io.h>
-#  include <Windows.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <io.h>
+#include <Windows.h>
 
 #elif defined(_WIN32)
 
-#  include <sys/stat.h>
-#  include <unistd.h>
-#  include <dirent.h>
-#  include <dir.h>
-#  include <Windows.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <dir.h>
+#include <Windows.h>
 
 #elif defined(__APPLE__)
 
-#  include <sys/stat.h>
-#  include <unistd.h>
-#  include <dirent.h>
-#  include <libproc.h>
-#  include <dlfcn.h>
-#  include <pwd.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <libproc.h>
+#include <dlfcn.h>
+#include <pwd.h>
 
 #else
 
-#  include <sys/stat.h>
-#  include <unistd.h>
-#  include <dirent.h>
-#  include <dlfcn.h>
-#  include <pwd.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <dlfcn.h>
+#include <pwd.h>
 
 #endif
 
@@ -77,7 +77,9 @@
 namespace tl
 {
 
-enum { OS_Auto, OS_Windows, OS_Linux } s_mode = OS_Auto;
+enum { OS_Auto,
+       OS_Windows,
+       OS_Linux } s_mode = OS_Auto;
 
 static bool is_win ()
 {
@@ -106,7 +108,7 @@ const char *line_separator ()
 
 static bool is_drive (const std::string &part)
 {
-  return is_win () && (part.size () == 2 && isalpha (part[0]) && part[1] == ':');
+  return is_win () && (part.size () == 2 && isalpha (part [0]) && part [1] == ':');
 }
 
 static std::string normalized_part (const std::string &part)
@@ -162,7 +164,7 @@ std::vector<std::string> split_path (const std::string &p, bool keep_last)
   if (is_win ()) {
 
     const char *cp = p.c_str ();
-    if (*cp && isalpha (*cp) && cp[1] == ':') {
+    if (*cp && isalpha (*cp) && cp [1] == ':') {
 
       //  drive name
       parts.push_back (std::string ());
@@ -171,7 +173,7 @@ std::vector<std::string> split_path (const std::string &p, bool keep_last)
 
       cp += 2;
 
-    } else if ((*cp == '\\' && cp[1] == '\\') || (*cp == '/' && cp[1] == '/')) {
+    } else if ((*cp == '\\' && cp [1] == '\\') || (*cp == '/' && cp [1] == '/')) {
 
       //  UNC server name
       const char *cp0 = cp;
@@ -181,22 +183,21 @@ std::vector<std::string> split_path (const std::string &p, bool keep_last)
       }
       parts.push_back (tl::normalized_part (std::string (cp0, 0, cp - cp0)));
 
-    } else if ((*cp == '\\' || *cp == '/') && cp[1] && isalpha (cp[1]) && cp[2] == ':') {
+    } else if ((*cp == '\\' || *cp == '/') && cp [1] && isalpha (cp [1]) && cp [2] == ':') {
 
       //  drive name in the form "/c:" or "\c:"
       parts.push_back (std::string ());
-      parts.back () += toupper (cp[1]);
+      parts.back () += toupper (cp [1]);
       parts.back () += ":";
 
       cp += 3;
-
     }
 
     while (*cp) {
 
       const char *cp0 = cp;
       bool any = false;
-      while (*cp && (!any || (*cp != '\\' && *cp != '/'))) {
+      while (*cp && (! any || (*cp != '\\' && *cp != '/'))) {
         if (*cp != '\\' && *cp != '/') {
           any = true;
         } else {
@@ -209,7 +210,6 @@ std::vector<std::string> split_path (const std::string &p, bool keep_last)
         first = false;
         parts.push_back (tl::normalized_part (std::string (cp0, 0, cp - cp0)));
       }
-
     }
 
   } else {
@@ -219,14 +219,14 @@ std::vector<std::string> split_path (const std::string &p, bool keep_last)
 
       const char *cp0 = cp;
       bool any = false;
-      while (*cp && (!any || *cp != '/')) {
+      while (*cp && (! any || *cp != '/')) {
         if (*cp != '/') {
           any = true;
         } else {
           cp0 = cp;
         }
         //  backslash escape
-        if (*cp == '\\' && cp[1]) {
+        if (*cp == '\\' && cp [1]) {
           ++cp;
         }
         ++cp;
@@ -236,9 +236,7 @@ std::vector<std::string> split_path (const std::string &p, bool keep_last)
         first = false;
         parts.push_back (std::string (cp0, 0, cp - cp0));
       }
-
     }
-
   }
 
   return parts;
@@ -255,7 +253,7 @@ static std::vector<std::string> split_filename (const std::string &fn)
     const char *cp0 = cp;
     ++cp;
     while (*cp && *cp != '.') {
-      if (*cp == '\\' && cp[1]) {
+      if (*cp == '\\' && cp [1]) {
         ++cp;
       }
       ++cp;
@@ -265,7 +263,6 @@ static std::vector<std::string> split_filename (const std::string &fn)
     if (*cp) {
       ++cp;
     }
-
   }
 
   return parts;
@@ -351,8 +348,7 @@ std::string extension_last (const std::string &s)
   }
 }
 
-bool
-is_parent_path (const std::string &parent, const std::string &path)
+bool is_parent_path (const std::string &parent, const std::string &path)
 {
   if (! file_exists (parent)) {
     //  If the parent path does not exist, we always return false. This cannot be a parent.
@@ -361,7 +357,7 @@ is_parent_path (const std::string &parent, const std::string &path)
 
   std::vector<std::string> parts = split_path (absolute_file_path (path));
 
-  while (! parts.empty () && ! (parts.size () == 1 && is_drive (parts[0]))) {
+  while (! parts.empty () && ! (parts.size () == 1 && is_drive (parts [0]))) {
     if (is_same_file (parent, tl::join (parts, ""))) {
       return true;
     } else {
@@ -392,12 +388,11 @@ std::vector<std::string> dir_entries (const std::string &s, bool with_files, boo
       }
 
       bool is_dir = ((fileinfo.attrib & _A_SUBDIR) != 0);
-      if ((e[0] != '.' || !without_dotfiles) && ((is_dir && with_dirs) || (!is_dir && with_files))) {
+      if ((e [0] != '.' || ! without_dotfiles) && ((is_dir && with_dirs) || (! is_dir && with_files))) {
         ee.push_back (e);
       }
 
     } while (_wfindnext (h, &fileinfo) == 0);
-
   }
 
   _findclose (h);
@@ -416,14 +411,12 @@ std::vector<std::string> dir_entries (const std::string &s, bool with_files, boo
       }
 
       bool is_dir = (d->d_type == DT_DIR);
-      if ((e[0] != '.' || !without_dotfiles) && ((is_dir && with_dirs) || (!is_dir && with_files))) {
+      if ((e [0] != '.' || ! without_dotfiles) && ((is_dir && with_dirs) || (! is_dir && with_files))) {
         ee.push_back (e);
       }
-
     }
 
     closedir (h);
-
   }
 
 #endif
@@ -466,7 +459,7 @@ static void glob_partial (const std::string &where, std::vector<std::string>::co
     glob_partial (root, pfrom, pto, res);
     return;
   }
-#endif  
+#endif
 
   tl::GlobPattern glob (tl::trimmed_part (*pfrom));
   ++pfrom;
@@ -509,7 +502,7 @@ bool mkpath (const std::string &p)
   }
 
   while (i < parts.size ()) {
-    front += parts[i++];
+    front += parts [i++];
     if (! file_exists (front)) {
       if (! mkdir (front)) {
 #if defined(FILE_UTILS_VERBOSE)
@@ -596,8 +589,7 @@ bool rm_dir_recursive (const std::string &p)
   return true;
 }
 
-bool
-cp_dir_recursive (const std::string &source, const std::string &target)
+bool cp_dir_recursive (const std::string &source, const std::string &target)
 {
   std::vector<std::string> entries;
   std::string path = tl::absolute_file_path (source);
@@ -638,14 +630,12 @@ cp_dir_recursive (const std::string &source, const std::string &target)
 #endif
       return false;
     }
-
   }
 
   return true;
 }
 
-bool
-mv_dir_recursive (const std::string &source, const std::string &target)
+bool mv_dir_recursive (const std::string &source, const std::string &target)
 {
   std::vector<std::string> entries;
   std::string path = tl::absolute_file_path (source);
@@ -678,7 +668,7 @@ mv_dir_recursive (const std::string &source, const std::string &target)
 
   if (! tl::rm_dir (path)) {
 #if defined(FILE_UTILS_VERBOSE)
-      tl::error << tr ("Unable to remove folder ") << path;
+    tl::error << tr ("Unable to remove folder ") << path;
 #endif
     error = true;
   }
@@ -763,7 +753,7 @@ static std::pair<std::string, bool> absolute_path_of_existing (const std::string
 bool is_absolute (const std::string &s)
 {
   //  ~ paths are always absolute, because the home directory is
-  if (s.size () > 0 && s[0] == '~') {
+  if (s.size () > 0 && s [0] == '~') {
     return true;
   }
 
@@ -780,7 +770,7 @@ bool is_absolute (const std::string &s)
 std::string absolute_file_path (const std::string &s)
 {
   //  ~ paths are always absolute, because the home directory is
-  if (s.size () > 0 && s[0] == '~') {
+  if (s.size () > 0 && s [0] == '~') {
     return get_home_path () + std::string (s, 1);
   }
 
@@ -792,7 +782,7 @@ std::string absolute_file_path (const std::string &s)
   std::pair<std::string, bool> known_part;
   std::vector<std::string> unknown_parts;
 
-  while (! parts.empty () && ! (parts.size () == 1 && is_drive (parts[0]))) {
+  while (! parts.empty () && ! (parts.size () == 1 && is_drive (parts [0]))) {
     known_part = absolute_path_of_existing (tl::join (parts, ""));
     if (! known_part.second) {
       unknown_parts.push_back (parts.back ());
@@ -816,10 +806,10 @@ std::string absolute_file_path (const std::string &s)
       //  case 1: return the full path as absolute
       return s;
 
-    } else if (parts.size () == 1 && is_drive (parts[0])) {
+    } else if (parts.size () == 1 && is_drive (parts [0])) {
 
       //  case 2 (for Windows): try to root on drive's working dir
-      known_part = absolute_path_of_existing (parts[0]);
+      known_part = absolute_path_of_existing (parts [0]);
       if (! known_part.second) {
         //  drive is not known ... return the original path as fallback
         return s;
@@ -831,7 +821,6 @@ std::string absolute_file_path (const std::string &s)
 
       //  case 2 (for *nix): try to root on current working dir
       return combine_path (current_dir (), tl::join (unknown_parts, ""));
-
     }
 
   } else {
@@ -892,9 +881,9 @@ bool is_dir (const std::string &p)
     return false;
   } else {
 #if defined(_MSC_VER)
-    return !(st.st_mode & _S_IFREG);
+    return ! (st.st_mode & _S_IFREG);
 #else
-    return !S_ISREG (st.st_mode);
+    return ! S_ISREG (st.st_mode);
 #endif
   }
 }
@@ -911,15 +900,13 @@ std::string relative_path (const std::string &base, const std::string &p)
       //  combine the remaining path
       std::reverse (rem.begin (), rem.end ());
       if (! rem.empty ()) {
-        rem[0] = tl::trimmed_part (rem.front ());
+        rem [0] = tl::trimmed_part (rem.front ());
       }
       return tl::join (rem, "");
-
     }
 
     rem.push_back (parts.back ());
     parts.pop_back ();
-
   }
 
   return p;
@@ -940,19 +927,19 @@ bool is_same_file (const std::string &a, const std::string &b)
 
   if (h1 != INVALID_HANDLE_VALUE && h2 != INVALID_HANDLE_VALUE) {
     BY_HANDLE_FILE_INFORMATION fi1, fi2;
-    if (::GetFileInformationByHandle(h1, &fi1) && ::GetFileInformationByHandle(h2, &fi2)) {
+    if (::GetFileInformationByHandle (h1, &fi1) && ::GetFileInformationByHandle (h2, &fi2)) {
       result = fi1.dwVolumeSerialNumber == fi2.dwVolumeSerialNumber &&
                fi1.nFileIndexHigh == fi2.nFileIndexHigh &&
                fi1.nFileIndexLow == fi2.nFileIndexLow;
-   }
+    }
   }
 
   if (h1 != INVALID_HANDLE_VALUE) {
-    ::CloseHandle(h1);
+    ::CloseHandle (h1);
   }
 
   if (h2 != INVALID_HANDLE_VALUE) {
-    ::CloseHandle(h2);
+    ::CloseHandle (h2);
   }
 
   return result;
@@ -972,7 +959,7 @@ bool is_same_file (const std::string &a, const std::string &b)
 std::string
 get_home_path ()
 {
-#if !defined(_WIN32)
+#if ! defined(_WIN32)
   if (tl::has_env ("HOME")) {
     return tl::get_env ("HOME");
   } else {
@@ -1000,7 +987,7 @@ get_app_path_internal ()
 {
 #if defined(_WIN32)
 
-  wchar_t buffer[MAX_PATH];
+  wchar_t buffer [MAX_PATH];
   int len;
   if ((len = GetModuleFileNameW (NULL, buffer, MAX_PATH)) > 0) {
     return tl::to_string (std::wstring (buffer));
@@ -1008,19 +995,19 @@ get_app_path_internal ()
 
 #elif __APPLE__
 
-  char buffer[PROC_PIDPATHINFO_MAXSIZE];
+  char buffer [PROC_PIDPATHINFO_MAXSIZE];
   int ret = proc_pidpath (getpid (), buffer, sizeof (buffer));
   if (ret > 0) {
     //  TODO: does this correctly translate paths? (MacOS uses UTF-8 encoding with D-like normalization)
     return std::string (buffer);
   }
 
-#elif defined (__FreeBSD__)
+#elif defined(__FreeBSD__)
 
-  char path[PATH_MAX];
+  char path [PATH_MAX];
   size_t len = PATH_MAX;
-  const int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1};
-  if (sysctl(&mib[0], 4, &path, &len, NULL, 0) == 0) {
+  const int mib [4] = {CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1};
+  if (sysctl (&mib [0], 4, &path, &len, NULL, 0) == 0) {
     return path;
   }
   return "";
@@ -1064,12 +1051,11 @@ get_module_path (void *addr)
   HMODULE h_module = NULL;
   if (GetModuleHandleEx (GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, (LPCTSTR) addr, &h_module)) {
 
-    wchar_t buffer[MAX_PATH];
+    wchar_t buffer [MAX_PATH];
     int len;
     if ((len = GetModuleFileNameW (h_module, buffer, MAX_PATH)) > 0) {
       return tl::absolute_file_path (tl::to_string (std::wstring (buffer, 0, len)));
     }
-
   }
 
   //  no way to get module file path
@@ -1077,7 +1063,7 @@ get_module_path (void *addr)
 
 #else
 
-  Dl_info info = { };
+  Dl_info info = {};
   if (dladdr (addr, &info)) {
     return tl::absolute_file_path (tl::to_string_from_local (info.dli_fname));
   } else {

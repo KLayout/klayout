@@ -34,7 +34,8 @@
 
 #include <list>
 
-namespace db {
+namespace db
+{
 
 class EdgeFilterBase;
 class MutableRegion;
@@ -2069,7 +2070,7 @@ private:
   RegionDelegate *mp_delegate;
 
   void set_delegate (RegionDelegate *delegate, bool keep_attributes = true);
-  db::MutableRegion *mutable_region();
+  db::MutableRegion *mutable_region ();
 };
 
 /**
@@ -2085,13 +2086,14 @@ public:
   /**
    *  @brief Constructor specifying the region where to store the polygons
    *
-   *  If "clear" is set to true, the region will be cleared before the 
+   *  If "clear" is set to true, the region will be cleared before the
    *  inserting of polygons starts. This allows using the region as input and
    *  output for any operation.
    */
-  RegionPolygonSink (Region &region, bool clear = false) 
+  RegionPolygonSink (Region &region, bool clear = false)
     : PolygonSink (), mp_region (&region), m_clear (clear)
-  { }
+  {
+  }
 
   /**
    *  @brief Start the sequence
@@ -2120,9 +2122,8 @@ private:
 
 namespace tl
 {
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Region &b);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Region &b);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Region &b);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Region &b);
 }
 
 #endif
-

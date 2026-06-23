@@ -82,14 +82,12 @@ NetTracerLayerExpressionInfo::operator= (const NetTracerLayerExpressionInfo &oth
     if (other.mp_b) {
       mp_b = new NetTracerLayerExpressionInfo (*other.mp_b);
     }
-
   }
 
   return *this;
 }
 
-void
-NetTracerLayerExpressionInfo::merge (NetTracerLayerExpression::Operator op, const NetTracerLayerExpressionInfo &other)
+void NetTracerLayerExpressionInfo::merge (NetTracerLayerExpression::Operator op, const NetTracerLayerExpressionInfo &other)
 {
   if (m_op != NetTracerLayerExpression::OPNone) {
     NetTracerLayerExpressionInfo *e = new NetTracerLayerExpressionInfo (*this);
@@ -292,8 +290,7 @@ NetTracerConnectionInfo::to_string () const
   return res;
 }
 
-void
-NetTracerConnectionInfo::parse (tl::Extractor &ex)
+void NetTracerConnectionInfo::parse (tl::Extractor &ex)
 {
   m_la = NetTracerLayerExpressionInfo::parse (ex);
   ex.expect (",");
@@ -322,13 +319,12 @@ NetTracerSymbolInfo::to_string () const
   std::string res;
   res += m_symbol.to_string ();
   res += "=";
-  res += tl::to_quoted_string(m_expression);
+  res += tl::to_quoted_string (m_expression);
 
   return res;
 }
 
-void
-NetTracerSymbolInfo::parse (tl::Extractor &ex)
+void NetTracerSymbolInfo::parse (tl::Extractor &ex)
 {
   m_symbol.read (ex);
   ex.expect ("=");
@@ -395,13 +391,10 @@ NetTracerNet::NetTracerNet (const NetTracer &tracer, const db::ICplxTrans &trans
             break;
           }
         }
-
       }
 
       define_layer (l, lp, lprep);
-
     }
-
   }
 }
 
@@ -433,13 +426,11 @@ NetTracerNet::export_net (db::Layout &layout, db::Cell &export_cell)
         new_layers.push_back (layer_index);
       }
 
-      lm = layer_map.insert (std::make_pair (net_shape->layer (), (unsigned int)layer_index)).first;
-
+      lm = layer_map.insert (std::make_pair (net_shape->layer (), (unsigned int) layer_index)).first;
     }
 
     tl::ident_map<db::properties_id_type> pm;
     export_cell.shapes (lm->second).insert (net_shape->shape (), db::ICplxTrans (net_shape->trans ()), pm);
-
   }
 
   return new_layers;
@@ -448,7 +439,7 @@ NetTracerNet::export_net (db::Layout &layout, db::Cell &export_cell)
 const std::string &
 NetTracerNet::cell_name (db::cell_index_type cell_index) const
 {
-  std::map <unsigned int, std::string>::const_iterator cn = m_cell_names.find (cell_index);
+  std::map<unsigned int, std::string>::const_iterator cn = m_cell_names.find (cell_index);
   if (cn != m_cell_names.end ()) {
     return cn->second;
   } else {
@@ -460,7 +451,7 @@ NetTracerNet::cell_name (db::cell_index_type cell_index) const
 db::LayerProperties
 NetTracerNet::representative_layer_for (unsigned int log_layer) const
 {
-  std::map <unsigned int, std::pair <db::LayerProperties, db::LayerProperties> >::const_iterator l = m_layers.find (log_layer);
+  std::map<unsigned int, std::pair<db::LayerProperties, db::LayerProperties>>::const_iterator l = m_layers.find (log_layer);
   if (l != m_layers.end ()) {
     return l->second.second;
   } else {
@@ -471,7 +462,7 @@ NetTracerNet::representative_layer_for (unsigned int log_layer) const
 db::LayerProperties
 NetTracerNet::layer_for (unsigned int log_layer) const
 {
-  std::map <unsigned int, std::pair <db::LayerProperties, db::LayerProperties> >::const_iterator l = m_layers.find (log_layer);
+  std::map<unsigned int, std::pair<db::LayerProperties, db::LayerProperties>>::const_iterator l = m_layers.find (log_layer);
   if (l != m_layers.end ()) {
     return l->second.first;
   } else {
@@ -479,8 +470,7 @@ NetTracerNet::layer_for (unsigned int log_layer) const
   }
 }
 
-void
-NetTracerNet::define_layer (unsigned int l, const db::LayerProperties &lp, const db::LayerProperties &lp_representative)
+void NetTracerNet::define_layer (unsigned int l, const db::LayerProperties &lp, const db::LayerProperties &lp_representative)
 {
   m_layers.insert (std::make_pair (l, std::make_pair (lp, lp_representative)));
 }

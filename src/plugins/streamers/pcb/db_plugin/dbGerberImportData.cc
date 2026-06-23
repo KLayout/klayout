@@ -43,8 +43,7 @@ GerberImportData::GerberImportData ()
   // .. nothing yet ..
 }
 
-void
-GerberImportData::reset ()
+void GerberImportData::reset ()
 {
   double dbu_saved = dbu;
   std::string base_dir_saved = base_dir;
@@ -72,8 +71,7 @@ GerberImportData::get_layer_properties_file () const
   return lyp_file;
 }
 
-void
-GerberImportData::setup_importer (db::GerberImporter *importer)
+void GerberImportData::setup_importer (db::GerberImporter *importer)
 {
   if (num_circle_points >= 4) {
     importer->set_circle_points (num_circle_points);
@@ -97,16 +95,14 @@ GerberImportData::setup_importer (db::GerberImporter *importer)
         db::GerberFile file_spec;
         file_spec.set_filename (file->filename);
 
-        for (std::vector <int>::const_iterator i = file->layout_layers.begin (); i != file->layout_layers.end (); ++i) {
+        for (std::vector<int>::const_iterator i = file->layout_layers.begin (); i != file->layout_layers.end (); ++i) {
           if (*i >= 0 && *i < int (layout_layers.size ())) {
             file_spec.add_layer_spec (layout_layers [*i]);
           }
         }
 
         importer->add_file (file_spec);
-
       }
-
     }
 
   } else {
@@ -128,9 +124,7 @@ GerberImportData::setup_importer (db::GerberImporter *importer)
           file_spec.add_layer_spec (layout_layers [n * 2]);
           importer->add_file (file_spec);
         }
-
       }
-
     }
 
     for (std::vector<GerberDrillFileDescriptor>::iterator file = drill_files.begin (); file != drill_files.end (); ++file) {
@@ -156,16 +150,12 @@ GerberImportData::setup_importer (db::GerberImporter *importer)
         }
 
         importer->add_file (file_spec);
-
       }
-
     }
-
   }
 }
 
-struct MountingConverter
-{
+struct MountingConverter {
   std::string to_string (GerberImportData::mounting_type m) const
   {
     return m == GerberImportData::MountingTop ? "top" : "bottom";
@@ -184,53 +174,41 @@ struct MountingConverter
 };
 
 //  declaration of the layer properties file XML structure
-static const tl::XMLStruct <GerberImportData>
-pcb_project_structure ("pcb-project",
-  tl::make_member (&GerberImportData::invert_negative_layers, "invert-negative-layers") +
-  tl::make_member (&GerberImportData::border, "border") +
-  tl::make_member (&GerberImportData::free_layer_mapping, "free-layer-mapping") +
-  tl::make_element (&GerberImportData::layout_layers, "layout-layers",
-    tl::make_member<db::LayerProperties, std::vector<db::LayerProperties>::const_iterator, std::vector<db::LayerProperties> > (&std::vector<db::LayerProperties>::begin, &std::vector<db::LayerProperties>::end, &std::vector<db::LayerProperties>::push_back, "layout-layer", db::LayoutLayerConverter ())
-  ) +
-  tl::make_member (&GerberImportData::mounting, "mounting", MountingConverter ()) +
-  tl::make_member (&GerberImportData::num_metal_layers, "num-metal-layers") +
-  tl::make_member (&GerberImportData::num_via_types, "num-via-types") +
-  tl::make_element (&GerberImportData::artwork_files, "artwork-files",
-    tl::make_element<GerberArtworkFileDescriptor, std::vector<GerberArtworkFileDescriptor>::const_iterator, std::vector<GerberArtworkFileDescriptor> > (&std::vector<GerberArtworkFileDescriptor>::begin, &std::vector<GerberArtworkFileDescriptor>::end, &std::vector<GerberArtworkFileDescriptor>::push_back, "artwork-file",
-      tl::make_member (&GerberArtworkFileDescriptor::filename, "filename")
-    )
-  ) +
-  tl::make_element (&GerberImportData::drill_files, "drill-files",
-    tl::make_element<GerberDrillFileDescriptor, std::vector<GerberDrillFileDescriptor>::const_iterator, std::vector<GerberDrillFileDescriptor> > (&std::vector<GerberDrillFileDescriptor>::begin, &std::vector<GerberDrillFileDescriptor>::end, &std::vector<GerberDrillFileDescriptor>::push_back, "drill-file",
-      tl::make_member (&GerberDrillFileDescriptor::start, "start") +
-      tl::make_member (&GerberDrillFileDescriptor::stop, "stop") +
-      tl::make_member (&GerberDrillFileDescriptor::filename, "filename")
-    )
-  ) +
-  tl::make_element (&GerberImportData::free_files, "free-files",
-    tl::make_element<GerberFreeFileDescriptor, std::vector<GerberFreeFileDescriptor>::const_iterator, std::vector<GerberFreeFileDescriptor> > (&std::vector<GerberFreeFileDescriptor>::begin, &std::vector<GerberFreeFileDescriptor>::end, &std::vector<GerberFreeFileDescriptor>::push_back, "free-file",
-      tl::make_member (&GerberFreeFileDescriptor::filename, "filename") +
-      tl::make_element (&GerberFreeFileDescriptor::layout_layers, "layout-layers",
-        tl::make_member<int, std::vector<int>::const_iterator, std::vector<int> > (&std::vector<int>::begin, &std::vector<int>::end, &std::vector<int>::push_back, "index")
-      )
-    )
-  ) +
-  tl::make_element (&GerberImportData::reference_points, "reference-points",
-    tl::make_element<std::pair <db::DPoint, db::DPoint>, std::vector<std::pair <db::DPoint, db::DPoint> >::const_iterator, std::vector<std::pair <db::DPoint, db::DPoint> > > (&std::vector<std::pair <db::DPoint, db::DPoint> >::begin, &std::vector<std::pair <db::DPoint, db::DPoint> >::end, &std::vector<std::pair <db::DPoint, db::DPoint> >::push_back, "reference-point",
-      tl::make_member (&std::pair <db::DPoint, db::DPoint>::first, "pcb", db::PointConverter<db::DPoint> ()) +
-      tl::make_member (&std::pair <db::DPoint, db::DPoint>::second, "layout", db::PointConverter<db::DPoint> ())
-    )
-  ) +
-  tl::make_member (&GerberImportData::explicit_trans, "explicit-trans", db::TransformationConverter<db::DCplxTrans> ()) +
-  tl::make_member (&GerberImportData::layer_properties_file, "layer-properties-file") +
-  tl::make_member (&GerberImportData::num_circle_points, "num-circle-points") +
-  tl::make_member (&GerberImportData::merge_flag, "merge-flag") +
-  tl::make_member (&GerberImportData::dbu, "dbu") +
-  tl::make_member (&GerberImportData::topcell_name, "cell-name")
-);
+static const tl::XMLStruct<GerberImportData>
+  pcb_project_structure ("pcb-project",
+                         tl::make_member (&GerberImportData::invert_negative_layers, "invert-negative-layers") +
+                           tl::make_member (&GerberImportData::border, "border") +
+                           tl::make_member (&GerberImportData::free_layer_mapping, "free-layer-mapping") +
+                           tl::make_element (&GerberImportData::layout_layers, "layout-layers",
+                                             tl::make_member<db::LayerProperties, std::vector<db::LayerProperties>::const_iterator, std::vector<db::LayerProperties>> (&std::vector<db::LayerProperties>::begin, &std::vector<db::LayerProperties>::end, &std::vector<db::LayerProperties>::push_back, "layout-layer", db::LayoutLayerConverter ())) +
+                           tl::make_member (&GerberImportData::mounting, "mounting", MountingConverter ()) +
+                           tl::make_member (&GerberImportData::num_metal_layers, "num-metal-layers") +
+                           tl::make_member (&GerberImportData::num_via_types, "num-via-types") +
+                           tl::make_element (&GerberImportData::artwork_files, "artwork-files",
+                                             tl::make_element<GerberArtworkFileDescriptor, std::vector<GerberArtworkFileDescriptor>::const_iterator, std::vector<GerberArtworkFileDescriptor>> (&std::vector<GerberArtworkFileDescriptor>::begin, &std::vector<GerberArtworkFileDescriptor>::end, &std::vector<GerberArtworkFileDescriptor>::push_back, "artwork-file",
+                                                                                                                                                                                                tl::make_member (&GerberArtworkFileDescriptor::filename, "filename"))) +
+                           tl::make_element (&GerberImportData::drill_files, "drill-files",
+                                             tl::make_element<GerberDrillFileDescriptor, std::vector<GerberDrillFileDescriptor>::const_iterator, std::vector<GerberDrillFileDescriptor>> (&std::vector<GerberDrillFileDescriptor>::begin, &std::vector<GerberDrillFileDescriptor>::end, &std::vector<GerberDrillFileDescriptor>::push_back, "drill-file",
+                                                                                                                                                                                          tl::make_member (&GerberDrillFileDescriptor::start, "start") +
+                                                                                                                                                                                            tl::make_member (&GerberDrillFileDescriptor::stop, "stop") +
+                                                                                                                                                                                            tl::make_member (&GerberDrillFileDescriptor::filename, "filename"))) +
+                           tl::make_element (&GerberImportData::free_files, "free-files",
+                                             tl::make_element<GerberFreeFileDescriptor, std::vector<GerberFreeFileDescriptor>::const_iterator, std::vector<GerberFreeFileDescriptor>> (&std::vector<GerberFreeFileDescriptor>::begin, &std::vector<GerberFreeFileDescriptor>::end, &std::vector<GerberFreeFileDescriptor>::push_back, "free-file",
+                                                                                                                                                                                       tl::make_member (&GerberFreeFileDescriptor::filename, "filename") +
+                                                                                                                                                                                         tl::make_element (&GerberFreeFileDescriptor::layout_layers, "layout-layers",
+                                                                                                                                                                                                           tl::make_member<int, std::vector<int>::const_iterator, std::vector<int>> (&std::vector<int>::begin, &std::vector<int>::end, &std::vector<int>::push_back, "index")))) +
+                           tl::make_element (&GerberImportData::reference_points, "reference-points",
+                                             tl::make_element<std::pair<db::DPoint, db::DPoint>, std::vector<std::pair<db::DPoint, db::DPoint>>::const_iterator, std::vector<std::pair<db::DPoint, db::DPoint>>> (&std::vector<std::pair<db::DPoint, db::DPoint>>::begin, &std::vector<std::pair<db::DPoint, db::DPoint>>::end, &std::vector<std::pair<db::DPoint, db::DPoint>>::push_back, "reference-point",
+                                                                                                                                                                                                                  tl::make_member (&std::pair<db::DPoint, db::DPoint>::first, "pcb", db::PointConverter<db::DPoint> ()) +
+                                                                                                                                                                                                                    tl::make_member (&std::pair<db::DPoint, db::DPoint>::second, "layout", db::PointConverter<db::DPoint> ()))) +
+                           tl::make_member (&GerberImportData::explicit_trans, "explicit-trans", db::TransformationConverter<db::DCplxTrans> ()) +
+                           tl::make_member (&GerberImportData::layer_properties_file, "layer-properties-file") +
+                           tl::make_member (&GerberImportData::num_circle_points, "num-circle-points") +
+                           tl::make_member (&GerberImportData::merge_flag, "merge-flag") +
+                           tl::make_member (&GerberImportData::dbu, "dbu") +
+                           tl::make_member (&GerberImportData::topcell_name, "cell-name"));
 
-void
-GerberImportData::load (const std::string &file)
+void GerberImportData::load (const std::string &file)
 {
   reset ();
   current_file = file;
@@ -238,8 +216,7 @@ GerberImportData::load (const std::string &file)
   pcb_project_structure.parse (in, *this);
 }
 
-void
-GerberImportData::load (tl::InputStream &stream)
+void GerberImportData::load (tl::InputStream &stream)
 {
   reset ();
   current_file = std::string ();
@@ -247,16 +224,14 @@ GerberImportData::load (tl::InputStream &stream)
   pcb_project_structure.parse (in, *this);
 }
 
-void
-GerberImportData::save (const std::string &file)
+void GerberImportData::save (const std::string &file)
 {
   tl::OutputStream os (file, tl::OutputStream::OM_Plain);
   pcb_project_structure.write (os, *this);
   current_file = file;
 }
 
-void
-GerberImportData::from_string (const std::string &s)
+void GerberImportData::from_string (const std::string &s)
 {
   tl::Extractor ex (s.c_str ());
   while (! ex.at_end ()) {
@@ -436,7 +411,6 @@ GerberImportData::from_string (const std::string &s)
     } else {
       ex.expect_end ();
     }
-
   }
 }
 
@@ -444,14 +418,14 @@ std::string
 GerberImportData::to_string () const
 {
   std::string s;
-  s += "free-layer-mapping=" + tl::to_string(free_layer_mapping) + ";";
-  s += "import-mode=" + tl::to_string(int (mode)) + ";";
+  s += "free-layer-mapping=" + tl::to_string (free_layer_mapping) + ";";
+  s += "import-mode=" + tl::to_string (int (mode)) + ";";
   s += "base-dir=" + tl::to_quoted_string (base_dir) + ";";
   s += "invert-negative-layers=" + tl::to_string (invert_negative_layers) + ";";
   s += "border=" + tl::to_string (border) + ";";
 
   s += "layout-layers=";
-  for (std::vector <db::LayerProperties>::const_iterator ll = layout_layers.begin (); ll != layout_layers.end (); ++ll) {
+  for (std::vector<db::LayerProperties>::const_iterator ll = layout_layers.begin (); ll != layout_layers.end (); ++ll) {
     if (ll != layout_layers.begin ()) {
       s += ",";
     }
@@ -464,7 +438,7 @@ GerberImportData::to_string () const
   s += "num-via-types=" + tl::to_string (num_via_types) + ";";
 
   s += "artwork-files=";
-  for (std::vector <GerberArtworkFileDescriptor>::const_iterator f = artwork_files.begin (); f != artwork_files.end (); ++f) {
+  for (std::vector<GerberArtworkFileDescriptor>::const_iterator f = artwork_files.begin (); f != artwork_files.end (); ++f) {
     if (f != artwork_files.begin ()) {
       s += ",";
     }
@@ -473,7 +447,7 @@ GerberImportData::to_string () const
   s += ";";
 
   s += "drill-files=";
-  for (std::vector <GerberDrillFileDescriptor>::const_iterator f = drill_files.begin (); f != drill_files.end (); ++f) {
+  for (std::vector<GerberDrillFileDescriptor>::const_iterator f = drill_files.begin (); f != drill_files.end (); ++f) {
     if (f != drill_files.begin ()) {
       s += ",";
     }
@@ -482,12 +456,12 @@ GerberImportData::to_string () const
   s += ";";
 
   s += "free-files=";
-  for (std::vector <GerberFreeFileDescriptor>::const_iterator f = free_files.begin (); f != free_files.end (); ++f) {
+  for (std::vector<GerberFreeFileDescriptor>::const_iterator f = free_files.begin (); f != free_files.end (); ++f) {
     if (f != free_files.begin ()) {
       s += ",";
     }
     s += "(" + tl::to_quoted_string (f->filename);
-    for (std::vector <int>::const_iterator i = f->layout_layers.begin (); i != f->layout_layers.end (); ++i) {
+    for (std::vector<int>::const_iterator i = f->layout_layers.begin (); i != f->layout_layers.end (); ++i) {
       s += "," + tl::to_string (*i);
     }
     s += ")";
@@ -495,12 +469,11 @@ GerberImportData::to_string () const
   s += ";";
 
   s += "reference-points=";
-  for (std::vector <std::pair <db::DPoint, db::DPoint> >::const_iterator rp = reference_points.begin (); rp != reference_points.end (); ++rp) {
+  for (std::vector<std::pair<db::DPoint, db::DPoint>>::const_iterator rp = reference_points.begin (); rp != reference_points.end (); ++rp) {
     if (rp != reference_points.begin ()) {
       s += ",";
     }
-    s += "((" + tl::to_string (rp->first.x ()) + "," + tl::to_string (rp->first.y ()) + "),("
-              + tl::to_string (rp->second.x ()) + "," + tl::to_string (rp->second.y ()) + "))";
+    s += "((" + tl::to_string (rp->first.x ()) + "," + tl::to_string (rp->first.y ()) + "),(" + tl::to_string (rp->second.x ()) + "," + tl::to_string (rp->second.y ()) + "))";
   }
   s += ";";
 

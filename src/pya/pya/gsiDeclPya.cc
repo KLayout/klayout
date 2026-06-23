@@ -39,19 +39,17 @@ static const pya::MethodTableEntry *setter (std::pair<const pya::MethodTableEntr
   return p->first;
 }
 
-gsi::Class<std::pair<const pya::MethodTableEntry *, const pya::MethodTableEntry *> > decl_PythonGetterSetterPair ("tl", "PythonGetterSetterPair",
-  gsi::method_ext ("getter", &getter, "@brief Gets the getter function") +
-  gsi::method_ext ("setter", &setter, "@brief Gets the setter function"),
-  "@hide"
-);
+gsi::Class<std::pair<const pya::MethodTableEntry *, const pya::MethodTableEntry *>> decl_PythonGetterSetterPair ("tl", "PythonGetterSetterPair",
+                                                                                                                 gsi::method_ext ("getter", &getter, "@brief Gets the getter function") +
+                                                                                                                   gsi::method_ext ("setter", &setter, "@brief Gets the setter function"),
+                                                                                                                 "@hide");
 
 gsi::Class<pya::MethodTableEntry> decl_PythonFunction ("tl", "PythonFunction",
-  gsi::method ("methods", &pya::MethodTableEntry::methods, "@brief Gets the list of methods bound to this Python function") +
-  gsi::method ("name", &pya::MethodTableEntry::name, "@brief Gets the name of this Python function") +
-  gsi::method ("is_static", &pya::MethodTableEntry::is_static, "@brief Gets the value indicating whether this Python function is 'static' (class function)") +
-  gsi::method ("is_protected", &pya::MethodTableEntry::is_protected, "@brief Gets a value indicating whether this function is protected"),
-  "@hide"
-);
+                                                       gsi::method ("methods", &pya::MethodTableEntry::methods, "@brief Gets the list of methods bound to this Python function") +
+                                                         gsi::method ("name", &pya::MethodTableEntry::name, "@brief Gets the name of this Python function") +
+                                                         gsi::method ("is_static", &pya::MethodTableEntry::is_static, "@brief Gets the value indicating whether this Python function is 'static' (class function)") +
+                                                         gsi::method ("is_protected", &pya::MethodTableEntry::is_protected, "@brief Gets a value indicating whether this function is protected"),
+                                                       "@hide");
 
 static std::vector<const pya::MethodTableEntry *> get_python_methods (const gsi::ClassBase *cls, bool st)
 {
@@ -62,7 +60,7 @@ static std::vector<const pya::MethodTableEntry *> get_python_methods (const gsi:
   if (mt != 0) {
     for (auto m = mt->method_table ().begin (); m != mt->method_table ().end (); ++m) {
       if (m->is_enabled () && m->is_static () == st) {
-        methods.push_back (m.operator-> ());
+        methods.push_back (m.operator->());
       }
     }
   }
@@ -70,11 +68,11 @@ static std::vector<const pya::MethodTableEntry *> get_python_methods (const gsi:
   return methods;
 }
 
-static std::vector<std::pair<const pya::MethodTableEntry *, const pya::MethodTableEntry *> > get_python_properties (const gsi::ClassBase *cls, bool st)
+static std::vector<std::pair<const pya::MethodTableEntry *, const pya::MethodTableEntry *>> get_python_properties (const gsi::ClassBase *cls, bool st)
 {
   const pya::MethodTable *mt = pya::MethodTable::method_table_by_class (cls);
 
-  std::vector<std::pair<const pya::MethodTableEntry *, const pya::MethodTableEntry *> > methods;
+  std::vector<std::pair<const pya::MethodTableEntry *, const pya::MethodTableEntry *>> methods;
 
   if (mt != 0) {
     for (auto m = mt->property_table ().begin (); m != mt->property_table ().end (); ++m) {
@@ -87,17 +85,13 @@ static std::vector<std::pair<const pya::MethodTableEntry *, const pya::MethodTab
   return methods;
 }
 
-static
-gsi::ClassExt<gsi::ClassBase> class_base_ext (
+static gsi::ClassExt<gsi::ClassBase> class_base_ext (
   gsi::method_ext ("python_methods", &get_python_methods, gsi::arg ("static"), "@brief Gets the Python methods (static or non-static)") +
-  gsi::method_ext ("python_properties", &get_python_properties, gsi::arg ("static"), "@brief Gets the Python properties (static or non-static) as a list of getter/setter pairs\nNote that if a getter or setter is not available the list of Python functions for this part is empty."),
-  "@hide"
-);
+    gsi::method_ext ("python_properties", &get_python_properties, gsi::arg ("static"), "@brief Gets the Python properties (static or non-static) as a list of getter/setter pairs\nNote that if a getter or setter is not available the list of Python functions for this part is empty."),
+  "@hide");
 
-static
-gsi::ClassExt<gsi::MethodBase> method_base_ext (
+static gsi::ClassExt<gsi::MethodBase> method_base_ext (
   gsi::method_ext ("python_methods", &pya::PythonInterpreter::python_doc, "@brief Gets the Python specific documentation"),
-  "@hide"
-);
+  "@hide");
 
 }

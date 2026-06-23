@@ -7,8 +7,8 @@
 #include <QtCore5Compat/QMutableLinkedListIterator>
 #include <QtCore5Compat/QRegExp>
 #include <QtCore5Compat/QStringRef>
-//#include <QtCore5Compat/QtCore5Compat>
-//#include <QtCore5Compat/QtCore5CompatDepends>
+// #include <QtCore5Compat/QtCore5Compat>
+// #include <QtCore5Compat/QtCore5CompatDepends>
 #include <QtCore5Compat/QtCore5CompatVersion>
 #include <QtCore5Compat/QTextCodec>
 #include <QtCore5Compat/QTextDecoder>

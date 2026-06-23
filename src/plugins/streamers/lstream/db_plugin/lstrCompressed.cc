@@ -29,13 +29,13 @@
 namespace lstr
 {
 
-Compressed::Compressed () 
-  : m_next_id (0) 
-{ 
+Compressed::Compressed ()
+  : m_next_id (0)
+{
   //  .. nothing yet ..
 }
 
-uint64_t 
+uint64_t
 Compressed::make_rep_id (const RegularArray &array, const std::vector<db::Vector> &irregular)
 {
   if (! array.is_null ()) {
@@ -63,13 +63,11 @@ Compressed::make_rep_id (const RegularArray &array, const std::vector<db::Vector
   } else {
 
     return 0;
-
   }
 }
 
 template <class Obj>
-void 
-Compressed::write_shape (const db::Shape &shape, RegularArray &regular, std::vector<db::Vector> &irregular_array)
+void Compressed::write_shape (const db::Shape &shape, RegularArray &regular, std::vector<db::Vector> &irregular_array)
 {
   Obj sh;
   shape.instantiate (sh);
@@ -82,8 +80,7 @@ Compressed::write_shape (const db::Shape &shape, RegularArray &regular, std::vec
   }
 }
 
-void 
-Compressed::compress_shapes (const db::Shapes &shapes, unsigned int level, bool recompress)
+void Compressed::compress_shapes (const db::Shapes &shapes, unsigned int level, bool recompress)
 {
   RegularArray no_array;
   std::vector<db::Vector> no_irregular_array;
@@ -106,7 +103,7 @@ Compressed::compress_shapes (const db::Shapes &shapes, unsigned int level, bool 
   Compressor<db::TextWithProperties> text_with_properties_compressor (level);
   Compressor<db::PointWithProperties> point_with_properties_compressor (level);
 
-  for (db::ShapeIterator shape = shapes.begin (db::ShapeIterator::All); ! shape.at_end (); ) {
+  for (db::ShapeIterator shape = shapes.begin (db::ShapeIterator::All); ! shape.at_end ();) {
 
     if (level <= 0 || (! recompress && shape.in_array ())) {
 
@@ -211,7 +208,7 @@ Compressed::compress_shapes (const db::Shapes &shapes, unsigned int level, bool 
         break;
 
       case db::Shape::SimplePolygonPtrArrayMember:
-           
+
         if (shape->has_prop_id ()) {
           auto simple_polygon_ref = *shape->basic_ptr (db::object_with_properties<db::Shape::simple_polygon_ptr_array_type>::tag ());
           db::SimplePolygonWithProperties simple_polygon (simple_polygon_ref.object ().obj (), simple_polygon_ref.properties_id ());
@@ -374,9 +371,7 @@ Compressed::compress_shapes (const db::Shapes &shapes, unsigned int level, bool 
       }
 
       ++shape;
-
     }
-
   }
 
   path_compressor.flush (this);
@@ -408,11 +403,11 @@ create_repetition_from_array (const Array *array, RegularArray &regular, std::ve
   if (array->is_iterated_array (&irregular_array)) {
 
     //  Take out the first displacement and move that to the shape and sort the displacements.
-    //  This way, sequences get normalized and there is a better chance of getting identical 
+    //  This way, sequences get normalized and there is a better chance of getting identical
     //  repetition vectors.
     tl_assert (! irregular_array.empty ());
     db::Vector po = irregular_array.front ();
-    std::vector<db::Vector>::iterator pw = irregular_array.begin();
+    std::vector<db::Vector>::iterator pw = irregular_array.begin ();
     for (std::vector<db::Vector>::iterator p = pw + 1; p != irregular_array.end (); ++p) {
       *pw++ = *p - po;
     }
@@ -447,21 +442,20 @@ Compressed::create_repetition (const db::Shape &array_shape, RegularArray &regul
     return create_repetition_from_array (array_shape.basic_ptr (db::Shape::short_box_array_type::tag ()), regular, irregular_array);
   case db::Shape::TextPtrArray:
     return create_repetition_from_array (array_shape.basic_ptr (db::Shape::text_ptr_array_type::tag ()), regular, irregular_array);
-  default: 
+  default:
     tl_assert (false);
     break;
   }
 }
 
-void 
-Compressed::compress_instances (const db::Cell::const_iterator &begin_instances, const std::set<db::cell_index_type> &cells_to_write, unsigned int level)
+void Compressed::compress_instances (const db::Cell::const_iterator &begin_instances, const std::set<db::cell_index_type> &cells_to_write, unsigned int level)
 {
   //  use compression 0 for the instances - this preserves the arrays and does not create new ones, the
   //  remaining ones are compressed into irregular arrays
   Compressor<db::CellInstArray> inst_compressor (0);
   Compressor<db::CellInstArrayWithProperties> inst_with_properties_compressor (0);
 
-  //  Collect all instances 
+  //  Collect all instances
   for (auto inst_iterator = begin_instances; ! inst_iterator.at_end (); ++inst_iterator) {
 
     if (cells_to_write.find (inst_iterator->cell_index ()) != cells_to_write.end ()) {
@@ -471,7 +465,7 @@ Compressed::compress_instances (const db::Cell::const_iterator &begin_instances,
 
       if (level == 0 || inst_array.size () > 1) {
 
-        //  Recode the instance array into a regular array or irregular array spec (the latter hardly used) and 
+        //  Recode the instance array into a regular array or irregular array spec (the latter hardly used) and
         //  a single instance.
         RegularArray array;
         std::vector<db::Vector> irregular_array;
@@ -515,11 +509,8 @@ Compressed::compress_instances (const db::Cell::const_iterator &begin_instances,
         } else {
           inst_compressor.add (single_inst, disp);
         }
-
       }
-
     }
-
   }
 
   inst_compressor.flush (this);

@@ -44,16 +44,14 @@ TextWriter::TextWriter (tl::OutputStream &stream)
   //  .. nothing yet ..
 }
 
-void
-TextWriter::begin_sorted_section ()
+void TextWriter::begin_sorted_section ()
 {
   m_cc.clear ();
   m_in_cell = true;
   m_cc_line.clear ();
 }
 
-void
-TextWriter::end_sorted_section ()
+void TextWriter::end_sorted_section ()
 {
   std::sort (m_cc.begin (), m_cc.end ());
   for (std::vector<std::string>::const_iterator l = m_cc.begin (); l != m_cc.end (); ++l) {
@@ -138,8 +136,7 @@ TextWriter::endl_str ()
   return "\n";
 }
 
-void
-TextWriter::write_props (const db::Layout & /*layout*/, size_t prop_id)
+void TextWriter::write_props (const db::Layout & /*layout*/, size_t prop_id)
 {
   *this << "set props {" << endl_str ();
 
@@ -154,17 +151,15 @@ TextWriter::write_props (const db::Layout & /*layout*/, size_t prop_id)
     } else if (name.is_a_string ()) {
       *this << "  {{" << name.to_string () << "} {" << value.to_string () << "}}" << endl_str ();
     }
-
   }
 
   *this << "}" << endl_str ();
 }
 
-void
-TextWriter::write (const db::Layout &layout)
+void TextWriter::write (const db::Layout &layout)
 {
   //  write header
-  
+
   std::string pfx = "";
 
   if (layout.prop_id () != 0) {
@@ -180,7 +175,7 @@ TextWriter::write (const db::Layout &layout)
 
     const db::Cell &cref (layout.cell (*cell));
 
-    //  cell header 
+    //  cell header
 
     std::string pfx = "";
 
@@ -191,12 +186,12 @@ TextWriter::write (const db::Layout &layout)
 
     *this << "begin_cell" << pfx << " {" << layout.cell_name (*cell) << "}" << endl ();
 
-    //  cell body 
+    //  cell body
 
     begin_sorted_section ();
 
     //  instances
-    
+
     for (db::Cell::const_iterator inst = cref.begin (); ! inst.at_end (); ++inst) {
 
       db::Vector a, b;
@@ -242,9 +237,7 @@ TextWriter::write (const db::Layout &layout)
         if (is_reg) {
           break;
         }
-
       }
-
     }
 
     end_sorted_section ();
@@ -252,7 +245,7 @@ TextWriter::write (const db::Layout &layout)
     //  shapes
 
     for (unsigned int l = 0; l < layout.layers (); ++l) {
- 
+
       if (layout.is_valid_layer (l)) {
 
         begin_sorted_section ();
@@ -272,23 +265,23 @@ TextWriter::write (const db::Layout &layout)
           }
 
           if (shape->is_text ()) {
-            
+
             db::Trans trans = shape->text_trans ();
 
-            *this << "text" << pfx 
-                  << " " << layer << " " << datatype 
-                  << " " << ((trans.rot () % 4) * 90.0) 
-                  << " " << (trans.is_mirror () ? 1 : 0) 
-                  << " " << trans.disp () 
+            *this << "text" << pfx
+                  << " " << layer << " " << datatype
+                  << " " << ((trans.rot () % 4) * 90.0)
+                  << " " << (trans.is_mirror () ? 1 : 0)
+                  << " " << trans.disp ()
                   << " {" << shape->text_string () << "}" << endl ();
 
           } else if (shape->is_polygon ()) {
 
-            *this << "boundary" << pfx 
+            *this << "boundary" << pfx
                   << " " << layer << " " << datatype;
 
             db::Shape::point_iterator e (shape->begin_hull ());
-            for ( ; e != shape->end_hull (); ++e) {
+            for (; e != shape->end_hull (); ++e) {
               *this << " " << *e;
             }
 
@@ -303,7 +296,7 @@ TextWriter::write (const db::Layout &layout)
           } else if (shape->is_edge ()) {
 
             db::Edge e (shape->edge ());
-            *this << "edge" << pfx 
+            *this << "edge" << pfx
                   << " " << layer << " " << datatype << " " << e.p1 () << " " << e.p2 () << endl ();
 
           } else if (shape->is_path ()) {
@@ -312,8 +305,8 @@ TextWriter::write (const db::Layout &layout)
             db::Path path;
             shape->path (path);
 
-            *this << "path" << pfx 
-                  << " " << layer << " " << datatype 
+            *this << "path" << pfx
+                  << " " << layer << " " << datatype
                   << " " << path.width ()
                   << " " << path.extensions ().first
                   << " " << path.extensions ().second;
@@ -325,25 +318,20 @@ TextWriter::write (const db::Layout &layout)
           } else if (shape->is_box ()) {
 
             db::Box b (shape->box ());
-            *this << "box" << pfx 
+            *this << "box" << pfx
                   << " " << layer << " " << datatype << " " << b.p1 () << " " << b.p2 () << endl ();
-
           }
 
           ++shape;
-
         }
 
         end_sorted_section ();
-
       }
-
     }
 
     //  end of cell
-    
-    *this << "end_cell" << endl ();
 
+    *this << "end_cell" << endl ();
   }
 
   *this << "end_lib" << endl ();
@@ -353,4 +341,3 @@ TextWriter::write (const db::Layout &layout)
 
 
 } // namespace db
-

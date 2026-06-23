@@ -73,7 +73,7 @@ AsIfFlatTexts::to_string (size_t nmax) const
   std::ostringstream os;
   TextsIterator p (begin ());
   bool first = true;
-  for ( ; ! p.at_end () && nmax != 0; ++p, --nmax) {
+  for (; ! p.at_end () && nmax != 0; ++p, --nmax) {
     if (! first) {
       os << ";";
     }
@@ -92,7 +92,7 @@ AsIfFlatTexts::to_string (size_t nmax) const
 TextsDelegate *
 AsIfFlatTexts::in (const Texts &other, bool invert) const
 {
-  std::set <db::Text> op;
+  std::set<db::Text> op;
   for (TextsIterator o (other.begin ()); ! o.at_end (); ++o) {
     op.insert (*o);
   }
@@ -328,12 +328,10 @@ AsIfFlatTexts::add (const Texts &other) const
     }
 
     return new_texts.release ();
-
   }
 }
 
-bool
-AsIfFlatTexts::equals (const Texts &other) const
+bool AsIfFlatTexts::equals (const Texts &other) const
 {
   if (empty () != other.empty ()) {
     return false;
@@ -353,8 +351,7 @@ AsIfFlatTexts::equals (const Texts &other) const
   return true;
 }
 
-bool
-AsIfFlatTexts::less (const Texts &other) const
+bool AsIfFlatTexts::less (const Texts &other) const
 {
   if (empty () != other.empty ()) {
     return empty () < other.empty ();
@@ -374,8 +371,7 @@ AsIfFlatTexts::less (const Texts &other) const
   return false;
 }
 
-void
-AsIfFlatTexts::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
+void AsIfFlatTexts::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
   //  improves performance when inserting an original layout into the same layout
   db::LayoutLocker locker (layout);
@@ -386,8 +382,7 @@ AsIfFlatTexts::insert_into (Layout *layout, db::cell_index_type into_cell, unsig
   }
 }
 
-void
-AsIfFlatTexts::insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const
+void AsIfFlatTexts::insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const
 {
   //  improves performance when inserting an original layout into the same layout
   db::LayoutLocker locker (layout);
@@ -412,14 +407,14 @@ AsIfFlatTexts::selected_interacting_generic (const Region &other, bool inverse) 
 
   AddressableTextDelivery e (begin ());
 
-  for ( ; ! e.at_end (); ++e) {
-    scanner.insert1 (e.operator-> (), 0);
+  for (; ! e.at_end (); ++e) {
+    scanner.insert1 (e.operator->(), 0);
   }
 
   AddressablePolygonDelivery p = other.addressable_polygons ();
 
-  for ( ; ! p.at_end (); ++p) {
-    scanner.insert2 (p.operator-> (), 1);
+  for (; ! p.at_end (); ++p) {
+    scanner.insert2 (p.operator->(), 1);
   }
 
   std::unique_ptr<FlatTexts> output (new FlatTexts ());
@@ -440,7 +435,6 @@ AsIfFlatTexts::selected_interacting_generic (const Region &other, bool inverse) 
         output->insert (*o);
       }
     }
-
   }
 
   return output.release ();
@@ -458,14 +452,14 @@ AsIfFlatTexts::pull_generic (const Region &other) const
 
   AddressableTextDelivery e (begin ());
 
-  for ( ; ! e.at_end (); ++e) {
-    scanner.insert1 (e.operator-> (), 0);
+  for (; ! e.at_end (); ++e) {
+    scanner.insert1 (e.operator->(), 0);
   }
 
   AddressablePolygonDelivery p = other.addressable_merged_polygons ();
 
-  for ( ; ! p.at_end (); ++p) {
-    scanner.insert2 (p.operator-> (), 1);
+  for (; ! p.at_end (); ++p) {
+    scanner.insert2 (p.operator->(), 1);
   }
 
   std::unique_ptr<FlatRegion> output (new FlatRegion (true));
@@ -495,4 +489,3 @@ AsIfFlatTexts::selected_not_interacting (const Region &other) const
 }
 
 }
-

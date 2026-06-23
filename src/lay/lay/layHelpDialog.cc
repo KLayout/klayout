@@ -122,4 +122,3 @@ void HelpDialog::hideEvent (QHideEvent *)
 }
 
 }
-

@@ -29,7 +29,8 @@
 #include "dbCellVariants.h"
 #include "dbBoxScanner.h"
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief A perimeter filter for use with Region::filter or Region::filtered
@@ -41,8 +42,7 @@ namespace db {
  */
 
 struct DB_PUBLIC RegionPerimeterFilter
-  : public PolygonFilterBase
-{
+  : public PolygonFilterBase {
   typedef db::coord_traits<db::Coord>::perimeter_type perimeter_type;
 
   /**
@@ -107,8 +107,7 @@ private:
  */
 
 struct DB_PUBLIC RegionAreaFilter
-  : public PolygonFilterBase
-{
+  : public PolygonFilterBase {
   typedef db::Polygon::area_type area_type;
 
   /**
@@ -168,12 +167,11 @@ private:
  */
 
 struct DB_PUBLIC AllMustMatchFilter
-  : public PolygonFilterBase
-{
+  : public PolygonFilterBase {
   /**
    *  @brief Constructor
    */
-  AllMustMatchFilter () { }
+  AllMustMatchFilter () {}
 
   virtual bool selected_set (const std::unordered_set<db::PolygonRefWithProperties> &polygons) const
   {
@@ -194,7 +192,6 @@ struct DB_PUBLIC AllMustMatchFilter
     }
     return true;
   }
-
 };
 
 /**
@@ -204,8 +201,7 @@ struct DB_PUBLIC AllMustMatchFilter
  */
 
 struct DB_PUBLIC RectilinearFilter
-  : public AllMustMatchFilter
-{
+  : public AllMustMatchFilter {
   /**
    *  @brief Constructor
    *  @param inverse If set to true, only polygons not matching this criterion will be filtered
@@ -248,8 +244,7 @@ private:
  */
 
 struct DB_PUBLIC RectangleFilter
-  : public AllMustMatchFilter
-{
+  : public AllMustMatchFilter {
   /**
    *  @brief Constructor
    *  @param inverse If set to true, only polygons not matching this criterion will be filtered
@@ -293,8 +288,7 @@ private:
  */
 
 struct DB_PUBLIC HoleCountFilter
-  : public AllMustMatchFilter
-{
+  : public AllMustMatchFilter {
   /**
    *  @brief Constructor
    *  @param inverse If set to true, only polygons not matching this criterion will be filtered
@@ -348,8 +342,7 @@ private:
  */
 
 struct DB_PUBLIC RegionBBoxFilter
-  : public AllMustMatchFilter
-{
+  : public AllMustMatchFilter {
   typedef db::Box::distance_type value_type;
 
   /**
@@ -421,8 +414,7 @@ private:
  */
 
 struct DB_PUBLIC RegionRatioFilter
-  : public AllMustMatchFilter
-{
+  : public AllMustMatchFilter {
   /**
    *  @brief The parameters available
    */
@@ -534,7 +526,7 @@ public:
   virtual void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const;
 
   virtual const TransformationReducer *vars () const { return &m_vars; }
-  virtual bool result_is_merged () const { return true; }   //  we believe so ...
+  virtual bool result_is_merged () const { return true; } //  we believe so ...
   virtual bool requires_raw_input () const { return false; }
   virtual bool wants_variants () const { return true; }
   virtual bool result_must_not_be_merged () const { return false; }
@@ -558,7 +550,7 @@ public:
   virtual void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const;
 
   virtual const TransformationReducer *vars () const { return 0; }
-  virtual bool result_is_merged () const { return false; }  //  isn't merged for nested holes :(
+  virtual bool result_is_merged () const { return false; } //  isn't merged for nested holes :(
   virtual bool requires_raw_input () const { return false; }
   virtual bool wants_variants () const { return true; }
   virtual bool result_must_not_be_merged () const { return false; }
@@ -577,7 +569,7 @@ public:
   virtual void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const;
 
   virtual const TransformationReducer *vars () const { return 0; }
-  virtual bool result_is_merged () const { return false; }   //  isn't merged for nested hulls :(
+  virtual bool result_is_merged () const { return false; } //  isn't merged for nested hulls :(
   virtual bool requires_raw_input () const { return false; }
   virtual bool wants_variants () const { return true; }
   virtual bool result_must_not_be_merged () const { return false; }
@@ -606,4 +598,3 @@ private:
 } // namespace db
 
 #endif
-

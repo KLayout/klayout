@@ -25,21 +25,32 @@
 
 namespace
 {
-  class A { };
-  class B : public A { };
-  class D : public B { };
-  class C : public A { };
-  class E { };
+class A
+{
+};
+class B : public A
+{
+};
+class D : public B
+{
+};
+class C : public A
+{
+};
+class E
+{
+};
 }
 
-struct XXX
-{
+struct XXX {
   int a, b;
 };
 
-class XX : public XXX, private tl::Object { };
+class XX : public XXX, private tl::Object
+{
+};
 
-TEST(1)
+TEST (1)
 {
   EXPECT_EQ (tl::value_from_type (tl::type_from_value<false>::value ()), false);
   EXPECT_EQ (tl::value_from_type (tl::type_from_value<true>::value ()), true);
@@ -62,7 +73,7 @@ TEST(1)
   B b;
   C c;
   EXPECT_EQ (tl::try_static_cast<A> (&a) == &a, true);
-  EXPECT_EQ (tl::try_static_cast<A> (&b) == (A *)&b, true);
-  EXPECT_EQ (tl::try_static_cast<A> (&c) == (A *)&c, true);
+  EXPECT_EQ (tl::try_static_cast<A> (&b) == (A *) &b, true);
+  EXPECT_EQ (tl::try_static_cast<A> (&c) == (A *) &c, true);
   EXPECT_EQ (tl::try_static_cast<B> (&c) == 0, true);
 }

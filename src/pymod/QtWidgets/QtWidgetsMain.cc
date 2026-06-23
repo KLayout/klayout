@@ -23,4 +23,4 @@
 #include "../pymodHelper.h"
 
 #include "QtWidgetsMain.h"
-DEFINE_PYMOD(QtWidgets, "QtWidgets", "KLayout/Qt module 'QtWidgets'")
+DEFINE_PYMOD (QtWidgets, "QtWidgets", "KLayout/Qt module 'QtWidgets'")

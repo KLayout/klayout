@@ -47,7 +47,7 @@ class InputHttpStream;
 class AuthenticationHandler
   : public QObject
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   AuthenticationHandler ();
@@ -64,7 +64,7 @@ private:
 class InputHttpStreamPrivateData
   : public QObject
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   InputHttpStreamPrivateData (InputHttpStream *stream, const std::string &url);
@@ -108,7 +108,7 @@ public:
 private slots:
   void finished (QNetworkReply *);
   void resend ();
-#if !defined(QT_NO_SSL)
+#if ! defined(QT_NO_SSL)
   void sslErrors (QNetworkReply *reply, const QList<QSslError> &errors);
 #endif
 
@@ -132,4 +132,3 @@ private:
 }
 
 #endif
-

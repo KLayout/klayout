@@ -42,13 +42,13 @@
 
 #include <set>
 
-namespace db 
+namespace db
 {
 
 class Shapes;
 
 /**
- *  @brief A generic edge iterator 
+ *  @brief A generic edge iterator
  *
  *  This edge iterator is used to provide edge iterators for simple and
  *  complex polygons as well.
@@ -73,13 +73,16 @@ public:
   typedef typename simple_polygon_ref_type::polygon_edge_iterator simple_polygon_ref_edge_iterator_type;
   typedef edge_type value_type;
   typedef void pointer;
-  typedef value_type reference; 
+  typedef value_type reference;
   typedef std::bidirectional_iterator_tag iterator_category;
   typedef void difference_type;
 
-  enum iterator_type
-  {
-    None, SimplePolygon, SimplePolygonRef, Polygon, PolygonRef
+  enum iterator_type {
+    None,
+    SimplePolygon,
+    SimplePolygonRef,
+    Polygon,
+    PolygonRef
   };
 
   /**
@@ -89,10 +92,10 @@ public:
   {
     m_type = None;
   }
-    
+
   /**
    *  @brief This constructor creates an edge iterator at "begin" for polygons
-   * 
+   *
    *  The iterator stores begin and end and provides a "at_end" method to
    *  test if the sequence is at the end.
    *
@@ -103,10 +106,10 @@ public:
     m_type = Polygon;
     new ((char *) m_d.iter) polygon_edge_iterator_type (begin);
   }
-    
+
   /**
    *  @brief This constructor creates an edge iterator at "begin" for polygon references
-   * 
+   *
    *  See former ctor.
    */
   generic_polygon_edge_iterator (const polygon_ref_edge_iterator_type &begin)
@@ -114,10 +117,10 @@ public:
     m_type = PolygonRef;
     new ((char *) m_d.iter) polygon_ref_edge_iterator_type (begin);
   }
-    
+
   /**
    *  @brief This constructor creates an edge iterator at "begin" for simple polygons
-   * 
+   *
    *  See former ctor.
    */
   generic_polygon_edge_iterator (const simple_polygon_edge_iterator_type &begin)
@@ -125,10 +128,10 @@ public:
     m_type = SimplePolygon;
     new ((char *) m_d.iter) simple_polygon_edge_iterator_type (begin);
   }
-    
+
   /**
    *  @brief This constructor creates an edge iterator at "begin" for simple polygon references
-   * 
+   *
    *  See former ctor.
    */
   generic_polygon_edge_iterator (const simple_polygon_ref_edge_iterator_type &begin)
@@ -136,7 +139,7 @@ public:
     m_type = SimplePolygonRef;
     new ((char *) m_d.iter) simple_polygon_ref_edge_iterator_type (begin);
   }
-    
+
   /**
    *  @brief at_end predicate
    */
@@ -156,7 +159,7 @@ public:
   /**
    *  @brief Increment operator
    */
-  generic_polygon_edge_iterator &operator++ () 
+  generic_polygon_edge_iterator &operator++ ()
   {
     generic_f<bool, inc_f> ();
     return *this;
@@ -165,7 +168,7 @@ public:
   /**
    *  @brief Decrement operator
    */
-  generic_polygon_edge_iterator &operator-- () 
+  generic_polygon_edge_iterator &operator-- ()
   {
     generic_f<bool, dec_f> ();
     return *this;
@@ -178,10 +181,10 @@ public:
   {
     return generic_const_f<edge_type, deref_f> ();
   }
-  
+
 private:
   //  This union is there to compute the maximum size required to hold all
-  //  kind of iterators 
+  //  kind of iterators
   union iter_size {
     char sz1 [sizeof (polygon_edge_iterator_type)];
     char sz2 [sizeof (polygon_ref_edge_iterator_type)];
@@ -192,7 +195,10 @@ private:
   //  This member must be first to guarantee alignment on 64bit systems:
   //  The strange construction and the local dummy class helps to guarantee alignment of the "iter" space
   union {
-    class _align_helper { long l; } _ah;
+    class _align_helper
+    {
+      long l;
+    } _ah;
     //  Hint: without the sizeof(size_t) offset, gcc 4.4.1 produces invalid iterators for the edge iterator.
     //  For example, these iterators do not correctly stop but produce more edges than are available.
     char iter [sizeof (iter_size) + sizeof (size_t)];
@@ -211,8 +217,7 @@ private:
     unsigned int operator() (const Iter &iter) const
     {
       return iter.contour ();
-    } 
-
+    }
   };
 
   struct at_end_f {
@@ -226,8 +231,7 @@ private:
     bool operator() (const Iter &iter) const
     {
       return iter.at_end ();
-    } 
-
+    }
   };
 
   struct inc_f {
@@ -243,7 +247,6 @@ private:
       iter.operator++ ();
       return false;
     }
-
   };
 
   struct dec_f {
@@ -258,8 +261,7 @@ private:
     {
       iter.operator-- ();
       return false;
-    } 
-
+    }
   };
 
   struct deref_f {
@@ -274,7 +276,6 @@ private:
     {
       return iter.operator* ();
     }
-
   };
 
   struct at_begin_f {
@@ -289,7 +290,6 @@ private:
     {
       return iter.at_begin ();
     }
-
   };
 
   template <class Ret, class Func>
@@ -310,7 +310,7 @@ private:
   }
 
   template <class Ret, class Func>
-  Ret generic_f () 
+  Ret generic_f ()
   {
     Func f;
     if (m_type == Polygon) {
@@ -328,7 +328,7 @@ private:
 };
 
 /**
- *  @brief A generic point iterator 
+ *  @brief A generic point iterator
  *
  *  This point iterator is used to provide point iterators for simple and
  *  complex polygons as well as paths.
@@ -353,18 +353,20 @@ public:
   typedef typename path_ref_type::iterator path_ref_point_iterator_type;
   typedef point_type value_type;
   typedef void pointer;
-  typedef value_type reference; 
+  typedef value_type reference;
   typedef std::bidirectional_iterator_tag iterator_category;
   typedef void difference_type;
 
-  enum iterator_type
-  {
-    Polygon, PolygonRef, Path, PathRef
+  enum iterator_type {
+    Polygon,
+    PolygonRef,
+    Path,
+    PathRef
   };
 
   /**
    *  @brief This constructor creates an point iterator at "begin" for polygons
-   * 
+   *
    *  The iterator stores begin and end and provides a "at_end" method to
    *  test if the sequence is at the end.
    *  This method also applies to simple polygon contours.
@@ -376,10 +378,10 @@ public:
     m_type = Polygon;
     new ((char *) m_d.iter) polygon_point_iterator_type (begin);
   }
-    
+
   /**
    *  @brief This constructor creates an point iterator at "begin" for polygon references
-   * 
+   *
    *  This method also applies to simple polygon references.
    *  See former ctor.
    */
@@ -388,10 +390,10 @@ public:
     m_type = PolygonRef;
     new ((char *) m_d.iter) polygon_ref_point_iterator_type (begin);
   }
-    
+
   /**
    *  @brief This constructor creates an point iterator at "begin" for paths
-   * 
+   *
    *  See former ctor.
    */
   generic_point_iterator (const path_point_iterator_type &begin)
@@ -399,10 +401,10 @@ public:
     m_type = Path;
     new ((char *) m_d.iter) path_point_iterator_type (begin);
   }
-    
+
   /**
    *  @brief This constructor creates an point iterator at "begin" for path references
-   * 
+   *
    *  See former ctor.
    */
   generic_point_iterator (const path_ref_point_iterator_type &begin)
@@ -410,7 +412,7 @@ public:
     m_type = PathRef;
     new ((char *) m_d.iter) path_ref_point_iterator_type (begin);
   }
-    
+
   /**
    *  @brief at_end predicate
    */
@@ -422,7 +424,7 @@ public:
   /**
    *  @brief Increment operator
    */
-  generic_point_iterator &operator++ () 
+  generic_point_iterator &operator++ ()
   {
     generic_f<bool, inc_f> ();
     return *this;
@@ -431,7 +433,7 @@ public:
   /**
    *  @brief Decrement operator
    */
-  generic_point_iterator &operator-- () 
+  generic_point_iterator &operator-- ()
   {
     generic_f<bool, dec_f> ();
     return *this;
@@ -446,7 +448,7 @@ public:
   }
 
   /**
-   *  @brief Sorting order 
+   *  @brief Sorting order
    */
   bool operator< (const generic_point_iterator &d) const
   {
@@ -466,7 +468,7 @@ public:
   }
 
   /**
-   *  @brief Equality 
+   *  @brief Equality
    */
   bool operator== (const generic_point_iterator &d) const
   {
@@ -488,12 +490,12 @@ public:
    */
   bool operator!= (const generic_point_iterator &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
-  
+
 private:
   //  This union is there to compute the maximum size required to hold all
-  //  kind of iterators 
+  //  kind of iterators
   union iter_size {
     char sz1 [sizeof (polygon_point_iterator_type)];
     char sz2 [sizeof (polygon_ref_point_iterator_type)];
@@ -504,7 +506,10 @@ private:
   //  This member must be first to guarantee alignment on 64bit systems:
   //  The strange construction and the local dummy class helps to guarantee alignment of the "iter" space
   union {
-    class _align_helper { long l; } _ah;
+    class _align_helper
+    {
+      long l;
+    } _ah;
     //  Hint: without the sizeof(size_t) offset, gcc 4.4.1 produces invalid iterators for the edge iterator.
     //  For safety the offset is added here as well:
     char iter [sizeof (iter_size) + sizeof (size_t)];
@@ -517,7 +522,7 @@ private:
     bool operator() (const Iter &iter) const
     {
       return iter.at_end ();
-    } 
+    }
   };
 
   struct inc_f {
@@ -526,7 +531,7 @@ private:
     {
       iter.operator++ ();
       return false;
-    } 
+    }
   };
 
   struct dec_f {
@@ -535,7 +540,7 @@ private:
     {
       iter.operator-- ();
       return false;
-    } 
+    }
   };
 
   struct deref_f {
@@ -543,7 +548,7 @@ private:
     point_type operator() (const Iter &iter) const
     {
       return iter.operator* ();
-    } 
+    }
   };
 
   struct at_begin_f {
@@ -551,7 +556,7 @@ private:
     bool operator() (const Iter &iter) const
     {
       return iter.at_begin ();
-    } 
+    }
   };
 
   template <class Ret, class Func>
@@ -570,7 +575,7 @@ private:
   }
 
   template <class Ret, class Func>
-  Ret generic_f () 
+  Ret generic_f ()
   {
     Func f;
     if (m_type == Polygon) {
@@ -586,21 +591,21 @@ private:
 };
 
 /**
- *  @brief A shape proxy 
+ *  @brief A shape proxy
  *
- *  The shape proxy is basically a pointer to a shape of different kinds 
+ *  The shape proxy is basically a pointer to a shape of different kinds
  *  No copy of the shape is created: if the shape proxy is copied the copy still
  *  points to the original shape. If the original shape is modified or deleted,
  *  the shape proxy will also point to a modified or invalid shape.
  *  The proxy can be "null" which means a invalid reference.
- */ 
+ */
 class DB_PUBLIC Shape
 {
 public:
   typedef db::Coord coord_type;
-  typedef coord_traits<coord_type>::area_type area_type; 
-  typedef coord_traits<coord_type>::distance_type distance_type; 
-  typedef coord_traits<coord_type>::perimeter_type perimeter_type; 
+  typedef coord_traits<coord_type>::area_type area_type;
+  typedef coord_traits<coord_type>::distance_type distance_type;
+  typedef coord_traits<coord_type>::perimeter_type perimeter_type;
   typedef db::simple_trans<coord_type> trans_type;
   typedef db::disp_trans<coord_type> disp_type;
   typedef db::unit_trans<coord_type> unit_trans_type;
@@ -631,55 +636,55 @@ public:
   typedef db::generic_polygon_edge_iterator<coord_type> polygon_edge_iterator;
   typedef db::generic_point_iterator<coord_type> point_iterator;
 
-  typedef tl::reuse_vector<db::polygon<coord_type> >::const_iterator polygon_iter_type;
-  typedef tl::reuse_vector<db::simple_polygon<coord_type> >::const_iterator simple_polygon_iter_type;
-  typedef tl::reuse_vector<db::polygon_ref<polygon_type, disp_type> >::const_iterator polygon_ref_iter_type;
-  typedef tl::reuse_vector<db::polygon_ref<polygon_type, unit_trans_type> >::const_iterator polygon_ptr_iter_type;
-  typedef tl::reuse_vector<db::array<polygon_ptr_type, disp_type> >::const_iterator polygon_ptr_array_iter_type;
-  typedef tl::reuse_vector<db::polygon_ref<simple_polygon_type, disp_type> >::const_iterator simple_polygon_ref_iter_type;
-  typedef tl::reuse_vector<db::polygon_ref<simple_polygon_type, unit_trans_type> >::const_iterator simple_polygon_ptr_iter_type;
-  typedef tl::reuse_vector<db::array<simple_polygon_ptr_type, disp_type> >::const_iterator simple_polygon_ptr_array_iter_type;
-  typedef tl::reuse_vector<db::path<coord_type> >::const_iterator path_iter_type;
-  typedef tl::reuse_vector<db::path_ref<path_type, disp_type> >::const_iterator path_ref_iter_type;
-  typedef tl::reuse_vector<db::path_ref<path_type, unit_trans_type> >::const_iterator path_ptr_iter_type;
-  typedef tl::reuse_vector<db::array<path_ptr_type, disp_type> >::const_iterator path_ptr_array_iter_type;
-  typedef tl::reuse_vector<db::edge<coord_type> >::const_iterator edge_iter_type;
-  typedef tl::reuse_vector<db::edge_pair<coord_type> >::const_iterator edge_pair_iter_type;
-  typedef tl::reuse_vector<db::point<coord_type> >::const_iterator point_iter_type;
-  typedef tl::reuse_vector<db::text<coord_type> >::const_iterator text_iter_type;
-  typedef tl::reuse_vector<db::text_ref<text_type, disp_type> >::const_iterator text_ref_iter_type;
-  typedef tl::reuse_vector<db::text_ref<text_type, unit_trans_type> >::const_iterator text_ptr_iter_type;
-  typedef tl::reuse_vector<db::array<text_ptr_type, disp_type> >::const_iterator text_ptr_array_iter_type;
-  typedef tl::reuse_vector<db::user_object<coord_type> >::const_iterator user_object_iter_type;
-  typedef tl::reuse_vector<db::box<coord_type> >::const_iterator box_iter_type;
-  typedef tl::reuse_vector<db::array<box_type, unit_trans_type> >::const_iterator box_array_iter_type;
-  typedef tl::reuse_vector<db::box<coord_type, coord_traits<coord_type>::short_coord_type> >::const_iterator short_box_iter_type;
-  typedef tl::reuse_vector<db::array<short_box_type, unit_trans_type> >::const_iterator short_box_array_iter_type;
+  typedef tl::reuse_vector<db::polygon<coord_type>>::const_iterator polygon_iter_type;
+  typedef tl::reuse_vector<db::simple_polygon<coord_type>>::const_iterator simple_polygon_iter_type;
+  typedef tl::reuse_vector<db::polygon_ref<polygon_type, disp_type>>::const_iterator polygon_ref_iter_type;
+  typedef tl::reuse_vector<db::polygon_ref<polygon_type, unit_trans_type>>::const_iterator polygon_ptr_iter_type;
+  typedef tl::reuse_vector<db::array<polygon_ptr_type, disp_type>>::const_iterator polygon_ptr_array_iter_type;
+  typedef tl::reuse_vector<db::polygon_ref<simple_polygon_type, disp_type>>::const_iterator simple_polygon_ref_iter_type;
+  typedef tl::reuse_vector<db::polygon_ref<simple_polygon_type, unit_trans_type>>::const_iterator simple_polygon_ptr_iter_type;
+  typedef tl::reuse_vector<db::array<simple_polygon_ptr_type, disp_type>>::const_iterator simple_polygon_ptr_array_iter_type;
+  typedef tl::reuse_vector<db::path<coord_type>>::const_iterator path_iter_type;
+  typedef tl::reuse_vector<db::path_ref<path_type, disp_type>>::const_iterator path_ref_iter_type;
+  typedef tl::reuse_vector<db::path_ref<path_type, unit_trans_type>>::const_iterator path_ptr_iter_type;
+  typedef tl::reuse_vector<db::array<path_ptr_type, disp_type>>::const_iterator path_ptr_array_iter_type;
+  typedef tl::reuse_vector<db::edge<coord_type>>::const_iterator edge_iter_type;
+  typedef tl::reuse_vector<db::edge_pair<coord_type>>::const_iterator edge_pair_iter_type;
+  typedef tl::reuse_vector<db::point<coord_type>>::const_iterator point_iter_type;
+  typedef tl::reuse_vector<db::text<coord_type>>::const_iterator text_iter_type;
+  typedef tl::reuse_vector<db::text_ref<text_type, disp_type>>::const_iterator text_ref_iter_type;
+  typedef tl::reuse_vector<db::text_ref<text_type, unit_trans_type>>::const_iterator text_ptr_iter_type;
+  typedef tl::reuse_vector<db::array<text_ptr_type, disp_type>>::const_iterator text_ptr_array_iter_type;
+  typedef tl::reuse_vector<db::user_object<coord_type>>::const_iterator user_object_iter_type;
+  typedef tl::reuse_vector<db::box<coord_type>>::const_iterator box_iter_type;
+  typedef tl::reuse_vector<db::array<box_type, unit_trans_type>>::const_iterator box_array_iter_type;
+  typedef tl::reuse_vector<db::box<coord_type, coord_traits<coord_type>::short_coord_type>>::const_iterator short_box_iter_type;
+  typedef tl::reuse_vector<db::array<short_box_type, unit_trans_type>>::const_iterator short_box_array_iter_type;
 
-  typedef tl::reuse_vector<db::object_with_properties<db::polygon<coord_type> > >::const_iterator ppolygon_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::simple_polygon<coord_type> > >::const_iterator psimple_polygon_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::polygon_ref<polygon_type, disp_type> > >::const_iterator ppolygon_ref_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::polygon_ref<polygon_type, unit_trans_type> > >::const_iterator ppolygon_ptr_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::array<polygon_ptr_type, disp_type> > >::const_iterator ppolygon_ptr_array_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::polygon_ref<simple_polygon_type, disp_type> > >::const_iterator psimple_polygon_ref_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::polygon_ref<simple_polygon_type, unit_trans_type> > >::const_iterator psimple_polygon_ptr_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::array<simple_polygon_ptr_type, disp_type> > >::const_iterator psimple_polygon_ptr_array_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::path<coord_type> > >::const_iterator ppath_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::path_ref<path_type, disp_type> > >::const_iterator ppath_ref_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::path_ref<path_type, unit_trans_type> > >::const_iterator ppath_ptr_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::array<path_ptr_type, disp_type> > >::const_iterator ppath_ptr_array_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::edge<coord_type> > >::const_iterator pedge_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::edge_pair<coord_type> > >::const_iterator pedge_pair_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::point<coord_type> > >::const_iterator ppoint_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::text<coord_type> > >::const_iterator ptext_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::text_ref<text_type, disp_type> > >::const_iterator ptext_ref_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::text_ref<text_type, unit_trans_type> > >::const_iterator ptext_ptr_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::array<text_ptr_type, disp_type> > >::const_iterator ptext_ptr_array_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::user_object<coord_type> > >::const_iterator puser_object_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::box<coord_type> > >::const_iterator pbox_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::array<box_type, unit_trans_type> > >::const_iterator pbox_array_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::box<coord_type, coord_traits<coord_type>::short_coord_type> > >::const_iterator pshort_box_iter_type;
-  typedef tl::reuse_vector<db::object_with_properties<db::array<short_box_type, unit_trans_type> > >::const_iterator pshort_box_array_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::polygon<coord_type>>>::const_iterator ppolygon_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::simple_polygon<coord_type>>>::const_iterator psimple_polygon_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::polygon_ref<polygon_type, disp_type>>>::const_iterator ppolygon_ref_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::polygon_ref<polygon_type, unit_trans_type>>>::const_iterator ppolygon_ptr_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::array<polygon_ptr_type, disp_type>>>::const_iterator ppolygon_ptr_array_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::polygon_ref<simple_polygon_type, disp_type>>>::const_iterator psimple_polygon_ref_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::polygon_ref<simple_polygon_type, unit_trans_type>>>::const_iterator psimple_polygon_ptr_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::array<simple_polygon_ptr_type, disp_type>>>::const_iterator psimple_polygon_ptr_array_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::path<coord_type>>>::const_iterator ppath_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::path_ref<path_type, disp_type>>>::const_iterator ppath_ref_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::path_ref<path_type, unit_trans_type>>>::const_iterator ppath_ptr_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::array<path_ptr_type, disp_type>>>::const_iterator ppath_ptr_array_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::edge<coord_type>>>::const_iterator pedge_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::edge_pair<coord_type>>>::const_iterator pedge_pair_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::point<coord_type>>>::const_iterator ppoint_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::text<coord_type>>>::const_iterator ptext_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::text_ref<text_type, disp_type>>>::const_iterator ptext_ref_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::text_ref<text_type, unit_trans_type>>>::const_iterator ptext_ptr_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::array<text_ptr_type, disp_type>>>::const_iterator ptext_ptr_array_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::user_object<coord_type>>>::const_iterator puser_object_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::box<coord_type>>>::const_iterator pbox_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::array<box_type, unit_trans_type>>>::const_iterator pbox_array_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::box<coord_type, coord_traits<coord_type>::short_coord_type>>>::const_iterator pshort_box_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::array<short_box_type, unit_trans_type>>>::const_iterator pshort_box_array_iter_type;
 
   //  Hint: in the following enum it is important that the ArrayMember types come *after*
   //  the non-member types. See db::shapes::erase with multi-shape erase capabilities.
@@ -714,8 +719,8 @@ public:
     Point,
     UserObject
   };
-    
-  /** 
+
+  /**
    *  @brief Construct a shape proxy as a null object
    */
   Shape ()
@@ -856,20 +861,20 @@ public:
     return mp_shapes;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a shape with properties
    *
    *  This forwards the initialisation to the basic shape type.
    */
   template <class Sh>
-  void init (db::object_tag< db::object_with_properties<Sh> >)
+  void init (db::object_tag<db::object_with_properties<Sh>>)
   {
     typename Sh::tag basic_tag = typename Sh::tag ();
     init (basic_tag);
     m_with_props = true;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a shape with properties for an array member
    *
    *  This form will copy the object itself. A temporary object may be passed to "obj".
@@ -877,14 +882,14 @@ public:
    *  This forwards the initialisation to the basic shape type.
    */
   template <class Sh, class Trans>
-  void init_member (db::object_tag< db::object_with_properties<Sh> >, const Trans &trans)
+  void init_member (db::object_tag<db::object_with_properties<Sh>>, const Trans &trans)
   {
     typename Sh::tag tag = typename Sh::tag ();
     init_member (tag, trans_type (trans));
     m_with_props = true;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a polygon
    */
   void init (polygon_type::tag)
@@ -892,7 +897,7 @@ public:
     m_type = Polygon;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a polygon reference
    */
   void init (polygon_ref_type::tag)
@@ -900,7 +905,7 @@ public:
     m_type = PolygonRef;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a polygon array member
    */
   void init_member (polygon_ptr_array_type::tag, const trans_type &trans)
@@ -909,7 +914,7 @@ public:
     m_type = PolygonPtrArrayMember;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a polygon reference array
    */
   void init (polygon_ptr_array_type::tag)
@@ -917,7 +922,7 @@ public:
     m_type = PolygonPtrArray;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a simple polygon
    */
   void init (simple_polygon_type::tag)
@@ -925,7 +930,7 @@ public:
     m_type = SimplePolygon;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a polygon reference
    */
   void init (simple_polygon_ref_type::tag)
@@ -933,7 +938,7 @@ public:
     m_type = SimplePolygonRef;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a simple polygon array member
    */
   void init_member (simple_polygon_ptr_array_type::tag, const trans_type &trans)
@@ -942,7 +947,7 @@ public:
     m_type = SimplePolygonPtrArrayMember;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a simple polygon reference array
    */
   void init (simple_polygon_ptr_array_type::tag)
@@ -950,7 +955,7 @@ public:
     m_type = SimplePolygonPtrArray;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a path
    */
   void init (path_type::tag)
@@ -958,7 +963,7 @@ public:
     m_type = Path;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a path reference
    */
   void init (path_ref_type::tag)
@@ -966,7 +971,7 @@ public:
     m_type = PathRef;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a path array member
    */
   void init_member (path_ptr_array_type::tag, const trans_type &trans)
@@ -975,7 +980,7 @@ public:
     m_type = PathPtrArrayMember;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a path reference array
    */
   void init (path_ptr_array_type::tag)
@@ -983,7 +988,7 @@ public:
     m_type = PathPtrArray;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a text
    */
   void init (text_type::tag)
@@ -991,7 +996,7 @@ public:
     m_type = Text;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a text reference
    */
   void init (text_ref_type::tag)
@@ -999,7 +1004,7 @@ public:
     m_type = TextRef;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a path array member
    */
   void init_member (text_ptr_array_type::tag, const trans_type &trans)
@@ -1008,7 +1013,7 @@ public:
     m_type = TextPtrArrayMember;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a text reference array
    */
   void init (text_ptr_array_type::tag)
@@ -1016,7 +1021,7 @@ public:
     m_type = TextPtrArray;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a edge
    */
   void init (edge_type::tag)
@@ -1048,7 +1053,7 @@ public:
     m_type = Box;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a box array member
    */
   void init_member (box_array_type::tag, const trans_type &trans)
@@ -1057,7 +1062,7 @@ public:
     m_type = BoxArrayMember;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a box array
    */
   void init (box_array_type::tag)
@@ -1065,7 +1070,7 @@ public:
     m_type = BoxArray;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a small box
    */
   void init (short_box_type::tag)
@@ -1073,7 +1078,7 @@ public:
     m_type = ShortBox;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a box array member
    */
   void init_member (short_box_array_type::tag, const trans_type &trans)
@@ -1082,7 +1087,7 @@ public:
     m_type = ShortBoxArrayMember;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a box array
    */
   void init (short_box_array_type::tag)
@@ -1090,7 +1095,7 @@ public:
     m_type = ShortBoxArray;
   }
 
-  /** 
+  /**
    *  @brief Construct a shape proxy as a reference to a user object
    */
   void init (user_object_type::tag)
@@ -1194,12 +1199,12 @@ public:
 
   /**
    *  @brief Create and return an edge iterator for the given contour
-   *  If the object is a polygon, a contour of 0 will deliver the 
+   *  If the object is a polygon, a contour of 0 will deliver the
    *  edges of the hull and higher contours will deliver the edges of holes.
    */
   polygon_edge_iterator begin_edge (unsigned int c) const;
 
-  /** 
+  /**
    *  @brief Return the type of the shape reference
    */
   object_type type () const
@@ -1207,7 +1212,7 @@ public:
     return m_type;
   }
 
-  /** 
+  /**
    *  @brief Test if the shape proxy is a null object
    */
   bool is_null () const
@@ -1215,7 +1220,7 @@ public:
     return m_type == Null;
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1231,7 +1236,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1247,7 +1252,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1263,7 +1268,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1279,7 +1284,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1295,7 +1300,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1311,7 +1316,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1327,7 +1332,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1344,7 +1349,7 @@ public:
   }
 
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1360,7 +1365,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1424,7 +1429,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1440,7 +1445,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1456,7 +1461,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1472,7 +1477,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1488,7 +1493,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1504,7 +1509,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1520,7 +1525,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1536,7 +1541,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to for objects with properties
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1553,7 +1558,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to for objects with properties
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1570,7 +1575,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to for objects with properties
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1587,7 +1592,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to for objects with properties
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1604,7 +1609,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to for objects with properties
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1632,7 +1637,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to for objects with properties
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1649,7 +1654,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to for objects with properties
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1666,7 +1671,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to for objects with properties
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1683,7 +1688,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to for objects with properties
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1751,7 +1756,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to for objects with properties
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1768,7 +1773,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to for objects with properties
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1785,7 +1790,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to for objects with properties
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1802,7 +1807,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to for objects with properties
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1819,7 +1824,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to for objects with properties
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1836,7 +1841,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to for objects with properties
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1853,7 +1858,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Return the actual object that this shape reference is pointing to for objects with properties
    *
    *  This is a generalization of the polygon (), etc. methods using a tag to identify the
@@ -1870,8 +1875,8 @@ public:
     }
   }
 
-  /** 
-   *  @brief Return the iterator (in stable reference mode) by tag 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag
    */
   polygon_iter_type basic_iter (polygon_type::tag) const
   {
@@ -1879,8 +1884,8 @@ public:
     return *(((polygon_iter_type *) m_generic.iter));
   }
 
-  /** 
-   *  @brief Return the iterator (in stable reference mode) by tag 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag
    */
   simple_polygon_iter_type basic_iter (simple_polygon_type::tag) const
   {
@@ -1888,8 +1893,8 @@ public:
     return *(((simple_polygon_iter_type *) m_generic.iter));
   }
 
-  /** 
-   *  @brief Return the iterator (in stable reference mode) by tag 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag
    */
   polygon_ref_iter_type basic_iter (polygon_ref_type::tag) const
   {
@@ -1897,8 +1902,8 @@ public:
     return *(((polygon_ref_iter_type *) m_generic.iter));
   }
 
-  /** 
-   *  @brief Return the iterator (in stable reference mode) by tag 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag
    */
   polygon_ptr_array_iter_type basic_iter (polygon_ptr_array_type::tag) const
   {
@@ -1906,8 +1911,8 @@ public:
     return *(((polygon_ptr_array_iter_type *) m_generic.iter));
   }
 
-  /** 
-   *  @brief Return the iterator (in stable reference mode) by tag 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag
    */
   simple_polygon_ref_iter_type basic_iter (simple_polygon_ref_type::tag) const
   {
@@ -1915,8 +1920,8 @@ public:
     return *(((simple_polygon_ref_iter_type *) m_generic.iter));
   }
 
-  /** 
-   *  @brief Return the iterator (in stable reference mode) by tag 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag
    */
   simple_polygon_ptr_array_iter_type basic_iter (simple_polygon_ptr_array_type::tag) const
   {
@@ -1924,8 +1929,8 @@ public:
     return *(((simple_polygon_ptr_array_iter_type *) m_generic.iter));
   }
 
-  /** 
-   *  @brief Return the iterator (in stable reference mode) by tag 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag
    */
   path_iter_type basic_iter (path_type::tag) const
   {
@@ -1933,8 +1938,8 @@ public:
     return *(((path_iter_type *) m_generic.iter));
   }
 
-  /** 
-   *  @brief Return the iterator (in stable reference mode) by tag 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag
    */
   path_ref_iter_type basic_iter (path_ref_type::tag) const
   {
@@ -1942,8 +1947,8 @@ public:
     return *(((path_ref_iter_type *) m_generic.iter));
   }
 
-  /** 
-   *  @brief Return the iterator (in stable reference mode) by tag 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag
    */
   path_ptr_array_iter_type basic_iter (path_ptr_array_type::tag) const
   {
@@ -1951,8 +1956,8 @@ public:
     return *(((path_ptr_array_iter_type *) m_generic.iter));
   }
 
-  /** 
-   *  @brief Return the iterator (in stable reference mode) by tag 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag
    */
   edge_iter_type basic_iter (edge_type::tag) const
   {
@@ -1979,7 +1984,7 @@ public:
   }
 
   /**
-   *  @brief Return the iterator (in stable reference mode) by tag 
+   *  @brief Return the iterator (in stable reference mode) by tag
    */
   text_iter_type basic_iter (text_type::tag) const
   {
@@ -1987,8 +1992,8 @@ public:
     return *(((text_iter_type *) m_generic.iter));
   }
 
-  /** 
-   *  @brief Return the iterator (in stable reference mode) by tag 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag
    */
   text_ref_iter_type basic_iter (text_ref_type::tag) const
   {
@@ -1996,8 +2001,8 @@ public:
     return *(((text_ref_iter_type *) m_generic.iter));
   }
 
-  /** 
-   *  @brief Return the iterator (in stable reference mode) by tag 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag
    */
   text_ptr_array_iter_type basic_iter (text_ptr_array_type::tag) const
   {
@@ -2005,8 +2010,8 @@ public:
     return *(((text_ptr_array_iter_type *) m_generic.iter));
   }
 
-  /** 
-   *  @brief Return the iterator (in stable reference mode) by tag 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag
    */
   user_object_iter_type basic_iter (user_object_type::tag) const
   {
@@ -2014,8 +2019,8 @@ public:
     return *(((user_object_iter_type *) m_generic.iter));
   }
 
-  /** 
-   *  @brief Return the iterator (in stable reference mode) by tag 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag
    */
   box_iter_type basic_iter (box_type::tag) const
   {
@@ -2023,8 +2028,8 @@ public:
     return *(((box_iter_type *) m_generic.iter));
   }
 
-  /** 
-   *  @brief Return the iterator (in stable reference mode) by tag 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag
    */
   box_array_iter_type basic_iter (box_array_type::tag) const
   {
@@ -2032,8 +2037,8 @@ public:
     return *(((box_array_iter_type *) m_generic.iter));
   }
 
-  /** 
-   *  @brief Return the iterator (in stable reference mode) by tag 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag
    */
   short_box_iter_type basic_iter (short_box_type::tag) const
   {
@@ -2041,8 +2046,8 @@ public:
     return *(((short_box_iter_type *) m_generic.iter));
   }
 
-  /** 
-   *  @brief Return the iterator (in stable reference mode) by tag 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag
    */
   short_box_array_iter_type basic_iter (short_box_array_type::tag) const
   {
@@ -2050,7 +2055,7 @@ public:
     return *(((short_box_array_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
    */
   ppolygon_iter_type basic_iter (db::object_with_properties<polygon_type>::tag) const
@@ -2059,7 +2064,7 @@ public:
     return *(((ppolygon_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
    */
   psimple_polygon_iter_type basic_iter (db::object_with_properties<simple_polygon_type>::tag) const
@@ -2068,7 +2073,7 @@ public:
     return *(((psimple_polygon_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
    */
   ppolygon_ref_iter_type basic_iter (db::object_with_properties<polygon_ref_type>::tag) const
@@ -2077,7 +2082,7 @@ public:
     return *(((ppolygon_ref_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
    */
   ppolygon_ptr_array_iter_type basic_iter (db::object_with_properties<polygon_ptr_array_type>::tag) const
@@ -2086,7 +2091,7 @@ public:
     return *(((ppolygon_ptr_array_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
    */
   psimple_polygon_ref_iter_type basic_iter (db::object_with_properties<simple_polygon_ref_type>::tag) const
@@ -2095,7 +2100,7 @@ public:
     return *(((psimple_polygon_ref_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
    */
   psimple_polygon_ptr_array_iter_type basic_iter (db::object_with_properties<simple_polygon_ptr_array_type>::tag) const
@@ -2104,7 +2109,7 @@ public:
     return *(((psimple_polygon_ptr_array_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
    */
   ppath_iter_type basic_iter (db::object_with_properties<path_type>::tag) const
@@ -2113,7 +2118,7 @@ public:
     return *(((ppath_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
    */
   ppath_ref_iter_type basic_iter (db::object_with_properties<path_ref_type>::tag) const
@@ -2122,7 +2127,7 @@ public:
     return *(((ppath_ref_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
    */
   ppath_ptr_array_iter_type basic_iter (db::object_with_properties<path_ptr_array_type>::tag) const
@@ -2131,7 +2136,7 @@ public:
     return *(((ppath_ptr_array_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
    */
   pedge_iter_type basic_iter (db::object_with_properties<edge_type>::tag) const
@@ -2167,7 +2172,7 @@ public:
     return *(((ptext_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
    */
   ptext_ref_iter_type basic_iter (db::object_with_properties<text_ref_type>::tag) const
@@ -2176,7 +2181,7 @@ public:
     return *(((ptext_ref_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
    */
   ptext_ptr_array_iter_type basic_iter (db::object_with_properties<text_ptr_array_type>::tag) const
@@ -2185,7 +2190,7 @@ public:
     return *(((ptext_ptr_array_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
    */
   puser_object_iter_type basic_iter (db::object_with_properties<user_object_type>::tag) const
@@ -2194,7 +2199,7 @@ public:
     return *(((puser_object_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
    */
   pbox_iter_type basic_iter (db::object_with_properties<box_type>::tag) const
@@ -2203,7 +2208,7 @@ public:
     return *(((pbox_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
    */
   pbox_array_iter_type basic_iter (db::object_with_properties<box_array_type>::tag) const
@@ -2212,7 +2217,7 @@ public:
     return *(((pbox_array_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
    */
   pshort_box_iter_type basic_iter (db::object_with_properties<short_box_type>::tag) const
@@ -2221,7 +2226,7 @@ public:
     return *(((pshort_box_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
    */
   pshort_box_array_iter_type basic_iter (db::object_with_properties<short_box_array_type>::tag) const
@@ -2230,7 +2235,7 @@ public:
     return *(((pshort_box_array_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
    *  @brief Return a reference to the polygon if one is referenced
    */
   const polygon_type &polygon () const
@@ -2238,12 +2243,12 @@ public:
     return *basic_ptr (polygon_type::tag ());
   }
 
-  /** 
+  /**
    *  @brief Return a polygon reference if one is referenced
    */
   polygon_ref_type polygon_ref () const;
 
-  /** 
+  /**
    *  @brief Return a reference to the simple polygon if one is referenced
    */
   const simple_polygon_type &simple_polygon () const
@@ -2251,30 +2256,30 @@ public:
     return *basic_ptr (simple_polygon_type::tag ());
   }
 
-  /** 
+  /**
    *  @brief Return a simple polygon reference if one is referenced
    */
   simple_polygon_ref_type simple_polygon_ref () const;
 
-  /** 
+  /**
    *  @brief Test if the shape proxy points to a polygon
    */
   bool is_polygon () const
   {
-    return (m_type == Polygon || m_type == PolygonRef || m_type == PolygonPtrArrayMember || 
+    return (m_type == Polygon || m_type == PolygonRef || m_type == PolygonPtrArrayMember ||
             m_type == SimplePolygon || m_type == SimplePolygonRef || m_type == SimplePolygonPtrArrayMember);
   }
 
-  /** 
+  /**
    *  @brief Instantiate the polygon object
-   * 
+   *
    *  If a polygon is referenced, this object is instantiated
    *  by this method. Paths are converted to polygons. Boxes are also converted.
    *  Returns true, if the conversion was successful.
    */
   bool polygon (polygon_type &p) const;
 
-  /** 
+  /**
    *  @brief Alias for polymorphic expansion
    *  Returns true, if the conversion was successful.
    */
@@ -2283,7 +2288,7 @@ public:
     return polygon (p);
   }
 
-  /** 
+  /**
    *  @brief Test if the shape proxy points to a simple polygon
    */
   bool is_simple_polygon () const
@@ -2291,16 +2296,16 @@ public:
     return (m_type == SimplePolygon || m_type == SimplePolygonRef || m_type == SimplePolygonPtrArrayMember);
   }
 
-  /** 
+  /**
    *  @brief Instantiate the simple polygon object
-   * 
+   *
    *  If a simple polygon is referenced, this object is instantiated
    *  by this method. Paths are converted to polygons. Boxes are also converted.
    *  Returns true, if the conversion was successful.
    */
   bool simple_polygon (simple_polygon_type &p) const;
 
-  /** 
+  /**
    *  @brief Alias for polymorphic expansion
    *  Returns true, if the conversion was successful.
    */
@@ -2309,7 +2314,7 @@ public:
     return simple_polygon (p);
   }
 
-  /** 
+  /**
    *  @brief Return a reference to the path if one is referenced
    */
   const path_type &path () const
@@ -2317,12 +2322,12 @@ public:
     return *basic_ptr (path_type::tag ());
   }
 
-  /** 
+  /**
    *  @brief Return a path reference if one is referenced
    */
   path_ref_type path_ref () const;
 
-  /** 
+  /**
    *  @brief Test if the shape proxy points to a path
    */
   bool is_path () const
@@ -2336,14 +2341,14 @@ public:
    *  Applies to paths only. Will assert if not a path.
    */
   distance_type path_length () const;
-  
+
   /**
    *  @brief Obtain the path width
    *
    *  Applies to paths only. Will assert if not a path.
    */
   coord_type path_width () const;
-  
+
   /**
    *  @brief Obtain the path extensions
    *
@@ -2352,7 +2357,7 @@ public:
    *  @return A pair consisting of the begin and end extensions.
    */
   std::pair<coord_type, coord_type> path_extensions () const;
-  
+
   /**
    *  @brief Obtain the round path flag
    *
@@ -2361,17 +2366,17 @@ public:
    *  @return True, if the path has round ends
    */
   bool round_path () const;
-  
-  /** 
+
+  /**
    *  @brief Instantiate the path object
-   * 
+   *
    *  If a path is referenced, this object is instantiated
    *  by this method.
    *  Returns true, if the conversion was successful.
    */
   bool path (path_type &p) const;
 
-  /** 
+  /**
    *  @brief Alias for polymorphic expansion
    */
   bool instantiate (path_type &p) const
@@ -2379,7 +2384,7 @@ public:
     return path (p);
   }
 
-  /** 
+  /**
    *  @brief Return a reference to the edge if one is referenced
    */
   const edge_type &edge () const
@@ -2388,7 +2393,7 @@ public:
     return *basic_ptr (edge_type::tag ());
   }
 
-  /** 
+  /**
    *  @brief Test if the shape proxy points to a edge
    */
   bool is_edge () const
@@ -2396,9 +2401,9 @@ public:
     return (m_type == Edge);
   }
 
-  /** 
+  /**
    *  @brief Instantiate the edge object
-   * 
+   *
    *  If a edge is referenced, this object is instantiated
    *  by this method.
    *  Returns true, if the conversion was successful.
@@ -2413,7 +2418,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Alias for polymorphic expansion
    *  Returns true, if the conversion was successful.
    */
@@ -2516,12 +2521,12 @@ public:
     return *basic_ptr (text_type::tag ());
   }
 
-  /** 
+  /**
    *  @brief Return a text reference if one is referenced
    */
   text_ref_type text_ref () const;
 
-  /** 
+  /**
    *  @brief Test if the shape proxy points to a text
    */
   bool is_text () const
@@ -2529,16 +2534,16 @@ public:
     return (m_type == Text || m_type == TextRef || m_type == TextPtrArrayMember);
   }
 
-  /** 
+  /**
    *  @brief Instantiate the text object
-   * 
+   *
    *  If a text is referenced, this object is instantiated
    *  by this method.
    *  Returns true, if the conversion was successful
    */
   bool text (text_type &t) const;
 
-  /** 
+  /**
    *  @brief Alias for polymorphic expansion
    *  Returns true, if the conversion was successful
    */
@@ -2553,7 +2558,7 @@ public:
    *  Applies to texts only. Will assert if not a text.
    */
   const char *text_string () const;
-  
+
   /**
    *  @brief Obtain the text transformation
    *
@@ -2589,12 +2594,12 @@ public:
    */
   db::VAlign text_valign () const;
 
-  /** 
+  /**
    *  @brief Return a box if one is referenced
    */
   box_type box () const;
 
-  /** 
+  /**
    *  @brief Test if the shape proxy points to a box
    */
   bool is_box () const
@@ -2602,9 +2607,9 @@ public:
     return (m_type == Box || m_type == ShortBox || m_type == BoxArrayMember || m_type == ShortBoxArrayMember);
   }
 
-  /** 
+  /**
    *  @brief Instantiate the box object
-   * 
+   *
    *  If a box is referenced, this object is instantiated
    *  by this method.
    *  Returns true, if the conversion was successful
@@ -2619,7 +2624,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Alias for polymorphic expansion
    */
   bool instantiate (box_type &p) const
@@ -2627,7 +2632,7 @@ public:
     return box (p);
   }
 
-  /** 
+  /**
    *  @brief Return a reference to the user object if one is referenced
    */
   const user_object_type &user_object () const
@@ -2635,7 +2640,7 @@ public:
     return *basic_ptr (user_object_type::tag ());
   }
 
-  /** 
+  /**
    *  @brief Test if the shape proxy points to a user object
    */
   bool is_user_object () const
@@ -2643,9 +2648,9 @@ public:
     return (m_type == UserObject);
   }
 
-  /** 
+  /**
    *  @brief Instantiate the user object
-   * 
+   *
    *  If a user object is referenced, this object is instantiated
    *  by this method.
    */
@@ -2654,7 +2659,7 @@ public:
     u = *basic_ptr (user_object_type::tag ());
   }
 
-  /** 
+  /**
    *  @brief Compute the bounding box of the shape the is referenced
    */
   box_type bbox () const;
@@ -2669,12 +2674,12 @@ public:
    */
   box_type rectangle () const;
 
-  /** 
+  /**
    *  @brief Compute the area of the shape
    */
   area_type area () const;
 
-  /** 
+  /**
    *  @brief Compute the perimeter of the shape
    */
   perimeter_type perimeter () const;
@@ -2704,7 +2709,7 @@ public:
    *  @brief Array instance member transformation
    *
    *  This attribute is valid only if is_array_member is true.
-   *  The transformation returned describes the relative transformation of the 
+   *  The transformation returned describes the relative transformation of the
    *  array member addressed.
    */
   const trans_type &array_trans () const
@@ -2713,7 +2718,7 @@ public:
   }
 
   /**
-   *  @brief inequality 
+   *  @brief inequality
    */
   bool operator!= (const Shape &d) const
   {
@@ -2721,7 +2726,7 @@ public:
   }
 
   /**
-   *  @brief equality 
+   *  @brief equality
    *
    *  Equality of shapes is not specified by the identity of the objects but by the
    *  identity of the pointers - both shapes must reference the same object.
@@ -2736,7 +2741,7 @@ public:
       //  there are supposed to have the same size for all types, thus all bytes are
       //  supposed to be meaningful
       for (unsigned int i = 0; i < sizeof (tl::reuse_vector<box_type>::const_iterator); ++i) {
-        if (m_generic.iter[i] != d.m_generic.iter[i]) {
+        if (m_generic.iter [i] != d.m_generic.iter [i]) {
           return false;
         }
       }
@@ -2749,7 +2754,7 @@ public:
   }
 
   /**
-   *  @brief less-than operator 
+   *  @brief less-than operator
    *
    *  Ordering of shapes is not specified by the identity of the objects but by the
    *  order of the pointers.
@@ -2765,8 +2770,8 @@ public:
       //  there are supposed to have the same size for all types, thus all bytes are
       //  supposed to be meaningful
       for (unsigned int i = 0; i < sizeof (tl::reuse_vector<box_type>::const_iterator); ++i) {
-        if (m_generic.iter[i] != d.m_generic.iter[i]) {
-          return m_generic.iter[i] < d.m_generic.iter[i];
+        if (m_generic.iter [i] != d.m_generic.iter [i]) {
+          return m_generic.iter [i] < d.m_generic.iter [i];
         }
       }
     } else {
@@ -2782,14 +2787,14 @@ public:
    */
   size_t hash_value () const;
 
-  /** 
+  /**
    *  @brief Convert to a string
    */
   std::string to_string () const;
 
 public:
   friend class db::Shapes;
- 
+
   union generic {
 
     const polygon_type *polygon;
@@ -2838,7 +2843,6 @@ public:
 
     //  all iterators have the same size - there is just one space for that
     char iter [sizeof (tl::reuse_vector<box_type>::const_iterator)];
-
   };
 
   db::Shapes *mp_shapes;
@@ -2849,22 +2853,20 @@ public:
   object_type m_type : 16;
 };
 
-}  // namespace db
+} // namespace db
 
 namespace std
 {
 
-  //  provide a template specialization for std::hash<T>
-  template <>
-  struct hash <db::Shape>
+//  provide a template specialization for std::hash<T>
+template <>
+struct hash<db::Shape> {
+  size_t operator() (const db::Shape &s) const
   {
-    size_t operator() (const db::Shape &s) const
-    {
-      return s.hash_value ();
-    }
-  };
+    return s.hash_value ();
+  }
+};
 
-}  // namespace std
-  
+} // namespace std
+
 #endif
-

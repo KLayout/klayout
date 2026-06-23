@@ -30,7 +30,8 @@
 
 #include <set>
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief An interface representing mutable edge collections
@@ -56,7 +57,7 @@ public:
 
   virtual void do_insert (const db::Edge &edge, db::properties_id_type prop_id) = 0;
 
-  void transform (const db::UnitTrans &) { }
+  void transform (const db::UnitTrans &) {}
   void transform (const db::Disp &t) { do_transform (db::Trans (t)); }
   void transform (const db::Trans &t) { do_transform (t); }
   void transform (const db::ICplxTrans &t) { do_transform (t); }
@@ -94,7 +95,6 @@ public:
       shape.edge (edge);
       edge.transform (trans);
       do_insert (edge, prop_id);
-
     }
   }
 
@@ -119,4 +119,3 @@ public:
 }
 
 #endif
-

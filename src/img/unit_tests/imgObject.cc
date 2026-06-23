@@ -32,18 +32,18 @@ static img::Object from_s (const std::string &s)
   return img;
 }
 
-TEST(1) 
+TEST (1)
 {
   img::Object image (12, 8, db::DCplxTrans (), false, false);
 
   EXPECT_EQ (image.is_color (), false);
   EXPECT_EQ (image.is_byte_data (), false);
 
-  EXPECT_EQ (image.float_data ()[0], 0.0);
-  EXPECT_EQ (image.float_data ()[1], 0.0);
-  EXPECT_EQ (image.float_data ()[12*8-1], 0.0);
-  EXPECT_EQ (image.data_length(), size_t (12 * 8));
-  
+  EXPECT_EQ (image.float_data () [0], 0.0);
+  EXPECT_EQ (image.float_data () [1], 0.0);
+  EXPECT_EQ (image.float_data () [12 * 8 - 1], 0.0);
+  EXPECT_EQ (image.data_length (), size_t (12 * 8));
+
   EXPECT_EQ (db::DCplxTrans (image.matrix ()).to_string (), "r0 *1 0,0");
 
   img::Object copy1 (image);
@@ -59,7 +59,7 @@ TEST(1)
 
   std::vector<double> d;
   for (unsigned int i = 0; i < image.data_length (); ++i) {
-    d.push_back (image.float_data ()[i]);
+    d.push_back (image.float_data () [i]);
   }
   copy1.set_data (12, 8, d);
   EXPECT_EQ (copy1.equals (&image), true);
@@ -67,18 +67,18 @@ TEST(1)
   EXPECT_EQ (copy1.width (), size_t (12));
   EXPECT_EQ (copy1.height (), size_t (8));
 
-  d[0] = 12.5;
-  d[5] = -12.5;
+  d [0] = 12.5;
+  d [5] = -12.5;
   copy1.set_data (12, 8, d);
   EXPECT_EQ (copy1.float_data () == image.float_data (), false);
-  EXPECT_EQ (copy1.float_data ()[0], 12.5);
-  EXPECT_EQ (copy1.float_data ()[1], 0.0);
-  EXPECT_EQ (copy1.float_data ()[5], -12.5);
-  EXPECT_EQ (copy1.float_data ()[6], 0.0);
-  EXPECT_EQ (image.float_data ()[0], 0.0);
-  EXPECT_EQ (image.float_data ()[1], 0.0);
-  EXPECT_EQ (image.float_data ()[5], 0.0);
-  EXPECT_EQ (image.float_data ()[6], 0.0);
+  EXPECT_EQ (copy1.float_data () [0], 12.5);
+  EXPECT_EQ (copy1.float_data () [1], 0.0);
+  EXPECT_EQ (copy1.float_data () [5], -12.5);
+  EXPECT_EQ (copy1.float_data () [6], 0.0);
+  EXPECT_EQ (image.float_data () [0], 0.0);
+  EXPECT_EQ (image.float_data () [1], 0.0);
+  EXPECT_EQ (image.float_data () [5], 0.0);
+  EXPECT_EQ (image.float_data () [6], 0.0);
   EXPECT_EQ (copy1.equals (&image), false);
 
   image.set_matrix (db::Matrix3d (db::DCplxTrans (2.5, 90, false, db::DVector (1, -2))) * db::Matrix3d::mag (2.5, 1.0));
@@ -155,18 +155,18 @@ TEST(1)
   EXPECT_EQ (image.mask (1, 2), false);
 }
 
-TEST(2) 
+TEST (2)
 {
   for (unsigned int channel = 0; channel < 3; ++channel) {
     img::Object image (12, 8, db::DCplxTrans (), true, false);
 
     EXPECT_EQ (image.is_color (), true);
 
-    EXPECT_EQ (image.float_data (channel)[0], 0.0);
-    EXPECT_EQ (image.float_data (channel)[1], 0.0);
-    EXPECT_EQ (image.float_data (channel)[12*8-1], 0.0);
-    EXPECT_EQ (image.data_length(), size_t (12 * 8));
-    
+    EXPECT_EQ (image.float_data (channel) [0], 0.0);
+    EXPECT_EQ (image.float_data (channel) [1], 0.0);
+    EXPECT_EQ (image.float_data (channel) [12 * 8 - 1], 0.0);
+    EXPECT_EQ (image.data_length (), size_t (12 * 8));
+
     EXPECT_EQ (db::DCplxTrans (image.matrix ()).to_string (), "r0 *1 0,0");
 
     img::Object copy1 (image);
@@ -180,30 +180,30 @@ TEST(2)
     EXPECT_EQ (copy1.equals (&image), true);
     EXPECT_EQ (copy1.float_data (channel) == image.float_data (channel), true);
 
-    std::vector<double> d[3];
+    std::vector<double> d [3];
     for (unsigned int j = 0; j < 3; ++j) {
       for (unsigned int i = 0; i < image.data_length (); ++i) {
-        d[j].push_back (image.float_data (j)[i]);
+        d [j].push_back (image.float_data (j) [i]);
       }
     }
-    copy1.set_data (12, 8, d[0], d[1], d[2]);
+    copy1.set_data (12, 8, d [0], d [1], d [2]);
     EXPECT_EQ (copy1.equals (&image), true);
     EXPECT_EQ (copy1.float_data (channel) == image.float_data (channel), false);
     EXPECT_EQ (copy1.width (), size_t (12));
     EXPECT_EQ (copy1.height (), size_t (8));
 
-    d[channel][0] = 12.5;
-    d[channel][5] = -12.5;
-    copy1.set_data (12, 8, d[0], d[1], d[2]);
+    d [channel][0] = 12.5;
+    d [channel][5] = -12.5;
+    copy1.set_data (12, 8, d [0], d [1], d [2]);
     EXPECT_EQ (copy1.float_data (channel) == image.float_data (channel), false);
-    EXPECT_EQ (copy1.float_data (channel)[0], 12.5);
-    EXPECT_EQ (copy1.float_data (channel)[1], 0.0);
-    EXPECT_EQ (copy1.float_data (channel)[5], -12.5);
-    EXPECT_EQ (copy1.float_data (channel)[6], 0.0);
-    EXPECT_EQ (image.float_data (channel)[0], 0.0);
-    EXPECT_EQ (image.float_data (channel)[1], 0.0);
-    EXPECT_EQ (image.float_data (channel)[5], 0.0);
-    EXPECT_EQ (image.float_data (channel)[6], 0.0);
+    EXPECT_EQ (copy1.float_data (channel) [0], 12.5);
+    EXPECT_EQ (copy1.float_data (channel) [1], 0.0);
+    EXPECT_EQ (copy1.float_data (channel) [5], -12.5);
+    EXPECT_EQ (copy1.float_data (channel) [6], 0.0);
+    EXPECT_EQ (image.float_data (channel) [0], 0.0);
+    EXPECT_EQ (image.float_data (channel) [1], 0.0);
+    EXPECT_EQ (image.float_data (channel) [5], 0.0);
+    EXPECT_EQ (image.float_data (channel) [6], 0.0);
     EXPECT_EQ (copy1.equals (&image), false);
 
     image.set_matrix (db::Matrix3d (db::DCplxTrans (2.5, 90, false, db::DVector (1, -2))) * db::Matrix3d::mag (2.5, 1.0));
@@ -264,31 +264,119 @@ TEST(2)
   }
 }
 
-TEST(3) 
+TEST (3)
 {
-  unsigned char d[] =  { 
-    11, 12, 13, 14, 15, 16, 17, 18, 19, 11, 11, 11, 
-    21, 22, 23, 24, 25, 26, 27, 28, 29, 21, 21, 21, 
-    31, 32, 33, 34, 35, 36, 37, 38, 39, 31, 31, 31, 
-    41, 42, 43, 44, 45, 46, 47, 48, 49, 41, 41, 41, 
-    51, 52, 53, 54, 55, 56, 57, 58, 59, 51, 51, 51, 
-    61, 62, 63, 64, 65, 66, 67, 68, 69, 61, 61, 61,
-    71, 72, 73, 74, 75, 76, 77, 78, 79, 71, 71, 71, 
-    81, 82, 83, 84, 85, 86, 87, 88, 89, 81, 81, 81, 
+  unsigned char d [] = {
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    11,
+    11,
+    11,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    21,
+    21,
+    21,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    31,
+    31,
+    31,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    41,
+    41,
+    41,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    51,
+    51,
+    51,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    61,
+    61,
+    61,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    71,
+    71,
+    71,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    81,
+    81,
+    81,
   };
 
-  unsigned char *data = new unsigned char [12*8];
-  memcpy (data, d, 12*8);
+  unsigned char *data = new unsigned char [12 * 8];
+  memcpy (data, d, 12 * 8);
   img::Object image (12, 8, db::DCplxTrans (), data);
 
   EXPECT_EQ (image.is_color (), false);
   EXPECT_EQ (image.is_byte_data (), true);
 
-  EXPECT_EQ ((int)image.byte_data ()[0], 11);
-  EXPECT_EQ ((int)image.byte_data ()[1], 12);
-  EXPECT_EQ ((int)image.byte_data ()[12*8-1], 81);
+  EXPECT_EQ ((int) image.byte_data () [0], 11);
+  EXPECT_EQ ((int) image.byte_data () [1], 12);
+  EXPECT_EQ ((int) image.byte_data () [12 * 8 - 1], 81);
   EXPECT_EQ (image.data_length (), size_t (12 * 8));
-  
+
   img::Object copy1 (image);
   EXPECT_EQ (copy1.equals (&image), true);
 
@@ -301,10 +389,10 @@ TEST(3)
   EXPECT_EQ (copy1.is_byte_data (), true);
   EXPECT_EQ (copy1.byte_data () == image.byte_data (), true);
 
-  unsigned char *data2 = new unsigned char[8*12];
+  unsigned char *data2 = new unsigned char [8 * 12];
   unsigned char *d2 = data2;
   for (unsigned int i = 0; i < image.data_length (); ++i) {
-    *d2++ = image.byte_data ()[i];
+    *d2++ = image.byte_data () [i];
   }
   copy1.set_data (12, 8, data2);
   EXPECT_EQ (copy1.is_byte_data (), true);
@@ -329,7 +417,7 @@ TEST(3)
 }
 
 //  color interpolation
-TEST(4)
+TEST (4)
 {
   img::DataMapping::false_color_nodes_type nodes;
 

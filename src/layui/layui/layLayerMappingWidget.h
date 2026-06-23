@@ -32,7 +32,7 @@
 
 namespace Ui
 {
-  class LayerMappingWidget;
+class LayerMappingWidget;
 }
 
 namespace lay
@@ -46,7 +46,7 @@ class FileDialog;
 class LAYUI_PUBLIC LayerMappingWidget
   : public QFrame
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -99,4 +99,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

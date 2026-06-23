@@ -79,23 +79,23 @@ class Cell;
  *  In enhanced fill mode, the origin is ignored unless a glue box is given.
  */
 
-DB_PUBLIC bool 
+DB_PUBLIC bool
 fill_region (db::Cell *cell, const db::Polygon &fp, db::cell_index_type fill_cell_index, const db::Box &fc_box,
              const db::Point &origin, bool enhanced_fill,
-             std::vector <db::Polygon> *remaining_parts = 0, const db::Vector &fill_margin = db::Vector (),
+             std::vector<db::Polygon> *remaining_parts = 0, const db::Vector &fill_margin = db::Vector (),
              const db::Box &glue_box = db::Box ());
 
 DB_PUBLIC bool
 fill_region (db::Cell *cell, const db::Polygon &fp, db::cell_index_type fill_cell_index, const db::Box &fc_box,
              const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
-             std::vector <db::Polygon> *remaining_parts = 0, const db::Vector &fill_margin = db::Vector (),
+             std::vector<db::Polygon> *remaining_parts = 0, const db::Vector &fill_margin = db::Vector (),
              const db::Box &glue_box = db::Box (), const db::Region &exclude_area = db::Region ());
 
 
 /**
  *  @brief A version of the fill tool that operates with region objects
  *
- *  remaining_parts (if non-null) will receive the non-filled parts of partially filled polygons. 
+ *  remaining_parts (if non-null) will receive the non-filled parts of partially filled polygons.
  *  fill_margin will specify the margin around the filled area when computing (through subtraction of the tiled area) the remaining_parts.
  *  remaining_polygons (if non-null) will receive the polygons which could not be filled at all.
  *

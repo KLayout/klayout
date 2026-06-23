@@ -42,8 +42,7 @@ namespace db
  *  "description" is a "speaking" description of the information.
  *  "value" is the value of the specific part of meta information.
  */
-struct DB_PUBLIC MetaInfo
-{
+struct DB_PUBLIC MetaInfo {
   MetaInfo (const std::string &d, const tl::Variant &v, bool p = false)
     : description (d), value (v), persisted (p)
   {
@@ -73,4 +72,3 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
 }
 
 #endif
-

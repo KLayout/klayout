@@ -73,9 +73,9 @@ public:
     return editor;
   }
 
-  void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex & /*index*/) const
+  void updateEditorGeometry (QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex & /*index*/) const
   {
-    editor->setGeometry(option.rect);
+    editor->setGeometry (option.rect);
   }
 
   void setEditorData (QWidget *widget, const QModelIndex &index) const
@@ -159,8 +159,7 @@ SaltGrainPropertiesDialog::SaltGrainPropertiesDialog (QWidget *parent)
   url_changed (QString ());
 }
 
-void
-SaltGrainPropertiesDialog::update_controls ()
+void SaltGrainPropertiesDialog::update_controls ()
 {
   setWindowTitle (m_title + tl::to_qstring (" - " + m_grain.name ()));
   license_alert->clear ();
@@ -191,15 +190,13 @@ SaltGrainPropertiesDialog::update_controls ()
     dependency_changed (item, 2);
 
     dependencies->addTopLevelItem (item);
-
   }
 
   update_icon ();
   update_screenshot ();
 }
 
-void
-SaltGrainPropertiesDialog::update_icon ()
+void SaltGrainPropertiesDialog::update_icon ()
 {
   if (m_grain.icon ().isNull ()) {
     icon_config_button->setIcon (QIcon (":/salt_icon.png"));
@@ -213,8 +210,7 @@ SaltGrainPropertiesDialog::update_icon ()
   }
 }
 
-void
-SaltGrainPropertiesDialog::update_screenshot ()
+void SaltGrainPropertiesDialog::update_screenshot ()
 {
   if (m_grain.screenshot ().isNull ()) {
     screenshot_config_button->setIcon (QIcon (":/add_16px.png"));
@@ -228,8 +224,7 @@ SaltGrainPropertiesDialog::update_screenshot ()
   }
 }
 
-void
-SaltGrainPropertiesDialog::update_data ()
+void SaltGrainPropertiesDialog::update_data ()
 {
   m_grain.set_version (tl::to_string (version->text ()));
   m_grain.set_api_version (tl::to_string (api_version->text ()));
@@ -255,12 +250,10 @@ SaltGrainPropertiesDialog::update_data ()
       dep.url = tl::to_string (url);
       m_grain.dependencies ().push_back (dep);
     }
-
   }
 }
 
-void
-SaltGrainPropertiesDialog::dependency_changed (QTreeWidgetItem *item, int column)
+void SaltGrainPropertiesDialog::dependency_changed (QTreeWidgetItem *item, int column)
 {
   if (! m_update_enabled) {
     return;
@@ -302,7 +295,6 @@ SaltGrainPropertiesDialog::dependency_changed (QTreeWidgetItem *item, int column
         item->setData (1, Qt::EditRole, QString ());
         item->setData (2, Qt::EditRole, tr ("(from repository)"));
       }
-
     }
 
   } else if (column == 1) {
@@ -326,14 +318,12 @@ SaltGrainPropertiesDialog::dependency_changed (QTreeWidgetItem *item, int column
         item->setData (2, Qt::EditRole, tr ("(from repository)"));
       }
     }
-
   }
 
   m_update_enabled = true;
 }
 
-void
-SaltGrainPropertiesDialog::url_changed (const QString &url)
+void SaltGrainPropertiesDialog::url_changed (const QString &url)
 {
   //  inserts the URL into the label
   m_grain.set_doc_url (tl::to_string (url));
@@ -341,10 +331,9 @@ SaltGrainPropertiesDialog::url_changed (const QString &url)
   open_label->setEnabled (! url.isEmpty ());
 }
 
-void
-SaltGrainPropertiesDialog::set_icon ()
+void SaltGrainPropertiesDialog::set_icon ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   const int max_dim = 256;
 
@@ -355,8 +344,8 @@ BEGIN_PROTECTED
     QImage img = QImage (fileName);
     if (img.width () > max_dim || img.height () > max_dim) {
       if (QMessageBox::warning (this, tr ("Image Too Big"),
-                                      tr ("Icon image too big - must be %1x%2 pixels max, but is %3x%4.\n\nScale image?").arg (max_dim).arg (max_dim).arg (img.width ()).arg (img.height ()),
-                                      QMessageBox::Yes, QMessageBox::No) == QMessageBox::No) {
+                                tr ("Icon image too big - must be %1x%2 pixels max, but is %3x%4.\n\nScale image?").arg (max_dim).arg (max_dim).arg (img.width ()).arg (img.height ()),
+                                QMessageBox::Yes, QMessageBox::No) == QMessageBox::No) {
         ok = false;
       } else {
         img = img.scaled (max_dim, max_dim, Qt::KeepAspectRatio);
@@ -368,23 +357,20 @@ BEGIN_PROTECTED
       m_image_dir = QFileInfo (fileName).path ();
       update_icon ();
     }
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-SaltGrainPropertiesDialog::reset_icon ()
+void SaltGrainPropertiesDialog::reset_icon ()
 {
   m_grain.set_icon (QImage ());
   update_icon ();
 }
 
-void
-SaltGrainPropertiesDialog::set_screenshot ()
+void SaltGrainPropertiesDialog::set_screenshot ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   const int max_dim = 1024;
 
@@ -395,8 +381,8 @@ BEGIN_PROTECTED
     QImage img = QImage (fileName);
     if (img.width () > max_dim || img.height () > max_dim) {
       if (QMessageBox::warning (this, tr ("Image Too Big"),
-                                      tr ("Showcase image too big - must be %1x%2 pixels max, but is %3x%4.\n\nScale image?").arg (max_dim).arg (max_dim).arg (img.width ()).arg (img.height ()),
-                                      QMessageBox::Yes, QMessageBox::No) == QMessageBox::No) {
+                                tr ("Showcase image too big - must be %1x%2 pixels max, but is %3x%4.\n\nScale image?").arg (max_dim).arg (max_dim).arg (img.width ()).arg (img.height ()),
+                                QMessageBox::Yes, QMessageBox::No) == QMessageBox::No) {
         ok = false;
       } else {
         img = img.scaled (max_dim, max_dim, Qt::KeepAspectRatio);
@@ -408,21 +394,18 @@ BEGIN_PROTECTED
       m_image_dir = QFileInfo (fileName).path ();
       update_screenshot ();
     }
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-SaltGrainPropertiesDialog::reset_screenshot ()
+void SaltGrainPropertiesDialog::reset_screenshot ()
 {
   m_grain.set_screenshot (QImage ());
   update_screenshot ();
 }
 
-void
-SaltGrainPropertiesDialog::add_dependency_clicked ()
+void SaltGrainPropertiesDialog::add_dependency_clicked ()
 {
   QTreeWidgetItem *item = new QTreeWidgetItem (dependencies);
   item->setFlags (item->flags () | Qt::ItemIsEditable);
@@ -430,8 +413,7 @@ SaltGrainPropertiesDialog::add_dependency_clicked ()
   dependencies->setCurrentItem (dependencies->topLevelItem (dependencies->topLevelItemCount () - 1));
 }
 
-void
-SaltGrainPropertiesDialog::remove_dependency_clicked ()
+void SaltGrainPropertiesDialog::remove_dependency_clicked ()
 {
   int index = dependencies->indexOfTopLevelItem (dependencies->currentItem ());
   if (index >= 0 && index < dependencies->topLevelItemCount ()) {
@@ -459,7 +441,7 @@ public:
 
   const lay::SaltGrain *grain_for_name (const std::string &name) const
   {
-    std::map <std::string, const lay::SaltGrain *>::const_iterator n = m_name_to_grain.find (name);
+    std::map<std::string, const lay::SaltGrain *>::const_iterator n = m_name_to_grain.find (name);
     if (n != m_name_to_grain.end ()) {
       return n->second;
     } else {
@@ -469,15 +451,15 @@ public:
 
   void check_circular (const lay::SaltGrain *current, const lay::SaltGrain *new_dep)
   {
-    std::vector <const lay::SaltGrain *> path;
+    std::vector<const lay::SaltGrain *> path;
     path.push_back (current);
     check_circular_follow (new_dep, path);
   }
 
 private:
-  std::map <std::string, const lay::SaltGrain *> m_name_to_grain;
+  std::map<std::string, const lay::SaltGrain *> m_name_to_grain;
 
-  void check_circular_follow (const lay::SaltGrain *current, std::vector <const lay::SaltGrain *> &path)
+  void check_circular_follow (const lay::SaltGrain *current, std::vector<const lay::SaltGrain *> &path)
   {
     if (! current) {
       return;
@@ -485,7 +467,7 @@ private:
 
     path.push_back (current);
 
-    for (std::vector <const lay::SaltGrain *>::const_iterator p = path.begin (); p != path.end () - 1; ++p) {
+    for (std::vector<const lay::SaltGrain *>::const_iterator p = path.begin (); p != path.end () - 1; ++p) {
       if (*p == current) {
         circular_reference_error (path);
       }
@@ -498,10 +480,10 @@ private:
     path.pop_back ();
   }
 
-  void circular_reference_error (std::vector <const lay::SaltGrain *> &path)
+  void circular_reference_error (std::vector<const lay::SaltGrain *> &path)
   {
     std::string msg = tl::to_string (QObject::tr ("The following path forms a circular dependency: "));
-    for (std::vector <const lay::SaltGrain *>::const_iterator p = path.begin (); p != path.end (); ++p) {
+    for (std::vector<const lay::SaltGrain *>::const_iterator p = path.begin (); p != path.end (); ++p) {
       if (p != path.begin ()) {
         msg += "->";
       }
@@ -513,8 +495,7 @@ private:
 
 }
 
-void
-SaltGrainPropertiesDialog::accept ()
+void SaltGrainPropertiesDialog::accept ()
 {
   update_data ();
 
@@ -560,7 +541,7 @@ SaltGrainPropertiesDialog::accept ()
   //  dependencies
   dependencies_alert->clear ();
   DependencyGraph dep (mp_salt);
-  std::set <std::string> dep_seen;
+  std::set<std::string> dep_seen;
   for (std::vector<SaltGrainDependency>::const_iterator d = m_grain.dependencies ().begin (); d != m_grain.dependencies ().end (); ++d) {
 
     if (! SaltGrain::valid_name (d->name)) {
@@ -592,7 +573,7 @@ SaltGrainPropertiesDialog::accept ()
                                   << tr ("If the dependency package has a version itself, the version is automatically set to its current version.");
     }
 
-    if (!d->url.empty () && download_package_information ()) {
+    if (! d->url.empty () && download_package_information ()) {
       SaltGrain gdep;
       try {
         gdep = SaltGrain::from_url (d->url);
@@ -607,26 +588,24 @@ SaltGrainPropertiesDialog::accept ()
                                      << tr ("Message: ") << ex.msg ();
       }
     }
-
   }
 
-  if (!license_alert->needs_attention () &&
-      !doc_url_alert->needs_attention () &&
-      !dependencies_alert->needs_attention () &&
-      !version_alert->needs_attention () &&
-      !api_version_alert->needs_attention ()) {
+  if (! license_alert->needs_attention () &&
+      ! doc_url_alert->needs_attention () &&
+      ! dependencies_alert->needs_attention () &&
+      ! version_alert->needs_attention () &&
+      ! api_version_alert->needs_attention ()) {
     QDialog::accept ();
   } else {
     if (QMessageBox::warning (this, tr ("Issues Encountered"),
-                                    tr ("Some issues have been found when inspecting the package details.\nThe respective fields are marked with warning icons.\n\nIgnore these issues and commit the package details?"),
-                                    QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes) {
+                              tr ("Some issues have been found when inspecting the package details.\nThe respective fields are marked with warning icons.\n\nIgnore these issues and commit the package details?"),
+                              QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes) {
       QDialog::accept ();
     }
   }
 }
 
-bool
-SaltGrainPropertiesDialog::exec_dialog (lay::SaltGrain *grain, lay::Salt *salt)
+bool SaltGrainPropertiesDialog::exec_dialog (lay::SaltGrain *grain, lay::Salt *salt)
 {
   m_grain = *grain;
   mp_salt = salt;

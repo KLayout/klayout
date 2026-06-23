@@ -69,11 +69,11 @@ std::string type_str (PyObject *obj)
 {
   if (obj == NULL) {
     return std::string ();
-  } 
+  }
   PyTypeObject *type = Py_TYPE (obj);
   if (type == NULL) {
     return std::string ();
-  } 
+  }
   return type->tp_name;
 }
 
@@ -85,7 +85,7 @@ gsi::Inspector::Visibility visibility_flag (PyObject *obj, PyObject *key)
   //  By default, classes and modules are not shown
   if (PyType_Check (obj) || PyModule_Check (obj)) {
     return gsi::Inspector::IfRequested;
-  } 
+  }
 
   //  Callable objects are not shown
   if (PyCallable_Check (obj)) {
@@ -96,7 +96,7 @@ gsi::Inspector::Visibility visibility_flag (PyObject *obj, PyObject *key)
   //  TODO: performance?
   if (test_type<std::string> (key, false)) {
     std::string k = python2c<std::string> (key);
-    if (k.empty () || k[0] == '_') {
+    if (k.empty () || k [0] == '_') {
       return gsi::Inspector::IfRequested;
     }
   }
@@ -166,8 +166,8 @@ public:
       return std::string ("(error)");
     }
   }
-  
-  tl::Variant value (size_t index) const 
+
+  tl::Variant value (size_t index) const
   {
     if (m_values && PyList_Check (m_values.get ()) && Py_ssize_t (index) < PyList_Size (m_values.get ())) {
       return python2c<tl::Variant> (PyList_GET_ITEM (m_values.get (), index));
@@ -176,7 +176,7 @@ public:
     }
   }
 
-  std::string type (size_t index) const 
+  std::string type (size_t index) const
   {
     if (m_values && PyList_Check (m_values.get ()) && Py_ssize_t (index) < PyList_Size (m_values.get ())) {
       return type_str (PyList_GET_ITEM (m_values.get (), index));
@@ -185,7 +185,7 @@ public:
     }
   }
 
-  gsi::Inspector::Visibility visibility (size_t index) const 
+  gsi::Inspector::Visibility visibility (size_t index) const
   {
     if (m_symbolic && m_keys && m_values && PyList_Check (m_values.get ()) && Py_ssize_t (index) < PyList_Size (m_values.get ()) && PyList_Check (m_keys.get ()) && Py_ssize_t (index) < PyList_Size (m_keys.get ())) {
       return visibility_flag (PyList_GET_ITEM (m_values.get (), index), PyList_GET_ITEM (m_keys.get (), index));
@@ -194,7 +194,7 @@ public:
     }
   }
 
-  size_t count () const 
+  size_t count () const
   {
     if (m_keys && PyList_Check (m_keys.get ())) {
       return size_t (PyList_GET_SIZE (m_keys.get ()));
@@ -206,7 +206,7 @@ public:
   virtual bool has_children (size_t index) const
   {
     if (m_values && PyList_Check (m_values.get ()) && Py_ssize_t (index) < PyList_Size (m_values.get ())) {
-      return !is_plain_type (PyList_GET_ITEM (m_values.get (), index));
+      return ! is_plain_type (PyList_GET_ITEM (m_values.get (), index));
     } else {
       return false;
     }
@@ -254,8 +254,8 @@ public:
   {
     return false;
   }
-  
-  std::string type (size_t index) const 
+
+  std::string type (size_t index) const
   {
     if (m_values && PyList_Check (m_values.get ()) && Py_ssize_t (index) < PyList_Size (m_values.get ())) {
       return type_str (PyList_GET_ITEM (m_values.get (), index));
@@ -264,7 +264,7 @@ public:
     }
   }
 
-  tl::Variant value (size_t index) const 
+  tl::Variant value (size_t index) const
   {
     if (m_values && PyList_Check (m_values.get ()) && Py_ssize_t (index) < PyList_Size (m_values.get ())) {
       return python2c<tl::Variant> (PyList_GET_ITEM (m_values.get (), index));
@@ -273,12 +273,12 @@ public:
     }
   }
 
-  gsi::Inspector::Visibility visibility (size_t /*index*/) const 
+  gsi::Inspector::Visibility visibility (size_t /*index*/) const
   {
     return gsi::Inspector::Always;
   }
 
-  size_t count () const 
+  size_t count () const
   {
     if (m_values && PyList_Check (m_values.get ())) {
       return size_t (PyList_GET_SIZE (m_values.get ()));
@@ -290,7 +290,7 @@ public:
   virtual bool has_children (size_t index) const
   {
     if (m_values && PyList_Check (m_values.get ()) && Py_ssize_t (index) < PyList_Size (m_values.get ())) {
-      return !is_plain_type (PyList_GET_ITEM (m_values.get (), index));
+      return ! is_plain_type (PyList_GET_ITEM (m_values.get (), index));
     } else {
       return false;
     }
@@ -337,7 +337,7 @@ public:
     return false;
   }
 
-  std::string type (size_t index) const 
+  std::string type (size_t index) const
   {
     if (m_values && PyTuple_Check (m_values.get ()) && Py_ssize_t (index) < PyTuple_Size (m_values.get ())) {
       return type_str (PyTuple_GET_ITEM (m_values.get (), index));
@@ -346,7 +346,7 @@ public:
     }
   }
 
-  tl::Variant value (size_t index) const 
+  tl::Variant value (size_t index) const
   {
     if (m_values && PyTuple_Check (m_values.get ()) && Py_ssize_t (index) < PyTuple_Size (m_values.get ())) {
       return python2c<tl::Variant> (PyTuple_GET_ITEM (m_values.get (), index));
@@ -355,12 +355,12 @@ public:
     }
   }
 
-  gsi::Inspector::Visibility visibility (size_t /*index*/) const 
+  gsi::Inspector::Visibility visibility (size_t /*index*/) const
   {
     return gsi::Inspector::Always;
   }
 
-  size_t count () const 
+  size_t count () const
   {
     if (m_values && PyTuple_Check (m_values.get ())) {
       return size_t (PyTuple_GET_SIZE (m_values.get ()));
@@ -372,7 +372,7 @@ public:
   virtual bool has_children (size_t index) const
   {
     if (m_values && PyTuple_Check (m_values.get ()) && Py_ssize_t (index) < PyTuple_Size (m_values.get ())) {
-      return !is_plain_type (PyTuple_GET_ITEM (m_values.get (), index));
+      return ! is_plain_type (PyTuple_GET_ITEM (m_values.get (), index));
     } else {
       return false;
     }
@@ -432,7 +432,7 @@ public:
     return other && other->m_obj.get () == m_obj.get ();
   }
 
-  std::string key (size_t index) const 
+  std::string key (size_t index) const
   {
     try {
       if (m_keys && PyList_Check (m_keys.get ()) && Py_ssize_t (index) < PyList_GET_SIZE (m_keys.get ())) {
@@ -444,8 +444,8 @@ public:
       return std::string ("(error)");
     }
   }
-  
-  tl::Variant value (size_t index) const 
+
+  tl::Variant value (size_t index) const
   {
     if (m_keys && PyList_Check (m_keys.get ()) && Py_ssize_t (index) < PyList_Size (m_keys.get ())) {
       PythonRef value (PyObject_GetAttr (m_obj.get (), PyList_GET_ITEM (m_keys.get (), index)));
@@ -458,7 +458,7 @@ public:
     }
   }
 
-  std::string type (size_t index) const 
+  std::string type (size_t index) const
   {
     if (m_keys && PyList_Check (m_keys.get ()) && Py_ssize_t (index) < PyList_Size (m_keys.get ())) {
       PythonRef value (PyObject_GetAttr (m_obj.get (), PyList_GET_ITEM (m_keys.get (), index)));
@@ -467,11 +467,11 @@ public:
       } else {
         return type_str (value.get ());
       }
-    } 
+    }
     return std::string ();
   }
 
-  gsi::Inspector::Visibility visibility (size_t index) const 
+  gsi::Inspector::Visibility visibility (size_t index) const
   {
     if (m_keys && PyList_Check (m_keys.get ()) && Py_ssize_t (index) < PyList_Size (m_keys.get ())) {
       PythonRef value (PyObject_GetAttr (m_obj.get (), PyList_GET_ITEM (m_keys.get (), index)));
@@ -480,11 +480,11 @@ public:
       } else {
         return visibility_flag (value.get (), PyList_GET_ITEM (m_keys.get (), index));
       }
-    } 
+    }
     return gsi::Inspector::Always;
   }
 
-  size_t count () const 
+  size_t count () const
   {
     if (m_keys && PyList_Check (m_keys.get ())) {
       return size_t (PyList_GET_SIZE (m_keys.get ()));
@@ -500,7 +500,7 @@ public:
       if (! value) {
         PyErr_Clear ();
       }
-      return !is_plain_type (value.get ());
+      return ! is_plain_type (value.get ());
     } else {
       return false;
     }
@@ -541,4 +541,3 @@ create_inspector (PyObject *obj, bool symbolic)
 }
 
 }
-

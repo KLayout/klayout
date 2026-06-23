@@ -78,14 +78,13 @@ Technologies::instance ()
   return sp_technologies.get ();
 }
 
-static tl::XMLElementList xml_elements () 
+static tl::XMLElementList xml_elements ()
 {
-  return make_element ((Technologies::const_iterator (Technologies::*) () const) &Technologies::begin, (Technologies::const_iterator (Technologies::*) () const) &Technologies::end, &Technologies::add_void, "technology",
-    Technology::xml_elements ()
-  );
+  return make_element ((Technologies::const_iterator (Technologies::*) () const) & Technologies::begin, (Technologies::const_iterator (Technologies::*) () const) & Technologies::end, &Technologies::add_void, "technology",
+                       Technology::xml_elements ());
 }
 
-std::string 
+std::string
 Technologies::to_xml () const
 {
   //  create a copy to filter out the ones which are not persisted
@@ -103,8 +102,7 @@ Technologies::to_xml () const
   return os.string ();
 }
 
-void 
-Technologies::load_from_xml (const std::string &s)
+void Technologies::load_from_xml (const std::string &s)
 {
   //  create a copy to filter out the ones which are not persisted and remain
   db::Technologies copy;
@@ -125,9 +123,9 @@ db::Technology *
 Technologies::add_tech (const Technology &tech, bool replace_same)
 {
   Technology *t = 0;
-  for (tl::stable_vector<Technology>::iterator i = m_technologies.begin (); !t && i != m_technologies.end (); ++i) {
+  for (tl::stable_vector<Technology>::iterator i = m_technologies.begin (); ! t && i != m_technologies.end (); ++i) {
     if (i->name () == tech.name ()) {
-      t = i.operator-> ();
+      t = i.operator->();
     }
   }
 
@@ -148,8 +146,7 @@ Technologies::add_tech (const Technology &tech, bool replace_same)
   return t;
 }
 
-void 
-Technologies::remove (const std::string &name)
+void Technologies::remove (const std::string &name)
 {
   for (tl::stable_vector<Technology>::iterator t = m_technologies.begin (); t != m_technologies.end (); ++t) {
     if (t->name () == name) {
@@ -160,8 +157,7 @@ Technologies::remove (const std::string &name)
   }
 }
 
-void
-Technologies::clear ()
+void Technologies::clear ()
 {
   if (! m_technologies.empty ()) {
     m_technologies.clear ();
@@ -169,8 +165,7 @@ Technologies::clear ()
   }
 }
 
-void
-Technologies::technology_changed (Technology *t)
+void Technologies::technology_changed (Technology *t)
 {
   if (m_in_update) {
     m_changed = true;
@@ -179,8 +174,7 @@ Technologies::technology_changed (Technology *t)
   }
 }
 
-void
-Technologies::technologies_changed ()
+void Technologies::technologies_changed ()
 {
   if (m_in_update) {
     m_changed = true;
@@ -189,16 +183,14 @@ Technologies::technologies_changed ()
   }
 }
 
-void
-Technologies::begin_updates ()
+void Technologies::begin_updates ()
 {
   tl_assert (! m_in_update);
   m_in_update = true;
   m_changed = false;
 }
 
-void
-Technologies::end_updates ()
+void Technologies::end_updates ()
 {
   if (m_in_update) {
     m_in_update = false;
@@ -209,21 +201,18 @@ Technologies::end_updates ()
   }
 }
 
-void
-Technologies::notify_technologies_changed ()
+void Technologies::notify_technologies_changed ()
 {
   technologies_changed ();
 }
 
-void
-Technologies::end_updates_no_event ()
+void Technologies::end_updates_no_event ()
 {
   m_in_update = false;
   m_changed = false;
 }
 
-bool 
-Technologies::has_technology (const std::string &name) const
+bool Technologies::has_technology (const std::string &name) const
 {
   for (tl::stable_vector<Technology>::const_iterator t = m_technologies.begin (); t != m_technologies.end (); ++t) {
     if (t->name () == name) {
@@ -235,7 +224,7 @@ Technologies::has_technology (const std::string &name) const
 }
 
 Technology *
-Technologies::technology_by_name (const std::string &name) 
+Technologies::technology_by_name (const std::string &name)
 {
   for (tl::stable_vector<Technology>::iterator t = m_technologies.begin (); t != m_technologies.end (); ++t) {
     if (t->name () == name) {
@@ -262,8 +251,7 @@ Technology::Technology (const std::string &name, const std::string &description,
   init ();
 }
 
-void 
-Technology::init ()
+void Technology::init ()
 {
   m_add_other_layers = true;
 
@@ -274,7 +262,7 @@ Technology::init ()
 
 Technology::~Technology ()
 {
-  for (std::vector <TechnologyComponent *>::const_iterator c = m_components.begin (); c != m_components.end (); ++c) {
+  for (std::vector<TechnologyComponent *>::const_iterator c = m_components.begin (); c != m_components.end (); ++c) {
     delete *c;
   }
   m_components.clear ();
@@ -290,7 +278,7 @@ Technology::Technology (const Technology &d)
     m_lyp_path (d.m_lyp_path), m_add_other_layers (d.m_add_other_layers), m_persisted (d.m_persisted),
     m_readonly (d.m_readonly), m_lyt_file (d.m_lyt_file)
 {
-  for (std::vector <TechnologyComponent *>::const_iterator c = d.m_components.begin (); c != d.m_components.end (); ++c) {
+  for (std::vector<TechnologyComponent *>::const_iterator c = d.m_components.begin (); c != d.m_components.end (); ++c) {
     m_components.push_back ((*c)->clone ());
   }
 }
@@ -315,17 +303,16 @@ Technology &Technology::operator= (const Technology &d)
     m_readonly = d.m_readonly;
     m_lyt_file = d.m_lyt_file;
 
-    for (std::vector <TechnologyComponent *>::const_iterator c = m_components.begin (); c != m_components.end (); ++c) {
+    for (std::vector<TechnologyComponent *>::const_iterator c = m_components.begin (); c != m_components.end (); ++c) {
       delete *c;
     }
     m_components.clear ();
 
-    for (std::vector <TechnologyComponent *>::const_iterator c = d.m_components.begin (); c != d.m_components.end (); ++c) {
+    for (std::vector<TechnologyComponent *>::const_iterator c = d.m_components.begin (); c != d.m_components.end (); ++c) {
       m_components.push_back ((*c)->clone ());
     }
 
     technology_changed ();
-
   }
 
   return *this;
@@ -385,32 +372,30 @@ Technology::default_grid () const
 }
 
 
-tl::XMLElementList 
-Technology::xml_elements () 
+tl::XMLElementList
+Technology::xml_elements ()
 {
-  tl::XMLElementList elements = 
-         tl::make_member (&Technology::name, &Technology::set_name, "name") + 
-         tl::make_member (&Technology::description, &Technology::set_description, "description") + 
-         tl::make_member (&Technology::group, &Technology::set_group, "group") +
-         tl::make_member (&Technology::dbu, &Technology::set_dbu, "dbu") +
-         tl::make_member (&Technology::default_grids, &Technology::set_default_grids, "default-grids") +
-         tl::make_member (&Technology::explicit_base_path, &Technology::set_explicit_base_path, "base-path") +
-         tl::make_member (&Technology::default_base_path, &Technology::set_default_base_path, "original-base-path") +
-         tl::make_member (&Technology::layer_properties_file, &Technology::set_layer_properties_file, "layer-properties_file") +
-         tl::make_member (&Technology::add_other_layers, &Technology::set_add_other_layers, "add-other-layers") +
-         tl::make_element (&Technology::load_layout_options, &Technology::set_load_layout_options, "reader-options",
-           db::load_options_xml_element_list ()
-         ) +
-         tl::make_element (&Technology::save_layout_options, &Technology::set_save_layout_options, "writer-options",
-           db::save_options_xml_element_list ()
-         );
+  tl::XMLElementList elements =
+    tl::make_member (&Technology::name, &Technology::set_name, "name") +
+    tl::make_member (&Technology::description, &Technology::set_description, "description") +
+    tl::make_member (&Technology::group, &Technology::set_group, "group") +
+    tl::make_member (&Technology::dbu, &Technology::set_dbu, "dbu") +
+    tl::make_member (&Technology::default_grids, &Technology::set_default_grids, "default-grids") +
+    tl::make_member (&Technology::explicit_base_path, &Technology::set_explicit_base_path, "base-path") +
+    tl::make_member (&Technology::default_base_path, &Technology::set_default_base_path, "original-base-path") +
+    tl::make_member (&Technology::layer_properties_file, &Technology::set_layer_properties_file, "layer-properties_file") +
+    tl::make_member (&Technology::add_other_layers, &Technology::set_add_other_layers, "add-other-layers") +
+    tl::make_element (&Technology::load_layout_options, &Technology::set_load_layout_options, "reader-options",
+                      db::load_options_xml_element_list ()) +
+    tl::make_element (&Technology::save_layout_options, &Technology::set_save_layout_options, "writer-options",
+                      db::save_options_xml_element_list ());
 
   for (tl::Registrar<db::TechnologyComponentProvider>::iterator cls = tl::Registrar<db::TechnologyComponentProvider>::begin (); cls != tl::Registrar<db::TechnologyComponentProvider>::end (); ++cls) {
     elements.append (cls->xml_element ());
   }
 
   // ignore all unknown elements
-  elements.append (tl::make_member<Technology> ("*")); 
+  elements.append (tl::make_member<Technology> ("*"));
 
   return elements;
 }
@@ -418,7 +403,7 @@ Technology::xml_elements ()
 const TechnologyComponent *
 Technology::component_by_name (const std::string &component_name) const
 {
-  for (std::vector <TechnologyComponent *>::const_iterator c = m_components.begin (); c != m_components.end (); ++c) {
+  for (std::vector<TechnologyComponent *>::const_iterator c = m_components.begin (); c != m_components.end (); ++c) {
     if ((*c)->name () == component_name) {
       return *c;
     }
@@ -430,7 +415,7 @@ Technology::component_by_name (const std::string &component_name) const
 TechnologyComponent *
 Technology::component_by_name (const std::string &component_name)
 {
-  for (std::vector <TechnologyComponent *>::const_iterator c = m_components.begin (); c != m_components.end (); ++c) {
+  for (std::vector<TechnologyComponent *>::const_iterator c = m_components.begin (); c != m_components.end (); ++c) {
     if ((*c)->name () == component_name) {
       return *c;
     }
@@ -439,20 +424,19 @@ Technology::component_by_name (const std::string &component_name)
   return 0;
 }
 
-std::vector <std::string>
+std::vector<std::string>
 Technology::component_names () const
 {
-  std::vector <std::string> names;
-  for (std::vector <TechnologyComponent *>::const_iterator c = m_components.begin (); c != m_components.end (); ++c) {
+  std::vector<std::string> names;
+  for (std::vector<TechnologyComponent *>::const_iterator c = m_components.begin (); c != m_components.end (); ++c) {
     names.push_back ((*c)->name ());
   }
   return names;
 }
 
-void
-Technology::set_component (TechnologyComponent *component)
+void Technology::set_component (TechnologyComponent *component)
 {
-  for (std::vector <TechnologyComponent *>::iterator c = m_components.begin (); c != m_components.end (); ++c) {
+  for (std::vector<TechnologyComponent *>::iterator c = m_components.begin (); c != m_components.end (); ++c) {
     if ((*c)->name () == component->name ()) {
       if (*c != component) {
         delete *c;
@@ -475,7 +459,7 @@ Technology::base_path () const
   return expr.interpolate (m_explicit_base_path.empty () ? m_default_base_path : m_explicit_base_path);
 }
 
-std::string 
+std::string
 Technology::correct_path (const std::string &fp) const
 {
   std::string bp = base_path ();
@@ -486,8 +470,7 @@ Technology::correct_path (const std::string &fp) const
   }
 }
 
-void 
-Technology::load (const std::string &fn)
+void Technology::load (const std::string &fn)
 {
   tl::XMLFileSource source (fn);
   tl::XMLStruct<db::Technology> xml_struct ("technology", xml_elements ());
@@ -503,15 +486,14 @@ Technology::load (const std::string &fn)
   set_tech_file_path (fn);
 }
 
-void
-Technology::save (const std::string &fn) const
+void Technology::save (const std::string &fn) const
 {
   tl::XMLStruct<db::Technology> xml_struct ("technology", xml_elements ());
   tl::OutputStream os (fn, tl::OutputStream::OM_Plain);
   xml_struct.write (os, *this);
 }
 
-std::string 
+std::string
 Technology::build_effective_path (const std::string &p) const
 {
   std::string bp = base_path ();
@@ -527,4 +509,3 @@ Technology::build_effective_path (const std::string &p) const
 }
 
 }
-

@@ -34,7 +34,7 @@ namespace lib
 /**
  *  @brief Implements the "ROUND_PATH" PCell of the basic library
  */
-class BasicRoundPath 
+class BasicRoundPath
   : public db::PCellDeclaration
 {
 public:
@@ -77,5 +77,3 @@ public:
 }
 
 #endif
-
-

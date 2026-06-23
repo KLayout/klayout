@@ -196,8 +196,7 @@ TestRegistrar::TestRegistrar ()
   //  .. nothing yet ..
 }
 
-void
-TestRegistrar::reg (tl::TestBase *t)
+void TestRegistrar::reg (tl::TestBase *t)
 {
   if (! ms_instance) {
     ms_instance = new TestRegistrar ();
@@ -211,7 +210,7 @@ TestRegistrar::instance ()
   return ms_instance;
 }
 
-const std::vector <tl::TestBase *> &
+const std::vector<tl::TestBase *> &
 TestRegistrar::tests () const
 {
   return m_tests;
@@ -280,7 +279,7 @@ bool TestBase::do_test (bool editable, bool slow)
 
   m_testtmp.clear ();
 
-  return (!m_any_failed);
+  return (! m_any_failed);
 }
 
 std::string TestBase::tmp_file (const std::string &fn) const
@@ -330,7 +329,7 @@ void TestBase::raise (const std::string &msg)
 
 void TestBase::test_is_editable_only ()
 {
-  if (!m_editable) {
+  if (! m_editable) {
     throw tl::CancelException ();
   }
 }
@@ -344,7 +343,7 @@ void TestBase::test_is_non_editable_only ()
 
 void TestBase::test_is_long_runner ()
 {
-  if (!m_slow) {
+  if (! m_slow) {
     throw tl::CancelException ();
   }
 }
@@ -352,8 +351,7 @@ void TestBase::test_is_long_runner ()
 void TestBase::write_detailed_diff (std::ostream &os, const std::string &subject, const std::string &ref)
 {
   os << replicate (" ", tl::indent ()) << "Actual value is:    " << tl::to_string (subject) << std::endl
-     << replicate (" ", tl::indent ()) << "Reference value is: " << tl::to_string (ref) << std::endl
-  ;
+     << replicate (" ", tl::indent ()) << "Reference value is: " << tl::to_string (ref) << std::endl;
 }
 
 static std::string read_file (const std::string &path)
@@ -363,7 +361,7 @@ static std::string read_file (const std::string &path)
   //  NOTE: using the text reader means we normalize CRLF/LF
   tl::TextInputStream ts (s);
   std::string t;
-  while (!ts.at_end ()) {
+  while (! ts.at_end ()) {
     t += ts.get_line ();
     t += "\n";
   }
@@ -377,9 +375,9 @@ void TestBase::compare_text_files (const std::string &path_a, const std::string 
   bool any = false;
 
   int n = 0;
-  for ( ; ! equal; ++n) {
+  for (; ! equal; ++n) {
 
-    std::string fn_a = path_a;  //  no variants for a
+    std::string fn_a = path_a; //  no variants for a
     std::string fn_b = path_b;
     if (n > 0) {
       fn_b += tl::sprintf (".%d", n);
@@ -408,14 +406,13 @@ void TestBase::compare_text_files (const std::string &path_a, const std::string 
       }
       break;
     }
-
   }
 
   if (! equal) {
     throw tl::Exception (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s%s",
-                               tl::absolute_file_path (path_a),
-                               tl::absolute_file_path (path_b),
-                               (n > 1 ? "\nand variants" : "")));
+                                      tl::absolute_file_path (path_a),
+                                      tl::absolute_file_path (path_b),
+                                      (n > 1 ? "\nand variants" : "")));
   }
 }
 

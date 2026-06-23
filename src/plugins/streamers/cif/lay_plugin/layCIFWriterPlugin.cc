@@ -50,8 +50,7 @@ CIFWriterOptionPage::~CIFWriterOptionPage ()
   mp_ui = 0;
 }
 
-void 
-CIFWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/)
+void CIFWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/)
 {
   const db::CIFWriterOptions *options = dynamic_cast<const db::CIFWriterOptions *> (o);
   if (options) {
@@ -60,8 +59,7 @@ CIFWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::
   }
 }
 
-void 
-CIFWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/, bool /*gzip*/)
+void CIFWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/, bool /*gzip*/)
 {
   db::CIFWriterOptions *options = dynamic_cast<db::CIFWriterOptions *> (o);
   if (options) {
@@ -77,7 +75,7 @@ class CIFWriterPluginDeclaration
   : public StreamWriterPluginDeclaration
 {
 public:
-  CIFWriterPluginDeclaration () 
+  CIFWriterPluginDeclaration ()
     : StreamWriterPluginDeclaration (db::CIFWriterOptions ().format_name ())
   {
     // .. nothing yet ..
@@ -97,4 +95,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> plugin_decl (new lay::CIFWriterPluginDeclaration (), 10000, "CIFWriter");
 
 }
-

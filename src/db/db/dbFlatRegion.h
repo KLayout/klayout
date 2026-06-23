@@ -31,7 +31,8 @@
 #include "dbShapes2.h"
 #include "tlCopyOnWrite.h"
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief An iterator delegate for the flat region
@@ -126,7 +127,7 @@ public:
     transform_generic (t);
   }
 
-  void flatten () { }
+  void flatten () {}
 
   db::Shapes &raw_polygons () { return *mp_polygons; }
   const db::Shapes &raw_polygons () const { return *mp_polygons; }
@@ -175,4 +176,3 @@ private:
 }
 
 #endif
-

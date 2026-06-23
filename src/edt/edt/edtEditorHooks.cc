@@ -65,9 +65,9 @@ public:
     tl::shared_ptr<EditorHooks> tmp (hooks);
 
     //  remove other hooks with the same name or with an identical address
-    for (auto h = m_hooks.begin (); h != m_hooks.end (); ) {
+    for (auto h = m_hooks.begin (); h != m_hooks.end ();) {
       auto hh = h++;
-      if (hh.operator-> () && (hh.operator-> () == hooks || hh->name () == name)) {
+      if (hh.operator->() && (hh.operator->() == hooks || hh->name () == name)) {
         m_hooks.erase (hh);
       }
     }
@@ -81,8 +81,8 @@ public:
   {
     tl::weak_collection<EditorHooks> res;
     for (auto h = m_hooks.begin (); h != m_hooks.end (); ++h) {
-      if (h.operator-> () && (! h->for_technologies () || h->is_for_technology (for_technology))) {
-        res.push_back (h.operator-> ());
+      if (h.operator->() && (! h->for_technologies () || h->is_for_technology (for_technology))) {
+        res.push_back (h.operator->());
       }
     }
 
@@ -106,20 +106,17 @@ EditorHooks::~EditorHooks ()
   //  .. nothing yet ..
 }
 
-bool
-EditorHooks::is_for_technology (const std::string &name) const
+bool EditorHooks::is_for_technology (const std::string &name) const
 {
   return m_technologies.find (name) != m_technologies.end ();
 }
 
-bool
-EditorHooks::for_technologies () const
+bool EditorHooks::for_technologies () const
 {
   return ! m_technologies.empty ();
 }
 
-void
-EditorHooks::set_technology (const std::string &t)
+void EditorHooks::set_technology (const std::string &t)
 {
   m_technologies.clear ();
   if (! t.empty ()) {
@@ -127,20 +124,17 @@ EditorHooks::set_technology (const std::string &t)
   }
 }
 
-void
-EditorHooks::clear_technologies ()
+void EditorHooks::clear_technologies ()
 {
   m_technologies.clear ();
 }
 
-void
-EditorHooks::add_technology (const std::string &tech)
+void EditorHooks::add_technology (const std::string &tech)
 {
   m_technologies.insert (tech);
 }
 
-void
-EditorHooks::register_editor_hooks (EditorHooks *hooks, const std::string &name)
+void EditorHooks::register_editor_hooks (EditorHooks *hooks, const std::string &name)
 {
   if (EditorHooksManager::instance ()) {
     hooks->keep ();

@@ -20,7 +20,7 @@
 
 */
 
-#if !defined(_HDR_gsiDeclLayEditorOptionsPage)
+#if ! defined(_HDR_gsiDeclLayEditorOptionsPage)
 #define _HDR_gsiDeclLayEditorOptionsPage
 
 #if defined(HAVE_QTBINDINGS)
@@ -35,7 +35,8 @@ namespace gsi
 {
 
 class EditorOptionsPageImpl
-  : public lay::EditorOptionsPageWidget, public gsi::ObjectBase
+  : public lay::EditorOptionsPageWidget,
+    public gsi::ObjectBase
 {
 public:
   EditorOptionsPageImpl (const std::string &title, int index);

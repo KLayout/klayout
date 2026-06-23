@@ -36,8 +36,8 @@ class DB_PUBLIC DeviceClassFactory
   : public gsi::ObjectBase
 {
 public:
-  DeviceClassFactory () { }
-  ~DeviceClassFactory () { }
+  DeviceClassFactory () {}
+  ~DeviceClassFactory () {}
   virtual db::DeviceClass *create_class () const = 0;
 };
 

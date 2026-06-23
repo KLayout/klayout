@@ -43,8 +43,7 @@ BasicCircle::BasicCircle ()
   //  .. nothing yet ..
 }
 
-bool 
-BasicCircle::can_create_from_shape (const db::Layout & /*layout*/, const db::Shape &shape, unsigned int /*layer*/) const
+bool BasicCircle::can_create_from_shape (const db::Layout & /*layout*/, const db::Shape &shape, unsigned int /*layer*/) const
 {
   return (shape.is_polygon () || shape.is_box () || shape.is_path ());
 }
@@ -68,7 +67,7 @@ BasicCircle::parameters_from_shape (const db::Layout &layout, const db::Shape &s
   return map_parameters (nm);
 }
 
-std::vector<db::PCellLayerDeclaration> 
+std::vector<db::PCellLayerDeclaration>
 BasicCircle::get_layer_declarations (const db::pcell_parameters_type &parameters) const
 {
   std::vector<db::PCellLayerDeclaration> layers;
@@ -81,8 +80,7 @@ BasicCircle::get_layer_declarations (const db::pcell_parameters_type &parameters
   return layers;
 }
 
-void 
-BasicCircle::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parameters_type &parameters) const
+void BasicCircle::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parameters_type &parameters) const
 {
   if (parameters.size () < p_total) {
     return;
@@ -92,9 +90,9 @@ BasicCircle::coerce_parameters (const db::Layout & /*layout*/, db::pcell_paramet
   double r = parameters [p_actual_radius].to_double ();
 
   double rs = ru;
-  if (parameters [p_handle].is_user <db::DPoint> ()) {
-    rs = parameters [p_handle].to_user <db::DPoint> ().distance ();
-  } 
+  if (parameters [p_handle].is_user<db::DPoint> ()) {
+    rs = parameters [p_handle].to_user<db::DPoint> ().distance ();
+  }
 
   if (fabs (ru - r) > 1e-6) {
     //  the explicit radius has changed: use it
@@ -111,8 +109,7 @@ BasicCircle::coerce_parameters (const db::Layout & /*layout*/, db::pcell_paramet
   parameters [p_radius] = ru;
 }
 
-void 
-BasicCircle::produce (const db::Layout &layout, const std::vector<unsigned int> &layer_ids, const db::pcell_parameters_type &parameters, db::Cell &cell) const
+void BasicCircle::produce (const db::Layout &layout, const std::vector<unsigned int> &layer_ids, const db::pcell_parameters_type &parameters, db::Cell &cell) const
 {
   if (parameters.size () < p_total || layer_ids.size () < 1) {
     return;
@@ -121,11 +118,11 @@ BasicCircle::produce (const db::Layout &layout, const std::vector<unsigned int> 
   double r = parameters [p_radius].to_double () / layout.dbu ();
   int n = std::max (3, parameters [p_npoints].to_int ());
 
-  std::vector <db::Point> points;
+  std::vector<db::Point> points;
   points.reserve (n);
 
-  //  Produce an outer circle approximation. This 
-  //  one looks slightly better in the case of few points. 
+  //  Produce an outer circle approximation. This
+  //  one looks slightly better in the case of few points.
   double rr = r / cos (M_PI / n);
   double da = 2.0 * M_PI / n;
   for (int i = 0; i < n; ++i) {
@@ -139,21 +136,21 @@ BasicCircle::produce (const db::Layout &layout, const std::vector<unsigned int> 
   cell.shapes (layer_ids [p_layer]).insert (poly);
 }
 
-std::string 
+std::string
 BasicCircle::get_display_name (const db::pcell_parameters_type &parameters) const
 {
   return "CIRCLE(l=" + std::string (parameters [p_layer].to_string ()) +
-               ",r=" + tl::to_string (parameters [p_radius].to_double ()) +
-               ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
-                 ")";
+         ",r=" + tl::to_string (parameters [p_radius].to_double ()) +
+         ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
+         ")";
 }
 
-std::vector<db::PCellParameterDeclaration> 
+std::vector<db::PCellParameterDeclaration>
 BasicCircle::get_parameter_declarations () const
 {
   std::vector<db::PCellParameterDeclaration> parameters;
 
-  //  parameter #0: layer 
+  //  parameter #0: layer
   tl_assert (parameters.size () == p_layer);
   parameters.push_back (db::PCellParameterDeclaration ("layer"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_layer);
@@ -167,14 +164,14 @@ BasicCircle::get_parameter_declarations () const
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
   parameters.back ().set_hidden (true);
 
-  //  parameter #2: handle 
+  //  parameter #2: handle
   tl_assert (parameters.size () == p_handle);
   parameters.push_back (db::PCellParameterDeclaration ("handle"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
   parameters.back ().set_default (db::DPoint (-1.0, 0));
   parameters.back ().set_description (tl::to_string (tr ("R")));
 
-  //  parameter #3: number of points 
+  //  parameter #3: number of points
   tl_assert (parameters.size () == p_npoints);
   parameters.push_back (db::PCellParameterDeclaration ("npoints"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_int);
@@ -193,5 +190,3 @@ BasicCircle::get_parameter_declarations () const
 }
 
 }
-
-

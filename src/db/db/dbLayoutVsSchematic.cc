@@ -87,8 +87,7 @@ db::NetlistCrossReference *LayoutVsSchematic::make_cross_ref ()
   return mp_cross_ref.get ();
 }
 
-bool
-LayoutVsSchematic::flag_missing_ports (const db::Circuit *circuit)
+bool LayoutVsSchematic::flag_missing_ports (const db::Circuit *circuit)
 {
   if (! mp_cross_ref.get ()) {
     return false;
@@ -118,10 +117,8 @@ LayoutVsSchematic::flag_missing_ports (const db::Circuit *circuit)
         pcd->log_entries.push_back (entry);
 
         error = true;
-
       }
     }
-
   }
 
   if (! any) {
@@ -129,10 +126,9 @@ LayoutVsSchematic::flag_missing_ports (const db::Circuit *circuit)
     std::string msg = tl::to_string (tr ("No pins found in circuit during 'flag_missing_ports'"));
     db::LogEntryData entry (db::Warning, msg);
     pcd->log_entries.push_back (entry);
-
   }
 
-  return !error;
+  return ! error;
 }
 
 void LayoutVsSchematic::save (const std::string &path, bool short_format)

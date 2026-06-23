@@ -36,15 +36,15 @@ namespace db
  *  @brief A cell specialization: a proxy for a library cell.
  *
  *  This cell serves as a proxy (or copy) of a cell contained in another library.
- *  This cell thus is a reference and a cached copy. 
+ *  This cell thus is a reference and a cached copy.
  *  The library reference is through the library id and the cell index inside this
  *  library.
  */
-class DB_PUBLIC LibraryProxy 
+class DB_PUBLIC LibraryProxy
   : public Cell
 {
 public:
-  /** 
+  /**
    *  @brief The constructor
    *
    *  The constructor gets the parameters that are unique for this variant.
@@ -57,12 +57,12 @@ public:
   ~LibraryProxy ();
 
   /**
-   *  @brief Cloning 
+   *  @brief Cloning
    */
   virtual Cell *clone (Layout &layout) const;
 
   /**
-   *  @brief Get the library id 
+   *  @brief Get the library id
    */
   lib_id_type lib_id () const
   {
@@ -88,9 +88,9 @@ public:
    *  Proxy cells are such whose layout represents a snapshot of another entity.
    *  Such cells can be PCell variants or library references for example.
    */
-  virtual bool is_proxy () const 
-  { 
-    return true; 
+  virtual bool is_proxy () const
+  {
+    return true;
   }
 
   /**
@@ -154,5 +154,3 @@ private:
 }
 
 #endif
-
-

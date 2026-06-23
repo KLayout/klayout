@@ -54,16 +54,18 @@ public:
    */
   CellInst ()
     : m_cell_index (0)
-  { }
+  {
+  }
 
   /**
    *  @brief Create a cell instance from the given index
-   *  
+   *
    *  @param ci The cell index
    */
   CellInst (cell_index_type ci)
     : m_cell_index (ci)
-  { }
+  {
+  }
 
   /**
    *  @brief The cell index accessor
@@ -76,7 +78,7 @@ public:
   /**
    *  @brief The cell index setter
    */
-  void cell_index (cell_index_type ci) 
+  void cell_index (cell_index_type ci)
   {
     m_cell_index = ci;
   }
@@ -110,7 +112,7 @@ public:
   box_type bbox (const Layout &g, unsigned int l) const;
 
   /**
-   *  @brief Comparison: comparison for equality 
+   *  @brief Comparison: comparison for equality
    */
   bool operator== (const CellInst &d) const
   {
@@ -118,9 +120,9 @@ public:
   }
 
   /**
-   *  @brief Comparison: compare by cell id 
+   *  @brief Comparison: compare by cell id
    *
-   *  This sorting order is used by the cell instances of the 
+   *  This sorting order is used by the cell instances of the
    *  cell.
    */
   bool operator< (const CellInst &d) const
@@ -140,4 +142,3 @@ private:
 } // namespace db
 
 #endif
-

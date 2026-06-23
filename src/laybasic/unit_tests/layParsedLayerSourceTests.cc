@@ -26,7 +26,8 @@
 #include "dbCell.h"
 #include "tlUnitTest.h"
 
-namespace {
+namespace
+{
 
 /**
  *  @brief Installs a temporary repository instance for testing
@@ -584,7 +585,7 @@ TEST (11)
   db::Cell &cc2 = layout.cell (layout.add_cell ("CC2"));
   db::Cell &cc3 = layout.cell (layout.add_cell ("CC3"));
   db::Cell &cc4 = layout.cell (layout.add_cell ("CC4"));
-  
+
   c1.insert (db::CellInstArray (c2.cell_index (), db::Trans ()));
   c2.insert (db::CellInstArray (c3.cell_index (), db::Trans ()));
   c2.insert (db::CellInstArray (c4.cell_index (), db::Trans ()));
@@ -594,40 +595,39 @@ TEST (11)
   c3.insert (db::CellInstArray (c5.cell_index (), db::Trans ()));
   c1.insert (db::CellInstArray (cc1.cell_index (), db::Trans ()));
 
-  lay::PartialTreeSelector pt (selector_from_string("").create_tree_selector (layout, c1.cell_index ()));
+  lay::PartialTreeSelector pt (selector_from_string ("").create_tree_selector (layout, c1.cell_index ()));
   EXPECT_EQ (tspath (layout, c1.cell_index (), pt), "+C1(+C2(+C3(+C5+CC3)+C4(+CC4)+CC2)+CC1)");
 
-  pt = selector_from_string("+C1").create_tree_selector (layout, c1.cell_index ());
+  pt = selector_from_string ("+C1").create_tree_selector (layout, c1.cell_index ());
   EXPECT_EQ (tspath (layout, c1.cell_index (), pt), "+C1(+C2(+C3(+C5+CC3)+C4(+CC4)+CC2)+CC1)");
 
-  pt = selector_from_string("-C1").create_tree_selector (layout, c1.cell_index ());
+  pt = selector_from_string ("-C1").create_tree_selector (layout, c1.cell_index ());
   EXPECT_EQ (tspath (layout, c1.cell_index (), pt), "-C1");
 
-  pt = selector_from_string("-C2").create_tree_selector (layout, c1.cell_index ());
+  pt = selector_from_string ("-C2").create_tree_selector (layout, c1.cell_index ());
   EXPECT_EQ (tspath (layout, c1.cell_index (), pt), "+C1(+CC1)");
 
-  pt = selector_from_string("+C1 -C2").create_tree_selector (layout, c1.cell_index ());
+  pt = selector_from_string ("+C1 -C2").create_tree_selector (layout, c1.cell_index ());
   EXPECT_EQ (tspath (layout, c1.cell_index (), pt), "+C1(+CC1)");
 
-  pt = selector_from_string("+C1 ( -C* +CC* )").create_tree_selector (layout, c1.cell_index ());
+  pt = selector_from_string ("+C1 ( -C* +CC* )").create_tree_selector (layout, c1.cell_index ());
   EXPECT_EQ (tspath (layout, c1.cell_index (), pt), "+C1(+CC1)");
 
-  pt = selector_from_string("-C2 +C3").create_tree_selector (layout, c1.cell_index ());
+  pt = selector_from_string ("-C2 +C3").create_tree_selector (layout, c1.cell_index ());
   EXPECT_EQ (tspath (layout, c1.cell_index (), pt), "+C1(-C2(+C3(+C5+CC3)-C4(-CC4)-CC2)+CC1)");
 
-  pt = selector_from_string("-C2 +CC*").create_tree_selector (layout, c1.cell_index ());
+  pt = selector_from_string ("-C2 +CC*").create_tree_selector (layout, c1.cell_index ());
   EXPECT_EQ (tspath (layout, c1.cell_index (), pt), "+C1(-C2(-C3(-C5+CC3)-C4(+CC4)+CC2)+CC1)");
 
-  pt = selector_from_string("+CC*").create_tree_selector (layout, c1.cell_index ());
+  pt = selector_from_string ("+CC*").create_tree_selector (layout, c1.cell_index ());
   EXPECT_EQ (tspath (layout, c1.cell_index (), pt), "-C1(-C2(-C3(-C5+CC3)-C4(+CC4)+CC2)+CC1)");
 
-  pt = selector_from_string("-* +CC*").create_tree_selector (layout, c1.cell_index ());
+  pt = selector_from_string ("-* +CC*").create_tree_selector (layout, c1.cell_index ());
   EXPECT_EQ (tspath (layout, c1.cell_index (), pt), "-C1(-C2(-C3(-C5+CC3)-C4(+CC4)+CC2)+CC1)");
 
-  pt = selector_from_string("-* ( -* +CC* )").create_tree_selector (layout, c1.cell_index ());
+  pt = selector_from_string ("-* ( -* +CC* )").create_tree_selector (layout, c1.cell_index ());
   EXPECT_EQ (tspath (layout, c1.cell_index (), pt), "-C1(+CC1)");
 
-  pt = selector_from_string("-C3 +CC*").create_tree_selector (layout, c1.cell_index ());
+  pt = selector_from_string ("-C3 +CC*").create_tree_selector (layout, c1.cell_index ());
   EXPECT_EQ (tspath (layout, c1.cell_index (), pt), "+C1(+C2(-C3(-C5+CC3)+C4(+CC4)+CC2)+CC1)");
 }
-

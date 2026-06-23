@@ -26,7 +26,7 @@
 #include "dbEdges.h"
 #include "dbEdgesUtils.h"
 
-TEST(1)
+TEST (1)
 {
   EXPECT_EQ (db::edge_interacts (db::Edge (db::Point (0, 0), db::Point (10, 10)), db::Edge (db::Point (0, 0), db::Point (10, 10))), true);
   EXPECT_EQ (db::edge_interacts (db::Edge (db::Point (10, 0), db::Point (20, 00)), db::Edge (db::Point (0, 0), db::Point (10, 0))), true);
@@ -86,17 +86,16 @@ TEST(1)
   EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (-10, 5), db::Point (0, 5)), db::Polygon (db::Box (0, 0, 10, 10))), true);
   EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (-10, 0), db::Point (10, 0)), db::Polygon (db::Box (0, 0, 10, 10))), true);
 
-  db::Point pts[] = {
+  db::Point pts [] = {
     db::Point (0, 0),
     db::Point (0, 10),
     db::Point (20, 10),
     db::Point (20, -10),
     db::Point (10, -10),
-    db::Point (10, 0)
-  };
+    db::Point (10, 0)};
 
   db::Polygon poly;
-  poly.assign_hull (pts + 0, pts + sizeof(pts) / sizeof(pts[0]));
+  poly.assign_hull (pts + 0, pts + sizeof (pts) / sizeof (pts [0]));
 
   EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (-10, 10), db::Point (20, 10)), poly), true);
   EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (-10, -10), db::Point (20, -10)), poly), true);
@@ -104,4 +103,3 @@ TEST(1)
   EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (-10, 0), db::Point (10, 0)), poly), true);
   EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (-10, 0), db::Point (9, 0)), poly), true);
 }
-

@@ -46,8 +46,7 @@ class PYAObjectBase;
  *  The heap collects objects created while filling the buffer.
  *  The stack must persist as long as the serial buffer is used.
  */
-void
-push_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, PyObject *arg, tl::Heap &heap);
+void push_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, PyObject *arg, tl::Heap &heap);
 
 /**
  *  @brief Reads a value from the serial stream (deserialize)
@@ -68,8 +67,7 @@ PythonRef pull_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, PYAObje
  *  @param loose If true, the test is performed in a loose fashion (used for second-pass matching)
  *  @return True, if the type match
  */
-bool
-test_arg (const gsi::ArgType &atype, PyObject *arg, bool loose, bool object_substitution);
+bool test_arg (const gsi::ArgType &atype, PyObject *arg, bool loose, bool object_substitution);
 
 /**
  *  @brief Correct constness if a reference is const and a non-const reference is required

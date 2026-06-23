@@ -110,7 +110,7 @@ static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *f
       db::Reader reader (stream);
       reader.read (layout, db::LoadLayoutOptions ());
 
-    } else if (ex.test("read:")) {
+    } else if (ex.test ("read:")) {
 
       std::string fn = fn_path, f;
       ex.read_word_or_quoted (f);
@@ -127,13 +127,11 @@ static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *f
     } else {
 
       break;
-
     }
 
-    if (! ex.test("+")) {
+    if (! ex.test ("+")) {
       break;
     }
-
   }
 
   if (! any_def && any_lef) {
@@ -207,7 +205,6 @@ static db::LayerMap run_test (tl::TestBase *_this, const char *lef_dir, const ch
     if (! equal) {
       _this->raise (tl::sprintf ("Compare failed - see %s vs empty file\n", tmp_file));
     }
-
   }
 
   return lm;
@@ -276,11 +273,10 @@ static void run_test2 (tl::TestBase *_this, const char *lef_dir, const char *fil
     if (! equal) {
       _this->raise (tl::sprintf ("Compare failed - see %s vs empty file\n", tmp_file));
     }
-
   }
 }
 
-TEST(reader_options)
+TEST (reader_options)
 {
   db::LEFDEFReaderOptions tc;
 
@@ -307,88 +303,88 @@ TEST(reader_options)
   EXPECT_EQ (tc.map_files ().back (), "xyz");
 }
 
-TEST(lef1)
+TEST (lef1)
 {
   run_test (_this, "lef1", "lef:in.lef", 0, default_options ());
 }
 
-TEST(lef2)
+TEST (lef2)
 {
   //  Also tests ability of plugin to properly read LEF
   run_test (_this, "lef2", "read:in.lef", "au.oas.gz", default_options ());
 }
 
-TEST(lef3)
+TEST (lef3)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_cell_outline_layer ("OUTLINE (2/0)");
   run_test (_this, "lef3", "lef:in.lef", "au.oas.gz", options);
 }
 
-TEST(lef4)
+TEST (lef4)
 {
   run_test (_this, "lef4", "lef:in.lef", 0, default_options ());
 }
 
-TEST(lef5)
+TEST (lef5)
 {
   run_test (_this, "lef5", "lef:in.lef", 0, default_options ());
 }
 
-TEST(lef6)
+TEST (lef6)
 {
   run_test (_this, "lef6", "lef:in.lef", 0, default_options ());
 }
 
-TEST(lef7)
+TEST (lef7)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_cell_outline_layer ("OUTLINE (8/0)");
   run_test (_this, "lef7", "lef:in_tech.lef+lef:in.lef", "au.oas.gz", options);
 }
 
-TEST(lef8)
+TEST (lef8)
 {
   //  this is rather a smoke test and throws a number of warnings
   //  (complete example)
   run_test (_this, "lef8", "lef:tech.lef+lef:a.lef", "au.oas.gz", default_options ());
 }
 
-TEST(def1)
+TEST (def1)
 {
   run_test (_this, "def1", "lef:in.lef+def:in.def", "au2_2.oas.gz", default_options ());
 }
 
-TEST(def2)
+TEST (def2)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_cell_outline_layer ("OUTLINE (10/0)");
   run_test (_this, "def2", "lef:0.lef+lef:1.lef+def:in.def.gz", "au_3.oas.gz", options);
 }
 
-TEST(def3)
+TEST (def3)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_cell_outline_layer ("OUTLINE (13/0)");
   run_test (_this, "def3", "lef:in.lef+def:in.def", "au_2.oas.gz", options);
 }
 
-TEST(def4)
+TEST (def4)
 {
   run_test (_this, "def4", "lef:in.lef+def:in.def", "au2_2.oas.gz", default_options ());
 }
 
-TEST(def5)
+TEST (def5)
 {
   run_test (_this, "def5", "lef:in.lef+def:in.def", "au.oas.gz", default_options ());
 }
 
-TEST(def6)
+TEST (def6)
 {
   run_test (_this, "def6", "lef:cells.lef+lef:tech.lef+def:in.def.gz", "au-new_2.oas.gz", default_options ());
 }
 
-TEST(def7)
+TEST (def7)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_placement_blockage_layer ("PLACEMENT_BLK (11/0)");
@@ -398,12 +394,12 @@ TEST(def7)
   run_test (_this, "def7", "map:in.map+lef:cells.lef+lef:tech.lef+def:in.def.gz", "au2_with_map_file-new_2.oas.gz", options);
 }
 
-TEST(def8)
+TEST (def8)
 {
   run_test (_this, "def8", "lef:tech.lef+def:in.def", "au.oas.gz", default_options ());
 }
 
-TEST(def9)
+TEST (def9)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_separate_groups (true);
@@ -412,48 +408,48 @@ TEST(def9)
   run_test (_this, "def9", "lef:tech.lef+lef:cells_modified.lef+def:in.def", "au_nogroups-new_2.oas.gz", default_options ());
 }
 
-TEST(def10)
+TEST (def10)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_cell_outline_layer ("OUTLINE (2/0)");
   run_test (_this, "def10", "def:in.def", "au.oas.gz", opt);
 }
 
-TEST(def11)
+TEST (def11)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_cell_outline_layer ("OUTLINE (12/0)");
   run_test (_this, "def11", "lef:test.lef+def:test.def", "au.oas.gz", opt);
 }
 
-TEST(def12)
+TEST (def12)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_cell_outline_layer ("OUTLINE (20/0)");
   run_test (_this, "def12", "lef:test.lef+def:test.def", "au-new.oas.gz", opt);
 }
 
-TEST(def13)
+TEST (def13)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   run_test (_this, "def13", "map:test.map+lef:test.lef_5.8+def:top.def.gz", "au2.oas.gz", opt);
 }
 
-TEST(def14)
+TEST (def14)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_macro_resolution_mode (1);
   run_test (_this, "def14", "map:test.map+lef:tech.lef+lef:stdlib.lef+def:test.def", "au_2.oas.gz", opt);
 }
 
-TEST(def15)
+TEST (def15)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_macro_resolution_mode (1);
   run_test (_this, "def15", "map:test.map+lef:tech.lef+def:test.def", "au2_2.oas.gz", opt);
 }
 
-TEST(def16)
+TEST (def16)
 {
   //  this is rather a smoke test
   //  (complete example)
@@ -462,12 +458,12 @@ TEST(def16)
   run_test (_this, "def16", "lef:a.lef+lef:tech.lef+def:a.def", "au_4d.oas.gz", opt);
 }
 
-TEST(100)
+TEST (100)
 {
   run_test (_this, "issue-172", "lef:in.lef+def:in.def", "au.oas.gz", default_options (), false);
 }
 
-TEST(101a)
+TEST (101a)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_produce_pin_names (true);
@@ -477,7 +473,7 @@ TEST(101a)
   run_test (_this, "issue-489", "lef:in.lef+def:in.def", "au.oas", opt, false);
 }
 
-TEST(101b)
+TEST (101b)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_produce_pin_names (true);
@@ -488,7 +484,7 @@ TEST(101b)
   run_test (_this, "issue-489", "lef:'in.l[lef]'+def:'in.d[def]'", "au.oas", opt, false);
 }
 
-TEST(102)
+TEST (102)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_produce_pin_names (true);
@@ -497,21 +493,21 @@ TEST(102)
   run_test (_this, "issue-489b", "lef:in_tech.lef+lef:in.lef", "au.oas.gz", opt, false);
 }
 
-TEST(103)
+TEST (103)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_cell_outline_layer ("OUTLINE (4/0)");
   run_test (_this, "issue-517", "def:in.def", "au.oas.gz", options, false);
 }
 
-TEST(104_doxy_vias)
+TEST (104_doxy_vias)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_cell_outline_layer ("OUTLINE (4/0)");
   run_test (_this, "doxy_vias", "def:test.def", "au.oas.gz", options, false);
 }
 
-TEST(105_specialnets_geo)
+TEST (105_specialnets_geo)
 {
   run_test (_this, "specialnets_geo", "lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
 
@@ -529,22 +525,22 @@ TEST(105_specialnets_geo)
   run_test (_this, "specialnets_geo", "lef:test.lef+def:test.def", "au_spnet_mapped.oas.gz", options, false);
 }
 
-TEST(106_wrongdirection)
+TEST (106_wrongdirection)
 {
   run_test (_this, "wrongdirection", "lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
 }
 
-TEST(107_specialwidths)
+TEST (107_specialwidths)
 {
   run_test (_this, "specialwidths", "lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
 }
 
-TEST(108_scanchain)
+TEST (108_scanchain)
 {
   run_test (_this, "scanchain", "def:test.def", "au.oas.gz", default_options (), false);
 }
 
-TEST(109_foreigncell)
+TEST (109_foreigncell)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_cell_outline_layer ("OUTLINE (43/0)");
@@ -565,7 +561,7 @@ TEST(109_foreigncell)
   run_test (_this, "foreigncell", "gds:macros.gds+lef:in_tech.lef+def:in.def", "au_no_macros.oas.gz", options, false);
 }
 
-TEST(110_lefpins)
+TEST (110_lefpins)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_produce_lef_pins (false);
@@ -579,7 +575,7 @@ TEST(110_lefpins)
   run_test (_this, "lefpins", "lef:in_tech.lef+lef:in.lef+def:in.def", "au_lefpins_mapped.oas.gz", options, false);
 }
 
-TEST(111_mapfile)
+TEST (111_mapfile)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_single_map_file ("test.map");
@@ -591,7 +587,7 @@ TEST(111_mapfile)
   run_test (_this, "mapfile", "read:in.def", "au.oas.gz", options, false);
 }
 
-TEST(112_via_properties)
+TEST (112_via_properties)
 {
   db::LEFDEFReaderOptions options = default_options ();
   db::LayerMap lm = db::LayerMap::from_string_file_format ("metal1: 1\nvia1: 2\nmetal2: 3");
@@ -599,11 +595,10 @@ TEST(112_via_properties)
 
   db::LayerMap lm_read = run_test (_this, "via_properties", "lef:in.lef+def:in.def", "au.oas.gz", options, false);
   EXPECT_EQ (lm_read.to_string (),
-    "layer_map('OUTLINE : OUTLINE (4/0)';'metal1.VIA : metal1 (1/0)';'metal2.VIA : metal2 (3/0)';'via1.VIA : via1 (2/0)')"
-  )
+             "layer_map('OUTLINE : OUTLINE (4/0)';'metal1.VIA : metal1 (1/0)';'metal2.VIA : metal2 (3/0)';'via1.VIA : via1 (2/0)')")
 }
 
-TEST(113_masks_1)
+TEST (113_masks_1)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_routing_suffix ("");
@@ -626,66 +621,64 @@ TEST(113_masks_1)
   db::LayerMap lm_read = run_test (_this, "masks-1", "lef:in_tech.lef+def:in.def", "au.oas.gz", options, false);
 
   EXPECT_EQ (lm_read.to_string_file_format (),
-    "OUTLINE : OUTLINE (4/0)\n"
-    "'M0PO.SPNET:1' : M0PO (1/101)\n"
-    "'M1.SPNET:2' : M1 (3/201)\n"
-    "'M1.SPNET:1' : M1 (3/101)\n"
-    "'M0PO.VIA:2' : M0PO (1/202)\n"
-    "'M1.VIA:1' : M1 (3/102)\n"
-    "'VIA0.VIA:1' : VIA0 (2/102)\n"
-    "'M0PO.SPNET:2' : M0PO (1/201)\n"
-    "M0PO.PIN : M0PO (1/2)\n"
-    "M0PO.LABEL : M0PO.LABEL (1/1)\n"
-    "'M0PO.PIN:2' : M0PO (1/210)\n"
-    "'M1.PIN:1' : M1 (3/110)\n"
-    "M1.LABEL : M1.LABEL (3/1)\n"
-    "'M1.NET:1' : M1 (3/100)\n"
-    "'M1.NET:2' : M1 (3/200)\n"
-    "'M0PO.VIA:1' : M0PO (1/102)\n"
-    "'M1.VIA:2' : M1 (3/202)\n"
-    "'VIA0.VIA:2' : VIA0 (2/202)\n"
-    "'M0PO.NET:1' : M0PO (1/100)\n"
-  )
+             "OUTLINE : OUTLINE (4/0)\n"
+             "'M0PO.SPNET:1' : M0PO (1/101)\n"
+             "'M1.SPNET:2' : M1 (3/201)\n"
+             "'M1.SPNET:1' : M1 (3/101)\n"
+             "'M0PO.VIA:2' : M0PO (1/202)\n"
+             "'M1.VIA:1' : M1 (3/102)\n"
+             "'VIA0.VIA:1' : VIA0 (2/102)\n"
+             "'M0PO.SPNET:2' : M0PO (1/201)\n"
+             "M0PO.PIN : M0PO (1/2)\n"
+             "M0PO.LABEL : M0PO.LABEL (1/1)\n"
+             "'M0PO.PIN:2' : M0PO (1/210)\n"
+             "'M1.PIN:1' : M1 (3/110)\n"
+             "M1.LABEL : M1.LABEL (3/1)\n"
+             "'M1.NET:1' : M1 (3/100)\n"
+             "'M1.NET:2' : M1 (3/200)\n"
+             "'M0PO.VIA:1' : M0PO (1/102)\n"
+             "'M1.VIA:2' : M1 (3/202)\n"
+             "'VIA0.VIA:2' : VIA0 (2/202)\n"
+             "'M0PO.NET:1' : M0PO (1/100)\n")
 
   options = default_options ();
   lm_read = run_test (_this, "masks-1", "map:in.map+lef:in_tech.lef+def:in.def", "au_map.oas.gz", options, false);
 
   EXPECT_EQ (lm_read.to_string_file_format (),
-    "OUTLINE : OUTLINE (4/0)\n"
-    "'M0PO.NET:1' : 'M0PO.NET:1' (1/100)\n"
-    "'M0PO.NET:2' : 'M0PO.NET:2' (1/200)\n"
-    "M0PO.PIN : M0PO.PIN (1/2)\n"
-    "'M0PO.PIN:1' : 'M0PO.PIN:1' (1/110)\n"
-    "'M0PO.PIN:2' : 'M0PO.PIN:2' (1/210)\n"
-    "'M0PO.SPNET:1' : 'M0PO.SPNET:1' (1/101)\n"
-    "'M0PO.SPNET:2' : 'M0PO.SPNET:2' (1/201)\n"
-    "'M0PO.VIA:1' : 'M0PO.VIA:1' (1/102)\n"
-    "'M0PO.VIA:2' : 'M0PO.VIA:2' (1/202)\n"
-    "M0PO.LABEL;M0PO.LEFLABEL : 'M0PO.LABEL/M0PO.LEFLABEL' (1/1)\n"
-    "'M1.NET:1' : 'M1.NET:1' (3/100)\n"
-    "'M1.NET:2' : 'M1.NET:2' (3/200)\n"
-    "M1.PIN : M1.PIN (3/2)\n"
-    "'M1.PIN:1' : 'M1.PIN:1' (3/110)\n"
-    "'M1.PIN:2' : 'M1.PIN:2' (3/210)\n"
-    "'M1.SPNET:1' : 'M1.SPNET:1' (3/101)\n"
-    "'M1.SPNET:2' : 'M1.SPNET:2' (3/201)\n"
-    "'M1.VIA:1' : 'M1.VIA:1' (3/102)\n"
-    "'M1.VIA:2' : 'M1.VIA:2' (3/202)\n"
-    "M1.LABEL;M1.LEFLABEL : 'M1.LABEL/M1.LEFLABEL' (3/1)\n"
-    "'VIA0.NET:1' : 'VIA0.NET:1' (2/100)\n"
-    "'VIA0.NET:2' : 'VIA0.NET:2' (2/200)\n"
-    "VIA0.PIN : VIA0.PIN (2/2)\n"
-    "'VIA0.PIN:1' : 'VIA0.PIN:1' (2/110)\n"
-    "'VIA0.PIN:2' : 'VIA0.PIN:2' (2/210)\n"
-    "'VIA0.SPNET:1' : 'VIA0.SPNET:1' (2/101)\n"
-    "'VIA0.SPNET:2' : 'VIA0.SPNET:2' (2/201)\n"
-    "'VIA0.VIA:1' : 'VIA0.VIA:1' (2/102)\n"
-    "'VIA0.VIA:2' : 'VIA0.VIA:2' (2/202)\n"
-    "VIA0.LABEL;VIA0.LEFLABEL : 'VIA0.LABEL/VIA0.LEFLABEL' (2/1)\n"
-  )
+             "OUTLINE : OUTLINE (4/0)\n"
+             "'M0PO.NET:1' : 'M0PO.NET:1' (1/100)\n"
+             "'M0PO.NET:2' : 'M0PO.NET:2' (1/200)\n"
+             "M0PO.PIN : M0PO.PIN (1/2)\n"
+             "'M0PO.PIN:1' : 'M0PO.PIN:1' (1/110)\n"
+             "'M0PO.PIN:2' : 'M0PO.PIN:2' (1/210)\n"
+             "'M0PO.SPNET:1' : 'M0PO.SPNET:1' (1/101)\n"
+             "'M0PO.SPNET:2' : 'M0PO.SPNET:2' (1/201)\n"
+             "'M0PO.VIA:1' : 'M0PO.VIA:1' (1/102)\n"
+             "'M0PO.VIA:2' : 'M0PO.VIA:2' (1/202)\n"
+             "M0PO.LABEL;M0PO.LEFLABEL : 'M0PO.LABEL/M0PO.LEFLABEL' (1/1)\n"
+             "'M1.NET:1' : 'M1.NET:1' (3/100)\n"
+             "'M1.NET:2' : 'M1.NET:2' (3/200)\n"
+             "M1.PIN : M1.PIN (3/2)\n"
+             "'M1.PIN:1' : 'M1.PIN:1' (3/110)\n"
+             "'M1.PIN:2' : 'M1.PIN:2' (3/210)\n"
+             "'M1.SPNET:1' : 'M1.SPNET:1' (3/101)\n"
+             "'M1.SPNET:2' : 'M1.SPNET:2' (3/201)\n"
+             "'M1.VIA:1' : 'M1.VIA:1' (3/102)\n"
+             "'M1.VIA:2' : 'M1.VIA:2' (3/202)\n"
+             "M1.LABEL;M1.LEFLABEL : 'M1.LABEL/M1.LEFLABEL' (3/1)\n"
+             "'VIA0.NET:1' : 'VIA0.NET:1' (2/100)\n"
+             "'VIA0.NET:2' : 'VIA0.NET:2' (2/200)\n"
+             "VIA0.PIN : VIA0.PIN (2/2)\n"
+             "'VIA0.PIN:1' : 'VIA0.PIN:1' (2/110)\n"
+             "'VIA0.PIN:2' : 'VIA0.PIN:2' (2/210)\n"
+             "'VIA0.SPNET:1' : 'VIA0.SPNET:1' (2/101)\n"
+             "'VIA0.SPNET:2' : 'VIA0.SPNET:2' (2/201)\n"
+             "'VIA0.VIA:1' : 'VIA0.VIA:1' (2/102)\n"
+             "'VIA0.VIA:2' : 'VIA0.VIA:2' (2/202)\n"
+             "VIA0.LABEL;VIA0.LEFLABEL : 'VIA0.LABEL/VIA0.LEFLABEL' (2/1)\n")
 }
 
-TEST(114_lef_skips_end_library)
+TEST (114_lef_skips_end_library)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_produce_pin_names (true);
@@ -694,7 +687,7 @@ TEST(114_lef_skips_end_library)
   run_test (_this, "lef-skips-end-library", "lef:in.lef+def:in.def", "au.oas", opt, false);
 }
 
-TEST(115_componentmaskshift)
+TEST (115_componentmaskshift)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_single_map_file ("in.map");
@@ -702,7 +695,7 @@ TEST(115_componentmaskshift)
   run_test (_this, "masks-2", "lef:in_tech.lef+lef:in.lef+def:in.def", "au.oas.gz", options, false);
 }
 
-TEST(116_layer_mapping)
+TEST (116_layer_mapping)
 {
   db::LEFDEFReaderOptions options = default_options ();
   db::LayerMap lm = db::LayerMap::from_string_file_format ("metal1: 1\nvia1: 2\nmetal2: 3\nOUTLINE: 42/17");
@@ -712,8 +705,7 @@ TEST(116_layer_mapping)
     db::Layout layout;
     db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
     EXPECT_EQ (lm_read.to_string (),
-      "layer_map('OUTLINE : OUTLINE (42/17)';'metal1.VIA : metal1 (1/0)';'metal2.VIA : metal2 (3/0)';'via1.VIA : via1 (2/0)')"
-    )
+               "layer_map('OUTLINE : OUTLINE (42/17)';'metal1.VIA : metal1 (1/0)';'metal2.VIA : metal2 (3/0)';'via1.VIA : via1 (2/0)')")
   }
 
   options.set_layer_map (db::LayerMap ());
@@ -722,8 +714,7 @@ TEST(116_layer_mapping)
     db::Layout layout;
     db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
     EXPECT_EQ (lm_read.to_string (),
-      "layer_map('OUTLINE : OUTLINE (4/0)';'metal1.VIA : metal1 (1/0)';'metal2.VIA : metal2 (3/0)';'via1.VIA : via1 (2/0)')"
-    )
+               "layer_map('OUTLINE : OUTLINE (4/0)';'metal1.VIA : metal1 (1/0)';'metal2.VIA : metal2 (3/0)';'via1.VIA : via1 (2/0)')")
   }
 
   lm = db::LayerMap::from_string_file_format ("metal1: M1\nmetal1.V: M1_V\nvia1: V1\nmetal2: M2\nOUTLINE: OUTL");
@@ -735,8 +726,7 @@ TEST(116_layer_mapping)
     db::Layout layout;
     db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
     EXPECT_EQ (lm_read.to_string (),
-      "layer_map('OUTLINE : OUTL (4/0)';'metal1.VIA : M1V (1/42)';'metal2.VIA : M2V (3/42)';'via1.VIA : V1V (2/42)')"
-    )
+               "layer_map('OUTLINE : OUTL (4/0)';'metal1.VIA : M1V (1/42)';'metal2.VIA : M2V (3/42)';'via1.VIA : V1V (2/42)')")
   }
 
   lm = db::LayerMap::from_string_file_format ("metal1: M1\nmetal1.V: M1_V\nvia1: V1\nmetal2: M2");
@@ -749,8 +739,7 @@ TEST(116_layer_mapping)
     db::Layout layout;
     db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
     EXPECT_EQ (lm_read.to_string (),
-      "layer_map('metal1.VIA : M1V (1/42)';'metal2.VIA : M2V (3/42)';'via1.VIA : V1V (2/42)')"
-    )
+               "layer_map('metal1.VIA : M1V (1/42)';'metal2.VIA : M2V (3/42)';'via1.VIA : V1V (2/42)')")
   }
 
   lm = db::LayerMap::from_string_file_format ("metal2: M2 (17/1)");
@@ -760,8 +749,7 @@ TEST(116_layer_mapping)
     db::Layout layout;
     db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
     EXPECT_EQ (lm_read.to_string (),
-      "layer_map('metal2.VIA : M2V (17/43)')"
-    )
+               "layer_map('metal2.VIA : M2V (17/43)')")
   }
 
   options.set_produce_via_geometry (false);
@@ -770,8 +758,7 @@ TEST(116_layer_mapping)
     db::Layout layout;
     db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
     EXPECT_EQ (lm_read.to_string (),
-      "layer_map()"
-    )
+               "layer_map()")
   }
 
   options.set_produce_via_geometry (true);
@@ -783,8 +770,7 @@ TEST(116_layer_mapping)
     db::Layout layout;
     db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
     EXPECT_EQ (lm_read.to_string (),
-      "layer_map('metal2.VIA : metal2.V (17/1)')"
-    )
+               "layer_map('metal2.VIA : metal2.V (17/1)')")
   }
 
   lm = db::LayerMap::from_string_file_format ("metal2.V: m2v (17/5)");
@@ -794,8 +780,7 @@ TEST(116_layer_mapping)
     db::Layout layout;
     db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
     EXPECT_EQ (lm_read.to_string (),
-      "layer_map('metal2.VIA : m2v (17/5)')"
-    )
+               "layer_map('metal2.VIA : m2v (17/5)')")
   }
 
   lm = db::LayerMap::from_string_file_format ("OUTLINE: OUTL");
@@ -806,8 +791,7 @@ TEST(116_layer_mapping)
     db::Layout layout;
     db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
     EXPECT_EQ (lm_read.to_string (),
-      "layer_map('OUTLINE : OUTL (42/17)')"
-    )
+               "layer_map('OUTLINE : OUTL (42/17)')")
   }
 
   lm = db::LayerMap::from_string_file_format ("OUTLINE: OUTL (18/1)");
@@ -818,8 +802,7 @@ TEST(116_layer_mapping)
     db::Layout layout;
     db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
     EXPECT_EQ (lm_read.to_string (),
-      "layer_map('OUTLINE : OUTL (18/1)')"
-    )
+               "layer_map('OUTLINE : OUTL (18/1)')")
   }
 
   options.set_cell_outline_layer ("OUTLINE (42/17)");
@@ -830,8 +813,7 @@ TEST(116_layer_mapping)
     db::Layout layout;
     db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
     EXPECT_EQ (lm_read.to_string (),
-      "layer_map('OUTLINE : OUTL (18/1)')"
-    )
+               "layer_map('OUTLINE : OUTL (18/1)')")
   }
 
   options.set_cell_outline_layer ("42/17");
@@ -842,51 +824,49 @@ TEST(116_layer_mapping)
     db::Layout layout;
     db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
     EXPECT_EQ (lm_read.to_string (),
-      "layer_map('OUTLINE : OUTLINE (18/1)')"
-    )
+               "layer_map('OUTLINE : OUTLINE (18/1)')")
   }
 }
 
-TEST(117_mapfile_all)
+TEST (117_mapfile_all)
 {
   db::LEFDEFReaderOptions options = default_options ();
 
   db::Layout layout;
   db::LayerMap lm_read = read (layout, "mapfile", "lef:in.lef+def:in.def+map:all.map", options, false);
   EXPECT_EQ (lm_read.to_string (),
-    "layer_map("
-      "'OUTLINE : OUTLINE (1/0)';"
-      "'+M1.LEFOBS;M1.LEFPIN;M1.NET;M1.PIN;M1.SPNET;M1.VIA : \\'M1.NET/PIN/SPNET/...\\' (1/5)';"
-      "'+M1.NET;M1.SPNET : \\'M1.NET/SPNET\\' (16/0)';"
-      "'+M1.NET : M1.NET (18/0)';"
-      "'+M1.LEFPIN;M1.NET;M1.PIN;M1.SPNET;M1.VIA : \\'M1.NET/PIN/SPNET/...\\' (22/2)';"
-      "'+\\'M1.NET:1\\';\\'M1.PIN:1\\';\\'M1.SPNET:1\\';\\'M1.VIA:1\\' : \\'M1.NET:1/PIN:1/...\\' (6/0)';"
-      "'+\\'M1.NET:1\\' : \\'M1.NET:1\\' (7/0)';"
-      "'+M1.PIN : M1.PIN (3/0)';"
-      "'+M1.PIN : M1.PIN (4/0)';"
-      "'+M1.FILL : M1.FILL (14/0)';"
-      "'+M1.FILL : M1.FILL (15/0)';"
-      "'+M1.FILL : M1.FILL (17/0)';"
-      "'M1.FILLOPC : M1.FILLOPC (9/0)';"
-      "'\\'M1.FILLOPC:1\\' : \\'M1.FILLOPC:1\\' (10/0)';"
-      "'\\'M1.FILLOPC:2\\' : \\'M1.FILLOPC:2\\' (11/0)';"
-      "'\\'M1.VIA:SIZE0.05X0.05\\' : \\'M1.VIA:SIZE0.05X0.05\\' (20/0)';"
-      "'\\'M1.VIA:SIZE3X3\\' : \\'M1.VIA:SIZE3X3\\' (21/0)';"
-      "'M1.LABEL : M1.LABEL (26/0)';"
-      // NAME M1/NET not supported: "'+M1.LABEL : M1.LABEL (27/0)';"
-      // NAME M1/SPNET not supported: "'+M1.LABEL : M1.LABEL (28/1)';"
-      "'M1.BLK : M1.BLK (13/0)';"
-      "'M1_TEXT.LABEL;M1_TEXT.LEFLABEL : \\'M1_TEXT.LABEL/M1_TEXT.LEFLABEL\\' (29/0)'"
-    ")"
-  )
+             "layer_map("
+             "'OUTLINE : OUTLINE (1/0)';"
+             "'+M1.LEFOBS;M1.LEFPIN;M1.NET;M1.PIN;M1.SPNET;M1.VIA : \\'M1.NET/PIN/SPNET/...\\' (1/5)';"
+             "'+M1.NET;M1.SPNET : \\'M1.NET/SPNET\\' (16/0)';"
+             "'+M1.NET : M1.NET (18/0)';"
+             "'+M1.LEFPIN;M1.NET;M1.PIN;M1.SPNET;M1.VIA : \\'M1.NET/PIN/SPNET/...\\' (22/2)';"
+             "'+\\'M1.NET:1\\';\\'M1.PIN:1\\';\\'M1.SPNET:1\\';\\'M1.VIA:1\\' : \\'M1.NET:1/PIN:1/...\\' (6/0)';"
+             "'+\\'M1.NET:1\\' : \\'M1.NET:1\\' (7/0)';"
+             "'+M1.PIN : M1.PIN (3/0)';"
+             "'+M1.PIN : M1.PIN (4/0)';"
+             "'+M1.FILL : M1.FILL (14/0)';"
+             "'+M1.FILL : M1.FILL (15/0)';"
+             "'+M1.FILL : M1.FILL (17/0)';"
+             "'M1.FILLOPC : M1.FILLOPC (9/0)';"
+             "'\\'M1.FILLOPC:1\\' : \\'M1.FILLOPC:1\\' (10/0)';"
+             "'\\'M1.FILLOPC:2\\' : \\'M1.FILLOPC:2\\' (11/0)';"
+             "'\\'M1.VIA:SIZE0.05X0.05\\' : \\'M1.VIA:SIZE0.05X0.05\\' (20/0)';"
+             "'\\'M1.VIA:SIZE3X3\\' : \\'M1.VIA:SIZE3X3\\' (21/0)';"
+             "'M1.LABEL : M1.LABEL (26/0)';"
+             // NAME M1/NET not supported: "'+M1.LABEL : M1.LABEL (27/0)';"
+             // NAME M1/SPNET not supported: "'+M1.LABEL : M1.LABEL (28/1)';"
+             "'M1.BLK : M1.BLK (13/0)';"
+             "'M1_TEXT.LABEL;M1_TEXT.LEFLABEL : \\'M1_TEXT.LABEL/M1_TEXT.LEFLABEL\\' (29/0)'"
+             ")")
 }
 
-TEST(118_density)
+TEST (118_density)
 {
   run_test (_this, "density", "read:in.lef", "au.oas.gz", default_options (), false);
 }
 
-TEST(119_multimapping)
+TEST (119_multimapping)
 {
   db::LEFDEFReaderOptions options = default_options ();
   db::LayerMap lm = db::LayerMap::from_string_file_format ("(M1:1/0)\n(M2:3/0)\n+(M1:100/0)\n+(M2:100/0)\n(VIA1:2/0)");
@@ -894,44 +874,43 @@ TEST(119_multimapping)
 
   db::LayerMap lm_read = run_test (_this, "multimap", "def:test.def", "au.oas.gz", options, false);
   EXPECT_EQ (lm_read.to_string (),
-    "layer_map("
-      "'OUTLINE : OUTLINE (4/0)';"
-      "'+M1.VIA : M1 (1/0)';"
-      "'+M1.VIA;M2.VIA : \\'M1;M2\\' (100/0)';"
-      "'+M2.VIA : M2 (3/0)';"
-      "'VIA1.VIA : VIA1 (2/0)'"
-    ")"
-  )
+             "layer_map("
+             "'OUTLINE : OUTLINE (4/0)';"
+             "'+M1.VIA : M1 (1/0)';"
+             "'+M1.VIA;M2.VIA : \\'M1;M2\\' (100/0)';"
+             "'+M2.VIA : M2 (3/0)';"
+             "'VIA1.VIA : VIA1 (2/0)'"
+             ")")
 }
 
-TEST(120_simplefill)
+TEST (120_simplefill)
 {
   run_test (_this, "fill", "map:simple.map+lef:simple.lef+def:simple.def", "simple_au.oas.gz", default_options (), false);
 }
 
-TEST(121_fillwithmask)
+TEST (121_fillwithmask)
 {
   run_test (_this, "fill", "map:with_mask.map+lef:with_mask.lef+def:with_mask.def", "with_mask_au.oas.gz", default_options (), false);
 }
 
-TEST(130_viasize)
+TEST (130_viasize)
 {
   run_test (_this, "viasize", "map:test.map+lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
 }
 
 //  issue-1065
-TEST(130_viasize2)
+TEST (130_viasize2)
 {
   run_test (_this, "viasize2", "map:test_ok.map+lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
   run_test (_this, "viasize2", "map:test_fail.map+lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
 }
 
-TEST(131_patternname)
+TEST (131_patternname)
 {
   run_test (_this, "patternname", "map:v.map+lef:v.lef+def:v.def", "au.oas.gz", default_options (), false);
 }
 
-TEST(132_issue1307_pin_names)
+TEST (132_issue1307_pin_names)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_produce_pin_names (true);
@@ -955,7 +934,7 @@ TEST(133_unknown_vias_are_errors)
 }
 */
 
-TEST(200_lefdef_plugin)
+TEST (200_lefdef_plugin)
 {
   db::Layout ly;
 
@@ -976,7 +955,7 @@ TEST(200_lefdef_plugin)
   db::compare_layouts (_this, ly, fn_path + "au_plugin_def.oas.gz", db::WriteOAS);
 }
 
-TEST(201_lefdef_plugin_explicit_lef)
+TEST (201_lefdef_plugin_explicit_lef)
 {
   db::Layout ly;
 
@@ -1001,7 +980,7 @@ TEST(201_lefdef_plugin_explicit_lef)
   db::compare_layouts (_this, ly, fn_path + "au_plugin_alt_lef.oas.gz", db::WriteOAS);
 }
 
-TEST(202_lefdef_blend_mode)
+TEST (202_lefdef_blend_mode)
 {
   db::LEFDEFReaderOptions lefdef_opt = default_options ();
 
@@ -1012,7 +991,7 @@ TEST(202_lefdef_blend_mode)
   run_test2 (_this, "blend_mode", "map:layers.map+lef:sub.lef+def:top.def", "map:layers.map+def:sub.def", "au3.oas.gz", lefdef_opt, false);
 }
 
-TEST(203_regionsAndMapfileConcat)
+TEST (203_regionsAndMapfileConcat)
 {
   db::LEFDEFReaderOptions lefdef_opt = default_options ();
 
@@ -1020,7 +999,7 @@ TEST(203_regionsAndMapfileConcat)
 }
 
 //  issue 1132
-TEST(204_concave_pins)
+TEST (204_concave_pins)
 {
   db::LEFDEFReaderOptions lefdef_opt = default_options ();
   lefdef_opt.set_lef_pins_datatype (12);
@@ -1032,7 +1011,7 @@ TEST(204_concave_pins)
 }
 
 //  issue 1214
-TEST(205_lef_resistance)
+TEST (205_lef_resistance)
 {
   db::LEFDEFReaderOptions lefdef_opt = default_options ();
   lefdef_opt.set_lef_pins_datatype (12);
@@ -1044,13 +1023,13 @@ TEST(205_lef_resistance)
 }
 
 //  issue 1282
-TEST(206_lef_spacing)
+TEST (206_lef_spacing)
 {
   run_test (_this, "issue-1282", "read:a.lef", 0, default_options (), false);
 }
 
 //  issue-1345
-TEST(207_joined_paths)
+TEST (207_joined_paths)
 {
   db::LEFDEFReaderOptions lefdef_opt = default_options ();
   lefdef_opt.set_joined_paths (true);
@@ -1060,25 +1039,25 @@ TEST(207_joined_paths)
 }
 
 //  issue-1432
-TEST(208_nets_and_rects)
+TEST (208_nets_and_rects)
 {
   run_test (_this, "issue-1432", "map:test.map+lef:test.lef+def:test.def", "au.oas", default_options (), false);
 }
 
 //  issue-1472
-TEST(209_invalid_split_paths)
+TEST (209_invalid_split_paths)
 {
   run_test (_this, "issue-1472", "map:tech.map+lef:tech.lef.gz+def:test.def.gz", "au.oas", default_options (), false);
 }
 
 //  issue-1499
-TEST(210_overlaps)
+TEST (210_overlaps)
 {
   run_test (_this, "issue-1499", "map:tech.map+lef:tech.lef+lef:blocks.lef+def:top.def", "au.oas", default_options (), false);
 }
 
 //  issue-1531
-TEST(211_symlinks)
+TEST (211_symlinks)
 {
   db::Layout ly;
 
@@ -1105,13 +1084,13 @@ TEST(211_symlinks)
 }
 
 //  issue-1528
-TEST(212_widthtable)
+TEST (212_widthtable)
 {
   run_test (_this, "issue-1528", "map:gds.map+lef:tech.lef+def:routed.def", "au.oas", default_options (), false);
 }
 
 //  issue-1724 (skip duplicate LEF)
-TEST(213_no_duplicate_LEF)
+TEST (213_no_duplicate_LEF)
 {
   db::Layout ly;
 
@@ -1138,7 +1117,7 @@ TEST(213_no_duplicate_LEF)
 }
 
 //  issue-1877 (VIA placement rounding)
-TEST(214_issue1877)
+TEST (214_issue1877)
 {
   db::Layout ly;
 
@@ -1161,7 +1140,7 @@ TEST(214_issue1877)
 }
 
 //  multi-DEF reader support (issue-2014)
-TEST(215_multiDEF)
+TEST (215_multiDEF)
 {
   std::string fn_path (tl::testdata ());
   fn_path += "/lefdef/multi_def/";
@@ -1177,14 +1156,13 @@ TEST(215_multiDEF)
   opt.set_option_by_name ("lefdef_config.map_file", "layers.map");
   opt.set_option_by_name ("lefdef_config.read_lef_with_def", true);
 
-  const char *files[] = {
+  const char *files [] = {
     "main.def",
     "comp_a.def",
     "comp_b.def",
-    "comp_c.def"
-  };
+    "comp_c.def"};
 
-  for (const char **fn = files; fn != files + sizeof (files) / sizeof (files[0]); ++fn) {
+  for (const char **fn = files; fn != files + sizeof (files) / sizeof (files [0]); ++fn) {
     tl::InputStream is (fn_path + *fn);
     db::Reader reader (is);
     reader.read (ly, opt);
@@ -1194,8 +1172,7 @@ TEST(215_multiDEF)
 }
 
 //  issue-2075
-TEST(216_line_extensions)
+TEST (216_line_extensions)
 {
   run_test (_this, "issue-2075", "map:test.map+lef:test.lef+def:test.def", "au.oas", default_options (), false);
 }
-

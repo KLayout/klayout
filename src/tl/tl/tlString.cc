@@ -63,8 +63,8 @@ StringConversionException::StringConversionException (const std::type_info &ti)
 wchar_t wdowncase (wchar_t c)
 {
   int ch = c >> 8;
-  if (ch >= 0 && ch < int (sizeof (uc_tab) / sizeof (uc_tab[0])) && uc_tab[ch]) {
-    return uc_tab[ch][c & 0xff];
+  if (ch >= 0 && ch < int (sizeof (uc_tab) / sizeof (uc_tab [0])) && uc_tab [ch]) {
+    return uc_tab [ch][c & 0xff];
   } else {
     return c;
   }
@@ -73,8 +73,8 @@ wchar_t wdowncase (wchar_t c)
 wchar_t wupcase (wchar_t c)
 {
   int ch = c >> 8;
-  if (ch >= 0 && ch < int (sizeof (lc_tab) / sizeof (lc_tab[0])) && lc_tab[ch]) {
-    return lc_tab[ch][c & 0xff];
+  if (ch >= 0 && ch < int (sizeof (lc_tab) / sizeof (lc_tab [0])) && lc_tab [ch]) {
+    return lc_tab [ch][c & 0xff];
   } else {
     return c;
   }
@@ -123,7 +123,7 @@ std::wstring to_wstring (const std::string &s)
   std::wstring ws;
 
   const char *cpe = s.c_str () + s.size ();
-  for (const char *cp = s.c_str (); cp < cpe; ) {
+  for (const char *cp = s.c_str (); cp < cpe;) {
 
     uint32_t c32 = utf32_from_utf8 (cp, cpe);
 
@@ -134,7 +134,6 @@ std::wstring to_wstring (const std::string &s)
     } else {
       ws += wchar_t (c32);
     }
-
   }
 
   return ws;
@@ -175,7 +174,6 @@ std::string to_string (const std::wstring &ws)
     } else {
       s.push_back (char (c32));
     }
-
   }
 
   return s;
@@ -216,7 +214,7 @@ inline bool safe_isspace (char c)
 bool skip_newline (const char *&cp)
 {
   if (*cp == '\012' || *cp == '\015') {
-    if (*cp == '\015' && cp[1] == '\012') {
+    if (*cp == '\015' && cp [1] == '\012') {
       ++cp;
     }
     ++cp;
@@ -310,7 +308,7 @@ std::string to_local (const std::string &s)
   for (std::wstring::const_iterator c = ws.begin (); c != ws.end (); ++c) {
     int length = wctomb (buffer.get (), *c);
     for (int i = 0; i < length; ++i) {
-      ls += buffer.get ()[i];
+      ls += buffer.get () [i];
     }
   }
 
@@ -410,7 +408,7 @@ static double local_strtod (const char *cp, const char *&cp_new)
 
   cp_new = cp;
 
-  return s * mant * pow(10.0, exponent);
+  return s * mant * pow (10.0, exponent);
 }
 
 // -------------------------------------------------------------------------
@@ -528,10 +526,10 @@ template <>
 std::string
 to_string (const __int128 &d)
 {
-  if (d < 0 ) {
-    return "-" + tl::to_string(static_cast<unsigned __int128> (-d));
+  if (d < 0) {
+    return "-" + tl::to_string (static_cast<unsigned __int128> (-d));
   } else {
-    return tl::to_string(static_cast<unsigned __int128> (d));
+    return tl::to_string (static_cast<unsigned __int128> (d));
   }
 }
 
@@ -558,14 +556,14 @@ to_string (const unsigned __int128 &_x)
       d += 1;
       x -= m;
     }
-    if (d > 0 || !first) {
+    if (d > 0 || ! first) {
       r += char ('0' + d);
       first = false;
     }
     m /= 10;
   }
 
-  r += char('0' + int(x));
+  r += char ('0' + int (x));
   return r;
 }
 
@@ -573,28 +571,28 @@ to_string (const unsigned __int128 &_x)
 
 template <>
 std::string
-to_string (char * const &cp)
+to_string (char *const &cp)
 {
   return std::string (cp);
 }
 
 template <>
 std::string
-to_string (const char * const &cp)
+to_string (const char *const &cp)
 {
   return std::string (cp);
 }
 
 template <>
 std::string
-to_string (unsigned char * const &cp)
+to_string (unsigned char *const &cp)
 {
   return std::string ((const char *) cp);
 }
 
 template <>
 std::string
-to_string (const unsigned char * const &cp)
+to_string (const unsigned char *const &cp)
 {
   return std::string ((const char *) cp);
 }
@@ -618,28 +616,26 @@ to_string (const bool &b)
   return b ? "true" : "false";
 }
 
-int
-edit_distance (const std::string &a, const std::string &b)
+int edit_distance (const std::string &a, const std::string &b)
 {
   std::vector<int> row0, row1;
   row0.resize (a.size () + 1, 0);
   row1.resize (a.size () + 1, 0);
 
   for (int i = 0; i <= int (a.size ()); ++i) {
-    row0[i] = i;
+    row0 [i] = i;
   }
 
   for (int i = 0; i < int (b.size ()); ++i) {
 
-    row1[0] = i + 1;
+    row1 [0] = i + 1;
 
     for (int j = 0; j < int (a.size ()); ++j) {
-      int cost = (b[i] == a[j] ? 0 : 1);
-      row1[j + 1] = std::min (row0[j] + cost, std::min (row0[j + 1], row1[j]) + 1);
+      int cost = (b [i] == a [j] ? 0 : 1);
+      row1 [j + 1] = std::min (row0 [j] + cost, std::min (row0 [j + 1], row1 [j]) + 1);
     }
 
     row0.swap (row1);
-
   }
 
   return row0 [a.size ()];
@@ -698,7 +694,7 @@ escape_string (const std::string &s)
   return r;
 }
 
-inline char unescape_char (const char * &cp)
+inline char unescape_char (const char *&cp)
 {
   if (safe_isdigit (*cp)) {
     int c = 0;
@@ -725,7 +721,7 @@ unescape_string (const std::string &value)
 {
   std::string r;
   for (const char *cp = value.c_str (); *cp; ++cp) {
-    if (*cp == '\\' && cp[1]) {
+    if (*cp == '\\' && cp [1]) {
       ++cp;
       r += unescape_char (cp);
     } else {
@@ -743,7 +739,7 @@ to_word_or_quoted_string (const std::string &s, const char *non_term)
   const char *cp = s.c_str ();
   if (*cp && (safe_isalpha (*cp) || strchr (non_term, *cp) != NULL)) {
     ++cp;
-    for ( ; *cp && (safe_isalnum (*cp) || strchr (non_term, *cp) != NULL); ++cp) {
+    for (; *cp && (safe_isalnum (*cp) || strchr (non_term, *cp) != NULL); ++cp) {
       ;
     }
   }
@@ -754,8 +750,7 @@ to_word_or_quoted_string (const std::string &s, const char *non_term)
   }
 }
 
-void
-escape_to_html (std::string &out, const std::string &in, bool replace_newlines)
+void escape_to_html (std::string &out, const std::string &in, bool replace_newlines)
 {
   for (const char *cp = in.c_str (); *cp; ++cp) {
     if (*cp == '<') {
@@ -834,7 +829,7 @@ replaced (const std::string &subject, const std::string &before, const std::stri
   std::string::size_type last = 0;
   while ((pos = subject.find (before, last)) != std::string::npos) {
     if (pos > last) {
-       s += std::string (subject, last, pos - last);
+      s += std::string (subject, last, pos - last);
     }
     s += after;
     last = pos + before.size ();
@@ -847,14 +842,12 @@ replaced (const std::string &subject, const std::string &before, const std::stri
   return s;
 }
 
-void
-from_string (const std::string &s, const char * &result)
+void from_string (const std::string &s, const char *&result)
 {
   result = s.c_str ();
 }
 
-void
-from_string (const std::string &s, const unsigned char * &result)
+void from_string (const std::string &s, const unsigned char *&result)
 {
   result = (unsigned char *) s.c_str ();
 }
@@ -893,10 +886,10 @@ convert_string_to_int (const std::string &s, T &v, bool eval)
   double x;
   // HACK: this should be some real string-to-int conversion
   tl::from_string_numeric (s, x, eval);
-  if (x < std::numeric_limits <T>::min ()) {
+  if (x < std::numeric_limits<T>::min ()) {
     throw tl::Exception (tl::to_string (tr ("Range underflow: ")) + s);
   }
-  if (x > std::numeric_limits <T>::max ()) {
+  if (x > std::numeric_limits<T>::max ()) {
     throw tl::Exception (tl::to_string (tr ("Range overflow: ")) + s);
   }
   v = T (x);
@@ -905,92 +898,77 @@ convert_string_to_int (const std::string &s, T &v, bool eval)
   }
 }
 
-void
-from_string (const std::string &s, double &v)
+void from_string (const std::string &s, double &v)
 {
   return from_string_numeric (s, v, false);
 }
 
-void
-from_string (const std::string &s, int &v)
+void from_string (const std::string &s, int &v)
 {
   convert_string_to_int (s, v, false);
 }
 
-void
-from_string (const std::string &s, long &v)
+void from_string (const std::string &s, long &v)
 {
   convert_string_to_int (s, v, false);
 }
 
-void
-from_string (const std::string &s, long long &v)
+void from_string (const std::string &s, long long &v)
 {
   convert_string_to_int (s, v, false);
 }
 
-void
-from_string (const std::string &s, unsigned int &v)
+void from_string (const std::string &s, unsigned int &v)
 {
   convert_string_to_int (s, v, false);
 }
 
-void
-from_string (const std::string &s, unsigned long &v)
+void from_string (const std::string &s, unsigned long &v)
 {
   convert_string_to_int (s, v, false);
 }
 
-void
-from_string (const std::string &s, unsigned long long &v)
+void from_string (const std::string &s, unsigned long long &v)
 {
   convert_string_to_int (s, v, false);
 }
 
-void
-from_string_ext (const std::string &s, double &v)
+void from_string_ext (const std::string &s, double &v)
 {
   return from_string_numeric (s, v, true);
 }
 
-void
-from_string_ext (const std::string &s, int &v)
+void from_string_ext (const std::string &s, int &v)
 {
   convert_string_to_int (s, v, true);
 }
 
-void
-from_string_ext (const std::string &s, long &v)
+void from_string_ext (const std::string &s, long &v)
 {
   convert_string_to_int (s, v, true);
 }
 
-void
-from_string_ext (const std::string &s, long long &v)
+void from_string_ext (const std::string &s, long long &v)
 {
   convert_string_to_int (s, v, true);
 }
 
-void
-from_string_ext (const std::string &s, unsigned int &v)
+void from_string_ext (const std::string &s, unsigned int &v)
 {
   convert_string_to_int (s, v, true);
 }
 
-void
-from_string_ext (const std::string &s, unsigned long &v)
+void from_string_ext (const std::string &s, unsigned long &v)
 {
   convert_string_to_int (s, v, true);
 }
 
-void
-from_string_ext (const std::string &s, unsigned long long &v)
+void from_string_ext (const std::string &s, unsigned long long &v)
 {
   convert_string_to_int (s, v, true);
 }
 
-void
-from_string (const std::string &s, bool &b)
+void from_string (const std::string &s, bool &b)
 {
   std::string t (tl::trim (s));
   if (t == "true") {
@@ -1189,63 +1167,56 @@ Extractor::read_quoted (std::string &value)
 
 namespace
 {
-  template <class T> struct overflow_msg_func;
+template <class T> struct overflow_msg_func;
 
-  template <> struct overflow_msg_func<long long>
+template <> struct overflow_msg_func<long long> {
+  std::string operator() () const
   {
-    std::string operator() () const
-    {
-      return tl::to_string (tr ("Range overflow on long long integer"));
-    }
-  };
+    return tl::to_string (tr ("Range overflow on long long integer"));
+  }
+};
 
-  template <> struct overflow_msg_func<unsigned long long>
+template <> struct overflow_msg_func<unsigned long long> {
+  std::string operator() () const
   {
-    std::string operator() () const
-    {
-      return tl::to_string (tr ("Range overflow on unsigned long long integer"));
-    }
-  };
+    return tl::to_string (tr ("Range overflow on unsigned long long integer"));
+  }
+};
 
-  template <> struct overflow_msg_func<long>
+template <> struct overflow_msg_func<long> {
+  std::string operator() () const
   {
-    std::string operator() () const
-    {
-      return tl::to_string (tr ("Range overflow on long integer"));
-    }
-  };
+    return tl::to_string (tr ("Range overflow on long integer"));
+  }
+};
 
-  template <> struct overflow_msg_func<unsigned long>
+template <> struct overflow_msg_func<unsigned long> {
+  std::string operator() () const
   {
-    std::string operator() () const
-    {
-      return tl::to_string (tr ("Range overflow on unsigned long integer"));
-    }
-  };
+    return tl::to_string (tr ("Range overflow on unsigned long integer"));
+  }
+};
 
-  template <> struct overflow_msg_func<int>
+template <> struct overflow_msg_func<int> {
+  std::string operator() () const
   {
-    std::string operator() () const
-    {
-      return tl::to_string (tr ("Range overflow on integer"));
-    }
-  };
+    return tl::to_string (tr ("Range overflow on integer"));
+  }
+};
 
-  template <> struct overflow_msg_func<unsigned int>
+template <> struct overflow_msg_func<unsigned int> {
+  std::string operator() () const
   {
-    std::string operator() () const
-    {
-      return tl::to_string (tr ("Range overflow on unsigned integer"));
-    }
-  };
+    return tl::to_string (tr ("Range overflow on unsigned integer"));
+  }
+};
 
-  template <> struct overflow_msg_func<unsigned char>
+template <> struct overflow_msg_func<unsigned char> {
+  std::string operator() () const
   {
-    std::string operator() () const
-    {
-      return tl::to_string (tr ("Range overflow on unsigned byte"));
-    }
-  };
+    return tl::to_string (tr ("Range overflow on unsigned byte"));
+  }
+};
 }
 
 template <class T> bool
@@ -1314,50 +1285,42 @@ Extractor::try_read_unsigned_int (T &value)
   return true;
 }
 
-bool
-Extractor::try_read (unsigned char &value)
+bool Extractor::try_read (unsigned char &value)
 {
   return try_read_unsigned_int (value);
 }
 
-bool
-Extractor::try_read (unsigned int &value)
+bool Extractor::try_read (unsigned int &value)
 {
   return try_read_unsigned_int (value);
 }
 
-bool
-Extractor::try_read (unsigned long &value)
+bool Extractor::try_read (unsigned long &value)
 {
   return try_read_unsigned_int (value);
 }
 
-bool
-Extractor::try_read (unsigned long long &value)
+bool Extractor::try_read (unsigned long long &value)
 {
   return try_read_unsigned_int (value);
 }
 
-bool
-Extractor::try_read (int &value)
+bool Extractor::try_read (int &value)
 {
   return try_read_signed_int (value);
 }
 
-bool
-Extractor::try_read (long &value)
+bool Extractor::try_read (long &value)
 {
   return try_read_signed_int (value);
 }
 
-bool
-Extractor::try_read (long long &value)
+bool Extractor::try_read (long long &value)
 {
   return try_read_signed_int (value);
 }
 
-bool
-Extractor::try_read (float &value)
+bool Extractor::try_read (float &value)
 {
   double d = value;
   if (try_read (d)) {
@@ -1368,8 +1331,7 @@ Extractor::try_read (float &value)
   }
 }
 
-bool
-Extractor::try_read (double &value)
+bool Extractor::try_read (double &value)
 {
   if (! *skip ()) {
     return false;
@@ -1386,8 +1348,7 @@ Extractor::try_read (double &value)
   }
 }
 
-bool
-Extractor::try_read (bool &value)
+bool Extractor::try_read (bool &value)
 {
   if (test ("0") || test ("false")) {
     value = false;
@@ -1400,8 +1361,7 @@ Extractor::try_read (bool &value)
   return false;
 }
 
-bool
-Extractor::try_read_name (std::string &string, const char *non_term)
+bool Extractor::try_read_name (std::string &string, const char *non_term)
 {
   if (! *skip ()) {
     return false;
@@ -1425,8 +1385,7 @@ Extractor::try_read_name (std::string &string, const char *non_term)
   return ! string.empty ();
 }
 
-bool
-Extractor::try_read_word (std::string &string, const char *non_term)
+bool Extractor::try_read_word (std::string &string, const char *non_term)
 {
   if (! *skip ()) {
     return false;
@@ -1442,14 +1401,12 @@ Extractor::try_read_word (std::string &string, const char *non_term)
   return ! string.empty ();
 }
 
-bool
-Extractor::try_read_word_or_quoted (std::string &string, const char *non_term)
+bool Extractor::try_read_word_or_quoted (std::string &string, const char *non_term)
 {
   return try_read_word (string, non_term) || try_read_quoted (string);
 }
 
-bool
-Extractor::try_read_quoted (std::string &string)
+bool Extractor::try_read_quoted (std::string &string)
 {
   char q = *skip ();
 
@@ -1460,7 +1417,7 @@ Extractor::try_read_quoted (std::string &string)
   ++m_cp;
   string.clear ();
   while (*m_cp && *m_cp != q) {
-    if (*m_cp == '\\' && m_cp[1]) {
+    if (*m_cp == '\\' && m_cp [1]) {
       ++m_cp;
       string += unescape_char (m_cp);
     } else {
@@ -1474,8 +1431,7 @@ Extractor::try_read_quoted (std::string &string)
   return true;
 }
 
-bool
-Extractor::try_read (std::string &string, const char *term)
+bool Extractor::try_read (std::string &string, const char *term)
 {
   //  if the terminating characters contain line feed for blank, we must not skip over them
   if (strchr (term, '\n') || strchr (term, ' ')) {
@@ -1529,8 +1485,7 @@ Extractor::expect (const char *token)
   return *this;
 }
 
-bool
-Extractor::test (const char *token)
+bool Extractor::test (const char *token)
 {
   skip ();
 
@@ -1551,8 +1506,7 @@ Extractor::test (const char *token)
   }
 }
 
-bool
-Extractor::test_without_case (const char *token)
+bool Extractor::test_without_case (const char *token)
 {
   skip ();
 
@@ -1582,8 +1536,7 @@ Extractor::skip ()
   return m_cp;
 }
 
-void
-Extractor::error (const std::string &msg)
+void Extractor::error (const std::string &msg)
 {
   std::string m (msg);
 
@@ -1707,8 +1660,7 @@ string::operator= (const char *c)
   return *this;
 }
 
-void
-string::assign (const char *c, size_t from, size_t to)
+void string::assign (const char *c, size_t from, size_t to)
 {
   m_size = to - from;
   if (m_size > 0) {
@@ -1754,8 +1706,7 @@ string::operator= (const string &s)
   return *this;
 }
 
-void
-string::assign (const tl::string &s, size_t from, size_t to)
+void string::assign (const tl::string &s, size_t from, size_t to)
 {
   if (&s != this) {
     assign (s.c_str (), from, to);
@@ -1772,14 +1723,12 @@ string::operator= (const std::string &s)
   return *this;
 }
 
-void
-string::assign (const std::string &s, size_t from, size_t to)
+void string::assign (const std::string &s, size_t from, size_t to)
 {
   assign (s.c_str (), from, to);
 }
 
-void
-string::clear ()
+void string::clear ()
 {
   if (mp_rep) {
     allocator_t alloc;
@@ -1790,8 +1739,7 @@ string::clear ()
   m_capacity = 0;
 }
 
-void
-string::reserve (size_t n)
+void string::reserve (size_t n)
 {
   if (m_capacity < n) {
     allocator_t alloc;
@@ -1805,76 +1753,64 @@ string::reserve (size_t n)
   }
 }
 
-bool
-string::operator== (const char *c) const
+bool string::operator== (const char *c) const
 {
-  return (c[0] == c_str()[0] && strcmp (c, c_str()) == 0);
+  return (c [0] == c_str () [0] && strcmp (c, c_str ()) == 0);
 }
 
-bool
-string::operator== (const tl::string &s) const
+bool string::operator== (const tl::string &s) const
 {
-  return (c_str()[0] == s.c_str()[0] && strcmp (c_str(), s.c_str()) == 0);
+  return (c_str () [0] == s.c_str () [0] && strcmp (c_str (), s.c_str ()) == 0);
 }
 
-bool
-string::operator!= (const char *c) const
+bool string::operator!= (const char *c) const
 {
-  return (c[0] != c_str()[0] || strcmp (c, c_str()) != 0);
+  return (c [0] != c_str () [0] || strcmp (c, c_str ()) != 0);
 }
 
-bool
-string::operator!= (const tl::string &s) const
+bool string::operator!= (const tl::string &s) const
 {
-  return (c_str()[0] != s.c_str()[0] || strcmp (c_str(), s.c_str()) != 0);
+  return (c_str () [0] != s.c_str () [0] || strcmp (c_str (), s.c_str ()) != 0);
 }
 
-bool
-string::operator< (const char *c) const
+bool string::operator< (const char *c) const
 {
-  return strcmp (c_str(), c) < 0;
+  return strcmp (c_str (), c) < 0;
 }
 
-bool
-string::operator< (const tl::string &s) const
+bool string::operator< (const tl::string &s) const
 {
-  return strcmp (c_str(), s.c_str()) < 0;
+  return strcmp (c_str (), s.c_str ()) < 0;
 }
 
-bool
-string::operator<= (const char *c) const
+bool string::operator<= (const char *c) const
 {
-  return strcmp (c_str(), c) <= 0;
+  return strcmp (c_str (), c) <= 0;
 }
 
-bool
-string::operator<= (const tl::string &s) const
+bool string::operator<= (const tl::string &s) const
 {
-  return strcmp (c_str(), s.c_str()) <= 0;
+  return strcmp (c_str (), s.c_str ()) <= 0;
 }
 
-bool
-string::operator> (const char *c) const
+bool string::operator> (const char *c) const
 {
-  return strcmp (c_str(), c) > 0;
+  return strcmp (c_str (), c) > 0;
 }
 
-bool
-string::operator> (const tl::string &s) const
+bool string::operator> (const tl::string &s) const
 {
-  return strcmp (c_str(), s.c_str()) > 0;
+  return strcmp (c_str (), s.c_str ()) > 0;
 }
 
-bool
-string::operator>= (const char *c) const
+bool string::operator>= (const char *c) const
 {
-  return strcmp (c_str(), c) >= 0;
+  return strcmp (c_str (), c) >= 0;
 }
 
-bool
-string::operator>= (const tl::string &s) const
+bool string::operator>= (const tl::string &s) const
 {
-  return strcmp (c_str(), s.c_str()) >= 0;
+  return strcmp (c_str (), s.c_str ()) >= 0;
 }
 
 // -------------------------------------------------------------------
@@ -1897,28 +1833,28 @@ std::string format_sci_stlport_fix (double f, int prec, unsigned int flags)
   std::string res;
   res.reserve (os.str ().size ());
   for (const char *cp = os.str ().c_str (); *cp; ++cp) {
-  if (*cp == '0' && (cp[1] == 'e' || cp[1] == 'E')) {
-    ++cp;
-  }
-  res += *cp;
+    if (*cp == '0' && (cp [1] == 'e' || cp [1] == 'E')) {
+      ++cp;
+    }
+    res += *cp;
   }
   return res;
 };
 #endif
 
 std::string
-sprintf (const char *f, const std::vector <tl::Variant> &vv, unsigned int a0)
+sprintf (const char *f, const std::vector<tl::Variant> &vv, unsigned int a0)
 {
   std::ostringstream os;
   os.imbue (c_locale);
 
-  int def_prec = os.precision();
+  int def_prec = os.precision ();
 
   unsigned int a = a0;
 
-  for (const char *cp = f; *cp; ) {
+  for (const char *cp = f; *cp;) {
 
-    if (*cp == '%' && cp[1] == '%') {
+    if (*cp == '%' && cp [1] == '%') {
       os << '%';
       cp += 2;
     } else if (*cp == '%') {
@@ -1933,28 +1869,28 @@ sprintf (const char *f, const std::vector <tl::Variant> &vv, unsigned int a0)
 
       if (*cp == '0') {
         ++cp;
-        os.fill('0');
+        os.fill ('0');
       } else {
-        os.fill(' ');
+        os.fill (' ');
       }
 
       unsigned int width = 0;
       while (safe_isdigit (*cp) && *cp) {
-        width = (width * 10) + (unsigned int)(*cp - '0');
+        width = (width * 10) + (unsigned int) (*cp - '0');
         ++cp;
       }
-      os.width(width);
+      os.width (width);
 
       if (*cp == '.') {
         ++cp;
         unsigned int prec = 0;
         while (safe_isdigit (*cp) && *cp) {
-          prec = (prec * 10) + (unsigned int)(*cp - '0');
+          prec = (prec * 10) + (unsigned int) (*cp - '0');
           ++cp;
         }
-        os.precision(prec);
+        os.precision (prec);
       } else {
-        os.precision(def_prec);
+        os.precision (def_prec);
       }
 
       //  allow up to two 'l' for compatibility
@@ -2007,7 +1943,7 @@ sprintf (const char *f, const std::vector <tl::Variant> &vv, unsigned int a0)
         }
         if (a < vv.size ()) {
 #if defined(_STLPORT_VERSION) && _STLPORT_VERSION == 0x521 && defined(_MSC_VER)
-        os << format_sci_stlport_fix (vv [a].to_double (), os.precision (), os.flags ()).c_str ();
+          os << format_sci_stlport_fix (vv [a].to_double (), os.precision (), os.flags ()).c_str ();
 #else
           os << vv [a].to_double ();
 #endif
@@ -2029,14 +1965,13 @@ sprintf (const char *f, const std::vector <tl::Variant> &vv, unsigned int a0)
       os << *cp;
       ++cp;
     }
-
   }
 
   return os.str ();
 }
 
 std::string
-sprintf (const std::string &f, const std::vector <tl::Variant> &vv, unsigned int a0)
+sprintf (const std::string &f, const std::vector<tl::Variant> &vv, unsigned int a0)
 {
   return tl::sprintf (f.c_str (), vv, a0);
 }

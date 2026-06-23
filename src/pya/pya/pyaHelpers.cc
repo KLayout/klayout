@@ -101,20 +101,18 @@ pya_channel_init (PyObject *self, PyObject *, PyObject *)
   return 0;
 }
 
-void
-PYAChannelObject::make_class ()
+void PYAChannelObject::make_class ()
 {
   static PyTypeObject channel_type = {
-    PyVarObject_HEAD_INIT (&PyType_Type, 0)
-    "__PYA_Channel",            // tp_name
-    sizeof (PYAChannelObject)   // tp_size
+    PyVarObject_HEAD_INIT (&PyType_Type, 0) "__PYA_Channel", // tp_name
+    sizeof (PYAChannelObject)                                // tp_size
   };
 
-  static PyMethodDef channel_methods[] = {
-      {"write", (PyCFunction) &pya_channel_write, METH_VARARGS, "internal stdout/stderr redirection object: write method" },
-      {"flush", (PyCFunction) &pya_channel_flush, METH_VARARGS, "internal stdout/stderr redirection object: flush method" },
-      {"isatty", (PyCFunction) &pya_channel_isatty, METH_VARARGS, "internal stdout/stderr redirection object: isatty method" },
-      {NULL,  NULL},
+  static PyMethodDef channel_methods [] = {
+    {"write", (PyCFunction) &pya_channel_write, METH_VARARGS, "internal stdout/stderr redirection object: write method"},
+    {"flush", (PyCFunction) &pya_channel_flush, METH_VARARGS, "internal stdout/stderr redirection object: flush method"},
+    {"isatty", (PyCFunction) &pya_channel_isatty, METH_VARARGS, "internal stdout/stderr redirection object: isatty method"},
+    {NULL, NULL},
   };
 
   channel_type.tp_flags = Py_TPFLAGS_DEFAULT;
@@ -124,7 +122,7 @@ PYAChannelObject::make_class ()
   PyType_Ready (&channel_type);
   Py_INCREF (&channel_type);
 
-  PyObject *module = PyImport_AddModule("__main__");
+  PyObject *module = PyImport_AddModule ("__main__");
   PyModule_AddObject (module, "__PYA_Channel", (PyObject *) &channel_type);
 
   cls = &channel_type;
@@ -180,7 +178,7 @@ pya_static_attribute_descriptor_set (PyObject *self, PyObject * /*obj*/, PyObjec
     PythonRef args (PyTuple_Pack (1, value));
     PyObject *ret = (*(attr->setter)) ((PyObject *) attr->type, args.get ());
     if (ret) {
-      Py_DECREF(ret);
+      Py_DECREF (ret);
       return 0;
     } else {
       return -1;
@@ -211,13 +209,11 @@ pya_static_attribute_descriptor_init (PyObject *self, PyObject *, PyObject *)
   return 0;
 }
 
-void
-PYAStaticAttributeDescriptorObject::make_class (PyObject *module)
+void PYAStaticAttributeDescriptorObject::make_class (PyObject *module)
 {
   static PyTypeObject static_attribute_descriptor_type = {
-    PyVarObject_HEAD_INIT (&PyType_Type, 0)
-    "pya._StaticAttribute",                       // tp_name
-    sizeof (PYAStaticAttributeDescriptorObject)   // tp_size
+    PyVarObject_HEAD_INIT (&PyType_Type, 0) "pya._StaticAttribute", // tp_name
+    sizeof (PYAStaticAttributeDescriptorObject)                     // tp_size
   };
 
   static_attribute_descriptor_type.tp_flags = Py_TPFLAGS_DEFAULT;
@@ -266,7 +262,7 @@ pya_ambiguous_method_dispatcher_get (PyObject *self, PyObject *obj, PyObject *ty
 
   //  taken from object.c, PyObject_GenericGetAttrWithDict
 #if PY_MAJOR_VERSION < 3
-  tl_assert (PyType_HasFeature (Py_TYPE (descr), Py_TPFLAGS_HAVE_CLASS)); 
+  tl_assert (PyType_HasFeature (Py_TYPE (descr), Py_TPFLAGS_HAVE_CLASS));
 #endif
   descrgetfunc f = Py_TYPE (descr)->tp_descr_get;
   if (f == NULL) {
@@ -293,13 +289,11 @@ pya_ambiguous_method_dispatcher_deallocate (PyObject *self)
   Py_TYPE (self)->tp_free ((PyObject *) self);
 }
 
-void
-PYAAmbiguousMethodDispatcher::make_class (PyObject *module)
+void PYAAmbiguousMethodDispatcher::make_class (PyObject *module)
 {
   static PyTypeObject static_ambiguous_method_dispatcher_type = {
-    PyVarObject_HEAD_INIT (&PyType_Type, 0)
-    "pya._AmbiguousMethodDispatcher",       // tp_name
-    sizeof (PYAAmbiguousMethodDispatcher)   // tp_size
+    PyVarObject_HEAD_INIT (&PyType_Type, 0) "pya._AmbiguousMethodDispatcher", // tp_name
+    sizeof (PYAAmbiguousMethodDispatcher)                                     // tp_size
   };
 
   static_ambiguous_method_dispatcher_type.tp_flags = Py_TPFLAGS_DEFAULT;
@@ -321,7 +315,7 @@ PYAAmbiguousMethodDispatcher *
 PYAAmbiguousMethodDispatcher::create (PyObject *ai, PyObject *ac)
 {
   tl_assert (cls != 0);
-  PYAAmbiguousMethodDispatcher* desc = (PYAAmbiguousMethodDispatcher *) cls->tp_alloc (cls, 0);
+  PYAAmbiguousMethodDispatcher *desc = (PYAAmbiguousMethodDispatcher *) cls->tp_alloc (cls, 0);
   if (desc == NULL) {
     Py_XDECREF (ai);
     Py_XDECREF (ac);
@@ -399,13 +393,11 @@ pya_plain_iterator_deallocate (PyObject *self)
   Py_TYPE (self)->tp_free ((PyObject *) self);
 }
 
-void
-PYAIteratorObject::make_class (PyObject *module)
+void PYAIteratorObject::make_class (PyObject *module)
 {
   static PyTypeObject iterator_type = {
-    PyVarObject_HEAD_INIT (&PyType_Type, 0)
-    "pya._Iterator",            // tp_name
-    sizeof (PYAIteratorObject)  // tp_size
+    PyVarObject_HEAD_INIT (&PyType_Type, 0) "pya._Iterator", // tp_name
+    sizeof (PYAIteratorObject)                               // tp_size
   };
 
   iterator_type.tp_flags = Py_TPFLAGS_DEFAULT;
@@ -617,26 +609,24 @@ PYASignal::~PYASignal ()
   }
 }
 
-void
-PYASignal::make_class (PyObject *module)
+void PYASignal::make_class (PyObject *module)
 {
   static PyTypeObject signal_type = {
-    PyVarObject_HEAD_INIT (&PyType_Type, 0)
-    "pya._Signal",      // tp_name
-    sizeof (PYASignal)  // tp_size
+    PyVarObject_HEAD_INIT (&PyType_Type, 0) "pya._Signal", // tp_name
+    sizeof (PYASignal)                                     // tp_size
   };
 
-  static PyMethodDef signal_methods[] = {
-      {"add", (PyCFunction) &pya_signal_add, METH_VARARGS, "internal signal proxy object: += operator" },
-      {"connect", (PyCFunction) &pya_signal_add, METH_VARARGS, "synonym to 'add' or '+='" },
-      {"remove", (PyCFunction) &pya_signal_remove, METH_VARARGS, "internal signal proxy object: -= operator" },
-      {"disconnect", (PyCFunction) &pya_signal_remove, METH_VARARGS, "synonym to 'remove' or '-='" },
-      {"set", (PyCFunction) &pya_signal_set, METH_VARARGS, "internal signal proxy object: assignment" },
-      {"clear", (PyCFunction) &pya_signal_clear, METH_NOARGS, "internal signal proxy object: clears all receivers" },
-      {NULL,  NULL},
+  static PyMethodDef signal_methods [] = {
+    {"add", (PyCFunction) &pya_signal_add, METH_VARARGS, "internal signal proxy object: += operator"},
+    {"connect", (PyCFunction) &pya_signal_add, METH_VARARGS, "synonym to 'add' or '+='"},
+    {"remove", (PyCFunction) &pya_signal_remove, METH_VARARGS, "internal signal proxy object: -= operator"},
+    {"disconnect", (PyCFunction) &pya_signal_remove, METH_VARARGS, "synonym to 'remove' or '-='"},
+    {"set", (PyCFunction) &pya_signal_set, METH_VARARGS, "internal signal proxy object: assignment"},
+    {"clear", (PyCFunction) &pya_signal_clear, METH_NOARGS, "internal signal proxy object: clears all receivers"},
+    {NULL, NULL},
   };
 
-  static PyNumberMethods nm = { };
+  static PyNumberMethods nm = {};
   nm.nb_inplace_add = &pya_signal_inplace_add;
   nm.nb_inplace_subtract = &pya_signal_inplace_remove;
 
@@ -672,4 +662,3 @@ PYASignal::create (PyObject *origin, pya::SignalHandler *handler)
 }
 
 }
-

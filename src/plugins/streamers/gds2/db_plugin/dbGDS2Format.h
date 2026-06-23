@@ -53,10 +53,10 @@ public:
   /**
    *  @brief How to treat BOX records
    *
-   *  This property specifies how to treat BOX records. 
+   *  This property specifies how to treat BOX records.
    *  Allowed values are 0 (ignore), 1 (treat as rectangles), 2 (treat as boundaries) or 3 (treat as errors).
    */
-  unsigned int box_mode; 
+  unsigned int box_mode;
 
   /**
    *  @brief Allow multiple big records
@@ -71,11 +71,11 @@ public:
    *  @brief Allow multiple XY records in BOUNDARY elements for unlimited large polygons
    *
    *  Setting this property to true allows producing polygons with an unlimited number of points
-   *  by using multiple XY records. 
+   *  by using multiple XY records.
    */
   bool allow_multi_xy_records;
 
-  /** 
+  /**
    *  @brief Implementation of FormatSpecificReaderOptions
    */
   virtual FormatSpecificReaderOptions *clone () const

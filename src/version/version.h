@@ -20,35 +20,34 @@
 
 */
 
-#define STRINGIFY(s) _STRINGIFY(s)
+#define STRINGIFY(s) _STRINGIFY (s)
 #define _STRINGIFY(s) #s
 
-const char *prg_exe_name        = "klayout";
-const char *prg_name            = "KLayout";
+const char *prg_exe_name = "klayout";
+const char *prg_name = "KLayout";
 
 #if defined(KLAYOUT_VERSION)
-const char *prg_version         = STRINGIFY(KLAYOUT_VERSION);
+const char *prg_version = STRINGIFY (KLAYOUT_VERSION);
 #else
-const char *prg_version         = "x.xx";
+const char *prg_version = "x.xx";
 #endif
 
 #if defined(KLAYOUT_VERSION_DATE)
-const char *prg_date            = STRINGIFY(KLAYOUT_VERSION_DATE);
+const char *prg_date = STRINGIFY (KLAYOUT_VERSION_DATE);
 #else
-const char *prg_date            = "xxxx-xx-xx";
+const char *prg_date = "xxxx-xx-xx";
 #endif
 
 #if defined(KLAYOUT_VERSION_REV)
-const char *prg_rev             = STRINGIFY(KLAYOUT_VERSION_REV);
+const char *prg_rev = STRINGIFY (KLAYOUT_VERSION_REV);
 #else
-const char *prg_rev             = "xxxxxxxx";
+const char *prg_rev = "xxxxxxxx";
 #endif
 
-const char *prg_author =  
-  "By Matthias K\303\266fferlein, Munich"
-  ;
+const char *prg_author =
+  "By Matthias K\303\266fferlein, Munich";
 
-const char *prg_about_text = 
+const char *prg_about_text =
   "For feedback and bug reports mail to: contact@klayout.de\n"
   "\n"
   "\n"
@@ -66,6 +65,4 @@ const char *prg_about_text =
   "\n"
   "You should have received a copy of the GNU General Public License\n"
   "along with this program; if not, write to the Free Software\n"
-  "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA\n"
-;
-
+  "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA\n";

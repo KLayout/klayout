@@ -38,7 +38,7 @@ class TextService
 public:
   TextService (db::Manager *manager, lay::LayoutViewBase *view);
   ~TextService ();
-  
+
 #if defined(HAVE_QT)
   virtual std::vector<lay::PropertiesPage *> properties_pages (db::Manager *manager, QWidget *parent);
 #endif
@@ -66,4 +66,3 @@ private:
 }
 
 #endif
-

@@ -38,18 +38,18 @@ namespace lstr
 
 const char *LStream_sig = "LStream_1.0";
 
-const char *LStream_generator = "klayout " STRINGIFY(KLAYOUT_VERSION);
+const char *LStream_generator = "klayout " STRINGIFY (KLAYOUT_VERSION);
 
 // ---------------------------------------------------------------
 
 /**
  *  @brief The LStream plugin
- * 
- *  Providing a class a regiserting it will enable this file 
+ *
+ *  Providing a class a regiserting it will enable this file
  *  format inside KLayout.
- * 
+ *
  *  It implements the "db::StreamFormatDeclaration" interface
- *  and provides KLayout with the necessary information to 
+ *  and provides KLayout with the necessary information to
  *  implement the format.
  */
 class LStreamFormatDeclaration
@@ -62,12 +62,12 @@ class LStreamFormatDeclaration
 
   /**
    *  @brief Returns a value indicating whether the given stream represents the particular format
-   * 
-   *  KLayout will use this method to identify a file by content, rather than 
+   *
+   *  KLayout will use this method to identify a file by content, rather than
    *  suffix. In the LStream case, the format is detected by the magic bytes
    *  at the front of the stream.
    */
-  virtual bool detect (tl::InputStream &stream) const 
+  virtual bool detect (tl::InputStream &stream) const
   {
     const char *hdr = stream.get (strlen (LStream_sig) + 1);
     return (hdr && strcmp (hdr, LStream_sig) == 0);
@@ -76,7 +76,7 @@ class LStreamFormatDeclaration
   /**
    *  @brief Creates a reader object that does the actual reading
    */
-  virtual db::ReaderBase *create_reader (tl::InputStream &s) const 
+  virtual db::ReaderBase *create_reader (tl::InputStream &s) const
   {
     return new Reader (s);
   }
@@ -84,7 +84,7 @@ class LStreamFormatDeclaration
   /**
    *  @brief Creates a writer object that does the actual reading
    */
-  virtual db::WriterBase *create_writer () const 
+  virtual db::WriterBase *create_writer () const
   {
     return new Writer ();
   }
@@ -116,14 +116,12 @@ class LStreamFormatDeclaration
   virtual tl::XMLElementBase *xml_writer_options_element () const
   {
     return new db::WriterOptionsXMLElement<lstr::WriterOptions> ("lstream",
-      tl::make_member (&lstr::WriterOptions::compression_level, "compression-level") +
-      tl::make_member (&lstr::WriterOptions::recompress, "recompress") +
-      tl::make_member (&lstr::WriterOptions::permissive, "permissive")
-    );
+                                                                 tl::make_member (&lstr::WriterOptions::compression_level, "compression-level") +
+                                                                   tl::make_member (&lstr::WriterOptions::recompress, "recompress") +
+                                                                   tl::make_member (&lstr::WriterOptions::permissive, "permissive"));
   }
 };
 
 static tl::RegisteredClass<db::StreamFormatDeclaration> format_decl (new LStreamFormatDeclaration (), 2050, "LStream");
 
 }
-

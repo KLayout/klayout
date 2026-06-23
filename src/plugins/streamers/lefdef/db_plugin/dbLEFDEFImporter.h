@@ -38,7 +38,7 @@
 
 namespace tl
 {
-  class AbsoluteProgress;
+class AbsoluteProgress;
 }
 
 namespace db
@@ -68,9 +68,9 @@ class DB_PLUGIN_PUBLIC LEFDEFReaderException
 {
 public:
   LEFDEFReaderException (const std::string &msg, int line, const std::string &cell, const std::string &fn)
-    : db::ReaderException (line >= 0 ? tl::sprintf (tl::to_string (tr ("%s (line=%d, cell=%s, file=%s)")), msg.c_str (), line, cell, fn) :
-                                       tl::sprintf (tl::to_string (tr ("%s (file=%s)")), msg.c_str (), fn))
-  { }
+    : db::ReaderException (line >= 0 ? tl::sprintf (tl::to_string (tr ("%s (line=%d, cell=%s, file=%s)")), msg.c_str (), line, cell, fn) : tl::sprintf (tl::to_string (tr ("%s (file=%s)")), msg.c_str (), fn))
+  {
+  }
 };
 
 template <class Value>
@@ -132,7 +132,7 @@ public:
     return m_read_all_layers;
   }
 
-  void set_read_all_layers (bool a) 
+  void set_read_all_layers (bool a)
   {
     m_read_all_layers = a;
   }
@@ -157,7 +157,7 @@ public:
     return m_dbu;
   }
 
-  void set_dbu (double dbu) 
+  void set_dbu (double dbu)
   {
     m_dbu = dbu;
   }
@@ -167,7 +167,7 @@ public:
     return m_produce_net_names;
   }
 
-  void set_produce_net_names (bool f) 
+  void set_produce_net_names (bool f)
   {
     m_produce_net_names = f;
   }
@@ -177,7 +177,7 @@ public:
     return m_net_property_name;
   }
 
-  void set_net_property_name (const tl::Variant &s) 
+  void set_net_property_name (const tl::Variant &s)
   {
     m_net_property_name = s;
   }
@@ -227,7 +227,7 @@ public:
     return m_produce_cell_outlines;
   }
 
-  void set_produce_cell_outlines (bool f) 
+  void set_produce_cell_outlines (bool f)
   {
     m_produce_cell_outlines = f;
   }
@@ -237,7 +237,7 @@ public:
     return m_cell_outline_layer;
   }
 
-  void set_cell_outline_layer (const std::string &s) 
+  void set_cell_outline_layer (const std::string &s)
   {
     m_cell_outline_layer = s;
   }
@@ -247,7 +247,7 @@ public:
     return m_produce_placement_blockages;
   }
 
-  void set_produce_placement_blockages (bool f) 
+  void set_produce_placement_blockages (bool f)
   {
     m_produce_placement_blockages = f;
   }
@@ -257,7 +257,7 @@ public:
     return m_placement_blockage_layer;
   }
 
-  void set_placement_blockage_layer (const std::string &s) 
+  void set_placement_blockage_layer (const std::string &s)
   {
     m_placement_blockage_layer = s;
   }
@@ -287,7 +287,7 @@ public:
     return m_produce_via_geometry;
   }
 
-  void set_produce_via_geometry (bool f) 
+  void set_produce_via_geometry (bool f)
   {
     m_produce_via_geometry = f;
   }
@@ -297,7 +297,7 @@ public:
     return m_via_geometry_suffix;
   }
 
-  void set_via_geometry_suffix (const std::string &s) 
+  void set_via_geometry_suffix (const std::string &s)
   {
     m_via_geometry_suffix = s;
   }
@@ -307,7 +307,7 @@ public:
     return m_via_geometry_datatype;
   }
 
-  void set_via_geometry_datatype (int s) 
+  void set_via_geometry_datatype (int s)
   {
     m_via_geometry_datatype = s;
   }
@@ -363,7 +363,7 @@ public:
     return m_produce_pins;
   }
 
-  void set_produce_pins (bool f) 
+  void set_produce_pins (bool f)
   {
     m_produce_pins = f;
   }
@@ -373,7 +373,7 @@ public:
     return m_pins_suffix;
   }
 
-  void set_pins_suffix (const std::string &s) 
+  void set_pins_suffix (const std::string &s)
   {
     m_pins_suffix = s;
   }
@@ -383,7 +383,7 @@ public:
     return m_pins_datatype;
   }
 
-  void set_pins_datatype (int s) 
+  void set_pins_datatype (int s)
   {
     m_pins_datatype = s;
   }
@@ -561,7 +561,7 @@ public:
     return m_produce_obstructions;
   }
 
-  void set_produce_obstructions (bool f) 
+  void set_produce_obstructions (bool f)
   {
     m_produce_obstructions = f;
   }
@@ -571,7 +571,7 @@ public:
     return m_obstructions_suffix;
   }
 
-  void set_obstructions_suffix (const std::string &s) 
+  void set_obstructions_suffix (const std::string &s)
   {
     m_obstructions_suffix = s;
   }
@@ -581,7 +581,7 @@ public:
     return m_obstructions_datatype;
   }
 
-  void set_obstructions_datatype (int s) 
+  void set_obstructions_datatype (int s)
   {
     m_obstructions_datatype = s;
   }
@@ -591,7 +591,7 @@ public:
     return m_produce_blockages;
   }
 
-  void set_produce_blockages (bool f) 
+  void set_produce_blockages (bool f)
   {
     m_produce_blockages = f;
   }
@@ -601,7 +601,7 @@ public:
     return m_blockages_suffix;
   }
 
-  void set_blockages_suffix (const std::string &s) 
+  void set_blockages_suffix (const std::string &s)
   {
     m_blockages_suffix = s;
   }
@@ -611,7 +611,7 @@ public:
     return m_blockages_datatype;
   }
 
-  void set_blockages_datatype (int s) 
+  void set_blockages_datatype (int s)
   {
     m_blockages_datatype = s;
   }
@@ -631,7 +631,7 @@ public:
     return m_labels_suffix;
   }
 
-  void set_labels_suffix (const std::string &s) 
+  void set_labels_suffix (const std::string &s)
   {
     m_labels_suffix = s;
   }
@@ -641,7 +641,7 @@ public:
     return m_labels_datatype;
   }
 
-  void set_labels_datatype (int s) 
+  void set_labels_datatype (int s)
   {
     m_labels_datatype = s;
   }
@@ -681,7 +681,7 @@ public:
     return m_produce_routing;
   }
 
-  void set_produce_routing (bool f) 
+  void set_produce_routing (bool f)
   {
     m_produce_routing = f;
   }
@@ -691,7 +691,7 @@ public:
     return m_routing_suffix;
   }
 
-  void set_routing_suffix (const std::string &s) 
+  void set_routing_suffix (const std::string &s)
   {
     m_routing_suffix = s;
   }
@@ -701,7 +701,7 @@ public:
     return m_routing_datatype;
   }
 
-  void set_routing_datatype (int s) 
+  void set_routing_datatype (int s)
   {
     m_routing_datatype = s;
   }
@@ -937,8 +937,8 @@ public:
   {
     std::vector<db::Layout *> res;
     for (tl::weak_collection<db::Layout>::const_iterator m = m_macro_layouts.begin (); m != m_macro_layouts.end (); ++m) {
-      if (m.operator-> ()) {
-        res.push_back (const_cast<db::Layout *> (m.operator-> ()));
+      if (m.operator->()) {
+        res.push_back (const_cast<db::Layout *> (m.operator->()));
       }
     }
     return res;
@@ -1068,37 +1068,36 @@ private:
 /**
  *  @brief Defines the layer purposes provided so far
  */
-enum LayerPurpose 
-{
+enum LayerPurpose {
   None = 0,
-  Routing,            //  from DEF only
-  Pins,               //  from DEF
-  Fills,              //  from DEF
-  FillsOPC,           //  from DEF
-  SpecialRouting,     //  from DEF only
-  LEFPins,            //  from LEF
-  ViaGeometry,        //  from LEF+DEF
-  Label,              //  from DEF
-  LEFLabel,           //  from LEF
-  Obstructions,       //  from LEF only
-  Outline,            //  from LEF+DEF
-  Blockage,           //  from DEF only
-  PlacementBlockage,  //  from DEF only
-  Regions,            //  from DEF only
-  RegionsNone,        //  from DEF only
-  RegionsFence,       //  from DEF only
-  RegionsGuide,       //  from DEF only
-  All                 //  from DEF only
+  Routing,           //  from DEF only
+  Pins,              //  from DEF
+  Fills,             //  from DEF
+  FillsOPC,          //  from DEF
+  SpecialRouting,    //  from DEF only
+  LEFPins,           //  from LEF
+  ViaGeometry,       //  from LEF+DEF
+  Label,             //  from DEF
+  LEFLabel,          //  from LEF
+  Obstructions,      //  from LEF only
+  Outline,           //  from LEF+DEF
+  Blockage,          //  from DEF only
+  PlacementBlockage, //  from DEF only
+  Regions,           //  from DEF only
+  RegionsNone,       //  from DEF only
+  RegionsFence,      //  from DEF only
+  RegionsGuide,      //  from DEF only
+  All                //  from DEF only
 };
 
 /**
  *  @brief A structure holding the layer details like purpose, mask and via size
  */
-struct LayerDetailsKey
-{
+struct LayerDetailsKey {
   LayerDetailsKey ()
     : purpose (Routing), mask (0)
-  { }
+  {
+  }
 
   LayerDetailsKey (LayerPurpose _purpose, unsigned int _mask = 0, const db::DVector &_via_size = db::DVector ())
     : purpose (_purpose), mask (_mask), via_size (_via_size)
@@ -1142,8 +1141,8 @@ struct LayerDetailsKey
 class DB_PLUGIN_PUBLIC LEFDEFNumberOfMasks
 {
 public:
-  LEFDEFNumberOfMasks () { }
-  virtual ~LEFDEFNumberOfMasks () { }
+  LEFDEFNumberOfMasks () {}
+  virtual ~LEFDEFNumberOfMasks () {}
 
   virtual unsigned int number_of_masks (const std::string &layer_name) const = 0;
 };
@@ -1154,8 +1153,8 @@ public:
 class DB_PLUGIN_PUBLIC LEFDEFLayoutGenerator
 {
 public:
-  LEFDEFLayoutGenerator () : def_local (false) { }
-  virtual ~LEFDEFLayoutGenerator () { }
+  LEFDEFLayoutGenerator () : def_local (false) {}
+  virtual ~LEFDEFLayoutGenerator () {}
 
   virtual void create_cell (LEFDEFReaderState &reader, db::Layout &layout, db::Cell &cell, const std::vector<std::string> *maskshift_layers, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm) = 0;
   virtual std::vector<std::string> maskshift_layers () const = 0;
@@ -1243,7 +1242,7 @@ public:
     if (m_maskshift_layers.size () <= size_t (l)) {
       m_maskshift_layers.resize (l + 1, std::string ());
     }
-    m_maskshift_layers[l] = s;
+    m_maskshift_layers [l] = s;
   }
 
   void set_fixedmask (bool f)
@@ -1255,14 +1254,14 @@ public:
 
 private:
   struct Via {
-    Via () : bottom_mask (0), cut_mask (0), top_mask (0) { }
+    Via () : bottom_mask (0), cut_mask (0), top_mask (0) {}
     std::string name;
     std::string nondefaultrule;
     unsigned int bottom_mask, cut_mask, top_mask;
     db::Trans trans;
   };
 
-  std::map <std::pair<std::string, LayerDetailsKey>, db::Shapes> m_shapes;
+  std::map<std::pair<std::string, LayerDetailsKey>, db::Shapes> m_shapes;
   std::list<Via> m_vias;
   std::vector<std::string> m_maskshift_layers;
   bool m_fixedmask;
@@ -1457,11 +1456,11 @@ private:
   /**
    *  @brief A key for the via cache
    */
-  struct ViaKey
-  {
+  struct ViaKey {
     ViaKey (const std::string &n, const std::string &ndr, unsigned int mb, unsigned int mc, unsigned int mt)
       : name (n), nondefaultrule (ndr), mask_bottom (mb), mask_cut (mc), mask_top (mt)
-    { }
+    {
+    }
 
     bool operator== (const ViaKey &other) const
     {
@@ -1495,14 +1494,15 @@ private:
   /**
    *  @brief A key for the via cache
    */
-  struct MacroKey
-  {
+  struct MacroKey {
     MacroKey ()
-    { }
+    {
+    }
 
     MacroKey (const std::string &n, const std::vector<unsigned int> &m)
       : name (n), masks (m)
-    { }
+    {
+    }
 
     bool operator== (const MacroKey &other) const
     {
@@ -1529,7 +1529,7 @@ private:
   LEFDEFReaderState &operator= (const LEFDEFReaderState &);
 
   LEFDEFImporter *mp_importer;
-  std::map <std::pair<std::string, LayerDetailsKey>, std::set<unsigned int> > m_layers;
+  std::map<std::pair<std::string, LayerDetailsKey>, std::set<unsigned int>> m_layers;
   db::LayerMap m_layer_map;
   bool m_create_layers;
   bool m_has_explicit_layer_mapping;
@@ -1538,7 +1538,7 @@ private:
   const LEFDEFReaderOptions *mp_tech_comp;
   std::map<ViaKey, db::Cell *> m_via_cells;
   std::multimap<std::pair<std::string, std::string>, LEFDEFLayoutGenerator *> m_via_generators;
-  std::map<MacroKey, std::pair<db::Cell *, db::Trans> > m_macro_cells;
+  std::map<MacroKey, std::pair<db::Cell *, db::Trans>> m_macro_cells;
   std::map<std::string, LEFDEFLayoutGenerator *> m_macro_generators;
   std::map<std::string, db::cell_index_type> m_foreign_cells;
   std::set<std::string> m_lef_files_read;
@@ -1547,17 +1547,16 @@ private:
   std::unique_ptr<db::LEFImporter> mp_lef_importer;
 
   std::set<unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
-  db::cell_index_type foreign_cell(Layout &layout, const std::string &name);
-  void read_single_map_file (const std::string &path, std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties> > &layer_map);
+  db::cell_index_type foreign_cell (Layout &layout, const std::string &name);
+  void read_single_map_file (const std::string &path, std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties>> &layer_map);
   std::pair<LEFDEFLayoutGenerator *, std::string> via_generator_and_rule (const std::string &vn, const std::string &nondefaultrule);
 };
 
 /**
  *  @brief A structure describing a via
  */
-struct DB_PLUGIN_PUBLIC ViaDesc
-{
-  ViaDesc () { }
+struct DB_PLUGIN_PUBLIC ViaDesc {
+  ViaDesc () {}
 
   /**
    *  @brief The names of bottom and top metal respectively
@@ -1568,9 +1567,8 @@ struct DB_PLUGIN_PUBLIC ViaDesc
 /**
  *  @brief A structure describing a macro
  */
-struct DB_PLUGIN_PUBLIC MacroDesc
-{
-  MacroDesc () { }
+struct DB_PLUGIN_PUBLIC MacroDesc {
+  MacroDesc () {}
 
   /**
    *  @brief The name of the FOREIGN cell if present
@@ -1868,5 +1866,3 @@ private:
 }
 
 #endif
-
-

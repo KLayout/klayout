@@ -29,15 +29,15 @@
 #include "dbPropertiesRepository.h"
 #include "layParsedLayerSource.h"
 
-namespace lay {
+namespace lay
+{
 
 class LayerProperties;
 
 /**
  *  @brief A helper struct to describe one entry in the redraw queue
  */
-struct RedrawLayerInfo
-{
+struct RedrawLayerInfo {
   RedrawLayerInfo (const lay::LayerProperties &lp);
 
   /**
@@ -50,7 +50,7 @@ struct RedrawLayerInfo
   /**
    *  @brief Visible layer
    *
-   *  If this flag is true, the layer is visible. Visible layers are drawn with 
+   *  If this flag is true, the layer is visible. Visible layers are drawn with
    *  higher priority than the invisible ones. This flag is set by the constructor.
    */
   bool visible;
@@ -108,9 +108,9 @@ struct RedrawLayerInfo
    *
    *  This member is set by the constructor.
    */
-  std::set <db::properties_id_type> prop_sel;
+  std::set<db::properties_id_type> prop_sel;
 
-  /** 
+  /**
    *  @brief Invert the property selection
    *
    *  This member is set by the constructor.

@@ -28,7 +28,7 @@
 
 #include "tlEvents.h"
 
-namespace db 
+namespace db
 {
 
 /**
@@ -36,12 +36,12 @@ namespace db
  *
  *  The layout state model is supposed to track the state of a layout object.
  *  The layout object to be tracked should be derived from db::LayoutStateModel
- *  and implement the do_update method. 
+ *  and implement the do_update method.
  *  The state model can track the state of any layout (or similar) object in two
  *  ways: once, if the bounding boxes become invalid and in another way, if the
  *  cell tree becomes invalid. These events are issued by containers used within
  *  the layout object (i.e. db::Shapes) and "collected" in the layout state model.
- *  Calling "update" will reset this state and call "do_update" to bring the 
+ *  Calling "update" will reset this state and call "do_update" to bring the
  *  layout object into a consistent state.
  *  In addition, observers using the tl::Observer interface can attach to this
  *  state model to track if the layout changes it's state.
@@ -78,7 +78,7 @@ public:
 
   /**
    *  @brief Invalidate the hierarchy information
-   * 
+   *
    *  This method is supposed to be called if something on the
    *  hierarchy has been changed - i.e. cells have been inserted
    *  or cell instances have been inserted.
@@ -87,7 +87,7 @@ public:
   {
     ++m_hier_generation_id;
     if (! m_hier_dirty || m_busy) {
-      do_invalidate_hier ();  //  must be called before the hierarchy is invalidated (stopping of redraw thread requires this)
+      do_invalidate_hier (); //  must be called before the hierarchy is invalidated (stopping of redraw thread requires this)
       m_hier_dirty = true;
     }
   }
@@ -95,7 +95,7 @@ public:
   /**
    *  @brief Invalidate the bounding boxes
    *
-   *  This method is supposed to be called by shape containers for example if 
+   *  This method is supposed to be called by shape containers for example if
    *  some event has occurred that changed the bounding boxes.
    *
    *  If the index is std::numeric_limits<unsigned int>::max, this method
@@ -122,7 +122,7 @@ public:
   /**
    *  @brief This method resets the layout's state back to valid hierarchy and bounding boxes
    *
-   *  This method will call do_update if necessary and reset the invalid flags. 
+   *  This method will call do_update if necessary and reset the invalid flags.
    */
   void update ();
 
@@ -197,7 +197,7 @@ protected:
   /**
    *  @brief Reimplement this method to update anything related to the hierarchy or bounding boxes.
    */
-  virtual void do_update () { }
+  virtual void do_update () {}
 
   /**
    *  @brief Issue a "layer properties changed event"
@@ -242,4 +242,3 @@ private:
 }
 
 #endif
-

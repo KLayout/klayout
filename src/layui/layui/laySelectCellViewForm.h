@@ -34,7 +34,7 @@
 
 namespace Ui
 {
-  class SelectCellViewForm;
+class SelectCellViewForm;
 }
 
 namespace lay
@@ -46,7 +46,7 @@ class LayoutViewBase;
 class LAYUI_PUBLIC SelectCellViewForm
   : public QDialog
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   SelectCellViewForm (QWidget *parent, lay::LayoutViewBase *view, const std::string &title, bool single = false);
@@ -60,12 +60,12 @@ public:
    *  @brief Set the title
    */
   void set_title (const std::string &title);
-  
+
   /**
    *  @brief Set the caption
    */
   void set_caption (const std::string &caption);
-  
+
   /**
    *  @brief This method must be called on all cv's before setup () to make the cv's known
    */
@@ -74,7 +74,7 @@ public:
   /**
    *  @brief Obtain the selected cellview's index (with changes)
    */
-  std::vector <int> selected_cellviews () const;
+  std::vector<int> selected_cellviews () const;
 
   /**
    *  @brief Obtain the selected cellview's index (in single selection mode)
@@ -97,4 +97,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

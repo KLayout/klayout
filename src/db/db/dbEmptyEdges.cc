@@ -144,17 +144,14 @@ EmptyEdges::or_with (const Edges &other) const
   }
 }
 
-bool
-EmptyEdges::equals (const Edges &other) const
+bool EmptyEdges::equals (const Edges &other) const
 {
   return other.empty ();
 }
 
-bool
-EmptyEdges::less (const Edges &other) const
+bool EmptyEdges::less (const Edges &other) const
 {
   return other.empty () ? false : true;
 }
 
 }
-

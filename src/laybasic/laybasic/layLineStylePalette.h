@@ -35,7 +35,6 @@ namespace lay
 class LAYBASIC_PUBLIC LineStylePalette
 {
 public:
-
   /**
    *  @brief Default constructor
    *
@@ -44,7 +43,7 @@ public:
   LineStylePalette ();
 
   /**
-   *  @brief Constructor from the data 
+   *  @brief Constructor from the data
    *
    *  @param styles The styles as a vector
    */
@@ -83,7 +82,7 @@ public:
    */
   void clear_styles ();
 
-  /** 
+  /**
    *  @brief Retrieve the style by index
    */
   unsigned int style_by_index (unsigned int n) const;
@@ -95,8 +94,8 @@ public:
    */
   unsigned int styles () const;
 
-  /** 
-   *  @brief Conversion to a string 
+  /**
+   *  @brief Conversion to a string
    */
   std::string to_string () const;
 
@@ -111,14 +110,12 @@ public:
   /**
    *  @brief Deliver the default palette
    */
-  static LineStylePalette default_palette (); 
+  static LineStylePalette default_palette ();
 
 private:
-  std::vector <unsigned int> m_styles;
-
+  std::vector<unsigned int> m_styles;
 };
 
 }
 
 #endif
-

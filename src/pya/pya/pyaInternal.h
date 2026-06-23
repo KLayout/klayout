@@ -37,7 +37,7 @@
 
 namespace gsi
 {
-  class MethodBase;
+class MethodBase;
 }
 
 namespace pya
@@ -70,7 +70,7 @@ public:
   void set_fallback_not_implemented (bool en);
   bool fallback_not_implemented () const;
 
-  void set_init(bool f);
+  void set_init (bool f);
   bool is_init () const;
 
   bool is_static () const;
@@ -276,7 +276,7 @@ public:
   /**
    *  @brief Gets the property table
    */
-  const std::vector<std::pair<MethodTableEntry, MethodTableEntry> > &property_table () const
+  const std::vector<std::pair<MethodTableEntry, MethodTableEntry>> &property_table () const
   {
     return m_property_table;
   }
@@ -288,7 +288,7 @@ private:
   std::map<std::pair<bool, std::string>, size_t> m_name_map;
   std::map<std::pair<bool, std::string>, size_t> m_property_name_map;
   std::vector<MethodTableEntry> m_table;
-  std::vector<std::pair<MethodTableEntry, MethodTableEntry> > m_property_table;
+  std::vector<std::pair<MethodTableEntry, MethodTableEntry>> m_property_table;
   PythonModule *mp_module;
 
   void add_method_basic (const std::string &name, const gsi::MethodBase *mb, bool enabled = true, bool init = false, bool fallback_not_implemented = false);
@@ -299,8 +299,7 @@ private:
 };
 
 struct PythonClassClientData
-  : public gsi::PerClassClientSpecificData
-{
+  : public gsi::PerClassClientSpecificData {
   PythonClassClientData (const gsi::ClassBase *_cls, PyTypeObject *_py_type, PyTypeObject *_py_type_static, PythonModule *module);
   ~PythonClassClientData ();
 

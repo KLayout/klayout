@@ -45,27 +45,27 @@ class QLineEdit;
 
 namespace Ui
 {
-  class GerberImportDialog;
+class GerberImportDialog;
 }
 
 namespace tl
 {
-  class InputStream;
+class InputStream;
 }
 
 namespace db
 {
-  class GerberImporter;
+class GerberImporter;
 }
 
 namespace lay
 {
 
-//  The item editor for the file column 
-class GerberImportDialogFileColumnEditorWidget 
+//  The item editor for the file column
+class GerberImportDialogFileColumnEditorWidget
   : public QFrame
 {
-Q_OBJECT 
+  Q_OBJECT
 public:
   GerberImportDialogFileColumnEditorWidget (QWidget *parent, db::GerberImportData *data);
 
@@ -81,11 +81,11 @@ private:
   db::GerberImportData *mp_data;
 };
 
-//  The item editor for the start/stop column 
-class GerberImportDialogMetalLayerColumnEditorWidget 
+//  The item editor for the start/stop column
+class GerberImportDialogMetalLayerColumnEditorWidget
   : public QComboBox
 {
-Q_OBJECT 
+  Q_OBJECT
 public:
   GerberImportDialogMetalLayerColumnEditorWidget (QWidget *parent, db::GerberImportData *data);
 
@@ -96,7 +96,7 @@ public:
 class GerberImportDialog
   : public QDialog
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
   GerberImportDialog (QWidget *parent, db::GerberImportData *data);
@@ -141,4 +141,3 @@ private:
 }
 
 #endif
-

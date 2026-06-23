@@ -77,7 +77,6 @@ std::vector<std::string> correct_path (const std::string &fn_in, const db::Layou
     if (! base_path.empty ()) {
       fn = tl::combine_path (base_path, fn);
     }
-
   }
 
   if (tl::file_exists (fn) || ! glob) {
@@ -87,7 +86,6 @@ std::vector<std::string> correct_path (const std::string &fn_in, const db::Layou
   } else {
     return tl::glob_expand (fn);
   }
-
 }
 
 // -----------------------------------------------------------------------------------
@@ -210,10 +208,10 @@ layer_spec_to_name (const std::string &layer_name, LayerPurpose purpose, unsigne
 
 RuleBasedViaGenerator::RuleBasedViaGenerator ()
   : LEFDEFLayoutGenerator (), m_bottom_mask (0), m_cut_mask (0), m_top_mask (0), m_rows (1), m_columns (1)
-{ }
+{
+}
 
-void
-RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<std::string> *maskshift_layers, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm)
+void RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<std::string> *maskshift_layers, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm)
 {
   //  will not be used with an external maskshift layer stack
   tl_assert (maskshift_layers == 0);
@@ -242,7 +240,7 @@ RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, d
   db::Point via_ll = m_offset - db::Vector (vs.x () / 2, vs.y () / 2);
   db::Box via_box (via_ll, via_ll + vs);
 
-  std::set <unsigned int> dl;
+  std::set<unsigned int> dl;
 
   dl = reader.open_layer (layout, m_bottom_layer, ViaGeometry, mask_bottom);
   for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
@@ -283,9 +281,7 @@ RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, d
         if (*p == '_') {
           ++p;
         }
-
       }
-
     }
 
     if (rp != 0) {
@@ -320,7 +316,6 @@ RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, d
           } else if (*pp && pp < p1) {
 
             d = (unsigned int) hex_value (*pp++);
-
           }
 
           if (cp > 0) {
@@ -334,7 +329,6 @@ RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, d
         } else {
 
           d = 0xf;
-
         }
 
         if ((d & (0x8 >> (bit++ % 4))) != 0) {
@@ -352,13 +346,9 @@ RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, d
           for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
             cell.shapes (*l).insert (db::Polygon (vb));
           }
-
         }
-
       }
-
     }
-
   }
 }
 
@@ -410,19 +400,17 @@ GeometryBasedLayoutGenerator::combine_maskshifts (const std::string &ln, unsigne
   }
 }
 
-void
-GeometryBasedLayoutGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<std::string> *ext_msl, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm)
+void GeometryBasedLayoutGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<std::string> *ext_msl, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm)
 {
-  for (std::map <std::pair<std::string, LayerDetailsKey>, db::Shapes>::const_iterator g = m_shapes.begin (); g != m_shapes.end (); ++g) {
+  for (std::map<std::pair<std::string, LayerDetailsKey>, db::Shapes>::const_iterator g = m_shapes.begin (); g != m_shapes.end (); ++g) {
 
     unsigned int mshift = get_maskshift (g->first.first, ext_msl, masks);
     unsigned int mask = mask_for (g->first.first, g->first.second.mask, mshift, nm);
 
-    std::set <unsigned int> dl = reader.open_layer (layout, g->first.first, g->first.second.purpose, mask, g->first.second.via_size);
+    std::set<unsigned int> dl = reader.open_layer (layout, g->first.first, g->first.second.purpose, mask, g->first.second.via_size);
     for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
       cell.shapes (*l).insert (g->second);
     }
-
   }
 
   for (std::list<Via>::const_iterator v = m_vias.begin (); v != m_vias.end (); ++v) {
@@ -448,7 +436,6 @@ GeometryBasedLayoutGenerator::create_cell (LEFDEFReaderState &reader, Layout &la
     if (vc) {
       cell.insert (db::CellInstArray (db::CellInst (vc->cell_index ()), v->trans));
     }
-
   }
 }
 
@@ -462,32 +449,27 @@ static db::Shape insert_shape (db::Shapes &shapes, const Shape &shape, db::prope
   }
 }
 
-void
-GeometryBasedLayoutGenerator::add_polygon (const std::string &ln, LayerPurpose purpose, const db::Polygon &poly, unsigned int mask, db::properties_id_type prop_id, const db::DVector &via_size)
+void GeometryBasedLayoutGenerator::add_polygon (const std::string &ln, LayerPurpose purpose, const db::Polygon &poly, unsigned int mask, db::properties_id_type prop_id, const db::DVector &via_size)
 {
   insert_shape (m_shapes [std::make_pair (ln, LayerDetailsKey (purpose, mask, via_size))], poly, prop_id);
 }
 
-void
-GeometryBasedLayoutGenerator::add_box (const std::string &ln, LayerPurpose purpose, const db::Box &box, unsigned int mask, db::properties_id_type prop_id, const db::DVector &via_size)
+void GeometryBasedLayoutGenerator::add_box (const std::string &ln, LayerPurpose purpose, const db::Box &box, unsigned int mask, db::properties_id_type prop_id, const db::DVector &via_size)
 {
   insert_shape (m_shapes [std::make_pair (ln, LayerDetailsKey (purpose, mask, via_size))], box, prop_id);
 }
 
-void
-GeometryBasedLayoutGenerator::add_path (const std::string &ln, LayerPurpose purpose, const db::Path &path, unsigned int mask, db::properties_id_type prop_id, const db::DVector &via_size)
+void GeometryBasedLayoutGenerator::add_path (const std::string &ln, LayerPurpose purpose, const db::Path &path, unsigned int mask, db::properties_id_type prop_id, const db::DVector &via_size)
 {
   insert_shape (m_shapes [std::make_pair (ln, LayerDetailsKey (purpose, mask, via_size))], path, prop_id);
 }
 
-void
-GeometryBasedLayoutGenerator::add_text (const std::string &ln, LayerPurpose purpose, const db::Text &text, unsigned int mask, db::properties_id_type prop_id)
+void GeometryBasedLayoutGenerator::add_text (const std::string &ln, LayerPurpose purpose, const db::Text &text, unsigned int mask, db::properties_id_type prop_id)
 {
   insert_shape (m_shapes [std::make_pair (ln, LayerDetailsKey (purpose, mask))], text, prop_id);
 }
 
-void
-GeometryBasedLayoutGenerator::add_via (const std::string &vn, const db::Trans &trans, unsigned int bottom_mask, unsigned int cut_mask, unsigned int top_mask)
+void GeometryBasedLayoutGenerator::add_via (const std::string &vn, const db::Trans &trans, unsigned int bottom_mask, unsigned int cut_mask, unsigned int top_mask)
 {
   m_vias.push_back (Via ());
   m_vias.back ().name = vn;
@@ -497,12 +479,11 @@ GeometryBasedLayoutGenerator::add_via (const std::string &vn, const db::Trans &t
   m_vias.back ().top_mask = top_mask;
 }
 
-void
-GeometryBasedLayoutGenerator::subtract_overlap_from_outline (const std::set<std::string> &overlap_layers)
+void GeometryBasedLayoutGenerator::subtract_overlap_from_outline (const std::set<std::string> &overlap_layers)
 {
   db::Shapes all_overlaps;
 
-  std::vector<std::map <std::pair<std::string, LayerDetailsKey>, db::Shapes>::iterator> to_remove;
+  std::vector<std::map<std::pair<std::string, LayerDetailsKey>, db::Shapes>::iterator> to_remove;
   for (auto s = m_shapes.begin (); s != m_shapes.end (); ++s) {
     if (overlap_layers.find (s->first.first) != overlap_layers.end ()) {
       all_overlaps.insert (s->second);
@@ -542,7 +523,6 @@ GeometryBasedLayoutGenerator::subtract_overlap_from_outline (const std::set<std:
     db::ShapeGenerator sg (s->second, true /*clear shapes*/);
     db::PolygonGenerator out (sg, true, true);
     proc.process (out, op);
-
   }
 }
 
@@ -551,7 +531,7 @@ GeometryBasedLayoutGenerator::subtract_overlap_from_outline (const std::set<std:
 
 LEFDEFReaderOptions::LEFDEFReaderOptions ()
   : m_read_all_layers (true),
-    m_dbu (0.001), 
+    m_dbu (0.001),
     m_produce_net_names (true),
     m_net_property_name (1),
     m_produce_inst_names (true),
@@ -728,7 +708,6 @@ static void set_datatypes (db::LEFDEFReaderOptions *data, void (db::LEFDEFReader
     } else {
       ex.expect (",");
     }
-
   }
 }
 
@@ -760,7 +739,6 @@ static void set_suffixes (db::LEFDEFReaderOptions *data, void (db::LEFDEFReaderO
     } else {
       ex.expect (",");
     }
-
   }
 }
 
@@ -810,8 +788,7 @@ static std::string get_suffixes (const db::LEFDEFReaderOptions *data, const std:
   return res;
 }
 
-void
-LEFDEFReaderOptions::set_via_geometry_suffix_str (const std::string &s)
+void LEFDEFReaderOptions::set_via_geometry_suffix_str (const std::string &s)
 {
   set_suffixes (this, &LEFDEFReaderOptions::clear_via_geometry_suffixes_per_mask, &LEFDEFReaderOptions::set_via_geometry_suffix, &LEFDEFReaderOptions::set_via_geometry_suffix_per_mask, s);
 }
@@ -822,8 +799,7 @@ LEFDEFReaderOptions::via_geometry_suffix_str () const
   return get_suffixes (this, &LEFDEFReaderOptions::via_geometry_suffix, &LEFDEFReaderOptions::via_geometry_suffix_per_mask, max_mask_number ());
 }
 
-void
-LEFDEFReaderOptions::set_via_geometry_datatype_str (const std::string &s)
+void LEFDEFReaderOptions::set_via_geometry_datatype_str (const std::string &s)
 {
   set_datatypes (this, &LEFDEFReaderOptions::clear_via_geometry_datatypes_per_mask, &LEFDEFReaderOptions::set_via_geometry_datatype, &LEFDEFReaderOptions::set_via_geometry_datatype_per_mask, s);
 }
@@ -834,8 +810,7 @@ LEFDEFReaderOptions::via_geometry_datatype_str () const
   return get_datatypes (this, &LEFDEFReaderOptions::via_geometry_datatype, &LEFDEFReaderOptions::via_geometry_datatype_per_mask, max_mask_number ());
 }
 
-void
-LEFDEFReaderOptions::set_pins_suffix_str (const std::string &s)
+void LEFDEFReaderOptions::set_pins_suffix_str (const std::string &s)
 {
   set_suffixes (this, &LEFDEFReaderOptions::clear_pins_suffixes_per_mask, &LEFDEFReaderOptions::set_pins_suffix, &LEFDEFReaderOptions::set_pins_suffix_per_mask, s);
 }
@@ -846,8 +821,7 @@ LEFDEFReaderOptions::pins_suffix_str () const
   return get_suffixes (this, &LEFDEFReaderOptions::pins_suffix, &LEFDEFReaderOptions::pins_suffix_per_mask, max_mask_number ());
 }
 
-void
-LEFDEFReaderOptions::set_pins_datatype_str (const std::string &s)
+void LEFDEFReaderOptions::set_pins_datatype_str (const std::string &s)
 {
   set_datatypes (this, &LEFDEFReaderOptions::clear_pins_datatypes_per_mask, &LEFDEFReaderOptions::set_pins_datatype, &LEFDEFReaderOptions::set_pins_datatype_per_mask, s);
 }
@@ -858,8 +832,7 @@ LEFDEFReaderOptions::pins_datatype_str () const
   return get_datatypes (this, &LEFDEFReaderOptions::pins_datatype, &LEFDEFReaderOptions::pins_datatype_per_mask, max_mask_number ());
 }
 
-void
-LEFDEFReaderOptions::set_lef_pins_suffix_str (const std::string &s)
+void LEFDEFReaderOptions::set_lef_pins_suffix_str (const std::string &s)
 {
   set_suffixes (this, &LEFDEFReaderOptions::clear_lef_pins_suffixes_per_mask, &LEFDEFReaderOptions::set_lef_pins_suffix, &LEFDEFReaderOptions::set_lef_pins_suffix_per_mask, s);
 }
@@ -870,8 +843,7 @@ LEFDEFReaderOptions::lef_pins_suffix_str () const
   return get_suffixes (this, &LEFDEFReaderOptions::lef_pins_suffix, &LEFDEFReaderOptions::lef_pins_suffix_per_mask, max_mask_number ());
 }
 
-void
-LEFDEFReaderOptions::set_lef_pins_datatype_str (const std::string &s)
+void LEFDEFReaderOptions::set_lef_pins_datatype_str (const std::string &s)
 {
   set_datatypes (this, &LEFDEFReaderOptions::clear_lef_pins_datatypes_per_mask, &LEFDEFReaderOptions::set_lef_pins_datatype, &LEFDEFReaderOptions::set_lef_pins_datatype_per_mask, s);
 }
@@ -882,8 +854,7 @@ LEFDEFReaderOptions::lef_pins_datatype_str () const
   return get_datatypes (this, &LEFDEFReaderOptions::lef_pins_datatype, &LEFDEFReaderOptions::lef_pins_datatype_per_mask, max_mask_number ());
 }
 
-void
-LEFDEFReaderOptions::set_fills_suffix_str (const std::string &s)
+void LEFDEFReaderOptions::set_fills_suffix_str (const std::string &s)
 {
   set_suffixes (this, &LEFDEFReaderOptions::clear_fills_suffixes_per_mask, &LEFDEFReaderOptions::set_fills_suffix, &LEFDEFReaderOptions::set_fills_suffix_per_mask, s);
 }
@@ -894,8 +865,7 @@ LEFDEFReaderOptions::fills_suffix_str () const
   return get_suffixes (this, &LEFDEFReaderOptions::fills_suffix, &LEFDEFReaderOptions::fills_suffix_per_mask, max_mask_number ());
 }
 
-void
-LEFDEFReaderOptions::set_fills_datatype_str (const std::string &s)
+void LEFDEFReaderOptions::set_fills_datatype_str (const std::string &s)
 {
   set_datatypes (this, &LEFDEFReaderOptions::clear_fills_datatypes_per_mask, &LEFDEFReaderOptions::set_fills_datatype, &LEFDEFReaderOptions::set_fills_datatype_per_mask, s);
 }
@@ -906,8 +876,7 @@ LEFDEFReaderOptions::fills_datatype_str () const
   return get_datatypes (this, &LEFDEFReaderOptions::fills_datatype, &LEFDEFReaderOptions::fills_datatype_per_mask, max_mask_number ());
 }
 
-void
-LEFDEFReaderOptions::set_routing_suffix_str (const std::string &s)
+void LEFDEFReaderOptions::set_routing_suffix_str (const std::string &s)
 {
   set_suffixes (this, &LEFDEFReaderOptions::clear_routing_suffixes_per_mask, &LEFDEFReaderOptions::set_routing_suffix, &LEFDEFReaderOptions::set_routing_suffix_per_mask, s);
 }
@@ -918,8 +887,7 @@ LEFDEFReaderOptions::routing_suffix_str () const
   return get_suffixes (this, &LEFDEFReaderOptions::routing_suffix, &LEFDEFReaderOptions::routing_suffix_per_mask, max_mask_number ());
 }
 
-void
-LEFDEFReaderOptions::set_routing_datatype_str (const std::string &s)
+void LEFDEFReaderOptions::set_routing_datatype_str (const std::string &s)
 {
   set_datatypes (this, &LEFDEFReaderOptions::clear_routing_datatypes_per_mask, &LEFDEFReaderOptions::set_routing_datatype, &LEFDEFReaderOptions::set_routing_datatype_per_mask, s);
 }
@@ -930,8 +898,7 @@ LEFDEFReaderOptions::routing_datatype_str () const
   return get_datatypes (this, &LEFDEFReaderOptions::routing_datatype, &LEFDEFReaderOptions::routing_datatype_per_mask, max_mask_number ());
 }
 
-void
-LEFDEFReaderOptions::set_special_routing_suffix_str (const std::string &s)
+void LEFDEFReaderOptions::set_special_routing_suffix_str (const std::string &s)
 {
   set_suffixes (this, &LEFDEFReaderOptions::clear_special_routing_suffixes_per_mask, &LEFDEFReaderOptions::set_special_routing_suffix, &LEFDEFReaderOptions::set_special_routing_suffix_per_mask, s);
 }
@@ -942,8 +909,7 @@ LEFDEFReaderOptions::special_routing_suffix_str () const
   return get_suffixes (this, &LEFDEFReaderOptions::special_routing_suffix, &LEFDEFReaderOptions::special_routing_suffix_per_mask, max_mask_number ());
 }
 
-void
-LEFDEFReaderOptions::set_special_routing_datatype_str (const std::string &s)
+void LEFDEFReaderOptions::set_special_routing_datatype_str (const std::string &s)
 {
   set_datatypes (this, &LEFDEFReaderOptions::clear_special_routing_datatypes_per_mask, &LEFDEFReaderOptions::set_special_routing_datatype, &LEFDEFReaderOptions::set_special_routing_datatype_per_mask, s);
 }
@@ -954,8 +920,7 @@ LEFDEFReaderOptions::special_routing_datatype_str () const
   return get_datatypes (this, &LEFDEFReaderOptions::special_routing_datatype, &LEFDEFReaderOptions::special_routing_datatype_per_mask, max_mask_number ());
 }
 
-void
-LEFDEFReaderOptions::set_lef_context_enabled (bool f)
+void LEFDEFReaderOptions::set_lef_context_enabled (bool f)
 {
   if (f != m_lef_context_enabled) {
     mp_reader_state.reset (0);
@@ -998,8 +963,7 @@ LEFDEFReaderState::~LEFDEFReaderState ()
   m_macro_generators.clear ();
 }
 
-void
-LEFDEFReaderState::init (Layout &layout, const std::string &base_path, const LoadLayoutOptions &options)
+void LEFDEFReaderState::init (Layout &layout, const std::string &base_path, const LoadLayoutOptions &options)
 {
   if (! mp_tech_comp) {
 
@@ -1013,7 +977,6 @@ LEFDEFReaderState::init (Layout &layout, const std::string &base_path, const Loa
 
     m_layer_map = mp_tech_comp->layer_map ();
     m_create_layers = mp_tech_comp->read_all_layers ();
-
   }
 
   if (mp_tech_comp) {
@@ -1039,34 +1002,28 @@ LEFDEFReaderState::init (Layout &layout, const std::string &base_path, const Loa
 
         if (fabs (new_layout->dbu () / layout.dbu () - 1.0) > db::epsilon) {
           warn (tl::sprintf (tl::to_string (tr ("DBU of macro layout file '%s' does not match reader DBU (layout DBU is %.12g, reader DBU is set to %.12g)")),
-                                                        *lp, new_layout->dbu (), layout.dbu ()));
+                             *lp, new_layout->dbu (), layout.dbu ()));
         }
-
       }
-
     }
-
   }
 }
 
-void
-LEFDEFReaderState::error (const std::string &msg)
+void LEFDEFReaderState::error (const std::string &msg)
 {
   if (mp_importer) {
     mp_importer->error (msg);
   }
 }
 
-void
-LEFDEFReaderState::warn (const std::string &msg, int warn_level)
+void LEFDEFReaderState::warn (const std::string &msg, int warn_level)
 {
   if (mp_importer) {
     mp_importer->warn (msg, warn_level);
   }
 }
 
-void
-LEFDEFReaderState::ensure_lef_importer (int warn_level)
+void LEFDEFReaderState::ensure_lef_importer (int warn_level)
 {
   if (! mp_lef_importer.get ()) {
     mp_lef_importer.reset (new db::LEFImporter (warn_level));
@@ -1080,8 +1037,7 @@ LEFDEFReaderState::lef_importer ()
   return *mp_lef_importer;
 }
 
-void
-LEFDEFReaderState::read_lef (const std::string &fn, db::Layout &layout)
+void LEFDEFReaderState::read_lef (const std::string &fn, db::Layout &layout)
 {
   tl::InputStream stream (fn);
   lef_importer ().read (stream, layout, *this);
@@ -1089,14 +1045,12 @@ LEFDEFReaderState::read_lef (const std::string &fn, db::Layout &layout)
   m_lef_files_read.insert (fn);
 }
 
-void
-LEFDEFReaderState::finish_lef (db::Layout &layout)
+void LEFDEFReaderState::finish_lef (db::Layout &layout)
 {
   lef_importer ().finish_lef (layout);
 }
 
-void
-LEFDEFReaderState::register_layer (const std::string &ln)
+void LEFDEFReaderState::register_layer (const std::string &ln)
 {
   m_default_number.insert (std::make_pair (ln, m_laynum));
   ++m_laynum;
@@ -1122,12 +1076,11 @@ static bool try_read_layers (tl::Extractor &ex, std::vector<int> &layers)
   return true;
 }
 
-void
-LEFDEFReaderState::read_map_files (const std::vector<std::string> &paths, db::Layout &layout, const std::string &base_path)
+void LEFDEFReaderState::read_map_files (const std::vector<std::string> &paths, db::Layout &layout, const std::string &base_path)
 {
   m_has_explicit_layer_mapping = true;
 
-  std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties> > layer_map;
+  std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties>> layer_map;
 
   for (std::vector<std::string>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
     read_single_map_file (correct_path (*p, layout, base_path, false).front (), layer_map);
@@ -1139,7 +1092,7 @@ LEFDEFReaderState::read_map_files (const std::vector<std::string> &paths, db::La
   m_layer_map.clear ();
 
   db::DirectLayerMapping lm (&layout);
-  for (std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties> >::const_iterator i = layer_map.begin (); i != layer_map.end (); ++i) {
+  for (std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties>>::const_iterator i = layer_map.begin (); i != layer_map.end (); ++i) {
     for (std::vector<db::LayerProperties>::const_iterator j = i->second.begin (); j != i->second.end (); ++j) {
       unsigned int layer = lm.map_layer (*j).second;
       m_layers [i->first].insert (layer);
@@ -1148,8 +1101,7 @@ LEFDEFReaderState::read_map_files (const std::vector<std::string> &paths, db::La
   }
 }
 
-void
-LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties> > &layer_map)
+void LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties>> &layer_map)
 {
   tl::InputFile file (path);
   tl::InputStream file_stream (file);
@@ -1173,9 +1125,8 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
   purpose_translation ["ALL"] = All;
 
   //  List of purposes corresponding to ALL
-  LayerPurpose all_purposes[] = {
-    LEFPins, Pins, SpecialRouting, Routing, ViaGeometry
-  };
+  LayerPurpose all_purposes [] = {
+    LEFPins, Pins, SpecialRouting, Routing, ViaGeometry};
 
   while (! ts.at_end ()) {
 
@@ -1245,7 +1196,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
         //    "(M2/LABELS): M2.LABEL"
         //  supported purposes: PINS(->Label), LEFPINS(->LEFLabels)
 
-        std::vector< std::pair<std::string, LayerPurpose> > layer_defs;
+        std::vector<std::pair<std::string, LayerPurpose>> layer_defs;
 
         std::vector<std::string> purposes = tl::split (w2, ",");
         for (std::vector<std::string>::const_iterator p = purposes.begin (); p != purposes.end (); ++p) {
@@ -1261,7 +1212,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
             if (lp.size () > 1) {
 
               LayerPurpose label_purpose = Pins;
-              std::map<std::string, LayerPurpose>::const_iterator i = purpose_translation.find (lp[1]);
+              std::map<std::string, LayerPurpose>::const_iterator i = purpose_translation.find (lp [1]);
               if (i != purpose_translation.end ()) {
                 label_purpose = i->second;
               }
@@ -1276,22 +1227,19 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
 
               layer_defs.push_back (std::make_pair (lp.front (), Label));
               layer_defs.push_back (std::make_pair (lp.front (), LEFLabel));
-
             }
-
           }
-
         }
 
         std::string final_name;
-        for (std::vector< std::pair<std::string, LayerPurpose> >::const_iterator i = layer_defs.begin (); i != layer_defs.end (); ++i) {
+        for (std::vector<std::pair<std::string, LayerPurpose>>::const_iterator i = layer_defs.begin (); i != layer_defs.end (); ++i) {
           if (! final_name.empty ()) {
             final_name += "/";
           }
           final_name += i->first + "." + purpose_to_name (i->second);
         }
 
-        for (std::vector< std::pair<std::string, LayerPurpose> >::const_iterator i = layer_defs.begin (); i != layer_defs.end (); ++i) {
+        for (std::vector<std::pair<std::string, LayerPurpose>>::const_iterator i = layer_defs.begin (); i != layer_defs.end (); ++i) {
           for (std::vector<int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
             for (std::vector<int>::const_iterator d = datatypes.begin (); d != datatypes.end (); ++d) {
               layer_map [std::make_pair (i->first, LayerDetailsKey (i->second))].push_back (db::LayerProperties (*l, *d, final_name));
@@ -1345,13 +1293,11 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
               if (ex.test (":SIZE:")) {
                 double sx = 0.0, sy = 0.0;
                 ex.read (sx);
-                ex.test("X");
+                ex.test ("X");
                 ex.read (sy);
                 via_size = db::DVector (sx, sy);
               }
-
             }
-
           }
 
           if (ex.test (":MASK:")) {
@@ -1364,16 +1310,14 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
 
           } else if (i->second == All) {
 
-            for (LayerPurpose *p = all_purposes; p != all_purposes + sizeof (all_purposes) / sizeof (all_purposes[0]); ++p) {
+            for (LayerPurpose *p = all_purposes; p != all_purposes + sizeof (all_purposes) / sizeof (all_purposes [0]); ++p) {
               translated_purposes.insert (LayerDetailsKey (*p, mask, via_size));
             }
 
           } else {
 
             translated_purposes.insert (LayerDetailsKey (i->second, mask, via_size));
-
           }
-
         }
 
         //  create a visual description string for the combined purposes
@@ -1393,7 +1337,6 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
           } else {
             purpose_str += ps;
           }
-
         }
 
         std::string final_name = w1 + "." + purpose_str;
@@ -1405,11 +1348,8 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
             }
           }
         }
-
       }
-
     }
-
   }
 }
 
@@ -1421,17 +1361,17 @@ static bool has_fallback (LayerPurpose p)
   return p == RegionsFence || p == RegionsGuide || p == RegionsNone;
 }
 
-std::set <unsigned int>
+std::set<unsigned int>
 LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPurpose purpose, unsigned int mask, const db::DVector &via_size)
 {
-  std::map <std::pair<std::string, LayerDetailsKey>, std::set<unsigned int> >::const_iterator nl;
+  std::map<std::pair<std::string, LayerDetailsKey>, std::set<unsigned int>>::const_iterator nl;
   nl = m_layers.find (std::make_pair (n, LayerDetailsKey (purpose, mask, via_size)));
   if (nl == m_layers.end ()) {
     nl = m_layers.find (std::make_pair (n, LayerDetailsKey (purpose, mask)));
   }
   if (nl == m_layers.end ()) {
 
-    std::set <unsigned int> ll;
+    std::set<unsigned int> ll;
 
     if (! m_has_explicit_layer_mapping) {
       ll = open_layer_uncached (layout, n, purpose, mask);
@@ -1507,7 +1447,7 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
  *    4/17                  4/17 : 4/11        OUTLINE 4/11
  */
 
-std::set<unsigned int> LEFDEFReaderState::open_layer_uncached(db::Layout &layout, const std::string &n, LayerPurpose purpose, unsigned int mask)
+std::set<unsigned int> LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n, LayerPurpose purpose, unsigned int mask)
 {
   if (n.empty ()) {
 
@@ -1599,7 +1539,6 @@ std::set<unsigned int> LEFDEFReaderState::open_layer_uncached(db::Layout &layout
       if (l == ll.end ()) {
         break;
       }
-
     }
 
     return res;
@@ -1769,16 +1708,13 @@ std::set<unsigned int> LEFDEFReaderState::open_layer_uncached(db::Layout &layout
       if (l == ll.end ()) {
         break;
       }
-
     }
 
     return res;
-
   }
 }
 
-void
-LEFDEFReaderState::start ()
+void LEFDEFReaderState::start ()
 {
   //  Start over for a new DEF file - this function is used in LEF context mode
   //  i.e. when LEFs are cached during multiple DEF reads. It is called when a new DEF is read.
@@ -1790,7 +1726,7 @@ LEFDEFReaderState::start ()
   //  Remove the via generators that were added by DEF
   //  TODO: there is no concept for "local LEFs" currently. Even LEFs stored along
   //  with DEFs are considered "global".
-  for (auto vg = m_via_generators.begin (); vg != m_via_generators.end (); ) {
+  for (auto vg = m_via_generators.begin (); vg != m_via_generators.end ();) {
     auto vg_here = vg;
     ++vg;
     if (vg_here->second->def_local) {
@@ -1805,8 +1741,7 @@ LEFDEFReaderState::start ()
   m_via_cells.clear ();
 }
 
-void
-LEFDEFReaderState::finish (db::Layout &layout)
+void LEFDEFReaderState::finish (db::Layout &layout)
 {
   CommonReaderBase::finish (layout);
 
@@ -1834,14 +1769,13 @@ LEFDEFReaderState::finish (db::Layout &layout)
     db::CellMapping cm;
     cm.create_multi_mapping_full (layout, target_cells, **m, source_cells);
     layout.copy_tree_shapes (**m, cm);
-
   }
 
   //  Warn about cells that could not be resolved
   for (std::map<std::string, db::cell_index_type>::iterator f = m_foreign_cells.begin (); f != m_foreign_cells.end (); ++f) {
     if (f->second != seen && layout.cell (f->second).is_ghost_cell ()) {
       warn (tl::sprintf (tl::to_string (tr ("Could not find a substitution layout for foreign cell '%s'")),
-                                  f->first));
+                         f->first));
     }
   }
 
@@ -1866,7 +1800,7 @@ LEFDEFReaderState::finish (db::Layout &layout)
 
   db::LayerMap lm;
 
-  for (std::map <std::pair<std::string, LayerDetailsKey>, std::set<unsigned int> >::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
+  for (std::map<std::pair<std::string, LayerDetailsKey>, std::set<unsigned int>>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
 
     if (l->second.empty ()) {
       continue;
@@ -1895,7 +1829,6 @@ LEFDEFReaderState::finish (db::Layout &layout)
         } else {
           lp.layer = n4n->second;
         }
-
       }
 
       if (lp.datatype < 0) {
@@ -1905,17 +1838,14 @@ LEFDEFReaderState::finish (db::Layout &layout)
       layout.set_properties (layer_index, lp);
 
       lm.mmap (db::LayerProperties (n), layer_index, lp);
-
     }
-
   }
 
   //  On return we deliver the "canonical" map which lists the decorated name vs. the real ones.
   m_layer_map = lm;
 }
 
-void
-LEFDEFReaderState::register_via_cell (const std::string &vn, const std::string &nondefaultrule, LEFDEFLayoutGenerator *generator)
+void LEFDEFReaderState::register_via_cell (const std::string &vn, const std::string &nondefaultrule, LEFDEFLayoutGenerator *generator)
 {
   //  inserts at the end of the range
   m_via_generators.insert (std::make_pair (std::make_pair (vn, nondefaultrule), generator));
@@ -1998,10 +1928,9 @@ LEFDEFReaderState::via_cell (const std::string &vn, const std::string &nondefaul
         details = tl::sprintf (tl::to_string (tr (" (trying with NONDEFAULTRULE '%s' and without)")), nondefaultrule);
       }
       error (tl::sprintf (tl::to_string (tr ("Could not find a via specification with name '%s'")) + details, vn));
-
     }
 
-    m_via_cells[vk] = cell;
+    m_via_cells [vk] = cell;
     return cell;
 
   } else {
@@ -2010,8 +1939,7 @@ LEFDEFReaderState::via_cell (const std::string &vn, const std::string &nondefaul
   }
 }
 
-void
-LEFDEFReaderState::register_macro_cell (const std::string &mn, LEFDEFLayoutGenerator *generator)
+void LEFDEFReaderState::register_macro_cell (const std::string &mn, LEFDEFLayoutGenerator *generator)
 {
   if (m_macro_generators.find (mn) != m_macro_generators.end ()) {
     delete m_macro_generators [mn];
@@ -2069,7 +1997,7 @@ LEFDEFReaderState::macro_cell (const std::string &mn, Layout &layout, const std:
     mk = MacroKey (mn, masks);
   }
 
-  std::map<MacroKey, std::pair<db::Cell *, db::Trans> >::const_iterator i = m_macro_cells.find (mk);
+  std::map<MacroKey, std::pair<db::Cell *, db::Trans>>::const_iterator i = m_macro_cells.find (mk);
   if (i != m_macro_cells.end ()) {
     tl_assert (! i->second.first || i->second.first->layout () == &layout);
     return i->second;
@@ -2094,7 +2022,6 @@ LEFDEFReaderState::macro_cell (const std::string &mn, Layout &layout, const std:
       //  use FOREIGN cell instead of new one
       cell = foreign_cell;
       tr = db::Trans (db::Point () - macro_desc.origin) * macro_desc.foreign_trans;
-
     }
 
   } else if (tech_comp ()->macro_resolution_mode () == 2) {
@@ -2125,7 +2052,6 @@ LEFDEFReaderState::macro_cell (const std::string &mn, Layout &layout, const std:
     } else {
       mg->create_cell (*this, layout, *cell, &maskshift_layers, masks, nm);
     }
-
   }
 
   m_macro_cells [mk] = std::make_pair (cell, tr);
@@ -2156,8 +2082,7 @@ LEFDEFImporter::get_mask (long m)
   return (unsigned int) m;
 }
 
-void 
-LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderState &state)
+void LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderState &state)
 {
   tl::log << tl::to_string (tr ("Reading LEF/DEF file")) << " " << stream.absolute_file_path ();
 
@@ -2204,7 +2129,7 @@ LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderS
     mp_progress = &progress;
     mp_stream = new tl::TextInputStream (stream);
 
-    do_read (layout); 
+    do_read (layout);
 
     mp_reader_state->attach_reader (0);
     delete mp_stream;
@@ -2220,8 +2145,7 @@ LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderS
   }
 }
 
-void 
-LEFDEFImporter::error (const std::string &msg)
+void LEFDEFImporter::error (const std::string &msg)
 {
   if (! mp_stream) {
     throw LEFDEFReaderException (msg, -1, std::string (), m_fn);
@@ -2232,8 +2156,7 @@ LEFDEFImporter::error (const std::string &msg)
   }
 }
 
-void 
-LEFDEFImporter::warn (const std::string &msg, int wl)
+void LEFDEFImporter::warn (const std::string &msg, int wl)
 {
   if (m_warn_level < wl) {
     return;
@@ -2252,8 +2175,7 @@ LEFDEFImporter::warn (const std::string &msg, int wl)
   }
 }
 
-bool
-LEFDEFImporter::at_end ()
+bool LEFDEFImporter::at_end ()
 {
   if (m_last_token.empty ()) {
     if (next ().empty ()) {
@@ -2263,8 +2185,7 @@ LEFDEFImporter::at_end ()
   return false;
 }
 
-bool  
-LEFDEFImporter::peek (const std::string &token)
+bool LEFDEFImporter::peek (const std::string &token)
 {
   if (m_last_token.empty ()) {
     if (next ().empty ()) {
@@ -2283,8 +2204,7 @@ LEFDEFImporter::peek (const std::string &token)
   return *a == *b;
 }
 
-bool  
-LEFDEFImporter::test (const std::string &token)
+bool LEFDEFImporter::test (const std::string &token)
 {
   if (peek (token)) {
     //  consume when successful
@@ -2295,24 +2215,21 @@ LEFDEFImporter::test (const std::string &token)
   }
 }
 
-void  
-LEFDEFImporter::expect (const std::string &token)
+void LEFDEFImporter::expect (const std::string &token)
 {
   if (! test (token)) {
     error ("Expected token: " + token);
   }
 }
 
-void
-LEFDEFImporter::expect (const std::string &token1, const std::string &token2)
+void LEFDEFImporter::expect (const std::string &token1, const std::string &token2)
 {
   if (! test (token1) && ! test (token2)) {
     error ("Expected token: " + token1 + " or " + token2);
   }
 }
 
-void
-LEFDEFImporter::expect (const std::string &token1, const std::string &token2, const std::string &token3)
+void LEFDEFImporter::expect (const std::string &token1, const std::string &token2, const std::string &token3)
 {
   if (! test (token1) && ! test (token2) && ! test (token3)) {
     error ("Expected token: " + token1 + ", " + token2 + " or " + token3);
@@ -2340,8 +2257,7 @@ LEFDEFImporter::get_double ()
   return d;
 }
 
-long  
-LEFDEFImporter::get_long ()
+long LEFDEFImporter::get_long ()
 {
   if (m_last_token.empty ()) {
     if (next ().empty ()) {
@@ -2361,8 +2277,7 @@ LEFDEFImporter::get_long ()
   return l;
 }
 
-void
-LEFDEFImporter::take ()
+void LEFDEFImporter::take ()
 {
   if (m_last_token.empty ()) {
     if (next ().empty ()) {
@@ -2372,7 +2287,7 @@ LEFDEFImporter::take ()
   m_last_token.clear ();
 }
 
-std::string 
+std::string
 LEFDEFImporter::get ()
 {
   if (m_last_token.empty ()) {
@@ -2385,14 +2300,12 @@ LEFDEFImporter::get ()
   return r;
 }
 
-void
-LEFDEFImporter::enter_section (const std::string &name)
+void LEFDEFImporter::enter_section (const std::string &name)
 {
   m_sections.push_back (name);
 }
 
-void
-LEFDEFImporter::leave_section ()
+void LEFDEFImporter::leave_section ()
 {
   m_sections.pop_back ();
 }
@@ -2408,12 +2321,12 @@ LEFDEFImporter::next ()
 
   do {
 
-    while ((c = mp_stream->get_char ()) != 0 && isspace (c)) 
+    while ((c = mp_stream->get_char ()) != 0 && isspace (c))
       ;
 
     if (c == '#') {
 
-      while ((c = mp_stream->get_char ()) != 0 && (c != '\015' && c != '\012')) 
+      while ((c = mp_stream->get_char ()) != 0 && (c != '\015' && c != '\012'))
         ;
 
     } else if (c == '\'' || c == '"') {
@@ -2433,7 +2346,7 @@ LEFDEFImporter::next ()
 
     } else if (c) {
 
-      m_last_token += c; 
+      m_last_token += c;
 
       while ((c = mp_stream->get_char ()) != 0 && ! isspace (c)) {
         if (c == '\\') {
@@ -2445,7 +2358,6 @@ LEFDEFImporter::next ()
       }
 
       break;
-
     }
 
   } while (c);
@@ -2501,4 +2413,3 @@ LEFDEFImporter::get_vector (double scale)
 }
 
 }
-

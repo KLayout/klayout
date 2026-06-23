@@ -39,33 +39,32 @@ namespace db
 
 class GerberImporter;
 
-struct GerberArtworkFileDescriptor
-{
+struct GerberArtworkFileDescriptor {
   std::string filename;
 };
 
-struct GerberDrillFileDescriptor
-{
-  GerberDrillFileDescriptor () : start (-1), stop (-1) { }
+struct GerberDrillFileDescriptor {
+  GerberDrillFileDescriptor () : start (-1), stop (-1) {}
 
   int start;
   int stop;
   std::string filename;
 };
 
-struct GerberFreeFileDescriptor
-{
+struct GerberFreeFileDescriptor {
   std::string filename;
   std::vector<int> layout_layers;
 };
 
-struct DB_PLUGIN_PUBLIC GerberImportData
-{
+struct DB_PLUGIN_PUBLIC GerberImportData {
 public:
   GerberImportData ();
 
-  enum mode_type { ModeIntoLayout = 0, ModeSamePanel, ModeNewPanel };
-  enum mounting_type { MountingTop = 0, MountingBottom };
+  enum mode_type { ModeIntoLayout = 0,
+                   ModeSamePanel,
+                   ModeNewPanel };
+  enum mounting_type { MountingTop = 0,
+                       MountingBottom };
 
   bool invert_negative_layers;
   double border;
@@ -73,14 +72,14 @@ public:
   mode_type mode;
   std::string base_dir;
   std::string current_file;
-  std::vector <db::LayerProperties> layout_layers;
+  std::vector<db::LayerProperties> layout_layers;
   mounting_type mounting;
   int num_metal_layers;
   int num_via_types;
-  std::vector <GerberArtworkFileDescriptor> artwork_files;
-  std::vector <GerberDrillFileDescriptor> drill_files;
-  std::vector <GerberFreeFileDescriptor> free_files;
-  std::vector <std::pair <db::DPoint, db::DPoint> > reference_points;
+  std::vector<GerberArtworkFileDescriptor> artwork_files;
+  std::vector<GerberDrillFileDescriptor> drill_files;
+  std::vector<GerberFreeFileDescriptor> free_files;
+  std::vector<std::pair<db::DPoint, db::DPoint>> reference_points;
   db::DCplxTrans explicit_trans;
   std::string layer_properties_file;
   int num_circle_points;

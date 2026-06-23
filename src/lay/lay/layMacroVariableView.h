@@ -33,7 +33,7 @@
 
 namespace tl
 {
-  class Variant;
+class Variant;
 }
 
 namespace lay
@@ -50,7 +50,7 @@ QString pretty_print (const tl::Variant &v);
 class LAY_PUBLIC MacroVariableView
   : public QTreeWidget
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
   /**
@@ -88,4 +88,3 @@ private:
 }
 
 #endif
-

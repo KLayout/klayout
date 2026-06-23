@@ -30,15 +30,17 @@
 
 #include <iterator>
 
-namespace tl {
-  class RelativeProgress;
+namespace tl
+{
+class RelativeProgress;
 }
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief A facility to create contours from edges
- *  
+ *
  *  This object will convert a set of edges to contours. "contours" are sequences of points, not
  *  necessarily closed ones. Contours may also be holes or outer contours - this object is not
  *  capable of making that distinction.
@@ -67,11 +69,10 @@ public:
   void fill (Iter from, Iter to, bool no = false, typename std::iterator_traits<Iter>::value_type::coord_type distance = 0, tl::RelativeProgress *progress = 0);
 
 private:
-  std::vector<std::vector <db::Point> > m_contours;
+  std::vector<std::vector<db::Point>> m_contours;
   std::vector<bool> m_contours_closed;
 };
 
 } // namespace db
 
 #endif
-

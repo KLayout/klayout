@@ -30,10 +30,11 @@
 
 KJ_BEGIN_HEADER
 
-namespace kj {
+namespace kj
+{
 
 template <typename ResultType>
-struct EncodingResult: public ResultType {
+struct EncodingResult : public ResultType {
   // Equivalent to ResultType (a String or wide-char array) for all intents and purposes, except
   // that the bool `hadErrors` can be inspected to see if any errors were encountered in the input.
   // Each encoding/decoding function that returns this type will "work around" errors in some way,
@@ -43,20 +44,21 @@ struct EncodingResult: public ResultType {
   // Through magic, KJ_IF_MAYBE() and KJ_{REQUIRE,ASSERT}_NONNULL() work on EncodingResult<T>
   // exactly if it were a Maybe<T> that is null in case of errors.
 
-  inline EncodingResult(ResultType&& result, bool hadErrors)
-      : ResultType(kj::mv(result)), hadErrors(hadErrors) {}
+  inline EncodingResult (ResultType &&result, bool hadErrors)
+    : ResultType (kj::mv (result)), hadErrors (hadErrors) {}
 
   const bool hadErrors;
 };
 
 template <typename T>
-inline auto KJ_STRINGIFY(const EncodingResult<T>& value)
-    -> decltype(toCharSequence(implicitCast<const T&>(value))) {
-  return toCharSequence(implicitCast<const T&>(value));
+inline auto KJ_STRINGIFY (const EncodingResult<T> &value)
+  -> decltype (toCharSequence (implicitCast<const T &> (value)))
+{
+  return toCharSequence (implicitCast<const T &> (value));
 }
 
-EncodingResult<Array<char16_t>> encodeUtf16(ArrayPtr<const char> text, bool nulTerminate = false);
-EncodingResult<Array<char32_t>> encodeUtf32(ArrayPtr<const char> text, bool nulTerminate = false);
+EncodingResult<Array<char16_t>> encodeUtf16 (ArrayPtr<const char> text, bool nulTerminate = false);
+EncodingResult<Array<char32_t>> encodeUtf32 (ArrayPtr<const char> text, bool nulTerminate = false);
 // Convert UTF-8 text (which KJ strings use) to UTF-16 or UTF-32.
 //
 // If `nulTerminate` is true, an extra NUL character will be added to the end of the output.
@@ -68,8 +70,8 @@ EncodingResult<Array<char32_t>> encodeUtf32(ArrayPtr<const char> text, bool nulT
 // [WTF-8 encoding](http://simonsapin.github.io/wtf-8/), which affects how invalid input is
 // handled. See comments on decodeUtf16() for more info.
 
-EncodingResult<String> decodeUtf16(ArrayPtr<const char16_t> utf16);
-EncodingResult<String> decodeUtf32(ArrayPtr<const char32_t> utf32);
+EncodingResult<String> decodeUtf16 (ArrayPtr<const char16_t> utf16);
+EncodingResult<String> decodeUtf32 (ArrayPtr<const char32_t> utf32);
 // Convert UTF-16 or UTF-32 to UTF-8 (which KJ strings use).
 //
 // The input should NOT include a NUL terminator; any NUL characters in the input array will be
@@ -104,9 +106,9 @@ EncodingResult<String> decodeUtf32(ArrayPtr<const char32_t> utf32);
 //   raised on subsequent legs unless all invalid sequences were replaced with U+FFFD (which, after
 //   all, is a valid code point).
 
-EncodingResult<Array<wchar_t>> encodeWideString(
-    ArrayPtr<const char> text, bool nulTerminate = false);
-EncodingResult<String> decodeWideString(ArrayPtr<const wchar_t> wide);
+EncodingResult<Array<wchar_t>> encodeWideString (
+  ArrayPtr<const char> text, bool nulTerminate = false);
+EncodingResult<String> decodeWideString (ArrayPtr<const wchar_t> wide);
 // Encode / decode strings of wchar_t, aka "wide strings". Unfortunately, different platforms have
 // different definitions for wchar_t. For example, on Windows they are 16-bit and encode UTF-16,
 // but on Linux they are 32-bit and encode UTF-32. Some platforms even define wchar_t as 8-bit,
@@ -116,20 +118,20 @@ EncodingResult<String> decodeWideString(ArrayPtr<const wchar_t> wide);
 // the target platform. So, these functions are simple aliases for encodeUtf*/decodeUtf*, above
 // (or simply make a copy if wchar_t is 8 bits).
 
-String encodeHex(ArrayPtr<const byte> bytes);
-EncodingResult<Array<byte>> decodeHex(ArrayPtr<const char> text);
+String encodeHex (ArrayPtr<const byte> bytes);
+EncodingResult<Array<byte>> decodeHex (ArrayPtr<const char> text);
 // Encode/decode bytes as hex strings.
 
-String encodeUriComponent(ArrayPtr<const byte> bytes);
-String encodeUriComponent(ArrayPtr<const char> bytes);
-EncodingResult<String> decodeUriComponent(ArrayPtr<const char> text);
+String encodeUriComponent (ArrayPtr<const byte> bytes);
+String encodeUriComponent (ArrayPtr<const char> bytes);
+EncodingResult<String> decodeUriComponent (ArrayPtr<const char> text);
 // Encode/decode URI components using % escapes for characters listed as "reserved" in RFC 2396.
 // This is the same behavior as JavaScript's `encodeURIComponent()`.
 //
 // See https://tools.ietf.org/html/rfc2396#section-2.3
 
-String encodeUriFragment(ArrayPtr<const byte> bytes);
-String encodeUriFragment(ArrayPtr<const char> bytes);
+String encodeUriFragment (ArrayPtr<const byte> bytes);
+String encodeUriFragment (ArrayPtr<const char> bytes);
 // Encode URL fragment components using the fragment percent encode set defined by the WHATWG URL
 // specification. Use decodeUriComponent() to decode.
 //
@@ -138,8 +140,8 @@ String encodeUriFragment(ArrayPtr<const char> bytes);
 //
 // See https://url.spec.whatwg.org/#fragment-percent-encode-set
 
-String encodeUriPath(ArrayPtr<const byte> bytes);
-String encodeUriPath(ArrayPtr<const char> bytes);
+String encodeUriPath (ArrayPtr<const byte> bytes);
+String encodeUriPath (ArrayPtr<const char> bytes);
 // Encode URL path components (not entire paths!) using the path percent encode set defined by the
 // WHATWG URL specification. Use decodeUriComponent() to decode.
 //
@@ -154,8 +156,8 @@ String encodeUriPath(ArrayPtr<const char> bytes);
 //
 // See https://url.spec.whatwg.org/#path-percent-encode-set
 
-String encodeUriUserInfo(ArrayPtr<const byte> bytes);
-String encodeUriUserInfo(ArrayPtr<const char> bytes);
+String encodeUriUserInfo (ArrayPtr<const byte> bytes);
+String encodeUriUserInfo (ArrayPtr<const char> bytes);
 // Encode URL userinfo components using the userinfo percent encode set defined by the WHATWG URL
 // specification. Use decodeUriComponent() to decode.
 //
@@ -164,9 +166,9 @@ String encodeUriUserInfo(ArrayPtr<const char> bytes);
 //
 // See https://url.spec.whatwg.org/#userinfo-percent-encode-set
 
-String encodeWwwForm(ArrayPtr<const byte> bytes);
-String encodeWwwForm(ArrayPtr<const char> bytes);
-EncodingResult<String> decodeWwwForm(ArrayPtr<const char> text);
+String encodeWwwForm (ArrayPtr<const byte> bytes);
+String encodeWwwForm (ArrayPtr<const char> bytes);
+EncodingResult<String> decodeWwwForm (ArrayPtr<const char> text);
 // Encode/decode URI components using % escapes and '+' (for spaces) according to the
 // application/x-www-form-urlencoded format defined by the WHATWG URL specification.
 //
@@ -182,8 +184,8 @@ struct DecodeUriOptions {
   // This struct is intentionally convertible from bool, in order to maintain backwards
   // compatibility with code written when `decodeBinaryUriComponent()` took a boolean second
   // parameter.
-  DecodeUriOptions(bool nulTerminate = false, bool plusToSpace = false)
-      : nulTerminate(nulTerminate), plusToSpace(plusToSpace) {}
+  DecodeUriOptions (bool nulTerminate = false, bool plusToSpace = false)
+    : nulTerminate (nulTerminate), plusToSpace (plusToSpace) {}
 
   bool nulTerminate;
   // Append a terminal NUL byte.
@@ -192,53 +194,47 @@ struct DecodeUriOptions {
   // Convert '+' to ' ' characters before percent decoding. Used to decode
   // application/x-www-form-urlencoded text, such as query strings.
 };
-EncodingResult<Array<byte>> decodeBinaryUriComponent(
-    ArrayPtr<const char> text, DecodeUriOptions options = DecodeUriOptions());
+EncodingResult<Array<byte>> decodeBinaryUriComponent (
+  ArrayPtr<const char> text, DecodeUriOptions options = DecodeUriOptions ());
 // Decode URI components using % escapes. This is a lower-level interface used to implement both
 // `decodeUriComponent()` and `decodeWwwForm()`
 
-String encodeCEscape(ArrayPtr<const byte> bytes);
-String encodeCEscape(ArrayPtr<const char> bytes);
-EncodingResult<Array<byte>> decodeBinaryCEscape(
-    ArrayPtr<const char> text, bool nulTerminate = false);
-EncodingResult<String> decodeCEscape(ArrayPtr<const char> text);
+String encodeCEscape (ArrayPtr<const byte> bytes);
+String encodeCEscape (ArrayPtr<const char> bytes);
+EncodingResult<Array<byte>> decodeBinaryCEscape (
+  ArrayPtr<const char> text, bool nulTerminate = false);
+EncodingResult<String> decodeCEscape (ArrayPtr<const char> text);
 
-String encodeBase64(ArrayPtr<const byte> bytes, bool breakLines = false);
+String encodeBase64 (ArrayPtr<const byte> bytes, bool breakLines = false);
 // Encode the given bytes as base64 text. If `breakLines` is true, line breaks will be inserted
 // into the output every 72 characters (e.g. for encoding e-mail bodies).
 
-EncodingResult<Array<byte>> decodeBase64(ArrayPtr<const char> text);
+EncodingResult<Array<byte>> decodeBase64 (ArrayPtr<const char> text);
 // Decode base64 text. This function reports errors required by the WHATWG HTML/Infra specs: see
 // https://html.spec.whatwg.org/multipage/webappapis.html#atob for details.
 
-String encodeBase64Url(ArrayPtr<const byte> bytes);
+String encodeBase64Url (ArrayPtr<const byte> bytes);
 // Encode the given bytes as URL-safe base64 text. (RFC 4648, section 5)
 
 // =======================================================================================
 // inline implementation details
 
-namespace _ {  // private
+namespace _
+{ // private
 
 template <typename T>
-NullableValue<T> readMaybe(EncodingResult<T>&& value) {
+NullableValue<T> readMaybe (EncodingResult<T> &&value)
+{
   if (value.hadErrors) {
     return nullptr;
   } else {
-    return kj::mv(value);
+    return kj::mv (value);
   }
 }
 
 template <typename T>
-T* readMaybe(EncodingResult<T>& value) {
-  if (value.hadErrors) {
-    return nullptr;
-  } else {
-    return &value;
-  }
-}
-
-template <typename T>
-const T* readMaybe(const EncodingResult<T>& value) {
+T *readMaybe (EncodingResult<T> &value)
+{
   if (value.hadErrors) {
     return nullptr;
   } else {
@@ -246,48 +242,68 @@ const T* readMaybe(const EncodingResult<T>& value) {
   }
 }
 
-String encodeCEscapeImpl(ArrayPtr<const byte> bytes, bool isBinary);
-
-}  // namespace _ (private)
-
-inline String encodeUriComponent(ArrayPtr<const char> text) {
-  return encodeUriComponent(text.asBytes());
-}
-inline EncodingResult<String> decodeUriComponent(ArrayPtr<const char> text) {
-  auto result = decodeBinaryUriComponent(text, DecodeUriOptions { /*.nulTerminate=*/true });
-  return { String(result.releaseAsChars()), result.hadErrors };
+template <typename T>
+const T *readMaybe (const EncodingResult<T> &value)
+{
+  if (value.hadErrors) {
+    return nullptr;
+  } else {
+    return &value;
+  }
 }
 
-inline String encodeUriFragment(ArrayPtr<const char> text) {
-  return encodeUriFragment(text.asBytes());
+String encodeCEscapeImpl (ArrayPtr<const byte> bytes, bool isBinary);
+
+} // namespace _ (private)
+
+inline String encodeUriComponent (ArrayPtr<const char> text)
+{
+  return encodeUriComponent (text.asBytes ());
 }
-inline String encodeUriPath(ArrayPtr<const char> text) {
-  return encodeUriPath(text.asBytes());
-}
-inline String encodeUriUserInfo(ArrayPtr<const char> text) {
-  return encodeUriUserInfo(text.asBytes());
+inline EncodingResult<String> decodeUriComponent (ArrayPtr<const char> text)
+{
+  auto result = decodeBinaryUriComponent (text, DecodeUriOptions{/*.nulTerminate=*/true});
+  return {String (result.releaseAsChars ()), result.hadErrors};
 }
 
-inline String encodeWwwForm(ArrayPtr<const char> text) {
-  return encodeWwwForm(text.asBytes());
+inline String encodeUriFragment (ArrayPtr<const char> text)
+{
+  return encodeUriFragment (text.asBytes ());
 }
-inline EncodingResult<String> decodeWwwForm(ArrayPtr<const char> text) {
-  auto result = decodeBinaryUriComponent(text, DecodeUriOptions { /*.nulTerminate=*/true,
-                                                                  /*.plusToSpace=*/true });
-  return { String(result.releaseAsChars()), result.hadErrors };
+inline String encodeUriPath (ArrayPtr<const char> text)
+{
+  return encodeUriPath (text.asBytes ());
 }
-
-inline String encodeCEscape(ArrayPtr<const char> text) {
-  return _::encodeCEscapeImpl(text.asBytes(), false);
-}
-
-inline String encodeCEscape(ArrayPtr<const byte> bytes) {
-  return _::encodeCEscapeImpl(bytes, true);
+inline String encodeUriUserInfo (ArrayPtr<const char> text)
+{
+  return encodeUriUserInfo (text.asBytes ());
 }
 
-inline EncodingResult<String> decodeCEscape(ArrayPtr<const char> text) {
-  auto result = decodeBinaryCEscape(text, true);
-  return { String(result.releaseAsChars()), result.hadErrors };
+inline String encodeWwwForm (ArrayPtr<const char> text)
+{
+  return encodeWwwForm (text.asBytes ());
+}
+inline EncodingResult<String> decodeWwwForm (ArrayPtr<const char> text)
+{
+  auto result = decodeBinaryUriComponent (text, DecodeUriOptions{/*.nulTerminate=*/true,
+                                                                 /*.plusToSpace=*/true});
+  return {String (result.releaseAsChars ()), result.hadErrors};
+}
+
+inline String encodeCEscape (ArrayPtr<const char> text)
+{
+  return _::encodeCEscapeImpl (text.asBytes (), false);
+}
+
+inline String encodeCEscape (ArrayPtr<const byte> bytes)
+{
+  return _::encodeCEscapeImpl (bytes, true);
+}
+
+inline EncodingResult<String> decodeCEscape (ArrayPtr<const char> text)
+{
+  auto result = decodeBinaryCEscape (text, true);
+  return {String (result.releaseAsChars ()), result.hadErrors};
 }
 
 // If you pass a string literal to a function taking ArrayPtr<const char>, it'll include the NUL
@@ -295,148 +311,183 @@ inline EncodingResult<String> decodeCEscape(ArrayPtr<const char> text) {
 // only even matters for encoding-test.c++.
 
 template <size_t s>
-inline EncodingResult<Array<char16_t>> encodeUtf16(const char (&text)[s], bool nulTerminate=false) {
-  return encodeUtf16(arrayPtr(text, s - 1), nulTerminate);
+inline EncodingResult<Array<char16_t>> encodeUtf16 (const char (&text) [s], bool nulTerminate = false)
+{
+  return encodeUtf16 (arrayPtr (text, s - 1), nulTerminate);
 }
 template <size_t s>
-inline EncodingResult<Array<char32_t>> encodeUtf32(const char (&text)[s], bool nulTerminate=false) {
-  return encodeUtf32(arrayPtr(text, s - 1), nulTerminate);
+inline EncodingResult<Array<char32_t>> encodeUtf32 (const char (&text) [s], bool nulTerminate = false)
+{
+  return encodeUtf32 (arrayPtr (text, s - 1), nulTerminate);
 }
 template <size_t s>
-inline EncodingResult<Array<wchar_t>> encodeWideString(
-    const char (&text)[s], bool nulTerminate=false) {
-  return encodeWideString(arrayPtr(text, s - 1), nulTerminate);
+inline EncodingResult<Array<wchar_t>> encodeWideString (
+  const char (&text) [s], bool nulTerminate = false)
+{
+  return encodeWideString (arrayPtr (text, s - 1), nulTerminate);
 }
 template <size_t s>
-inline EncodingResult<String> decodeUtf16(const char16_t (&utf16)[s]) {
-  return decodeUtf16(arrayPtr(utf16, s - 1));
+inline EncodingResult<String> decodeUtf16 (const char16_t (&utf16) [s])
+{
+  return decodeUtf16 (arrayPtr (utf16, s - 1));
 }
 template <size_t s>
-inline EncodingResult<String> decodeUtf32(const char32_t (&utf32)[s]) {
-  return decodeUtf32(arrayPtr(utf32, s - 1));
+inline EncodingResult<String> decodeUtf32 (const char32_t (&utf32) [s])
+{
+  return decodeUtf32 (arrayPtr (utf32, s - 1));
 }
 template <size_t s>
-inline EncodingResult<String> decodeWideString(const wchar_t (&utf32)[s]) {
-  return decodeWideString(arrayPtr(utf32, s - 1));
+inline EncodingResult<String> decodeWideString (const wchar_t (&utf32) [s])
+{
+  return decodeWideString (arrayPtr (utf32, s - 1));
 }
 template <size_t s>
-inline EncodingResult<Array<byte>> decodeHex(const char (&text)[s]) {
-  return decodeHex(arrayPtr(text, s - 1));
+inline EncodingResult<Array<byte>> decodeHex (const char (&text) [s])
+{
+  return decodeHex (arrayPtr (text, s - 1));
 }
 template <size_t s>
-inline String encodeUriComponent(const char (&text)[s]) {
-  return encodeUriComponent(arrayPtr(text, s - 1));
+inline String encodeUriComponent (const char (&text) [s])
+{
+  return encodeUriComponent (arrayPtr (text, s - 1));
 }
 template <size_t s>
-inline Array<byte> decodeBinaryUriComponent(const char (&text)[s]) {
-  return decodeBinaryUriComponent(arrayPtr(text, s - 1));
+inline Array<byte> decodeBinaryUriComponent (const char (&text) [s])
+{
+  return decodeBinaryUriComponent (arrayPtr (text, s - 1));
 }
 template <size_t s>
-inline EncodingResult<String> decodeUriComponent(const char (&text)[s]) {
-  return decodeUriComponent(arrayPtr(text, s-1));
+inline EncodingResult<String> decodeUriComponent (const char (&text) [s])
+{
+  return decodeUriComponent (arrayPtr (text, s - 1));
 }
 template <size_t s>
-inline String encodeUriFragment(const char (&text)[s]) {
-  return encodeUriFragment(arrayPtr(text, s - 1));
+inline String encodeUriFragment (const char (&text) [s])
+{
+  return encodeUriFragment (arrayPtr (text, s - 1));
 }
 template <size_t s>
-inline String encodeUriPath(const char (&text)[s]) {
-  return encodeUriPath(arrayPtr(text, s - 1));
+inline String encodeUriPath (const char (&text) [s])
+{
+  return encodeUriPath (arrayPtr (text, s - 1));
 }
 template <size_t s>
-inline String encodeUriUserInfo(const char (&text)[s]) {
-  return encodeUriUserInfo(arrayPtr(text, s - 1));
+inline String encodeUriUserInfo (const char (&text) [s])
+{
+  return encodeUriUserInfo (arrayPtr (text, s - 1));
 }
 template <size_t s>
-inline String encodeWwwForm(const char (&text)[s]) {
-  return encodeWwwForm(arrayPtr(text, s - 1));
+inline String encodeWwwForm (const char (&text) [s])
+{
+  return encodeWwwForm (arrayPtr (text, s - 1));
 }
 template <size_t s>
-inline EncodingResult<String> decodeWwwForm(const char (&text)[s]) {
-  return decodeWwwForm(arrayPtr(text, s-1));
+inline EncodingResult<String> decodeWwwForm (const char (&text) [s])
+{
+  return decodeWwwForm (arrayPtr (text, s - 1));
 }
 template <size_t s>
-inline String encodeCEscape(const char (&text)[s]) {
-  return encodeCEscape(arrayPtr(text, s - 1));
+inline String encodeCEscape (const char (&text) [s])
+{
+  return encodeCEscape (arrayPtr (text, s - 1));
 }
 template <size_t s>
-inline EncodingResult<Array<byte>> decodeBinaryCEscape(const char (&text)[s]) {
-  return decodeBinaryCEscape(arrayPtr(text, s - 1));
+inline EncodingResult<Array<byte>> decodeBinaryCEscape (const char (&text) [s])
+{
+  return decodeBinaryCEscape (arrayPtr (text, s - 1));
 }
 template <size_t s>
-inline EncodingResult<String> decodeCEscape(const char (&text)[s]) {
-  return decodeCEscape(arrayPtr(text, s-1));
+inline EncodingResult<String> decodeCEscape (const char (&text) [s])
+{
+  return decodeCEscape (arrayPtr (text, s - 1));
 }
 template <size_t s>
-EncodingResult<Array<byte>> decodeBase64(const char (&text)[s]) {
-  return decodeBase64(arrayPtr(text, s - 1));
+EncodingResult<Array<byte>> decodeBase64 (const char (&text) [s])
+{
+  return decodeBase64 (arrayPtr (text, s - 1));
 }
 
 #if __cplusplus >= 202000L
 template <size_t s>
-inline EncodingResult<Array<char16_t>> encodeUtf16(const char8_t (&text)[s], bool nulTerminate=false) {
-  return encodeUtf16(arrayPtr(reinterpret_cast<const char*>(text), s - 1), nulTerminate);
+inline EncodingResult<Array<char16_t>> encodeUtf16 (const char8_t (&text) [s], bool nulTerminate = false)
+{
+  return encodeUtf16 (arrayPtr (reinterpret_cast<const char *> (text), s - 1), nulTerminate);
 }
 template <size_t s>
-inline EncodingResult<Array<char32_t>> encodeUtf32(const char8_t (&text)[s], bool nulTerminate=false) {
-  return encodeUtf32(arrayPtr(reinterpret_cast<const char*>(text), s - 1), nulTerminate);
+inline EncodingResult<Array<char32_t>> encodeUtf32 (const char8_t (&text) [s], bool nulTerminate = false)
+{
+  return encodeUtf32 (arrayPtr (reinterpret_cast<const char *> (text), s - 1), nulTerminate);
 }
 template <size_t s>
-inline EncodingResult<Array<wchar_t>> encodeWideString(
-    const char8_t (&text)[s], bool nulTerminate=false) {
-  return encodeWideString(arrayPtr(reinterpret_cast<const char*>(text), s - 1), nulTerminate);
+inline EncodingResult<Array<wchar_t>> encodeWideString (
+  const char8_t (&text) [s], bool nulTerminate = false)
+{
+  return encodeWideString (arrayPtr (reinterpret_cast<const char *> (text), s - 1), nulTerminate);
 }
 template <size_t s>
-inline EncodingResult<Array<byte>> decodeHex(const char8_t (&text)[s]) {
-  return decodeHex(arrayPtr(reinterpret_cast<const char*>(text), s - 1));
+inline EncodingResult<Array<byte>> decodeHex (const char8_t (&text) [s])
+{
+  return decodeHex (arrayPtr (reinterpret_cast<const char *> (text), s - 1));
 }
 template <size_t s>
-inline String encodeUriComponent(const char8_t (&text)[s]) {
-  return encodeUriComponent(arrayPtr(reinterpret_cast<const char*>(text), s - 1));
+inline String encodeUriComponent (const char8_t (&text) [s])
+{
+  return encodeUriComponent (arrayPtr (reinterpret_cast<const char *> (text), s - 1));
 }
 template <size_t s>
-inline Array<byte> decodeBinaryUriComponent(const char8_t (&text)[s]) {
-  return decodeBinaryUriComponent(arrayPtr(reinterpret_cast<const char*>(text), s - 1));
+inline Array<byte> decodeBinaryUriComponent (const char8_t (&text) [s])
+{
+  return decodeBinaryUriComponent (arrayPtr (reinterpret_cast<const char *> (text), s - 1));
 }
 template <size_t s>
-inline EncodingResult<String> decodeUriComponent(const char8_t (&text)[s]) {
-  return decodeUriComponent(arrayPtr(reinterpret_cast<const char*>(text), s-1));
+inline EncodingResult<String> decodeUriComponent (const char8_t (&text) [s])
+{
+  return decodeUriComponent (arrayPtr (reinterpret_cast<const char *> (text), s - 1));
 }
 template <size_t s>
-inline String encodeUriFragment(const char8_t (&text)[s]) {
-  return encodeUriFragment(arrayPtr(reinterpret_cast<const char*>(text), s - 1));
+inline String encodeUriFragment (const char8_t (&text) [s])
+{
+  return encodeUriFragment (arrayPtr (reinterpret_cast<const char *> (text), s - 1));
 }
 template <size_t s>
-inline String encodeUriPath(const char8_t (&text)[s]) {
-  return encodeUriPath(arrayPtr(reinterpret_cast<const char*>(text), s - 1));
+inline String encodeUriPath (const char8_t (&text) [s])
+{
+  return encodeUriPath (arrayPtr (reinterpret_cast<const char *> (text), s - 1));
 }
 template <size_t s>
-inline String encodeUriUserInfo(const char8_t (&text)[s]) {
-  return encodeUriUserInfo(arrayPtr(reinterpret_cast<const char*>(text), s - 1));
+inline String encodeUriUserInfo (const char8_t (&text) [s])
+{
+  return encodeUriUserInfo (arrayPtr (reinterpret_cast<const char *> (text), s - 1));
 }
 template <size_t s>
-inline String encodeWwwForm(const char8_t (&text)[s]) {
-  return encodeWwwForm(arrayPtr(reinterpret_cast<const char*>(text), s - 1));
+inline String encodeWwwForm (const char8_t (&text) [s])
+{
+  return encodeWwwForm (arrayPtr (reinterpret_cast<const char *> (text), s - 1));
 }
 template <size_t s>
-inline EncodingResult<String> decodeWwwForm(const char8_t (&text)[s]) {
-  return decodeWwwForm(arrayPtr(reinterpret_cast<const char*>(text), s-1));
+inline EncodingResult<String> decodeWwwForm (const char8_t (&text) [s])
+{
+  return decodeWwwForm (arrayPtr (reinterpret_cast<const char *> (text), s - 1));
 }
 template <size_t s>
-inline String encodeCEscape(const char8_t (&text)[s]) {
-  return encodeCEscape(arrayPtr(reinterpret_cast<const char*>(text), s - 1));
+inline String encodeCEscape (const char8_t (&text) [s])
+{
+  return encodeCEscape (arrayPtr (reinterpret_cast<const char *> (text), s - 1));
 }
 template <size_t s>
-inline EncodingResult<Array<byte>> decodeBinaryCEscape(const char8_t (&text)[s]) {
-  return decodeBinaryCEscape(arrayPtr(reinterpret_cast<const char*>(text), s - 1));
+inline EncodingResult<Array<byte>> decodeBinaryCEscape (const char8_t (&text) [s])
+{
+  return decodeBinaryCEscape (arrayPtr (reinterpret_cast<const char *> (text), s - 1));
 }
 template <size_t s>
-inline EncodingResult<String> decodeCEscape(const char8_t (&text)[s]) {
-  return decodeCEscape(arrayPtr(reinterpret_cast<const char*>(text), s-1));
+inline EncodingResult<String> decodeCEscape (const char8_t (&text) [s])
+{
+  return decodeCEscape (arrayPtr (reinterpret_cast<const char *> (text), s - 1));
 }
 template <size_t s>
-EncodingResult<Array<byte>> decodeBase64(const char8_t (&text)[s]) {
-  return decodeBase64(arrayPtr(reinterpret_cast<const char*>(text), s - 1));
+EncodingResult<Array<byte>> decodeBase64 (const char8_t (&text) [s])
+{
+  return decodeBase64 (arrayPtr (reinterpret_cast<const char *> (text), s - 1));
 }
 #endif
 

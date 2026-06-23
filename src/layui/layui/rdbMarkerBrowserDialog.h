@@ -33,12 +33,12 @@
 
 namespace Ui
 {
-  class MarkerBrowserDialog;
+class MarkerBrowserDialog;
 }
 
 namespace db
 {
-  class Layout;
+class Layout;
 }
 
 namespace rdb
@@ -113,4 +113,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

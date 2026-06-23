@@ -46,12 +46,13 @@ class Layout;
  *  @brief Layer spec string format error exception
  */
 class DB_PUBLIC LayerSpecFormatException
-  : public tl::Exception 
+  : public tl::Exception
 {
 public:
   LayerSpecFormatException (const char *s)
     : tl::Exception (tl::to_string (tr ("Not a valid layer map expression: '..%s' (use '/' to separated layer and datatype, ',' to list numbers for layer or datatype, '-' to create ranges and ';' to concatenate multiple subexpressions)")), s)
-  { }
+  {
+  }
 };
 
 /**
@@ -80,7 +81,7 @@ inline bool is_static_ld (ld_type ld)
 inline ld_type relative_ld (ld_type ld)
 {
   if (ld < 0) {
-    return std::numeric_limits<ld_type>::min() - ld;
+    return std::numeric_limits<ld_type>::min () - ld;
   } else {
     //  NOTE: this way "any_ld" is equivalent to "relative_ld(0)"
     return -ld - 1;
@@ -95,7 +96,7 @@ inline bool is_relative_ld (ld_type ld)
 inline ld_type ld_offset (ld_type ld)
 {
   if (ld < 0) {
-    ld_type neg = ld - std::numeric_limits<ld_type>::min();
+    ld_type neg = ld - std::numeric_limits<ld_type>::min ();
     ld_type pos = -(ld + 1);
     return neg < pos ? -neg : pos;
   } else {
@@ -114,17 +115,18 @@ inline ld_type ld_combine (ld_type a, ld_type b)
 /**
  *  @brief A struct for a layer/datatype pair)
  */
-struct DB_PUBLIC LDPair
-{
+struct DB_PUBLIC LDPair {
   LDPair ()
     : layer (0), datatype (0)
-  { }
+  {
+  }
 
   LDPair (ld_type l, ld_type d)
     : layer (l), datatype (d)
-  { }
+  {
+  }
 
-  static LDPair invalid () 
+  static LDPair invalid ()
   {
     return LDPair (-1, -1);
   }
@@ -171,7 +173,7 @@ struct DB_PUBLIC LDPair
  *  mapped to multiple target layers. It also supports merging but
  *  mapping different input layers to a single target layer.
  *
- *  A layer map object can be used as a standalone object or in 
+ *  A layer map object can be used as a standalone object or in
  *  conjunction with a layout object. As a standalone object, the
  *  logical layers (indexes) are simply consecutive numbers.
  *  Such objects are used as input for the reader function inside
@@ -188,11 +190,11 @@ class DB_PUBLIC LayerMap
   : public gsi::ObjectBase
 {
 public:
-  typedef tl::interval_map<ld_type, std::set<unsigned int> > datatype_map;
+  typedef tl::interval_map<ld_type, std::set<unsigned int>> datatype_map;
   typedef tl::interval_map<ld_type, datatype_map> ld_map;
   typedef ld_map::const_iterator const_iterator_layers;
   typedef datatype_map::const_iterator const_iterator_datatypes;
-  typedef std::map<std::string, std::set<unsigned int> >::const_iterator const_iterator_names;
+  typedef std::map<std::string, std::set<unsigned int>>::const_iterator const_iterator_names;
 
   /**
    *  @brief The constructor for an empty map
@@ -238,14 +240,14 @@ public:
    */
   std::set<unsigned int> logical (const LDPair &p) const;
 
-  /** 
+  /**
    *  @brief Query a layer mapping from a name
    *
    *  @return A set of layers which are designated targets.
    */
   std::set<unsigned int> logical (const std::string &name) const;
 
-  /** 
+  /**
    *  @brief Query a layer mapping from a name or LDPair
    *
    *  @return A set of layers which are designated targets.
@@ -305,7 +307,7 @@ public:
    */
   std::string mapping_str (unsigned int l) const;
 
-  /** 
+  /**
    *  @brief LayerProperties describing one mapping of a logical layer
    *
    *  In general, there are more than one LDPairs or names mapped
@@ -411,7 +413,7 @@ public:
   /**
    *  @brief Multi-map a ldpair to a logical layer with a target layer
    *
-   *  The target layer specifies which layer to create for the 
+   *  The target layer specifies which layer to create for the
    *  corresponding input.
    */
   void mmap (const LDPair &p, unsigned int l, const LayerProperties &t);
@@ -419,7 +421,7 @@ public:
   /**
    *  @brief Multi-map a name to a logical layer with a target layer
    *
-   *  The target layer specifies which layer to create for the 
+   *  The target layer specifies which layer to create for the
    *  corresponding input.
    */
   void mmap (const std::string &name, unsigned int l, const LayerProperties &t);
@@ -453,12 +455,12 @@ public:
    */
   void mmap (const LDPair &p1, const LDPair &p2, unsigned int l, const LayerProperties &t);
 
-  /** 
+  /**
    *  @brief Map a range given by a string expression to a logical layer
-   * 
-   *  The string expression is constructed using the syntax: 
-   *  "list[/list][;..]" for layer/datatype pairs. "list" is a 
-   *  sequence of numbers, separated by comma values or a range 
+   *
+   *  The string expression is constructed using the syntax:
+   *  "list[/list][;..]" for layer/datatype pairs. "list" is a
+   *  sequence of numbers, separated by comma values or a range
    *  separated by a hyphen. Examples are: "1/2", "1-5/0", "1,2,5/0",
    *  "1/5;5/6".
    *
@@ -466,7 +468,7 @@ public:
    *  for the upper limit, it is equivalent to "all layer above". When used
    *  alone, it is equivalent to "all layers". Examples: "1 / *", "* / 10-*".
    *
-   *  Named layers are specified simply by specifying the name, if 
+   *  Named layers are specified simply by specifying the name, if
    *  necessary in single or double quotes (if the name begins with a digit or
    *  contains non-word characters). layer/datatype and name descriptions can
    *  be mixed, i.e. "AA;1/5" (meaning: name "AA" or layer 1/datatype 5).
@@ -620,7 +622,7 @@ public:
 
 private:
   ld_map m_ld_map;
-  std::map<std::string, std::set<unsigned int> > m_name_map;
+  std::map<std::string, std::set<unsigned int>> m_name_map;
   std::map<unsigned int, LayerProperties> m_target_layers;
   std::vector<LayerProperties> m_placeholders;
   unsigned int m_next_index;
@@ -643,9 +645,8 @@ private:
  */
 namespace tl
 {
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::LayerMap &t);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::LayerMap &t);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::LayerMap &t);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::LayerMap &t);
 } // namespace tl
 
 #endif
-

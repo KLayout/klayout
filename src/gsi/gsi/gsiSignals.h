@@ -35,11 +35,11 @@
 
 //  On MinGW, the "access" macro will interfere with QMetaMethod's access method
 #if defined(access)
-#  undef access
+#undef access
 #endif
 
 #if defined(HAVE_QT)
-#  include <QMetaMethod>
+#include <QMetaMethod>
 #endif
 
 /**
@@ -112,8 +112,10 @@
 namespace gsi
 {
 
-struct empty_list_t { };
-template <class T, class H> struct type_pair_t { };
+struct empty_list_t {
+};
+template <class T, class H> struct type_pair_t {
+};
 
 class SignalAdaptor;
 
@@ -131,12 +133,12 @@ public:
   /**
    *  @brief Constructor
    */
-  SignalHandler () { }
+  SignalHandler () {}
 
   /**
    *  @brief Destructor
    */
-  virtual ~SignalHandler () { }
+  virtual ~SignalHandler () {}
 
   /**
    *  @brief Provides the implementation for the call of the signal
@@ -241,12 +243,13 @@ public:
  *  client-side code.
  */
 class GSI_PUBLIC QtSignalAdaptorBase
-  : public QObject, public SignalAdaptor
+  : public QObject,
+    public SignalAdaptor
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
-  QtSignalAdaptorBase () { }
+  QtSignalAdaptorBase () {}
 
 public slots:
   void generic ()
@@ -301,11 +304,11 @@ protected:
     //  override the moc-generated qt_metacall implementation by our custom one
     //  in the base class.
     if (c == QMetaObject::InvokeMetaMethod && mp_handler) {
-       SerialArgs args (mp_method->argsize ());
-       write_args (args, a);
-       //  .. further
-       SerialArgs ret (mp_method->retsize ());
-       mp_handler->call (mp_method, args, ret);
+      SerialArgs args (mp_method->argsize ());
+      write_args (args, a);
+      //  .. further
+      SerialArgs ret (mp_method->retsize ());
+      mp_handler->call (mp_method, args, ret);
     }
 
     return -1;
@@ -334,7 +337,7 @@ private:
  *  provided by the base class.
  */
 template <class H, class T>
-class QtSignalAdaptor<type_pair_t<H, T> >
+class QtSignalAdaptor<type_pair_t<H, T>>
   : public QtSignalAdaptor<T>
 {
 public:
@@ -352,8 +355,7 @@ protected:
    *  errors.
    */
   template <class X>
-  struct writer
-  {
+  struct writer {
     void operator() (SerialArgs &args, void *a)
     {
       args.write<X> (*reinterpret_cast<X *> (a));
@@ -364,8 +366,7 @@ protected:
    *  @brief A specialization of the argument writer for a const reference
    */
   template <class X>
-  struct writer<const X &>
-  {
+  struct writer<const X &> {
     void operator() (SerialArgs &args, void *a)
     {
       args.write<const X &> (*reinterpret_cast<const X *> (a));
@@ -376,8 +377,7 @@ protected:
    *  @brief A specialization of the argument writer for a non-const reference
    */
   template <class X>
-  struct writer<X &>
-  {
+  struct writer<X &> {
     void operator() (SerialArgs &args, void *a)
     {
       args.write<X &> (*reinterpret_cast<X *> (a));
@@ -426,7 +426,7 @@ public:
 
   void add_handler (void *obj, SignalHandler *handler) const
   {
-    _add_handler<QtSignalAdaptor<empty_list_t> > (obj, handler);
+    _add_handler<QtSignalAdaptor<empty_list_t>> (obj, handler);
   }
 
   void initialize ()
@@ -447,7 +447,7 @@ protected:
   {
     //  NOTE: this scheme requires 4.8 at least
 
-    QObject *qobj = (QObject *)obj;
+    QObject *qobj = (QObject *) obj;
 
     A *adaptor = new A (this, handler);
     //  tie the lifetime of the adaptor to that of the handler
@@ -484,7 +484,7 @@ private:
 };
 
 template <class H, class T>
-class QtSignalImpl<type_pair_t<H, T> >
+class QtSignalImpl<type_pair_t<H, T>>
   : public QtSignalImpl<T>
 {
 public:
@@ -502,7 +502,7 @@ public:
 
   virtual MethodBase *clone () const
   {
-    return new QtSignalImpl<type_pair_t<H, T> > (*this);
+    return new QtSignalImpl<type_pair_t<H, T>> (*this);
   }
 
   void initialize ()
@@ -513,7 +513,7 @@ public:
 
   void add_handler (void *obj, SignalHandler *handler) const
   {
-    QtSignalImpl<empty_list_t>::template _add_handler<QtSignalAdaptor<type_pair_t<H, T> > > (obj, handler);
+    QtSignalImpl<empty_list_t>::template _add_handler<QtSignalAdaptor<type_pair_t<H, T>>> (obj, handler);
   }
 
 protected:
@@ -532,7 +532,7 @@ private:
  */
 inline Methods qt_signal (const char *signal, const std::string &name, const std::string &doc = std::string ())
 {
-  return Methods(new QtSignalImpl<empty_list_t> (signal, name, doc));
+  return Methods (new QtSignalImpl<empty_list_t> (signal, name, doc));
 }
 
 /**
@@ -541,7 +541,7 @@ inline Methods qt_signal (const char *signal, const std::string &name, const std
 template <class A1>
 inline Methods qt_signal (const char *signal, const std::string &name, const std::string &doc = std::string ())
 {
-  return Methods(new QtSignalImpl<type_pair_t<A1, empty_list_t> > (signal, name, doc));
+  return Methods (new QtSignalImpl<type_pair_t<A1, empty_list_t>> (signal, name, doc));
 }
 
 /**
@@ -552,14 +552,14 @@ template <class A1,
 inline Methods qt_signal (const char *signal, const std::string &name,
                           const ArgSpec<S1> &s1, const std::string &doc = std::string ())
 {
-  return Methods((new QtSignalImpl<type_pair_t<A1, empty_list_t> > (signal, name, doc))->def_arg (s1));
+  return Methods ((new QtSignalImpl<type_pair_t<A1, empty_list_t>> (signal, name, doc))->def_arg (s1));
 }
 
 //  ...
 template <class A1, class A2>
 inline Methods qt_signal (const char *signal, const std::string &name, const std::string &doc = std::string ())
 {
-  return Methods(new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, empty_list_t> > > (signal, name, doc));
+  return Methods (new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, empty_list_t>>> (signal, name, doc));
 }
 
 //  ...
@@ -568,15 +568,16 @@ template <class A1, class A2,
 inline Methods qt_signal (const char *signal, const std::string &name,
                           const ArgSpec<S1> &s1, const ArgSpec<S2> &s2, const std::string &doc = std::string ())
 {
-  return Methods((new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, empty_list_t> > > (signal, name, doc))
-                  ->def_arg (s1)->def_arg (s2));
+  return Methods ((new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, empty_list_t>>> (signal, name, doc))
+                    ->def_arg (s1)
+                    ->def_arg (s2));
 }
 
 //  ...
 template <class A1, class A2, class A3>
 inline Methods qt_signal (const char *signal, const std::string &name, const std::string &doc = std::string ())
 {
-  return Methods(new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, empty_list_t> > > > (signal, name, doc));
+  return Methods (new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, empty_list_t>>>> (signal, name, doc));
 }
 
 //  ...
@@ -585,15 +586,17 @@ template <class A1, class A2, class A3,
 inline Methods qt_signal (const char *signal, const std::string &name,
                           const ArgSpec<S1> &s1, const ArgSpec<S2> &s2, const ArgSpec<S3> &s3, const std::string &doc = std::string ())
 {
-  return Methods((new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, empty_list_t> > > > (signal, name, doc))
-                  ->def_arg (s1)->def_arg (s2)->def_arg (s3));
+  return Methods ((new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, empty_list_t>>>> (signal, name, doc))
+                    ->def_arg (s1)
+                    ->def_arg (s2)
+                    ->def_arg (s3));
 }
 
 //  ...
 template <class A1, class A2, class A3, class A4>
 inline Methods qt_signal (const char *signal, const std::string &name, const std::string &doc = std::string ())
 {
-  return Methods(new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, empty_list_t> > > > > (signal, name, doc));
+  return Methods (new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, empty_list_t>>>>> (signal, name, doc));
 }
 
 //  ...
@@ -602,15 +605,18 @@ template <class A1, class A2, class A3, class A4,
 inline Methods qt_signal (const char *signal, const std::string &name,
                           const ArgSpec<S1> &s1, const ArgSpec<S2> &s2, const ArgSpec<S3> &s3, const ArgSpec<S4> &s4, const std::string &doc = std::string ())
 {
-  return Methods((new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, empty_list_t> > > > > (signal, name, doc))
-                  ->def_arg (s1)->def_arg (s2)->def_arg (s3)->def_arg (s4));
+  return Methods ((new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, empty_list_t>>>>> (signal, name, doc))
+                    ->def_arg (s1)
+                    ->def_arg (s2)
+                    ->def_arg (s3)
+                    ->def_arg (s4));
 }
 
 //  ...
 template <class A1, class A2, class A3, class A4, class A5>
 inline Methods qt_signal (const char *signal, const std::string &name, const std::string &doc = std::string ())
 {
-  return Methods(new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, empty_list_t> > > > > > (signal, name, doc));
+  return Methods (new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, empty_list_t>>>>>> (signal, name, doc));
 }
 
 //  ...
@@ -619,15 +625,19 @@ template <class A1, class A2, class A3, class A4, class A5,
 inline Methods qt_signal (const char *signal, const std::string &name,
                           const ArgSpec<S1> &s1, const ArgSpec<S2> &s2, const ArgSpec<S3> &s3, const ArgSpec<S4> &s4, const ArgSpec<S5> &s5, const std::string &doc = std::string ())
 {
-  return Methods((new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, empty_list_t> > > > > > (signal, name, doc))
-                  ->def_arg (s1)->def_arg (s2)->def_arg (s3)->def_arg (s4)->def_arg (s5));
+  return Methods ((new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, empty_list_t>>>>>> (signal, name, doc))
+                    ->def_arg (s1)
+                    ->def_arg (s2)
+                    ->def_arg (s3)
+                    ->def_arg (s4)
+                    ->def_arg (s5));
 }
 
 //  ...
 template <class A1, class A2, class A3, class A4, class A5, class A6>
 inline Methods qt_signal (const char *signal, const std::string &name, const std::string &doc = std::string ())
 {
-  return Methods(new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, type_pair_t<A6, empty_list_t> > > > > > > (signal, name, doc));
+  return Methods (new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, type_pair_t<A6, empty_list_t>>>>>>> (signal, name, doc));
 }
 
 //  ...
@@ -636,15 +646,20 @@ template <class A1, class A2, class A3, class A4, class A5, class A6,
 inline Methods qt_signal (const char *signal, const std::string &name,
                           const ArgSpec<S1> &s1, const ArgSpec<S2> &s2, const ArgSpec<S3> &s3, const ArgSpec<S4> &s4, const ArgSpec<S5> &s5, const ArgSpec<S6> &s6, const std::string &doc = std::string ())
 {
-  return Methods((new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, type_pair_t<A6, empty_list_t> > > > > > > (signal, name, doc))
-                  ->def_arg (s1)->def_arg (s2)->def_arg (s3)->def_arg (s4)->def_arg (s5)->def_arg (s6));
+  return Methods ((new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, type_pair_t<A6, empty_list_t>>>>>>> (signal, name, doc))
+                    ->def_arg (s1)
+                    ->def_arg (s2)
+                    ->def_arg (s3)
+                    ->def_arg (s4)
+                    ->def_arg (s5)
+                    ->def_arg (s6));
 }
 
 //  ...
 template <class A1, class A2, class A3, class A4, class A5, class A6, class A7>
 inline Methods qt_signal (const char *signal, const std::string &name, const std::string &doc = std::string ())
 {
-  return Methods(new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, type_pair_t<A6, type_pair_t<A7, empty_list_t> > > > > > > > (signal, name, doc));
+  return Methods (new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, type_pair_t<A6, type_pair_t<A7, empty_list_t>>>>>>>> (signal, name, doc));
 }
 
 //  ...
@@ -653,15 +668,21 @@ template <class A1, class A2, class A3, class A4, class A5, class A6, class A7,
 inline Methods qt_signal (const char *signal, const std::string &name,
                           const ArgSpec<S1> &s1, const ArgSpec<S2> &s2, const ArgSpec<S3> &s3, const ArgSpec<S4> &s4, const ArgSpec<S5> &s5, const ArgSpec<S6> &s6, const ArgSpec<S7> &s7, const std::string &doc = std::string ())
 {
-  return Methods((new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, type_pair_t<A6, type_pair_t<A7, empty_list_t> > > > > > > > (signal, name, doc))
-                  ->def_arg (s1)->def_arg (s2)->def_arg (s3)->def_arg (s4)->def_arg (s5)->def_arg (s6)->def_arg (s7));
+  return Methods ((new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, type_pair_t<A6, type_pair_t<A7, empty_list_t>>>>>>>> (signal, name, doc))
+                    ->def_arg (s1)
+                    ->def_arg (s2)
+                    ->def_arg (s3)
+                    ->def_arg (s4)
+                    ->def_arg (s5)
+                    ->def_arg (s6)
+                    ->def_arg (s7));
 }
 
 //  ...
 template <class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8>
 inline Methods qt_signal (const char *signal, const std::string &name, const std::string &doc = std::string ())
 {
-  return Methods(new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, type_pair_t<A6, type_pair_t<A7, type_pair_t<A8, empty_list_t> > > > > > > > > (signal, name, doc));
+  return Methods (new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, type_pair_t<A6, type_pair_t<A7, type_pair_t<A8, empty_list_t>>>>>>>>> (signal, name, doc));
 }
 
 //  ...
@@ -670,15 +691,22 @@ template <class A1, class A2, class A3, class A4, class A5, class A6, class A7, 
 inline Methods qt_signal (const char *signal, const std::string &name,
                           const ArgSpec<S1> &s1, const ArgSpec<S2> &s2, const ArgSpec<S3> &s3, const ArgSpec<S4> &s4, const ArgSpec<S5> &s5, const ArgSpec<S6> &s6, const ArgSpec<S7> &s7, const ArgSpec<S8> &s8, const std::string &doc = std::string ())
 {
-  return Methods((new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, type_pair_t<A6, type_pair_t<A7, type_pair_t<A8, empty_list_t> > > > > > > > > (signal, name, doc))
-                  ->def_arg (s1)->def_arg (s2)->def_arg (s3)->def_arg (s4)->def_arg (s5)->def_arg (s6)->def_arg (s7)->def_arg (s8));
+  return Methods ((new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, type_pair_t<A6, type_pair_t<A7, type_pair_t<A8, empty_list_t>>>>>>>>> (signal, name, doc))
+                    ->def_arg (s1)
+                    ->def_arg (s2)
+                    ->def_arg (s3)
+                    ->def_arg (s4)
+                    ->def_arg (s5)
+                    ->def_arg (s6)
+                    ->def_arg (s7)
+                    ->def_arg (s8));
 }
 
 //  ...
 template <class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
 inline Methods qt_signal (const char *signal, const std::string &name, const std::string &doc)
 {
-  return Methods(new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, type_pair_t<A6, type_pair_t<A7, type_pair_t<A8, type_pair_t<A9, empty_list_t> > > > > > > > > > (signal, name, doc));
+  return Methods (new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, type_pair_t<A6, type_pair_t<A7, type_pair_t<A8, type_pair_t<A9, empty_list_t>>>>>>>>>> (signal, name, doc));
 }
 
 //  ...
@@ -687,8 +715,16 @@ template <class A1, class A2, class A3, class A4, class A5, class A6, class A7, 
 inline Methods qt_signal (const char *signal, const std::string &name,
                           const ArgSpec<S1> &s1, const ArgSpec<S2> &s2, const ArgSpec<S3> &s3, const ArgSpec<S4> &s4, const ArgSpec<S5> &s5, const ArgSpec<S6> &s6, const ArgSpec<S7> &s7, const ArgSpec<S8> &s8, const ArgSpec<S9> &s9, const std::string &doc = std::string ())
 {
-  return Methods((new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, type_pair_t<A6, type_pair_t<A7, type_pair_t<A8, type_pair_t<A9, empty_list_t> > > > > > > > > > (signal, name, doc))
-                  ->def_arg (s1)->def_arg (s2)->def_arg (s3)->def_arg (s4)->def_arg (s5)->def_arg (s6)->def_arg (s7)->def_arg (s8)->def_arg (s9));
+  return Methods ((new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, type_pair_t<A6, type_pair_t<A7, type_pair_t<A8, type_pair_t<A9, empty_list_t>>>>>>>>>> (signal, name, doc))
+                    ->def_arg (s1)
+                    ->def_arg (s2)
+                    ->def_arg (s3)
+                    ->def_arg (s4)
+                    ->def_arg (s5)
+                    ->def_arg (s6)
+                    ->def_arg (s7)
+                    ->def_arg (s8)
+                    ->def_arg (s9));
 }
 
 #endif
@@ -724,9 +760,9 @@ public:
   void event_receiver (int /*argc*/, void ** /*args*/)
   {
     if (mp_handler) {
-       SerialArgs args (mp_method->argsize ());
-       SerialArgs ret (mp_method->retsize ());
-       mp_handler->call (mp_method, args, ret);
+      SerialArgs args (mp_method->argsize ());
+      SerialArgs ret (mp_method->retsize ());
+      mp_handler->call (mp_method, args, ret);
     }
   }
 
@@ -758,7 +794,7 @@ private:
  *  provided by the base class.
  */
 template <class H, class T>
-class EventSignalAdaptor<type_pair_t<H, T> >
+class EventSignalAdaptor<type_pair_t<H, T>>
   : public EventSignalAdaptor<T>
 {
 public:
@@ -774,11 +810,11 @@ public:
   void event_receiver (int /*argc*/, void **a)
   {
     if (this->handler ()) {
-       SerialArgs args (this->method ()->argsize ());
-       write_args (args, a);
-       //  .. further
-       SerialArgs ret (this->method ()->retsize ());
-       this->handler ()->call (this->method (), args, ret);
+      SerialArgs args (this->method ()->argsize ());
+      write_args (args, a);
+      //  .. further
+      SerialArgs ret (this->method ()->retsize ());
+      this->handler ()->call (this->method (), args, ret);
     }
   }
 
@@ -790,8 +826,7 @@ protected:
    *  errors.
    */
   template <class X>
-  struct writer
-  {
+  struct writer {
     void operator() (SerialArgs &args, void *a)
     {
       args.write<X> (*reinterpret_cast<X *> (a));
@@ -802,8 +837,7 @@ protected:
    *  @brief A specialization of the argument writer for a const reference
    */
   template <class X>
-  struct writer<const X &>
-  {
+  struct writer<const X &> {
     void operator() (SerialArgs &args, void *a)
     {
       args.write<const X &> (*reinterpret_cast<const X *> (a));
@@ -814,8 +848,7 @@ protected:
    *  @brief A specialization of the argument writer for a non-const reference
    */
   template <class X>
-  struct writer<X &>
-  {
+  struct writer<X &> {
     void operator() (SerialArgs &args, void *a)
     {
       args.write<X &> (*reinterpret_cast<X *> (a));
@@ -856,7 +889,7 @@ public:
 
   void add_handler (void *obj, SignalHandler *handler) const
   {
-    _add_handler<EventSignalAdaptor<empty_list_t> > (obj, handler);
+    _add_handler<EventSignalAdaptor<empty_list_t>> (obj, handler);
   }
 
   void initialize ()
@@ -873,7 +906,7 @@ protected:
     //  tie the lifetime of the adaptor to that of the handler
     handler->set_adaptor (adaptor);
 
-    X *x = (X *)obj;
+    X *x = (X *) obj;
     (x->*mp_event).add (adaptor, &A::event_receiver);
   }
 
@@ -887,7 +920,7 @@ private:
 };
 
 template <class X, class E, class H, class T>
-class EventSignalImpl<X, E, type_pair_t<H, T> >
+class EventSignalImpl<X, E, type_pair_t<H, T>>
   : public EventSignalImpl<X, E, T>
 {
 public:
@@ -900,12 +933,12 @@ public:
 
   virtual MethodBase *clone () const
   {
-    return new EventSignalImpl<X, E, type_pair_t<H, T> > (*this);
+    return new EventSignalImpl<X, E, type_pair_t<H, T>> (*this);
   }
 
   void add_handler (void *obj, SignalHandler *handler) const
   {
-    EventSignalImpl<X, E, empty_list_t>::template _add_handler<EventSignalAdaptor<type_pair_t<H, T> > > (obj, handler);
+    EventSignalImpl<X, E, empty_list_t>::template _add_handler<EventSignalAdaptor<type_pair_t<H, T>>> (obj, handler);
   }
 
   template <class S>
@@ -954,7 +987,7 @@ public:
 
   void add_handler (void *obj, SignalHandler *handler) const
   {
-    _add_handler<EventSignalAdaptor<empty_list_t> > (obj, handler);
+    _add_handler<EventSignalAdaptor<empty_list_t>> (obj, handler);
   }
 
   void initialize ()
@@ -971,7 +1004,7 @@ protected:
     //  tie the lifetime of the adaptor to that of the handler
     handler->set_adaptor (adaptor);
 
-    X *x = (X *)obj;
+    X *x = (X *) obj;
     (*mp_event) (x).add (adaptor, &A::event_receiver);
   }
 
@@ -985,7 +1018,7 @@ private:
 };
 
 template <class X, class E, class H, class T>
-class EventSignalFuncImpl<X, E, type_pair_t<H, T> >
+class EventSignalFuncImpl<X, E, type_pair_t<H, T>>
   : public EventSignalFuncImpl<X, E, T>
 {
 public:
@@ -998,12 +1031,12 @@ public:
 
   virtual MethodBase *clone () const
   {
-    return new EventSignalFuncImpl<X, E, type_pair_t<H, T> > (*this);
+    return new EventSignalFuncImpl<X, E, type_pair_t<H, T>> (*this);
   }
 
   void add_handler (void *obj, SignalHandler *handler) const
   {
-    EventSignalFuncImpl<X, E, empty_list_t>::template _add_handler<EventSignalAdaptor<type_pair_t<H, T> > > (obj, handler);
+    EventSignalFuncImpl<X, E, empty_list_t>::template _add_handler<EventSignalAdaptor<type_pair_t<H, T>>> (obj, handler);
   }
 
   template <class S>
@@ -1036,7 +1069,7 @@ private:
 template <class X>
 Methods event (const std::string &name, tl::event<> (X::*event), const std::string &doc = std::string ())
 {
-  return Methods(new EventSignalImpl<X, tl::event<>, empty_list_t> (event, name, doc));
+  return Methods (new EventSignalImpl<X, tl::event<>, empty_list_t> (event, name, doc));
 }
 
 /**
@@ -1045,7 +1078,7 @@ Methods event (const std::string &name, tl::event<> (X::*event), const std::stri
 template <class X, class A1>
 inline Methods event (const std::string &name, tl::event<A1> (X::*event), const std::string &doc = std::string ())
 {
-  return Methods(new EventSignalImpl<X, tl::event<A1>, type_pair_t<A1, empty_list_t> > (event, name, doc));
+  return Methods (new EventSignalImpl<X, tl::event<A1>, type_pair_t<A1, empty_list_t>> (event, name, doc));
 }
 
 /**
@@ -1055,15 +1088,15 @@ template <class X, class A1, class S1>
 inline Methods event (const std::string &name, tl::event<A1> (X::*event),
                       const ArgSpec<S1> &s1, const std::string &doc = std::string ())
 {
-  return Methods((new EventSignalImpl<X, tl::event<A1>, type_pair_t<A1, empty_list_t> > (event, name, doc))
-                  ->def_arg (s1));
+  return Methods ((new EventSignalImpl<X, tl::event<A1>, type_pair_t<A1, empty_list_t>> (event, name, doc))
+                    ->def_arg (s1));
 }
 
 //  ...
 template <class X, class A1, class A2>
 inline Methods event (const std::string &name, tl::event<A1, A2> (X::*event), const std::string &doc = std::string ())
 {
-  return Methods(new EventSignalImpl<X, tl::event<A1, A2>, type_pair_t<A1, type_pair_t<A2, empty_list_t> > > (event, name, doc));
+  return Methods (new EventSignalImpl<X, tl::event<A1, A2>, type_pair_t<A1, type_pair_t<A2, empty_list_t>>> (event, name, doc));
 }
 
 //  ...
@@ -1071,15 +1104,16 @@ template <class X, class A1, class A2, class S1, class S2>
 inline Methods event (const std::string &name, tl::event<A1, A2> (X::*event),
                       const ArgSpec<S1> &s1, const ArgSpec<S2> &s2, const std::string &doc = std::string ())
 {
-  return Methods((new EventSignalImpl<X, tl::event<A1, A2>, type_pair_t<A1, type_pair_t<A2, empty_list_t> > > (event, name, doc))
-                  ->def_arg (s1)->def_arg (s2));
+  return Methods ((new EventSignalImpl<X, tl::event<A1, A2>, type_pair_t<A1, type_pair_t<A2, empty_list_t>>> (event, name, doc))
+                    ->def_arg (s1)
+                    ->def_arg (s2));
 }
 
 //  ...
 template <class X, class A1, class A2, class A3>
 inline Methods event (const std::string &name, tl::event<A1, A2, A3> (X::*event), const std::string &doc = std::string ())
 {
-  return Methods(new EventSignalImpl<X, tl::event<A1, A2, A3>, type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, empty_list_t> > > > (event, name, doc));
+  return Methods (new EventSignalImpl<X, tl::event<A1, A2, A3>, type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, empty_list_t>>>> (event, name, doc));
 }
 
 //  ...
@@ -1087,15 +1121,17 @@ template <class X, class A1, class A2, class A3, class S1, class S2, class S3>
 inline Methods event (const std::string &name, tl::event<A1, A2, A3> (X::*event),
                       const ArgSpec<S1> &s1, const ArgSpec<S2> &s2, const ArgSpec<S3> &s3, const std::string &doc = std::string ())
 {
-  return Methods((new EventSignalImpl<X, tl::event<A1, A2, A3>, type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, empty_list_t> > > > (event, name, doc))
-                  ->def_arg (s1)->def_arg (s2)->def_arg (s3));
+  return Methods ((new EventSignalImpl<X, tl::event<A1, A2, A3>, type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, empty_list_t>>>> (event, name, doc))
+                    ->def_arg (s1)
+                    ->def_arg (s2)
+                    ->def_arg (s3));
 }
 
 //  ...
 template <class X, class A1, class A2, class A3, class A4>
 inline Methods event (const std::string &name, tl::event<A1, A2, A3, A4> (X::*event), const std::string &doc = std::string ())
 {
-  return Methods(new EventSignalImpl<X, tl::event<A1, A2, A3, A4>, type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, empty_list_t> > > > > (event, name, doc));
+  return Methods (new EventSignalImpl<X, tl::event<A1, A2, A3, A4>, type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, empty_list_t>>>>> (event, name, doc));
 }
 
 //  ...
@@ -1103,8 +1139,11 @@ template <class X, class A1, class A2, class A3, class A4, class S1, class S2, c
 inline Methods event (const std::string &name, tl::event<A1, A2, A3, A4> (X::*event),
                       const ArgSpec<S1> &s1, const ArgSpec<S2> &s2, const ArgSpec<S3> &s3, const ArgSpec<S4> &s4, const std::string &doc = std::string ())
 {
-  return Methods((new EventSignalImpl<X, tl::event<A1, A2, A3, A4>, type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, empty_list_t> > > > > (event, name, doc))
-                  ->def_arg (s1)->def_arg (s2)->def_arg (s3)->def_arg (s4));
+  return Methods ((new EventSignalImpl<X, tl::event<A1, A2, A3, A4>, type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, empty_list_t>>>>> (event, name, doc))
+                    ->def_arg (s1)
+                    ->def_arg (s2)
+                    ->def_arg (s3)
+                    ->def_arg (s4));
 }
 
 /**
@@ -1113,7 +1152,7 @@ inline Methods event (const std::string &name, tl::event<A1, A2, A3, A4> (X::*ev
 template <class X>
 Methods event_ext (const std::string &name, tl::event<> &(*event) (X *), const std::string &doc = std::string ())
 {
-  return Methods(new EventSignalFuncImpl<X, tl::event<>, empty_list_t> (event, name, doc));
+  return Methods (new EventSignalFuncImpl<X, tl::event<>, empty_list_t> (event, name, doc));
 }
 
 /**
@@ -1122,7 +1161,7 @@ Methods event_ext (const std::string &name, tl::event<> &(*event) (X *), const s
 template <class X, class A1>
 inline Methods event_ext (const std::string &name, tl::event<A1> &(*event) (X *), const std::string &doc = std::string ())
 {
-  return Methods(new EventSignalFuncImpl<X, tl::event<A1>, type_pair_t<A1, empty_list_t> > (event, name, doc));
+  return Methods (new EventSignalFuncImpl<X, tl::event<A1>, type_pair_t<A1, empty_list_t>> (event, name, doc));
 }
 
 /**
@@ -1132,15 +1171,15 @@ template <class X, class A1, class S1>
 inline Methods event_ext (const std::string &name, tl::event<A1> &(*event) (X *),
                           const ArgSpec<S1> &s1, const std::string &doc = std::string ())
 {
-  return Methods((new EventSignalFuncImpl<X, tl::event<A1>, type_pair_t<A1, empty_list_t> > (event, name, doc))
-                  ->def_arg (s1));
+  return Methods ((new EventSignalFuncImpl<X, tl::event<A1>, type_pair_t<A1, empty_list_t>> (event, name, doc))
+                    ->def_arg (s1));
 }
 
 //  ...
 template <class X, class A1, class A2>
 inline Methods event_ext (const std::string &name, tl::event<A1, A2> &(*event) (X *), const std::string &doc = std::string ())
 {
-  return Methods(new EventSignalFuncImpl<X, tl::event<A1, A2>, type_pair_t<A1, type_pair_t<A2, empty_list_t> > > (event, name, doc));
+  return Methods (new EventSignalFuncImpl<X, tl::event<A1, A2>, type_pair_t<A1, type_pair_t<A2, empty_list_t>>> (event, name, doc));
 }
 
 //  ...
@@ -1148,15 +1187,16 @@ template <class X, class A1, class A2, class S1, class S2>
 inline Methods event_ext (const std::string &name, tl::event<A1, A2> &(*event) (X *),
                           const ArgSpec<S1> &s1, const ArgSpec<S2> &s2, const std::string &doc = std::string ())
 {
-  return Methods((new EventSignalFuncImpl<X, tl::event<A1, A2>, type_pair_t<A1, type_pair_t<A2, empty_list_t> > > (event, name, doc))
-                  ->def_arg (s1)->def_arg (s2));
+  return Methods ((new EventSignalFuncImpl<X, tl::event<A1, A2>, type_pair_t<A1, type_pair_t<A2, empty_list_t>>> (event, name, doc))
+                    ->def_arg (s1)
+                    ->def_arg (s2));
 }
 
 //  ...
 template <class X, class A1, class A2, class A3>
 inline Methods event_ext (const std::string &name, tl::event<A1, A2, A3> &(*event) (X *), const std::string &doc = std::string ())
 {
-  return Methods(new EventSignalFuncImpl<X, tl::event<A1, A2, A3>, type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, empty_list_t> > > > (event, name, doc));
+  return Methods (new EventSignalFuncImpl<X, tl::event<A1, A2, A3>, type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, empty_list_t>>>> (event, name, doc));
 }
 
 //  ...
@@ -1164,15 +1204,17 @@ template <class X, class A1, class A2, class A3, class S1, class S2, class S3>
 inline Methods event_ext (const std::string &name, tl::event<A1, A2, A3> &(*event) (X *),
                           const ArgSpec<S1> &s1, const ArgSpec<S2> &s2, const ArgSpec<S3> &s3, const std::string &doc = std::string ())
 {
-  return Methods((new EventSignalFuncImpl<X, tl::event<A1, A2, A3>, type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, empty_list_t> > > > (event, name, doc))
-                  ->def_arg (s1)->def_arg (s2)->def_arg (s3));
+  return Methods ((new EventSignalFuncImpl<X, tl::event<A1, A2, A3>, type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, empty_list_t>>>> (event, name, doc))
+                    ->def_arg (s1)
+                    ->def_arg (s2)
+                    ->def_arg (s3));
 }
 
 //  ...
 template <class X, class A1, class A2, class A3, class A4>
 inline Methods event_ext (const std::string &name, tl::event<A1, A2, A3, A4> &(*event) (X *), const std::string &doc = std::string ())
 {
-  return Methods(new EventSignalFuncImpl<X, tl::event<A1, A2, A3, A4>, type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, empty_list_t> > > > > (event, name, doc));
+  return Methods (new EventSignalFuncImpl<X, tl::event<A1, A2, A3, A4>, type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, empty_list_t>>>>> (event, name, doc));
 }
 
 //  ...
@@ -1180,11 +1222,13 @@ template <class X, class A1, class A2, class A3, class A4, class S1, class S2, c
 inline Methods event_ext (const std::string &name, tl::event<A1, A2, A3, A4> &(*event) (X *),
                           const ArgSpec<S1> &s1, const ArgSpec<S2> &s2, const ArgSpec<S3> &s3, const ArgSpec<S4> &s4, const std::string &doc = std::string ())
 {
-  return Methods((new EventSignalFuncImpl<X, tl::event<A1, A2, A3, A4>, type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, empty_list_t> > > > > (event, name, doc))
-                  ->def_arg (s1)->def_arg (s2)->def_arg (s3)->def_arg (s4));
+  return Methods ((new EventSignalFuncImpl<X, tl::event<A1, A2, A3, A4>, type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, empty_list_t>>>>> (event, name, doc))
+                    ->def_arg (s1)
+                    ->def_arg (s2)
+                    ->def_arg (s3)
+                    ->def_arg (s4));
 }
 
 }
 
 #endif
-

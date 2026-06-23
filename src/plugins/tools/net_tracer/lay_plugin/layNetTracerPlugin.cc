@@ -43,7 +43,7 @@ class NetTracerPluginDeclaration
   : public lay::PluginDeclaration
 {
 public:
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> &options) const
   {
     options.push_back (std::pair<std::string, std::string> (cfg_nt_window_mode, "fit-net"));
     options.push_back (std::pair<std::string, std::string> (cfg_nt_window_dim, "1.0"));
@@ -58,9 +58,9 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_nt_marker_intensity, "50"));
   }
 
-  virtual std::vector<std::pair <std::string, lay::ConfigPage *> > config_pages (QWidget *parent) const
+  virtual std::vector<std::pair<std::string, lay::ConfigPage *>> config_pages (QWidget *parent) const
   {
-    std::vector<std::pair <std::string, lay::ConfigPage *> > pages;
+    std::vector<std::pair<std::string, lay::ConfigPage *>> pages;
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Other Tools|Net Tracer")), new NetTracerConfigPage (parent)));
     return pages;
   }
@@ -102,4 +102,3 @@ public:
 static tl::RegisteredClass<lay::TechnologyEditorProvider> editor_decl (new NetTracerTechnologyEditorProvider (), 13000, db::net_tracer_component_name ().c_str ());
 
 }
-

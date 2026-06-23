@@ -50,7 +50,7 @@ class LayoutToNetlist;
 /**
  *  @brief A shape heap where intermediate shapes can be placed into
  *
- *  This heap is intended to hold flat, top level shapes and uses a cache. First, the cache compresses 
+ *  This heap is intended to hold flat, top level shapes and uses a cache. First, the cache compresses
  *  the data and second, this guarantees that the Shape references delivered point to the same object
  *  for identical shapes.
  */
@@ -105,11 +105,11 @@ public:
   }
 
   /**
-   *  @brief Returns true if the shape is valid 
+   *  @brief Returns true if the shape is valid
    */
   bool is_valid () const
   {
-    return !m_shape.is_null ();
+    return ! m_shape.is_null ();
   }
 
   /**
@@ -147,7 +147,7 @@ public:
     m_bbox = m_trans * m_shape.bbox ();
   }
 
-  /** 
+  /**
    *  @brief Gets the pseudo flag
    *
    *  The pseudo flag is set when the shape is not a part of the incremental net
@@ -159,15 +159,15 @@ public:
     return m_pseudo;
   }
 
-  /** 
+  /**
    *  @brief Sets the pseudo flag
    */
-  void set_pseudo (bool p) 
+  void set_pseudo (bool p)
   {
     m_pseudo = p;
   }
 
-  /** 
+  /**
    *  @brief Gets the layer where the shape is located
    */
   unsigned int layer () const
@@ -175,7 +175,7 @@ public:
     return m_layer;
   }
 
-  /** 
+  /**
    *  @brief Gets the cell index where the shape is located
    */
   db::cell_index_type cell_index () const
@@ -183,12 +183,12 @@ public:
     return m_cell_index;
   }
 
-  /** 
+  /**
    *  @brief equal operator
    */
   bool operator== (const NetTracerShape &other) const
   {
-    //  Note: the pseudo flag is not part of the comparison. That way, the shape can be 
+    //  Note: the pseudo flag is not part of the comparison. That way, the shape can be
     //  marked "already found" by a pseudo-type shape.
     if (m_layer != other.m_layer) {
       return false;
@@ -205,12 +205,12 @@ public:
     return m_trans.equal (other.m_trans);
   }
 
-  /** 
+  /**
    *  @brief less operator
    */
   bool operator< (const NetTracerShape &other) const
   {
-    //  Note: the pseudo flag is not part of the comparison. That way, the shape can be 
+    //  Note: the pseudo flag is not part of the comparison. That way, the shape can be
     //  marked "already found" by a pseudo-type shape.
     if (m_layer != other.m_layer) {
       return m_layer < other.m_layer;
@@ -239,8 +239,7 @@ private:
 /**
  *  @brief A box converter for the NetTracerShape which is used to build a quad tree for them
  */
-struct HitTestDataBoxConverter
-{
+struct HitTestDataBoxConverter {
   db::Box operator() (const NetTracerShape *d) const
   {
     return d->bbox ();
@@ -260,7 +259,11 @@ public:
   /**
    *  @brief The operator
    */
-  enum Operator { OPNone, OPOr, OPNot, OPAnd, OPXor };
+  enum Operator { OPNone,
+                  OPOr,
+                  OPNot,
+                  OPAnd,
+                  OPXor };
 
   /**
    *  @brief A helper class wrapping a Region with a tl::Object
@@ -273,11 +276,13 @@ public:
   public:
     RegionHolder ()
       : mp_region (0)
-    { }
+    {
+    }
 
     RegionHolder (db::Region *region)
       : mp_region (region)
-    { }
+    {
+    }
 
     ~RegionHolder ()
     {
@@ -415,7 +420,7 @@ public:
    *  new seeds, it is stored in the output set using the seed as the adjacent shape.
    *  "mask" is used as a mask for the output if not null.
    */
-  void compute_results (unsigned int layer, db::cell_index_type cell_index, const std::vector<db::Polygon> *mask, const std::set <std::pair<NetTracerShape, const NetTracerShape *> > &input, const HitTestDataBoxTree *seeds, NetTracerShapeHeap &shape_heap, std::set <std::pair<NetTracerShape, const NetTracerShape *> > &output, const NetTracerData &data, db::EdgeProcessor &ep) const;
+  void compute_results (unsigned int layer, db::cell_index_type cell_index, const std::vector<db::Polygon> *mask, const std::set<std::pair<NetTracerShape, const NetTracerShape *>> &input, const HitTestDataBoxTree *seeds, NetTracerShapeHeap &shape_heap, std::set<std::pair<NetTracerShape, const NetTracerShape *>> &output, const NetTracerData &data, db::EdgeProcessor &ep) const;
 
   /**
    *  @brief Dump for debugging purposes
@@ -425,7 +430,7 @@ public:
   /**
    *  @brief Create a corresponding region inside a LayoutToNetlist object
    */
-  tl::shared_ptr<RegionHolder> make_l2n_region (db::LayoutToNetlist &l2n, std::map<unsigned int, tl::shared_ptr<RegionHolder> > &region_cache, const std::string &name);
+  tl::shared_ptr<RegionHolder> make_l2n_region (db::LayoutToNetlist &l2n, std::map<unsigned int, tl::shared_ptr<RegionHolder>> &region_cache, const std::string &name);
 
 private:
   int m_a, m_b;
@@ -433,7 +438,7 @@ private:
   Operator m_op;
 
   void collect_original_layers (std::set<unsigned int> &l) const;
-  tl::shared_ptr<NetTracerLayerExpression::RegionHolder> make_l2n_region_for_org (db::LayoutToNetlist &l2n, std::map <unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> > &region_cache, int org_index, const std::string &name);
+  tl::shared_ptr<NetTracerLayerExpression::RegionHolder> make_l2n_region_for_org (db::LayoutToNetlist &l2n, std::map<unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder>> &region_cache, int org_index, const std::string &name);
 };
 
 /**
@@ -459,7 +464,7 @@ public:
   /**
    *  @brief Creates a connection between layer la and lb with a via layer
    *
-   *  A connection described by this constructor defines a connection at all places where la overlaps the via 
+   *  A connection described by this constructor defines a connection at all places where la overlaps the via
    *  shape and the same via shape overlaps lb.
    */
   NetTracerConnection (int la, int via, int lb)
@@ -499,7 +504,7 @@ public:
   }
 
   /**
-   *  @brief Returns the index of the via layer. 
+   *  @brief Returns the index of the via layer.
    *
    *  Returns a negative value if the via layer is not present (and should be considered
    *  empty).
@@ -517,7 +522,7 @@ private:
 };
 
 /**
- *  @brief Wraps the data for a net tracing 
+ *  @brief Wraps the data for a net tracing
  */
 class DB_PLUGIN_PUBLIC NetTracerData
 {
@@ -568,7 +573,7 @@ public:
   /**
    *  @brief Add a connection to the connection graph
    *
-   *  The layers in the connect are logical layers. Hence, logical layer must be specified before 
+   *  The layers in the connect are logical layers. Hence, logical layer must be specified before
    *  add_connection can be used.
    */
   void add_connection (const NetTracerConnection &connection);
@@ -591,7 +596,7 @@ public:
    *  The result pair will contain the ones which do not require booleans in the first element, and the ones which
    *  do in the second.
    */
-  const std::pair <std::set <unsigned int>, std::set <unsigned int> > &requires_booleans (unsigned int from_layer) const;
+  const std::pair<std::set<unsigned int>, std::set<unsigned int>> &requires_booleans (unsigned int from_layer) const;
 
   /**
    *  @brief Find the logical layers that the given original layer participates in
@@ -603,7 +608,7 @@ public:
   /**
    *  @brief returns the symbol list
    */
-  const std::map <std::string, unsigned int> &symbols () const
+  const std::map<std::string, unsigned int> &symbols () const
   {
     return m_symbols;
   }
@@ -635,14 +640,14 @@ public:
 
 private:
   unsigned int m_next_log_layer;
-  std::vector <NetTracerConnection> m_connections;
-  std::map <unsigned int, std::set <unsigned int> > m_original_layers;
-  std::map <unsigned int, std::set <unsigned int> > m_connection_graph;
-  std::map <unsigned int, std::set <unsigned int> > m_log_connection_graph;
-  mutable std::map <unsigned int, NetTracerLayerExpression *> m_log_layers;
-  mutable std::map <unsigned int, std::pair <std::set <unsigned int>, std::set <unsigned int> > > m_requires_booleans;
-  std::map <std::string, unsigned int> m_symbols;
-  std::map <unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> > m_l2n_regions;
+  std::vector<NetTracerConnection> m_connections;
+  std::map<unsigned int, std::set<unsigned int>> m_original_layers;
+  std::map<unsigned int, std::set<unsigned int>> m_connection_graph;
+  std::map<unsigned int, std::set<unsigned int>> m_log_connection_graph;
+  mutable std::map<unsigned int, NetTracerLayerExpression *> m_log_layers;
+  mutable std::map<unsigned int, std::pair<std::set<unsigned int>, std::set<unsigned int>>> m_requires_booleans;
+  std::map<std::string, unsigned int> m_symbols;
+  std::map<unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder>> m_l2n_regions;
 
   void add_layer_pair (unsigned int a, unsigned int b);
   void add_layers (unsigned int a, unsigned int b);
@@ -659,7 +664,7 @@ private:
 class DB_PLUGIN_PUBLIC NetTracer
 {
 public:
-  typedef std::set <NetTracerShape>::const_iterator iterator;
+  typedef std::set<NetTracerShape>::const_iterator iterator;
 
   /**
    *  @brief Construct a net tracer on the given cellview.
@@ -776,28 +781,27 @@ public:
 private:
   const db::Layout *mp_layout;
   const db::Cell *mp_cell;
-  std::set <NetTracerShape> m_shapes_found;
+  std::set<NetTracerShape> m_shapes_found;
   NetTracerShapeHeap m_shape_heap;
-  std::map <NetTracerShape, std::vector<const NetTracerShape *> > m_shapes_graph;
+  std::map<NetTracerShape, std::vector<const NetTracerShape *>> m_shapes_graph;
   tl::AbsoluteProgress *mp_progress;
-  std::set <std::pair<NetTracerShape, const NetTracerShape *> > m_hit_test_queue;
+  std::set<std::pair<NetTracerShape, const NetTracerShape *>> m_hit_test_queue;
   std::string m_name;
   int m_name_hier_depth;
   bool m_incomplete;
   size_t m_trace_depth;
-  NetTracerShape m_stop_shape; 
+  NetTracerShape m_stop_shape;
   NetTracerShape m_start_shape;
   db::EdgeProcessor m_ep;
 
-  void determine_interactions (const db::Box &seed, const NetTracerShape *shape, const std::set<unsigned int> &layers, std::set <std::pair<NetTracerShape, const NetTracerShape *> > &delivery);
-  void determine_interactions (const db::Polygon &seed, const NetTracerShape *shape, const std::set<unsigned int> &layers, std::set <std::pair<NetTracerShape, const NetTracerShape *> > &delivery);
-  void determine_interactions (const std::vector<const NetTracerShape *> &seeds, const db::Box &combined_box, const std::set<unsigned int> &layers, std::set <std::pair<NetTracerShape, const NetTracerShape *> > &delivery, bool do_seed_assignment = true);
+  void determine_interactions (const db::Box &seed, const NetTracerShape *shape, const std::set<unsigned int> &layers, std::set<std::pair<NetTracerShape, const NetTracerShape *>> &delivery);
+  void determine_interactions (const db::Polygon &seed, const NetTracerShape *shape, const std::set<unsigned int> &layers, std::set<std::pair<NetTracerShape, const NetTracerShape *>> &delivery);
+  void determine_interactions (const std::vector<const NetTracerShape *> &seeds, const db::Box &combined_box, const std::set<unsigned int> &layers, std::set<std::pair<NetTracerShape, const NetTracerShape *>> &delivery, bool do_seed_assignment = true);
   void evaluate_text (const db::RecursiveShapeIterator &iter);
   const NetTracerShape *deliver_shape (const NetTracerShape &shape, const NetTracerShape *adjacent);
-  void compute_results_for_next_iteration (const std::vector <const NetTracerShape *> &new_seeds, unsigned int seed_layer, const std::set<unsigned int> &output_layers, std::set <std::pair<NetTracerShape, const NetTracerShape *> > &current, std::set <std::pair<NetTracerShape, const NetTracerShape *> > &output, const NetTracerData &data);
+  void compute_results_for_next_iteration (const std::vector<const NetTracerShape *> &new_seeds, unsigned int seed_layer, const std::set<unsigned int> &output_layers, std::set<std::pair<NetTracerShape, const NetTracerShape *>> &current, std::set<std::pair<NetTracerShape, const NetTracerShape *>> &output, const NetTracerData &data);
 };
 
 }
 
 #endif
-

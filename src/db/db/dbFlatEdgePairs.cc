@@ -138,7 +138,6 @@ EdgePairsDelegate *FlatEdgePairs::add (const EdgePairs &other) const
         new_edge_pairs->raw_edge_pairs ().insert (*p);
       }
     }
-
   }
 
   return new_edge_pairs.release ();
@@ -165,7 +164,6 @@ EdgePairsDelegate *FlatEdgePairs::add_in_place (const EdgePairs &other)
         ep.insert (*p);
       }
     }
-
   }
 
   return this;
@@ -234,12 +232,10 @@ void FlatEdgePairs::apply_property_translator (const db::PropertiesTranslator &p
     mp_edge_pairs->swap (new_edge_pairs);
 
     invalidate_cache ();
-
   }
 }
 
-void
-FlatEdgePairs::insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const
+void FlatEdgePairs::insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const
 {
   db::Shapes &out = layout->cell (into_cell).shapes (into_layer);
 
@@ -253,14 +249,12 @@ FlatEdgePairs::insert_into_as_polygons (Layout *layout, db::cell_index_type into
   }
 }
 
-void
-FlatEdgePairs::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
+void FlatEdgePairs::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
   layout->cell (into_cell).shapes (into_layer).insert (*mp_edge_pairs);
 }
 
-void
-FlatEdgePairs::do_insert (const db::EdgePair &ep, db::properties_id_type prop_id)
+void FlatEdgePairs::do_insert (const db::EdgePair &ep, db::properties_id_type prop_id)
 {
   if (prop_id != 0) {
     mp_edge_pairs->insert (db::EdgePairWithProperties (ep, prop_id));
@@ -271,4 +265,3 @@ FlatEdgePairs::do_insert (const db::EdgePair &ep, db::properties_id_type prop_id
 }
 
 }
-

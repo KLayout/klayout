@@ -22,4 +22,3 @@
 
 
 #include "dbBoxScanner.h"
-

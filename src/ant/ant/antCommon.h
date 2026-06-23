@@ -21,31 +21,31 @@
 */
 
 
-#if !defined(HDR_antCommon_h)
-# define HDR_antCommon_h
+#if ! defined(HDR_antCommon_h)
+#define HDR_antCommon_h
 
-# if defined _WIN32 || defined __CYGWIN__
+#if defined _WIN32 || defined __CYGWIN__
 
-#   ifdef MAKE_ANT_LIBRARY
-#     define ANT_PUBLIC __declspec(dllexport)
-#   else
-#     define ANT_PUBLIC __declspec(dllimport)
-#   endif
-#   define ANT_LOCAL
-#   define ANT_PUBLIC_TEMPLATE
+#ifdef MAKE_ANT_LIBRARY
+#define ANT_PUBLIC __declspec (dllexport)
+#else
+#define ANT_PUBLIC __declspec (dllimport)
+#endif
+#define ANT_LOCAL
+#define ANT_PUBLIC_TEMPLATE
 
-# else
+#else
 
-#   if __GNUC__ >= 4 || defined(__clang__)
-#     define ANT_PUBLIC __attribute__ ((visibility ("default")))
-#     define ANT_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
-#     define ANT_LOCAL  __attribute__ ((visibility ("hidden")))
-#   else
-#     define ANT_PUBLIC
-#     define ANT_PUBLIC_TEMPLATE
-#     define ANT_LOCAL
-#   endif
+#if __GNUC__ >= 4 || defined(__clang__)
+#define ANT_PUBLIC __attribute__ ((visibility ("default")))
+#define ANT_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
+#define ANT_LOCAL __attribute__ ((visibility ("hidden")))
+#else
+#define ANT_PUBLIC
+#define ANT_PUBLIC_TEMPLATE
+#define ANT_LOCAL
+#endif
 
-# endif
+#endif
 
 #endif

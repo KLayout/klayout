@@ -30,7 +30,7 @@
 
 #include "libBasicCircle.h"
 
-TEST(1_Circle)
+TEST (1_Circle)
 {
   const size_t p_layer = 0;
   const size_t p_radius = 1;
@@ -48,8 +48,8 @@ TEST(1_Circle)
   tl_assert (pc.first);
 
   std::map<std::string, tl::Variant> params;
-  params["layer"] = db::LayerProperties (1, 0);
-  params["actual_radius"] = 10.0;
+  params ["layer"] = db::LayerProperties (1, 0);
+  params ["actual_radius"] = 10.0;
 
   db::cell_index_type lib_cell;
   db::cell_index_type circle;
@@ -76,7 +76,7 @@ TEST(1_Circle)
   //  change radius explicitly
 
   plist = ly.get_pcell_parameters (ly.cell (circle).cell_index ());
-  plist[p_actual_radius] = 9.0;
+  plist [p_actual_radius] = 9.0;
   circle = ly.get_pcell_variant_cell (circle, plist);
 
   //  as the radius is an input parameter, only after Library::refresh the other parameters get updated
@@ -91,7 +91,7 @@ TEST(1_Circle)
   //  change handle explicitly
 
   plist = ly.get_pcell_parameters (circle);
-  plist[p_handle] = db::DPoint (0.0, 8.0);
+  plist [p_handle] = db::DPoint (0.0, 8.0);
   circle = ly.get_pcell_variant_cell (circle, plist);
 
   //  as the handle is an input parameter, only after Library::refresh the other parameters get updated
@@ -114,7 +114,7 @@ TEST(1_Circle)
   EXPECT_EQ (plist [p_actual_radius].to_string (), "1.5");
 }
 
-TEST(2_Pie)
+TEST (2_Pie)
 {
   static size_t p_layer = 0;
   static size_t p_radius = 1;
@@ -139,10 +139,10 @@ TEST(2_Pie)
   tl_assert (pc.first);
 
   std::map<std::string, tl::Variant> params;
-  params["layer"] = db::LayerProperties (1, 0);
-  params["actual_radius"] = 10.0;
-  params["actual_start_angle"] = -90.0;
-  params["actual_end_angle"] = 0.0;
+  params ["layer"] = db::LayerProperties (1, 0);
+  params ["actual_radius"] = 10.0;
+  params ["actual_start_angle"] = -90.0;
+  params ["actual_end_angle"] = 0.0;
 
   db::cell_index_type lib_cell;
   db::cell_index_type pie;
@@ -173,7 +173,7 @@ TEST(2_Pie)
   //  change radius explicitly
 
   plist = ly.get_pcell_parameters (pie);
-  plist[p_actual_radius] = 9.0;
+  plist [p_actual_radius] = 9.0;
   pie = ly.get_pcell_variant_cell (pie, plist);
 
   //  as the radius is an input parameter, only after Library::refresh the other parameters get updated
@@ -196,7 +196,7 @@ TEST(2_Pie)
   //  change end angle explicitly
 
   plist = ly.get_pcell_parameters (pie);
-  plist[p_actual_end_angle] = 90.0;
+  plist [p_actual_end_angle] = 90.0;
   pie = ly.get_pcell_variant_cell (pie, plist);
 
   //  as the end angle is an input parameter, only after Library::refresh the other parameters get updated
@@ -219,7 +219,7 @@ TEST(2_Pie)
   //  change start angle explicitly
 
   plist = ly.get_pcell_parameters (pie);
-  plist[p_actual_start_angle] = 0.0;
+  plist [p_actual_start_angle] = 0.0;
   pie = ly.get_pcell_variant_cell (pie, plist);
 
   //  as the end angle is an input parameter, only after Library::refresh the other parameters get updated
@@ -242,7 +242,7 @@ TEST(2_Pie)
   //  change handle1 explicitly
 
   plist = ly.get_pcell_parameters (pie);
-  plist[p_actual_handle1] = db::DPoint (0.0, -5.0);
+  plist [p_actual_handle1] = db::DPoint (0.0, -5.0);
   pie = ly.get_pcell_variant_cell (pie, plist);
 
   //  as the handle is an input parameter, only after Library::refresh the other parameters get updated
@@ -265,7 +265,7 @@ TEST(2_Pie)
   //  change handle2 explicitly
 
   plist = ly.get_pcell_parameters (pie);
-  plist[p_actual_handle2] = db::DPoint (5.0, 0.0);
+  plist [p_actual_handle2] = db::DPoint (5.0, 0.0);
   pie = ly.get_pcell_variant_cell (pie, plist);
 
   //  as the handle is an input parameter, only after Library::refresh the other parameters get updated
@@ -286,7 +286,7 @@ TEST(2_Pie)
   EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_radius].to_double (), 5);
 }
 
-TEST(3_Arc)
+TEST (3_Arc)
 {
   static size_t p_layer = 0;
   static size_t p_radius1 = 1;
@@ -313,11 +313,11 @@ TEST(3_Arc)
   tl_assert (pc.first);
 
   std::map<std::string, tl::Variant> params;
-  params["layer"] = db::LayerProperties (1, 0);
-  params["actual_radius1"] = 4.0;
-  params["actual_radius2"] = 10.0;
-  params["actual_start_angle"] = -90.0;
-  params["actual_end_angle"] = 0.0;
+  params ["layer"] = db::LayerProperties (1, 0);
+  params ["actual_radius1"] = 4.0;
+  params ["actual_radius2"] = 10.0;
+  params ["actual_start_angle"] = -90.0;
+  params ["actual_end_angle"] = 0.0;
 
   db::cell_index_type lib_cell;
   db::cell_index_type arc;
@@ -350,7 +350,7 @@ TEST(3_Arc)
   //  change radius2 explicitly
 
   plist = ly.get_pcell_parameters (arc);
-  plist[p_actual_radius2] = 9.0;
+  plist [p_actual_radius2] = 9.0;
   arc = ly.get_pcell_variant_cell (arc, plist);
 
   //  as the radius is an input parameter, only after Library::refresh the other parameters get updated
@@ -375,7 +375,7 @@ TEST(3_Arc)
   //  change radius1 explicitly
 
   plist = ly.get_pcell_parameters (arc);
-  plist[p_actual_radius1] = 5.0;
+  plist [p_actual_radius1] = 5.0;
   arc = ly.get_pcell_variant_cell (arc, plist);
 
   //  as the radius is an input parameter, only after Library::refresh the other parameters get updated
@@ -400,7 +400,7 @@ TEST(3_Arc)
   //  change end angle explicitly
 
   plist = ly.get_pcell_parameters (arc);
-  plist[p_actual_end_angle] = 90.0;
+  plist [p_actual_end_angle] = 90.0;
   arc = ly.get_pcell_variant_cell (arc, plist);
 
   //  as the end angle is an input parameter, only after Library::refresh the other parameters get updated
@@ -425,7 +425,7 @@ TEST(3_Arc)
   //  change start angle explicitly
 
   plist = ly.get_pcell_parameters (arc);
-  plist[p_actual_start_angle] = 0.0;
+  plist [p_actual_start_angle] = 0.0;
   arc = ly.get_pcell_variant_cell (arc, plist);
 
   //  as the end angle is an input parameter, only after Library::refresh the other parameters get updated
@@ -450,7 +450,7 @@ TEST(3_Arc)
   //  change handle1 explicitly
 
   plist = ly.get_pcell_parameters (arc);
-  plist[p_actual_handle1] = db::DPoint (0.0, -5.0);
+  plist [p_actual_handle1] = db::DPoint (0.0, -5.0);
   arc = ly.get_pcell_variant_cell (arc, plist);
 
   //  as the handle is an input parameter, only after Library::refresh the other parameters get updated
@@ -475,7 +475,7 @@ TEST(3_Arc)
   //  change handle2 explicitly
 
   plist = ly.get_pcell_parameters (arc);
-  plist[p_actual_handle2] = db::DPoint (9.0, 0.0);
+  plist [p_actual_handle2] = db::DPoint (9.0, 0.0);
   arc = ly.get_pcell_variant_cell (arc, plist);
 
   //  as the handle is an input parameter, only after Library::refresh the other parameters get updated
@@ -498,7 +498,7 @@ TEST(3_Arc)
   EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_radius2].to_double (), 9);
 }
 
-TEST(4_Donut)
+TEST (4_Donut)
 {
   static size_t p_layer = 0;
   static size_t p_radius1 = 1;
@@ -519,11 +519,11 @@ TEST(4_Donut)
   tl_assert (pc.first);
 
   std::map<std::string, tl::Variant> params;
-  params["layer"] = db::LayerProperties (1, 0);
-  params["actual_radius1"] = 4.0;
-  params["actual_radius2"] = 10.0;
-  params["actual_start_angle"] = -90.0;
-  params["actual_end_angle"] = 0.0;
+  params ["layer"] = db::LayerProperties (1, 0);
+  params ["actual_radius1"] = 4.0;
+  params ["actual_radius2"] = 10.0;
+  params ["actual_start_angle"] = -90.0;
+  params ["actual_end_angle"] = 0.0;
 
   db::cell_index_type lib_cell;
   db::cell_index_type donut;
@@ -552,7 +552,7 @@ TEST(4_Donut)
   //  change radius2 explicitly
 
   plist = ly.get_pcell_parameters (donut);
-  plist[p_actual_radius2] = 9.0;
+  plist [p_actual_radius2] = 9.0;
   donut = ly.get_pcell_variant_cell (donut, plist);
 
   //  as the radius is an input parameter, only after Library::refresh the other parameters get updated
@@ -571,7 +571,7 @@ TEST(4_Donut)
   //  change radius1 explicitly
 
   plist = ly.get_pcell_parameters (donut);
-  plist[p_actual_radius1] = 5.0;
+  plist [p_actual_radius1] = 5.0;
   donut = ly.get_pcell_variant_cell (donut, plist);
 
   //  as the radius is an input parameter, only after Library::refresh the other parameters get updated
@@ -590,7 +590,7 @@ TEST(4_Donut)
   //  change handle1 explicitly
 
   plist = ly.get_pcell_parameters (donut);
-  plist[p_handle1] = db::DPoint (0.0, -5.0);
+  plist [p_handle1] = db::DPoint (0.0, -5.0);
   donut = ly.get_pcell_variant_cell (donut, plist);
 
   lib_basic->refresh ();
@@ -606,7 +606,7 @@ TEST(4_Donut)
   //  change handle2 explicitly
 
   plist = ly.get_pcell_parameters (donut);
-  plist[p_handle2] = db::DPoint (9.0, 0.0);
+  plist [p_handle2] = db::DPoint (9.0, 0.0);
   donut = ly.get_pcell_variant_cell (donut, plist);
 
   lib_basic->refresh ();
@@ -631,7 +631,7 @@ TEST(4_Donut)
   EXPECT_EQ (plist [p_actual_radius2].to_string (), "0.5");
 }
 
-TEST(5_Ellipse)
+TEST (5_Ellipse)
 {
   static size_t p_layer = 0;
   static size_t p_radius_x = 1;
@@ -652,11 +652,11 @@ TEST(5_Ellipse)
   tl_assert (pc.first);
 
   std::map<std::string, tl::Variant> params;
-  params["layer"] = db::LayerProperties (1, 0);
-  params["actual_radius_x"] = 4.0;
-  params["actual_radius_y"] = 10.0;
-  params["actual_start_angle"] = -90.0;
-  params["actual_end_angle"] = 0.0;
+  params ["layer"] = db::LayerProperties (1, 0);
+  params ["actual_radius_x"] = 4.0;
+  params ["actual_radius_y"] = 10.0;
+  params ["actual_start_angle"] = -90.0;
+  params ["actual_end_angle"] = 0.0;
 
   db::cell_index_type lib_cell;
   db::cell_index_type ellipse;
@@ -685,7 +685,7 @@ TEST(5_Ellipse)
   //  change radius2 explicitly
 
   plist = ly.get_pcell_parameters (ellipse);
-  plist[p_actual_radius_y] = 9.0;
+  plist [p_actual_radius_y] = 9.0;
   ellipse = ly.get_pcell_variant_cell (ellipse, plist);
 
   //  as the radius is an input parameter, only after Library::refresh the other parameters get updated
@@ -704,7 +704,7 @@ TEST(5_Ellipse)
   //  change radius1 explicitly
 
   plist = ly.get_pcell_parameters (ellipse);
-  plist[p_actual_radius_x] = 5.0;
+  plist [p_actual_radius_x] = 5.0;
   ellipse = ly.get_pcell_variant_cell (ellipse, plist);
 
   //  as the radius is an input parameter, only after Library::refresh the other parameters get updated
@@ -723,7 +723,7 @@ TEST(5_Ellipse)
   //  change handle1 explicitly
 
   plist = ly.get_pcell_parameters (ellipse);
-  plist[p_handle_x] = db::DPoint (-5.0, 0.0);
+  plist [p_handle_x] = db::DPoint (-5.0, 0.0);
   ellipse = ly.get_pcell_variant_cell (ellipse, plist);
 
   lib_basic->refresh ();
@@ -739,7 +739,7 @@ TEST(5_Ellipse)
   //  change handle2 explicitly
 
   plist = ly.get_pcell_parameters (ellipse);
-  plist[p_handle_y] = db::DPoint (0.0, 9.0);
+  plist [p_handle_y] = db::DPoint (0.0, 9.0);
   ellipse = ly.get_pcell_variant_cell (ellipse, plist);
 
   lib_basic->refresh ();
@@ -765,7 +765,7 @@ TEST(5_Ellipse)
 }
 
 //  regeneration of PCells after reading
-TEST(10)
+TEST (10)
 {
   db::Layout ly;
 
@@ -781,6 +781,6 @@ TEST(10)
   tl_assert (lib_basic);
   lib_basic->refresh ();
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/gds/basic_instances_au.gds");
 }

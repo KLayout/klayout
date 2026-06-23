@@ -43,12 +43,12 @@ public:
   using db::plc::ConvexDecomposition::ConvexDecomposition;
 };
 
-TEST(basic)
+TEST (basic)
 {
   db::plc::Graph plc;
   TestableConvexDecomposition decomp (&plc);
 
-  db::Point contour[] = {
+  db::Point contour [] = {
     db::Point (0, 0),
     db::Point (0, 100),
     db::Point (1000, 100),
@@ -56,10 +56,9 @@ TEST(basic)
     db::Point (1100, 500),
     db::Point (1100, 100),
     db::Point (2100, 100),
-    db::Point (2100, 0)
-  };
+    db::Point (2100, 0)};
 
-  db::Point contour2[] = {
+  db::Point contour2 [] = {
     db::Point (4000, 0),
     db::Point (4000, 100),
     db::Point (5000, 100),
@@ -69,17 +68,16 @@ TEST(basic)
     db::Point (6100, 100),
     db::Point (6100, -1000),
     db::Point (4150, -1000),
-    db::Point (4150, 0)
-  };
+    db::Point (4150, 0)};
 
   db::Region region;
 
   db::Polygon poly;
-  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour [0]));
   region.insert (poly);
 
   poly.clear ();
-  poly.assign_hull (contour2 + 0, contour2 + sizeof (contour2) / sizeof (contour2[0]));
+  poly.assign_hull (contour2 + 0, contour2 + sizeof (contour2) / sizeof (contour2 [0]));
   region.insert (poly);
 
   double dbu = 0.001;
@@ -112,9 +110,9 @@ TEST(basic)
   db::compare_layouts (_this, *ly, tl::testdata () + "/algo/hm_decomposition_au4.gds");
 }
 
-TEST(problematic_polygon)
+TEST (problematic_polygon)
 {
-  db::Point contour[] = {
+  db::Point contour [] = {
     db::Point (14590, 990),
     db::Point (6100, 990),
     db::Point (7360, 4450),
@@ -125,11 +123,10 @@ TEST(problematic_polygon)
     db::Point (13590, 17100),
     db::Point (10280, 6120),
     db::Point (26790, 13060),
-    db::Point (41270, 970)
-  };
+    db::Point (41270, 970)};
 
   db::Polygon poly;
-  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour [0]));
 
   double dbu = 0.001;
 
@@ -146,9 +143,9 @@ TEST(problematic_polygon)
   db::compare_layouts (_this, *ly, tl::testdata () + "/algo/hm_decomposition_au5.gds");
 }
 
-TEST(problematic_polygon2)
+TEST (problematic_polygon2)
 {
-  db::Point contour[] = {
+  db::Point contour [] = {
     db::Point (-2100, 200),
     db::Point (-2100, 2000),
     db::Point (-500, 2000),
@@ -169,11 +166,10 @@ TEST(problematic_polygon2)
     db::Point (-1771, 943),
     db::Point (-1790, 847),
     db::Point (-1800, 749),
-    db::Point (-1800, 200)
-  };
+    db::Point (-1800, 200)};
 
   db::Polygon poly;
-  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour [0]));
 
   double dbu = 0.001;
 
@@ -192,7 +188,7 @@ TEST(problematic_polygon2)
   db::compare_layouts (_this, *ly, tl::testdata () + "/algo/hm_decomposition_au6.gds");
 }
 
-TEST(polygon_with_holes)
+TEST (polygon_with_holes)
 {
   db::Layout ly;
   tl::InputStream s (tl::testdata () + "/algo/hm_decomposition_7.gds");
@@ -222,4 +218,3 @@ TEST(polygon_with_holes)
   std::unique_ptr<db::Layout> ly_out (plc.to_layout ());
   db::compare_layouts (_this, *ly_out, tl::testdata () + "/algo/hm_decomposition_au7.gds");
 }
-

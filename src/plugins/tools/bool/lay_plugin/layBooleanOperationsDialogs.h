@@ -30,7 +30,7 @@
 
 namespace db
 {
-  class Layout;
+class Layout;
 }
 
 namespace lay
@@ -42,11 +42,11 @@ class LayoutViewBase;
 /**
  *  @brief The boolean operation options
  */
-class BooleanOptionsDialog 
+class BooleanOptionsDialog
   : public QDialog,
     public Ui::BooleanOptionsDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   BooleanOptionsDialog (QWidget *parent);
@@ -66,11 +66,11 @@ private:
 /**
  *  @brief The sizing operation options
  */
-class SizingOptionsDialog 
+class SizingOptionsDialog
   : public QDialog,
     public Ui::SizingOptionsDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   SizingOptionsDialog (QWidget *parent);
@@ -90,11 +90,11 @@ private:
 /**
  *  @brief The merge operation options
  */
-class MergeOptionsDialog 
+class MergeOptionsDialog
   : public QDialog,
     public Ui::MergeOptionsDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   MergeOptionsDialog (QWidget *parent);
@@ -114,6 +114,3 @@ private:
 }
 
 #endif
-
-
-

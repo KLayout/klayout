@@ -29,8 +29,8 @@
 
 namespace lay
 {
-  class CellView;
-  class DragDropDataBase;
+class CellView;
+class DragDropDataBase;
 }
 
 namespace edt
@@ -44,7 +44,7 @@ class InstService
 {
 public:
   InstService (db::Manager *manager, lay::LayoutViewBase *view);
-  
+
 #if defined(HAVE_QT)
   virtual std::vector<lay::PropertiesPage *> properties_pages (db::Manager *manager, QWidget *parent);
 #endif
@@ -78,7 +78,7 @@ private:
   std::string m_cell_or_pcell_name, m_lib_name;
   std::string m_cell_or_pcell_name_previous, m_lib_name_previous;
   std::map<std::string, tl::Variant> m_pcell_parameters;
-  std::map<std::pair<std::string, std::string>, std::map<std::string, tl::Variant> > m_stored_pcell_parameters;
+  std::map<std::pair<std::string, std::string>, std::map<std::string, tl::Variant>> m_stored_pcell_parameters;
   bool m_is_pcell;
   bool m_array;
   unsigned int m_rows, m_columns;
@@ -113,4 +113,3 @@ private:
 }
 
 #endif
-

@@ -111,10 +111,9 @@ RNetwork::to_string (bool with_coords) const
   return res;
 }
 
-void
-RNetwork::clear ()
+void RNetwork::clear ()
 {
-  m_elements.clear ();   //  must happen before m_nodes
+  m_elements.clear (); //  must happen before m_nodes
   m_nodes.clear ();
   m_elements_by_nodes.clear ();
   m_nodes_by_type.clear ();
@@ -144,7 +143,6 @@ RNetwork::create_node (RNode::node_type type, unsigned int port_index, unsigned 
     RNode *new_node = new RNode (this, type, db::DBox (), port_index, layer);
     m_nodes.push_back (new_node);
     return new_node;
-
   }
 }
 
@@ -179,12 +177,10 @@ RNetwork::create_element (double conductance, RNode *a, RNode *b)
     element->m_ib = --b->m_elements.end ();
 
     return element;
-
   }
 }
 
-void
-RNetwork::remove_node (RNode *node)
+void RNetwork::remove_node (RNode *node)
 {
   tl_assert (node->type == RNode::Internal);
   while (! node->m_elements.empty ()) {
@@ -193,8 +189,7 @@ RNetwork::remove_node (RNode *node)
   delete node;
 }
 
-void
-RNetwork::remove_element (RElement *element)
+void RNetwork::remove_element (RElement *element)
 {
   RNode *a = const_cast<RNode *> (element->a ());
   RNode *b = const_cast<RNode *> (element->b ());
@@ -209,8 +204,7 @@ RNetwork::remove_element (RElement *element)
   }
 }
 
-void
-RNetwork::join_nodes (RNode *a, RNode *b)
+void RNetwork::join_nodes (RNode *a, RNode *b)
 {
   for (auto e = b->elements ().begin (); e != b->elements ().end (); ++e) {
     RNode *on = const_cast<RNode *> ((*e)->other (b));
@@ -223,8 +217,7 @@ RNetwork::join_nodes (RNode *a, RNode *b)
   remove_node (b);
 }
 
-void
-RNetwork::simplify ()
+void RNetwork::simplify ()
 {
   bool any_change = true;
 
@@ -268,7 +261,6 @@ RNetwork::simplify ()
           join_nodes (remaining, n);
         }
       }
-
     }
 
     //  combine serial resistors if connected through an internal node
@@ -287,11 +279,11 @@ RNetwork::simplify ()
 
           auto e = n->elements ().begin ();
 
-          RNode *n1 = const_cast<RNode *> ((*e)->other (n.operator-> ()));
+          RNode *n1 = const_cast<RNode *> ((*e)->other (n.operator->()));
           double r1 = (*e)->resistance ();
 
           ++e;
-          RNode *n2 = const_cast<RNode *> ((*e)->other (n.operator-> ()));
+          RNode *n2 = const_cast<RNode *> ((*e)->other (n.operator->()));
           double r2 = (*e)->resistance ();
 
           double r = r1 + r2;
@@ -300,21 +292,16 @@ RNetwork::simplify ()
           } else {
             create_element (1.0 / r, n1, n2);
           }
-
         }
 
-        nodes_to_remove.push_back (n.operator-> ());
-
+        nodes_to_remove.push_back (n.operator->());
       }
-
     }
 
     for (auto n = nodes_to_remove.begin (); n != nodes_to_remove.end (); ++n) {
       remove_node (*n);
     }
-
   }
-
 }
 
 }

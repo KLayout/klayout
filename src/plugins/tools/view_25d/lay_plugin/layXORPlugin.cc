@@ -46,16 +46,14 @@ public:
     mp_dialog = 0;
   }
 
-  void menu_activated (const std::string &symbol) 
+  void menu_activated (const std::string &symbol)
   {
     if (symbol == "lay::xor_tool") {
 
       if (mp_dialog->exec_dialog (mp_view)) {
 
         // ... implementation is in layXORToolDialog.cc ...
-
       }
-
     }
   }
 
@@ -72,8 +70,8 @@ public:
   {
     //  .. nothing yet ..
   }
-  
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
+
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> &options) const
   {
     options.push_back (std::pair<std::string, std::string> (cfg_xor_input_mode, "all"));
     options.push_back (std::pair<std::string, std::string> (cfg_xor_output_mode, "rdb"));
@@ -119,4 +117,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new lay::XORPluginDeclaration (), 3000, "lay::XORPlugin");
 
 }
-

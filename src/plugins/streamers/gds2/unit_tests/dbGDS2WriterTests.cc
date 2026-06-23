@@ -80,25 +80,25 @@ void run_test (tl::TestBase *_this, const char *file, const char *file_ref, bool
   }
 }
 
-TEST(1)
+TEST (1)
 {
   run_test (_this, "arefs.gds", "arefs_ref.gds");
 }
 
-TEST(1a)
+TEST (1a)
 {
   db::GDS2WriterOptions opt;
   run_test (_this, "arefs_skew.gds", "arefs_skew1.gds", false, opt);
 }
 
-TEST(1b)
+TEST (1b)
 {
   db::GDS2WriterOptions opt;
   opt.resolve_skew_arrays = true;
   run_test (_this, "arefs_skew.gds", "arefs_skew2.gds", false, opt);
 }
 
-TEST(2)
+TEST (2)
 {
   db::Manager m (false);
   db::Layout layout_org (&m);
@@ -107,9 +107,9 @@ TEST(2)
   db::LayerProperties lp;
   lp.layer = 1;
   lp.datatype = 0;
-  unsigned int lid = layout_org.insert_layer (lp); 
+  unsigned int lid = layout_org.insert_layer (lp);
 
-  std::vector <db::Point> pts;
+  std::vector<db::Point> pts;
   for (int i = 0; i < 20000; ++i) {
     db::DPoint dp (i * cos (i * 0.01), i * sin (i * 0.01));
     pts.push_back (db::Point (dp));
@@ -144,7 +144,7 @@ TEST(2)
 }
 
 // Test the writer's capabilities to cut a polygon into small pieces correctly
-TEST(3)
+TEST (3)
 {
   db::Manager m (false);
   db::Layout layout_org (&m);
@@ -188,9 +188,9 @@ TEST(3)
         if (layout_read.is_valid_layer (j) && layout_read.get_properties (j) == lp_org) {
           db::ShapeProcessor sp;
           EXPECT_EQ (top_org.shapes (i).size () * 30 < top_read.shapes (j).size (), true);
-          sp.boolean (layout_org, top_org, i, 
-                      layout_read, top_read, j, 
-                      top_org.shapes (xor_layer), db::BooleanOp::Xor, true, false); 
+          sp.boolean (layout_org, top_org, i,
+                      layout_read, top_read, j,
+                      top_org.shapes (xor_layer), db::BooleanOp::Xor, true, false);
           EXPECT_EQ (top_org.shapes (xor_layer).size () > 210, true);
           sp.size (layout_org, top_org, xor_layer, top_org.shapes (xor_layer), db::Coord (-1), db::Coord (-1));
           EXPECT_EQ (top_org.shapes (xor_layer).size () == 0, true);
@@ -201,7 +201,7 @@ TEST(3)
 }
 
 // Test the writer's capabilities to write polygon's with holes
-TEST(4)
+TEST (4)
 {
   db::ShapeProcessor sp;
 
@@ -249,9 +249,9 @@ TEST(4)
         if (layout_read.is_valid_layer (j) && layout_read.get_properties (j) == lp_org) {
           EXPECT_EQ (top_org.shapes (i).size () != top_read.shapes (j).size (), true);
           EXPECT_EQ (top_org.shapes (i).size () > 0, true);
-          sp.boolean (layout_org, top_org, i, 
-                      layout_read, top_read, j, 
-                      top_org.shapes (xor_layer), db::BooleanOp::Xor, true, false); 
+          sp.boolean (layout_org, top_org, i,
+                      layout_read, top_read, j,
+                      top_org.shapes (xor_layer), db::BooleanOp::Xor, true, false);
           sp.size (layout_org, top_org, xor_layer, top_org.shapes (xor_layer), db::Coord (-1), db::Coord (-1));
           EXPECT_EQ (top_org.shapes (xor_layer).size () == 0, true);
         }
@@ -260,7 +260,7 @@ TEST(4)
   }
 }
 
-TEST(100)
+TEST (100)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -296,10 +296,10 @@ TEST(100)
   db::FTrans f (1, true);
   db::Vector p (-10, 20);
   db::Trans t (f.rot (), p);
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
   std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_100.gds");
 
@@ -316,7 +316,7 @@ TEST(100)
   db::Layout gg;
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$1}\n"
     "box 1 0 {0 100} {1000 1200}\n"
@@ -332,8 +332,7 @@ TEST(100)
     "sref {$3} 90 1 1 {-10 20}\n"
     "box 2 0 {0 -100} {2000 2200}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -342,7 +341,7 @@ TEST(100)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(101)
+TEST (101)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -378,10 +377,10 @@ TEST(101)
   db::FTrans f (1, true);
   db::Vector p (-10, 20);
   db::Trans t (f.rot (), p);
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
   std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_101.gds");
 
@@ -400,12 +399,11 @@ TEST(101)
   db::Layout gg;
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$2}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -414,7 +412,7 @@ TEST(101)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(102)
+TEST (102)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -450,10 +448,10 @@ TEST(102)
   db::FTrans f (1, true);
   db::Vector p (-10, 20);
   db::Trans t (f.rot (), p);
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
   std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_102.gds");
 
@@ -472,7 +470,7 @@ TEST(102)
   db::Layout gg;
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$1}\n"
     "box 1 0 {0 100} {1000 1200}\n"
@@ -484,8 +482,7 @@ TEST(102)
     "sref {$1} 90 1 1 {-10 20}\n"
     "sref {$3} 90 1 1 {-10 20}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -494,7 +491,7 @@ TEST(102)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(103)
+TEST (103)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -530,10 +527,10 @@ TEST(103)
   db::FTrans f (1, true);
   db::Vector p (-10, 20);
   db::Trans t (f.rot (), p);
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
   std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_103.gds");
 
@@ -552,13 +549,12 @@ TEST(103)
   db::Layout gg;
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$2}\n"
     "box 2 0 {0 -100} {2000 2200}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -567,7 +563,7 @@ TEST(103)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(110)
+TEST (110)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -603,10 +599,10 @@ TEST(110)
   db::FTrans f (1, true);
   db::Vector p (-10, 20);
   db::Trans t (f.rot (), p);
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
   std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_110.gds");
 
@@ -625,7 +621,7 @@ TEST(110)
   db::Layout gg;
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$1}\n"
     "box 1 0 {0 100} {1000 1200}\n"
@@ -633,8 +629,7 @@ TEST(110)
     "begin_cell {$3}\n"
     "sref {$1} 90 1 1 {-10 20}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -643,7 +638,7 @@ TEST(110)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(111)
+TEST (111)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -679,10 +674,10 @@ TEST(111)
   db::FTrans f (1, true);
   db::Vector p (-10, 20);
   db::Trans t (f.rot (), p);
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
   std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_111.gds");
 
@@ -702,12 +697,11 @@ TEST(111)
   db::Layout gg;
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$3}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -716,7 +710,7 @@ TEST(111)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(112)
+TEST (112)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -752,10 +746,10 @@ TEST(112)
   db::FTrans f (1, true);
   db::Vector p (-10, 20);
   db::Trans t (f.rot (), p);
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
   std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_112.gds");
 
@@ -775,7 +769,7 @@ TEST(112)
   db::Layout gg;
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$1}\n"
     "box 1 0 {0 100} {1000 1200}\n"
@@ -783,8 +777,7 @@ TEST(112)
     "begin_cell {$3}\n"
     "sref {$1} 90 1 1 {-10 20}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -793,7 +786,7 @@ TEST(112)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(113)
+TEST (113)
 {
   db::Manager m (false);
   db::Layout g (&m);
@@ -829,10 +822,10 @@ TEST(113)
   db::FTrans f (1, true);
   db::Vector p (-10, 20);
   db::Trans t (f.rot (), p);
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
-  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+  c3.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
   std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_113.gds");
 
@@ -852,12 +845,11 @@ TEST(113)
   db::Layout gg;
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$3}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -867,7 +859,7 @@ TEST(113)
 }
 
 
-TEST(114)
+TEST (114)
 {
   // text alignment flags, font and text size
 
@@ -906,61 +898,60 @@ TEST(114)
   db::Layout gg;
   reader.read (gg);
 
-  db::ShapeIterator s = gg.cell(0).shapes(0).begin(db::ShapeIterator::All);
+  db::ShapeIterator s = gg.cell (0).shapes (0).begin (db::ShapeIterator::All);
   EXPECT_EQ (s.at_end (), false);
   EXPECT_EQ (s->is_text (), true);
   EXPECT_EQ (s->text_size (), 0);
-  EXPECT_EQ ((int)s->text_font (), (int)db::NoFont);
-  EXPECT_EQ ((int)s->text_halign (), (int)db::NoHAlign);
-  EXPECT_EQ ((int)s->text_valign (), (int)db::NoVAlign);
+  EXPECT_EQ ((int) s->text_font (), (int) db::NoFont);
+  EXPECT_EQ ((int) s->text_halign (), (int) db::NoHAlign);
+  EXPECT_EQ ((int) s->text_valign (), (int) db::NoVAlign);
   ++s;
   EXPECT_EQ (s.at_end (), false);
   EXPECT_EQ (s->is_text (), true);
   EXPECT_EQ (s->text_size (), 1000);
-  EXPECT_EQ ((int)s->text_font (), (int)db::NoFont);
-  EXPECT_EQ ((int)s->text_halign (), (int)db::NoHAlign);
-  EXPECT_EQ ((int)s->text_valign (), (int)db::NoVAlign);
+  EXPECT_EQ ((int) s->text_font (), (int) db::NoFont);
+  EXPECT_EQ ((int) s->text_halign (), (int) db::NoHAlign);
+  EXPECT_EQ ((int) s->text_valign (), (int) db::NoVAlign);
   ++s;
   EXPECT_EQ (s.at_end (), false);
   EXPECT_EQ (s->is_text (), true);
   EXPECT_EQ (s->text_size (), 1000);
   // Right now, the font is not written
   // EXPECT_EQ ((int)s->text_font (), (int)db::Font (7));
-  EXPECT_EQ ((int)s->text_halign (), (int)db::HAlignLeft); //  NoAlign -> default
-  EXPECT_EQ ((int)s->text_valign (), (int)db::VAlignBottom); //  NoAlign -> default
+  EXPECT_EQ ((int) s->text_halign (), (int) db::HAlignLeft);   //  NoAlign -> default
+  EXPECT_EQ ((int) s->text_valign (), (int) db::VAlignBottom); //  NoAlign -> default
   ++s;
   EXPECT_EQ (s.at_end (), false);
   EXPECT_EQ (s->is_text (), true);
   EXPECT_EQ (s->text_size (), 1000);
   // Right now, the font is not written
   // EXPECT_EQ ((int)s->text_font (), (int)db::Font (0));
-  EXPECT_EQ ((int)s->text_halign (), (int)db::HAlignCenter);
-  EXPECT_EQ ((int)s->text_valign (), (int)db::VAlignBottom);
+  EXPECT_EQ ((int) s->text_halign (), (int) db::HAlignCenter);
+  EXPECT_EQ ((int) s->text_valign (), (int) db::VAlignBottom);
   ++s;
   EXPECT_EQ (s.at_end (), false);
   EXPECT_EQ (s->is_text (), true);
   EXPECT_EQ (s->text_size (), 1000);
   // Right now, the font is not written
   // EXPECT_EQ ((int)s->text_font (), (int)db::Font (7));
-  EXPECT_EQ ((int)s->text_halign (), (int)db::HAlignCenter);
-  EXPECT_EQ ((int)s->text_valign (), (int)db::VAlignBottom);
+  EXPECT_EQ ((int) s->text_halign (), (int) db::HAlignCenter);
+  EXPECT_EQ ((int) s->text_valign (), (int) db::VAlignBottom);
   ++s;
   EXPECT_EQ (s.at_end (), false);
   EXPECT_EQ (s->is_text (), true);
   EXPECT_EQ (s->text_size (), 1000);
   // Right now, the font is not written
   // EXPECT_EQ ((int)s->text_font (), (int)db::Font (7));
-  EXPECT_EQ ((int)s->text_halign (), (int)db::HAlignLeft);
-  EXPECT_EQ ((int)s->text_valign (), (int)db::VAlignCenter);
+  EXPECT_EQ ((int) s->text_halign (), (int) db::HAlignLeft);
+  EXPECT_EQ ((int) s->text_valign (), (int) db::VAlignCenter);
   ++s;
   EXPECT_EQ (s.at_end (), true);
-  
 }
 
-TEST(115)
+TEST (115)
 {
   //  polygons and boxes without area
-  
+
   db::Manager m (false);
   db::Layout g (&m);
 
@@ -975,18 +966,17 @@ TEST(115)
   c1.shapes (0).insert (db::Box (100, 0, 100, 200));
   c1.shapes (0).insert (db::Box (100, -20, 100, -20));
 
-  db::Point pts[] = {
+  db::Point pts [] = {
     db::Point (100, 15),
     db::Point (150, 15),
-    db::Point (120, 15)
-  };
+    db::Point (120, 15)};
 
   db::Polygon p;
-  p.assign_hull (&pts[0], &pts[sizeof (pts) / sizeof(pts[0])], false);
+  p.assign_hull (&pts [0], &pts [sizeof (pts) / sizeof (pts [0])], false);
   c1.shapes (0).insert (p);
 
   db::SimplePolygon ps;
-  ps.assign_hull (&pts[0], &pts[sizeof (pts) / sizeof(pts[0])], false);
+  ps.assign_hull (&pts [0], &pts [sizeof (pts) / sizeof (pts [0])], false);
   ps.transform (db::FTrans (db::FTrans::r90), false);
   c1.shapes (0).insert (ps);
 
@@ -1005,7 +995,7 @@ TEST(115)
   db::Layout gg;
   reader.read (gg);
 
-  const char *expected = 
+  const char *expected =
     "begin_lib 0.001\n"
     "begin_cell {$1}\n"
     "boundary 1 0 {-15 100} {-15 120} {-15 150} {-15 100}\n"
@@ -1013,8 +1003,7 @@ TEST(115)
     "box 1 0 {100 -20} {100 -20}\n"
     "box 1 0 {100 0} {100 200}\n"
     "end_cell\n"
-    "end_lib\n"
-  ;
+    "end_lib\n";
 
   tl::OutputStringStream os;
   tl::OutputStream stream (os);
@@ -1023,7 +1012,7 @@ TEST(115)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(116)
+TEST (116)
 {
   //  big paths with multi-xy
 
@@ -1084,7 +1073,7 @@ TEST(116)
   EXPECT_EQ (pp == path, true);
 }
 
-TEST(117)
+TEST (117)
 {
   //  big polygons with multi-xy
 
@@ -1145,14 +1134,14 @@ TEST(117)
 }
 
 //  error on duplicate cell name
-TEST(118)
+TEST (118)
 {
   db::Manager m (false);
   db::Layout layout_org (&m);
 
   db::cell_index_type cid1 = layout_org.add_cell ("A");
   db::cell_index_type cid2 = layout_org.add_cell ("B");
-  layout_org.rename_cell (cid2, "A");  //  creates a duplicate cell
+  layout_org.rename_cell (cid2, "A"); //  creates a duplicate cell
 
   db::LayerProperties lp;
   lp.layer = 1;
@@ -1179,7 +1168,7 @@ TEST(118)
 }
 
 //  Extreme fracturing by max. points
-TEST(120)
+TEST (120)
 {
   db::GDS2WriterOptions opt;
   opt.max_vertex_count = 4;
@@ -1188,7 +1177,7 @@ TEST(120)
 }
 
 //  Extreme fracturing by max. points
-TEST(121)
+TEST (121)
 {
   db::GDS2WriterOptions opt;
   opt.max_vertex_count = 4;
@@ -1196,7 +1185,7 @@ TEST(121)
 }
 
 //  Meta info
-TEST(130)
+TEST (130)
 {
   db::Layout layout_org;
 
@@ -1313,7 +1302,7 @@ TEST(130)
 }
 
 //  Giant meta info (issue #1794)
-TEST(131)
+TEST (131)
 {
   db::Layout layout_org;
 
@@ -1366,7 +1355,7 @@ TEST(131)
 }
 
 //  Many meta info (issue #1794)
-TEST(132)
+TEST (132)
 {
   db::Layout layout_org;
 
@@ -1451,7 +1440,7 @@ static std::string huge_string ()
 }
 
 //  Exceeding limits
-TEST(140)
+TEST (140)
 {
   db::Layout layout;
   db::cell_index_type top_index = layout.add_cell ("TOP");
@@ -1462,7 +1451,7 @@ TEST(140)
   EXPECT_EQ (run_test_with_error (1.0, layout), "String max. length overflow, writing layer 1/0, writing cell 'TOP'");
 }
 
-TEST(141)
+TEST (141)
 {
   db::Layout layout;
   db::cell_index_type top_index = layout.add_cell ("TOP");
@@ -1473,7 +1462,7 @@ TEST(141)
   EXPECT_EQ (run_test_with_error (1.0, layout), "Cannot write layer numbers larger than 65535 to GDS2 streams, writing cell 'TOP'");
 }
 
-TEST(142)
+TEST (142)
 {
   db::Layout layout;
   db::cell_index_type top_index = layout.add_cell ("TOP");
@@ -1484,7 +1473,7 @@ TEST(142)
   child.shapes (l1).insert (db::Box (0, 0, 100, 200));
 
   top.insert (db::CellInstArray (child_index, db::Trans (), db::Vector (100000000, 0), db::Vector (0, 100000000), 10, 10));
-  EXPECT_EQ (run_test_with_error (1.0, layout), "");  //  no error
+  EXPECT_EQ (run_test_with_error (1.0, layout), ""); //  no error
 
   top.clear_insts ();
 
@@ -1497,7 +1486,7 @@ TEST(142)
   EXPECT_EQ (run_test_with_error (1.0, layout), "Cannot write array references with more than 32767 columns or rows to GDS2 streams, writing instances, writing cell 'TOP'");
 }
 
-TEST(143)
+TEST (143)
 {
   db::Layout layout;
   db::cell_index_type top_index = layout.add_cell ("TOP");
@@ -1549,32 +1538,30 @@ void run_text_size_test (tl::TestBase *_this, db::Coord size, double def_size, d
 }
 
 //  default text size
-TEST(144a)
+TEST (144a)
 {
   run_text_size_test (_this, 0, 1.25, 1250);
 }
 
-TEST(144b)
+TEST (144b)
 {
   run_text_size_test (_this, 500, 1.25, 500);
 }
 
-TEST(144c)
+TEST (144c)
 {
   run_text_size_test (_this, 0, 0.0, 0);
 }
 
-TEST(144d)
+TEST (144d)
 {
   run_text_size_test (_this, 0, -1.0, 0);
 }
 
 //  Extreme fracturing by max. points
-TEST(166)
+TEST (166)
 {
   db::GDS2WriterOptions opt;
   opt.max_vertex_count = 4;
   run_test (_this, "t166.oas.gz", "t166_au.gds.gz", false, opt);
 }
-
-

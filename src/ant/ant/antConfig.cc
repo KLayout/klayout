@@ -29,7 +29,7 @@ namespace ant
 // ------------------------------------------------------------
 //  Helper functions to get and set the configuration
 
-std::string 
+std::string
 StyleConverter::to_string (ant::Object::style_type s)
 {
   if (s == ant::Object::STY_ruler) {
@@ -53,8 +53,7 @@ StyleConverter::to_string (ant::Object::style_type s)
   }
 }
 
-void  
-StyleConverter::from_string (const std::string &tt, ant::Object::style_type &s)
+void StyleConverter::from_string (const std::string &tt, ant::Object::style_type &s)
 {
   std::string t (tl::trim (tt));
   if (t == "ruler") {
@@ -78,7 +77,7 @@ StyleConverter::from_string (const std::string &tt, ant::Object::style_type &s)
   }
 }
 
-std::string  
+std::string
 OutlineConverter::to_string (ant::Object::outline_type o)
 {
   if (o == ant::Object::OL_diag) {
@@ -104,8 +103,7 @@ OutlineConverter::to_string (ant::Object::outline_type o)
   }
 }
 
-void   
-OutlineConverter::from_string (const std::string &s, ant::Object::outline_type &o)
+void OutlineConverter::from_string (const std::string &s, ant::Object::outline_type &o)
 {
   std::string t (tl::trim (s));
   if (t == "diag") {
@@ -147,8 +145,7 @@ PositionConverter::to_string (ant::Object::position_type p)
   }
 }
 
-void
-PositionConverter::from_string (const std::string &s, ant::Object::position_type &p)
+void PositionConverter::from_string (const std::string &s, ant::Object::position_type &p)
 {
   std::string t (tl::trim (s));
   if (t == "auto") {
@@ -180,8 +177,7 @@ AlignmentConverter::to_string (ant::Object::alignment_type a)
   }
 }
 
-void
-AlignmentConverter::from_string (const std::string &s, ant::Object::alignment_type &a)
+void AlignmentConverter::from_string (const std::string &s, ant::Object::alignment_type &a)
 {
   std::string t (tl::trim (s));
   if (t == "auto") {
@@ -217,8 +213,7 @@ RulerModeConverter::to_string (ant::Template::ruler_mode_type m)
   }
 }
 
-void
-RulerModeConverter::from_string (const std::string &s, ant::Template::ruler_mode_type &a)
+void RulerModeConverter::from_string (const std::string &s, ant::Template::ruler_mode_type &a)
 {
   std::string t (tl::trim (s));
   if (t == "normal") {
@@ -239,13 +234,12 @@ RulerModeConverter::from_string (const std::string &s, ant::Template::ruler_mode
 }
 
 std::string
-TemplatesConverter::to_string (const std::vector <ant::Template> &t)
+TemplatesConverter::to_string (const std::vector<ant::Template> &t)
 {
   return ant::Template::to_string (t);
 }
 
-void 
-TemplatesConverter::from_string (const std::string &s, std::vector <ant::Template> &t)
+void TemplatesConverter::from_string (const std::string &s, std::vector<ant::Template> &t)
 {
   t = ant::Template::from_string (s);
 }
@@ -265,4 +259,3 @@ const std::string cfg_ruler_templates ("ruler-templates-v2");
 const std::string cfg_current_ruler_template ("current-ruler-template");
 
 } // namespace ant
-

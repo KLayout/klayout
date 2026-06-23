@@ -226,8 +226,7 @@ D25ViewWidget::~D25ViewWidget ()
   doneCurrent ();
 }
 
-void
-D25ViewWidget::reset_viewport ()
+void D25ViewWidget::reset_viewport ()
 {
   m_scale_factor = 1.0;
   m_vscale_factor = 1.0;
@@ -236,8 +235,7 @@ D25ViewWidget::reset_viewport ()
   camera_init ();
 }
 
-void
-D25ViewWidget::reset ()
+void D25ViewWidget::reset ()
 {
   reset_viewport ();
   emit scale_factor_changed (m_scale_factor);
@@ -245,8 +243,7 @@ D25ViewWidget::reset ()
   refresh ();
 }
 
-void
-D25ViewWidget::wheelEvent (QWheelEvent *event)
+void D25ViewWidget::wheelEvent (QWheelEvent *event)
 {
   if (event->angleDelta ().y () == 0) {
     return;
@@ -294,16 +291,13 @@ D25ViewWidget::wheelEvent (QWheelEvent *event)
       m_scale_factor *= exp (d);
 
       emit scale_factor_changed (m_scale_factor);
-
     }
-
   }
 
   refresh ();
 }
 
-void
-D25ViewWidget::keyPressEvent (QKeyEvent *event)
+void D25ViewWidget::keyPressEvent (QKeyEvent *event)
 {
   if (event->key () == Qt::Key_Shift) {
 
@@ -331,7 +325,6 @@ D25ViewWidget::keyPressEvent (QKeyEvent *event)
       QVector3D cd = t.inverted ().map (QVector3D (0, 0, cam_dist ()));
 
       set_displacement (displacement () + d * cd / m_scale_factor);
-
     }
 
   } else if (event->key () == Qt::Key_Left || event->key () == Qt::Key_Right) {
@@ -362,14 +355,11 @@ D25ViewWidget::keyPressEvent (QKeyEvent *event)
       QVector3D cd = t.inverted ().map (QVector3D (cam_dist (), 0, 0));
 
       set_displacement (displacement () + d * cd / m_scale_factor);
-
     }
-
   }
 }
 
-void
-D25ViewWidget::keyReleaseEvent (QKeyEvent *event)
+void D25ViewWidget::keyReleaseEvent (QKeyEvent *event)
 {
   if (event->key () == Qt::Key_Shift) {
     mp_mode.reset (0);
@@ -397,8 +387,7 @@ D25ViewWidget::hit_point_with_scene (const QVector3D &line_dir)
   }
 }
 
-void
-D25ViewWidget::mousePressEvent (QMouseEvent *event)
+void D25ViewWidget::mousePressEvent (QMouseEvent *event)
 {
   mp_mode.reset (0);
 
@@ -413,14 +402,12 @@ D25ViewWidget::mousePressEvent (QMouseEvent *event)
   }
 }
 
-void
-D25ViewWidget::mouseReleaseEvent (QMouseEvent * /*event*/)
+void D25ViewWidget::mouseReleaseEvent (QMouseEvent * /*event*/)
 {
   mp_mode.reset (0);
 }
 
-void
-D25ViewWidget::mouseMoveEvent (QMouseEvent *event)
+void D25ViewWidget::mouseMoveEvent (QMouseEvent *event)
 {
   if (mp_mode.get ()) {
     mp_mode->mouse_move (event);
@@ -429,8 +416,7 @@ D25ViewWidget::mouseMoveEvent (QMouseEvent *event)
 
 inline double square (double x) { return x * x; }
 
-void
-D25ViewWidget::fit ()
+void D25ViewWidget::fit ()
 {
   if (m_bbox.empty ()) {
 
@@ -462,7 +448,6 @@ D25ViewWidget::fit ()
       if (d > 1e-6) {
         m_scale_factor = std::min (m_scale_factor, cam_dist () * tfov / d);
       }
-
     }
 
     //  create some margin
@@ -471,7 +456,6 @@ D25ViewWidget::fit ()
     //  Reset displacement to center the scene
     m_displacement = -(bll + dim * 0.5);
     m_displacement.setY (0.0);
-
   }
 
   refresh ();
@@ -479,14 +463,12 @@ D25ViewWidget::fit ()
   emit scale_factor_changed (m_scale_factor);
 }
 
-void
-D25ViewWidget::refresh ()
+void D25ViewWidget::refresh ()
 {
   update ();
 }
 
-void
-D25ViewWidget::set_material_visible (size_t index, bool visible)
+void D25ViewWidget::set_material_visible (size_t index, bool visible)
 {
   if (index < m_layers.size () && m_layers [index].visible != visible) {
     m_layers [index].visible = visible;
@@ -494,15 +476,13 @@ D25ViewWidget::set_material_visible (size_t index, bool visible)
   }
 }
 
-void
-D25ViewWidget::showEvent (QShowEvent *)
+void D25ViewWidget::showEvent (QShowEvent *)
 {
   //  NOTE: This should happen automatically, but apparently the OpenGL widget doesn't do an automatic refresh:
   update ();
 }
 
-void
-D25ViewWidget::camera_changed ()
+void D25ViewWidget::camera_changed ()
 {
   refresh ();
 }
@@ -513,8 +493,7 @@ D25ViewWidget::aspect_ratio () const
   return double (width ()) / double (height ());
 }
 
-void
-D25ViewWidget::clear ()
+void D25ViewWidget::clear ()
 {
   m_layers.clear ();
   m_vertex_chunks.clear ();
@@ -533,10 +512,10 @@ D25ViewWidget::clear ()
 
 static void color_to_gl (tl::color_t color, GLfloat (&gl_color) [4])
 {
-  gl_color[0] = ((color >> 16) & 0xff) / 255.0f;
-  gl_color[1] = ((color >> 8) & 0xff) / 255.0f;
-  gl_color[2] = (color & 0xff) / 255.0f;
-  gl_color[3] = 1.0f;
+  gl_color [0] = ((color >> 16) & 0xff) / 255.0f;
+  gl_color [1] = ((color >> 8) & 0xff) / 255.0f;
+  gl_color [2] = (color & 0xff) / 255.0f;
+  gl_color [3] = 1.0f;
 }
 
 static void color_to_gl (const tl::color_t *color, GLfloat (&gl_color) [4])
@@ -566,8 +545,7 @@ static void lp_to_info (const lay::LayerPropertiesNode &lp, D25ViewWidget::Layer
   info.visible = true;
 }
 
-void
-D25ViewWidget::open_display (const tl::color_t *frame_color, const tl::color_t *fill_color, const db::LayerProperties *like, const std::string *name)
+void D25ViewWidget::open_display (const tl::color_t *frame_color, const tl::color_t *fill_color, const db::LayerProperties *like, const std::string *name)
 {
   m_vertex_chunks.push_back (triangle_chunks_type ());
   m_normals_chunks.push_back (triangle_chunks_type ());
@@ -603,14 +581,12 @@ D25ViewWidget::open_display (const tl::color_t *frame_color, const tl::color_t *
   m_display_open = true;
 }
 
-void
-D25ViewWidget::close_display ()
+void D25ViewWidget::close_display ()
 {
   m_display_open = false;
 }
 
-void
-D25ViewWidget::enter (const db::RecursiveShapeIterator *iter, double zstart, double zstop)
+void D25ViewWidget::enter (const db::RecursiveShapeIterator *iter, double zstart, double zstop)
 {
   tl_assert (m_display_open);
 
@@ -644,7 +620,6 @@ D25ViewWidget::enter (const db::RecursiveShapeIterator *iter, double zstart, dou
             break;
           }
         }
-
       }
 
     } else {
@@ -652,14 +627,11 @@ D25ViewWidget::enter (const db::RecursiveShapeIterator *iter, double zstart, dou
       //  sequential assignment
       tl::color_t color = mp_view->get_palette ().luminous_color_by_index (m_layers.size ());
       color_to_gl (color, info.fill_color);
-
     }
-
   }
 }
 
-void
-D25ViewWidget::entry (const db::Region &data, double dbu, double zstart, double zstop)
+void D25ViewWidget::entry (const db::Region &data, double dbu, double zstart, double zstop)
 {
   const db::OriginalLayerRegion *original = dynamic_cast<const db::OriginalLayerRegion *> (data.delegate ());
   if (original) {
@@ -674,10 +646,9 @@ D25ViewWidget::entry (const db::Region &data, double dbu, double zstart, double 
   render_region (progress, *m_layers.back ().vertex_chunk, *m_layers.back ().normals_chunk, *m_layers.back ().line_chunk, data, dbu, db::CplxTrans (dbu).inverted () * m_bbox, zstart, zstop);
 }
 
-void
-D25ViewWidget::entry (const db::Edges &data, double dbu, double zstart, double zstop)
+void D25ViewWidget::entry (const db::Edges &data, double dbu, double zstart, double zstop)
 {
-  const db::OriginalLayerEdges *original = dynamic_cast<const  db::OriginalLayerEdges *> (data.delegate ());
+  const db::OriginalLayerEdges *original = dynamic_cast<const db::OriginalLayerEdges *> (data.delegate ());
   if (original) {
     //  try to establish a default color from the region's origin if required
     auto it = original->begin_iter ();
@@ -690,10 +661,9 @@ D25ViewWidget::entry (const db::Edges &data, double dbu, double zstart, double z
   render_edges (progress, *m_layers.back ().vertex_chunk, *m_layers.back ().normals_chunk, *m_layers.back ().line_chunk, data, dbu, db::CplxTrans (dbu).inverted () * m_bbox, zstart, zstop);
 }
 
-void
-D25ViewWidget::entry (const db::EdgePairs &data, double dbu, double zstart, double zstop)
+void D25ViewWidget::entry (const db::EdgePairs &data, double dbu, double zstart, double zstop)
 {
-  const db::OriginalLayerEdgePairs *original = dynamic_cast<const  db::OriginalLayerEdgePairs *> (data.delegate ());
+  const db::OriginalLayerEdgePairs *original = dynamic_cast<const db::OriginalLayerEdgePairs *> (data.delegate ());
   if (original) {
     //  try to establish a default color from the region's origin if required
     auto it = original->begin_iter ();
@@ -706,20 +676,17 @@ D25ViewWidget::entry (const db::EdgePairs &data, double dbu, double zstart, doub
   render_edge_pairs (progress, *m_layers.back ().vertex_chunk, *m_layers.back ().normals_chunk, *m_layers.back ().line_chunk, data, dbu, db::CplxTrans (dbu).inverted () * m_bbox, zstart, zstop);
 }
 
-void
-D25ViewWidget::finish ()
+void D25ViewWidget::finish ()
 {
   //  .. nothing yet ..
 }
 
-void
-D25ViewWidget::attach_view (LayoutViewBase *view)
+void D25ViewWidget::attach_view (LayoutViewBase *view)
 {
   mp_view = view;
 }
 
-void
-D25ViewWidget::render_polygon (D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::triangle_chunks_type &normals, D25ViewWidget::line_chunks_type &line_chunks, const db::Polygon &poly, double dbu, double zstart, double zstop)
+void D25ViewWidget::render_polygon (D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::triangle_chunks_type &normals, D25ViewWidget::line_chunks_type &line_chunks, const db::Polygon &poly, double dbu, double zstart, double zstop)
 {
   if (poly.holes () > 0) {
 
@@ -753,9 +720,9 @@ D25ViewWidget::render_polygon (D25ViewWidget::triangle_chunks_type &chunks, D25V
     std::copy (poly.hull ().begin (), poly.hull ().end (), &pts [0]);
 
     //  triangle bottom
-    chunks.add (pts[0].x () * dbu, zstart, pts[0].y () * dbu);
-    chunks.add (pts[2].x () * dbu, zstart, pts[2].y () * dbu);
-    chunks.add (pts[1].x () * dbu, zstart, pts[1].y () * dbu);
+    chunks.add (pts [0].x () * dbu, zstart, pts [0].y () * dbu);
+    chunks.add (pts [2].x () * dbu, zstart, pts [2].y () * dbu);
+    chunks.add (pts [1].x () * dbu, zstart, pts [1].y () * dbu);
 
     //  normals
     for (unsigned int i = 0; i < 3; ++i) {
@@ -763,9 +730,9 @@ D25ViewWidget::render_polygon (D25ViewWidget::triangle_chunks_type &chunks, D25V
     }
 
     //  triangle top
-    chunks.add (pts[0].x () * dbu, zstop, pts[0].y () * dbu);
-    chunks.add (pts[1].x () * dbu, zstop, pts[1].y () * dbu);
-    chunks.add (pts[2].x () * dbu, zstop, pts[2].y () * dbu);
+    chunks.add (pts [0].x () * dbu, zstop, pts [0].y () * dbu);
+    chunks.add (pts [1].x () * dbu, zstop, pts [1].y () * dbu);
+    chunks.add (pts [2].x () * dbu, zstop, pts [2].y () * dbu);
 
     //  normals
     for (unsigned int i = 0; i < 3; ++i) {
@@ -775,9 +742,9 @@ D25ViewWidget::render_polygon (D25ViewWidget::triangle_chunks_type &chunks, D25V
     if (poly.hull ().size () == 4) {
 
       //  triangle bottom
-      chunks.add (pts[0].x () * dbu, zstart, pts[0].y () * dbu);
-      chunks.add (pts[3].x () * dbu, zstart, pts[3].y () * dbu);
-      chunks.add (pts[2].x () * dbu, zstart, pts[2].y () * dbu);
+      chunks.add (pts [0].x () * dbu, zstart, pts [0].y () * dbu);
+      chunks.add (pts [3].x () * dbu, zstart, pts [3].y () * dbu);
+      chunks.add (pts [2].x () * dbu, zstart, pts [2].y () * dbu);
 
       //  normals
       for (unsigned int i = 0; i < 3; ++i) {
@@ -785,22 +752,19 @@ D25ViewWidget::render_polygon (D25ViewWidget::triangle_chunks_type &chunks, D25V
       }
 
       //  triangle top
-      chunks.add (pts[0].x () * dbu, zstop, pts[0].y () * dbu);
-      chunks.add (pts[2].x () * dbu, zstop, pts[2].y () * dbu);
-      chunks.add (pts[3].x () * dbu, zstop, pts[3].y () * dbu);
+      chunks.add (pts [0].x () * dbu, zstop, pts [0].y () * dbu);
+      chunks.add (pts [2].x () * dbu, zstop, pts [2].y () * dbu);
+      chunks.add (pts [3].x () * dbu, zstop, pts [3].y () * dbu);
 
       //  normals
       for (unsigned int i = 0; i < 3; ++i) {
         normals.add (0.0, -1.0, 0.0);
       }
-
     }
-
   }
 }
 
-void
-D25ViewWidget::render_wall (D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::triangle_chunks_type &normals, D25ViewWidget::line_chunks_type &line_chunks, const db::Edge &edge, double dbu, double zstart, double zstop)
+void D25ViewWidget::render_wall (D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::triangle_chunks_type &normals, D25ViewWidget::line_chunks_type &line_chunks, const db::Edge &edge, double dbu, double zstart, double zstop)
 {
   if (edge.is_degenerate ()) {
     return;
@@ -829,12 +793,11 @@ D25ViewWidget::render_wall (D25ViewWidget::triangle_chunks_type &chunks, D25View
   line_chunks.add (edge.p1 ().x () * dbu, zstop, edge.p1 ().y () * dbu);
 }
 
-void
-D25ViewWidget::render_region (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::triangle_chunks_type &normals, D25ViewWidget::line_chunks_type &line_chunks, const db::Region &region, double dbu, const db::Box &clip_box, double zstart, double zstop)
+void D25ViewWidget::render_region (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::triangle_chunks_type &normals, D25ViewWidget::line_chunks_type &line_chunks, const db::Region &region, double dbu, const db::Box &clip_box, double zstart, double zstop)
 {
   std::vector<db::Polygon> poly_heap;
 
-  for (db::Region::const_iterator p = region.begin (); !p.at_end (); ++p) {
+  for (db::Region::const_iterator p = region.begin (); ! p.at_end (); ++p) {
 
     poly_heap.clear ();
     db::clip_poly (*p, clip_box, poly_heap, false /*keep holes*/);
@@ -848,16 +811,13 @@ D25ViewWidget::render_region (tl::AbsoluteProgress &progress, D25ViewWidget::tri
       for (db::Polygon::polygon_edge_iterator e = p->begin_edge (); ! e.at_end (); ++e) {
         render_wall (chunks, normals, line_chunks, *e, dbu, zstart, zstop);
       }
-
     }
-
   }
 }
 
-void
-D25ViewWidget::render_edges (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &normals, D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Edges &edges, double dbu, const db::Box &clip_box, double zstart, double zstop)
+void D25ViewWidget::render_edges (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &normals, D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Edges &edges, double dbu, const db::Box &clip_box, double zstart, double zstop)
 {
-  for (db::Edges::const_iterator e = edges.begin (); !e.at_end (); ++e) {
+  for (db::Edges::const_iterator e = edges.begin (); ! e.at_end (); ++e) {
 
     ++progress;
 
@@ -865,14 +825,12 @@ D25ViewWidget::render_edges (tl::AbsoluteProgress &progress, D25ViewWidget::tria
     if (ec.first) {
       render_wall (chunks, normals, line_chunks, ec.second, dbu, zstart, zstop);
     }
-
   }
 }
 
-void
-D25ViewWidget::render_edge_pairs (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &normals, D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::EdgePairs &edge_pairs, double dbu, const db::Box &clip_box, double zstart, double zstop)
+void D25ViewWidget::render_edge_pairs (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &normals, D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::EdgePairs &edge_pairs, double dbu, const db::Box &clip_box, double zstart, double zstop)
 {
-  for (db::EdgePairs::const_iterator e = edge_pairs.begin (); !e.at_end (); ++e) {
+  for (db::EdgePairs::const_iterator e = edge_pairs.begin (); ! e.at_end (); ++e) {
 
     ++progress;
 
@@ -887,7 +845,6 @@ D25ViewWidget::render_edge_pairs (tl::AbsoluteProgress &progress, D25ViewWidget:
     if (ec.first) {
       render_wall (chunks, normals, line_chunks, ec.second, dbu, zstart, zstop);
     }
-
   }
 }
 
@@ -911,8 +868,7 @@ static std::pair<double, double> find_grid (double v)
   return std::make_pair (v, v);
 }
 
-void
-D25ViewWidget::initializeGL ()
+void D25ViewWidget::initializeGL ()
 {
   tl_assert (m_shapes_program == 0);
   tl_assert (m_gridplane_program == 0);
@@ -943,60 +899,58 @@ D25ViewWidget::initializeGL ()
     m_gridplane_program = 0;
 
     emit init_failed ();
-
   }
 }
 
-void
-D25ViewWidget::do_initialize_gl ()
+void D25ViewWidget::do_initialize_gl ()
 {
-  QOpenGLFunctions::initializeOpenGLFunctions();
+  QOpenGLFunctions::initializeOpenGLFunctions ();
 
   glEnable (GL_BLEND);
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   static const char *shapes_vertex_shader_source =
-      "#version 120\n"
-      "\n"
-      "attribute vec4 posAttr;\n"
-      "attribute vec4 normalsAttr;\n"
-      "uniform mat4 matrix;\n"
-      "uniform vec3 illum;\n"
-      "varying float dp;\n"
-      "\n"
-      "void main() {\n"
-      "   gl_Position = matrix * posAttr;\n"
-      "   dp = dot(normalsAttr.xyz, illum);\n"
-      "}\n";
+    "#version 120\n"
+    "\n"
+    "attribute vec4 posAttr;\n"
+    "attribute vec4 normalsAttr;\n"
+    "uniform mat4 matrix;\n"
+    "uniform vec3 illum;\n"
+    "varying float dp;\n"
+    "\n"
+    "void main() {\n"
+    "   gl_Position = matrix * posAttr;\n"
+    "   dp = dot(normalsAttr.xyz, illum);\n"
+    "}\n";
 
   static const char *shapes_fragment_shader_source =
-      "#version 120\n"
-      "\n"
-      "varying float dp;\n"
-      "uniform highp float mist_factor;\n"
-      "uniform highp float mist_add;\n"
-      "uniform vec4 color;\n"
-      "uniform vec4 ambient;\n"
-      "\n"
-      "lowp vec4 color_by_z(lowp vec4 c, highp float z) {\n"
-      "  highp float mist_rgb = c.g * mist_factor + mist_add;\n"
-      "  lowp vec4 mist_color = vec4(mist_rgb, mist_rgb, mist_rgb, 1.0);\n"
-      "  highp float d = 0.12;\n" //  d + dd/2 = 0.15 = 1/?
-      "  highp float dd = 0.06;\n"
-      "  highp float f = 1.0;\n"
-      "  if (z < d - dd) {\n"
-      "    f = 0.0;\n"
-      "  } else if (z < d + dd) {\n"
-      "    f = (z - (d - dd)) / (2.0 * dd);\n"
-      "  }\n"
-      "  return (1.0 - f) * mist_color + f * c;\n"
-      "}\n"
-      "\n"
-      "void main() {\n"
-      "   lowp vec4 vertex_color = color * (dp * 0.5 + 0.5) - (min(0.0, dp) * ambient);\n"
-      "   vertex_color.a = 1.0;\n"
-      "   gl_FragColor = color_by_z(vertex_color, gl_FragCoord.w);\n"
-      "}\n";
+    "#version 120\n"
+    "\n"
+    "varying float dp;\n"
+    "uniform highp float mist_factor;\n"
+    "uniform highp float mist_add;\n"
+    "uniform vec4 color;\n"
+    "uniform vec4 ambient;\n"
+    "\n"
+    "lowp vec4 color_by_z(lowp vec4 c, highp float z) {\n"
+    "  highp float mist_rgb = c.g * mist_factor + mist_add;\n"
+    "  lowp vec4 mist_color = vec4(mist_rgb, mist_rgb, mist_rgb, 1.0);\n"
+    "  highp float d = 0.12;\n" //  d + dd/2 = 0.15 = 1/?
+    "  highp float dd = 0.06;\n"
+    "  highp float f = 1.0;\n"
+    "  if (z < d - dd) {\n"
+    "    f = 0.0;\n"
+    "  } else if (z < d + dd) {\n"
+    "    f = (z - (d - dd)) / (2.0 * dd);\n"
+    "  }\n"
+    "  return (1.0 - f) * mist_color + f * c;\n"
+    "}\n"
+    "\n"
+    "void main() {\n"
+    "   lowp vec4 vertex_color = color * (dp * 0.5 + 0.5) - (min(0.0, dp) * ambient);\n"
+    "   vertex_color.a = 1.0;\n"
+    "   gl_FragColor = color_by_z(vertex_color, gl_FragCoord.w);\n"
+    "}\n";
 
   m_shapes_program = new QOpenGLShaderProgram (this);
   if (! m_shapes_program->addShaderFromSourceCode (QOpenGLShader::Vertex, shapes_vertex_shader_source)) {
@@ -1010,39 +964,39 @@ D25ViewWidget::do_initialize_gl ()
   }
 
   static const char *lines_vertex_shader_source =
-      "#version 120\n"
-      "\n"
-      "attribute vec4 posAttr;\n"
-      "uniform mat4 matrix;\n"
-      "\n"
-      "void main() {\n"
-      "   gl_Position = matrix * posAttr;\n"
-      "}\n";
+    "#version 120\n"
+    "\n"
+    "attribute vec4 posAttr;\n"
+    "uniform mat4 matrix;\n"
+    "\n"
+    "void main() {\n"
+    "   gl_Position = matrix * posAttr;\n"
+    "}\n";
 
   static const char *lines_fragment_shader_source =
-      "#version 120\n"
-      "\n"
-      "uniform lowp vec4 color;\n"
-      "uniform highp float mist_factor;\n"
-      "uniform highp float mist_add;\n"
-      "\n"
-      "lowp vec4 color_by_z(lowp vec4 c, highp float z) {\n"
-      "  highp float mist_rgb = c.g * mist_factor + mist_add;\n"
-      "  lowp vec4 mist_color = vec4(mist_rgb, mist_rgb, mist_rgb, 1.0);\n"
-      "  highp float d = 0.12;\n" //  d + dd/2 = 0.15 = 1/?
-      "  highp float dd = 0.06;\n"
-      "  highp float f = 1.0;\n"
-      "  if (z < d - dd) {\n"
-      "    f = 0.0;\n"
-      "  } else if (z < d + dd) {\n"
-      "    f = (z - (d - dd)) / (2.0 * dd);\n"
-      "  }\n"
-      "  return (1.0 - f) * mist_color + f * c;\n"
-      "}\n"
-      "\n"
-      "void main() {\n"
-      "   gl_FragColor = color_by_z(color, gl_FragCoord.w);\n"
-      "}\n";
+    "#version 120\n"
+    "\n"
+    "uniform lowp vec4 color;\n"
+    "uniform highp float mist_factor;\n"
+    "uniform highp float mist_add;\n"
+    "\n"
+    "lowp vec4 color_by_z(lowp vec4 c, highp float z) {\n"
+    "  highp float mist_rgb = c.g * mist_factor + mist_add;\n"
+    "  lowp vec4 mist_color = vec4(mist_rgb, mist_rgb, mist_rgb, 1.0);\n"
+    "  highp float d = 0.12;\n" //  d + dd/2 = 0.15 = 1/?
+    "  highp float dd = 0.06;\n"
+    "  highp float f = 1.0;\n"
+    "  if (z < d - dd) {\n"
+    "    f = 0.0;\n"
+    "  } else if (z < d + dd) {\n"
+    "    f = (z - (d - dd)) / (2.0 * dd);\n"
+    "  }\n"
+    "  return (1.0 - f) * mist_color + f * c;\n"
+    "}\n"
+    "\n"
+    "void main() {\n"
+    "   gl_FragColor = color_by_z(color, gl_FragCoord.w);\n"
+    "}\n";
 
   m_lines_program = new QOpenGLShaderProgram (this);
   if (! m_lines_program->addShaderFromSourceCode (QOpenGLShader::Vertex, lines_vertex_shader_source)) {
@@ -1058,22 +1012,22 @@ D25ViewWidget::do_initialize_gl ()
   //  grid plane shader source
 
   static const char *gridplan_vertex_shader_source =
-      "#version 120\n"
-      "\n"
-      "attribute vec4 posAttr;\n"
-      "uniform mat4 matrix;\n"
-      "\n"
-      "void main() {\n"
-      "   gl_Position = matrix * posAttr;\n"
-      "}\n";
+    "#version 120\n"
+    "\n"
+    "attribute vec4 posAttr;\n"
+    "uniform mat4 matrix;\n"
+    "\n"
+    "void main() {\n"
+    "   gl_Position = matrix * posAttr;\n"
+    "}\n";
 
   static const char *gridplan_fragment_shader_source =
-      "#version 120\n"
-      "\n"
-      "uniform lowp vec4 color;\n"
-      "void main() {\n"
-      "   gl_FragColor = color;\n"
-      "}\n";
+    "#version 120\n"
+    "\n"
+    "uniform lowp vec4 color;\n"
+    "void main() {\n"
+    "   gl_FragColor = color;\n"
+    "}\n";
 
   m_gridplane_program = new QOpenGLShaderProgram (this);
   if (! m_gridplane_program->addShaderFromSourceCode (QOpenGLShader::Vertex, gridplan_vertex_shader_source)) {
@@ -1087,8 +1041,7 @@ D25ViewWidget::do_initialize_gl ()
   }
 }
 
-void
-D25ViewWidget::paintGL ()
+void D25ViewWidget::paintGL ()
 {
   if (! mp_view) {
     return;
@@ -1158,7 +1111,6 @@ D25ViewWidget::paintGL ()
         ++v;
         ++n;
       }
-
     }
   }
 
@@ -1238,7 +1190,6 @@ D25ViewWidget::paintGL ()
 
     x = xx;
     z = zz;
-
   }
 
   m_gridplane_program->setUniformValue ("color", foreground_rgb, foreground_rgb, foreground_rgb, 0.25f);
@@ -1287,7 +1238,7 @@ D25ViewWidget::paintGL ()
     double step = (major ? gmajor : gminor);
 
     x = ceil (l / step) * step;
-    for ( ; x < r - step * epsilon; x += step) {
+    for (; x < r - step * epsilon; x += step) {
       if ((fabs (floor (x / gmajor + 0.5) * gmajor - x) < epsilon) == (major != 0)) {
         vertexes.add (x, 0.0, b - margin);
         vertexes.add (x, 0.0, t + margin);
@@ -1295,7 +1246,7 @@ D25ViewWidget::paintGL ()
     }
 
     y = ceil (b / step) * step;
-    for ( ; y < t - step * epsilon; y += step) {
+    for (; y < t - step * epsilon; y += step) {
       if ((fabs (floor (y / gmajor + 0.5) * gmajor - y) < epsilon) == (major != 0)) {
         vertexes.add (l - margin, 0.0, y);
         vertexes.add (r + margin, 0.0, y);
@@ -1304,7 +1255,6 @@ D25ViewWidget::paintGL ()
 
     glLineWidth (2.0);
     vertexes.draw_to (this, positions, GL_LINES);
-
   }
 
   //  the plane itself
@@ -1431,7 +1381,6 @@ D25ViewWidget::paintGL ()
     m_gridplane_program->setUniformValue ("color", foreground_rgb, foreground_rgb, foreground_rgb, 0.3f);
 
     vertexes.draw_to (this, positions, GL_TRIANGLES);
-
   }
 
   glDisableVertexAttribArray (positions);
@@ -1439,11 +1388,9 @@ D25ViewWidget::paintGL ()
   m_shapes_program->release ();
 }
 
-void
-D25ViewWidget::resizeGL (int /*w*/, int /*h*/)
+void D25ViewWidget::resizeGL (int /*w*/, int /*h*/)
 {
   refresh ();
 }
 
 }
-

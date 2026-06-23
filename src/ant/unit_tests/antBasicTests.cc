@@ -27,7 +27,7 @@
 
 //  NOTE: most tests are in ruby/antTest.rb
 
-TEST(1) 
+TEST (1)
 {
   ant::Template tmp = ant::Template ("title", "fmt_x", "fmt_y", "fmt",
                                      ant::Object::STY_arrow_both,
@@ -50,7 +50,7 @@ TEST(1)
   EXPECT_EQ (a.category (), "cat");
 }
 
-TEST(2)
+TEST (2)
 {
   ant::Template tmp = ant::Template ("title", "fmt_x", "fmt_y", "fmt",
                                      ant::Object::STY_arrow_both,

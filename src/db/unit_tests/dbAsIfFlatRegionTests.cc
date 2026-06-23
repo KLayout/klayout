@@ -38,7 +38,7 @@
 #include "tlUnitTest.h"
 #include "tlStream.h"
 
-TEST(1_Basic)
+TEST (1_Basic)
 {
   db::Layout ly;
   {
@@ -69,7 +69,7 @@ TEST(1_Basic)
     db::CellCounter cc (&ly);
     for (db::Layout::top_down_const_iterator c = ly.begin_top_down (); c != ly.end_top_down (); ++c) {
       size_t ns = 0;
-      for (db::Shapes::shape_iterator is = ly.cell (*c).shapes (li1).begin (db::ShapeIterator::Regions); !is.at_end (); ++is) {
+      for (db::Shapes::shape_iterator is = ly.cell (*c).shapes (li1).begin (db::ShapeIterator::Regions); ! is.at_end (); ++is) {
         ++ns;
       }
       n += cc.weight (*c) * ns;
@@ -81,7 +81,6 @@ TEST(1_Basic)
     EXPECT_EQ (regions.back ().hier_count (), nhier);
     EXPECT_EQ (regions.back ().bbox (), db::Region (iter).bbox ());
     EXPECT_EQ (regions.back ().is_merged (), false);
-
   }
 
   unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
@@ -90,7 +89,7 @@ TEST(1_Basic)
     target.insert (target_top_cell_index, target_layers [r - regions.begin ()], *r);
   }
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au1.gds");
 
   //  some operations
@@ -114,7 +113,7 @@ TEST(1_Basic)
   EXPECT_EQ (r2.is_merged (), false);
 }
 
-TEST(2)
+TEST (2)
 {
   db::Layout ly;
   {
@@ -130,7 +129,7 @@ TEST(2)
   db::Layout target;
 
   //  deliberately using vector to force reallocation ...
-  std::vector<std::pair<db::Region, unsigned int> > regions;
+  std::vector<std::pair<db::Region, unsigned int>> regions;
 
   for (db::Layout::layer_iterator li = ly.begin_layers (); li != ly.end_layers (); ++li) {
 
@@ -146,20 +145,19 @@ TEST(2)
     regions.push_back (std::make_pair (db::Region (iter2), tl));
     //  TODO: currently, original layer regions don't clip - emulate this
     regions.back ().first &= db::Region (iter2.region ());
-
   }
 
   unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
 
-  for (std::vector<std::pair<db::Region, unsigned int> >::const_iterator r = regions.begin (); r != regions.end (); ++r) {
+  for (std::vector<std::pair<db::Region, unsigned int>>::const_iterator r = regions.begin (); r != regions.end (); ++r) {
     target.insert (target_top_cell_index, r->second, r->first);
   }
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au2.gds");
 }
 
-TEST(3_BoolAndNot)
+TEST (3_BoolAndNot)
 {
   db::Layout ly;
   {
@@ -182,32 +180,32 @@ TEST(3_BoolAndNot)
   db::Region r42 (db::RecursiveShapeIterator (ly, top_cell, l42));
   db::Region box (db::Box (2000, -1000, 6000, 4000));
 
-  db::Region r2minus3   = r2 - r3;
+  db::Region r2minus3 = r2 - r3;
   db::Region r2minusbox = r2 - box;
-  db::Region r2minus42  = r2 - r42;
+  db::Region r2minus42 = r2 - r42;
   db::Region rboxminus3 = box - r3;
-  db::Region r42minus3  = r42 - r3;
+  db::Region r42minus3 = r42 - r3;
   db::Region r42minus42 = r42 - r42;
 
-  db::Region tr2minus3   = r2.andnot (r3).second;
+  db::Region tr2minus3 = r2.andnot (r3).second;
   db::Region tr2minusbox = r2.andnot (box).second;
-  db::Region tr2minus42  = r2.andnot (r42).second;
+  db::Region tr2minus42 = r2.andnot (r42).second;
   db::Region trboxminus3 = box.andnot (r3).second;
-  db::Region tr42minus3  = r42.andnot (r3).second;
+  db::Region tr42minus3 = r42.andnot (r3).second;
   db::Region tr42minus42 = r42.andnot (r42).second;
 
-  db::Region r2and3   = r2 & r3;
+  db::Region r2and3 = r2 & r3;
   db::Region r2andbox = r2 & box;
-  db::Region r2and42  = r2 & r42;
+  db::Region r2and42 = r2 & r42;
   db::Region rboxand3 = box & r3;
-  db::Region r42and3  = r42 & r3;
+  db::Region r42and3 = r42 & r3;
   db::Region r42and42 = r42 & r42;
 
-  db::Region tr2and3   = r2.andnot (r3).first;
+  db::Region tr2and3 = r2.andnot (r3).first;
   db::Region tr2andbox = r2.andnot (box).first;
-  db::Region tr2and42  = r2.andnot (r42).first;
+  db::Region tr2and42 = r2.andnot (r42).first;
   db::Region trboxand3 = box.andnot (r3).first;
-  db::Region tr42and3  = r42.andnot (r3).first;
+  db::Region tr42and3 = r42.andnot (r3).first;
   db::Region tr42and42 = r42.andnot (r42).first;
 
   {
@@ -228,7 +226,7 @@ TEST(3_BoolAndNot)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (24, 0)), r42and3);
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (25, 0)), r42and42);
 
-    CHECKPOINT();
+    CHECKPOINT ();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au3.gds");
   }
 
@@ -250,12 +248,12 @@ TEST(3_BoolAndNot)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (24, 0)), tr42and3);
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (25, 0)), tr42and42);
 
-    CHECKPOINT();
+    CHECKPOINT ();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au3b.gds");
   }
 }
 
-TEST(4_Add)
+TEST (4_Add)
 {
   db::Layout ly;
   {
@@ -306,7 +304,7 @@ TEST(4_Add)
     rnew42 += r2;
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), rnew42);
 
-    CHECKPOINT();
+    CHECKPOINT ();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au4a.gds");
   }
 
@@ -323,12 +321,12 @@ TEST(4_Add)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), box + r3);
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r2 + box);
 
-    CHECKPOINT();
+    CHECKPOINT ();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au4b.gds");
   }
 }
 
-TEST(5_BoolXOR)
+TEST (5_BoolXOR)
 {
   db::Layout ly;
   {
@@ -351,11 +349,11 @@ TEST(5_BoolXOR)
   db::Region r42 (db::RecursiveShapeIterator (ly, top_cell, l42));
   db::Region box (db::Box (2000, -1000, 6000, 4000));
 
-  db::Region r2xor3   = r2 ^ r3;
+  db::Region r2xor3 = r2 ^ r3;
   db::Region r2xorbox = r2 ^ box;
-  db::Region r2xor42  = r2 ^ r42;
+  db::Region r2xor42 = r2 ^ r42;
   db::Region rboxxor3 = box ^ r3;
-  db::Region r42xor3  = r42 ^ r3;
+  db::Region r42xor3 = r42 ^ r3;
   db::Region r42xor42 = r42 ^ r42;
 
   EXPECT_EQ (r2xor3.is_merged (), true);
@@ -370,11 +368,11 @@ TEST(5_BoolXOR)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), r42xor3);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (15, 0)), r42xor42);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au5.gds");
 }
 
-TEST(7_Merge)
+TEST (7_Merge)
 {
   db::Layout ly;
   {
@@ -408,11 +406,11 @@ TEST(7_Merge)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r6_merged);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), r6_merged_minwc);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au7.gds");
 }
 
-TEST(8_AreaAndPerimeter)
+TEST (8_AreaAndPerimeter)
 {
   db::Layout ly;
   {
@@ -440,7 +438,7 @@ TEST(8_AreaAndPerimeter)
   EXPECT_EQ (r1.area (db::Box (-40000, -90000, -50000, -80000)), db::coord_traits<db::Coord>::area_type (0));
 }
 
-TEST(9_SizingSimple)
+TEST (9_SizingSimple)
 {
   db::Layout ly;
   {
@@ -475,11 +473,11 @@ TEST(9_SizingSimple)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), r6_sized_plus);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), r6_sized_aniso_plus);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au9a.gds");
 }
 
-TEST(10_HullsAndHoles)
+TEST (10_HullsAndHoles)
 {
   db::Layout ly;
   {
@@ -511,11 +509,11 @@ TEST(10_HullsAndHoles)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), hulls);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), holes);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au10.gds");
 }
 
-TEST(11_RoundAndSmoothed)
+TEST (11_RoundAndSmoothed)
 {
   db::Layout ly;
   {
@@ -547,11 +545,11 @@ TEST(11_RoundAndSmoothed)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), smoothed);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), smoothed_keep_hv);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au11.gds");
 }
 
-TEST(12_GridSnap)
+TEST (12_GridSnap)
 {
   db::Layout ly;
   {
@@ -577,11 +575,11 @@ TEST(12_GridSnap)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r3);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r3snapped);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au12.gds");
 }
 
-TEST(13_Edges)
+TEST (13_Edges)
 {
   db::Layout ly;
   {
@@ -611,11 +609,11 @@ TEST(13_Edges)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r3edges);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r3edges_filtered);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au13.gds");
 }
 
-TEST(13b_Edges)
+TEST (13b_Edges)
 {
   db::Layout ly;
   {
@@ -649,11 +647,11 @@ TEST(13b_Edges)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1edges);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r2edges);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au13b.gds");
 }
 
-TEST(14_Interacting)
+TEST (14_Interacting)
 {
   db::Layout ly;
   {
@@ -753,7 +751,7 @@ TEST(14_Interacting)
     EXPECT_EQ (r2r.selected_inside (r1).is_merged (), false);
     EXPECT_EQ (r2.selected_inside (r1).is_merged (), true);
 
-    CHECKPOINT();
+    CHECKPOINT ();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au14a.gds");
   }
 
@@ -775,12 +773,12 @@ TEST(14_Interacting)
     EXPECT_EQ (r6r.selected_interacting (r1e).is_merged (), false);
     EXPECT_EQ (r6r.selected_interacting (r1er).is_merged (), false);
 
-    CHECKPOINT();
+    CHECKPOINT ();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au14b.gds");
   }
 }
 
-TEST(15_Filtered)
+TEST (15_Filtered)
 {
   db::Layout ly;
   {
@@ -812,7 +810,7 @@ TEST(15_Filtered)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), af1_filtered);
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), af1_else);
 
-    CHECKPOINT();
+    CHECKPOINT ();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au15a.gds");
   }
 
@@ -832,12 +830,12 @@ TEST(15_Filtered)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r2_bwf);
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r2_bhf);
 
-    CHECKPOINT();
+    CHECKPOINT ();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au15b.gds");
   }
 }
 
-TEST(16_MergeWithMinWC)
+TEST (16_MergeWithMinWC)
 {
   db::Layout ly;
   {
@@ -870,12 +868,12 @@ TEST(16_MergeWithMinWC)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1_merged_wc1);
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r1_merged_wc2);
 
-    CHECKPOINT();
+    CHECKPOINT ();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au16.gds");
   }
 }
 
-TEST(17_SinglePolygonChecks)
+TEST (17_SinglePolygonChecks)
 {
   db::Layout ly;
   {
@@ -910,12 +908,12 @@ TEST(17_SinglePolygonChecks)
 
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r6.notch_check (1300, db::RegionCheckOptions (false, db::Euclidian, 90, 0)));
 
-    CHECKPOINT();
+    CHECKPOINT ();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au17.gds");
   }
 }
 
-TEST(18_MultiPolygonChecks)
+TEST (18_MultiPolygonChecks)
 {
   db::Layout ly;
   {
@@ -952,12 +950,12 @@ TEST(18_MultiPolygonChecks)
 
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), r6.enclosing_check (r4, 100, db::RegionCheckOptions (true, db::Projection, 90, 0)));
 
-    CHECKPOINT();
+    CHECKPOINT ();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au18.gds");
   }
 }
 
-TEST(19_GridCheck)
+TEST (19_GridCheck)
 {
   db::Layout ly;
   {
@@ -986,11 +984,11 @@ TEST(19_GridCheck)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r3_gc1);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r3_gc2);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au19.gds");
 }
 
-TEST(20_AngleCheck)
+TEST (20_AngleCheck)
 {
   db::Layout ly;
   {
@@ -1017,11 +1015,11 @@ TEST(20_AngleCheck)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), ep1_ac1);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (3, 0)), ep1_ac2);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au20.gds");
 }
 
-TEST(21_Processors)
+TEST (21_Processors)
 {
   db::Layout ly;
   {
@@ -1066,11 +1064,11 @@ TEST(21_Processors)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), r1.processed (db::ConvexDecomposition (db::PO_vertical)));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 0)), r1.processed (db::ConvexDecomposition (db::PO_horizontal)));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au21.gds");
 }
 
-TEST(22_TwoLayoutsWithDifferentDBU)
+TEST (22_TwoLayoutsWithDifferentDBU)
 {
   db::Layout ly1;
   {
@@ -1107,11 +1105,11 @@ TEST(22_TwoLayoutsWithDifferentDBU)
 
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r11.sized (1000) ^ r12);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au22.gds");
 }
 
-TEST(27a_snap)
+TEST (27a_snap)
 {
   db::Layout ly;
   {
@@ -1132,11 +1130,11 @@ TEST(27a_snap)
 
   r2.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/flat_region_au27.gds");
 }
 
-TEST(27b_snap)
+TEST (27b_snap)
 {
   db::Layout ly;
   {
@@ -1157,11 +1155,11 @@ TEST(27b_snap)
 
   r1.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/flat_region_au27.gds");
 }
 
-TEST(28a_snap)
+TEST (28a_snap)
 {
   db::Layout ly;
   {
@@ -1182,11 +1180,11 @@ TEST(28a_snap)
 
   r2.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/flat_region_au28.gds");
 }
 
-TEST(28b_snap)
+TEST (28b_snap)
 {
   db::Layout ly;
   {
@@ -1207,11 +1205,11 @@ TEST(28b_snap)
 
   r1.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/flat_region_au28.gds");
 }
 
-TEST(29_InteractionsWithTexts)
+TEST (29_InteractionsWithTexts)
 {
   db::Layout ly;
   {
@@ -1258,11 +1256,11 @@ TEST(29_InteractionsWithTexts)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), t);
   }
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au29.gds");
 }
 
-TEST(30a_interact_with_count_region)
+TEST (30a_interact_with_count_region)
 {
   db::Layout ly;
   unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
@@ -1354,7 +1352,7 @@ TEST(30a_interact_with_count_region)
   EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "(0,0;0,200;100,200;100,0)");
 }
 
-TEST(30b_interact_with_count_edge)
+TEST (30b_interact_with_count_edge)
 {
   db::Layout ly;
   unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
@@ -1446,7 +1444,7 @@ TEST(30b_interact_with_count_edge)
   EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "(0,0;0,200;100,200;100,0)");
 }
 
-TEST(30c_interact_with_count_text)
+TEST (30c_interact_with_count_text)
 {
   db::Layout ly;
   unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
@@ -1537,7 +1535,7 @@ TEST(30c_interact_with_count_text)
   EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "(0,0;0,200;100,200;100,0)");
 }
 
-TEST(31_in)
+TEST (31_in)
 {
   db::Layout ly;
   {
@@ -1553,7 +1551,7 @@ TEST(31_in)
 
   unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
   unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
-  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));  //  empty
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0)); //  empty
 
   db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1));
   db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2));
@@ -1585,11 +1583,11 @@ TEST(31_in)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), r2r.in (r1r));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), r2r.in (r1r, true));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au31.gds");
 }
 
-TEST(31_in_and_out)
+TEST (31_in_and_out)
 {
   db::Layout ly;
   {
@@ -1605,7 +1603,7 @@ TEST(31_in_and_out)
 
   unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
   unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
-  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));  //  empty
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0)); //  empty
 
   db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1));
   db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2));
@@ -1638,11 +1636,11 @@ TEST(31_in_and_out)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), r2r.in_and_out (r1r).first);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), r2r.in_and_out (r1r).second);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au31.gds");
 }
 
-TEST(40_BoolWithProperties)
+TEST (40_BoolWithProperties)
 {
   db::Layout ly;
   {
@@ -1658,7 +1656,7 @@ TEST(40_BoolWithProperties)
 
   unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
   unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
-  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));  //  empty
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0)); //  empty
 
   db::RecursiveShapeIterator si1 (ly, top_cell, l1);
   si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
@@ -1747,7 +1745,7 @@ TEST(40_BoolWithProperties)
 
   db::Region clip_region_wp (new db::FlatRegion ());
   db::PropertiesSet ps;
-  ps.insert (tl::Variant (1), "42");   //  "42" needs to be a string as GDS properties are strings as well
+  ps.insert (tl::Variant (1), "42"); //  "42" needs to be a string as GDS properties are strings as well
   db::properties_id_type pid42 = db::properties_id (ps);
   clip_region_wp.insert (db::BoxWithProperties (clip, pid42));
 
@@ -1772,11 +1770,11 @@ TEST(40_BoolWithProperties)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (84, 0)), clip_region_wp.bool_and (clip_region, db::SamePropertiesConstraintDrop));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (85, 0)), clip_region_wp.bool_and (clip_region_wp, db::SamePropertiesConstraintDrop));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au40.gds");
 }
 
-TEST(41_EdgesWithProperties)
+TEST (41_EdgesWithProperties)
 {
   db::Layout ly;
   {
@@ -1826,11 +1824,11 @@ TEST(41_EdgesWithProperties)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r2wp.edges ());
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), r2wp_nomerge.edges ());
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au41.gds");
 }
 
-TEST(42_DRCWithProperties)
+TEST (42_DRCWithProperties)
 {
   db::Layout ly;
   {
@@ -1909,11 +1907,11 @@ TEST(42_DRCWithProperties)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 1)), r1.separation_check (r2, 1000, opt));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 1)), r2.space_check (1000, opt));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au42.gds");
 }
 
-TEST(43_ComplexOpsWithProperties)
+TEST (43_ComplexOpsWithProperties)
 {
   db::Layout ly;
   {
@@ -1982,11 +1980,11 @@ TEST(43_ComplexOpsWithProperties)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 1)), r1.cop_to_region (sep_check2p, db::DifferentPropertiesConstraintDrop));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 1)), r1.cop_to_edges (sep_check2e, db::DifferentPropertiesConstraintDrop));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au43.gds");
 }
 
-TEST(44_SizeWithProperties)
+TEST (44_SizeWithProperties)
 {
   db::Layout ly;
   {
@@ -2029,23 +2027,22 @@ TEST(44_SizeWithProperties)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), r2.sized (200));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), r2.sized (250, 50, 2));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au44.gds");
 }
 
-TEST(100_Issue1275)
+TEST (100_Issue1275)
 {
-  db::Point pts[] = {
+  db::Point pts [] = {
     db::Point (-21983, -43808),
     db::Point (-37841, 16636),
     db::Point (-20484, 35228),
     db::Point (30428, 41627),
     db::Point (38312, 28960),
-    db::Point (-7811, -37922)
-  };
+    db::Point (-7811, -37922)};
 
   db::Polygon polygon;
-  polygon.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+  polygon.assign_hull (&pts [0], &pts [sizeof (pts) / sizeof (pts [0])]);
 
   db::Region region;
 
@@ -2074,4 +2071,3 @@ TEST(100_Issue1275)
 
   EXPECT_EQ (region.sized (100).to_string (), "(-22037,-43939;-22054,-43930;-37952,16664;-20532,35323;30479,41734;38432,28957;-7745,-38003)");
 }
-

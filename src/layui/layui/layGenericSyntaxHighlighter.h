@@ -42,8 +42,7 @@ namespace lay
 /**
  *  @brief Specifies one element in the text block's user data
  */
-struct LAYUI_PUBLIC SyntaxHighlighterElement
-{
+struct LAYUI_PUBLIC SyntaxHighlighterElement {
 public:
   /**
    *  @brief Default constructor
@@ -91,13 +90,13 @@ public:
 /**
  *  @brief A rule implementation base class
  *
- *  Rule implementations must implement this base class in order to plug into the 
+ *  Rule implementations must implement this base class in order to plug into the
  *  generic syntax highlighter framework.
  */
 class LAYUI_PUBLIC GenericSyntaxHighlighterRuleBase
 {
 public:
-  /** 
+  /**
    *  @brief Base class constructor
    */
   GenericSyntaxHighlighterRuleBase ();
@@ -107,12 +106,12 @@ public:
    */
   virtual ~GenericSyntaxHighlighterRuleBase ();
 
-  /** 
+  /**
    *  @brief Matches the given string against this rule
-   *  
-   *  On success, this method returns true. It will use the input arguments for dynamic rules to replace the %N 
-   *  placeholders. 
-   *  If the rule matches, the end_index will be set to the end of the sequence and output_args 
+   *
+   *  On success, this method returns true. It will use the input arguments for dynamic rules to replace the %N
+   *  placeholders.
+   *  If the rule matches, the end_index will be set to the end of the sequence and output_args
    *  will contain any arguments matched.
    *  generationId is a counter that will incremented when a new block is highlighted. This allows caching
    *  matches in some cases (i.e. regexp matcher).
@@ -151,7 +150,7 @@ private:
 
 /**
  *  @brief A proxy for the actual rule implementation
- * 
+ *
  *  This object will forward the match request to the actual implementation.
  */
 class LAYUI_PUBLIC GenericSyntaxHighlighterRule
@@ -179,7 +178,7 @@ public:
    */
   ~GenericSyntaxHighlighterRule ();
 
-  /** 
+  /**
    *  @brief Assignment operator
    */
   GenericSyntaxHighlighterRule &operator= (const GenericSyntaxHighlighterRule &d);
@@ -263,7 +262,7 @@ public:
   /**
    *  @brief Sets the first non-space flag
    *
-   *  If true, this rule only matches if the match is the first non-space character 
+   *  If true, this rule only matches if the match is the first non-space character
    *  after the current position
    */
   void set_first_non_space (bool f)
@@ -282,7 +281,7 @@ public:
   /**
    *  @brief Adds a rule as a child rule
    */
-  void add_child_rule (const GenericSyntaxHighlighterRule &rule) 
+  void add_child_rule (const GenericSyntaxHighlighterRule &rule)
   {
     if (! rule.is_null ()) {
       m_child_rules.push_back (rule);
@@ -292,7 +291,7 @@ public:
   /**
    *  @brief Matches the string against the given rule
    *
-   *  Returns true, if the rule matches. In this case, end_index will be set to the end of the sequence and 
+   *  Returns true, if the rule matches. In this case, end_index will be set to the end of the sequence and
    *  output_args will contain any arguments matched.
    */
   bool match (const QString &input, unsigned int generation_id, int index, int &end_index, const QList<QString> &input_args, QList<QString> &output_args) const;
@@ -463,7 +462,7 @@ private:
   /**
    *  @brief Sets the context's Id
    */
-  void set_id (int id) 
+  void set_id (int id)
   {
     m_id = id;
   }
@@ -539,7 +538,7 @@ public:
   }
 
   /**
-   *  @brief Dump the contents 
+   *  @brief Dump the contents
    */
   void dump () const;
 
@@ -640,18 +639,18 @@ public:
    *  @brief Set the special styles for a given attribute ID
    */
   void set_style (int id, const QTextCharFormat &format);
-  
+
   /**
    *  @brief Set the basic style and special styles for a given attribute ID
    */
-  void set_styles (int id, int basic_style_id,  const QTextCharFormat &format);
-  
+  void set_styles (int id, int basic_style_id, const QTextCharFormat &format);
+
   /**
    *  @brief Gets the effective format for a given ID
    */
   QTextCharFormat format_for (int id) const;
 
-  /** 
+  /**
    *  @brief Assign the styles from another set of attributes
    *
    *  This method does not copy the basic_attributes pointer
@@ -670,7 +669,7 @@ public:
 
 private:
   const GenericSyntaxHighlighterAttributes *mp_basic_attributes;
-  std::vector<std::pair<int, QTextCharFormat> > m_attributes;
+  std::vector<std::pair<int, QTextCharFormat>> m_attributes;
   std::map<QString, int> m_ids;
 
   void add (const QString &name, int id, bool bold, bool italic, bool underline, bool strikeout, const char *foreground, const char *fg_selected, const char *background, const char *bg_selected);
@@ -696,10 +695,10 @@ public:
 
   /**
    *  @brief Match the given string and return true if the match succeeds.
-   * 
+   *
    *  This method will match the given string based on the current state. On success, this method modifies
-   *  the state and returns true. On success, end_index to the end of the sequence found, attribute_id will 
-   *  hold the attribute ID of the rule found. def_attribute_id will always contain the attribute ID of the 
+   *  the state and returns true. On success, end_index to the end of the sequence found, attribute_id will
+   *  hold the attribute ID of the rule found. def_attribute_id will always contain the attribute ID of the
    *  previous state, also if the method returns false.
    */
   bool match (const QString &string, unsigned int generation_id, int index, int &end_index, int &def_attribute_id, int &attribute_id);
@@ -710,7 +709,7 @@ public:
   int current_context_id () const;
 
 private:
-  std::vector<std::pair<int, QList<QString> > > m_stack;
+  std::vector<std::pair<int, QList<QString>>> m_stack;
   const GenericSyntaxHighlighterContexts *mp_contexts;
 };
 
@@ -720,7 +719,7 @@ private:
 class LAYUI_PUBLIC GenericSyntaxHighlighter
   : public QSyntaxHighlighter
 {
-public: 
+public:
   /**
    *  @brief Creates a GenericSyntaxHighlighter
    *  @param parent The owner of the highlighter
@@ -729,11 +728,11 @@ public:
    *  @param initialize_attributes If true, the attributes are initialized from the itemData lines
    */
   GenericSyntaxHighlighter (QObject *parent, QIODevice &input, GenericSyntaxHighlighterAttributes *attributes, bool initialize_attributes);
-  
+
   /**
    *  @brief Implementation of the highlighter
    */
-  void highlightBlock(const QString &text);
+  void highlightBlock (const QString &text);
 
 private:
   GenericSyntaxHighlighterContexts m_contexts;
@@ -748,4 +747,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

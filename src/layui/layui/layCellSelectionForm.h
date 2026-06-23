@@ -38,8 +38,8 @@
 
 namespace Ui
 {
-  class CellSelectionForm;
-  class LibraryCellSelectionForm;
+class CellSelectionForm;
+class LibraryCellSelectionForm;
 }
 
 namespace lay
@@ -54,7 +54,7 @@ class LayoutView;
 class LAYUI_PUBLIC CellSelectionForm
   : public QDialog
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   CellSelectionForm (QWidget *parent, LayoutViewBase *view, const char *name, bool simple_mode = false);
@@ -70,23 +70,23 @@ public:
   const lay::CellView &selected_cellview () const;
 
 public slots:
-  void view_changed(int);
-  void cell_changed(const QModelIndex &current, const QModelIndex &);
-  void child_changed(const QModelIndex &current);
-  void parent_changed(const QModelIndex &current);
-  void name_changed();
-  void set_parent();
-  void set_child();
-  void hide_cell();
-  void show_cell();
-  void apply_clicked();
-  void find_next_clicked();
-  void find_prev_clicked();
+  void view_changed (int);
+  void cell_changed (const QModelIndex &current, const QModelIndex &);
+  void child_changed (const QModelIndex &current);
+  void parent_changed (const QModelIndex &current);
+  void name_changed ();
+  void set_parent ();
+  void set_child ();
+  void hide_cell ();
+  void show_cell ();
+  void apply_clicked ();
+  void find_next_clicked ();
+  void find_prev_clicked ();
 
 private:
   Ui::CellSelectionForm *mp_ui;
   lay::LayoutViewBase *mp_view;
-  std::vector <lay::CellView> m_cellviews;
+  std::vector<lay::CellView> m_cellviews;
   int m_current_cv;
   bool m_name_cb_enabled;
   bool m_cells_cb_enabled;
@@ -114,7 +114,7 @@ private:
 class LAYUI_PUBLIC LibraryCellSelectionForm
   : public QDialog
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   /**
@@ -187,9 +187,9 @@ public:
   }
 
 public slots:
-  void name_changed(const QString &);
-  void cell_changed(const QModelIndex &current, const QModelIndex &);
-  void find_next_clicked();
+  void name_changed (const QString &);
+  void cell_changed (const QModelIndex &current, const QModelIndex &);
+  void find_next_clicked ();
   void lib_changed ();
   void show_all_changed ();
 
@@ -216,4 +216,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

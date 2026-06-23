@@ -134,7 +134,7 @@ public:
     rb_gc_register_address (&m_hash);
     m_keys = rb_ary_new2 (long (RHASH_SIZE (m_hash)));
     rb_gc_register_address (&m_keys);
-    rb_hash_foreach (m_hash, (int (*)(...)) &push_key_to_ary_i, m_keys);
+    rb_hash_foreach (m_hash, (int (*) (...)) &push_key_to_ary_i, m_keys);
   }
 
   ~RBAHashInspector ()
@@ -301,7 +301,7 @@ private:
   VALUE m_obj, m_members;
 };
 
-static void collect_getters (const gsi::ClassBase *cls, std::vector<std::pair<std::string, const gsi::MethodBase *> > &getters)
+static void collect_getters (const gsi::ClassBase *cls, std::vector<std::pair<std::string, const gsi::MethodBase *>> &getters)
 {
   if (cls->base ()) {
     collect_getters (cls->base (), getters);
@@ -399,7 +399,7 @@ public:
 
     if (index < m_getters.size ()) {
 
-      const gsi::MethodBase *meth = m_getters[index].second;
+      const gsi::MethodBase *meth = m_getters [index].second;
 
       Proxy *p = 0;
       Data_Get_Struct (m_obj, Proxy, p);
@@ -417,9 +417,7 @@ public:
 
         tl::Heap heap;
         return pull_arg (meth->ret_type (), p, retlist, heap);
-
       }
-
     }
 
     return Qnil;
@@ -465,7 +463,7 @@ private:
   VALUE m_obj;
   const gsi::ClassBase *mp_cls;
   VALUE m_members;
-  std::vector<std::pair<std::string, const gsi::MethodBase *> > m_getters;
+  std::vector<std::pair<std::string, const gsi::MethodBase *>> m_getters;
 };
 
 class RBAClassInspector

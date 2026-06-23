@@ -37,7 +37,7 @@ void BD_PUBLIC init ();
 /**
  *  @brief The main function implementation
  */
-int BD_PUBLIC _main_impl (int (*delegate) (int, char *[]), int argc, char *argv[]);
+int BD_PUBLIC _main_impl (int (*delegate) (int, char *[]), int argc, char *argv []);
 
 }
 

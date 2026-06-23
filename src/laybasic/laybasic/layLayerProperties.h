@@ -42,11 +42,13 @@
 #include <string>
 #include <iostream>
 
-namespace tl {
-  class XMLSource;
+namespace tl
+{
+class XMLSource;
 }
 
-namespace lay {
+namespace lay
+{
 
 class LayoutViewBase;
 class LayerPropertiesList;
@@ -56,10 +58,10 @@ class LayerPropertiesNode;
  *  @brief A layer properties structure
  *
  *  The layer properties encapsulate the settings relevant for
- *  the display and source of a layer. 
+ *  the display and source of a layer.
  *
  *  Each attribute is present in two incarnations: local and real.
- *  "real" refers to the effective attribute after collecting the 
+ *  "real" refers to the effective attribute after collecting the
  *  attributes from the parents to the leaf property node.
  *  The "real" attributes are computed when the property tree is
  *  "realized". In the spirit of this distinction, all read accessors
@@ -69,11 +71,11 @@ class LayerPropertiesNode;
  *
  *  The source is specified in two ways: once in "source" and once
  *  in an internal representation that can be used by the drawing engine.
- *  The "realize" method converts the generic into the internal 
+ *  The "realize" method converts the generic into the internal
  *  representation.
  *
  *  "brightness" is a index that indicates how much to make the
- *  color brighter to darker rendering the effective color 
+ *  color brighter to darker rendering the effective color
  *  (eff_frame_color (), eff_fill_color ()). It's value is roughly between
  *  -255 and 255.
  */
@@ -122,16 +124,16 @@ public:
   }
 
   /**
-   *  @brief Equality 
+   *  @brief Equality
    */
   bool operator== (const LayerProperties &d) const;
-  
+
   /**
-   *  @brief Inequality 
+   *  @brief Inequality
    */
   bool operator!= (const LayerProperties &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
 
   /**
@@ -140,8 +142,8 @@ public:
   static tl::color_t brighter (tl::color_t in, int b);
 
   /**
-   *  @brief render the effective frame color 
-   *  
+   *  @brief render the effective frame color
+   *
    *  The effective frame color is computed from the frame color brightness and the
    *  frame color.
    */
@@ -149,7 +151,7 @@ public:
 
   /**
    *  @brief render the effective fill color
-   *  
+   *
    *  The effective fill color is computed from the frame color brightness and the
    *  frame color.
    */
@@ -157,16 +159,16 @@ public:
 
   /**
    *  @brief render the effective frame color plus an additional brightness adjustment
-   *  
-   *  This method returns the effective frame color with an additional brightness adjustment 
+   *
+   *  This method returns the effective frame color with an additional brightness adjustment
    *  applied.
    */
   tl::color_t eff_frame_color_brighter (bool real, int plus_brightness) const;
 
   /**
    *  @brief render the effective frame color plus an additional brightness adjustment
-   *  
-   *  This method returns the effective fill color with an additional brightness adjustment 
+   *
+   *  This method returns the effective fill color with an additional brightness adjustment
    *  applied.
    */
   tl::color_t eff_fill_color_brighter (bool real, int plus_brightness) const;
@@ -186,7 +188,7 @@ public:
       return m_frame_color;
     }
   }
-  
+
   /**
    *  @brief Set the frame color code to the given value
    *
@@ -201,7 +203,7 @@ public:
       need_realize (nr_visual);
     }
   }
-  
+
   /**
    *  @brief Set the frame color to the given value
    */
@@ -211,7 +213,7 @@ public:
   }
 
   /**
-   *  @brief Reset the frame color 
+   *  @brief Reset the frame color
    */
   void clear_frame_color ()
   {
@@ -241,7 +243,7 @@ public:
       return m_fill_color;
     }
   }
-  
+
   /**
    *  @brief Set the fill color code to the given value
    *
@@ -256,7 +258,7 @@ public:
       need_realize (nr_visual);
     }
   }
-  
+
   /**
    *  @brief Set the fill color to the given value
    */
@@ -264,7 +266,7 @@ public:
   {
     set_fill_color_code (c | 0xff000000);
   }
-  
+
   /**
    *  @brief Reset the fill color
    */
@@ -272,7 +274,7 @@ public:
   {
     set_fill_color_code (0);
   }
-  
+
   /**
    *  @brief Test, if the frame color is set
    */
@@ -280,10 +282,10 @@ public:
   {
     return fill_color (real) != 0;
   }
-  
+
   /**
    *  @brief Set the frame brightness
-   *  
+   *
    *  For neutral brightness set this value to 0.
    */
   void set_frame_brightness (int b)
@@ -308,10 +310,10 @@ public:
       return m_frame_brightness;
     }
   }
-    
+
   /**
    *  @brief Set the fill brightness
-   *  
+   *
    *  For neutral brightness set this value to 0.
    */
   void set_fill_brightness (int b)
@@ -325,7 +327,7 @@ public:
 
   /**
    *  @brief Get the fill brightness value
-   * 
+   *
    *  If the brightness is not set, this method may return an invalid value
    */
   int fill_brightness (bool real) const
@@ -338,7 +340,7 @@ public:
       return m_fill_brightness;
     }
   }
-    
+
   /**
    *  @brief Set the dither pattern index
    */
@@ -350,7 +352,7 @@ public:
       need_realize (nr_visual);
     }
   }
-  
+
   /**
    *  @brief Get the effective dither pattern index
    */
@@ -362,10 +364,10 @@ public:
       return (unsigned int) dither_pattern (real);
     }
   }
-  
+
   /**
    *  @brief Get the dither pattern index
-   *  
+   *
    *  This method may deliver an invalid dither pattern index if it is not set.
    */
   int dither_pattern (bool real) const
@@ -378,7 +380,7 @@ public:
       return m_dither_pattern;
     }
   }
-  
+
   /**
    *  @brief Clear the dither pattern
    */
@@ -386,7 +388,7 @@ public:
   {
     set_dither_pattern (-1);
   }
-  
+
   /**
    *  @brief Test, if the dither pattern is set
    */
@@ -394,7 +396,7 @@ public:
   {
     return dither_pattern (real) >= 0;
   }
-  
+
   /**
    *  @brief Set the line style index
    */
@@ -462,7 +464,7 @@ public:
       need_realize (nr_visual);
     }
   }
-  
+
   /**
    *  @brief Get the validity state
    */
@@ -488,7 +490,7 @@ public:
       need_realize (nr_visual);
     }
   }
-  
+
   /**
    *  @brief Get the visibility state
    */
@@ -510,7 +512,7 @@ public:
    *  either shapes or cell boxes. Invalid layers, i.e. such that have a layer selection
    *  which does not match one of the layers in the layout or invalid layers, are not considered "visual".
    *
-   *  Only "visual" layers are considered for selection, object snapping etc.  
+   *  Only "visual" layers are considered for selection, object snapping etc.
    *
    *  This method evaluates the state in "real" mode.
    */
@@ -525,7 +527,7 @@ public:
   {
     return layer_index () >= 0;
   }
-  
+
   /**
    *  @brief standard layer attribute
    *
@@ -535,7 +537,7 @@ public:
   {
     return source (true).special_purpose () == lay::ParsedLayerSource::SP_None;
   }
-  
+
   /**
    *  @brief cell_box layer attribute
    *
@@ -545,7 +547,7 @@ public:
   {
     return source (true).special_purpose () == lay::ParsedLayerSource::SP_CellFrame;
   }
-  
+
   /**
    *  @brief Set the transparency state
    */
@@ -557,7 +559,7 @@ public:
       need_realize (nr_visual);
     }
   }
-  
+
   /**
    *  @brief Get the transparency state
    */
@@ -571,7 +573,7 @@ public:
       return m_transparent;
     }
   }
-  
+
   /**
    *  @brief Set the line width
    */
@@ -583,7 +585,7 @@ public:
       need_realize (nr_visual);
     }
   }
-  
+
   /**
    *  @brief Get the line width
    */
@@ -597,7 +599,7 @@ public:
       return m_width;
     }
   }
-  
+
   /**
    *  @brief Set the marked state
    */
@@ -609,7 +611,7 @@ public:
       need_realize (nr_visual);
     }
   }
-  
+
   /**
    *  @brief Get the marked state
    */
@@ -623,7 +625,7 @@ public:
       return m_marked;
     }
   }
-  
+
   /**
    *  @brief Set the animation state
    */
@@ -635,7 +637,7 @@ public:
       need_realize (nr_visual);
     }
   }
-  
+
   /**
    *  @brief Get the animation state
    */
@@ -668,9 +670,9 @@ public:
    *  @brief Sets a value indicating that shapes are drawn with a diagonal cross
    */
   void set_xfill (bool xf);
-  
+
   /**
-   *  @brief Set the name 
+   *  @brief Set the name
    */
   void set_name (const std::string &n)
   {
@@ -680,7 +682,7 @@ public:
       need_realize (nr_meta);
     }
   }
-  
+
   /**
    *  @brief Get the name
    */
@@ -689,29 +691,29 @@ public:
     refresh ();
     return m_name;
   }
-  
+
   /**
    *  @brief Obtain the display string for this layer
    *
    *  This string is supposed to be shown in the layer list. It
    *  reflects the source specification in an abbreviated fashion.
    *
-   *  If always_with_source is set to true, the source will be shown always. 
-   *  If it is set to false, the view's always_show_source attribute with determine whether the source is 
+   *  If always_with_source is set to true, the source will be shown always.
+   *  If it is set to false, the view's always_show_source attribute with determine whether the source is
    *  shown.
    */
   std::string display_string (const lay::LayoutViewBase *view, bool real, bool always_with_source = false) const;
-  
+
   /**
-   *  @brief The source specification 
+   *  @brief The source specification
    *
    *  This method delivers the source specification as a string
    */
   std::string source_string (bool real) const
   {
-    return source(real).to_string ();
+    return source (real).to_string ();
   }
-  
+
   /**
    *  @brief Load the source specification from a string
    *
@@ -720,15 +722,15 @@ public:
    *  object must be "realized" with respect to a LayoutViewBase object.
    */
   void set_source (const std::string &s);
-  
+
   /**
-   *  @brief Load the source specification 
+   *  @brief Load the source specification
    *
    *  In order to make the layer usable, the properties
    *  object must be "realized" with respect to a LayoutViewBase object.
    */
   void set_source (const lay::ParsedLayerSource &s);
-  
+
   /**
    *  @brief Access to the layer source
    */
@@ -742,13 +744,13 @@ public:
       return m_source;
     }
   }
-  
+
   /**
    *  @brief The "source specification": layer index
    *
-   *  This is the layer index of the respective layer in the layout object. 
+   *  This is the layer index of the respective layer in the layout object.
    *  The index may be negative, in which case no specific layer is addressed.
-   *  This is a property derived from the source specification that can only 
+   *  This is a property derived from the source specification that can only
    *  be obtained in "real" semantics.
    */
   int layer_index () const
@@ -756,13 +758,13 @@ public:
     ensure_source_realized ();
     return m_layer_index;
   }
-  
+
   /**
    *  @brief The "source specification": cellview index
    *
    *  This is the index of the cell view that this layer resides on.
    *  It may be negative to indicate that it is not considered.
-   *  This is a property derived from the source specification that can only 
+   *  This is a property derived from the source specification that can only
    *  be obtained in "real" semantics.
    */
   int cellview_index () const
@@ -770,7 +772,7 @@ public:
     ensure_source_realized ();
     return m_cellview_index;
   }
-  
+
   /**
    *  @brief Access to the transformation (in database units)
    *
@@ -784,7 +786,7 @@ public:
   }
 
   /**
-   *  @brief Access to the hierarchy level specification 
+   *  @brief Access to the hierarchy level specification
    *
    *  This is a derived attribute that can only be obtained in "real"
    *  semantics.
@@ -822,7 +824,7 @@ public:
 
   /**
    *  @brief return the "flattened" object
-   *  
+   *
    *  Compute the "effective" properties (if the object is part of a hierarchy) and create a
    *  new object that represents the same properties but as "local".
    */
@@ -836,7 +838,7 @@ public:
   /**
    *  @brief Actually realize the source properties (implemented by node class)
    *
-   *  This method may be called for example, if new layers have been added to 
+   *  This method may be called for example, if new layers have been added to
    *  a layout and the layer properties should reflect that.
    */
   virtual void realize_source () const;
@@ -844,52 +846,52 @@ public:
   /**
    *  @brief Adaptors required for the XML reader
    */
-  tl::color_t frame_color_loc () const        { return frame_color (false);      }
-  tl::color_t fill_color_loc () const         { return fill_color (false);       }
-  int frame_brightness_loc () const           { return frame_brightness (false); }
-  int fill_brightness_loc () const            { return fill_brightness (false);  }
-  int dither_pattern_loc () const             { return dither_pattern (false);   }
-  int line_style_loc () const                 { return line_style (false);       }
-  bool visible_loc () const                   { return visible (false);          }
-  bool valid_loc () const                     { return valid (false);            }
-  bool transparent_loc () const               { return transparent (false);      }
-  int width_loc () const                      { return width (false);            }
-  bool marked_loc () const                    { return marked (false);           }
-  bool xfill_loc () const                     { return xfill (false);            }
-  int animation_loc () const                  { return animation (false);        }
-  std::string source_string_loc () const      { return source_string (false);    }
+  tl::color_t frame_color_loc () const { return frame_color (false); }
+  tl::color_t fill_color_loc () const { return fill_color (false); }
+  int frame_brightness_loc () const { return frame_brightness (false); }
+  int fill_brightness_loc () const { return fill_brightness (false); }
+  int dither_pattern_loc () const { return dither_pattern (false); }
+  int line_style_loc () const { return line_style (false); }
+  bool visible_loc () const { return visible (false); }
+  bool valid_loc () const { return valid (false); }
+  bool transparent_loc () const { return transparent (false); }
+  int width_loc () const { return width (false); }
+  bool marked_loc () const { return marked (false); }
+  bool xfill_loc () const { return xfill (false); }
+  int animation_loc () const { return animation (false); }
+  std::string source_string_loc () const { return source_string (false); }
 
 protected:
   /**
    *  @brief Merge the parents "real" style with the child's (*this) local style and store the style in the child's real style.
-   * 
-   *  If the parent argument is zero, the local style is just copied into the 
+   *
+   *  If the parent argument is zero, the local style is just copied into the
    *  real style.
    *
    *  @param d The parent properties object or 0 if there is no parent
    */
-  void merge_visual (const LayerProperties *d) const; 
+  void merge_visual (const LayerProperties *d) const;
 
   /**
    *  @brief Merge the parents "real" source with the child's (*this) source and store the style in the child's real style.
-   * 
-   *  If the parent argument is zero, the local source is just copied into the 
+   *
+   *  If the parent argument is zero, the local source is just copied into the
    *  real style.
    *
    *  @param d The parent properties object or 0 if there is no parent
    */
-  void merge_source (const LayerProperties *d) const; 
+  void merge_source (const LayerProperties *d) const;
 
   /**
-   *  @brief Compute the internal state 
-   * 
+   *  @brief Compute the internal state
+   *
    *  Computes the internal state such as property selection set.
    *
    *  @param view The view the properties refer to or 0 if there is no view.
    */
   void do_realize (const LayoutViewBase *view) const;
 
-  /** 
+  /**
    *  @brief Tell, if a realize of the visual properties is needed
    */
   bool realize_needed_visual () const
@@ -897,7 +899,7 @@ protected:
     return m_realize_needed_visual;
   }
 
-  /** 
+  /**
    *  @brief Tell, if a realize of the source properties is needed
    */
   bool realize_needed_source () const
@@ -927,7 +929,7 @@ protected:
   /**
    *  @brief Fetches the current status from the original properties for the LayerPropertiesNodeRef implementation
    */
-  virtual void refresh () const { }
+  virtual void refresh () const {}
 
 private:
   //  the generation number
@@ -1045,26 +1047,26 @@ public:
   }
 
   /**
-   *  @brief Equality 
+   *  @brief Equality
    */
   bool operator== (const LayerPropertiesNode &d) const;
-  
+
   /**
-   *  @brief Inequality 
+   *  @brief Inequality
    */
   bool operator!= (const LayerPropertiesNode &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
 
   /**
    *  @brief return the "flattened" object
-   *  
-   *  Contrary to what the name suggests, this method does not flatten the 
+   *
+   *  Contrary to what the name suggests, this method does not flatten the
    *  hierarchy but rather returns an object that does not need a parent
-   *  for the "real" properties. See lay::LayerProperties::flat for a 
-   *  description of this process. 
-   *  The child list of the returned object will be the same that of the 
+   *  for the "real" properties. See lay::LayerProperties::flat for a
+   *  description of this process.
+   *  The child list of the returned object will be the same that of the
    *  original object.
    */
   LayerPropertiesNode flat () const
@@ -1096,7 +1098,7 @@ public:
     refresh ();
     return m_children.begin ();
   }
-  
+
   /**
    *  @brief Child layers: end iterator
    */
@@ -1105,7 +1107,7 @@ public:
     refresh ();
     return m_children.end ();
   }
-  
+
   /**
    *  @brief Child layers: begin iterator
    */
@@ -1114,11 +1116,11 @@ public:
     refresh ();
     return m_children.begin ();
   }
-  
+
   /**
    *  @brief Child layers: end iterator
    */
-  iterator end_children () 
+  iterator end_children ()
   {
     refresh ();
     return m_children.end ();
@@ -1136,7 +1138,7 @@ public:
   {
     m_children.clear ();
   }
-  
+
   /**
    *  @brief Return a reference to the last child
    */
@@ -1144,7 +1146,7 @@ public:
   {
     return m_children.back ();
   }
-  
+
   /**
    *  @brief Return a reference to the last child
    */
@@ -1152,17 +1154,17 @@ public:
   {
     return m_children.back ();
   }
-  
+
   /**
    *  @brief Insert a child
    */
   LayerPropertiesNode &insert_child (const iterator &iter, const LayerPropertiesNode &child);
-  
+
   /**
    *  @brief Delete a child
    */
   void erase_child (const iterator &iter);
-  
+
   /**
    *  @brief Test, if there are children
    */
@@ -1170,7 +1172,7 @@ public:
   {
     return ! m_children.empty ();
   }
-  
+
   /**
    *  @brief Compute the bbox of this layer
    *
@@ -1178,7 +1180,7 @@ public:
    *  given default layout or path, if no specific is given).
    *  The node must have been attached to a view to make this
    *  operation possible.
-   *  
+   *
    *  @return A bbox in micron units
    */
   db::DBox bbox () const;
@@ -1223,12 +1225,12 @@ public:
   /**
    *  @brief Obtain the unique ID
    *
-   *  Each layer properties node object has a unique ID that is created 
+   *  Each layer properties node object has a unique ID that is created
    *  when a new LayerPropertiesNode object is instantiated. The ID is
    *  copied when the object is copied. The ID can be used to identify the
    *  object irregardless of it's content.
    */
-  unsigned int id () const 
+  unsigned int id () const
   {
     return m_id;
   }
@@ -1241,13 +1243,13 @@ public:
     m_expanded = ex;
   }
 
-protected: 
+protected:
   virtual void need_realize (unsigned int flags, bool force);
   virtual void expanded_state_changed ();
   void set_parent (const LayerPropertiesNode *);
 
 private:
-  //  A reference to the view 
+  //  A reference to the view
   tl::weak_ptr<lay::LayoutViewBase> mp_view;
   unsigned int m_list_index;
   bool m_expanded;
@@ -1299,7 +1301,7 @@ public:
   /**
    *  @brief Assignment
    */
-  LayerPropertiesConstIterator &operator= (const LayerPropertiesConstIterator &d); 
+  LayerPropertiesConstIterator &operator= (const LayerPropertiesConstIterator &d);
 
   /**
    *  @brief Inequality
@@ -1324,14 +1326,14 @@ public:
 
   /**
    *  @brief At-the-top property
-   * 
+   *
    *  This predicate is true if there is no parent level.
    */
   bool at_top () const;
 
   /**
    *  @brief At-the-end property
-   * 
+   *
    *  This predicate is true if the iterator is at the end of either all elements or
    *  at the end of the child list (if down_next_child() or down_first_child() is used to iterate).
    */
@@ -1339,7 +1341,7 @@ public:
 
   /**
    *  @brief "is null" predicate
-   * 
+   *
    *  This predicate is true if the iterator is "null". Such an iterator can be
    *  created with the default constructor or by moving a top-level iterator up.
    */
@@ -1359,7 +1361,7 @@ public:
 
   /**
    *  @brief Move up
-   * 
+   *
    *  The iterator is moved to point to the current element's parent.
    *  If the current element does not have a parent, the iterator will
    *  be undefined.
@@ -1368,14 +1370,14 @@ public:
 
   /**
    *  @brief Move to the next sibling
-   * 
+   *
    *  The iterator is moved to the nth next sibling of the current element.
    */
   LayerPropertiesConstIterator &next_sibling (ptrdiff_t n = 1);
 
   /**
    *  @brief Move to the sibling with the given index
-   * 
+   *
    *  The iterator is moved to the nth sibling of the current element.
    */
   LayerPropertiesConstIterator &to_sibling (size_t n);
@@ -1389,7 +1391,7 @@ public:
    *  @brief Move to the first child
    *
    *  This method moves to the child of the current element. If there is
-   *  no child, at_end() will be true. Even then, the iterator points to 
+   *  no child, at_end() will be true. Even then, the iterator points to
    *  the child level and up() can be used to move back.
    */
   LayerPropertiesConstIterator &down_first_child ();
@@ -1398,7 +1400,7 @@ public:
    *  @brief Move to the last child
    *
    *  This method moves to the child of the current element. at_end() will be
-   *  true then. Even then, the iterator points to the child level and up() 
+   *  true then. Even then, the iterator points to the child level and up()
    *  can be used to move back.
    */
   LayerPropertiesConstIterator &down_last_child ();
@@ -1416,7 +1418,7 @@ public:
   /**
    *  @brief Access to the current element
    */
-  const LayerPropertiesNode *operator-> () const
+  const LayerPropertiesNode *operator->() const
   {
     const LayerPropertiesNode *o = obj ();
     tl_assert (o != 0);
@@ -1426,16 +1428,16 @@ public:
   /**
    *  @brief Invalidate the object pointer
    *
-   *  This method must be called whenever the object underlying the 
+   *  This method must be called whenever the object underlying the
    *  current element is changed, i.e. deleted. This call invalidates
-   *  the pointer to the current element thus forcing a refresh of 
+   *  the pointer to the current element thus forcing a refresh of
    *  the object reference.
    */
   void invalidate ();
 
   /**
-   *  @brief Obtain the parent iterator 
-   * 
+   *  @brief Obtain the parent iterator
+   *
    *  If there is no parent, the returned iterator will be 'null'.
    */
   LayerPropertiesConstIterator parent () const
@@ -1447,7 +1449,7 @@ public:
 
   /**
    *  @brief Obtain the iterator pointing to the first child
-   * 
+   *
    *  If there is no children, the iterator will be a valid insert point but not
    *  point to any valid element. It will report "at_end".
    */
@@ -1460,7 +1462,7 @@ public:
 
   /**
    *  @brief Obtain the iterator pointing to the last child
-   * 
+   *
    *  The iterator will be a valid insert point but not
    *  point to any valid element. It will report "at_end".
    */
@@ -1472,12 +1474,12 @@ public:
   }
 
   /**
-   *  @brief Obtain the parent object and the index of the child 
+   *  @brief Obtain the parent object and the index of the child
    *
    *  The parent object pointer is 0 if there is no parent. The second
    *  member of the pair indicates which child is addressed.
    */
-  std::pair <const LayerPropertiesNode *, size_t> parent_obj () const;
+  std::pair<const LayerPropertiesNode *, size_t> parent_obj () const;
 
   /**
    *  @brief Obtain the current index
@@ -1486,16 +1488,16 @@ public:
   {
     return m_uint;
   }
-  
+
   /**
    *  @brief Obtain the index of the child within the parent
    *
    *  This method returns the index, that the element pointed to has in the list
-   *  of children of it's parent. If the element does not have a parent, the 
+   *  of children of it's parent. If the element does not have a parent, the
    *  index of the element in the global list is returned.
    */
   size_t child_index () const;
-  
+
   /**
    *  @brief Obtain a pointer to the object referenced
    *
@@ -1516,7 +1518,7 @@ public:
   {
     return m_list.get ();
   }
-  
+
 private:
   friend class LayerPropertiesList;
 
@@ -1525,7 +1527,7 @@ private:
   mutable tl::weak_ptr<LayerPropertiesNode> mp_obj;
 
   void inc (unsigned int d);
-  std::pair <size_t, size_t> factor () const;
+  std::pair<size_t, size_t> factor () const;
   void set_obj () const;
 };
 
@@ -1533,8 +1535,7 @@ private:
  *  @brief A helper function to compare layer properties nodes bottom-up
  */
 
-struct LAYBASIC_PUBLIC CompareLayerIteratorBottomUp 
-{
+struct LAYBASIC_PUBLIC CompareLayerIteratorBottomUp {
   bool operator() (const lay::LayerPropertiesConstIterator &a, const lay::LayerPropertiesConstIterator &b)
   {
     return a.uint () > b.uint ();
@@ -1622,19 +1623,19 @@ public:
    */
   LayerPropertiesNode &operator* () const
   {
-    return const_cast <LayerPropertiesNode &> (LayerPropertiesConstIterator::operator* ());
+    return const_cast<LayerPropertiesNode &> (LayerPropertiesConstIterator::operator* ());
   }
 
   /**
    *  @brief Access to the current element
    */
-  LayerPropertiesNode *operator-> () const
+  LayerPropertiesNode *operator->() const
   {
-    return const_cast <LayerPropertiesNode *> (LayerPropertiesConstIterator::operator-> ());
+    return const_cast<LayerPropertiesNode *> (LayerPropertiesConstIterator::operator->());
   }
 
   /**
-   *  @brief Obtain the parent iterator 
+   *  @brief Obtain the parent iterator
    */
   LayerPropertiesIterator parent () const
   {
@@ -1642,11 +1643,11 @@ public:
   }
 
   /**
-   *  @brief Obtain the parent object and the index of the child 
+   *  @brief Obtain the parent object and the index of the child
    */
-  std::pair <LayerPropertiesNode *, size_t> parent_obj () const
+  std::pair<LayerPropertiesNode *, size_t> parent_obj () const
   {
-    std::pair <const LayerPropertiesNode *, size_t> pp = LayerPropertiesConstIterator::parent_obj ();
+    std::pair<const LayerPropertiesNode *, size_t> pp = LayerPropertiesConstIterator::parent_obj ();
     return std::make_pair (const_cast<LayerPropertiesNode *> (pp.first), pp.second);
   }
 
@@ -1662,7 +1663,8 @@ public:
 private:
   LayerPropertiesIterator (const LayerPropertiesConstIterator &d)
     : LayerPropertiesConstIterator (d)
-  { }
+  {
+  }
 };
 
 /**
@@ -1677,7 +1679,7 @@ public:
   typedef LayerPropertiesNode::child_list layer_list;
   typedef LayerPropertiesNode::const_iterator const_iterator;
   typedef LayerPropertiesNode::iterator iterator;
-  
+
   /**
    *  @brief Constructor
    */
@@ -1694,7 +1696,7 @@ public:
   LayerPropertiesList (const LayerPropertiesList &d);
 
   /**
-   *  @brief Assignment 
+   *  @brief Assignment
    */
   LayerPropertiesList &operator= (const LayerPropertiesList &d);
 
@@ -1702,15 +1704,15 @@ public:
    *  @brief Equality
    */
   bool operator== (const LayerPropertiesList &d) const;
-  
+
   /**
    *  @brief Inequality
    */
   bool operator!= (const LayerPropertiesList &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
-  
+
   /**
    *  @brief Flat iterator
    *
@@ -1743,36 +1745,36 @@ public:
    *  @brief Start iterator for the layers (top-level)
    */
   const_iterator begin_const () const;
-  
+
   /**
    *  @brief End iterator for the layers (top-level)
    */
   const_iterator end_const () const;
-  
+
   /**
    *  @brief Start iterator for the layers (top-level)
    */
   iterator begin ();
-  
+
   /**
    *  @brief End iterator for the layers (top-level)
    */
   iterator end ();
-  
+
   /**
    *  @brief Last element of the list
    */
   LayerPropertiesNode &back ();
-  
+
   /**
    *  @brief Last element of the list
    */
   const LayerPropertiesNode &back () const;
-  
+
   /**
    *  @brief Expand the layer properties list
    *
-   *  Expansion of the layer properties list means to apply wildcards - i.e. 
+   *  Expansion of the layer properties list means to apply wildcards - i.e.
    *  "@*" is expanded into an outer iteration of layout indices.
    *
    *  @param map_cv_index Maps a specified cv index to the one to use. Use -1 for the first entry to map any present cv index. Map to -1 to specify expansion to all available cv indices.
@@ -1806,7 +1808,7 @@ public:
 
   /**
    *  @brief Insert a new element into the tree before the given position
-   * 
+   *
    *  The iterator specifies at which element to insert the new element.
    *  The iterator may have a special form in which it points to a parent
    *  and past-the-end of the respective child list (stack.back ().first==stack.back ().second).
@@ -1816,14 +1818,14 @@ public:
    */
   LayerPropertiesNode &
   insert (const LayerPropertiesIterator &iter, const LayerPropertiesNode &node);
-  
+
   /**
    *  @brief Delete the given element from the tree
-   * 
-   *  The iterator specifies the element to delete. 
+   *
+   *  The iterator specifies the element to delete.
    */
   void erase (const LayerPropertiesIterator &iter);
-  
+
   /**
    *  @brief Iterator over the custom dither pattern: begin iterator
    */
@@ -1909,7 +1911,7 @@ public:
   /**
    *  @brief Set the name of the layer properties set
    */
-  void set_name (const std::string &name) 
+  void set_name (const std::string &name)
   {
     m_name = name;
   }
@@ -1923,25 +1925,25 @@ public:
    *  @brief Load the layers from a XML stream
    */
   void load (tl::XMLSource &stream);
-  
+
   /**
    *  @brief Save the layers in XML format
    */
   void save (tl::OutputStream &os) const;
-  
+
   /**
    *  @brief Load a set of layer properties lists from a XML stream
    */
-  static void load (tl::XMLSource &stream, std::vector <lay::LayerPropertiesList> &properties_lists);
-  
+  static void load (tl::XMLSource &stream, std::vector<lay::LayerPropertiesList> &properties_lists);
+
   /**
    *  @brief Save a set of layers in XML format
    */
-  static void save (tl::OutputStream &os, const std::vector <lay::LayerPropertiesList> &properties_lists);
-  
+  static void save (tl::OutputStream &os, const std::vector<lay::LayerPropertiesList> &properties_lists);
+
   /**
    *  @brief Attach the list to the view
-   * 
+   *
    *  This step attaches all nodes in the list to the given view.
    *  It is required before the nodes can be fully realized.
    *  "load" automatically attaches the view.
@@ -2049,9 +2051,6 @@ private:
   virtual void expanded_state_changed ();
   virtual void refresh () const;
 };
-
 }
 
 #endif
-
-

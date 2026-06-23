@@ -94,7 +94,6 @@ LoadLayoutOptionsDialog::LoadLayoutOptionsDialog (QWidget *parent, const std::st
       m_pages.push_back (std::make_pair (page, fmt->format_name ()));
       any_option = true;
     }
-
   }
 
   if (! any_option) {
@@ -112,16 +111,14 @@ LoadLayoutOptionsDialog::~LoadLayoutOptionsDialog ()
   mp_ui = 0;
 }
 
-void 
-LoadLayoutOptionsDialog::button_pressed (QAbstractButton *button)
+void LoadLayoutOptionsDialog::button_pressed (QAbstractButton *button)
 {
   if (button == mp_ui->buttonBox->button (QDialogButtonBox::Reset)) {
     reset_button_pressed ();
   }
 }
 
-void
-LoadLayoutOptionsDialog::current_tech_changed (int index)
+void LoadLayoutOptionsDialog::current_tech_changed (int index)
 {
   if (index != m_technology_index) {
     commit ();
@@ -130,21 +127,19 @@ LoadLayoutOptionsDialog::current_tech_changed (int index)
   }
 }
 
-void
-LoadLayoutOptionsDialog::reset_button_pressed ()
+void LoadLayoutOptionsDialog::reset_button_pressed ()
 {
   BEGIN_PROTECTED
 
   if (m_technology_index >= 0) {
-    m_opt_array[m_technology_index] = db::LoadLayoutOptions ();
+    m_opt_array [m_technology_index] = db::LoadLayoutOptions ();
   }
   update ();
 
   END_PROTECTED
 }
 
-void
-LoadLayoutOptionsDialog::ok_button_pressed ()
+void LoadLayoutOptionsDialog::ok_button_pressed ()
 {
   BEGIN_PROTECTED
 
@@ -154,18 +149,17 @@ LoadLayoutOptionsDialog::ok_button_pressed ()
   END_PROTECTED
 }
 
-void
-LoadLayoutOptionsDialog::commit ()
+void LoadLayoutOptionsDialog::commit ()
 {
   if (m_technology_index < 0) {
     return;
   }
 
   //  create the particular options for all formats
-  for (std::vector< std::pair<StreamReaderOptionsPage *, std::string> >::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
+  for (std::vector<std::pair<StreamReaderOptionsPage *, std::string>>::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
     if (page->first) {
       db::FormatSpecificReaderOptions *opt = m_opt_array [m_technology_index].get_options (page->second);
-      if (!opt) {
+      if (! opt) {
         //  Create the options if not already done.
         const lay::StreamReaderPluginDeclaration *decl = StreamReaderPluginDeclaration::plugin_for_format (page->second);
         if (decl) {
@@ -180,25 +174,23 @@ LoadLayoutOptionsDialog::commit ()
   }
 }
 
-void 
-LoadLayoutOptionsDialog::update ()
+void LoadLayoutOptionsDialog::update ()
 {
   if (m_technology_index < 0) {
     return;
   }
 
   const db::Technology *tech = m_tech_array [m_technology_index];
-  mp_ui->options_tab->setEnabled (!tech || tech->is_persisted ());
+  mp_ui->options_tab->setEnabled (! tech || tech->is_persisted ());
 
-  for (std::vector< std::pair<StreamReaderOptionsPage *, std::string> >::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
+  for (std::vector<std::pair<StreamReaderOptionsPage *, std::string>>::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
     if (page->first) {
       page->first->setup (m_opt_array [m_technology_index].get_options (page->second), tech);
     }
   }
 }
 
-bool 
-LoadLayoutOptionsDialog::edit_global_options (lay::Dispatcher *config_root, db::Technologies *technologies)
+bool LoadLayoutOptionsDialog::edit_global_options (lay::Dispatcher *config_root, db::Technologies *technologies)
 {
   m_opt_array.clear ();
   m_tech_array.clear ();
@@ -229,14 +221,13 @@ LoadLayoutOptionsDialog::edit_global_options (lay::Dispatcher *config_root, db::
     d += t->description ();
 
     m_opt_array.push_back (t->load_layout_options ());
-    m_tech_array.push_back (t.operator-> ());
+    m_tech_array.push_back (t.operator->());
 
     mp_ui->tech_cbx->addItem (tl::to_qstring (d));
     if (t->name () == technology) {
       mp_ui->tech_cbx->setCurrentIndex (i);
       m_technology_index = i;
     }
-
   }
 
   mp_ui->tech_cbx->blockSignals (false);
@@ -259,7 +250,7 @@ LoadLayoutOptionsDialog::edit_global_options (lay::Dispatcher *config_root, db::
     i = 0;
     technologies->begin_updates ();
     for (db::Technologies::iterator t = technologies->begin (); t != technologies->end () && i < m_opt_array.size (); ++t, ++i) {
-      technologies->begin ()[i].set_load_layout_options (m_opt_array [i]);
+      technologies->begin () [i].set_load_layout_options (m_opt_array [i]);
     }
     technologies->end_updates ();
 
@@ -270,8 +261,7 @@ LoadLayoutOptionsDialog::edit_global_options (lay::Dispatcher *config_root, db::
   }
 }
 
-bool 
-LoadLayoutOptionsDialog::get_options (db::LoadLayoutOptions &options)
+bool LoadLayoutOptionsDialog::get_options (db::LoadLayoutOptions &options)
 {
   mp_ui->tech_frame->hide ();
   mp_ui->always_cbx->hide ();
@@ -290,8 +280,7 @@ LoadLayoutOptionsDialog::get_options (db::LoadLayoutOptions &options)
   }
 }
 
-bool 
-LoadLayoutOptionsDialog::get_options_internal ()
+bool LoadLayoutOptionsDialog::get_options_internal ()
 {
   update ();
   if (exec ()) {
@@ -332,7 +321,6 @@ SpecificLoadLayoutOptionsDialog::SpecificLoadLayoutOptionsDialog (QWidget *paren
 
       mp_editor->show ();
       mp_editor->setup (specific_options, 0);
-
     }
   }
 }
@@ -346,10 +334,9 @@ SpecificLoadLayoutOptionsDialog::~SpecificLoadLayoutOptionsDialog ()
   mp_specific_options = 0;
 }
 
-void
-SpecificLoadLayoutOptionsDialog::accept ()
+void SpecificLoadLayoutOptionsDialog::accept ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   if (mp_editor && mp_options && mp_specific_options) {
     mp_editor->commit (mp_specific_options, 0);
     mp_options->set_options (mp_specific_options);
@@ -357,7 +344,7 @@ BEGIN_PROTECTED
   }
 
   QDialog::accept ();
-END_PROTECTED
+  END_PROTECTED
 }
 
 }

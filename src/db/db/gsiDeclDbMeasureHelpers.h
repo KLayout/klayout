@@ -119,7 +119,7 @@ public:
     }
   }
 
-  virtual void process (const db::object_with_properties<shape_type> &shape, std::vector<db::object_with_properties<shape_type> > &res) const
+  virtual void process (const db::object_with_properties<shape_type> &shape, std::vector<db::object_with_properties<shape_type>> &res) const
   {
     try {
 
@@ -163,7 +163,7 @@ public:
 
 public:
   db::MeasureEval m_eval;
-  std::vector<std::pair<db::property_names_id_type, tl::Expression> > m_expressions;
+  std::vector<std::pair<db::property_names_id_type, tl::Expression>> m_expressions;
   bool m_copy_properties;
   std::map<tl::Variant, std::string> m_expression_strings;
 };
@@ -204,7 +204,7 @@ public:
       m_eval.set_shape (&shape);
 
       bool res = m_expression.execute ().to_bool ();
-      return m_inverse ? !res : res;
+      return m_inverse ? ! res : res;
 
     } catch (tl::Exception &ex) {
       tl::warn << ex.msg ();
@@ -221,7 +221,7 @@ public:
       m_eval.set_shape (&shape);
 
       bool res = m_expression.execute ().to_bool ();
-      return m_inverse ? !res : res;
+      return m_inverse ? ! res : res;
 
     } catch (tl::Exception &ex) {
       tl::warn << ex.msg ();

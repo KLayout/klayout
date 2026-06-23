@@ -41,7 +41,7 @@ class InstPropertiesPage
   : public lay::PropertiesPage,
     public Ui::InstPropertiesPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   InstPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);

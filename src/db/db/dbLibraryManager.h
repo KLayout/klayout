@@ -52,10 +52,10 @@ class Library;
 class DB_PUBLIC LibraryManager
 {
 public:
-  typedef std::multimap <std::string, lib_id_type> lib_name_map;
+  typedef std::multimap<std::string, lib_id_type> lib_name_map;
   typedef lib_name_map::const_iterator iterator;
 
-  /** 
+  /**
    *  @brief The singleton instance
    */
   static LibraryManager &instance ();
@@ -179,12 +179,12 @@ public:
   }
 
   /**
-   *  @brief Register a library under the given name and associate a id 
+   *  @brief Register a library under the given name and associate a id
    *
    *  The library will then be owned by the library manager.
    *  This method is use the name property of the library (which must not be
    *  changed later) and set the id of the library.
-   *  If a library with that name already exists, the existing library will still 
+   *  If a library with that name already exists, the existing library will still
    *  be available by id, but not by name.
    *
    *  @param library The library to register
@@ -199,7 +199,7 @@ public:
   void unregister_lib (Library *library);
 
   /**
-   *  @brief Deletes a library 
+   *  @brief Deletes a library
    */
   void delete_lib (Library *library);
 
@@ -235,4 +235,3 @@ private:
 
 
 #endif
-

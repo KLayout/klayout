@@ -30,7 +30,7 @@
 #include <math.h>
 
 // basics
-TEST(1) 
+TEST (1)
 {
   tl::Eval e;
   tl::Variant v;
@@ -211,7 +211,7 @@ TEST(1)
   v = e.parse ("to_i(1)-to_i(2)").execute ();
   EXPECT_EQ (v.to_string (), std::string ("-1"));
   v = e.parse ("to_i(1)-to_ui(2)").execute ();
-  if (sizeof(long) == 8) {
+  if (sizeof (long) == 8) {
     EXPECT_EQ (v.to_string (), std::string ("18446744073709551615"));
   } else {
     EXPECT_EQ (v.to_string (), std::string ("4294967295"));
@@ -227,13 +227,13 @@ TEST(1)
   v = e.parse ("to_i(1)-'2'").execute ();
   EXPECT_EQ (v.to_string (), std::string ("-1"));
   v = e.parse ("to_ui(1)-to_i(2)").execute ();
-  if (sizeof(long) == 8) {
+  if (sizeof (long) == 8) {
     EXPECT_EQ (v.to_string (), std::string ("18446744073709551615"));
   } else {
     EXPECT_EQ (v.to_string (), std::string ("4294967295"));
   }
   v = e.parse ("to_ui(1)-to_ui(2)").execute ();
-  if (sizeof(long) == 8) {
+  if (sizeof (long) == 8) {
     EXPECT_EQ (v.to_string (), std::string ("18446744073709551615"));
   } else {
     EXPECT_EQ (v.to_string (), std::string ("4294967295"));
@@ -247,7 +247,7 @@ TEST(1)
   v = e.parse ("to_ui(1)-2.4").execute ();
   EXPECT_EQ (v.to_string (), std::string ("-1.4"));
   v = e.parse ("to_ui(1)-'2'").execute ();
-  if (sizeof(long) == 8) {
+  if (sizeof (long) == 8) {
     EXPECT_EQ (v.to_string (), std::string ("18446744073709551615"));
   } else {
     EXPECT_EQ (v.to_string (), std::string ("4294967295"));
@@ -317,9 +317,9 @@ TEST(1)
 class Point
 {
 public:
-  Point () : m_x (0), m_y (0) { }
+  Point () : m_x (0), m_y (0) {}
 
-  Point (int x, int y) : m_x (x), m_y (y) { }
+  Point (int x, int y) : m_x (x), m_y (y) {}
 
   int x () const { return m_x; }
   int y () const { return m_y; }
@@ -457,14 +457,14 @@ public:
   virtual int to_int (const void *) const { tl_assert (false); }
   virtual double to_double (const void *) const { tl_assert (false); }
   virtual void to_variant (const void *, tl::Variant &) const { tl_assert (false); }
-  virtual void read (void *, tl::Extractor &) const { }
+  virtual void read (void *, tl::Extractor &) const {}
   virtual const char *name () const { return "Box"; }
   virtual unsigned int type_code () const { return 0; }
   virtual const tl::EvalClass *eval_cls () const { return this; }
   virtual bool is_const () const { return false; }
   virtual bool is_ref () const { return false; }
   virtual void *deref_proxy (tl::Object *) const { return 0; }
-  virtual const gsi::ClassBase*gsi_cls() const { return 0; }
+  virtual const gsi::ClassBase *gsi_cls () const { return 0; }
   virtual const tl::VariantUserClassBase *change_constness (bool) const { return this; }
   static BoxClassClass instance;
 };
@@ -490,7 +490,7 @@ void BoxClass::execute (const tl::ExpressionParserContext &context, tl::Variant 
     out = object.to_user<Box> ().height ();
   } else if (method == "&") {
     tl_assert (args.size () == 1);
-    out = tl::Variant (new Box (object.to_user<Box> () & args[0].to_user<Box> ()), &BoxClass::instance, true);
+    out = tl::Variant (new Box (object.to_user<Box> () & args [0].to_user<Box> ()), &BoxClass::instance, true);
   } else if (method == "to_s") {
     out = object.to_user<Box> ().to_string ();
   } else if (method == "is_box") {
@@ -498,16 +498,16 @@ void BoxClass::execute (const tl::ExpressionParserContext &context, tl::Variant 
   } else if (method == "is_edge") {
     out = false;
   } else {
-    throw tl::NoMethodError("Box", method, context);
+    throw tl::NoMethodError ("Box", method, context);
   }
 }
 
 void BoxClassClass::execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant & /*object*/, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
 {
   if (method == "new") {
-    out = tl::Variant (new Box (args[0].to_long(), args[1].to_long(), args[2].to_long(), args[3].to_long()), &BoxClass::instance, true);
+    out = tl::Variant (new Box (args [0].to_long (), args [1].to_long (), args [2].to_long (), args [3].to_long ()), &BoxClass::instance, true);
   } else {
-    throw tl::NoMethodError("Box", method, context);
+    throw tl::NoMethodError ("Box", method, context);
   }
 }
 
@@ -526,21 +526,21 @@ public:
   virtual int to_int (const void *) const { tl_assert (false); }
   virtual double to_double (const void *) const { tl_assert (false); }
   virtual void to_variant (const void *, tl::Variant &) const { tl_assert (false); }
-  virtual void read (void *, tl::Extractor &) const { }
+  virtual void read (void *, tl::Extractor &) const {}
   virtual const char *name () const { return "Edge"; }
   virtual unsigned int type_code () const { return 0; }
   virtual const tl::EvalClass *eval_cls () const { return this; }
   virtual bool is_const () const { return false; }
   virtual bool is_ref () const { return false; }
   virtual void *deref_proxy (tl::Object *) const { return 0; }
-  virtual const gsi::ClassBase*gsi_cls() const { return 0; }
+  virtual const gsi::ClassBase *gsi_cls () const { return 0; }
   virtual const tl::VariantUserClassBase *change_constness (bool) const { return this; }
   static EdgeClassClass instance;
 };
 
 EdgeClassClass EdgeClassClass::instance;
 
-class EdgeClass : public tl::VariantUserClassImpl<Edge>,  private tl::EvalClass
+class EdgeClass : public tl::VariantUserClassImpl<Edge>, private tl::EvalClass
 {
 public:
   virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
@@ -558,7 +558,7 @@ public:
     } else if (method == "*") {
       out.set_user (new Edge (object.to_user<Edge> () * args [0].to_double ()), object.user_cls (), true);
     } else {
-      throw tl::NoMethodError("Edge", method, context);
+      throw tl::NoMethodError ("Edge", method, context);
     }
   }
   virtual const tl::EvalClass *eval_cls () const { return this; }
@@ -567,18 +567,17 @@ public:
 
 EdgeClass EdgeClass::instance;
 
-void 
-EdgeClassClass::execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant & /*object*/, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
+void EdgeClassClass::execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant & /*object*/, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
 {
   if (method == "new") {
-    out = tl::Variant (new Edge (args[0].to_long(), args[1].to_long(), args[2].to_long(), args[3].to_long()), &EdgeClass::instance, true);
+    out = tl::Variant (new Edge (args [0].to_long (), args [1].to_long (), args [2].to_long (), args [3].to_long ()), &EdgeClass::instance, true);
   } else {
-    throw tl::NoMethodError("Edge", method, context);
+    throw tl::NoMethodError ("Edge", method, context);
   }
 }
 
 // basics: custom objects
-TEST(1b) 
+TEST (1b)
 {
   tl::Eval e;
   tl::Variant v;
@@ -629,7 +628,7 @@ TEST(1b)
 }
 
 //  to_bool
-TEST(2)
+TEST (2)
 {
   tl::Eval e;
   tl::Variant v;
@@ -651,7 +650,7 @@ TEST(2)
 }
 
 //  to_double
-TEST(3)
+TEST (3)
 {
   tl::Eval e;
   tl::Variant v;
@@ -661,7 +660,7 @@ TEST(3)
 }
 
 //  functions
-TEST(5)
+TEST (5)
 {
   tl::Eval e;
   tl::Variant v;
@@ -763,7 +762,7 @@ TEST(5)
 }
 
 //  string functions
-TEST(6)
+TEST (6)
 {
   tl::Eval e;
   tl::Variant v;
@@ -851,18 +850,18 @@ TEST(6)
   v = e.parse ("is_dir('.')?1:0").execute ();
   EXPECT_EQ (v.to_string (), std::string ("1"));
   v = e.parse ("sprintf('%g %e %f',M_PI,M_PI*1e6,M_PI*0.001)").execute ();
-  EXPECT_EQ (v.to_string (), tl::sprintf("%g %e %f", M_PI, M_PI*1e6, M_PI*0.001));
+  EXPECT_EQ (v.to_string (), tl::sprintf ("%g %e %f", M_PI, M_PI * 1e6, M_PI * 0.001));
   v = e.parse ("sprintf('%g %e %f',M_PI*1e6,M_PI*1e6,M_PI*1e6)").execute ();
-  EXPECT_EQ (v.to_string (), tl::sprintf("%g %e %f", M_PI*1e6, M_PI*1e6, M_PI*1e6));
+  EXPECT_EQ (v.to_string (), tl::sprintf ("%g %e %f", M_PI * 1e6, M_PI * 1e6, M_PI * 1e6));
   v = e.parse ("sprintf('%-15g %015.8e %15.12f %g',M_PI,M_PI*1e6,M_PI*0.001,M_PI)").execute ();
-  EXPECT_EQ (v.to_string (), tl::sprintf("%-15g %015.8e %15.12f %g", M_PI, M_PI*1e6, M_PI*0.001,M_PI));
+  EXPECT_EQ (v.to_string (), tl::sprintf ("%-15g %015.8e %15.12f %g", M_PI, M_PI * 1e6, M_PI * 0.001, M_PI));
   v = e.parse ("sprintf('%-5s %5s %x %u %d (%s)','a','b',1234,2345,3456)").execute ();
-  EXPECT_EQ (v.to_string (), tl::sprintf("%-5s %5s %x %u %d ()", "a", "b", 1234, 2345, 3456));
+  EXPECT_EQ (v.to_string (), tl::sprintf ("%-5s %5s %x %u %d ()", "a", "b", 1234, 2345, 3456));
   std::string msg;
   try {
     v = e.parse ("error('My error')").execute ();
   } catch (tl::Exception &ex) {
-    msg = ex.msg();
+    msg = ex.msg ();
   }
   EXPECT_EQ (msg, std::string ("My error"));
   //  argument index in error messages
@@ -870,13 +869,13 @@ TEST(6)
   try {
     v = e.parse ("substr('abcabc',2,'xyz')").execute ();
   } catch (tl::Exception &ex) {
-    msg = ex.msg();
+    msg = ex.msg ();
   }
   EXPECT_EQ (msg, std::string ("Integer value expected for argument #3 at position 0 (substr('abcabc',2,'x..)"));
 }
 
 //  compare ops
-TEST(7)
+TEST (7)
 {
   tl::Eval e;
   tl::Variant v;
@@ -922,7 +921,7 @@ TEST(7)
 }
 
 //  boolean ops
-TEST(8)
+TEST (8)
 {
   tl::Eval e;
   tl::Variant v;
@@ -965,7 +964,7 @@ TEST(8)
 }
 
 //  shift ops
-TEST(9)
+TEST (9)
 {
   tl::Eval e;
   tl::Variant v;
@@ -977,7 +976,7 @@ TEST(9)
 }
 
 //  bitwise ops
-TEST(10)
+TEST (10)
 {
   tl::Eval e;
   tl::Variant v;
@@ -991,7 +990,7 @@ TEST(10)
 }
 
 //  unary ops
-TEST(11)
+TEST (11)
 {
   tl::Eval e;
   tl::Variant v;
@@ -1010,7 +1009,7 @@ class F0
   : public tl::EvalFunction
 {
 public:
-  void execute (const tl::ExpressionParserContext &, tl::Variant &out, const std::vector <tl::Variant> &, const std::map<std::string, tl::Variant> *) const
+  void execute (const tl::ExpressionParserContext &, tl::Variant &out, const std::vector<tl::Variant> &, const std::map<std::string, tl::Variant> *) const
   {
     out = tl::Variant (17);
   }
@@ -1020,9 +1019,9 @@ class F1
   : public tl::EvalFunction
 {
 public:
-  void execute (const tl::ExpressionParserContext &, tl::Variant &out, const std::vector <tl::Variant> &vv, const std::map<std::string, tl::Variant> *) const
+  void execute (const tl::ExpressionParserContext &, tl::Variant &out, const std::vector<tl::Variant> &vv, const std::map<std::string, tl::Variant> *) const
   {
-    out = tl::Variant (vv[0].to_long() + 1);
+    out = tl::Variant (vv [0].to_long () + 1);
   }
 };
 
@@ -1030,9 +1029,9 @@ class F2
   : public tl::EvalFunction
 {
 public:
-  void execute (const tl::ExpressionParserContext &, tl::Variant &out, const std::vector <tl::Variant> &vv, const std::map<std::string, tl::Variant> *) const
+  void execute (const tl::ExpressionParserContext &, tl::Variant &out, const std::vector<tl::Variant> &vv, const std::map<std::string, tl::Variant> *) const
   {
-    out = tl::Variant (vv[0].to_long() + 2);
+    out = tl::Variant (vv [0].to_long () + 2);
   }
 };
 
@@ -1040,24 +1039,24 @@ class F3
   : public tl::EvalFunction
 {
 public:
-  void execute (const tl::ExpressionParserContext &, tl::Variant &out, const std::vector <tl::Variant> &vv, const std::map<std::string, tl::Variant> *) const
+  void execute (const tl::ExpressionParserContext &, tl::Variant &out, const std::vector<tl::Variant> &vv, const std::map<std::string, tl::Variant> *) const
   {
-    out = tl::Variant (vv[0].to_long() + 3);
+    out = tl::Variant (vv [0].to_long () + 3);
   }
 };
 
 
 //  variables and functions
-TEST(12)
+TEST (12)
 {
   tl::Eval e, ee;
-  e.set_global_var ("GV", tl::Variant("gg"));
-  e.set_var ("L", tl::Variant((long) 89));
-  ee.set_var ("L", tl::Variant((long) 123));
-  e.define_global_function ("f0", new F0());
-  e.define_global_function ("fg", new F1());
-  e.define_function ("fl", new F2());
-  ee.define_function ("fl", new F3());
+  e.set_global_var ("GV", tl::Variant ("gg"));
+  e.set_var ("L", tl::Variant ((long) 89));
+  ee.set_var ("L", tl::Variant ((long) 123));
+  e.define_global_function ("f0", new F0 ());
+  e.define_global_function ("fg", new F1 ());
+  e.define_function ("fl", new F2 ());
+  ee.define_function ("fl", new F3 ());
 
   tl::Variant v;
 
@@ -1071,7 +1070,7 @@ TEST(12)
   EXPECT_EQ (v.to_string (), std::string ("gg124"));
   v = e.parse ("to_s(fg(17))+fl(L)").execute ();
   EXPECT_EQ (v.to_string (), std::string ("1891"));
-  e.define_function ("fl", new F3());
+  e.define_function ("fl", new F3 ());
   v = e.parse ("to_s(fg(17))+fl(L)").execute ();
   EXPECT_EQ (v.to_string (), std::string ("1892"));
   v = ee.parse ("to_s(fg(17))+fl(L)").execute ();
@@ -1079,13 +1078,13 @@ TEST(12)
 }
 
 //  interpolation
-TEST(13)
+TEST (13)
 {
   tl::Eval e, ee;
-  e.set_var ("L", tl::Variant((long) 89));
-  ee.set_var ("L", tl::Variant((long) 123));
-  ee.set_var ("$", tl::Variant("dollar"));
-  ee.set_var ("_", tl::Variant("underscore"));
+  e.set_var ("L", tl::Variant ((long) 89));
+  ee.set_var ("L", tl::Variant ((long) 123));
+  ee.set_var ("$", tl::Variant ("dollar"));
+  ee.set_var ("_", tl::Variant ("underscore"));
 
   EXPECT_EQ (e.interpolate ("A$L B$(L+100)C"), std::string ("A89 B189C"));
   EXPECT_EQ (ee.interpolate ("123*11=$(L*11)."), std::string ("123*11=1353."));
@@ -1095,7 +1094,7 @@ TEST(13)
 }
 
 // assignment
-TEST(14) 
+TEST (14)
 {
   tl::Eval e;
   tl::Variant v;
@@ -1113,7 +1112,7 @@ TEST(14)
 }
 
 // index
-TEST(15) 
+TEST (15)
 {
   tl::Eval e;
   tl::Variant v;
@@ -1149,7 +1148,7 @@ TEST(15)
 }
 
 // match/nomatch
-TEST(16) 
+TEST (16)
 {
   tl::Eval e;
   tl::Variant v;
@@ -1169,7 +1168,7 @@ TEST(16)
 }
 
 // polymorphic functions
-TEST(18)
+TEST (18)
 {
   tl::Eval e;
   tl::Variant v;
@@ -1184,7 +1183,7 @@ TEST(18)
 }
 
 // comments
-TEST(19)
+TEST (19)
 {
   tl::Eval e;
   e.parse ("var tr=Trans.new(1,false,Vector.new(10,20))").execute ();
@@ -1197,7 +1196,7 @@ TEST(19)
 }
 
 // issue-787
-TEST(20)
+TEST (20)
 {
   tl::Eval e;
   e.parse ("var ly=Layout.new(true)").execute ();
@@ -1216,4 +1215,3 @@ TEST(20)
   v = e.parse ("i2.dtrans.disp.y").execute ();
   EXPECT_EQ (v.to_string (), std::string ("0.3"));
 }
-

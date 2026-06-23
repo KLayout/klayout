@@ -45,14 +45,13 @@ class SaltGrain;
 class SaltModel
   : public QAbstractItemModel
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
    *  @brief An enum describing the severity of a message
    */
-  enum Severity
-  {
+  enum Severity {
     None = 0,
     Info = 1,
     Warning = 2,
@@ -87,7 +86,7 @@ public:
   /**
    *  @brief Implementation of the QAbstractItemModel interface
    */
-  int columnCount(const QModelIndex & /*parent*/) const;
+  int columnCount (const QModelIndex & /*parent*/) const;
 
   /**
    *  @brief Implementation of the QAbstractItemModel interface
@@ -185,7 +184,7 @@ public:
   bool m_salt_exclude;
   std::set<std::string> m_marked;
   std::set<std::string> m_disabled;
-  std::map<std::string, std::pair<Severity, std::string> > m_messages;
+  std::map<std::string, std::pair<Severity, std::string>> m_messages;
   std::map<std::string, int> m_display_order;
   std::vector<SaltGrain *> m_ordered_grains;
   bool m_in_update;

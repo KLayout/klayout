@@ -33,8 +33,7 @@
 namespace rdb
 {
 
-void
-scan_layer (rdb::Category *cat, const db::Layout &layout, unsigned int layer, const db::Cell *from, int levels, bool with_properties)
+void scan_layer (rdb::Category *cat, const db::Layout &layout, unsigned int layer, const db::Cell *from, int levels, bool with_properties)
 {
   rdb::Database *rdb = cat->database ();
   if (! rdb) {
@@ -52,7 +51,7 @@ scan_layer (rdb::Category *cat, const db::Layout &layout, unsigned int layer, co
     cells.insert (from->cell_index ());
   }
 
-  for (db::Layout::const_iterator c = layout.begin (); c != layout.end (); ++c) { 
+  for (db::Layout::const_iterator c = layout.begin (); c != layout.end (); ++c) {
 
     if (from && cells.find (c->cell_index ()) == cells.end ()) {
       continue;
@@ -75,13 +74,10 @@ scan_layer (rdb::Category *cat, const db::Layout &layout, unsigned int layer, co
             rdb_cell_nc->references ().insert (Reference (t, rdb_top_cell->id ()));
           }
         }
-      
       }
 
       create_items_from_shapes (rdb, rdb_cell->id (), cat->id (), db::CplxTrans (layout.dbu ()), cell.shapes (layer), with_properties);
-
     }
-
   }
 }
 
@@ -224,7 +220,6 @@ public:
       if (! mp_rdb_cell) {
         mp_rdb_cell = mp_rdb->create_cell (cn);
       }
-
     }
   }
 
@@ -243,8 +238,7 @@ public:
 
 }
 
-void
-scan_layer (rdb::Category *cat, const db::RecursiveShapeIterator &iter, bool flat, bool with_properties)
+void scan_layer (rdb::Category *cat, const db::RecursiveShapeIterator &iter, bool flat, bool with_properties)
 {
   if (! iter.top_cell () || ! iter.layout ()) {
     return;
@@ -254,8 +248,7 @@ scan_layer (rdb::Category *cat, const db::RecursiveShapeIterator &iter, bool fla
   scan_layer (cat, 0, trans, iter, flat, with_properties);
 }
 
-void
-scan_layer (rdb::Category *cat, rdb::Cell *cell, const db::CplxTrans &trans, const db::RecursiveShapeIterator &iter, bool flat, bool with_properties)
+void scan_layer (rdb::Category *cat, rdb::Cell *cell, const db::CplxTrans &trans, const db::RecursiveShapeIterator &iter, bool flat, bool with_properties)
 {
   if (! cat->database ()) {
     return;
@@ -278,14 +271,14 @@ void create_items_from_iterator (rdb::Database *db, rdb::id_type cell_id, rdb::i
   tl_assert (iter.layout ());
   double dbu = iter.layout ()->dbu ();
 
-  for (db::RecursiveShapeIterator i = iter; !i.at_end (); ++i) {
+  for (db::RecursiveShapeIterator i = iter; ! i.at_end (); ++i) {
     create_item_from_shape (db, cell_id, cat_id, db::CplxTrans (dbu) * i.trans (), *i, with_properties);
   }
 }
 
 void create_items_from_shapes (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const db::Shapes &shapes, bool with_properties)
 {
-  for (db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::All); !s.at_end (); ++s) {
+  for (db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
     create_item_from_shape (db, cell_id, cat_id, trans, *s, with_properties);
   }
 }
@@ -325,7 +318,7 @@ void create_items_from_region (rdb::Database *db, rdb::id_type cell_id, rdb::id_
 
   for (iter o = collection.begin (); ! o.at_end (); ++o) {
     rdb::Item *item = db->create_item (cell_id, cat_id);
-    item->values ().add (new rdb::Value <db::DPolygon> (o->transformed (trans)));
+    item->values ().add (new rdb::Value<db::DPolygon> (o->transformed (trans)));
   }
 }
 
@@ -335,7 +328,7 @@ void create_items_from_edges (rdb::Database *db, rdb::id_type cell_id, rdb::id_t
 
   for (iter o = collection.begin (); ! o.at_end (); ++o) {
     rdb::Item *item = db->create_item (cell_id, cat_id);
-    item->values ().add (new rdb::Value <db::DEdge> (o->transformed (trans)));
+    item->values ().add (new rdb::Value<db::DEdge> (o->transformed (trans)));
   }
 }
 
@@ -345,7 +338,7 @@ void create_items_from_edge_pairs (rdb::Database *db, rdb::id_type cell_id, rdb:
 
   for (iter o = collection.begin (); ! o.at_end (); ++o) {
     rdb::Item *item = db->create_item (cell_id, cat_id);
-    item->values ().add (new rdb::Value <db::DEdgePair> (o->transformed (trans)));
+    item->values ().add (new rdb::Value<db::DEdgePair> (o->transformed (trans)));
   }
 }
 
@@ -398,7 +391,7 @@ ValueBase *add_item_value (rdb::Item *item, const tl::Variant &v, const db::Cplx
   }
 }
 
-ValueBase *add_item_value(rdb::Item *item, const tl::Variant &v, double dbu, rdb::id_type tag_id)
+ValueBase *add_item_value (rdb::Item *item, const tl::Variant &v, double dbu, rdb::id_type tag_id)
 {
   if (dbu > 0 && v.is_user<db::Box> ()) {
     return item->add_value (db::CplxTrans (dbu) * v.to_user<db::Box> (), tag_id);
@@ -448,4 +441,3 @@ ValueBase *add_item_value(rdb::Item *item, const tl::Variant &v, double dbu, rdb
 }
 
 }
-

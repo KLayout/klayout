@@ -30,7 +30,8 @@
 
 #include <set>
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief An interface representing mutable edge pair collections
@@ -56,7 +57,7 @@ public:
 
   virtual void reserve (size_t n) = 0;
 
-  void transform (const db::UnitTrans &) { }
+  void transform (const db::UnitTrans &) {}
   void transform (const db::Disp &t) { do_transform (db::Trans (t)); }
   void transform (const db::Trans &t) { do_transform (t); }
   void transform (const db::ICplxTrans &t) { do_transform (t); }
@@ -98,4 +99,3 @@ public:
 }
 
 #endif
-

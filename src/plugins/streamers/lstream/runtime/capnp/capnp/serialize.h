@@ -45,19 +45,21 @@
 
 CAPNP_BEGIN_HEADER
 
-namespace capnp {
+namespace capnp
+{
 
-class FlatArrayMessageReader: public MessageReader {
+class FlatArrayMessageReader : public MessageReader
+{
   // Parses a message from a flat array.  Note that it makes sense to use this together with mmap()
   // for extremely fast parsing.
 
 public:
-  FlatArrayMessageReader(kj::ArrayPtr<const word> array, ReaderOptions options = ReaderOptions());
+  FlatArrayMessageReader (kj::ArrayPtr<const word> array, ReaderOptions options = ReaderOptions ());
   // The array must remain valid until the MessageReader is destroyed.
 
-  kj::ArrayPtr<const word> getSegment(uint id) override;
+  kj::ArrayPtr<const word> getSegment (uint id) override;
 
-  const word* getEnd() const { return end; }
+  const word *getEnd () const { return end; }
   // Get a pointer just past the end of the message as determined by reading the message header.
   // This could actually be before the end of the input array.  This pointer is useful e.g. if
   // you know that the input array has extra stuff appended after the message and you want to
@@ -67,12 +69,12 @@ private:
   // Optimize for single-segment case.
   kj::ArrayPtr<const word> segment0;
   kj::Array<kj::ArrayPtr<const word>> moreSegments;
-  const word* end;
+  const word *end;
 };
 
-kj::ArrayPtr<const word> initMessageBuilderFromFlatArrayCopy(
-    kj::ArrayPtr<const word> array, MessageBuilder& target,
-    ReaderOptions options = ReaderOptions());
+kj::ArrayPtr<const word> initMessageBuilderFromFlatArrayCopy (
+  kj::ArrayPtr<const word> array, MessageBuilder &target,
+  ReaderOptions options = ReaderOptions ());
 // Convenience function which reads a message using `FlatArrayMessageReader` then copies the
 // content into the target `MessageBuilder`, verifying that the message structure is valid
 // (although not necessarily that it matches the desired schema).
@@ -85,7 +87,7 @@ kj::ArrayPtr<const word> initMessageBuilderFromFlatArrayCopy(
 // of `MessageBuilder`'s constructors. However, this approach skips the validation step and is not
 // safe to use on untrusted input. Therefore, we do not provide a convenience method for it.)
 
-kj::Array<word> messageToFlatArray(MessageBuilder& builder);
+kj::Array<word> messageToFlatArray (MessageBuilder &builder);
 // Constructs a flat array containing the entire content of the given message.
 //
 // To output the message as bytes, use `.asBytes()` on the returned word array. Keep in mind that
@@ -96,16 +98,16 @@ kj::Array<word> messageToFlatArray(MessageBuilder& builder);
 //     kj::ArrayPtr<kj::byte> bytes = words.asBytes();
 //     write(fd, bytes.begin(), bytes.size());
 
-kj::Array<word> messageToFlatArray(kj::ArrayPtr<const kj::ArrayPtr<const word>> segments);
+kj::Array<word> messageToFlatArray (kj::ArrayPtr<const kj::ArrayPtr<const word>> segments);
 // Version of messageToFlatArray that takes a raw segment array.
 
-size_t computeSerializedSizeInWords(MessageBuilder& builder);
+size_t computeSerializedSizeInWords (MessageBuilder &builder);
 // Returns the size, in words, that will be needed to serialize the message, including the header.
 
-size_t computeSerializedSizeInWords(kj::ArrayPtr<const kj::ArrayPtr<const word>> segments);
+size_t computeSerializedSizeInWords (kj::ArrayPtr<const kj::ArrayPtr<const word>> segments);
 // Version of computeSerializedSizeInWords that takes a raw segment array.
 
-size_t expectedSizeInWordsFromPrefix(kj::ArrayPtr<const word> messagePrefix);
+size_t expectedSizeInWordsFromPrefix (kj::ArrayPtr<const word> messagePrefix);
 // Given a prefix of a serialized message, try to determine the expected total size of the message,
 // in words. The returned size is based on the information known so far; it may be an underestimate
 // if the prefix doesn't contain the full segment table.
@@ -121,22 +123,23 @@ size_t expectedSizeInWordsFromPrefix(kj::ArrayPtr<const word> messagePrefix);
 
 // =======================================================================================
 
-class InputStreamMessageReader: public MessageReader {
+class InputStreamMessageReader : public MessageReader
+{
   // A MessageReader that reads from an abstract kj::InputStream. See also StreamFdMessageReader
   // for a subclass specific to file descriptors.
 
 public:
-  InputStreamMessageReader(kj::InputStream& inputStream,
-                           ReaderOptions options = ReaderOptions(),
-                           kj::ArrayPtr<word> scratchSpace = nullptr);
-  ~InputStreamMessageReader() noexcept(false);
+  InputStreamMessageReader (kj::InputStream &inputStream,
+                            ReaderOptions options = ReaderOptions (),
+                            kj::ArrayPtr<word> scratchSpace = nullptr);
+  ~InputStreamMessageReader () noexcept (false);
 
   // implements MessageReader ----------------------------------------
-  kj::ArrayPtr<const word> getSegment(uint id) override;
+  kj::ArrayPtr<const word> getSegment (uint id) override;
 
 private:
-  kj::InputStream& inputStream;
-  byte* readPos;
+  kj::InputStream &inputStream;
+  byte *readPos;
 
   // Optimize for single-segment case.
   kj::ArrayPtr<const word> segment0;
@@ -148,9 +151,9 @@ private:
   kj::UnwindDetector unwindDetector;
 };
 
-void readMessageCopy(kj::InputStream& input, MessageBuilder& target,
-                     ReaderOptions options = ReaderOptions(),
-                     kj::ArrayPtr<word> scratchSpace = nullptr);
+void readMessageCopy (kj::InputStream &input, MessageBuilder &target,
+                      ReaderOptions options = ReaderOptions (),
+                      kj::ArrayPtr<word> scratchSpace = nullptr);
 // Convenience function which reads a message using `InputStreamMessageReader` then copies the
 // content into the target `MessageBuilder`, verifying that the message structure is valid
 // (although not necessarily that it matches the desired schema).
@@ -159,35 +162,36 @@ void readMessageCopy(kj::InputStream& input, MessageBuilder& target,
 // of `MessageBuilder`'s constructors. However, this approach skips the validation step and is not
 // safe to use on untrusted input. Therefore, we do not provide a convenience method for it.)
 
-void writeMessage(kj::OutputStream& output, MessageBuilder& builder);
+void writeMessage (kj::OutputStream &output, MessageBuilder &builder);
 // Write the message to the given output stream.
 
-void writeMessage(kj::OutputStream& output, kj::ArrayPtr<const kj::ArrayPtr<const word>> segments);
+void writeMessage (kj::OutputStream &output, kj::ArrayPtr<const kj::ArrayPtr<const word>> segments);
 // Write the segment array to the given output stream.
 
 // =======================================================================================
 // Specializations for reading from / writing to file descriptors.
 
-class StreamFdMessageReader: private kj::FdInputStream, public InputStreamMessageReader {
+class StreamFdMessageReader : private kj::FdInputStream, public InputStreamMessageReader
+{
   // A MessageReader that reads from a stream-based file descriptor.
 
 public:
-  StreamFdMessageReader(int fd, ReaderOptions options = ReaderOptions(),
-                        kj::ArrayPtr<word> scratchSpace = nullptr)
-      : FdInputStream(fd), InputStreamMessageReader(*this, options, scratchSpace) {}
+  StreamFdMessageReader (int fd, ReaderOptions options = ReaderOptions (),
+                         kj::ArrayPtr<word> scratchSpace = nullptr)
+    : FdInputStream (fd), InputStreamMessageReader (*this, options, scratchSpace) {}
   // Read message from a file descriptor, without taking ownership of the descriptor.
 
-  StreamFdMessageReader(kj::AutoCloseFd fd, ReaderOptions options = ReaderOptions(),
-                        kj::ArrayPtr<word> scratchSpace = nullptr)
-      : FdInputStream(kj::mv(fd)), InputStreamMessageReader(*this, options, scratchSpace) {}
+  StreamFdMessageReader (kj::AutoCloseFd fd, ReaderOptions options = ReaderOptions (),
+                         kj::ArrayPtr<word> scratchSpace = nullptr)
+    : FdInputStream (kj::mv (fd)), InputStreamMessageReader (*this, options, scratchSpace) {}
   // Read a message from a file descriptor, taking ownership of the descriptor.
 
-  ~StreamFdMessageReader() noexcept(false);
+  ~StreamFdMessageReader () noexcept (false);
 };
 
-void readMessageCopyFromFd(int fd, MessageBuilder& target,
-                           ReaderOptions options = ReaderOptions(),
-                           kj::ArrayPtr<word> scratchSpace = nullptr);
+void readMessageCopyFromFd (int fd, MessageBuilder &target,
+                            ReaderOptions options = ReaderOptions (),
+                            kj::ArrayPtr<word> scratchSpace = nullptr);
 // Convenience function which reads a message using `StreamFdMessageReader` then copies the
 // content into the target `MessageBuilder`, verifying that the message structure is valid
 // (although not necessarily that it matches the desired schema).
@@ -196,14 +200,14 @@ void readMessageCopyFromFd(int fd, MessageBuilder& target,
 // of `MessageBuilder`'s constructors. However, this approach skips the validation step and is not
 // safe to use on untrusted input. Therefore, we do not provide a convenience method for it.)
 
-void writeMessageToFd(int fd, MessageBuilder& builder);
+void writeMessageToFd (int fd, MessageBuilder &builder);
 // Write the message to the given file descriptor.
 //
 // This function throws an exception on any I/O error.  If your code is not exception-safe, be sure
 // you catch this exception at the call site.  If throwing an exception is not acceptable, you
 // can implement your own OutputStream with arbitrary error handling and then use writeMessage().
 
-void writeMessageToFd(int fd, kj::ArrayPtr<const kj::ArrayPtr<const word>> segments);
+void writeMessageToFd (int fd, kj::ArrayPtr<const kj::ArrayPtr<const word>> segments);
 // Write the segment array to the given file descriptor.
 //
 // This function throws an exception on any I/O error.  If your code is not exception-safe, be sure
@@ -213,22 +217,26 @@ void writeMessageToFd(int fd, kj::ArrayPtr<const kj::ArrayPtr<const word>> segme
 // =======================================================================================
 // inline stuff
 
-inline kj::Array<word> messageToFlatArray(MessageBuilder& builder) {
-  return messageToFlatArray(builder.getSegmentsForOutput());
+inline kj::Array<word> messageToFlatArray (MessageBuilder &builder)
+{
+  return messageToFlatArray (builder.getSegmentsForOutput ());
 }
 
-inline size_t computeSerializedSizeInWords(MessageBuilder& builder) {
-  return computeSerializedSizeInWords(builder.getSegmentsForOutput());
+inline size_t computeSerializedSizeInWords (MessageBuilder &builder)
+{
+  return computeSerializedSizeInWords (builder.getSegmentsForOutput ());
 }
 
-inline void writeMessage(kj::OutputStream& output, MessageBuilder& builder) {
-  writeMessage(output, builder.getSegmentsForOutput());
+inline void writeMessage (kj::OutputStream &output, MessageBuilder &builder)
+{
+  writeMessage (output, builder.getSegmentsForOutput ());
 }
 
-inline void writeMessageToFd(int fd, MessageBuilder& builder) {
-  writeMessageToFd(fd, builder.getSegmentsForOutput());
+inline void writeMessageToFd (int fd, MessageBuilder &builder)
+{
+  writeMessageToFd (fd, builder.getSegmentsForOutput ());
 }
 
-}  // namespace capnp
+} // namespace capnp
 
 CAPNP_END_HEADER

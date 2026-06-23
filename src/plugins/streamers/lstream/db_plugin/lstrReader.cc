@@ -85,7 +85,7 @@ add_vector (const db::Point &p, stream::geometry::Vector::Reader reader)
 /**
  *  @brief Converts a stream::geometry::Point object to a db::Point
  */
-static db::Point 
+static db::Point
 make_point (stream::geometry::Point::Reader reader)
 {
   return db::Point (cast_to_coord (reader.getX ()), cast_to_coord (reader.getY ()));
@@ -121,7 +121,7 @@ make_fixpoint_trans (stream::geometry::FixPointTransformation fp)
 
 /**
  *  @brief Converts a stream::library::LayerEntry::Purpose enum value into a string
- * 
+ *
  *  This method is used to derive layer names. The default purpose is not
  *  converted to a string an left empty.
  */
@@ -177,12 +177,12 @@ purpose_string (stream::library::LayerEntry::Purpose purpose, stream::library::L
 
 /**
  *  @brief Turns a stream::geometry::Contour contour into a list of _PSTL_PRAGMA_SIMD_ORDERED_MONOTONIC_2ARGS
- * 
+ *
  *  A contour is a list of points, representing a closed loop (for polygons) or
  *  a linear chain of line segments (for paths).get_regular_array
- *  
+ *
  *  This function will extract the list of points from the Contour object.get_regular_array
- * 
+ *
  *  @param contour The list of points (output)
  *  @param reader The stream::geometry::Contour object (input)
  */
@@ -203,12 +203,12 @@ make_contour (std::vector<db::Point> &contour, stream::geometry::Contour::Reader
 
 /**
  *  @brief Generates a ICplxTrans transformation from a stream::layoutView::CellTransformation object
- * 
+ *
  *  ICplxTrans is the generic (complex) transformation used inside KLayout to
  *  represent affine transformations. These including isotropic scaling,
  *  arbitrary angle rotations, mirroring and displacement.
  */
-static db::ICplxTrans 
+static db::ICplxTrans
 make_transformation (stream::layoutView::CellTransformation::Reader transformation)
 {
   db::Vector d = make_vector (transformation.getDisplacement ());
@@ -234,10 +234,10 @@ make_transformation (stream::layoutView::CellTransformation::Reader transformati
 
 /**
  *  @brief Extracts a list of displacements from a "ENUMERATED" type stream::repetition::Repetition
- * 
+ *
  *  @param repetition The Cap'n'Proto repetition type (input)
  *  @param vectors The displacements derived from the repetition (output)
- *  
+ *
  *  The repetition is expected to be of ENUMERATED type.
  *  The first element of the output list of displacements is a zero
  *  vector which is implicitly included in the enumerated repetition.
@@ -262,17 +262,17 @@ make_vectors (stream::repetition::Repetition::Reader repetition, std::vector<db:
 
 /**
  *  @brief Turns a stream::repetition::Repetition into a db::iterated_array<db::Coord> object
- * 
+ *
  *  The Repetition object is expected to be of ENUMERATED type. The list of
  *  displacements is turned into a irregular array for use in shape or instance
  *  arrays.
- * 
+ *
  *  Note that the output array will contain one element in addition. This
  *  is the first element which represents the original object without displacement.
- * 
+ *
  *  @param repetition The Repetition object delivered by Cap'n'Proto (input)
  *  @param array The KLayout irregular (enumerated) array object (output)
- *  
+ *
  */
 static void
 make_iterated_array (stream::repetition::Repetition::Reader repetition, db::iterated_array<db::Coord> &array)
@@ -292,11 +292,11 @@ make_iterated_array (stream::repetition::Repetition::Reader repetition, db::iter
 
 /**
  *  @brief Extracts the regular array parameters (a, b, na, nb) from stream::repetition::Repetition
- *  
+ *
  *  The Repetition object is expected to represent a REGULAR or REGULAR_ORTH
  *  repetition. The returned values are the array axes (a, b) and dimensions
  *  (na, nb).
- * 
+ *
  *  @param repetition The Repetition object delivered by Cap'n'Proto (input)
  *  @param a The a axis (output)
  *  @param b The b axis (output)
@@ -325,16 +325,15 @@ get_regular_array (stream::repetition::Repetition::Reader repetition, db::Vector
     b = db::Vector (0, regular_ortho.getDy ());
     na = regular_ortho.getNx ();
     nb = regular_ortho.getNy ();
-
   }
 }
 
 /**
  *  @brief Turns a stream::repetition::Repetition into a db::regular_array<db::Coord>get_regular_array
- *  
+ *
  *  The latter is the basic object to represent a regular array in KLayout's
  *  shape and instance arrays.
- * 
+ *
  *  @param repetition The Repetition object delivered by Cap'n'Proto (input)
  *  @param array The KLayout regular array object (output)
  */
@@ -365,8 +364,7 @@ Reader::~Reader () noexcept
   //  .. nothing yet ..
 }
 
-void
-Reader::init (const db::LoadLayoutOptions &options)
+void Reader::init (const db::LoadLayoutOptions &options)
 {
   db::CommonReader::init (options);
 
@@ -387,14 +385,12 @@ Reader::position ()
   }
 }
 
-void 
-Reader::error (const std::string &msg)
+void Reader::error (const std::string &msg)
 {
   throw LStreamReaderException (msg, cellname ().c_str (), m_source, position ());
 }
 
-void 
-Reader::warn (const std::string &msg, int wl)
+void Reader::warn (const std::string &msg, int wl)
 {
   if (warn_level () < wl) {
     return;
@@ -415,8 +411,7 @@ Reader::warn (const std::string &msg, int wl)
 }
 
 //  See declaration
-void 
-Reader::do_read (db::Layout &layout)
+void Reader::do_read (db::Layout &layout)
 {
   try {
     do_read_internal (layout);
@@ -430,8 +425,7 @@ Reader::do_read (db::Layout &layout)
 }
 
 //  do_read delegate, unprotected
-void 
-Reader::do_read_internal (db::Layout &layout)
+void Reader::do_read_internal (db::Layout &layout)
 {
   mp_layout = &layout;
   m_cellname.clear ();
@@ -443,12 +437,12 @@ Reader::do_read_internal (db::Layout &layout)
   m_stream.reset ();
 
   size_t nhdr = strlen (LStream_sig) + 1;
-  std::unique_ptr<char[]> hdr (new char [nhdr]);
+  std::unique_ptr<char []> hdr (new char [nhdr]);
   size_t nhdr_read = m_stream.tryRead (hdr.get (), nhdr, nhdr);
   if (nhdr_read != nhdr || memcmp (LStream_sig, hdr.get (), nhdr) != 0) {
     error (tl::to_string (tr ("LStream format not recognized (missing magic bytes)")));
   }
-  
+
   kj::BufferedInputStreamWrapper kj_stream (m_stream);
 
   //  Reads the global header
@@ -462,7 +456,7 @@ Reader::do_read_internal (db::Layout &layout)
 
   read_library (kj_stream);
 
-  //  Read the cell messages after the library in the order the cells were defined in 
+  //  Read the cell messages after the library in the order the cells were defined in
   //  stream::library::CellSpecsTable.
   for (auto c = m_cells.begin (); c != m_cells.end (); ++c) {
     m_cellname = c->second;
@@ -475,8 +469,7 @@ Reader::do_read_internal (db::Layout &layout)
  *  @brief A helper class to join two datatype layer name map members
  *  TODO: should not be required with the proper extensions to the CommonReader base
  */
-struct LNameJoinOp1
-{
+struct LNameJoinOp1 {
   void operator() (std::string &a, const std::string &b)
   {
     db::join_layer_names (a, b);
@@ -488,8 +481,7 @@ struct LNameJoinOp1
  *  This implementation basically merged the datatype maps.
  *  TODO: should not be required with the proper extensions to the CommonReader base
  */
-struct LNameJoinOp2
-{
+struct LNameJoinOp2 {
   void operator() (tl::interval_map<db::ld_type, std::string> &a, const tl::interval_map<db::ld_type, std::string> &b)
   {
     LNameJoinOp1 op1;
@@ -497,8 +489,7 @@ struct LNameJoinOp2
   }
 };
 
-void 
-Reader::read_layers (stream::library::ViewSpec::Reader view_specs)
+void Reader::read_layers (stream::library::ViewSpec::Reader view_specs)
 {
   size_t index = 0;
   auto layer_entries = view_specs.getLayerTable ().getLayerEntries ();
@@ -507,16 +498,16 @@ Reader::read_layers (stream::library::ViewSpec::Reader view_specs)
     db::LayerProperties lp;
     auto ln = l->getLayerNumbers ();
     if (ln.size () == 1) {
-      lp = db::LayerProperties (ln[0], 0);
+      lp = db::LayerProperties (ln [0], 0);
     } else if (ln.size () >= 2) {
-      lp = db::LayerProperties (ln[0], ln[1]);
+      lp = db::LayerProperties (ln [0], ln [1]);
     }
 
     lp.name = l->getName ();
 
     auto ps = purpose_string (l->getPurpose ());
     if (! ps.empty ()) {
-      //  In case of a non-DRAWING Purpose, generate a named layer adding the purpose to 
+      //  In case of a non-DRAWING Purpose, generate a named layer adding the purpose to
       //  the layer string
       lp = db::LayerProperties (lp.to_string () + "." + ps);
     }
@@ -528,12 +519,11 @@ Reader::read_layers (stream::library::ViewSpec::Reader view_specs)
 
         //  add name to the layer name map
         //  TODO: should be easier with a better API
-        tl::interval_map <db::ld_type, std::string> dt_map;
+        tl::interval_map<db::ld_type, std::string> dt_map;
         LNameJoinOp1 op1;
         dt_map.add (lp.datatype, lp.datatype + 1, lp.name, op1);
         LNameJoinOp2 op2;
         layer_names ().add (lp.layer, lp.layer + 1, dt_map, op2);
-
       }
 
       auto li = open_dl (*mp_layout, db::LDPair (lp.layer, lp.datatype));
@@ -544,13 +534,12 @@ Reader::read_layers (stream::library::ViewSpec::Reader view_specs)
     } else {
       warn (tl::sprintf (tl::to_string (tr ("Purely named layers (here: '%s') cannot be read currently")), lp.name));
     }
-
   }
 }
 
 /**
  *  @brief Creates a KLayout variant from a stream::variant::Variant
- * 
+ *
  *  As a speciality, the "OBJECT" type allows using KLayout's
  *  string convention to represent KLayout objects. This allows serialization
  *  of certain types such as boxes or polygons, but basically bears the risk
@@ -570,39 +559,36 @@ Reader::make_variant (stream::variant::Variant::Value::Reader variant)
     return tl::Variant (variant.getUint64 ());
   case stream::variant::Variant::Value::INT64:
     return tl::Variant (variant.getInt64 ());
-  case stream::variant::Variant::Value::LIST:
-    {
-      tl::Variant var_list = tl::Variant::empty_list ();
-      auto list = variant.getList ();
-      for (auto l = list.begin (); l != list.end (); ++l) {
-        var_list.push (make_variant (l->getValue ()));
-      }
-      return var_list;
+  case stream::variant::Variant::Value::LIST: {
+    tl::Variant var_list = tl::Variant::empty_list ();
+    auto list = variant.getList ();
+    for (auto l = list.begin (); l != list.end (); ++l) {
+      var_list.push (make_variant (l->getValue ()));
     }
-  case stream::variant::Variant::Value::ARRAY:
-    {
-      tl::Variant var_array = tl::Variant::empty_array ();
-      auto array = variant.getArray ();
-      for (auto l = array.begin (); l != array.end (); ++l) {
-        var_array.insert (make_variant (l->getKey ().getValue ()), make_variant (l->getValue ().getValue ()));
-      }
-      return var_array;
+    return var_list;
+  }
+  case stream::variant::Variant::Value::ARRAY: {
+    tl::Variant var_array = tl::Variant::empty_array ();
+    auto array = variant.getArray ();
+    for (auto l = array.begin (); l != array.end (); ++l) {
+      var_array.insert (make_variant (l->getKey ().getValue ()), make_variant (l->getValue ().getValue ()));
     }
-  case stream::variant::Variant::Value::OBJECT:
-    {
-      std::string str = variant.getObject ();
-      tl::Extractor ex (str.c_str ());
-      tl::Variant var;
-      if (ex.test ("klayout") && ex.test (":")) {
-        try {
-          ex.read (var);
-        } catch (tl::Exception &ex) {
-          warn (tl::sprintf (tl::to_string (tr ("Error extracting object string from variant ('%s'): %s")),
-                str, ex.msg ()));
-        }
+    return var_array;
+  }
+  case stream::variant::Variant::Value::OBJECT: {
+    std::string str = variant.getObject ();
+    tl::Extractor ex (str.c_str ());
+    tl::Variant var;
+    if (ex.test ("klayout") && ex.test (":")) {
+      try {
+        ex.read (var);
+      } catch (tl::Exception &ex) {
+        warn (tl::sprintf (tl::to_string (tr ("Error extracting object string from variant ('%s'): %s")),
+                           str, ex.msg ()));
       }
-      return var;
     }
+    return var;
+  }
   case stream::variant::Variant::Value::TEXT:
     return tl::Variant (std::string (variant.getText ()));
   default:
@@ -612,26 +598,25 @@ Reader::make_variant (stream::variant::Variant::Value::Reader variant)
 
 /**
  *  @brief Reads meta information from the stream::propertySet::PropertySet
- * 
+ *
  *  This method will read the meta information from the given PropertySet object
  *  and attach it to the given cell (if cell != 0) or the layout (if cell == 0).
- * 
- *  Meta information is a mechanism to attach additional, rich key/value 
+ *
+ *  Meta information is a mechanism to attach additional, rich key/value
  *  pairs to cells or the layout. Contrary to properties, meta information
  *  does not need to follow conventions. Also properties are available down
  *  to shape and instance level, while meta information isn't.
- * 
+ *
  *  Meta information can be used for example to attach blobs to the layout.
- *  Meta information is supposed to be generated, maintained and consumed 
+ *  Meta information is supposed to be generated, maintained and consumed
  *  by a particular system in it's own specific ways and to be considered
  *  opaque or optional by other systems.
- * 
+ *
  *  Properties on the other hand can be carried through other file formats
- *  such as GDS and OASIS, provided they follow some conventions (e.g. 
+ *  such as GDS and OASIS, provided they follow some conventions (e.g.
  *  integer keys only for GDS).
  */
-void 
-Reader::make_meta_data (const db::Cell *cell, stream::metaData::MetaData::Reader meta_data)
+void Reader::make_meta_data (const db::Cell *cell, stream::metaData::MetaData::Reader meta_data)
 {
   auto entries = meta_data.getEntries ();
   for (auto e = entries.begin (); e != entries.end (); ++e) {
@@ -648,17 +633,16 @@ Reader::make_meta_data (const db::Cell *cell, stream::metaData::MetaData::Reader
     } else {
       mp_layout->add_meta_info (name, meta_info);
     }
-
   }
 }
 
 /**
  *  @brief Extract cell parameters from stream::library::CellParameters
- * 
- *  This method takes cell parameters and turns them into a map of 
+ *
+ *  This method takes cell parameters and turns them into a map of
  *  parameter names vs. values. The values are variants.
  */
-std::map<std::string, tl::Variant> 
+std::map<std::string, tl::Variant>
 Reader::make_pcell_parameters (stream::library::CellParameters::Reader cell_parameters)
 {
   std::map<std::string, tl::Variant> parameters;
@@ -675,19 +659,18 @@ Reader::make_pcell_parameters (stream::library::CellParameters::Reader cell_para
 
 /**
  *  @brief Creates the cells from the cell specification table
- * 
+ *
  *  This method is called inside "read_library". It will read
  *  every cell in the order defined by "library::CellSpecsTable"
  *  and create the corresponding KLayout cell.
- * 
+ *
  *  PCell and library cell resolution also happens here.
  *  Note that in order to properly restore a cell "alife",
- *  the corresponding libraries have to be installed. If 
+ *  the corresponding libraries have to be installed. If
  *  a cell is not found in the libraries, a "cold proxy"
  *  (aka "defunct cell") is created.
  */
-void 
-Reader::read_cells (stream::library::Library::Reader library)
+void Reader::read_cells (stream::library::Library::Reader library)
 {
   m_cells.clear ();
 
@@ -713,10 +696,10 @@ Reader::read_cells (stream::library::Library::Reader library)
         //  Fallback to the actual cell name if no library cell name is given
         library_cell_name = cell_name;
       }
-        
+
       db::LayoutOrCellContextInfo context_info;
 
-      //  NOTE: it is assumed that PCells define the "parameters" field and 
+      //  NOTE: it is assumed that PCells define the "parameters" field and
       //  non-pcells don't.
       if (l->hasParameters ()) {
         auto pcell_param = make_pcell_parameters (l->getParameters ());
@@ -732,23 +715,20 @@ Reader::read_cells (stream::library::Library::Reader library)
       mp_layout->recover_proxy_as (cell_index, context_info, &layer_mapping);
 
       cell = &mp_layout->cell (cell_index);
-
     }
 
     cell->prop_id (get_properties_id_by_id (l->getPropertySetId ()));
-
   }
 }
 
 /**
  *  @brief Reads the "library::LibraryRefs" section
- * 
+ *
  *  This method will set up the library ID to name tables.
  *  Only after executing this method you can call "get_library_name_by_id"
  *  to get the library name for a library Id.
  */
-void 
-Reader::read_library_refs (stream::library::Library::Reader library)
+void Reader::read_library_refs (stream::library::Library::Reader library)
 {
   auto libraries = library.getLibraryRefs ().getRefs ();
   size_t index = 1;
@@ -759,18 +739,17 @@ Reader::read_library_refs (stream::library::Library::Reader library)
 
 /**
  *  @brief Reads the "library::PropertyNamesTable" and "library::PropertiesTable" sections
- * 
+ *
  *  This method will set up the property tables: one for translating a
  *  property name Id into a name and one for translating the property Id
  *  into a property set (basically an alias for a dictionary of property
- *  names to value). 
- * 
+ *  names to value).
+ *
  *  Only after executing this method you can call "get_property_name_id_by_id"
  *  to get the property name for a property name Id or "get_properties_id_by_id"
  *  to get the KLayout properties Id for a LStream property Id.
  */
-void 
-Reader::read_properties (stream::library::Library::Reader library)
+void Reader::read_properties (stream::library::Library::Reader library)
 {
   auto property_names = library.getPropertyNamesTable ().getNames ();
 
@@ -783,7 +762,7 @@ Reader::read_properties (stream::library::Library::Reader library)
   for (auto n = property_names.begin (); n != property_names.end (); ++n) {
 
     size_t ns_id = n->getNamespaceId ();
-    
+
     tl::Variant pn;
     if (ns_id > 0) {
       //  Account for the namespace by building a prefixed string ("namespace:name"). In other words: namespaced
@@ -796,7 +775,6 @@ Reader::read_properties (stream::library::Library::Reader library)
     }
 
     m_property_name_id_map.insert (std::make_pair (n - property_names.begin (), db::property_names_id (pn)));
-
   }
 
   auto properties = library.getPropertiesTable ().getPropertySets ();
@@ -810,21 +788,19 @@ Reader::read_properties (stream::library::Library::Reader library)
     }
 
     m_properties_id_map.insert (std::make_pair (p - properties.begin () + 1, db::properties_id (ps)));
-
   }
 }
 
 /**
  *  @brief Reads the text string table from library::TextStringsTable
- * 
+ *
  *  The text strings table associates Ids with strings. This method
  *  is called during reading the library.
- *  
+ *
  *  Only after executing this method you can use "get_string_by_id"
  *  to obtain the string reference for a text string Id.
  */
-void 
-Reader::read_text_strings (stream::library::Library::Reader library)
+void Reader::read_text_strings (stream::library::Library::Reader library)
 {
   auto text_strings = library.getTextStringsTable ().getTextStrings ();
   for (auto t = text_strings.begin (); t != text_strings.end (); ++t) {
@@ -833,21 +809,19 @@ Reader::read_text_strings (stream::library::Library::Reader library)
     db::StringRepository::instance ()->change_string_ref (string_ref, *t);
 
     m_text_strings_by_id.insert (std::make_pair (uint64_t (t - text_strings.begin ()), string_ref));
-
   }
 }
 
 /**
  *  @brief Reads the cell message for a given cell
- * 
- *  The reader will call this method to extract cell messages from 
+ *
+ *  The reader will call this method to extract cell messages from
  *  the stream after the library was processed.
- * 
+ *
  *  This method will not only read the cell message, but also consume
  *  the following cell view messages.
  */
-void
-Reader::read_cell (db::cell_index_type cell_index, kj::BufferedInputStream &is)
+void Reader::read_cell (db::cell_index_type cell_index, kj::BufferedInputStream &is)
 {
   yield_progress ();
   capnp::PackedMessageReader message (is);
@@ -895,7 +869,7 @@ Reader::make_object (stream::geometry::Point::Reader reader)
 /**
  *  @brief "make_object" overloads: make a db::Box from a stream::geometry::Box
  */
-db::Box 
+db::Box
 Reader::make_object (stream::geometry::Box::Reader reader)
 {
   db::Point p1 = make_point (reader.getP1 ());
@@ -931,7 +905,7 @@ Reader::make_object (stream::geometry::EdgePair::Reader reader)
 
 /**
  *  @brief "make_object" overloads: make a db::SimplePolygonRef from a stream::geometry::SimplePolygon
- * 
+ *
  *  Note: db::SimplePolygonRef is choosen over db::SimplePolygon for compactness
  *  of the database.
  */
@@ -949,7 +923,7 @@ Reader::make_object (stream::geometry::SimplePolygon::Reader reader)
 
 /**
  *  @brief "make_object" overloads: make a db::PolygonRef from a stream::geometry::Polygon
- * 
+ *
  *  Note: db::PolygonRef is choosen over db::Polygon for compactness
  *  of the database.
  */
@@ -961,7 +935,7 @@ Reader::make_object (stream::geometry::Polygon::Reader reader)
 
   db::Polygon polygon;
   polygon.assign_hull (contour.begin (), contour.end (), false, false);
-  
+
   auto holes = reader.getHoles ();
   polygon.reserve_holes (holes.size ());
   for (auto h = holes.begin (); h != holes.end (); ++h) {
@@ -974,7 +948,7 @@ Reader::make_object (stream::geometry::Polygon::Reader reader)
 
 /**
  *  @brief "make_object" overloads: make a db::PathRef from a stream::geometry::Path
- * 
+ *
  *  Note: db::PathRef is choosen over db::Path for compactness
  *  of the database.
  */
@@ -1005,7 +979,7 @@ Reader::make_object (stream::geometry::Path::Reader reader)
 
 /**
  *  @brief "make_object" overloads: make a db::Text from a stream::geometry::Text
- * 
+ *
  *  Note: the texts use StringRef string references for compactness of the database.
  */
 db::Text
@@ -1047,15 +1021,14 @@ Reader::make_object (stream::geometry::Label::Reader reader)
 
 /**
  *  @brief Creates a single cell reference from the given cell index, property Id and transformation
- * 
+ *
  *  The new instance is inserted into the current cell.
- * 
+ *
  *  @param of_cell The cell to instantiate
  *  @param prop_id The (KLayout) property Id for the properties to attach to the cell instance
  *  @param ct The cell transformation
  */
-void
-Reader::make_single_cell_instance (db::cell_index_type of_cell, db::properties_id_type prop_id, const db::ICplxTrans &ct)
+void Reader::make_single_cell_instance (db::cell_index_type of_cell, db::properties_id_type prop_id, const db::ICplxTrans &ct)
 {
   db::CellInstArray ca;
 
@@ -1074,71 +1047,33 @@ Reader::make_single_cell_instance (db::cell_index_type of_cell, db::properties_i
 
 /**
  *  @brief Creates an array cell reference from the given cell index, property Id, repetition and transformation
- * 
+ *
  *  The new instance is inserted into the current cell.
- * 
+ *
  *  Enumerated cell instances are resolved in non-editable mode and kept in editable mode.
  *  Regular arrays are always maintained.
- * 
+ *
  *  @param of_cell The cell to instantiate
  *  @param prop_id The (KLayout) property Id for the properties to attach to the cell instance
  *  @param repetition The LStream repetition of the cell
  *  @param ct The cell transformation
  */
-void
-Reader::make_cell_instance (db::cell_index_type of_cell, db::properties_id_type prop_id, stream::repetition::Repetition::Reader repetition, const db::ICplxTrans &ct)
+void Reader::make_cell_instance (db::cell_index_type of_cell, db::properties_id_type prop_id, stream::repetition::Repetition::Reader repetition, const db::ICplxTrans &ct)
 {
   switch (repetition.getTypes ().which ()) {
-  case stream::repetition::Repetition::Types::ENUMERATED:
-    {
-      if (! mp_layout->is_editable ()) {
+  case stream::repetition::Repetition::Types::ENUMERATED: {
+    if (! mp_layout->is_editable ()) {
 
-        db::CellInstArray ca;
-
-        if (ct.is_complex ()) {
-          db::CellInstArray::iterated_complex_array_type array (ct.rcos (), ct.mag ());
-          make_iterated_array (repetition, array);
-          ca = db::CellInstArray (db::CellInst (of_cell), db::Trans (ct), mp_layout->array_repository ().insert (array));
-        } else {
-          db::CellInstArray::iterated_array_type array;
-          make_iterated_array (repetition, array);
-          ca = db::CellInstArray (db::CellInst (of_cell), db::Trans (ct), mp_layout->array_repository ().insert (array));
-        }
-
-        if (prop_id == 0) {
-          mp_cell->insert (ca);
-        } else {
-          mp_cell->insert (db::CellInstArrayWithProperties (ca, prop_id));
-        }
-
-      } else {
-
-        //  resolve iterated arrays in non-editable mode
-
-        std::vector<db::Vector> vectors;
-        make_vectors (repetition, vectors);
-
-        for (auto v = vectors.begin (); v != vectors.end (); ++v) {
-          make_single_cell_instance (of_cell, prop_id, db::ICplxTrans (*v) * ct);
-        }
-
-      }
-    }
-    break;
-
-  case stream::repetition::Repetition::Types::REGULAR:
-  case stream::repetition::Repetition::Types::REGULAR_ORTHO:
-    {
       db::CellInstArray ca;
 
-      db::Vector a, b;
-      unsigned long na = 0, nb = 0;
-      get_regular_array (repetition, a, b, na, nb);
-
       if (ct.is_complex ()) {
-        ca = db::CellInstArray (db::CellInst (of_cell), ct, mp_layout->array_repository (), a, b, na, nb);
+        db::CellInstArray::iterated_complex_array_type array (ct.rcos (), ct.mag ());
+        make_iterated_array (repetition, array);
+        ca = db::CellInstArray (db::CellInst (of_cell), db::Trans (ct), mp_layout->array_repository ().insert (array));
       } else {
-        ca = db::CellInstArray (db::CellInst (of_cell), db::Trans (ct), mp_layout->array_repository (), a, b, na, nb);
+        db::CellInstArray::iterated_array_type array;
+        make_iterated_array (repetition, array);
+        ca = db::CellInstArray (db::CellInst (of_cell), db::Trans (ct), mp_layout->array_repository ().insert (array));
       }
 
       if (prop_id == 0) {
@@ -1146,8 +1081,40 @@ Reader::make_cell_instance (db::cell_index_type of_cell, db::properties_id_type 
       } else {
         mp_cell->insert (db::CellInstArrayWithProperties (ca, prop_id));
       }
+
+    } else {
+
+      //  resolve iterated arrays in non-editable mode
+
+      std::vector<db::Vector> vectors;
+      make_vectors (repetition, vectors);
+
+      for (auto v = vectors.begin (); v != vectors.end (); ++v) {
+        make_single_cell_instance (of_cell, prop_id, db::ICplxTrans (*v) * ct);
+      }
     }
-    break;
+  } break;
+
+  case stream::repetition::Repetition::Types::REGULAR:
+  case stream::repetition::Repetition::Types::REGULAR_ORTHO: {
+    db::CellInstArray ca;
+
+    db::Vector a, b;
+    unsigned long na = 0, nb = 0;
+    get_regular_array (repetition, a, b, na, nb);
+
+    if (ct.is_complex ()) {
+      ca = db::CellInstArray (db::CellInst (of_cell), ct, mp_layout->array_repository (), a, b, na, nb);
+    } else {
+      ca = db::CellInstArray (db::CellInst (of_cell), db::Trans (ct), mp_layout->array_repository (), a, b, na, nb);
+    }
+
+    if (prop_id == 0) {
+      mp_cell->insert (ca);
+    } else {
+      mp_cell->insert (db::CellInstArrayWithProperties (ca, prop_id));
+    }
+  } break;
 
   case stream::repetition::Repetition::Types::SINGLE:
     make_single_cell_instance (of_cell, prop_id, ct);
@@ -1160,28 +1127,27 @@ Reader::make_cell_instance (db::cell_index_type of_cell, db::properties_id_type 
 
 /**
  *  @brief Creates array objects in "Ref" mode
- * 
+ *
  *  This method takes an object (e.g. Box etc.), a layer index and a
  *  KLayout property Id and a repetition specification.
- * 
+ *
  *  In editable mode, it will explode the repetition into a number of
  *  single shapes.
- * 
+ *
  *  In non-editable mode, it will create respective shape arrays.
  *  The shape arrays are of db::array<Object, db::UnitTrans> type.
  *  These are the valid types for simple shapes such as edges and boxes.
- * 
+ *
  *  The objects are placed inside the current cell at the layer given
  *  by "li".
- * 
+ *
  *  @param li The layer index where the shapes are to be placed
  *  @param prop_id The (KLayout) property Id for the properties to attach to the shapes
  *  @param object The basic object to place (times the repetition)
  *  @param repetition The LStream repetition of the cell
  */
 template <class Object>
-void
-Reader::make_object_array_ref (unsigned int li, db::properties_id_type prop_id, const Object &object, stream::repetition::Repetition::Reader repetition)
+void Reader::make_object_array_ref (unsigned int li, db::properties_id_type prop_id, const Object &object, stream::repetition::Repetition::Reader repetition)
 {
   if (mp_layout->is_editable ()) {
     make_object_array_explode (li, prop_id, object, repetition);
@@ -1189,36 +1155,32 @@ Reader::make_object_array_ref (unsigned int li, db::properties_id_type prop_id, 
   }
 
   switch (repetition.getTypes ().which ()) {
-  case stream::repetition::Repetition::Types::ENUMERATED:
-    {
-      typedef db::array<Object, db::UnitTrans> array_type;
-      typename array_type::iterated_array_type array;
-      make_iterated_array (repetition, array);
+  case stream::repetition::Repetition::Types::ENUMERATED: {
+    typedef db::array<Object, db::UnitTrans> array_type;
+    typename array_type::iterated_array_type array;
+    make_iterated_array (repetition, array);
 
-      if (prop_id == 0) {
-        mp_cell->shapes (li).insert (array_type (object, db::UnitTrans (), mp_layout->array_repository ().insert (array)));
-      } else {
-        mp_cell->shapes (li).insert (db::object_with_properties<array_type> (array_type (object, db::UnitTrans (), mp_layout->array_repository ().insert (array)), prop_id));
-      }
+    if (prop_id == 0) {
+      mp_cell->shapes (li).insert (array_type (object, db::UnitTrans (), mp_layout->array_repository ().insert (array)));
+    } else {
+      mp_cell->shapes (li).insert (db::object_with_properties<array_type> (array_type (object, db::UnitTrans (), mp_layout->array_repository ().insert (array)), prop_id));
     }
-    break;
+  } break;
 
   case stream::repetition::Repetition::Types::REGULAR:
-  case stream::repetition::Repetition::Types::REGULAR_ORTHO:
-    {
-      db::Vector a, b;
-      unsigned long na = 0, nb = 0;
-      get_regular_array (repetition, a, b, na, nb);
+  case stream::repetition::Repetition::Types::REGULAR_ORTHO: {
+    db::Vector a, b;
+    unsigned long na = 0, nb = 0;
+    get_regular_array (repetition, a, b, na, nb);
 
-      db::array<Object, db::UnitTrans> array (object, db::UnitTrans (), mp_layout->array_repository (), a, b, na, nb);
+    db::array<Object, db::UnitTrans> array (object, db::UnitTrans (), mp_layout->array_repository (), a, b, na, nb);
 
-      if (prop_id == 0) {
-        mp_cell->shapes (li).insert (array);
-      } else {
-        mp_cell->shapes (li).insert (db::object_with_properties<db::array<Object, db::UnitTrans> > (array, prop_id));
-      }
+    if (prop_id == 0) {
+      mp_cell->shapes (li).insert (array);
+    } else {
+      mp_cell->shapes (li).insert (db::object_with_properties<db::array<Object, db::UnitTrans>> (array, prop_id));
     }
-    break;
+  } break;
 
   case stream::repetition::Repetition::Types::SINGLE:
     mp_cell->shapes (li).insert (object);
@@ -1231,13 +1193,13 @@ Reader::make_object_array_ref (unsigned int li, db::properties_id_type prop_id, 
 
 /**
  *  @brief Creates array objects in "Ref to Ptr" mode
- * 
+ *
  *  This method takes an "ref" type object (e.g. PolygonRef etc.), a layer index and a
  *  KLayout property Id and a repetition specification.
- * 
+ *
  *  In editable mode, it will explode the repetition into a number of
  *  single shapes.
- * 
+ *
  *  In non-editable mode, it will create respective shape arrays.
  *  The shape arrays are of db::array<Object, db::DispTrans> type.
  *  The object will be converted to a "Ptr" type given by the "ObjectPtr"
@@ -1245,18 +1207,17 @@ Reader::make_object_array_ref (unsigned int li, db::properties_id_type prop_id, 
  *  "PolygonRef" is "PolygonPtr". Eventually this is a pointer to a polygon
  *  without the displacement implied by "PolygonRef". This translation
  *  is implied by the array's "front" object.
- * 
+ *
  *  The objects are placed inside the current cell at the layer given
  *  by "li".
- * 
+ *
  *  @param li The layer index where the shapes are to be placed
  *  @param prop_id The (KLayout) property Id for the properties to attach to the shapes
  *  @param object The basic object to place (times the repetition)
  *  @param repetition The LStream repetition of the cell
  */
 template <class Object, class ObjectPtr>
-void
-Reader::make_object_array_ptr (unsigned int li, db::properties_id_type prop_id, const Object &object, stream::repetition::Repetition::Reader repetition)
+void Reader::make_object_array_ptr (unsigned int li, db::properties_id_type prop_id, const Object &object, stream::repetition::Repetition::Reader repetition)
 {
   if (mp_layout->is_editable ()) {
     make_object_array_explode (li, prop_id, object, repetition);
@@ -1264,39 +1225,35 @@ Reader::make_object_array_ptr (unsigned int li, db::properties_id_type prop_id, 
   }
 
   switch (repetition.getTypes ().which ()) {
-  case stream::repetition::Repetition::Types::ENUMERATED:
-    {
-      typedef db::array<ObjectPtr, db::Disp> array_type;
-      typename array_type::iterated_array_type array;
-      make_iterated_array (repetition, array);
+  case stream::repetition::Repetition::Types::ENUMERATED: {
+    typedef db::array<ObjectPtr, db::Disp> array_type;
+    typename array_type::iterated_array_type array;
+    make_iterated_array (repetition, array);
 
-      ObjectPtr ptr (object.ptr (), db::UnitTrans ());
+    ObjectPtr ptr (object.ptr (), db::UnitTrans ());
 
-      if (prop_id == 0) {
-        mp_cell->shapes (li).insert (array_type (ptr, object.trans (), mp_layout->array_repository ().insert (array)));
-      } else {
-        mp_cell->shapes (li).insert (db::object_with_properties<array_type> (array_type (ptr, object.trans (), mp_layout->array_repository ().insert (array)), prop_id));
-      }
+    if (prop_id == 0) {
+      mp_cell->shapes (li).insert (array_type (ptr, object.trans (), mp_layout->array_repository ().insert (array)));
+    } else {
+      mp_cell->shapes (li).insert (db::object_with_properties<array_type> (array_type (ptr, object.trans (), mp_layout->array_repository ().insert (array)), prop_id));
     }
-    break;
+  } break;
 
   case stream::repetition::Repetition::Types::REGULAR:
-  case stream::repetition::Repetition::Types::REGULAR_ORTHO:
-    {
-      db::Vector a, b;
-      unsigned long na = 0, nb = 0;
-      get_regular_array (repetition, a, b, na, nb);
+  case stream::repetition::Repetition::Types::REGULAR_ORTHO: {
+    db::Vector a, b;
+    unsigned long na = 0, nb = 0;
+    get_regular_array (repetition, a, b, na, nb);
 
-      ObjectPtr ptr (object.ptr (), db::UnitTrans ());
-      db::array<ObjectPtr, db::Disp> array (ptr, object.trans (), mp_layout->array_repository (), a, b, na, nb);
+    ObjectPtr ptr (object.ptr (), db::UnitTrans ());
+    db::array<ObjectPtr, db::Disp> array (ptr, object.trans (), mp_layout->array_repository (), a, b, na, nb);
 
-      if (prop_id == 0) {
-        mp_cell->shapes (li).insert (array);
-      } else {
-        mp_cell->shapes (li).insert (db::object_with_properties<db::array<ObjectPtr, db::Disp> > (array, prop_id));
-      }
+    if (prop_id == 0) {
+      mp_cell->shapes (li).insert (array);
+    } else {
+      mp_cell->shapes (li).insert (db::object_with_properties<db::array<ObjectPtr, db::Disp>> (array, prop_id));
     }
-    break;
+  } break;
 
   case stream::repetition::Repetition::Types::SINGLE:
     mp_cell->shapes (li).insert (object);
@@ -1309,74 +1266,66 @@ Reader::make_object_array_ptr (unsigned int li, db::properties_id_type prop_id, 
 
 /**
  *  @brief Creates array objects in "explode" mode
- * 
+ *
  *  This method takes an object (e.g. db::Box, db::Polygon), a layer index and a
  *  KLayout property Id and a repetition specification.
- * 
+ *
  *  It will explode the repetition into a number of single shapes and place
  *  them inside the current cell on the given layer.
- * 
+ *
  *  @param li The layer index where the shapes are to be placed
  *  @param prop_id The (KLayout) property Id for the properties to attach to the shapes
  *  @param object The basic object to place (times the repetition)
  *  @param repetition The LStream repetition of the cell
  */
 template <class Object>
-void
-Reader::make_object_array_explode (unsigned int li, db::properties_id_type prop_id, const Object &object, stream::repetition::Repetition::Reader repetition)
+void Reader::make_object_array_explode (unsigned int li, db::properties_id_type prop_id, const Object &object, stream::repetition::Repetition::Reader repetition)
 {
   switch (repetition.getTypes ().which ()) {
-  case stream::repetition::Repetition::Types::ENUMERATED:
-    {
-      std::vector<db::Vector> vectors;
-      make_vectors (repetition, vectors);
+  case stream::repetition::Repetition::Types::ENUMERATED: {
+    std::vector<db::Vector> vectors;
+    make_vectors (repetition, vectors);
 
-      for (auto v = vectors.begin (); v != vectors.end (); ++v) {
+    for (auto v = vectors.begin (); v != vectors.end (); ++v) {
+
+      Object moved_object (object);
+      moved_object.transform (db::Disp (*v));
+
+      if (prop_id == 0) {
+        mp_cell->shapes (li).insert (moved_object);
+      } else {
+        mp_cell->shapes (li).insert (db::object_with_properties<Object> (moved_object, prop_id));
+      }
+    }
+  } break;
+
+  case stream::repetition::Repetition::Types::REGULAR:
+  case stream::repetition::Repetition::Types::REGULAR_ORTHO: {
+    db::Vector a, b;
+    unsigned long na = 0, nb = 0;
+    get_regular_array (repetition, a, b, na, nb);
+
+    na = std::max ((unsigned long) 1, na);
+    nb = std::max ((unsigned long) 1, nb);
+
+    db::Vector da;
+    for (unsigned long ia = 0; ia < na; ++ia, da += a) {
+
+      db::Vector db;
+      for (unsigned long ib = 0; ib < nb; ++ib, db += b) {
 
         Object moved_object (object);
-        moved_object.transform (db::Disp (*v));
+        moved_object.transform (db::Disp (da + db));
 
         if (prop_id == 0) {
           mp_cell->shapes (li).insert (moved_object);
         } else {
           mp_cell->shapes (li).insert (db::object_with_properties<Object> (moved_object, prop_id));
         }
-
       }
     }
-    break;
 
-  case stream::repetition::Repetition::Types::REGULAR:
-  case stream::repetition::Repetition::Types::REGULAR_ORTHO:
-    {
-      db::Vector a, b;
-      unsigned long na = 0, nb = 0;
-      get_regular_array (repetition, a, b, na, nb);
-
-      na = std::max ((unsigned long) 1, na);
-      nb = std::max ((unsigned long) 1, nb);
-
-      db::Vector da;
-      for (unsigned long ia = 0; ia < na; ++ia, da += a) {
-
-        db::Vector db;
-        for (unsigned long ib = 0; ib < nb; ++ib, db += b) {
-
-          Object moved_object (object);
-          moved_object.transform (db::Disp (da + db));
-
-          if (prop_id == 0) {
-            mp_cell->shapes (li).insert (moved_object);
-          } else {
-            mp_cell->shapes (li).insert (db::object_with_properties<Object> (moved_object, prop_id));
-          }
-
-        }
-
-      }
-
-    }
-    break;
+  } break;
 
   case stream::repetition::Repetition::Types::SINGLE:
     if (prop_id == 0) {
@@ -1394,8 +1343,7 @@ Reader::make_object_array_explode (unsigned int li, db::properties_id_type prop_
 /**
  *  @brief Overload: creates an object array for SimplePolygonRef objects
  */
-void
-Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, const db::SimplePolygonRef &object, stream::repetition::Repetition::Reader repetition)
+void Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, const db::SimplePolygonRef &object, stream::repetition::Repetition::Reader repetition)
 {
   make_object_array_ptr<db::SimplePolygonRef, db::SimplePolygonPtr> (li, prop_id, object, repetition);
 }
@@ -1403,8 +1351,7 @@ Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, cons
 /**
  *  @brief Overload: creates an object array for PolygonRef objects
  */
-void
-Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, const db::PolygonRef &object, stream::repetition::Repetition::Reader repetition)
+void Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, const db::PolygonRef &object, stream::repetition::Repetition::Reader repetition)
 {
   make_object_array_ptr<db::PolygonRef, db::PolygonPtr> (li, prop_id, object, repetition);
 }
@@ -1412,8 +1359,7 @@ Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, cons
 /**
  *  @brief Overload: creates an object array for PathRef objects
  */
-void
-Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, const db::PathRef &object, stream::repetition::Repetition::Reader repetition)
+void Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, const db::PathRef &object, stream::repetition::Repetition::Reader repetition)
 {
   make_object_array_ptr<db::PathRef, db::PathPtr> (li, prop_id, object, repetition);
 }
@@ -1421,8 +1367,7 @@ Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, cons
 /**
  *  @brief Overload: creates an object array for Box objects
  */
-void
-Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, const db::Box &object, stream::repetition::Repetition::Reader repetition)
+void Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, const db::Box &object, stream::repetition::Repetition::Reader repetition)
 {
   make_object_array_ref (li, prop_id, object, repetition);
 }
@@ -1430,8 +1375,7 @@ Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, cons
 /**
  *  @brief Overload: creates an object array for Edge objects
  */
-void
-Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, const db::Edge &object, stream::repetition::Repetition::Reader repetition)
+void Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, const db::Edge &object, stream::repetition::Repetition::Reader repetition)
 {
   make_object_array_explode (li, prop_id, object, repetition);
 }
@@ -1439,8 +1383,7 @@ Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, cons
 /**
  *  @brief Overload: creates an object array for EdgePair objects
  */
-void
-Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, const db::EdgePair &object, stream::repetition::Repetition::Reader repetition)
+void Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, const db::EdgePair &object, stream::repetition::Repetition::Reader repetition)
 {
   make_object_array_explode (li, prop_id, object, repetition);
 }
@@ -1448,8 +1391,7 @@ Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, cons
 /**
  *  @brief Overload: creates an object array for Point objects
  */
-void
-Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, const db::Point &object, stream::repetition::Repetition::Reader repetition)
+void Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, const db::Point &object, stream::repetition::Repetition::Reader repetition)
 {
   make_object_array_explode (li, prop_id, object, repetition);
 }
@@ -1457,22 +1399,20 @@ Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, cons
 /**
  *  @brief Overload: creates an object array for Text objects
  */
-void
-Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, const db::Text &object, stream::repetition::Repetition::Reader repetition)
+void Reader::make_object_array (unsigned int li, db::properties_id_type prop_id, const db::Text &object, stream::repetition::Repetition::Reader repetition)
 {
   make_object_array_explode (li, prop_id, object, repetition);
 }
 
 /**
  *  @brief Reads the instances for a layout view
- * 
+ *
  *  This method will take the given layout view (stream::layoutView::LayoutView)
  *  and produce the instances contained therein in the current cell.
- * 
+ *
  *  This method is called while reading the layout view.
  */
-void
-Reader::read_instances (stream::layoutView::LayoutView::Reader layout_view)
+void Reader::read_instances (stream::layoutView::LayoutView::Reader layout_view)
 {
   auto instance_repetitions = layout_view.getInstanceRepetitions ();
   auto instances = layout_view.getInstances ();
@@ -1521,22 +1461,21 @@ Reader::read_instances (stream::layoutView::LayoutView::Reader layout_view)
 
 /**
  *  @brief Reads the shapes of a given kindf for a layout view
- * 
+ *
  *  This method will take the given shape container (stream::layoutView::ObjectContainerForType<CPObject>)
  *  and produce the shapes of "CPObject" type contained therein. The shapes will
- *  be placed on the given layer (by "li") in the current cell. 
- * 
+ *  be placed on the given layer (by "li") in the current cell.
+ *
  *  The KLayout shape type is given by the "Object" template parameter.
- * 
+ *
  *  This method is called while reading the layout view.
- * 
+ *
  *  @param li The layer index where to produce the shapes in the current cell
  *  @param reader The shape container
  *  @param repetitions The repetition repository. This list is used to identify the repetition per shape.
  */
 template <class Object, class CPObject>
-void
-Reader::read_shapes (unsigned int li, typename stream::layoutView::ObjectContainerForType<CPObject>::Reader reader, capnp::List<stream::repetition::Repetition, capnp::Kind::STRUCT>::Reader repetitions) 
+void Reader::read_shapes (unsigned int li, typename stream::layoutView::ObjectContainerForType<CPObject>::Reader reader, capnp::List<stream::repetition::Repetition, capnp::Kind::STRUCT>::Reader repetitions)
 {
   tl_assert (mp_cell != 0);
 
@@ -1582,13 +1521,12 @@ Reader::read_shapes (unsigned int li, typename stream::layoutView::ObjectContain
 
 /**
  *  @brief Reads a layer from the given stream::layoutView::Layer
- * 
+ *
  *  The method is called while processing the layout view message.
  *  It is called per layer inside the layout view. It will extract
  *  the various shape types and place them in the specified layer.
  */
-void
-Reader::read_layer (stream::layoutView::Layer::Reader reader)
+void Reader::read_layer (stream::layoutView::Layer::Reader reader)
 {
   auto li = get_layer_by_id (reader.getLayerId ());
   auto repetitions = reader.getRepetitions ();
@@ -1605,14 +1543,13 @@ Reader::read_layer (stream::layoutView::Layer::Reader reader)
 
 /**
  *  @brief Processes the layout view message
- * 
+ *
  *  This method reads the instances and shapes contained in this message
  *  into the cell given by "cell_index".
- * 
+ *
  *  While this method is executed the current cell is set.
  */
-void
-Reader::read_layout_view (db::cell_index_type cell_index, kj::BufferedInputStream &is)
+void Reader::read_layout_view (db::cell_index_type cell_index, kj::BufferedInputStream &is)
 {
   mp_cell = &mp_layout->cell (cell_index);
 
@@ -1625,10 +1562,10 @@ Reader::read_layout_view (db::cell_index_type cell_index, kj::BufferedInputStrea
   stream::layoutView::LayoutView::Reader layout_view = message.getRoot<stream::layoutView::LayoutView> ();
 
   if (mp_cell->is_proxy ()) {
-    //  Do not read proxies (library cells, pcells) as they are restored already 
+    //  Do not read proxies (library cells, pcells) as they are restored already
     //  and are connected to some source.
     //  NOTE: this is a decision to "always update" which in actually should be
-    //  configurable. To "use data from stream", we should not update the cell 
+    //  configurable. To "use data from stream", we should not update the cell
     //  to proxy data and use the stream data instead.
     return;
   }
@@ -1651,11 +1588,10 @@ Reader::read_layout_view (db::cell_index_type cell_index, kj::BufferedInputStrea
 
 /**
  *  @brief Processes the meta data view message
- * 
+ *
  *  This method reads the meta data information for a cell.
  */
-void
-Reader::read_meta_data_view (db::cell_index_type cell_index, kj::BufferedInputStream &is)
+void Reader::read_meta_data_view (db::cell_index_type cell_index, kj::BufferedInputStream &is)
 {
   mp_cell = &mp_layout->cell (cell_index);
 
@@ -1667,30 +1603,28 @@ Reader::read_meta_data_view (db::cell_index_type cell_index, kj::BufferedInputSt
   make_meta_data (&mp_layout->cell (cell_index), meta_data.getData ());
 }
 
-/** 
+/**
  *  @brief This method is called "frequently" to yield the progress
  */
-void 
-Reader::yield_progress ()
+void Reader::yield_progress ()
 {
   m_progress.set (m_stream.position ());
 }
 
 /**
  *  @brief Reader the global header
- * 
+ *
  *  This method will also decide which library to parse if
  *  multiple libraries are present.
- * 
+ *
  *  If a single layout-type library is present, it will read that
  *  one. Otherwise it will read the first unnamed one or the
  *  first one if there are no unnamed libraries.
- * 
+ *
  *  It will set "m_library_index" to the index of the library
  *  we want to read.
  */
-void
-Reader::read_header (kj::BufferedInputStream &is)
+void Reader::read_header (kj::BufferedInputStream &is)
 {
   yield_progress ();
   capnp::PackedMessageReader message (is);
@@ -1725,7 +1659,7 @@ Reader::read_header (kj::BufferedInputStream &is)
   }
 
   if (library_index < 0) {
-    std::set <std::string> types;
+    std::set<std::string> types;
     for (auto l = libraries.begin (); l != libraries.end (); ++l) {
       if (l->getType ().size () > 0) {
         types.insert (l->getType ());
@@ -1745,8 +1679,7 @@ Reader::read_header (kj::BufferedInputStream &is)
 /**
  *  @brief Skips a library, including cells and cell views
  */
-void
-Reader::skip_library (kj::BufferedInputStream &is)
+void Reader::skip_library (kj::BufferedInputStream &is)
 {
   yield_progress ();
   capnp::PackedMessageReader message (is);
@@ -1767,17 +1700,15 @@ Reader::skip_library (kj::BufferedInputStream &is)
       yield_progress ();
       capnp::PackedMessageReader consumed (is);
     }
-
   }
 }
 
 /**
  *  @brief Reads the library message
- * 
+ *
  *  Processes the various tables contained inside the library.
  */
-void
-Reader::read_library (kj::BufferedInputStream &is)
+void Reader::read_library (kj::BufferedInputStream &is)
 {
   yield_progress ();
   capnp::PackedMessageReader message (is);
@@ -1805,7 +1736,7 @@ Reader::read_library (kj::BufferedInputStream &is)
   }
 
   if (m_layout_view_id == std::numeric_limits<uint64_t>::max ()) {
-    std::set <std::string> view_strings;
+    std::set<std::string> view_strings;
     for (auto v = views.begin (); v != views.end (); ++v) {
       view_strings.insert (v->getName ());
     }
@@ -1813,7 +1744,7 @@ Reader::read_library (kj::BufferedInputStream &is)
     error (tl::to_string (tr ("There is no view called 'layout' with 'LayoutView' class - present views are: ")) + views_str);
   }
 
-  auto layout_view = views[m_layout_view_id];
+  auto layout_view = views [m_layout_view_id];
 
   //  Read the tables we're interested in
 
@@ -1839,11 +1770,11 @@ Reader::read_library (kj::BufferedInputStream &is)
 
 /**
  *  @brief Gets the KLayout layer Id from a LStream layer Id
- * 
+ *
  *  This method can only be called after the library has been processed.
  *  It will assert if the LStream Id is not valid.
  */
-unsigned int 
+unsigned int
 Reader::get_layer_by_id (uint64_t id) const
 {
   auto m = m_layer_id_map.find (id);
@@ -1853,7 +1784,7 @@ Reader::get_layer_by_id (uint64_t id) const
 
 /**
  *  @brief Gets the name of the library for a given LStream library Id
- * 
+ *
  *  This method can only be called after the library has been processed.
  *  It will assert if the LStream Id is not valid.
  */
@@ -1871,11 +1802,11 @@ Reader::get_library_name_by_id (uint64_t id) const
 
 /**
  *  @brief Gets the KLayout property name Id for a given LStream property name Id
- * 
+ *
  *  This method can only be called after the library has been processed.
  *  It will assert if the LStream Id is not valid.
  */
-db::property_names_id_type 
+db::property_names_id_type
 Reader::get_property_name_id_by_id (uint64_t id) const
 {
   auto m = m_property_name_id_map.find (id);
@@ -1885,11 +1816,11 @@ Reader::get_property_name_id_by_id (uint64_t id) const
 
 /**
  *  @brief Gets the KLayout property set Id for a given LStream property set Id
- * 
+ *
  *  This method can only be called after the library has been processed.
  *  It will assert if the LStream Id is not valid.
  */
-db::properties_id_type 
+db::properties_id_type
 Reader::get_properties_id_by_id (uint64_t id) const
 {
   if (id == 0) {
@@ -1903,7 +1834,7 @@ Reader::get_properties_id_by_id (uint64_t id) const
 
 /**
  *  @brief Gets the db::StringRef (a text string proxy) for a given LStream text Id
- * 
+ *
  *  This method can only be called after the library has been processed.
  *  It will assert if the LStream Id is not valid.
  */

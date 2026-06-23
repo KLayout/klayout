@@ -35,7 +35,7 @@
 #endif
 
 #ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN  // ::eyeroll::
+#define WIN32_LEAN_AND_MEAN // ::eyeroll::
 #endif
 
 #define NOSERVICE 1

@@ -26,7 +26,7 @@
 
 #include "dbEdgePairRelations.h"
 
-TEST(1)
+TEST (1)
 {
   EXPECT_EQ (edge_projection (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (50, 0), db::Point (75, 0))), db::Edge::distance_type (25));
   EXPECT_EQ (edge_projection (db::Edge (db::Point (100, 0), db::Point (0, 0)), db::Edge (db::Point (50, 0), db::Point (75, 0))), db::Edge::distance_type (25));
@@ -48,7 +48,7 @@ TEST(1)
   EXPECT_EQ (edge_projection (db::Edge (db::Point (-15, -5), db::Point (95, 105)), db::Edge (db::Point (24, -20), db::Point (-24, 20))), db::Edge::distance_type (6));
 }
 
-TEST(2)
+TEST (2)
 {
   db::Edge output;
   EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 10), db::Point (100, 200)), &output), false);
@@ -96,7 +96,7 @@ TEST(2)
   EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (190, -50), db::Point (190, -50)), &output), false);
 }
 
-TEST(3)
+TEST (3)
 {
   db::Edge output;
   EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 200), db::Point (100, 200)), &output), false);
@@ -136,7 +136,7 @@ TEST(3)
   EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(-100,0;-100,-100)");
   EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), true);
-  EXPECT_EQ (output.to_string (), "(-100,100;-100,-100)");   //  dot vs. line (issue #2141)
+  EXPECT_EQ (output.to_string (), "(-100,100;-100,-100)"); //  dot vs. line (issue #2141)
   EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 50), db::Point (100, 50)), &output), false);
   EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, -50), db::Point (100, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(100,-50;100,-50)");
@@ -146,7 +146,7 @@ TEST(3)
   EXPECT_EQ (output.to_string (), "(190,-50;190,-50)");
 }
 
-TEST(4)
+TEST (4)
 {
   db::Edge output;
   EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 200), db::Point (100, 200)), &output), false);
@@ -179,7 +179,7 @@ TEST(4)
   EXPECT_EQ (output.to_string (), "(80,0;0,-57)");
   EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), false);
   EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), true);
-  EXPECT_EQ (output.to_string (), "(-100,0;-100,0)");  //  dot vs. line (issue #2141)
+  EXPECT_EQ (output.to_string (), "(-100,0;-100,0)"); //  dot vs. line (issue #2141)
   EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 50), db::Point (100, 50)), &output), false);
   EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, -50), db::Point (100, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(100,-50;100,-50)");
@@ -188,7 +188,7 @@ TEST(4)
   EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (190, -50), db::Point (190, -50)), &output), false);
 }
 
-TEST(5)
+TEST (5)
 {
   db::EdgePair output;
   bool res;
@@ -219,7 +219,7 @@ TEST(5)
   f.set_ignore_angle (10.0);
   res = f.check (db::Edge (db::Point (100, 10), db::Point (0, 10)), db::Edge (db::Point (0, 10), db::Point (100, 200)), &output);
   EXPECT_EQ (res, false);
-  
+
   db::EdgeRelationFilter ff (db::SpaceRelation, 50);
   res = ff.check (db::Edge (db::Point (100, 10), db::Point (0, 0)), db::Edge (db::Point (0, 10), db::Point (100, 200)), &output);
   EXPECT_EQ (res, false);
@@ -269,7 +269,7 @@ TEST(5)
   EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,0;54,5):(0,10;22,52)");
 }
 
-TEST(6)
+TEST (6)
 {
   db::EdgeRelationFilter f (db::WidthRelation, 70000);
   db::EdgePair output;
@@ -278,7 +278,7 @@ TEST(6)
   EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(20570000,-18890000;20650000,-18890000):(20650000,-18950000;20550000,-18950000)");
 }
 
-TEST(7)
+TEST (7)
 {
   db::EdgeRelationFilter f (db::WidthRelation, 100);
   db::EdgePair output;
@@ -357,7 +357,7 @@ TEST(7)
   EXPECT_EQ (res, false);
 }
 
-TEST(8_KissingCornerProblem)
+TEST (8_KissingCornerProblem)
 {
   //  The kissing corner problem is solved by allowing distance-0 width and space relations and checking them
   //  if the projection is >0.
@@ -468,7 +468,7 @@ TEST(8_KissingCornerProblem)
   EXPECT_EQ (res, false);
 }
 
-TEST(9_KissingCornerProblemSquareMetrics)
+TEST (9_KissingCornerProblemSquareMetrics)
 {
   //  The kissing corner problem is solved by allowing distance-0 width and space relations and checking them
   //  if the projection is >0.
@@ -546,7 +546,7 @@ TEST(9_KissingCornerProblemSquareMetrics)
   EXPECT_EQ (res, false);
 }
 
-TEST(10_KissingCornerProblemProjectionMetrics)
+TEST (10_KissingCornerProblemProjectionMetrics)
 {
   //  The kissing corner problem is solved by allowing distance-0 width and space relations and checking them
   //  if the projection is >0. It is not effective in projection metrics as there is no overlap.

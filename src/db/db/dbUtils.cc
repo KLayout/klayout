@@ -37,7 +37,7 @@ De Boor algorithm for NURBS
 */
 
 static db::DPoint
-b_spline_point (double x, const std::vector<std::pair<db::DPoint, double> > &control_points, int p, const std::vector<double> &t)
+b_spline_point (double x, const std::vector<std::pair<db::DPoint, double>> &control_points, int p, const std::vector<double> &t)
 {
   int k = (int) (std::lower_bound (t.begin (), t.end (), x + 1e-6) - t.begin ());
   if (k <= p) {
@@ -49,22 +49,22 @@ b_spline_point (double x, const std::vector<std::pair<db::DPoint, double> > &con
 
   std::vector<db::DPoint> d;
   std::vector<double> dw;
-  d.reserve(p + 1);
+  d.reserve (p + 1);
   for (int j = 0; j <= p; ++j) {
-    double w = control_points[j + k - p].second;
-    d.push_back (control_points[j + k - p].first * w);
+    double w = control_points [j + k - p].second;
+    d.push_back (control_points [j + k - p].first * w);
     dw.push_back (w);
   }
 
   for (int r = 1; r <= p; ++r) {
     for (int j = p; j >= r; --j) {
-      double alpha = (x - t[j + k - p]) / (t[j + 1 + k - r] - t[j + k - p]);
-      d[j] = d[j] * alpha + (d[j - 1] - d[j - 1] * alpha);
-      dw[j] = dw[j] * alpha + dw[j - 1] * (1.0 - alpha);
+      double alpha = (x - t [j + k - p]) / (t [j + 1 + k - r] - t [j + k - p]);
+      d [j] = d [j] * alpha + (d [j - 1] - d [j - 1] * alpha);
+      dw [j] = dw [j] * alpha + dw [j - 1] * (1.0 - alpha);
     }
   }
 
-  return d[p] * (1.0 / dw[p]);
+  return d [p] * (1.0 / dw [p]);
 }
 
 /**
@@ -90,7 +90,7 @@ spline_interpolate (std::list<db::DPoint> &curve_points,
                     typename std::list<db::DPoint>::iterator current_curve_point,
                     double t_start,
                     double dt,
-                    const std::vector<std::pair<db::DPoint, double> > &control_points,
+                    const std::vector<std::pair<db::DPoint, double>> &control_points,
                     int degree,
                     const std::vector<double> &knots,
                     double sin_da,
@@ -106,7 +106,7 @@ spline_interpolate (std::list<db::DPoint> &curve_points,
 
   db::DVector p1 (s1, *current_curve_point);
   db::DVector p2 (*pm, s1);
-  double pl1 = p1.length(), pl2 = p2.length();
+  double pl1 = p1.length (), pl2 = p2.length ();
 
   if (curve_points.size () < control_points.size () - degree - 1) {
 
@@ -120,7 +120,7 @@ spline_interpolate (std::list<db::DPoint> &curve_points,
 
     db::DVector q1 (s2, *pm);
     db::DVector q2 (*pe, s2);
-    double ql1 = q1.length(), ql2 = q2.length();
+    double ql1 = q1.length (), ql2 = q2.length ();
 
     db::DVector p (*pm, *current_curve_point);
     db::DVector q (*pe, *pm);
@@ -142,7 +142,6 @@ spline_interpolate (std::list<db::DPoint> &curve_points,
 
         curve_points.insert (pm, s1);
         spline_interpolate (curve_points, current_curve_point, t_start, dt * 0.5, control_points, degree, knots, sin_da, accu);
-
       }
 
       if (fabs (db::vprod (q1, q)) > ql * accu) {
@@ -152,24 +151,20 @@ spline_interpolate (std::list<db::DPoint> &curve_points,
 
         curve_points.insert (pe, s2);
         spline_interpolate (curve_points, pm, t_start + dt, dt * 0.5, control_points, degree, knots, sin_da, accu);
-
       }
-
     }
-
   }
 }
 
-static
-std::list<db::DPoint>
-do_spline_interpolation (const std::vector<std::pair<db::DPoint, double> > &control_points, int degree, const std::vector<double> &knots, double relative_accuracy, double absolute_accuracy)
+static std::list<db::DPoint>
+do_spline_interpolation (const std::vector<std::pair<db::DPoint, double>> &control_points, int degree, const std::vector<double> &knots, double relative_accuracy, double absolute_accuracy)
 {
   //  TODO: this is quite inefficient
-  if (int (knots.size()) != int (control_points.size() + degree + 1)) {
+  if (int (knots.size ()) != int (control_points.size () + degree + 1)) {
     throw tl::Exception (tl::to_string (tr ("Spline interpolation failed: mismatch between number of knots and points (#knots must be #points+degree+1)")));
   }
 
-  if (int(knots.size ()) <= degree || control_points.empty () || degree <= 1) {
+  if (int (knots.size ()) <= degree || control_points.empty () || degree <= 1) {
     return std::list<db::DPoint> ();
   }
 
@@ -193,9 +188,9 @@ do_spline_interpolation (const std::vector<std::pair<db::DPoint, double> > &cont
 
 template <class P>
 std::list<P>
-spline_interpolation (const std::vector<std::pair<P, double> > &control_points, int degree, const std::vector<double> &knots, double relative_accuracy, double absolute_accuracy)
+spline_interpolation (const std::vector<std::pair<P, double>> &control_points, int degree, const std::vector<double> &knots, double relative_accuracy, double absolute_accuracy)
 {
-  std::vector<std::pair<db::DPoint, double> > cp;
+  std::vector<std::pair<db::DPoint, double>> cp;
   cp.reserve (control_points.size ());
 
   for (size_t i = 0; i < control_points.size (); ++i) {
@@ -213,7 +208,7 @@ spline_interpolation (const std::vector<std::pair<P, double> > &control_points, 
 
 template <>
 DB_PUBLIC std::list<db::DPoint>
-spline_interpolation (const std::vector<std::pair<db::DPoint, double> > &control_points, int degree, const std::vector<double> &knots, double relative_accuracy, double absolute_accuracy)
+spline_interpolation (const std::vector<std::pair<db::DPoint, double>> &control_points, int degree, const std::vector<double> &knots, double relative_accuracy, double absolute_accuracy)
 {
   return do_spline_interpolation (control_points, degree, knots, relative_accuracy, absolute_accuracy);
 }
@@ -222,7 +217,7 @@ template <class P>
 std::list<P>
 spline_interpolation (const std::vector<P> &control_points, const std::vector<double> &weights, int degree, const std::vector<double> &knots, double relative_accuracy, double absolute_accuracy)
 {
-  std::vector<std::pair<P, double> > cp;
+  std::vector<std::pair<P, double>> cp;
   cp.reserve (control_points.size ());
 
   for (size_t i = 0; i < control_points.size (); ++i) {
@@ -240,7 +235,7 @@ template <class P>
 std::list<P>
 spline_interpolation (const std::vector<P> &control_points, int degree, const std::vector<double> &knots, double relative_accuracy, double absolute_accuracy)
 {
-  std::vector<std::pair<P, double> > cp;
+  std::vector<std::pair<P, double>> cp;
   cp.reserve (control_points.size ());
 
   for (size_t i = 0; i < control_points.size (); ++i) {
@@ -252,7 +247,7 @@ spline_interpolation (const std::vector<P> &control_points, int degree, const st
 
 template DB_PUBLIC std::list<db::Point> spline_interpolation (const std::vector<db::Point> &, int, const std::vector<double> &, double, double);
 template DB_PUBLIC std::list<db::Point> spline_interpolation (const std::vector<db::Point> &, const std::vector<double> &, int, const std::vector<double> &, double, double);
-template DB_PUBLIC std::list<db::Point> spline_interpolation (const std::vector<std::pair<db::Point, double> > &, int, const std::vector<double> &, double, double);
+template DB_PUBLIC std::list<db::Point> spline_interpolation (const std::vector<std::pair<db::Point, double>> &, int, const std::vector<double> &, double, double);
 
 template DB_PUBLIC std::list<db::DPoint> spline_interpolation (const std::vector<db::DPoint> &, int, const std::vector<double> &, double, double);
 template DB_PUBLIC std::list<db::DPoint> spline_interpolation (const std::vector<db::DPoint> &, const std::vector<double> &, int, const std::vector<double> &, double, double);

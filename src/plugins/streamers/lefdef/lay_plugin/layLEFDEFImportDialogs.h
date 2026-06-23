@@ -39,8 +39,7 @@ namespace lay
 /**
  *  @brief A structure containing the LEF importer data
  */
-struct LAY_PLUGIN_PUBLIC LEFDEFImportData
-{
+struct LAY_PLUGIN_PUBLIC LEFDEFImportData {
   LEFDEFImportData ();
 
   void from_string (const std::string &s);
@@ -58,7 +57,7 @@ class LAY_PLUGIN_PUBLIC LEFDEFImportOptionsDialog
   : public QDialog,
     private Ui::LEFDEFImportOptionsDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LEFDEFImportOptionsDialog (QWidget *parent, bool is_lef_dialog);
@@ -84,7 +83,7 @@ class LEFDEFReaderOptionsEditor
   : public lay::StreamReaderOptionsPage,
     public Ui::LEFDEFTechnologyComponentEditor
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LEFDEFReaderOptionsEditor (QWidget *parent);
@@ -116,4 +115,3 @@ private:
 }
 
 #endif
-

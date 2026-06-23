@@ -36,7 +36,7 @@ SubCircuit::SubCircuit ()
   //  .. nothing yet ..
 }
 
-SubCircuit::~SubCircuit()
+SubCircuit::~SubCircuit ()
 {
   for (std::vector<Net::subcircuit_pin_iterator>::const_iterator p = m_pin_refs.begin (); p != m_pin_refs.end (); ++p) {
     if (! tl::is_null_iterator (*p) && (*p)->net ()) {
@@ -143,7 +143,7 @@ const NetSubcircuitPinRef *SubCircuit::netref_for_pin (size_t pin_id) const
   if (pin_id < m_pin_refs.size ()) {
     Net::subcircuit_pin_iterator p = m_pin_refs [pin_id];
     if (! tl::is_null_iterator (p)) {
-      return p.operator-> ();
+      return p.operator->();
     }
   }
   return 0;

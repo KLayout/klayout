@@ -37,7 +37,8 @@
 
 #include <string>
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief A pair of edges
@@ -61,14 +62,14 @@ public:
   typedef db::polygon<C> polygon_type;
   typedef db::simple_polygon<C> simple_polygon_type;
   typedef db::coord_traits<C> coord_traits;
-  typedef typename coord_traits::distance_type distance_type; 
-  typedef typename coord_traits::area_type area_type; 
+  typedef typename coord_traits::distance_type distance_type;
+  typedef typename coord_traits::area_type area_type;
   typedef typename coord_traits::perimeter_type perimeter_type;
-  typedef db::object_tag< edge_pair<C> > tag;
+  typedef db::object_tag<edge_pair<C>> tag;
 
   /**
    *  @brief The default constructor.
-   *  
+   *
    *  The default constructor creates an edge pair with two default edges.
    */
   edge_pair ()
@@ -151,7 +152,7 @@ public:
     return l < bl || (l == bl && g < bg);
   }
 
-  /** 
+  /**
    *  @brief Equality test
    */
   bool operator== (const edge_pair<C> &b) const
@@ -162,12 +163,12 @@ public:
     return lesser () == b.lesser () && greater () == b.greater ();
   }
 
-  /** 
+  /**
    *  @brief Inequality test
    */
   bool operator!= (const edge_pair<C> &b) const
   {
-    return !operator== (b);
+    return ! operator== (b);
   }
 
   /**
@@ -202,7 +203,7 @@ public:
    */
   bool not_equal (const edge_pair<C> &b) const
   {
-    return !equal (b);
+    return ! equal (b);
   }
 
   /**
@@ -234,11 +235,11 @@ public:
   /**
    *  @brief Returns the moved edge pair
    *
-   *  Moves the edge by the given offset and returns the 
+   *  Moves the edge by the given offset and returns the
    *  moved edge. The edge is not modified.
    *
    *  @param p The distance to move the edge.
-   * 
+   *
    *  @return The moved edge.
    */
   edge_pair<C> moved (const vector<C> &p) const
@@ -253,7 +254,7 @@ public:
    *
    *  Transforms the edge pair with the given transformation.
    *  Modifies the edge pair with the transformed edge.
-   *  
+   *
    *  @param t The transformation to apply.
    *
    *  @return The transformed edge pair.
@@ -270,7 +271,7 @@ public:
    *
    *  Transforms the edge pair with the given transformation.
    *  Does not modify the edge pair but returns the transformed edge.
-   *  
+   *
    *  @param t The transformation to apply.
    *
    *  @return The transformed edge pair.
@@ -284,11 +285,11 @@ public:
   /**
    *  @brief Moves the edge pair.
    *
-   *  Moves the edge pair by the given offset and returns the 
+   *  Moves the edge pair by the given offset and returns the
    *  moved edge pair. The edge pair is overwritten.
    *
    *  @param p The distance to move the edge pair.
-   * 
+   *
    *  @return The moved edge pair.
    */
   edge_pair<C> &move (const vector<C> &p)
@@ -301,7 +302,7 @@ public:
   /**
    *  @brief Sets the first edge.
    */
-  void set_first (const edge_type &e) 
+  void set_first (const edge_type &e)
   {
     m_first = e;
   }
@@ -309,7 +310,7 @@ public:
   /**
    *  @brief Sets the second edge.
    */
-  void set_second (const edge_type &e) 
+  void set_second (const edge_type &e)
   {
     m_second = e;
   }
@@ -317,7 +318,7 @@ public:
   /**
    *  @brief The first edge (non-const).
    */
-  edge_type &first () 
+  edge_type &first ()
   {
     return m_first;
   }
@@ -325,7 +326,7 @@ public:
   /**
    *  @brief The second edge (non-const).
    */
-  edge_type &second () 
+  edge_type &second ()
   {
     return m_second;
   }
@@ -422,7 +423,7 @@ public:
   {
     return lesser ().to_string (dbu) + (m_symmetric ? "|" : "/") + greater ().to_string (dbu);
   }
-  
+
   /**
    *  @brief Test whether the edges inside the edge pair are parallel
    *
@@ -448,20 +449,20 @@ public:
   /**
    *  @brief Swaps the edges
    */
-  void swap_edges () 
+  void swap_edges ()
   {
     std::swap (m_first, m_second);
   }
 
   /**
-   *  @brief Normalize the edge orientation 
+   *  @brief Normalize the edge orientation
    *
-   *  This method modifies the orientation of the first edge such that both 
+   *  This method modifies the orientation of the first edge such that both
    *  edge are anti-parallel. Such edge pairs will generate polygons which are non-self overlapping.
    *  In addition, the edges are sorted such that the edges form a closed loop in clockwise
    *  direction.
    */
-  edge_pair<C> &normalize () 
+  edge_pair<C> &normalize ()
   {
     area_type a1 = db::vprod (m_first.p2 () - m_second.p2 (), m_first.p1 () - m_second.p1 ());
     area_type a2 = db::vprod (m_first.p1 () - m_second.p2 (), m_first.p2 () - m_second.p1 ());
@@ -486,7 +487,6 @@ public:
         m_first.swap_points ();
         m_second.swap_points ();
       }
-
     }
 
     return *this;
@@ -506,9 +506,9 @@ public:
    *  @brief Convert to a polygon (template)
    *
    *  The given extension is applied to start and end points as well as perpendicular.
-   *  This way it is possible to map degenerated edge pairs (points, coincident etc.) 
+   *  This way it is possible to map degenerated edge pairs (points, coincident etc.)
    *  to get an area and hence they can be mapped to polygons without vanishing.
-   *  This method does not automatically normalize the edge pairs but it is recommended 
+   *  This method does not automatically normalize the edge pairs but it is recommended
    *  to normalize them before converting them to polygons.
    */
   template <class Poly>
@@ -521,7 +521,7 @@ public:
 
       if (! m_first.is_degenerate ()) {
         e1.extend (e);
-      } 
+      }
       if (! m_second.is_degenerate ()) {
         e2.extend (e);
       }
@@ -538,17 +538,15 @@ public:
           //  a single line connecting two points: modify the edges
           e1 = DEdge (m_first.p1 (), m_second.p1 ());
           e2 = DEdge (m_second.p1 (), m_first.p1 ());
-        } 
+        }
+      }
 
-      } 
-        
       e1.shift (e);
       e2.shift (e);
-
     }
 
-    point_type pts[4] = { point_type (e1.p1 ()), point_type (e1.p2 ()),
-                          point_type (e2.p1 ()), point_type (e2.p2 ()) };
+    point_type pts [4] = {point_type (e1.p1 ()), point_type (e1.p2 ()),
+                          point_type (e2.p1 ()), point_type (e2.p2 ())};
     Poly p;
     p.assign_hull (pts + 0, pts + 4);
     return p;
@@ -586,7 +584,7 @@ private:
  *  @param s The scaling factor
  *
  *  @return The scaled edge pair
- */ 
+ */
 template <class C>
 inline edge_pair<db::DCoord>
 operator* (const edge_pair<C> &e, double s)
@@ -597,7 +595,7 @@ operator* (const edge_pair<C> &e, double s)
 /**
  *  @brief Binary * operator (transformation)
  *
- *  Transforms the edge pair with the given transformation and 
+ *  Transforms the edge pair with the given transformation and
  *  returns the result.
  *
  *  @param t The transformation to apply
@@ -605,7 +603,7 @@ operator* (const edge_pair<C> &e, double s)
  *  @return t * e
  */
 template <class C, class Tr>
-inline edge_pair<typename Tr::target_coord_type> 
+inline edge_pair<typename Tr::target_coord_type>
 operator* (const Tr &t, const edge_pair<C> &e)
 {
   return e.transformed (t);
@@ -624,7 +622,7 @@ operator<< (std::ostream &os, const edge_pair<C> &e)
 /**
  *  @brief The standard edge pair typedef
  */
-typedef edge_pair<db::Coord>  EdgePair;
+typedef edge_pair<db::Coord> EdgePair;
 
 /**
  *  @brief The double coordinate edge pair typedef
@@ -637,15 +635,14 @@ typedef edge_pair<db::DCoord> DEdgePair;
  *  @brief Special extractors for the edges
  */
 
-namespace tl 
+namespace tl
 {
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::EdgePair &b);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DEdgePair &b);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::EdgePair &b);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DEdgePair &b);
 
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::EdgePair &b);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DEdgePair &b);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::EdgePair &b);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DEdgePair &b);
 
 } // namespace tl
 
 #endif
-

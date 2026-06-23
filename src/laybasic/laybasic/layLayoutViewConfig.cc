@@ -38,7 +38,7 @@ class LayoutViewBasicConfigDeclaration
   : public lay::PluginDeclaration
 {
 public:
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> &options) const
   {
     lay::ColorConverter cc;
     options.push_back (std::pair<std::string, std::string> (cfg_default_lyp_file, ""));
@@ -87,8 +87,8 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_transient_sel_color, cc.to_string (tl::Color ())));
     options.push_back (std::pair<std::string, std::string> (cfg_transient_sel_line_width, "1"));
     options.push_back (std::pair<std::string, std::string> (cfg_transient_sel_vertex_size, "0"));
-    options.push_back (std::pair<std::string, std::string> (cfg_transient_sel_dither_pattern, "-1"));  //  no specific one
-    options.push_back (std::pair<std::string, std::string> (cfg_transient_sel_line_style, "-1"));  //  no specific one
+    options.push_back (std::pair<std::string, std::string> (cfg_transient_sel_dither_pattern, "-1")); //  no specific one
+    options.push_back (std::pair<std::string, std::string> (cfg_transient_sel_line_style, "-1"));     //  no specific one
     options.push_back (std::pair<std::string, std::string> (cfg_transient_sel_halo, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_sel_transient_mode, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_sel_inside_pcells_mode, "false"));

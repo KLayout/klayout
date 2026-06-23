@@ -28,7 +28,7 @@
 #include "dbPolygonGenerators.h"
 #include "tlUnitTest.h"
 
-TEST(1) 
+TEST (1)
 {
   db::Box box (0, 0, 1000, 1000);
   db::Polygon in (box);
@@ -37,7 +37,7 @@ TEST(1)
   db::cut_polygon (in, db::Edge (db::Point (0, 500), db::Point (1, 500)), std::back_inserter (right_of));
 
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,500;1000,500;1000,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,500;1000,500;1000,0)");
 
   right_of.clear ();
 
@@ -53,18 +53,18 @@ TEST(1)
 
   db::cut_polygon (in, db::Edge (db::Point (0, 1000), db::Point (1, 1000)), std::back_inserter (right_of));
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,1000;1000,1000;1000,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,1000;1000,1000;1000,0)");
 
   right_of.clear ();
 
   db::cut_polygon (in, db::Edge (db::Point (0, 1001), db::Point (1, 1001)), std::back_inserter (right_of));
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,1000;1000,1000;1000,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,1000;1000,1000;1000,0)");
 }
 
-TEST(2) 
+TEST (2)
 {
-  std::vector <db::Point> c;
+  std::vector<db::Point> c;
   c.push_back (db::Point (0, 0));
   c.push_back (db::Point (0, 400));
   c.push_back (db::Point (400, 400));
@@ -87,49 +87,49 @@ TEST(2)
   db::cut_polygon (in, db::Edge (db::Point (0, 200), db::Point (1, 200)), std::back_inserter (right_of));
 
   EXPECT_EQ (right_of.size (), size_t (2));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,200;100,200;100,100;200,100;200,0)");
-  EXPECT_EQ (right_of[1].to_string (), "(300,0;300,200;400,200;400,100;600,100;600,200;700,200;700,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,200;100,200;100,100;200,100;200,0)");
+  EXPECT_EQ (right_of [1].to_string (), "(300,0;300,200;400,200;400,100;600,100;600,200;700,200;700,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 100), db::Point (1, 100)), std::back_inserter (right_of));
 
   EXPECT_EQ (right_of.size (), size_t (2));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,100;200,100;200,0)");
-  EXPECT_EQ (right_of[1].to_string (), "(300,0;300,100;700,100;700,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,100;200,100;200,0)");
+  EXPECT_EQ (right_of [1].to_string (), "(300,0;300,100;700,100;700,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 50), db::Point (1, 50)), std::back_inserter (right_of));
 
   EXPECT_EQ (right_of.size (), size_t (2));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,50;200,50;200,0)");
-  EXPECT_EQ (right_of[1].to_string (), "(300,0;300,50;700,50;700,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,50;200,50;200,0)");
+  EXPECT_EQ (right_of [1].to_string (), "(300,0;300,50;700,50;700,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 300), db::Point (1, 300)), std::back_inserter (right_of));
 
   EXPECT_EQ (right_of.size (), size_t (2));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,300;100,300;100,100;200,100;200,0)");
-  EXPECT_EQ (right_of[1].to_string (), "(300,0;300,300;400,300;400,100;600,100;600,300;700,300;700,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,300;100,300;100,100;200,100;200,0)");
+  EXPECT_EQ (right_of [1].to_string (), "(300,0;300,300;400,300;400,100;600,100;600,300;700,300;700,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 400), db::Point (1, 400)), std::back_inserter (right_of));
 
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,400;400,400;400,100;600,100;600,300;700,300;700,0;300,0;300,300;100,300;100,100;200,100;200,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,400;400,400;400,100;600,100;600,300;700,300;700,0;300,0;300,300;100,300;100,100;200,100;200,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 500), db::Point (1, 500)), std::back_inserter (right_of));
 
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,400;400,400;400,100;600,100;600,300;700,300;700,0;300,0;300,300;100,300;100,100;200,100;200,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,400;400,400;400,100;600,100;600,300;700,300;700,0;300,0;300,300;100,300;100,100;200,100;200,0)");
 }
 
-TEST(3) 
+TEST (3)
 {
   db::Box box (0, 0, 1000, 1000);
   db::Polygon in (box);
 
-  std::vector <db::Point> c;
+  std::vector<db::Point> c;
   c.push_back (db::Point (100, 100));
   c.push_back (db::Point (100, 400));
   c.push_back (db::Point (200, 400));
@@ -147,24 +147,24 @@ TEST(3)
   db::cut_polygon (in, db::Edge (db::Point (0, 200), db::Point (1, 200)), std::back_inserter (right_of));
 
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,200;100,200;100,100;200,100;200,200;400,200;400,100;500,100;500,200;1000,200;1000,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,200;100,200;100,100;200,100;200,200;400,200;400,100;500,100;500,200;1000,200;1000,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 50), db::Point (1, 50)), std::back_inserter (right_of));
 
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,50;1000,50;1000,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,50;1000,50;1000,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 500), db::Point (1, 500)), std::back_inserter (right_of));
 
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,500;1000,500;1000,0/100,100;200,100;200,400;100,400/400,100;500,100;500,400;400,400)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,500;1000,500;1000,0/100,100;200,100;200,400;100,400/400,100;500,100;500,400;400,400)");
 }
 
-TEST(4) 
+TEST (4)
 {
-  std::vector <db::Point> c;
+  std::vector<db::Point> c;
   c.push_back (db::Point (0, 0));
   c.push_back (db::Point (0, 400));
   c.push_back (db::Point (400, 400));
@@ -183,45 +183,44 @@ TEST(4)
   db::cut_polygon (in, db::Edge (db::Point (0, 300), db::Point (1, 300)), std::back_inserter (right_of));
 
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,300;400,300;400,200;300,200;300,100;400,100;400,300;600,300;600,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,300;400,300;400,200;300,200;300,100;400,100;400,300;600,300;600,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (1, 300), db::Point (0, 300)), std::back_inserter (right_of));
 
   EXPECT_EQ (right_of.size (), size_t (2));
-  EXPECT_EQ (right_of[0].to_string (), "(400,300;400,400;600,400;600,300)");
-  EXPECT_EQ (right_of[1].to_string (), "(0,300;0,400;400,400;400,300)");
+  EXPECT_EQ (right_of [0].to_string (), "(400,300;400,400;600,400;600,300)");
+  EXPECT_EQ (right_of [1].to_string (), "(0,300;0,400;400,400;400,300)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 50), db::Point (1, 50)), std::back_inserter (right_of));
 
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,50;600,50;600,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,50;600,50;600,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 100), db::Point (1, 100)), std::back_inserter (right_of));
 
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,100;600,100;600,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,100;600,100;600,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 150), db::Point (1, 150)), std::back_inserter (right_of));
 
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,150;300,150;300,100;400,100;400,150;600,150;600,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,150;300,150;300,100;400,100;400,150;600,150;600,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 200), db::Point (1, 200)), std::back_inserter (right_of));
 
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,200;300,200;300,100;400,100;400,200;600,200;600,0)");
-
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,200;300,200;300,100;400,100;400,200;600,200;600,0)");
 }
 
 
-TEST(5) 
+TEST (5)
 {
-  std::vector <db::Point> c;
+  std::vector<db::Point> c;
   c.push_back (db::Point (0, 0));
   c.push_back (db::Point (0, 884));
   c.push_back (db::Point (1010, 884));
@@ -288,12 +287,12 @@ TEST(5)
   db::cut_polygon (in, db::Edge (db::Point (565, 1), db::Point (565, 0)), std::back_inserter (right_of));
 
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,884;565,884;565,332;72,332;72,313;89,313;89,332;565,332;565,327;173,327;173,304;211,304;211,327;565,327;565,302;174,302;174,275;212,275;212,302;565,302;565,268;47,268;47,257;62,257;62,268;565,268;565,243;49,243;49,231;63,231;63,243;565,243;565,214;72,214;72,194;93,194;93,214;565,214;565,77;5,77;5,15;67,15;67,77;565,77;565,38;328,38;328,17;405,17;405,38;565,38;565,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,884;565,884;565,332;72,332;72,313;89,313;89,332;565,332;565,327;173,327;173,304;211,304;211,327;565,327;565,302;174,302;174,275;212,275;212,302;565,302;565,268;47,268;47,257;62,257;62,268;565,268;565,243;49,243;49,231;63,231;63,243;565,243;565,214;72,214;72,194;93,194;93,214;565,214;565,77;5,77;5,15;67,15;67,77;565,77;565,38;328,38;328,17;405,17;405,38;565,38;565,0)");
 }
 
-TEST(6) 
+TEST (6)
 {
-  std::vector <db::Point> c;
+  std::vector<db::Point> c;
   c.push_back (db::Point (0, 0));
   c.push_back (db::Point (0, 100));
   c.push_back (db::Point (100, 100));
@@ -311,13 +310,13 @@ TEST(6)
   db::cut_polygon (in, db::Edge (db::Point (0, 200), db::Point (1, 200)), std::back_inserter (right_of));
 
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,100;100,100;200,200;300,100;400,100;400,200;500,200;500,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,100;100,100;200,200;300,100;400,100;400,200;500,200;500,0)");
   c.push_back (db::Point ());
 }
 
-TEST(7) 
+TEST (7)
 {
-  std::vector <db::Point> c;
+  std::vector<db::Point> c;
   c.push_back (db::Point (0, 0));
   c.push_back (db::Point (0, 1));
   c.push_back (db::Point (3, 1));
@@ -331,18 +330,17 @@ TEST(7)
 
   db::cut_polygon (in, db::Edge (db::Point (2, 0), db::Point (2, 1)), std::back_inserter (right_of));
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(2,0;2,1;3,1;3,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(2,0;2,1;3,1;3,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (2, 1), db::Point (2, 0)), std::back_inserter (right_of));
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,1;2,1;2,0)");
-
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,1;2,1;2,0)");
 }
 
-TEST(8) 
+TEST (8)
 {
-  std::vector <db::Point> c;
+  std::vector<db::Point> c;
   c.push_back (db::Point (0, 0));
   c.push_back (db::Point (0, 300));
   c.push_back (db::Point (300, 300));
@@ -360,19 +358,18 @@ TEST(8)
 
   db::cut_polygon (in, db::Edge (db::Point (200, 0), db::Point (200, 1)), std::back_inserter (right_of));
   EXPECT_EQ (right_of.size (), size_t (2));
-  EXPECT_EQ (right_of[0].to_string (), "(200,0;200,50;300,50;300,0)");
-  EXPECT_EQ (right_of[1].to_string (), "(200,200;200,300;300,300)");
+  EXPECT_EQ (right_of [0].to_string (), "(200,0;200,50;300,50;300,0)");
+  EXPECT_EQ (right_of [1].to_string (), "(200,200;200,300;300,300)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (200, 1), db::Point (200, 0)), std::back_inserter (right_of));
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(0,0;0,300;200,300;200,200;100,200;100,100;200,200;150,50;200,50;200,0)");
-
+  EXPECT_EQ (right_of [0].to_string (), "(0,0;0,300;200,300;200,200;100,200;100,100;200,200;150,50;200,50;200,0)");
 }
 
-TEST(9) 
+TEST (9)
 {
-  std::vector <db::Point> c;
+  std::vector<db::Point> c;
   c.push_back (db::Point (0, 0));
   c.push_back (db::Point (0, 200));
   c.push_back (db::Point (250, 200));
@@ -396,19 +393,19 @@ TEST(9)
 
   db::cut_polygon (in, db::Edge (db::Point (200, 0), db::Point (200, 1)), std::back_inserter (right_of));
   EXPECT_EQ (right_of.size (), size_t (2));
-  EXPECT_EQ (right_of[0].to_string (), "(200,0;200,200;250,200;250,100;300,100;300,200;200,200;200,400;400,400;400,0)");
-  EXPECT_EQ (right_of[1].to_string (), "(200,400;200,500;400,500;400,400)");
+  EXPECT_EQ (right_of [0].to_string (), "(200,0;200,200;250,200;250,100;300,100;300,200;200,200;200,400;400,400;400,0)");
+  EXPECT_EQ (right_of [1].to_string (), "(200,400;200,500;400,500;400,400)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (200, 1), db::Point (200, 0)), std::back_inserter (right_of));
   EXPECT_EQ (right_of.size (), size_t (2));
-  EXPECT_EQ (right_of[0].to_string (), "(0,200;0,500;200,500;200,400;100,400;100,300;150,300;150,400;200,400;200,200)");
-  EXPECT_EQ (right_of[1].to_string (), "(0,0;0,200;200,200;200,0)");
+  EXPECT_EQ (right_of [0].to_string (), "(0,200;0,500;200,500;200,400;100,400;100,300;150,300;150,400;200,400;200,200)");
+  EXPECT_EQ (right_of [1].to_string (), "(0,0;0,200;200,200;200,0)");
 }
 
-TEST(9a) 
+TEST (9a)
 {
-  std::vector <db::Point> c;
+  std::vector<db::Point> c;
   c.push_back (db::Point (942, 10230));
   c.push_back (db::Point (943, 10272));
   c.push_back (db::Point (988, 10278));
@@ -478,21 +475,21 @@ TEST(9a)
 
   db::cut_polygon (in, db::Edge (db::Point (1016, 0), db::Point (1016, 1)), std::back_inserter (right_of));
   EXPECT_EQ (right_of.size (), size_t (4));
-  EXPECT_EQ (right_of[0].to_string (), "(1016,10230;1016,10259;1027,10252;1037,10266;1021,10280;1034,10280;1038,10269;1039,10277;1036,10285;1090,10285;1090,10252;1027,10252;1017,10237;1019,10230)");
-  EXPECT_EQ (right_of[1].to_string (), "(1016,10265;1016,10280;1021,10280)");
-  EXPECT_EQ (right_of[2].to_string (), "(1016,10280;1016,10283;1017,10283;1016,10284;1016,10288;1024,10288;1022,10283;1032,10285;1027,10297;1031,10297;1036,10285;1041,10286;1043,10302;1090,10302;1090,10285;1032,10285;1034,10280)");
-  EXPECT_EQ (right_of[3].to_string (), "(1016,10288;1016,10302;1028,10302;1026,10300;1027,10297;1029,10302;1031,10297;1027,10297;1024,10288)");
+  EXPECT_EQ (right_of [0].to_string (), "(1016,10230;1016,10259;1027,10252;1037,10266;1021,10280;1034,10280;1038,10269;1039,10277;1036,10285;1090,10285;1090,10252;1027,10252;1017,10237;1019,10230)");
+  EXPECT_EQ (right_of [1].to_string (), "(1016,10265;1016,10280;1021,10280)");
+  EXPECT_EQ (right_of [2].to_string (), "(1016,10280;1016,10283;1017,10283;1016,10284;1016,10288;1024,10288;1022,10283;1032,10285;1027,10297;1031,10297;1036,10285;1041,10286;1043,10302;1090,10302;1090,10285;1032,10285;1034,10280)");
+  EXPECT_EQ (right_of [3].to_string (), "(1016,10288;1016,10302;1028,10302;1026,10300;1027,10297;1029,10302;1031,10297;1027,10297;1024,10288)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (1016, 1), db::Point (1016, 0)), std::back_inserter (right_of));
   EXPECT_EQ (right_of.size (), size_t (2));
-  EXPECT_EQ (right_of[0].to_string (), "(942,10230;994,10274;988,10278;999,10278;994,10274;1007,10265;1002,10280;1016,10280;1016,10265;1007,10265;1012,10252;1014,10260;1007,10265;1016,10265;1014,10260;1016,10259;1016,10230;942,10230;942,10281;983,10281;988,10278;1002,10280;994,10302;1016,10302;1016,10288;1011,10288;1003,10281;1016,10283;1016,10280;1002,10280;999,10278;988,10278;943,10272)");
-  EXPECT_EQ (right_of[1].to_string (), "(1016,10284;1011,10288;1016,10288)");
+  EXPECT_EQ (right_of [0].to_string (), "(942,10230;994,10274;988,10278;999,10278;994,10274;1007,10265;1002,10280;1016,10280;1016,10265;1007,10265;1012,10252;1014,10260;1007,10265;1016,10265;1014,10260;1016,10259;1016,10230;942,10230;942,10281;983,10281;988,10278;1002,10280;994,10302;1016,10302;1016,10288;1011,10288;1003,10281;1016,10283;1016,10280;1002,10280;999,10278;988,10278;943,10272)");
+  EXPECT_EQ (right_of [1].to_string (), "(1016,10284;1011,10288;1016,10288)");
 }
 
-TEST(9b) 
+TEST (9b)
 {
-  std::vector <db::Point> c;
+  std::vector<db::Point> c;
   c.push_back (db::Point (942, 10230));
   c.push_back (db::Point (942, 10265));
   c.push_back (db::Point (943, 10265));
@@ -515,18 +512,17 @@ TEST(9b)
 
   db::cut_polygon (in, db::Edge (db::Point (1007, 0), db::Point (1007, 1)), std::back_inserter (right_of));
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(1007,10230;1007,10265;1012,10252;1014,10260;1007,10265;1016,10265;1014,10260;1016,10259;1016,10230)");
+  EXPECT_EQ (right_of [0].to_string (), "(1007,10230;1007,10265;1012,10252;1014,10260;1007,10265;1016,10265;1014,10260;1016,10259;1016,10230)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (1007, 1), db::Point (1007, 0)), std::back_inserter (right_of));
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(942,10230;942,10265;943,10265;942,10230;983,10265;1007,10265;1007,10230)");
-
+  EXPECT_EQ (right_of [0].to_string (), "(942,10230;942,10265;943,10265;942,10230;983,10265;1007,10265;1007,10230)");
 }
 
-TEST(9c) 
+TEST (9c)
 {
-  std::vector <db::Point> c;
+  std::vector<db::Point> c;
   c.push_back (db::Point (14335, 8265));
   c.push_back (db::Point (14335, 10265));
   c.push_back (db::Point (17335, 10265));
@@ -560,22 +556,22 @@ TEST(9c)
 
   db::cut_polygon (in, db::Edge (db::Point (15835, 0), db::Point (15835, 1)), std::back_inserter (right_of));
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(17335,8265;16335,9265;15835,9265;15835,9765;16002,9932;15835,10015;15835,10265;17335,10265)");
+  EXPECT_EQ (right_of [0].to_string (), "(17335,8265;16335,9265;15835,9265;15835,9765;16002,9932;15835,10015;15835,10265;17335,10265)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (15835, 1), db::Point (15835, 0)), std::back_inserter (right_of));
   EXPECT_EQ (right_of.size (), size_t (4));
   if (right_of.size () >= 4) {
-    EXPECT_EQ (right_of[0].to_string (), "(14335,8265;14335,9265;15335,9265)");
-    EXPECT_EQ (right_of[1].to_string (), "(15335,9265;15335,9765;15668,9932;15835,9765;15835,9265)");
-    EXPECT_EQ (right_of[2].to_string (), "(14335,9265;14335,10265;15335,10265;15335,9765)");
-    EXPECT_EQ (right_of[3].to_string (), "(15668,9932;15335,10265;15835,10265;15835,10015)");
+    EXPECT_EQ (right_of [0].to_string (), "(14335,8265;14335,9265;15335,9265)");
+    EXPECT_EQ (right_of [1].to_string (), "(15335,9265;15335,9765;15668,9932;15835,9765;15835,9265)");
+    EXPECT_EQ (right_of [2].to_string (), "(14335,9265;14335,10265;15335,10265;15335,9765)");
+    EXPECT_EQ (right_of [3].to_string (), "(15668,9932;15335,10265;15835,10265;15835,10015)");
   }
 }
 
-TEST(9d) 
+TEST (9d)
 {
-  std::vector <db::Point> c;
+  std::vector<db::Point> c;
   c.push_back (db::Point (17335, 8265));
   c.push_back (db::Point (16335, 9265));
   c.push_back (db::Point (15335, 9265));
@@ -596,25 +592,24 @@ TEST(9d)
 
   db::cut_polygon (in, db::Edge (db::Point (16002, 0), db::Point (16002, 1)), std::back_inserter (right_of));
   EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(17335,8265;16335,9265;16002,9265;16002,10265;17335,10265)");
+  EXPECT_EQ (right_of [0].to_string (), "(17335,8265;16335,9265;16002,9265;16002,10265;17335,10265)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (16002, 1), db::Point (16002, 0)), std::back_inserter (right_of));
   EXPECT_EQ (right_of.size (), size_t (2));
-  EXPECT_EQ (right_of[0].to_string (), "(15668,9932;15335,10265;16002,10265;16002,9932;15835,10015)");
-  EXPECT_EQ (right_of[1].to_string (), "(15335,9265;15335,9765;15668,9932;15835,9765;16002,9932;16002,9265)");
+  EXPECT_EQ (right_of [0].to_string (), "(15668,9932;15335,10265;16002,10265;16002,9932;15835,10015)");
+  EXPECT_EQ (right_of [1].to_string (), "(15335,9265;15335,9765;15668,9932;15835,9765;16002,9932;16002,9265)");
 }
 
-TEST(10)
+TEST (10)
 {
   //  Simple test for polygon-box/edge interaction (integer coordinates)
   db::Polygon poly;
-  db::Point p[] = {
+  db::Point p [] = {
     db::Point (0, 100),
     db::Point (100, 100),
-    db::Point (0, 0)
-  };
-  poly.assign_hull (p, p + sizeof (p) / sizeof (p[0]));
+    db::Point (0, 0)};
+  poly.assign_hull (p, p + sizeof (p) / sizeof (p [0]));
 
   EXPECT_EQ (interact (poly, db::Edge (-10, -10, -1, -1)), false);
   EXPECT_EQ (interact (poly, db::Edge (-10, -10, 0, 0)), true);
@@ -693,16 +688,15 @@ TEST(10)
   EXPECT_EQ (interact (db::Polygon (db::Box (-10, -10, 50, 110)), db::Polygon (db::Box (0, 0, 100, 100))), true);
 }
 
-TEST(11)
+TEST (11)
 {
   //  Simple test for polygon-box interaction (double coordinates)
   db::DPolygon poly;
-  db::DPoint p[] = {
+  db::DPoint p [] = {
     db::DPoint (0, 100),
     db::DPoint (100, 100),
-    db::DPoint (0, 0)
-  };
-  poly.assign_hull (p, p + sizeof (p) / sizeof (p[0]));
+    db::DPoint (0, 0)};
+  poly.assign_hull (p, p + sizeof (p) / sizeof (p [0]));
 
   EXPECT_EQ (interact (poly, db::DEdge (-1.0, -1.0, -0.1, -0.1)), false);
   EXPECT_EQ (interact (poly, db::DEdge (-10, -10, 0, 0)), true);
@@ -783,38 +777,36 @@ TEST(11)
   EXPECT_EQ (interact (db::DPolygon (db::DBox (-10, -10, 50, 110)), db::DPolygon (db::DBox (0, 0, 100, 100))), true);
 }
 
-TEST(12)
+TEST (12)
 {
   //  Simple test for polygon-box interaction (integer coordinates)
   db::Polygon poly;
-  db::Point p[] = {
-    db::Point (3595000+960,3812000+680),
-    db::Point (3595000+960,3812000+1080),
-    db::Point (3595000+680,3812000+1080),
-    db::Point (3595000+680,3812000+1320),
-    db::Point (3595000+1720,3812000+1320),
-    db::Point (3595000+1720,3812000+1080),
-    db::Point (3595000+1240,3812000+1080),
-    db::Point (3595000+1240,3812000+680)
-  };
-  poly.assign_hull (p, p + sizeof (p) / sizeof (p[0]));
+  db::Point p [] = {
+    db::Point (3595000 + 960, 3812000 + 680),
+    db::Point (3595000 + 960, 3812000 + 1080),
+    db::Point (3595000 + 680, 3812000 + 1080),
+    db::Point (3595000 + 680, 3812000 + 1320),
+    db::Point (3595000 + 1720, 3812000 + 1320),
+    db::Point (3595000 + 1720, 3812000 + 1080),
+    db::Point (3595000 + 1240, 3812000 + 1080),
+    db::Point (3595000 + 1240, 3812000 + 680)};
+  poly.assign_hull (p, p + sizeof (p) / sizeof (p [0]));
 
   db::Polygon poly2;
-  db::Point p2[] = {
-    db::Point (3595000+660-1000,3812000+480-1000),
-    db::Point (3595000+660-1000,3812000+520),
-    db::Point (3595000+480,3812000+520),
-    db::Point (3595000+480,3812000+880),
-    db::Point (3595000+760,3812000+880),
-    db::Point (3595000+760,3812000+520),
-    db::Point (3595000+1460,3812000+520),
-    db::Point (3595000+1460,3812000+830),
-    db::Point (3595000+1720,3812000+830),
-    db::Point (3595000+1720,3812000+520),
-    db::Point (3595000+1940,3812000+520),
-    db::Point (3595000+1940,3812000+480-1000)
-  };
-  poly2.assign_hull (p2, p2 + sizeof (p2) / sizeof (p2[0]));
+  db::Point p2 [] = {
+    db::Point (3595000 + 660 - 1000, 3812000 + 480 - 1000),
+    db::Point (3595000 + 660 - 1000, 3812000 + 520),
+    db::Point (3595000 + 480, 3812000 + 520),
+    db::Point (3595000 + 480, 3812000 + 880),
+    db::Point (3595000 + 760, 3812000 + 880),
+    db::Point (3595000 + 760, 3812000 + 520),
+    db::Point (3595000 + 1460, 3812000 + 520),
+    db::Point (3595000 + 1460, 3812000 + 830),
+    db::Point (3595000 + 1720, 3812000 + 830),
+    db::Point (3595000 + 1720, 3812000 + 520),
+    db::Point (3595000 + 1940, 3812000 + 520),
+    db::Point (3595000 + 1940, 3812000 + 480 - 1000)};
+  poly2.assign_hull (p2, p2 + sizeof (p2) / sizeof (p2 [0]));
 
   EXPECT_EQ (interact (poly, poly2), false);
   EXPECT_EQ (interact (poly2, poly), false);
@@ -840,7 +832,7 @@ static std::string am_to_string (const db::AreaMap &am)
   return r;
 }
 
-TEST(20) 
+TEST (20)
 {
   db::Box box (100, 100, 500, 500);
   db::Polygon in (box);
@@ -851,7 +843,7 @@ TEST(20)
   EXPECT_EQ (am_to_string (am), "(10000,20000,10000),(20000,40000,20000),(10000,20000,10000)");
 }
 
-TEST(21) 
+TEST (21)
 {
   db::Box box (200, 200, 400, 400);
   db::Polygon in (box);
@@ -862,7 +854,7 @@ TEST(21)
   EXPECT_EQ (am_to_string (am), "(0,0,0),(0,40000,0),(0,0,0)");
 }
 
-TEST(22) 
+TEST (22)
 {
   db::Box box (250, 250, 350, 350);
   db::Polygon in (box);
@@ -873,7 +865,7 @@ TEST(22)
   EXPECT_EQ (am_to_string (am), "(0,0,0),(0,10000,0),(0,0,0)");
 }
 
-TEST(23) 
+TEST (23)
 {
   db::Box box (-1000, -500, 2000, 3000);
   db::Polygon in (box);
@@ -884,16 +876,15 @@ TEST(23)
   EXPECT_EQ (am_to_string (am), "(40000,40000,40000),(40000,40000,40000),(40000,40000,40000)");
 }
 
-TEST(24) 
+TEST (24)
 {
-  db::Point p[3] = {
+  db::Point p [3] = {
     db::Point (0, 100),
     db::Point (500, 500),
-    db::Point (0, 0)
-  };
+    db::Point (0, 0)};
 
   db::Polygon in;
-  in.assign_hull (&p[0], &p[3]);
+  in.assign_hull (&p [0], &p [3]);
 
   db::AreaMap am (db::Point (0, 0), db::Vector (100, 100), 5, 5);
   db::rasterize (in, am);
@@ -902,16 +893,15 @@ TEST(24)
   EXPECT_EQ (am.total_area (), 25000);
 }
 
-TEST(25) 
+TEST (25)
 {
-  db::Point p[3] = {
+  db::Point p [3] = {
     db::Point (0, 100),
     db::Point (600, 500),
-    db::Point (300, 0)
-  };
+    db::Point (300, 0)};
 
   db::Polygon in;
-  in.assign_hull (&p[0], &p[3]);
+  in.assign_hull (&p [0], &p [3]);
 
   db::AreaMap am (db::Point (0, 0), db::Vector (100, 100), 5, 5);
   db::rasterize (in, am);
@@ -951,9 +941,9 @@ TEST(25)
   EXPECT_EQ (am_to_string (am), "(1750)");
 }
 
-TEST(26) 
+TEST (26)
 {
-  db::Point p[10] = {
+  db::Point p [10] = {
     db::Point (0, 300),
     db::Point (300, 300),
     db::Point (300, 0),
@@ -963,11 +953,10 @@ TEST(26)
     db::Point (200, 200),
     db::Point (100, 200),
     db::Point (100, 0),
-    db::Point (0, 0)
-  };
+    db::Point (0, 0)};
 
   db::Polygon in;
-  in.assign_hull (&p[0], &p[10]);
+  in.assign_hull (&p [0], &p [10]);
 
   db::AreaMap am (db::Point (0, 0), db::Vector (100, 100), 3, 3);
   db::rasterize (in, am);
@@ -975,9 +964,9 @@ TEST(26)
   EXPECT_EQ (am_to_string (am), "(10000,10000,10000),(10000,0,10000),(10000,10000,10000)");
 }
 
-TEST(27) 
+TEST (27)
 {
-  db::Point p[10] = {
+  db::Point p [10] = {
     db::Point (-100, 400),
     db::Point (400, 400),
     db::Point (400, -100),
@@ -987,11 +976,10 @@ TEST(27)
     db::Point (200, 200),
     db::Point (100, 200),
     db::Point (100, -100),
-    db::Point (-100, -100)
-  };
+    db::Point (-100, -100)};
 
   db::Polygon in;
-  in.assign_hull (&p[0], &p[10]);
+  in.assign_hull (&p [0], &p [10]);
 
   db::AreaMap am (db::Point (0, 0), db::Vector (100, 100), 3, 3);
   db::rasterize (in, am);
@@ -999,9 +987,9 @@ TEST(27)
   EXPECT_EQ (am_to_string (am), "(10000,10000,10000),(10000,0,10000),(10000,10000,10000)");
 }
 
-TEST(28) 
+TEST (28)
 {
-  db::Point p[10] = {
+  db::Point p [10] = {
     db::Point (-100, 400),
     db::Point (400, 400),
     db::Point (400, -100),
@@ -1011,11 +999,10 @@ TEST(28)
     db::Point (180, 180),
     db::Point (120, 180),
     db::Point (120, -100),
-    db::Point (-100, -100)
-  };
+    db::Point (-100, -100)};
 
   db::Polygon in;
-  in.assign_hull (&p[0], &p[10]);
+  in.assign_hull (&p [0], &p [10]);
 
   db::AreaMap am (db::Point (0, 0), db::Vector (100, 100), 3, 3);
   db::rasterize (in, am);
@@ -1023,62 +1010,60 @@ TEST(28)
   EXPECT_EQ (am_to_string (am), "(10000,10000,10000),(10000,6400,10000),(10000,10000,10000)");
 }
 
-TEST(29) 
+TEST (29)
 {
-  db::Point p[] = {
-    db::Point (1600,7009),
-    db::Point (1600,7351),
-    db::Point (1335,8538),
-    db::Point (1341,8545),
-    db::Point (1669,8545),
-    db::Point (1669,7009)
-  };
+  db::Point p [] = {
+    db::Point (1600, 7009),
+    db::Point (1600, 7351),
+    db::Point (1335, 8538),
+    db::Point (1341, 8545),
+    db::Point (1669, 8545),
+    db::Point (1669, 7009)};
 
   db::Polygon in;
-  in.assign_hull (&p[0], &p[sizeof(p)/sizeof(p[0])]);
+  in.assign_hull (&p [0], &p [sizeof (p) / sizeof (p [0])]);
 
-  db::AreaMap am (db::Point (1360,7038), db::Vector (60,60), 6, 26);
+  db::AreaMap am (db::Point (1360, 7038), db::Vector (60, 60), 6, 26);
   db::rasterize (in, am);
 
   EXPECT_EQ (am_to_string (am), "(0,0,0,0,3600,540),(0,0,0,0,3600,540),(0,0,0,0,3600,540),(0,0,0,0,3600,540),(0,0,0,0,3600,540),(0,0,0,235,3600,540),(0,0,0,1020,3600,540),(0,0,0,1830,3600,540),(0,0,0,2640,3600,540),(0,0,36,3411,3600,540),(0,0,630,3600,3600,540),(0,0,1440,3600,3600,540),(0,0,2250,3600,3600,540),(0,0,3060,3600,3600,540),(0,269,3589,3600,3600,540),(0,1050,3600,3600,3600,540),(0,1860,3600,3600,3600,540),(0,2670,3600,3600,3600,540),(52,3424,3600,3600,3600,540),(690,3600,3600,3600,3600,540),(1470,3600,3600,3600,3600,540),(2280,3600,3600,3600,3600,540),(3090,3600,3600,3600,3600,540),(3592,3600,3600,3600,3600,540),(3600,3600,3600,3600,3600,540),(420,420,420,420,420,63)");
 }
 
-TEST(30) 
+TEST (30)
 {
-  db::Point p[] = {
-    db::Point (7161,-9547),
-    db::Point (7128,-9531),
-    db::Point (7128,-9198),
-    db::Point (7398,-9198),
-    db::Point (7398,-8928),
-    db::Point (7668,-8928),
-    db::Point (7668,-8658),
-    db::Point (7938,-8658),
-    db::Point (7938,-8388),
-    db::Point (8208,-8388),
-    db::Point (8208,-8118),
-    db::Point (8478,-8118),
-    db::Point (8478,-7848),
-    db::Point (8748,-7848),
-    db::Point (8748,-7578),
-    db::Point (9045,-7578),
-    db::Point (9061,-7610),
-    db::Point (8951,-7759),
-    db::Point (8550,-8245),
-    db::Point (8121,-8703),
-    db::Point (7661,-9133)
-  };
+  db::Point p [] = {
+    db::Point (7161, -9547),
+    db::Point (7128, -9531),
+    db::Point (7128, -9198),
+    db::Point (7398, -9198),
+    db::Point (7398, -8928),
+    db::Point (7668, -8928),
+    db::Point (7668, -8658),
+    db::Point (7938, -8658),
+    db::Point (7938, -8388),
+    db::Point (8208, -8388),
+    db::Point (8208, -8118),
+    db::Point (8478, -8118),
+    db::Point (8478, -7848),
+    db::Point (8748, -7848),
+    db::Point (8748, -7578),
+    db::Point (9045, -7578),
+    db::Point (9061, -7610),
+    db::Point (8951, -7759),
+    db::Point (8550, -8245),
+    db::Point (8121, -8703),
+    db::Point (7661, -9133)};
 
   db::Polygon in;
-  in.assign_hull (&p[0], &p[sizeof(p)/sizeof(p[0])]);
+  in.assign_hull (&p [0], &p [sizeof (p) / sizeof (p [0])]);
 
-  db::AreaMap am (db::Point (7128,-9547), db::Vector (81,82), 24, 25);
+  db::AreaMap am (db::Point (7128, -9547), db::Vector (81, 82), 24, 25);
   db::rasterize (in, am);
 
   EXPECT_EQ (am_to_string (am), "(5418,1071,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),(6642,6267,1967,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),(6642,6642,6582,3119,15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),(6642,6642,6642,6642,4317,240,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),(1701,1701,1701,4995,6642,5303,735,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),(0,0,0,4428,6642,6642,5952,1127,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),(0,0,0,4428,6642,6642,6642,6178,1484,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),(0,0,0,2430,3645,3645,4644,6642,6355,1859,0,0,0,0,0,0,0,0,0,0,0,0,0,0),(0,0,0,0,0,0,2214,6642,6642,6489,2275,0,0,0,0,0,0,0,0,0,0,0,0,0),(0,0,0,0,0,0,2214,6642,6642,6642,6582,2698,0,0,0,0,0,0,0,0,0,0,0,0),(0,0,0,0,0,0,1863,5589,5589,5589,6642,6632,2994,0,0,0,0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0,0,0,6642,6642,6624,2698,0,0,0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0,0,0,6642,6642,6642,6587,2379,0,0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0,0,0,6642,6642,6642,6642,6537,2111,0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0,0,0,891,891,891,4725,6642,6471,1859,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0,0,0,0,0,0,4428,6642,6642,6378,1570,0,0,0,0,0,0),(0,0,0,0,0,0,0,0,0,0,0,0,0,4428,6642,6642,6642,6166,960,0,0,0,0,0),(0,0,0,0,0,0,0,0,0,0,0,0,0,1890,2835,2835,4104,6642,5617,432,0,0,0,0),(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2214,6642,6642,4860,104,0,0,0),(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2214,6642,6642,6642,3854,0,0,0),(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1593,4779,4779,4779,6642,2788,0,0),(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6642,6538,1777,0),(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6642,6642,6110,704),(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6642,6642,6642,4539),(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,81,81,81,55)");
 }
 
-TEST(41)
+TEST (41)
 {
   db::Point pattern [] = {
     db::Point (0, -100),
@@ -1088,11 +1073,10 @@ TEST(41)
     db::Point (50, 50),
     db::Point (100, 75),
     db::Point (100, 0),
-    db::Point (100, -50)
-  };
+    db::Point (100, -50)};
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
   db::Polygon pout = minkowski_sum (p, db::Edge (db::Point (10, 10), db::Point (210, 110)), true);
 
@@ -1118,7 +1102,7 @@ TEST(41)
 
   EXPECT_EQ (pout.to_string (), "(210,-190;143,-157;110,-165;-90,-65;10,110;85,72;110,85;310,-15;310,-140)");
 
-  std::vector <db::Point> c;
+  std::vector<db::Point> c;
   c.push_back (db::Point (10, 10));
   c.push_back (db::Point (10, 110));
   c.push_back (db::Point (210, 110));
@@ -1162,7 +1146,7 @@ TEST(41)
   EXPECT_EQ (pout.to_string (), "(10,-90;10,-65;-90,-65;-90,235;10,410;510,410;535,385;610,385;610,-40;510,-90)");
 }
 
-TEST(42)
+TEST (42)
 {
   db::Point pattern [] = {
     db::Point (0, -100),
@@ -1172,25 +1156,23 @@ TEST(42)
     db::Point (50, 50),
     db::Point (100, 75),
     db::Point (100, 0),
-    db::Point (100, -50)
-  };
+    db::Point (100, -50)};
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
   db::Point hole [] = {
-    db::Point (20, -67), 
-    db::Point (20, -30), 
-    db::Point (15, -26), 
-    db::Point (-60, -45), 
-    db::Point (4, 68), 
-    db::Point (46, 26), 
-    db::Point (80, 43), 
-    db::Point (80, -37)
-  };
+    db::Point (20, -67),
+    db::Point (20, -30),
+    db::Point (15, -26),
+    db::Point (-60, -45),
+    db::Point (4, 68),
+    db::Point (46, 26),
+    db::Point (80, 43),
+    db::Point (80, -37)};
 
-  p.insert_hole (&hole[0], &hole[0] + sizeof (hole) / sizeof (hole[0]));
-  
+  p.insert_hole (&hole [0], &hole [0] + sizeof (hole) / sizeof (hole [0]));
+
   db::Polygon pout = minkowski_sum (p, db::Edge (db::Point (10, 10), db::Point (30, 10)), true);
 
   EXPECT_EQ (pout.to_string (), "(10,-90;10,-45;-70,-65;-90,-65;-15,65;27,65;-27,-29;25,-16;45,-16;50,-20;50,-47;90,-27;90,43;76,36;56,36;27,65;-15,65;-8,78;10,110;30,110;73,67;110,85;130,85;130,-40;30,-90)");
@@ -1205,7 +1187,7 @@ TEST(42)
 }
 
 //  smoothing
-TEST(100) 
+TEST (100)
 {
   db::Point pattern [] = {
     db::Point (0, -100),
@@ -1217,14 +1199,14 @@ TEST(100)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
-  EXPECT_EQ (smooth (p, 5, true).to_string (),  "(0,-100;0,0;50,10;100,-10;150,0;150,-100)");
+  EXPECT_EQ (smooth (p, 5, true).to_string (), "(0,-100;0,0;50,10;100,-10;150,0;150,-100)");
   EXPECT_EQ (smooth (p, 20, true).to_string (), "(0,-100;0,0;150,0;150,-100)");
 }
 
 //  smoothing
-TEST(101) 
+TEST (101)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -1236,14 +1218,14 @@ TEST(101)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
-  EXPECT_EQ (smooth (p, 5, true).to_string (),  "(100,-10;50,10;0,0;0,100;150,100;150,0)");
+  EXPECT_EQ (smooth (p, 5, true).to_string (), "(100,-10;50,10;0,0;0,100;150,100;150,0)");
   EXPECT_EQ (smooth (p, 20, true).to_string (), "(0,0;0,100;150,100;150,0)");
 }
 
 //  smoothing
-TEST(102) 
+TEST (102)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -1253,14 +1235,14 @@ TEST(102)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
-  EXPECT_EQ (smooth (p, 20, true).to_string (),  "()");
+  EXPECT_EQ (smooth (p, 20, true).to_string (), "()");
   EXPECT_EQ (smooth (p, 5, true).to_string (), "(100,-10;150,0;0,0;50,10)");
 }
 
 //  smoothing
-TEST(103)
+TEST (103)
 {
   db::Point pattern [] = {
     db::Point (56852, -237283),
@@ -1276,19 +1258,18 @@ TEST(103)
     db::Point (66516, -248243),
     db::Point (63261, -249092),
     db::Point (59995, -249899),
-    db::Point (59881, -249925)
-  };
+    db::Point (59881, -249925)};
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
-  EXPECT_EQ (smooth (p, 0, true).to_string (),  "(59881,-249925;56852,-237283;56961,-237258;60061,-236492;63152,-235686;66231,-234839;69300,-233952;69407,-233919;73105,-246382;72992,-246417;69760,-247351;66516,-248243;63261,-249092;59995,-249899)");
-  EXPECT_EQ (smooth (p, 50, true).to_string (),  "(59881,-249925;56852,-237283;63152,-235686;69407,-233919;73105,-246382;69760,-247351)");
-  EXPECT_EQ (smooth (p, 5000, true).to_string (),  "(59881,-249925;56852,-237283;69407,-233919;73105,-246382)");
+  EXPECT_EQ (smooth (p, 0, true).to_string (), "(59881,-249925;56852,-237283;56961,-237258;60061,-236492;63152,-235686;66231,-234839;69300,-233952;69407,-233919;73105,-246382;72992,-246417;69760,-247351;66516,-248243;63261,-249092;59995,-249899)");
+  EXPECT_EQ (smooth (p, 50, true).to_string (), "(59881,-249925;56852,-237283;63152,-235686;69407,-233919;73105,-246382;69760,-247351)");
+  EXPECT_EQ (smooth (p, 5000, true).to_string (), "(59881,-249925;56852,-237283;69407,-233919;73105,-246382)");
 }
 
 //  smoothing
-TEST(104)
+TEST (104)
 {
   db::Point pattern [] = {
     db::Point (-245, -942),
@@ -1297,18 +1278,17 @@ TEST(104)
     db::Point (247, 943),
     db::Point (248, 943),
     db::Point (943, 246),
-    db::Point (-244, -942)
-  };
+    db::Point (-244, -942)};
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
-  EXPECT_EQ (smooth (p, 12, false).to_string (),  "(-244,-942;-942,-246;248,943;943,246)");
-  EXPECT_EQ (smooth (p, 12, true).to_string (),  "(-245,-942;-942,-247;-942,-246;247,943;248,943;943,246;-244,-942)");
+  EXPECT_EQ (smooth (p, 12, false).to_string (), "(-244,-942;-942,-246;248,943;943,246)");
+  EXPECT_EQ (smooth (p, 12, true).to_string (), "(-245,-942;-942,-247;-942,-246;247,943;248,943;943,246;-244,-942)");
 }
 
 //  smoothing
-TEST(105)
+TEST (105)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -1318,22 +1298,21 @@ TEST(105)
     db::Point (800, 1100),
     db::Point (800, 1000),
     db::Point (2000, 1000),
-    db::Point (2000, 0)
-  };
+    db::Point (2000, 0)};
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
-  EXPECT_EQ (smooth (p, 0, false).to_string (),  "(0,0;0,1000;100,1000;100,1100;800,1100;800,1000;2000,1000;2000,0)");
-  EXPECT_EQ (smooth (p, 50, false).to_string (),  "(0,0;0,1000;100,1000;100,1100;800,1100;800,1000;2000,1000;2000,0)");
-  EXPECT_EQ (smooth (p, 80, false).to_string (),  "(0,0;0,1000;100,1100;800,1100;800,1000;2000,1000;2000,0)");
-  EXPECT_EQ (smooth (p, 90, false).to_string (),  "(0,0;0,1000;800,1100;800,1000;2000,1000;2000,0)");
-  EXPECT_EQ (smooth (p, 100, false).to_string (),  "(0,0;0,1000;2000,1000;2000,0)");
-  EXPECT_EQ (smooth (p, 100, true).to_string (),  "(0,0;0,1000;100,1000;100,1100;800,1100;800,1000;2000,1000;2000,0)");
+  EXPECT_EQ (smooth (p, 0, false).to_string (), "(0,0;0,1000;100,1000;100,1100;800,1100;800,1000;2000,1000;2000,0)");
+  EXPECT_EQ (smooth (p, 50, false).to_string (), "(0,0;0,1000;100,1000;100,1100;800,1100;800,1000;2000,1000;2000,0)");
+  EXPECT_EQ (smooth (p, 80, false).to_string (), "(0,0;0,1000;100,1100;800,1100;800,1000;2000,1000;2000,0)");
+  EXPECT_EQ (smooth (p, 90, false).to_string (), "(0,0;0,1000;800,1100;800,1000;2000,1000;2000,0)");
+  EXPECT_EQ (smooth (p, 100, false).to_string (), "(0,0;0,1000;2000,1000;2000,0)");
+  EXPECT_EQ (smooth (p, 100, true).to_string (), "(0,0;0,1000;100,1000;100,1100;800,1100;800,1000;2000,1000;2000,0)");
 }
 
 //  smoothing
-TEST(106)
+TEST (106)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -1359,15 +1338,15 @@ TEST(106)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
-  EXPECT_EQ (smooth (p, 0, false).to_string (),  "(0,0;0,73235;100,74568;700,82468;1200,90468;2000,106468;2300,114468;2700,130468;2800,138468;2800,154468;2700,162468;2300,178468;2000,186468;1200,202468;700,210468;100,218368;0,219701;0,272971;126450,272971;126450,0)");
-  EXPECT_EQ (smooth (p, 100, false).to_string (),  "(0,0;100,74568;1200,90468;2300,114468;2800,138468;2700,162468;2000,186468;700,210468;0,219701;0,272971;126450,272971;126450,0)");
-  EXPECT_EQ (smooth (p, 100, true).to_string (),  "(0,0;0,73235;1200,90468;2300,114468;2800,138468;2800,154468;2000,186468;700,210468;0,219701;0,272971;126450,272971;126450,0)");
+  EXPECT_EQ (smooth (p, 0, false).to_string (), "(0,0;0,73235;100,74568;700,82468;1200,90468;2000,106468;2300,114468;2700,130468;2800,138468;2800,154468;2700,162468;2300,178468;2000,186468;1200,202468;700,210468;100,218368;0,219701;0,272971;126450,272971;126450,0)");
+  EXPECT_EQ (smooth (p, 100, false).to_string (), "(0,0;100,74568;1200,90468;2300,114468;2800,138468;2700,162468;2000,186468;700,210468;0,219701;0,272971;126450,272971;126450,0)");
+  EXPECT_EQ (smooth (p, 100, true).to_string (), "(0,0;0,73235;1200,90468;2300,114468;2800,138468;2800,154468;2000,186468;700,210468;0,219701;0,272971;126450,272971;126450,0)");
 }
 
 //  smoothing, small units
-TEST(107)
+TEST (107)
 {
   db::Point pattern [] = {
     db::Point (1, 1),
@@ -1415,18 +1394,17 @@ TEST(107)
     db::Point (17, 4),
     db::Point (17, 3),
     db::Point (16, 3),
-    db::Point (16, 1)
-  };
+    db::Point (16, 1)};
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
-  EXPECT_EQ (smooth (p, 0, false).to_string (),  "(1,1;1,2;2,2;2,4;3,4;3,5;4,5;4,7;5,7;5,8;6,8;6,9;7,9;7,16;8,16;8,17;9,17;9,18;10,18;10,19;12,19;12,20;16,20;16,21;17,21;17,22;18,22;18,23;24,23;24,15;23,15;23,14;22,14;22,12;21,12;21,10;20,10;20,8;19,8;19,6;18,6;18,4;17,4;17,3;16,3;16,1)");
-  EXPECT_EQ (smooth (p, 1, false).to_string (),  "(1,1;2,4;4,5;4,7;7,9;7,16;10,18;18,22;24,23;24,15;22,14;18,4;17,4;16,1)");
+  EXPECT_EQ (smooth (p, 0, false).to_string (), "(1,1;1,2;2,2;2,4;3,4;3,5;4,5;4,7;5,7;5,8;6,8;6,9;7,9;7,16;8,16;8,17;9,17;9,18;10,18;10,19;12,19;12,20;16,20;16,21;17,21;17,22;18,22;18,23;24,23;24,15;23,15;23,14;22,14;22,12;21,12;21,10;20,10;20,8;19,8;19,6;18,6;18,4;17,4;17,3;16,3;16,1)");
+  EXPECT_EQ (smooth (p, 1, false).to_string (), "(1,1;2,4;4,5;4,7;7,9;7,16;10,18;18,22;24,23;24,15;22,14;18,4;17,4;16,1)");
 }
 
 //  rounding
-TEST(200) 
+TEST (200)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -1436,7 +1414,7 @@ TEST(200)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
   {
     double rinner = 0.0, router = 0.0;
@@ -1445,11 +1423,11 @@ TEST(200)
     db::Polygon pp = compute_rounded (p, 0, 20000, 200);
     EXPECT_EQ (pp.hull ().size (), size_t (200));
     EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
-    
-    EXPECT_EQ (tl::to_string (rinner),  "0");
-    EXPECT_EQ (tl::to_string (router),  "20000");
-    EXPECT_EQ (tl::to_string (n),  "200");
-    EXPECT_EQ (pr.to_string (),  "(0,0;0,100000;100000,100000;100000,0)");
+
+    EXPECT_EQ (tl::to_string (rinner), "0");
+    EXPECT_EQ (tl::to_string (router), "20000");
+    EXPECT_EQ (tl::to_string (n), "200");
+    EXPECT_EQ (pr.to_string (), "(0,0;0,100000;100000,100000;100000,0)");
   }
 
   {
@@ -1459,11 +1437,11 @@ TEST(200)
     db::Polygon pp = compute_rounded (p, 0, 50000, 200);
     EXPECT_EQ (pp.hull ().size (), size_t (200));
     EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
-    
-    EXPECT_EQ (tl::to_string (rinner),  "0");
-    EXPECT_EQ (tl::to_string (router),  "50000");
-    EXPECT_EQ (tl::to_string (n),  "200");
-    EXPECT_EQ (pr.to_string (),  "(0,0;0,100000;100000,100000;100000,0)");
+
+    EXPECT_EQ (tl::to_string (rinner), "0");
+    EXPECT_EQ (tl::to_string (router), "50000");
+    EXPECT_EQ (tl::to_string (n), "200");
+    EXPECT_EQ (pr.to_string (), "(0,0;0,100000;100000,100000;100000,0)");
   }
 
   {
@@ -1473,16 +1451,16 @@ TEST(200)
     db::Polygon pp = compute_rounded (p, 0, 70000, 200);
     EXPECT_EQ (pp.hull ().size (), size_t (200));
     EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
-    
-    EXPECT_EQ (tl::to_string (rinner),  "0");
-    EXPECT_EQ (tl::to_string (router),  "50000");
-    EXPECT_EQ (tl::to_string (n),  "200");
-    EXPECT_EQ (pr.to_string (),  "(0,0;0,100000;100000,100000;100000,0)");
+
+    EXPECT_EQ (tl::to_string (rinner), "0");
+    EXPECT_EQ (tl::to_string (router), "50000");
+    EXPECT_EQ (tl::to_string (n), "200");
+    EXPECT_EQ (pr.to_string (), "(0,0;0,100000;100000,100000;100000,0)");
   }
 }
 
 //  rounding
-TEST(201) 
+TEST (201)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -1492,7 +1470,7 @@ TEST(201)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
   {
     double rinner = 0.0, router = 0.0;
@@ -1501,16 +1479,16 @@ TEST(201)
     db::Polygon pp = compute_rounded (p, 0, 50000, 200);
     EXPECT_EQ (pp.hull ().size (), size_t (200));
     EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
-    
-    EXPECT_EQ (tl::to_string (rinner),  "0");
-    EXPECT_EQ (tl::to_string (router),  "25000");
-    EXPECT_EQ (tl::to_string (n),  "200");
-    EXPECT_EQ (pr.to_string (),  "(0,0;0,100000;50000,100000;50000,0)");
+
+    EXPECT_EQ (tl::to_string (rinner), "0");
+    EXPECT_EQ (tl::to_string (router), "25000");
+    EXPECT_EQ (tl::to_string (n), "200");
+    EXPECT_EQ (pr.to_string (), "(0,0;0,100000;50000,100000;50000,0)");
   }
 }
 
 //  rounding
-TEST(202) 
+TEST (202)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -1531,8 +1509,8 @@ TEST(202)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
-  p.insert_hole (&hole[0], &hole[0] + sizeof (hole) / sizeof (hole[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
+  p.insert_hole (&hole [0], &hole [0] + sizeof (hole) / sizeof (hole [0]));
 
   {
     double rinner = 0.0, router = 0.0;
@@ -1541,11 +1519,11 @@ TEST(202)
     db::Polygon pp = compute_rounded (p, 50000, 150000, 200);
     EXPECT_EQ (pp.hull ().size (), size_t (300));
     EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
-    
-    EXPECT_EQ (tl::to_string (rinner),  "50000");
-    EXPECT_EQ (tl::to_string (router),  "150000");
-    EXPECT_EQ (tl::to_string (n),  "200");
-    EXPECT_EQ (pr.to_string (),  "(0,0;0,600000;400000,600000;400000,400000;600000,400000;600000,0/100000,100000;500000,100000;500000,300000;300000,300000;300000,500000;100000,500000)");
+
+    EXPECT_EQ (tl::to_string (rinner), "50000");
+    EXPECT_EQ (tl::to_string (router), "150000");
+    EXPECT_EQ (tl::to_string (n), "200");
+    EXPECT_EQ (pr.to_string (), "(0,0;0,600000;400000,600000;400000,400000;600000,400000;600000,0/100000,100000;500000,100000;500000,300000;300000,300000;300000,500000;100000,500000)");
   }
 
   {
@@ -1555,11 +1533,11 @@ TEST(202)
     db::Polygon pp = compute_rounded (p, 100000, 150000, 200);
     EXPECT_EQ (pp.hull ().size (), size_t (300));
     EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
-    
-    EXPECT_EQ (tl::to_string (rinner),  "92000");
-    EXPECT_EQ (tl::to_string (router),  "120000");
-    EXPECT_EQ (tl::to_string (n),  "200");
-    EXPECT_EQ (pr.to_string (),  "(0,0;0,600000;400000,600000;400000,400000;600000,400000;600000,0/100000,100000;500000,100000;500000,300000;300000,300000;300000,500000;100000,500000)");
+
+    EXPECT_EQ (tl::to_string (rinner), "92000");
+    EXPECT_EQ (tl::to_string (router), "120000");
+    EXPECT_EQ (tl::to_string (n), "200");
+    EXPECT_EQ (pr.to_string (), "(0,0;0,600000;400000,600000;400000,400000;600000,400000;600000,0/100000,100000;500000,100000;500000,300000;300000,300000;300000,500000;100000,500000)");
   }
 
   {
@@ -1580,16 +1558,16 @@ TEST(202)
 
     EXPECT_EQ (pp.hull ().size (), size_t (301));
     EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
-    
-    EXPECT_EQ (tl::to_string (rinner),  "50000");
-    EXPECT_EQ (tl::to_string (router),  "150000");
-    EXPECT_EQ (tl::to_string (n),  "200");
-    EXPECT_EQ (pr.to_string (),  "(0,0;0,600000;400000,600000;400000,400000;600000,400000;600000,0/100000,100000;500000,100000;500000,300000;300000,300000;300000,500000;100000,500000)");
+
+    EXPECT_EQ (tl::to_string (rinner), "50000");
+    EXPECT_EQ (tl::to_string (router), "150000");
+    EXPECT_EQ (tl::to_string (n), "200");
+    EXPECT_EQ (pr.to_string (), "(0,0;0,600000;400000,600000;400000,400000;600000,400000;600000,0/100000,100000;500000,100000;500000,300000;300000,300000;300000,500000;100000,500000)");
   }
 }
 
 //  rounding
-TEST(203) 
+TEST (203)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -1610,8 +1588,8 @@ TEST(203)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
-  p.insert_hole (&hole[0], &hole[0] + sizeof (hole) / sizeof (hole[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
+  p.insert_hole (&hole [0], &hole [0] + sizeof (hole) / sizeof (hole [0]));
 
   double rinner = 0.0, router = 0.0;
   unsigned int n;
@@ -1631,15 +1609,15 @@ TEST(203)
 
   EXPECT_EQ (pp.hull ().size (), size_t (300));
   EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
-  
-  EXPECT_EQ (tl::to_string (rinner),  "5000");
-  EXPECT_EQ (tl::to_string (router),  "15000");
-  EXPECT_EQ (tl::to_string (n),  "200");
-  EXPECT_EQ (pr.to_string (),  "(0,0;0,60000;40000,60000;40000,40000;60000,40000;60000,0/10000,10000;50000,10000;50000,30000;30000,30000;30000,50000;10000,50000)");
+
+  EXPECT_EQ (tl::to_string (rinner), "5000");
+  EXPECT_EQ (tl::to_string (router), "15000");
+  EXPECT_EQ (tl::to_string (n), "200");
+  EXPECT_EQ (pr.to_string (), "(0,0;0,60000;40000,60000;40000,40000;60000,40000;60000,0/10000,10000;50000,10000;50000,30000;30000,30000;30000,50000;10000,50000)");
 }
 
 //  rounding
-TEST(204) 
+TEST (204)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -1656,8 +1634,8 @@ TEST(204)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
-  p.insert_hole (&hole[0], &hole[0] + sizeof (hole) / sizeof (hole[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
+  p.insert_hole (&hole [0], &hole [0] + sizeof (hole) / sizeof (hole [0]));
 
   double rinner = 0.0, router = 0.0;
   unsigned int n;
@@ -1677,15 +1655,15 @@ TEST(204)
 
   EXPECT_EQ (pp.hull ().size (), size_t (200));
   EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
-  
-  EXPECT_EQ (tl::to_string (rinner),  "10000");
-  EXPECT_EQ (tl::to_string (router),  "20000");
-  EXPECT_EQ (tl::to_string (n),  "200");
-  EXPECT_EQ (pr.to_string (),  "(0,0;0,40000;40000,40000;40000,0/10000,10000;30000,10000;30000,30000;10000,30000)");
+
+  EXPECT_EQ (tl::to_string (rinner), "10000");
+  EXPECT_EQ (tl::to_string (router), "20000");
+  EXPECT_EQ (tl::to_string (n), "200");
+  EXPECT_EQ (pr.to_string (), "(0,0;0,40000;40000,40000;40000,0/10000,10000;30000,10000;30000,30000;10000,30000)");
 }
 
 //  rounding
-TEST(205_issue318)
+TEST (205_issue318)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -1695,7 +1673,7 @@ TEST(205_issue318)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
   double rinner = 0.0, router = 0.0;
   unsigned int n;
@@ -1703,24 +1681,24 @@ TEST(205_issue318)
   db::Polygon pp = compute_rounded (p, 100000, 200000, 64);
   EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
 
-  EXPECT_EQ (tl::to_string (rinner),  "0");
-  EXPECT_EQ (tl::to_string (router),  "200000");
-  EXPECT_EQ (tl::to_string (n),  "64");
+  EXPECT_EQ (tl::to_string (rinner), "0");
+  EXPECT_EQ (tl::to_string (router), "200000");
+  EXPECT_EQ (tl::to_string (n), "64");
   //  slight rounding errors, but still a good approximation ...
-  EXPECT_EQ (pr.to_string (),  "(0,0;0,419998;400000,400002;400000,0)");
+  EXPECT_EQ (pr.to_string (), "(0,0;0,419998;400000,400002;400000,0)");
 
   pp = compute_rounded (p, 50000, 100000, 64);
   EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
 
-  EXPECT_EQ (tl::to_string (rinner),  "0");
-  EXPECT_EQ (tl::to_string (router),  "100000");
-  EXPECT_EQ (tl::to_string (n),  "64");
+  EXPECT_EQ (tl::to_string (rinner), "0");
+  EXPECT_EQ (tl::to_string (router), "100000");
+  EXPECT_EQ (tl::to_string (n), "64");
   //  slight rounding issue due to  ...
-  EXPECT_EQ (pr.to_string (),  "(0,0;0,420001;400000,400000;400000,0)");
+  EXPECT_EQ (pr.to_string (), "(0,0;0,420001;400000,400000;400000,0)");
 }
 
 //  rounding
-TEST(206_issue318)
+TEST (206_issue318)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -1730,7 +1708,7 @@ TEST(206_issue318)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
   double rinner = 0.0, router = 0.0;
   unsigned int n;
@@ -1738,58 +1716,57 @@ TEST(206_issue318)
   db::Polygon pp = compute_rounded (p, 100000, 200000, 64);
   EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
 
-  EXPECT_EQ (tl::to_string (rinner),  "0");
-  EXPECT_EQ (tl::to_string (router),  "199992");
-  EXPECT_EQ (tl::to_string (n),  "65");
+  EXPECT_EQ (tl::to_string (rinner), "0");
+  EXPECT_EQ (tl::to_string (router), "199992");
+  EXPECT_EQ (tl::to_string (n), "65");
   //  good approximation of a top edge ...
-  EXPECT_EQ (pr.to_string (),  "(0,0;0,618467;400000,581242;400000,0)");
+  EXPECT_EQ (pr.to_string (), "(0,0;0,618467;400000,581242;400000,0)");
 
   pp = compute_rounded (p, 50000, 100000, 64);
   EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
 
-  EXPECT_EQ (tl::to_string (rinner),  "0");
-  EXPECT_EQ (tl::to_string (router),  "100000");
-  EXPECT_EQ (tl::to_string (n),  "64");
+  EXPECT_EQ (tl::to_string (rinner), "0");
+  EXPECT_EQ (tl::to_string (router), "100000");
+  EXPECT_EQ (tl::to_string (n), "64");
   //  the acute corner is split into two parts
-  EXPECT_EQ (pr.to_string (),  "(0,0;0,20309228;199083,20290710;400000,400000;400000,0)");
+  EXPECT_EQ (pr.to_string (), "(0,0;0,20309228;199083,20290710;400000,400000;400000,0)");
 }
 
 //  rounding
-TEST(207_issue318)
+TEST (207_issue318)
 {
   db::Point pattern [] = {
-    db::Point(-2523825, -4693678),
-    db::Point(-2627783, -4676814),
-    db::Point(-2705532, -4629488),
-    db::Point(-2747861, -4559084),
-    db::Point(-2750596, -4499543),
-    db::Point(-2753284, -4335751),
-    db::Point(-2764621, -4271381),
-    db::Point(-2828260, -4154562),
-    db::Point(-2808940, -4144038),
-    db::Point(-2743579, -4264019),
-    db::Point(-2731316, -4333649),
-    db::Point(-2728604, -4498857),
-    db::Point(-2726139, -4552516),
-    db::Point(-2689468, -4613512),
-    db::Point(-2620017, -4655786),
-    db::Point(-2529175, -4670522),
-    db::Point(-2468652, -4627768),
-    db::Point(-2437469, -4536777),
-    db::Point(-2434902, -4384723),
-    db::Point(-2436252, -4320529),
-    db::Point(-2395450, -4234678),
-    db::Point(-2338494, -4144716),
-    db::Point(-2319906, -4156484),
-    db::Point(-2376150, -4245322),
-    db::Point(-2414148, -4325271),
-    db::Point(-2412898, -4384677),
-    db::Point(-2415531, -4540623),
-    db::Point(-2450148, -4641632)
-  };
+    db::Point (-2523825, -4693678),
+    db::Point (-2627783, -4676814),
+    db::Point (-2705532, -4629488),
+    db::Point (-2747861, -4559084),
+    db::Point (-2750596, -4499543),
+    db::Point (-2753284, -4335751),
+    db::Point (-2764621, -4271381),
+    db::Point (-2828260, -4154562),
+    db::Point (-2808940, -4144038),
+    db::Point (-2743579, -4264019),
+    db::Point (-2731316, -4333649),
+    db::Point (-2728604, -4498857),
+    db::Point (-2726139, -4552516),
+    db::Point (-2689468, -4613512),
+    db::Point (-2620017, -4655786),
+    db::Point (-2529175, -4670522),
+    db::Point (-2468652, -4627768),
+    db::Point (-2437469, -4536777),
+    db::Point (-2434902, -4384723),
+    db::Point (-2436252, -4320529),
+    db::Point (-2395450, -4234678),
+    db::Point (-2338494, -4144716),
+    db::Point (-2319906, -4156484),
+    db::Point (-2376150, -4245322),
+    db::Point (-2414148, -4325271),
+    db::Point (-2412898, -4384677),
+    db::Point (-2415531, -4540623),
+    db::Point (-2450148, -4641632)};
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
   double rinner = 0.0, router = 0.0;
   unsigned int n;
@@ -1799,7 +1776,7 @@ TEST(207_issue318)
 }
 
 //  is_convex
-TEST(300)
+TEST (300)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -1816,12 +1793,12 @@ TEST(300)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
   EXPECT_EQ (db::is_convex (p), true);
   EXPECT_EQ (db::is_convex (db::polygon_to_simple_polygon (p)), true);
 
-  p.insert_hole (&hole[0], &hole[0] + sizeof (hole) / sizeof (hole[0]));
+  p.insert_hole (&hole [0], &hole [0] + sizeof (hole) / sizeof (hole [0]));
 
   EXPECT_EQ (db::is_convex (p), false);
   EXPECT_EQ (db::is_convex (db::polygon_to_simple_polygon (p)), false);
@@ -1829,9 +1806,9 @@ TEST(300)
 }
 
 struct TestPolygonSink
-  : db::SimplePolygonSink
-{
-  void put (const db::SimplePolygon &p) {
+  : db::SimplePolygonSink {
+  void put (const db::SimplePolygon &p)
+  {
     if (! s.empty ()) {
       s += "\n";
     }
@@ -1841,7 +1818,7 @@ struct TestPolygonSink
 };
 
 //  decompose_to_convex
-TEST(310)
+TEST (310)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -1858,7 +1835,7 @@ TEST(310)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
   TestPolygonSink ps;
 
@@ -1869,38 +1846,35 @@ TEST(310)
   db::decompose_convex (db::polygon_to_simple_polygon (p), db::PO_any, ps);
   EXPECT_EQ (ps.s, "(0,0;0,40000;40000,40000;40000,0)");
 
-  p.insert_hole (&hole[0], &hole[0] + sizeof (hole) / sizeof (hole[0]));
+  p.insert_hole (&hole [0], &hole [0] + sizeof (hole) / sizeof (hole [0]));
 
   ps.s.clear ();
   db::decompose_convex (p, db::PO_any, ps);
   EXPECT_EQ (ps.s,
-    "(0,10000;0,30000;10000,30000;10000,10000)\n"
-    "(0,30000;0,40000;30000,40000;30000,30000)\n"
-    "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
-    "(0,0;0,10000;40000,10000;40000,0)"
-  );
+             "(0,10000;0,30000;10000,30000;10000,10000)\n"
+             "(0,30000;0,40000;30000,40000;30000,30000)\n"
+             "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
+             "(0,0;0,10000;40000,10000;40000,0)");
 
   ps.s.clear ();
   db::decompose_convex (db::polygon_to_simple_polygon (p), db::PO_any, ps);
   EXPECT_EQ (ps.s,
-    "(0,30000;0,40000;30000,40000;30000,30000)\n"
-    "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
-    "(10000,0;10000,10000;40000,10000;40000,0)\n"
-    "(0,0;0,30000;10000,30000;10000,0)"
-  );
+             "(0,30000;0,40000;30000,40000;30000,30000)\n"
+             "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
+             "(10000,0;10000,10000;40000,10000;40000,0)\n"
+             "(0,0;0,30000;10000,30000;10000,0)");
 
   ps.s.clear ();
   db::decompose_convex (db::simple_polygon_to_polygon (db::polygon_to_simple_polygon (p)), db::PO_any, ps);
   EXPECT_EQ (ps.s,
-    "(0,10000;0,30000;10000,30000;10000,10000)\n"
-    "(0,30000;0,40000;30000,40000;30000,30000)\n"
-    "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
-    "(0,0;0,10000;40000,10000;40000,0)"
-  );
+             "(0,10000;0,30000;10000,30000;10000,10000)\n"
+             "(0,30000;0,40000;30000,40000;30000,30000)\n"
+             "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
+             "(0,0;0,10000;40000,10000;40000,0)");
 }
 
 //  decompose_to_convex
-TEST(311)
+TEST (311)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -1917,7 +1891,7 @@ TEST(311)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
   TestPolygonSink ps;
 
@@ -1928,38 +1902,35 @@ TEST(311)
   db::decompose_convex (db::polygon_to_simple_polygon (p), db::PO_horizontal, ps);
   EXPECT_EQ (ps.s, "(0,0;0,40000;40000,40000;40000,0)");
 
-  p.insert_hole (&hole[0], &hole[0] + sizeof (hole) / sizeof (hole[0]));
+  p.insert_hole (&hole [0], &hole [0] + sizeof (hole) / sizeof (hole [0]));
 
   ps.s.clear ();
   db::decompose_convex (p, db::PO_horizontal, ps);
   EXPECT_EQ (ps.s,
-    "(0,10000;0,30000;10000,30000;10000,10000)\n"
-    "(0,30000;0,40000;40000,40000;40000,30000)\n"
-    "(30000,10000;30000,30000;40000,30000;40000,10000)\n"
-    "(0,0;0,10000;40000,10000;40000,0)"
-  );
+             "(0,10000;0,30000;10000,30000;10000,10000)\n"
+             "(0,30000;0,40000;40000,40000;40000,30000)\n"
+             "(30000,10000;30000,30000;40000,30000;40000,10000)\n"
+             "(0,0;0,10000;40000,10000;40000,0)");
 
   ps.s.clear ();
   db::decompose_convex (db::polygon_to_simple_polygon (p), db::PO_horizontal, ps);
   EXPECT_EQ (ps.s,
-    "(0,30000;0,40000;40000,40000;40000,30000)\n"
-    "(30000,10000;30000,30000;40000,30000;40000,10000)\n"
-    "(0,0;0,10000;40000,10000;40000,0)\n"
-    "(0,10000;0,30000;10000,30000;10000,10000)"
-  );
+             "(0,30000;0,40000;40000,40000;40000,30000)\n"
+             "(30000,10000;30000,30000;40000,30000;40000,10000)\n"
+             "(0,0;0,10000;40000,10000;40000,0)\n"
+             "(0,10000;0,30000;10000,30000;10000,10000)");
 
   ps.s.clear ();
   db::decompose_convex (db::simple_polygon_to_polygon (db::polygon_to_simple_polygon (p)), db::PO_horizontal, ps);
   EXPECT_EQ (ps.s,
-    "(0,10000;0,30000;10000,30000;10000,10000)\n"
-    "(0,30000;0,40000;40000,40000;40000,30000)\n"
-    "(30000,10000;30000,30000;40000,30000;40000,10000)\n"
-    "(0,0;0,10000;40000,10000;40000,0)"
-  );
+             "(0,10000;0,30000;10000,30000;10000,10000)\n"
+             "(0,30000;0,40000;40000,40000;40000,30000)\n"
+             "(30000,10000;30000,30000;40000,30000;40000,10000)\n"
+             "(0,0;0,10000;40000,10000;40000,0)");
 }
 
 //  decompose_to_convex
-TEST(312)
+TEST (312)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -1976,7 +1947,7 @@ TEST(312)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
   TestPolygonSink ps;
 
@@ -1987,38 +1958,35 @@ TEST(312)
   db::decompose_convex (db::polygon_to_simple_polygon (p), db::PO_htrapezoids, ps);
   EXPECT_EQ (ps.s, "(0,0;0,40000;40000,40000;40000,0)");
 
-  p.insert_hole (&hole[0], &hole[0] + sizeof (hole) / sizeof (hole[0]));
+  p.insert_hole (&hole [0], &hole [0] + sizeof (hole) / sizeof (hole [0]));
 
   ps.s.clear ();
   db::decompose_convex (p, db::PO_htrapezoids, ps);
   EXPECT_EQ (ps.s,
-    "(0,10000;0,30000;10000,30000;10000,10000)\n"
-    "(0,30000;0,40000;30000,40000;30000,30000)\n"
-    "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
-    "(0,0;0,10000;40000,10000;40000,0)"
-  );
+             "(0,10000;0,30000;10000,30000;10000,10000)\n"
+             "(0,30000;0,40000;30000,40000;30000,30000)\n"
+             "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
+             "(0,0;0,10000;40000,10000;40000,0)");
 
   ps.s.clear ();
   db::decompose_convex (db::polygon_to_simple_polygon (p), db::PO_htrapezoids, ps);
   EXPECT_EQ (ps.s,
-    "(0,30000;0,40000;30000,40000;30000,30000)\n"
-    "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
-    "(10000,0;10000,10000;40000,10000;40000,0)\n"
-    "(0,0;0,30000;10000,30000;10000,0)"
-  );
+             "(0,30000;0,40000;30000,40000;30000,30000)\n"
+             "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
+             "(10000,0;10000,10000;40000,10000;40000,0)\n"
+             "(0,0;0,30000;10000,30000;10000,0)");
 
   ps.s.clear ();
   db::decompose_convex (db::simple_polygon_to_polygon (db::polygon_to_simple_polygon (p)), db::PO_htrapezoids, ps);
   EXPECT_EQ (ps.s,
-    "(0,10000;0,30000;10000,30000;10000,10000)\n"
-    "(0,30000;0,40000;30000,40000;30000,30000)\n"
-    "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
-    "(0,0;0,10000;40000,10000;40000,0)"
-  );
+             "(0,10000;0,30000;10000,30000;10000,10000)\n"
+             "(0,30000;0,40000;30000,40000;30000,30000)\n"
+             "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
+             "(0,0;0,10000;40000,10000;40000,0)");
 }
 
 //  decompose_to_convex
-TEST(313)
+TEST (313)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -2035,7 +2003,7 @@ TEST(313)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
   TestPolygonSink ps;
 
@@ -2046,38 +2014,35 @@ TEST(313)
   db::decompose_convex (db::polygon_to_simple_polygon (p), db::PO_vertical, ps);
   EXPECT_EQ (ps.s, "(0,0;0,40000;40000,40000;40000,0)");
 
-  p.insert_hole (&hole[0], &hole[0] + sizeof (hole) / sizeof (hole[0]));
+  p.insert_hole (&hole [0], &hole [0] + sizeof (hole) / sizeof (hole [0]));
 
   ps.s.clear ();
   db::decompose_convex (p, db::PO_vertical, ps);
   EXPECT_EQ (ps.s,
-    "(10000,0;10000,10000;30000,10000;30000,0)\n"
-    "(0,0;0,40000;10000,40000;10000,0)\n"
-    "(10000,30000;10000,40000;30000,40000;30000,30000)\n"
-    "(30000,0;30000,40000;40000,40000;40000,0)"
-  );
+             "(10000,0;10000,10000;30000,10000;30000,0)\n"
+             "(0,0;0,40000;10000,40000;10000,0)\n"
+             "(10000,30000;10000,40000;30000,40000;30000,30000)\n"
+             "(30000,0;30000,40000;40000,40000;40000,0)");
 
   ps.s.clear ();
   db::decompose_convex (db::polygon_to_simple_polygon (p), db::PO_vertical, ps);
   EXPECT_EQ (ps.s,
-    "(0,30000;0,40000;30000,40000;30000,30000)\n"
-    "(30000,0;30000,40000;40000,40000;40000,0)\n"
-    "(10000,0;10000,10000;30000,10000;30000,0)\n"
-    "(0,0;0,30000;10000,30000;10000,0)"
-  );
+             "(0,30000;0,40000;30000,40000;30000,30000)\n"
+             "(30000,0;30000,40000;40000,40000;40000,0)\n"
+             "(10000,0;10000,10000;30000,10000;30000,0)\n"
+             "(0,0;0,30000;10000,30000;10000,0)");
 
   ps.s.clear ();
   db::decompose_convex (db::simple_polygon_to_polygon (db::polygon_to_simple_polygon (p)), db::PO_vertical, ps);
   EXPECT_EQ (ps.s,
-    "(10000,0;10000,10000;30000,10000;30000,0)\n"
-    "(0,0;0,40000;10000,40000;10000,0)\n"
-    "(10000,30000;10000,40000;30000,40000;30000,30000)\n"
-    "(30000,0;30000,40000;40000,40000;40000,0)"
-  );
+             "(10000,0;10000,10000;30000,10000;30000,0)\n"
+             "(0,0;0,40000;10000,40000;10000,0)\n"
+             "(10000,30000;10000,40000;30000,40000;30000,30000)\n"
+             "(30000,0;30000,40000;40000,40000;40000,0)");
 }
 
 //  decompose_to_convex
-TEST(314)
+TEST (314)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -2094,7 +2059,7 @@ TEST(314)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
   TestPolygonSink ps;
 
@@ -2105,38 +2070,35 @@ TEST(314)
   db::decompose_convex (db::polygon_to_simple_polygon (p), db::PO_vtrapezoids, ps);
   EXPECT_EQ (ps.s, "(0,0;0,40000;40000,40000;40000,0)");
 
-  p.insert_hole (&hole[0], &hole[0] + sizeof (hole) / sizeof (hole[0]));
+  p.insert_hole (&hole [0], &hole [0] + sizeof (hole) / sizeof (hole [0]));
 
   ps.s.clear ();
   db::decompose_convex (p, db::PO_vtrapezoids, ps);
   EXPECT_EQ (ps.s,
-    "(10000,0;10000,10000;30000,10000;30000,0)\n"
-    "(0,0;0,30000;10000,30000;10000,0)\n"
-    "(0,30000;0,40000;30000,40000;30000,30000)\n"
-    "(30000,0;30000,40000;40000,40000;40000,0)"
-  );
+             "(10000,0;10000,10000;30000,10000;30000,0)\n"
+             "(0,0;0,30000;10000,30000;10000,0)\n"
+             "(0,30000;0,40000;30000,40000;30000,30000)\n"
+             "(30000,0;30000,40000;40000,40000;40000,0)");
 
   ps.s.clear ();
   db::decompose_convex (db::polygon_to_simple_polygon (p), db::PO_vtrapezoids, ps);
   EXPECT_EQ (ps.s,
-    "(0,30000;0,40000;30000,40000;30000,30000)\n"
-    "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
-    "(10000,0;10000,10000;40000,10000;40000,0)\n"
-    "(0,0;0,30000;10000,30000;10000,0)"
-  );
+             "(0,30000;0,40000;30000,40000;30000,30000)\n"
+             "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
+             "(10000,0;10000,10000;40000,10000;40000,0)\n"
+             "(0,0;0,30000;10000,30000;10000,0)");
 
   ps.s.clear ();
   db::decompose_convex (db::simple_polygon_to_polygon (db::polygon_to_simple_polygon (p)), db::PO_vtrapezoids, ps);
   EXPECT_EQ (ps.s,
-    "(10000,0;10000,10000;30000,10000;30000,0)\n"
-    "(0,0;0,30000;10000,30000;10000,0)\n"
-    "(0,30000;0,40000;30000,40000;30000,30000)\n"
-    "(30000,0;30000,40000;40000,40000;40000,0)"
-  );
+             "(10000,0;10000,10000;30000,10000;30000,0)\n"
+             "(0,0;0,30000;10000,30000;10000,0)\n"
+             "(0,30000;0,40000;30000,40000;30000,30000)\n"
+             "(30000,0;30000,40000;40000,40000;40000,0)");
 }
 
 //  decompose_to_trapezoids
-TEST(320)
+TEST (320)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -2153,7 +2115,7 @@ TEST(320)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
   TestPolygonSink ps;
 
@@ -2164,38 +2126,35 @@ TEST(320)
   db::decompose_trapezoids (db::polygon_to_simple_polygon (p), db::TD_simple, ps);
   EXPECT_EQ (ps.s, "(0,0;0,40000;40000,40000;40000,0)");
 
-  p.insert_hole (&hole[0], &hole[0] + sizeof (hole) / sizeof (hole[0]));
+  p.insert_hole (&hole [0], &hole [0] + sizeof (hole) / sizeof (hole [0]));
 
   ps.s.clear ();
   db::decompose_trapezoids (p, db::TD_simple, ps);
   EXPECT_EQ (ps.s,
-    "(0,0;0,10000;40000,10000;40000,0)\n"
-    "(0,10000;0,30000;10000,30000;10000,10000)\n"
-    "(30000,10000;30000,30000;40000,30000;40000,10000)\n"
-    "(0,30000;0,40000;40000,40000;40000,30000)"
-  );
+             "(0,0;0,10000;40000,10000;40000,0)\n"
+             "(0,10000;0,30000;10000,30000;10000,10000)\n"
+             "(30000,10000;30000,30000;40000,30000;40000,10000)\n"
+             "(0,30000;0,40000;40000,40000;40000,30000)");
 
   ps.s.clear ();
   db::decompose_trapezoids (db::polygon_to_simple_polygon (p), db::TD_simple, ps);
   EXPECT_EQ (ps.s,
-    "(0,0;0,10000;40000,10000;40000,0)\n"
-    "(0,10000;0,30000;10000,30000;10000,10000)\n"
-    "(30000,10000;30000,30000;40000,30000;40000,10000)\n"
-    "(0,30000;0,40000;40000,40000;40000,30000)"
-  );
+             "(0,0;0,10000;40000,10000;40000,0)\n"
+             "(0,10000;0,30000;10000,30000;10000,10000)\n"
+             "(30000,10000;30000,30000;40000,30000;40000,10000)\n"
+             "(0,30000;0,40000;40000,40000;40000,30000)");
 
   ps.s.clear ();
   db::decompose_trapezoids (db::simple_polygon_to_polygon (db::polygon_to_simple_polygon (p)), db::TD_simple, ps);
   EXPECT_EQ (ps.s,
-    "(0,0;0,10000;40000,10000;40000,0)\n"
-    "(0,10000;0,30000;10000,30000;10000,10000)\n"
-    "(30000,10000;30000,30000;40000,30000;40000,10000)\n"
-    "(0,30000;0,40000;40000,40000;40000,30000)"
-  );
+             "(0,0;0,10000;40000,10000;40000,0)\n"
+             "(0,10000;0,30000;10000,30000;10000,10000)\n"
+             "(30000,10000;30000,30000;40000,30000;40000,10000)\n"
+             "(0,30000;0,40000;40000,40000;40000,30000)");
 }
 
 //  decompose_to_trapezoids
-TEST(321)
+TEST (321)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -2212,7 +2171,7 @@ TEST(321)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
   TestPolygonSink ps;
 
@@ -2223,38 +2182,35 @@ TEST(321)
   db::decompose_trapezoids (db::polygon_to_simple_polygon (p), db::TD_htrapezoids, ps);
   EXPECT_EQ (ps.s, "(0,0;0,40000;40000,40000;40000,0)");
 
-  p.insert_hole (&hole[0], &hole[0] + sizeof (hole) / sizeof (hole[0]));
+  p.insert_hole (&hole [0], &hole [0] + sizeof (hole) / sizeof (hole [0]));
 
   ps.s.clear ();
   db::decompose_trapezoids (p, db::TD_htrapezoids, ps);
   EXPECT_EQ (ps.s,
-    "(0,10000;0,30000;10000,30000;10000,10000)\n"
-    "(0,30000;0,40000;30000,40000;30000,30000)\n"
-    "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
-    "(0,0;0,10000;40000,10000;40000,0)"
-  );
+             "(0,10000;0,30000;10000,30000;10000,10000)\n"
+             "(0,30000;0,40000;30000,40000;30000,30000)\n"
+             "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
+             "(0,0;0,10000;40000,10000;40000,0)");
 
   ps.s.clear ();
   db::decompose_trapezoids (db::polygon_to_simple_polygon (p), db::TD_htrapezoids, ps);
   EXPECT_EQ (ps.s,
-    "(0,30000;0,40000;30000,40000;30000,30000)\n"
-    "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
-    "(10000,0;10000,10000;40000,10000;40000,0)\n"
-    "(0,0;0,30000;10000,30000;10000,0)"
-  );
+             "(0,30000;0,40000;30000,40000;30000,30000)\n"
+             "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
+             "(10000,0;10000,10000;40000,10000;40000,0)\n"
+             "(0,0;0,30000;10000,30000;10000,0)");
 
   ps.s.clear ();
   db::decompose_trapezoids (db::simple_polygon_to_polygon (db::polygon_to_simple_polygon (p)), db::TD_htrapezoids, ps);
   EXPECT_EQ (ps.s,
-    "(0,10000;0,30000;10000,30000;10000,10000)\n"
-    "(0,30000;0,40000;30000,40000;30000,30000)\n"
-    "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
-    "(0,0;0,10000;40000,10000;40000,0)"
-  );
+             "(0,10000;0,30000;10000,30000;10000,10000)\n"
+             "(0,30000;0,40000;30000,40000;30000,30000)\n"
+             "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
+             "(0,0;0,10000;40000,10000;40000,0)");
 }
 
 //  decompose_to_trapezoids
-TEST(322)
+TEST (322)
 {
   db::Point pattern [] = {
     db::Point (0, 0),
@@ -2271,7 +2227,7 @@ TEST(322)
   };
 
   db::Polygon p;
-  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+  p.assign_hull (&pattern [0], &pattern [0] + sizeof (pattern) / sizeof (pattern [0]));
 
   TestPolygonSink ps;
 
@@ -2282,40 +2238,37 @@ TEST(322)
   db::decompose_trapezoids (db::polygon_to_simple_polygon (p), db::TD_vtrapezoids, ps);
   EXPECT_EQ (ps.s, "(0,0;0,40000;40000,40000;40000,0)");
 
-  p.insert_hole (&hole[0], &hole[0] + sizeof (hole) / sizeof (hole[0]));
+  p.insert_hole (&hole [0], &hole [0] + sizeof (hole) / sizeof (hole [0]));
 
   ps.s.clear ();
   db::decompose_trapezoids (p, db::TD_vtrapezoids, ps);
   EXPECT_EQ (ps.s,
-    "(10000,0;10000,10000;30000,10000;30000,0)\n"
-    "(0,0;0,30000;10000,30000;10000,0)\n"
-    "(0,30000;0,40000;30000,40000;30000,30000)\n"
-    "(30000,0;30000,40000;40000,40000;40000,0)"
-  );
+             "(10000,0;10000,10000;30000,10000;30000,0)\n"
+             "(0,0;0,30000;10000,30000;10000,0)\n"
+             "(0,30000;0,40000;30000,40000;30000,30000)\n"
+             "(30000,0;30000,40000;40000,40000;40000,0)");
 
   ps.s.clear ();
   db::decompose_trapezoids (db::polygon_to_simple_polygon (p), db::TD_vtrapezoids, ps);
   EXPECT_EQ (ps.s,
-    "(0,30000;0,40000;30000,40000;30000,30000)\n"
-    "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
-    "(10000,0;10000,10000;40000,10000;40000,0)\n"
-    "(0,0;0,30000;10000,30000;10000,0)"
-  );
+             "(0,30000;0,40000;30000,40000;30000,30000)\n"
+             "(30000,10000;30000,40000;40000,40000;40000,10000)\n"
+             "(10000,0;10000,10000;40000,10000;40000,0)\n"
+             "(0,0;0,30000;10000,30000;10000,0)");
 
   ps.s.clear ();
   db::decompose_trapezoids (db::simple_polygon_to_polygon (db::polygon_to_simple_polygon (p)), db::TD_vtrapezoids, ps);
   EXPECT_EQ (ps.s,
-    "(10000,0;10000,10000;30000,10000;30000,0)\n"
-    "(0,0;0,30000;10000,30000;10000,0)\n"
-    "(0,30000;0,40000;30000,40000;30000,30000)\n"
-    "(30000,0;30000,40000;40000,40000;40000,0)"
-  );
+             "(10000,0;10000,10000;30000,10000;30000,0)\n"
+             "(0,0;0,30000;10000,30000;10000,0)\n"
+             "(0,30000;0,40000;30000,40000;30000,30000)\n"
+             "(30000,0;30000,40000;40000,40000;40000,0)");
 }
 
 //  cut self-overlapping polygon
-TEST(400)
+TEST (400)
 {
-  std::vector <db::Point> c;
+  std::vector<db::Point> c;
   c.push_back (db::Point (0, 0));
   c.push_back (db::Point (0, 100));
   c.push_back (db::Point (1000, 100));
@@ -2332,14 +2285,14 @@ TEST(400)
 
     db::cut_polygon (in, db::Edge (db::Point (500, 0), db::Point (500, 1)), std::back_inserter (right_of));
     EXPECT_EQ (right_of.size (), size_t (2));
-    EXPECT_EQ (right_of[0].to_string (), "(500,0;500,100;900,100;900,0)");
-    EXPECT_EQ (right_of[1].to_string (), "(900,100;900,900;500,900;500,1000;1000,1000;1000,100)");
+    EXPECT_EQ (right_of [0].to_string (), "(500,0;500,100;900,100;900,0)");
+    EXPECT_EQ (right_of [1].to_string (), "(900,100;900,900;500,900;500,1000;1000,1000;1000,100)");
 
     right_of.clear ();
     db::cut_polygon (in, db::Edge (db::Point (500, 1), db::Point (500, 0)), std::back_inserter (right_of));
     EXPECT_EQ (right_of.size (), size_t (2));
-    EXPECT_EQ (right_of[0].to_string (), "(0,0;0,100;500,100;500,0)");
-    EXPECT_EQ (right_of[1].to_string (), "(0,900;0,1000;500,1000;500,900)");
+    EXPECT_EQ (right_of [0].to_string (), "(0,0;0,100;500,100;500,0)");
+    EXPECT_EQ (right_of [1].to_string (), "(0,900;0,1000;500,1000;500,900)");
   }
 
   {
@@ -2349,21 +2302,21 @@ TEST(400)
 
     db::cut_polygon (in, db::Edge (db::Point (500, 0), db::Point (500, 1)), std::back_inserter (right_of));
     EXPECT_EQ (right_of.size (), size_t (2));
-    EXPECT_EQ (right_of[0].to_string (), "(500,0;500,100;900,100;900,0)");
-    EXPECT_EQ (right_of[1].to_string (), "(900,100;900,900;500,900;500,1000;1000,1000;1000,100)");
+    EXPECT_EQ (right_of [0].to_string (), "(500,0;500,100;900,100;900,0)");
+    EXPECT_EQ (right_of [1].to_string (), "(900,100;900,900;500,900;500,1000;1000,1000;1000,100)");
 
     right_of.clear ();
     db::cut_polygon (in, db::Edge (db::Point (500, 1), db::Point (500, 0)), std::back_inserter (right_of));
     EXPECT_EQ (right_of.size (), size_t (2));
-    EXPECT_EQ (right_of[0].to_string (), "(0,0;0,100;500,100;500,0)");
-    EXPECT_EQ (right_of[1].to_string (), "(0,900;0,1000;500,1000;500,900)");
+    EXPECT_EQ (right_of [0].to_string (), "(0,0;0,100;500,100;500,0)");
+    EXPECT_EQ (right_of [1].to_string (), "(0,900;0,1000;500,1000;500,900)");
   }
 }
 
 //  cut self-overlapping polygon (with double types)
-TEST(401)
+TEST (401)
 {
-  std::vector <db::DPoint> c;
+  std::vector<db::DPoint> c;
   c.push_back (db::DPoint (0, 0));
   c.push_back (db::DPoint (0, 100));
   c.push_back (db::DPoint (1000, 100));
@@ -2380,14 +2333,14 @@ TEST(401)
 
     db::cut_polygon (in, db::DEdge (db::DPoint (500, 0), db::DPoint (500, 1)), std::back_inserter (right_of));
     EXPECT_EQ (right_of.size (), size_t (2));
-    EXPECT_EQ (right_of[0].to_string (), "(500,0;500,100;900,100;900,0)");
-    EXPECT_EQ (right_of[1].to_string (), "(900,100;900,900;500,900;500,1000;1000,1000;1000,100)");
+    EXPECT_EQ (right_of [0].to_string (), "(500,0;500,100;900,100;900,0)");
+    EXPECT_EQ (right_of [1].to_string (), "(900,100;900,900;500,900;500,1000;1000,1000;1000,100)");
 
     right_of.clear ();
     db::cut_polygon (in, db::DEdge (db::DPoint (500, 1), db::DPoint (500, 0)), std::back_inserter (right_of));
     EXPECT_EQ (right_of.size (), size_t (2));
-    EXPECT_EQ (right_of[0].to_string (), "(0,0;0,100;500,100;500,0)");
-    EXPECT_EQ (right_of[1].to_string (), "(0,900;0,1000;500,1000;500,900)");
+    EXPECT_EQ (right_of [0].to_string (), "(0,0;0,100;500,100;500,0)");
+    EXPECT_EQ (right_of [1].to_string (), "(0,900;0,1000;500,1000;500,900)");
   }
 
   {
@@ -2397,19 +2350,19 @@ TEST(401)
 
     db::cut_polygon (in, db::DEdge (db::DPoint (500, 0), db::DPoint (500, 1)), std::back_inserter (right_of));
     EXPECT_EQ (right_of.size (), size_t (2));
-    EXPECT_EQ (right_of[0].to_string (), "(500,0;500,100;900,100;900,0)");
-    EXPECT_EQ (right_of[1].to_string (), "(900,100;900,900;500,900;500,1000;1000,1000;1000,100)");
+    EXPECT_EQ (right_of [0].to_string (), "(500,0;500,100;900,100;900,0)");
+    EXPECT_EQ (right_of [1].to_string (), "(900,100;900,900;500,900;500,1000;1000,1000;1000,100)");
 
     right_of.clear ();
     db::cut_polygon (in, db::DEdge (db::DPoint (500, 1), db::DPoint (500, 0)), std::back_inserter (right_of));
     EXPECT_EQ (right_of.size (), size_t (2));
-    EXPECT_EQ (right_of[0].to_string (), "(0,0;0,100;500,100;500,0)");
-    EXPECT_EQ (right_of[1].to_string (), "(0,900;0,1000;500,1000;500,900)");
+    EXPECT_EQ (right_of [0].to_string (), "(0,0;0,100;500,100;500,0)");
+    EXPECT_EQ (right_of [1].to_string (), "(0,900;0,1000;500,1000;500,900)");
   }
 }
 
 //  cut empty polygons
-TEST(402)
+TEST (402)
 {
   {
     db::Polygon in;
@@ -2438,14 +2391,14 @@ TEST(402)
 }
 
 //  cut point-like polygons
-TEST(403)
+TEST (403)
 {
   {
     db::Polygon in (db::Box (1000, 0, 1000, 0));
     std::vector<db::Polygon> right_of;
     db::cut_polygon (in, db::Edge (db::Point (500, 0), db::Point (500, 1)), std::back_inserter (right_of));
     EXPECT_EQ (right_of.size (), size_t (1));
-    EXPECT_EQ (right_of[0].to_string (), "()");  // bad, but no contour available :-(
+    EXPECT_EQ (right_of [0].to_string (), "()"); // bad, but no contour available :-(
     right_of.clear ();
     db::cut_polygon (in, db::Edge (db::Point (500, 1), db::Point (500, 0)), std::back_inserter (right_of));
     EXPECT_EQ (right_of.size (), size_t (0));
@@ -2456,7 +2409,7 @@ TEST(403)
     std::vector<db::SimplePolygon> right_of;
     db::cut_polygon (in, db::Edge (db::Point (500, 0), db::Point (500, 1)), std::back_inserter (right_of));
     EXPECT_EQ (right_of.size (), size_t (1));
-    EXPECT_EQ (right_of[0].to_string (), "()");  // bad, but no contour available :-(
+    EXPECT_EQ (right_of [0].to_string (), "()"); // bad, but no contour available :-(
     right_of.clear ();
     db::cut_polygon (in, db::Edge (db::Point (500, 1), db::Point (500, 0)), std::back_inserter (right_of));
     EXPECT_EQ (right_of.size (), size_t (0));
@@ -2467,7 +2420,7 @@ TEST(403)
     std::vector<db::DPolygon> right_of;
     db::cut_polygon (in, db::DEdge (db::DPoint (500, 0), db::DPoint (500, 1)), std::back_inserter (right_of));
     EXPECT_EQ (right_of.size (), size_t (1));
-    EXPECT_EQ (right_of[0].to_string (), "()");  // bad, but no contour available :-(
+    EXPECT_EQ (right_of [0].to_string (), "()"); // bad, but no contour available :-(
     right_of.clear ();
     db::cut_polygon (in, db::DEdge (db::DPoint (500, 1), db::DPoint (500, 0)), std::back_inserter (right_of));
     EXPECT_EQ (right_of.size (), size_t (0));
@@ -2478,7 +2431,7 @@ TEST(403)
     std::vector<db::DSimplePolygon> right_of;
     db::cut_polygon (in, db::DEdge (db::DPoint (500, 0), db::DPoint (500, 1)), std::back_inserter (right_of));
     EXPECT_EQ (right_of.size (), size_t (1));
-    EXPECT_EQ (right_of[0].to_string (), "()");  // bad, but no contour available :-(
+    EXPECT_EQ (right_of [0].to_string (), "()"); // bad, but no contour available :-(
     right_of.clear ();
     db::cut_polygon (in, db::DEdge (db::DPoint (500, 1), db::DPoint (500, 0)), std::back_inserter (right_of));
     EXPECT_EQ (right_of.size (), size_t (0));
@@ -2486,7 +2439,7 @@ TEST(403)
 }
 
 //  issue 166
-TEST(404)
+TEST (404)
 {
   db::Polygon poly;
   std::string s ("(390,0;438,936;176,874;0,832;438,937;541,961;821,102)");
@@ -2497,12 +2450,12 @@ TEST(404)
   db::split_polygon (poly, sp);
   EXPECT_EQ (sp.size (), size_t (2));
   if (sp.size () >= 2) {
-    EXPECT_EQ (sp[0].to_string (), "(390,0;438,936;390,925;438,937;541,961;821,102)");
-    EXPECT_EQ (sp[1].to_string (), "(0,832;176,874;390,925)");
+    EXPECT_EQ (sp [0].to_string (), "(390,0;438,936;390,925;438,937;541,961;821,102)");
+    EXPECT_EQ (sp [1].to_string (), "(0,832;176,874;390,925)");
   }
 }
 
-TEST(405)
+TEST (405)
 {
   db::Polygon poly;
   std::string s ("(0,0;0,1126;30,1126;30,30;3044,30;3044,1126;5782,1126;5782,30;8796,30;8796,1126;0,1126;0,1141;3009,1141;3009,1156;3194,1156;3194,1141;8826,1141;8826,0;5742,0;5742,1126;3084,1126;3084,0)");
@@ -2514,8 +2467,8 @@ TEST(405)
 
   EXPECT_EQ (sp.size (), size_t (2));
   if (sp.size () >= 2) {
-    EXPECT_EQ (sp[0].to_string (), "(5742,0;5742,1126;5782,1126;5782,30;8796,30;8796,1126;3194,1126;3194,1141;8826,1141;8826,0)");
-    EXPECT_EQ (sp[1].to_string (), "(0,0;0,1126;30,1126;30,30;3044,30;3044,1126;0,1126;0,1141;3009,1141;3009,1156;3194,1156;3194,1126;3084,1126;3084,0)");
+    EXPECT_EQ (sp [0].to_string (), "(5742,0;5742,1126;5782,1126;5782,30;8796,30;8796,1126;3194,1126;3194,1141;8826,1141;8826,0)");
+    EXPECT_EQ (sp [1].to_string (), "(0,0;0,1126;30,1126;30,30;3044,30;3044,1126;0,1126;0,1141;3009,1141;3009,1156;3194,1156;3194,1126;3084,1126;3084,0)");
   }
 }
 
@@ -2528,7 +2481,7 @@ static db::Polygon str2poly (const std::string &s)
 }
 
 //  self-overlapping, non-orientable check
-TEST(500)
+TEST (500)
 {
   std::string ps;
   std::vector<db::Polygon> parts;
@@ -2562,14 +2515,14 @@ TEST(500)
   EXPECT_EQ (db::is_strange_polygon (str2poly (ps), &parts), true);
   EXPECT_EQ (parts.size (), size_t (1));
   if (! parts.empty ()) {
-    EXPECT_EQ (parts[0].to_string (), "(0,0;500,500;1000,0)");
+    EXPECT_EQ (parts [0].to_string (), "(0,0;500,500;1000,0)");
   }
 
   parts.clear ();
   EXPECT_EQ (db::is_non_orientable_polygon (str2poly (ps), &parts), true);
   EXPECT_EQ (parts.size (), size_t (1));
   if (! parts.empty ()) {
-    EXPECT_EQ (parts[0].to_string (), "(0,0;500,500;1000,0)");
+    EXPECT_EQ (parts [0].to_string (), "(0,0;500,500;1000,0)");
   }
 
   //  self-touching
@@ -2586,7 +2539,7 @@ TEST(500)
   EXPECT_EQ (db::is_strange_polygon (str2poly (ps), &parts), true);
   EXPECT_EQ (parts.size (), size_t (1));
   if (! parts.empty ()) {
-    EXPECT_EQ (parts[0].to_string (), "(0,2000;0,2500;1000,2500;1000,2000)");
+    EXPECT_EQ (parts [0].to_string (), "(0,2000;0,2500;1000,2500;1000,2000)");
   }
 
   //  inner loop twisted

@@ -27,7 +27,7 @@
 #include "tlCommandLineParser.h"
 #include "tlTimer.h"
 
-BD_PUBLIC int strmcmp (int argc, char *argv[])
+BD_PUBLIC int strmcmp (int argc, char *argv [])
 {
   bd::GenericReaderOptions generic_reader_options_a;
   generic_reader_options_a.set_prefix ("a");
@@ -62,77 +62,58 @@ BD_PUBLIC int strmcmp (int argc, char *argv[])
   generic_reader_options_a.add_options (cmd);
   generic_reader_options_b.add_options (cmd);
 
-  cmd << tl::arg ("input_a",                   &infile_a,   "The first input file (any format, may be gzip compressed)")
-      << tl::arg ("input_b",                   &infile_b,   "The second input file (any format, may be gzip compressed)")
-      << tl::arg ("-ta|--top-a=name",          &top_a,      "Specifies the cell to take as top cell from the first layout",
+  cmd << tl::arg ("input_a", &infile_a, "The first input file (any format, may be gzip compressed)")
+      << tl::arg ("input_b", &infile_b, "The second input file (any format, may be gzip compressed)")
+      << tl::arg ("-ta|--top-a=name", &top_a, "Specifies the cell to take as top cell from the first layout",
                   "Use this option to take a specific cell as the top cell from the first layout. All "
                   "cells not called directly or indirectly from this cell are ignored. If you use this option, "
-                  "--top-b must be specified too and can be different from the first layout's top cell."
-                 )
-      << tl::arg ("-tb|--top-b=name",          &top_b,      "Specifies the cell to take as top cell from the second layout",
-                  "See --top-a for details."
-                 )
-      << tl::arg ("-s|--silent",               &silent,     "Enables silent mode",
+                  "--top-b must be specified too and can be different from the first layout's top cell.")
+      << tl::arg ("-tb|--top-b=name", &top_b, "Specifies the cell to take as top cell from the second layout",
+                  "See --top-a for details.")
+      << tl::arg ("-s|--silent", &silent, "Enables silent mode",
                   "In silent mode, no differences are printed, but the exit code indicates whether "
-                  "the layouts are the same (0) or differences exist (> 0)."
-                 )
+                  "the layouts are the same (0) or differences exist (> 0).")
       << tl::arg ("#!--with-text-orientation", &no_text_orientation, "Compares orientations for texts",
                   "With this option, text orientation is compared too. The position of the "
                   "text is always compared, but the rotation angle is compared only when this option "
-                  "is present."
-                 )
-      << tl::arg ("#!--with-text-details",     &no_text_details, "Compares font and alignment for texts",
-                  "With this option, text font and alignment is compared too."
-                 )
-      << tl::arg ("-np|--without-properties",  &no_properties, "Ignores properties",
-                  "With this option, shape, cell and file properties are not compared."
-                 )
+                  "is present.")
+      << tl::arg ("#!--with-text-details", &no_text_details, "Compares font and alignment for texts",
+                  "With this option, text font and alignment is compared too.")
+      << tl::arg ("-np|--without-properties", &no_properties, "Ignores properties",
+                  "With this option, shape, cell and file properties are not compared.")
       << tl::arg ("-nl|--without-layer-names", &no_layer_names, "Ignores layer names",
-                  "With this option, layer names are not compared."
-                 )
-      << tl::arg ("!-u|--terse",               &verbose,    "Skips too many details",
-                  "With this option, no details about differences are printed."
-                 )
-      << tl::arg ("-r|--print-properties",     &print_properties, "Prints shape properties too",
-                  "This option, shape properties are printed too."
-                 )
-      << tl::arg ("-p|--as-polygons",          &as_polygons, "Compares shapes are polygons",
-                  "This option is equivalent to using --boxes-as-polygons and --paths-as-polygons."
-                 )
-      << tl::arg ("--boxes-as-polygons",       &boxes_as_polygons, "Turns boxes into polygons before compare",
-                  "With this option, boxes and equivalent polygons are treated identical."
-                 )
-      << tl::arg ("--paths-as-polygons",       &paths_as_polygons, "Turns paths into polygons before compare",
-                  "With this option, paths and equivalent polygons are treated identical."
-                 )
-      << tl::arg ("--expand-arrays",           &flatten_array_insts, "Expands array instances before compare",
-                  "With this option, arrays are equivalent single instances are treated identical."
-                 )
-      << tl::arg ("-1|--ignore-duplicates",    &ignore_duplicates, "Ignore duplicate instances and shapes",
+                  "With this option, layer names are not compared.")
+      << tl::arg ("!-u|--terse", &verbose, "Skips too many details",
+                  "With this option, no details about differences are printed.")
+      << tl::arg ("-r|--print-properties", &print_properties, "Prints shape properties too",
+                  "This option, shape properties are printed too.")
+      << tl::arg ("-p|--as-polygons", &as_polygons, "Compares shapes are polygons",
+                  "This option is equivalent to using --boxes-as-polygons and --paths-as-polygons.")
+      << tl::arg ("--boxes-as-polygons", &boxes_as_polygons, "Turns boxes into polygons before compare",
+                  "With this option, boxes and equivalent polygons are treated identical.")
+      << tl::arg ("--paths-as-polygons", &paths_as_polygons, "Turns paths into polygons before compare",
+                  "With this option, paths and equivalent polygons are treated identical.")
+      << tl::arg ("--expand-arrays", &flatten_array_insts, "Expands array instances before compare",
+                  "With this option, arrays are equivalent single instances are treated identical.")
+      << tl::arg ("-1|--ignore-duplicates", &ignore_duplicates, "Ignore duplicate instances and shapes",
                   "With this option, duplicate instances or shapes are ignored and duplication "
-                  "does not count as a difference."
-                 )
-      << tl::arg ("-l|--layer-details",        &dont_summarize_missing_layers, "Prints details about differences for missing layers",
+                  "does not count as a difference.")
+      << tl::arg ("-l|--layer-details", &dont_summarize_missing_layers, "Prints details about differences for missing layers",
                   "With this option, missing layers are treated as \"empty\" and details about differences to "
                   "other, non-empty layers are printed. Essentially the content of the non-empty counterpart "
                   "is printed. Without this option, missing layers are treated as a single difference of type "
-                  "\"missing layer\"."
-                 )
-      << tl::arg ("-c|--cell-mapping",         &smart_cell_mapping, "Attempts to identify cells by their properties",
+                  "\"missing layer\".")
+      << tl::arg ("-c|--cell-mapping", &smart_cell_mapping, "Attempts to identify cells by their properties",
                   "If this option is given, the algorithm will try to identify identical cells by their "
                   "geometrical properties (placement, size etc.) instead of their name. This way, cell renaming can "
-                  "be detected"
-                 )
-      << tl::arg ("-t|--tolerance=value",      &tolerance, "Specifies a tolerance for geometry compare",
+                  "be detected")
+      << tl::arg ("-t|--tolerance=value", &tolerance, "Specifies a tolerance for geometry compare",
                   "If this value is given, shape comparison allows for this tolerance when comparing "
-                  "coordinates. The tolerance value is given in micrometer units."
-                 )
-      << tl::arg ("-m|--max-count=value",      &max_count, "Specifies the maximum number of differences to report",
+                  "coordinates. The tolerance value is given in micrometer units.")
+      << tl::arg ("-m|--max-count=value", &max_count, "Specifies the maximum number of differences to report",
                   "If the value is 1, only a warning saying that the log has been abbreviated is printed. "
                   "If the value is >1, max-count-1 differences plus one warning about abbreviation is printed. "
-                  "A value of 0 means \"no limitation\". To suppress all output, use --silent."
-                 )
-    ;
+                  "A value of 0 means \"no limitation\". To suppress all output, use --silent.");
 
   cmd.brief ("This program will compare two layout files on a per-object basis");
 
@@ -221,7 +202,6 @@ BD_PUBLIC int strmcmp (int argc, char *argv[])
         throw tl::Exception ("Top cell of second layout is not unique which is required for -c|--cell-mapping");
       }
     }
-
   }
 
   if (! top_a.empty ()) {

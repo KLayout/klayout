@@ -39,9 +39,10 @@ namespace tl
  *  @brief The deferred method scheduler
  */
 class TL_PUBLIC DeferredMethodSchedulerQt
-  : public QObject, public DeferredMethodScheduler
+  : public QObject,
+    public DeferredMethodScheduler
 {
-Q_OBJECT
+  Q_OBJECT
 public:
   /**
    *  @brief Constructor
@@ -73,4 +74,3 @@ private:
 }
 
 #endif
-

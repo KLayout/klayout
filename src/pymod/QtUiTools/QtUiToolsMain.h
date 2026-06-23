@@ -26,8 +26,7 @@ FORCE_LINK_GSI_QTCORE
 #undef FORCE_LINK_GSI_QTCORE
 #define FORCE_LINK_GSI_QTCORE
 
-#  include "../../gsiqt/qtbasic/gsiQtUiToolsExternals.h"
+#include "../../gsiqt/qtbasic/gsiQtUiToolsExternals.h"
 FORCE_LINK_GSI_QTUITOOLS
 #undef FORCE_LINK_GSI_QTUITOOLS
 #define FORCE_LINK_GSI_QTUITOOLS
-

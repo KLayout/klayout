@@ -46,17 +46,17 @@
 #include "edtDistribute.h"
 
 #if defined(HAVE_QT)
-#  include "layDialogs.h"
-#  include "layCellSelectionForm.h"
-#  include "edtDialogs.h"
-#  include "edtEditorOptionsPages.h"
+#include "layDialogs.h"
+#include "layCellSelectionForm.h"
+#include "edtDialogs.h"
+#include "edtEditorOptionsPages.h"
 #endif
 
 #if defined(HAVE_QT)
-#  include <QInputDialog>
-#  include <QMessageBox>
-#  include <QFontInfo>
-#  include <QWidgetAction>
+#include <QInputDialog>
+#include <QMessageBox>
+#include <QFontInfo>
+#include <QWidgetAction>
 #endif
 
 namespace edt
@@ -166,8 +166,7 @@ MainService::make_array_options_dialog ()
 
 #endif
 
-void
-MainService::menu_activated (const std::string &symbol)
+void MainService::menu_activated (const std::string &symbol)
 {
   if (symbol == "edt::descend") {
     cm_descend ();
@@ -228,10 +227,10 @@ MainService::menu_activated (const std::string &symbol)
 class CommonInsts
 {
 public:
-  CommonInsts () 
-    : m_valid (true), m_first (true), m_ambiguous (false), m_cv_index (0) 
-  { 
-    //  .. nothing yet ..  
+  CommonInsts ()
+    : m_valid (true), m_first (true), m_ambiguous (false), m_cv_index (0)
+  {
+    //  .. nothing yet ..
   }
 
   void add (const lay::ObjectInstPath &path, unsigned int n)
@@ -259,13 +258,13 @@ public:
       std::vector<db::InstElement>::iterator i1 = m_common_inst.begin ();
       lay::ObjectInstPath::iterator i2 = path.begin ();
       while (i1 != m_common_inst.end () && i2 != path.end () && *i1 == *i2) {
-        ++i1; ++i2;
+        ++i1;
+        ++i2;
       }
       if (i1 != m_common_inst.end ()) {
         m_ambiguous = true;
         m_common_inst.erase (i1, m_common_inst.end ());
       }
-
     }
   }
 
@@ -313,24 +312,21 @@ private:
 };
 
 
-void
-MainService::cm_descend ()
+void MainService::cm_descend ()
 {
   descend (false);
 }
 
-void
-MainService::cm_descend_into ()
+void MainService::cm_descend_into ()
 {
   descend (true);
 }
 
-void
-MainService::descend (bool into)
+void MainService::descend (bool into)
 {
   CommonInsts common_inst;
 
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view ()->get_plugins<edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end () && common_inst.valid (); ++es) {
     for (EditableSelectionIterator sel = (*es)->begin_selection (); ! sel.at_end () && common_inst.valid (); ++sel) {
       common_inst.add (*sel, 1);
@@ -360,7 +356,7 @@ MainService::descend (bool into)
 
   //  remove the common path and create a new set of selections
 
-  std::vector< std::vector<lay::ObjectInstPath> > new_selections;
+  std::vector<std::vector<lay::ObjectInstPath>> new_selections;
   new_selections.reserve (edt_services.size ());
 
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
@@ -378,9 +374,7 @@ MainService::descend (bool into)
       if (new_sel.is_cell_inst () && new_sel.begin () == new_sel.end ()) {
         new_selections.back ().pop_back ();
       }
-
     }
-
   }
 
   //  this will clear the selection:
@@ -395,18 +389,16 @@ MainService::descend (bool into)
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es, ++index) {
     (*es)->set_selection (new_selections [index].begin (), new_selections [index].end ());
   }
-
 }
 
-void  
-MainService::cm_ascend ()
+void MainService::cm_ascend ()
 {
   //  add one path component and create a new set of selections
 
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view ()->get_plugins<edt::Service> ();
 
   bool any_selected = false;
-  std::vector< std::vector<lay::ObjectInstPath> > new_selections;
+  std::vector<std::vector<lay::ObjectInstPath>> new_selections;
   new_selections.reserve (edt_services.size ());
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
     new_selections.push_back (std::vector<lay::ObjectInstPath> ());
@@ -459,22 +451,17 @@ MainService::cm_ascend ()
             }
           }
         }
-
       }
-
     }
-
   }
 
   unsigned int index = 0;
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es, ++index) {
     (*es)->set_selection (new_selections [index].begin (), new_selections [index].end ());
   }
-
 }
 
-void  
-MainService::cm_flatten_insts ()
+void MainService::cm_flatten_insts ()
 {
 #if ! defined(HAVE_QT)
   tl_assert (false); // see TODO
@@ -498,7 +485,7 @@ MainService::cm_flatten_insts ()
 
   std::set<db::Layout *> needs_cleanup;
 
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view ()->get_plugins<edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 
     for (EditableSelectionIterator r = (*es)->begin_selection (); ! r.at_end (); ++r) {
@@ -516,17 +503,13 @@ MainService::cm_flatten_insts ()
           }
 
           if (cv->layout ().cell (r->back ().inst_ptr.cell_index ()).is_proxy ()) {
-            needs_cleanup.insert (& cv->layout ());
+            needs_cleanup.insert (&cv->layout ());
           }
 
           target_cell.erase (r->back ().inst_ptr);
-
         }
-
       }
-
     }
-
   }
 
   //  clean up the layouts that need to do so.
@@ -542,8 +525,7 @@ MainService::cm_flatten_insts ()
   }
 }
 
-void  
-MainService::cm_move_hier_up ()
+void MainService::cm_move_hier_up ()
 {
   view ()->cancel_edits ();
   check_no_guiding_shapes ();
@@ -552,7 +534,7 @@ MainService::cm_move_hier_up ()
     manager ()->transaction (tl::to_string (tr ("Move up in hierarchy")));
   }
 
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view ()->get_plugins<edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 
     std::vector<lay::ObjectInstPath> new_selection;
@@ -586,18 +568,14 @@ MainService::cm_move_hier_up ()
           new_selection.back ().set_cv_index (r->cv_index ());
           new_selection.back ().set_layer (r->layer ());
           new_selection.back ().set_shape (new_shape);
-
         }
-
       }
-
     }
-          
+
     //  delete all the objects currently selected and set the new selection
     (*es)->del_selected ();
 
     (*es)->set_selection (new_selection.begin (), new_selection.end ());
-
   }
 
   if (manager ()) {
@@ -611,11 +589,11 @@ MainService::cm_move_hier_up ()
  *  The purpose of this class is to implement instance resolution for variant building.
  *  Resolution means converting to an instance of a different cell.
  *  A normal (single) instance is easy to convert: a new instance is created and the
- *  cell index set to point to the new one. For an array instance however that is 
+ *  cell index set to point to the new one. For an array instance however that is
  *  more complicated. Since the instance to resolve is usually just a part of that array, it
  *  is required to split the original array and create new instances for the parts. These
  *  parts must be maintained, because one task of the resolver is to map other array members
- *  of the original array to new instances. In that case, the resolver has to look for a 
+ *  of the original array to new instances. In that case, the resolver has to look for a
  *  suitable piece and return an array member instance to that one.
  */
 class ArrayResolver
@@ -632,7 +610,7 @@ public:
 
   /**
    *  @brief Plain instance resolution constructor
-   *  The new instance is simply taken as the given one. This can be used to map array instances unconditionally or 
+   *  The new instance is simply taken as the given one. This can be used to map array instances unconditionally or
    *  for mapping single instances.
    */
   ArrayResolver (const db::Instance &new_inst)
@@ -643,7 +621,7 @@ public:
 
   /**
    *  @brief Resolve the given instance (elem) to a new one with the given new cell (new_cell_index)
-   *  This method will resolve elem, create a corresponding instance with the new cell index. If necessary, new 
+   *  This method will resolve elem, create a corresponding instance with the new cell index. If necessary, new
    *  instances for array pieces are created (see above) and inserted into the cell. The resolver will map other
    *  instances to these pieces when necessary in the "resolve" function.
    */
@@ -725,7 +703,6 @@ public:
 
       m_na_before = m_na_after = 0;
       m_nb_before = m_nb_after = 0;
-
     }
 
     {
@@ -740,7 +717,6 @@ public:
         m_new_inst = parent_cell.replace_prop_id (m_new_inst, prop_id);
       }
     }
-
   }
 
   /**
@@ -779,13 +755,12 @@ private:
   unsigned long m_na_before, m_na_after, m_nb_before, m_nb_after;
 };
 
-void  
-MainService::cm_make_cell_variants ()
+void MainService::cm_make_cell_variants ()
 {
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
 
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view ()->get_plugins<edt::Service> ();
 
   //  TODO: this limitation is not really necessary, but makes the code somewhat simpler
   int cv_index = -1;
@@ -826,7 +801,7 @@ MainService::cm_make_cell_variants ()
 
   size_t num_sel = new_selection.size ();
 
-  //  TODO: the algorithm is basically O(2) in the number of selected items. A first 
+  //  TODO: the algorithm is basically O(2) in the number of selected items. A first
   //  step to mitigate that problem is to provide a progress and hence a way to cancel it.
   tl::RelativeProgress progress (tl::to_string (tr ("Make cell variants for selection")), num_sel, 1);
 
@@ -839,14 +814,14 @@ MainService::cm_make_cell_variants ()
 
     //  A map for a part of the selection path to a new instance (value.first is the next original cell of the path and
     //  value.second the ArrayResolver which can be used to fetch the corresponding new instance in the new target cell).
-    std::map<std::pair<db::cell_index_type, db::Instance>, std::pair<db::cell_index_type, ArrayResolver> > new_instances;
+    std::map<std::pair<db::cell_index_type, db::Instance>, std::pair<db::cell_index_type, ArrayResolver>> new_instances;
 
     //  Collect the current path (pairs of cell / instance in that cell).
     //  TODO: this rewriting of the path is not really required.
-    std::vector<std::pair<db::cell_index_type, db::InstElement> > path;
+    std::vector<std::pair<db::cell_index_type, db::InstElement>> path;
 
-    db::cell_index_type pc = selection[nsel].topcell ();
-    for (lay::ObjectInstPath::iterator p = selection[nsel].begin (); p != selection[nsel].end () && ! layout.cell (p->inst_ptr.cell_index ()).is_proxy (); ++p) {
+    db::cell_index_type pc = selection [nsel].topcell ();
+    for (lay::ObjectInstPath::iterator p = selection [nsel].begin (); p != selection [nsel].end () && ! layout.cell (p->inst_ptr.cell_index ()).is_proxy (); ++p) {
       path.push_back (std::make_pair (pc, *p));
       pc = p->inst_ptr.cell_index ();
     }
@@ -858,9 +833,9 @@ MainService::cm_make_cell_variants ()
 
       bool needs_variant = false;
 
-      //  create variants for each part of the path if required. While doing so, store information about the 
+      //  create variants for each part of the path if required. While doing so, store information about the
       //  mapping to the new path in new_instances.
-      for (std::vector<std::pair<db::cell_index_type, db::InstElement> >::const_iterator p = path.begin (); p != path.end (); ++p) {
+      for (std::vector<std::pair<db::cell_index_type, db::InstElement>>::const_iterator p = path.begin (); p != path.end (); ++p) {
 
         db::Cell &parent_cell = layout.cell (parent_cell_index);
         db::Cell &org_cell = layout.cell (elem.inst_ptr.cell_index ());
@@ -900,32 +875,30 @@ MainService::cm_make_cell_variants ()
           db::Instance next_inst;
           for (db::Cell::const_iterator i = org_cell.begin (); ! i.at_end (); ++i) {
             db::Instance ni = new_cell.insert (*i);
-            if (p + 1 != path.end () && p[1].second.inst_ptr == *i) {
+            if (p + 1 != path.end () && p [1].second.inst_ptr == *i) {
               next_inst = ni;
             } else {
               //  Plain resolution for all side branches
-              new_instances.insert(std::make_pair (std::make_pair (org_cell.cell_index (), *i), std::make_pair (i->cell_index (), ArrayResolver (ni))));
+              new_instances.insert (std::make_pair (std::make_pair (org_cell.cell_index (), *i), std::make_pair (i->cell_index (), ArrayResolver (ni))));
             }
           }
 
           db::cell_index_type next_org = p->second.inst_ptr.cell_index ();
 
           //  Resolve the original instance into a new one (and split arrays while doing so)
-          new_instances.insert(std::make_pair (std::make_pair (p->first, p->second.inst_ptr), std::make_pair (next_org, ArrayResolver ()))).first->second.second.resolve (parent_cell, elem, new_cell_index);
+          new_instances.insert (std::make_pair (std::make_pair (p->first, p->second.inst_ptr), std::make_pair (next_org, ArrayResolver ()))).first->second.second.resolve (parent_cell, elem, new_cell_index);
 
           if (p + 1 != path.end ()) {
             parent_cell_index = new_cell_index;
-            elem = p[1].second;
+            elem = p [1].second;
             elem.inst_ptr = next_inst;
           }
 
         } else if (p + 1 != path.end ()) {
           parent_cell_index = elem.inst_ptr.cell_index ();
-          elem = p[1].second;
+          elem = p [1].second;
         }
-
       }
-
     }
 
     //  map the selection to the new instances
@@ -943,7 +916,7 @@ MainService::cm_make_cell_variants ()
       //  map the path and move "cell" further along the original path.
       bool needs_translate = true;
       for (lay::ObjectInstPath::iterator p = r->begin (); p != r->end (); ++p) {
-        std::map<std::pair<db::cell_index_type, db::Instance>, std::pair<db::cell_index_type, ArrayResolver> >::const_iterator ni = new_instances.end ();
+        std::map<std::pair<db::cell_index_type, db::Instance>, std::pair<db::cell_index_type, ArrayResolver>>::const_iterator ni = new_instances.end ();
         if (needs_translate) {
           ni = new_instances.find (std::make_pair (cell, p->inst_ptr));
         }
@@ -973,9 +946,7 @@ MainService::cm_make_cell_variants ()
           new_path.set_shape (r->shape ());
         }
       }
-
     }
-
   }
 
   //  Install the new selection
@@ -993,13 +964,12 @@ MainService::cm_make_cell_variants ()
   }
 }
 
-void  
-MainService::cm_resolve_arefs ()
+void MainService::cm_resolve_arefs ()
 {
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
 
-  edt::InstService *inst_service = view ()->get_plugin <edt::InstService> ();
+  edt::InstService *inst_service = view ()->get_plugin<edt::InstService> ();
   if (! inst_service) {
     return;
   }
@@ -1058,9 +1028,7 @@ MainService::cm_resolve_arefs ()
 
       new_selection.push_back (*p);
       new_selection.back ().back () = db::InstElement (new_inst);
-
     }
-
   }
 
   for (std::vector<lay::ObjectInstPath>::const_iterator p = insts_to_resolve.begin (); p != insts_to_resolve.end (); ++p) {
@@ -1077,8 +1045,7 @@ MainService::cm_resolve_arefs ()
   }
 }
 
-void  
-MainService::cm_make_cell ()
+void MainService::cm_make_cell ()
 {
 #if ! defined(HAVE_QT)
   tl_assert (false); // see TODO
@@ -1088,7 +1055,7 @@ MainService::cm_make_cell ()
   check_no_guiding_shapes ();
 
   int cv_index = -1;
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view ()->get_plugins<edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
     for (EditableSelectionIterator r = (*es)->begin_selection (); ! r.at_end (); ++r) {
       if (cv_index < 0) {
@@ -1108,7 +1075,7 @@ MainService::cm_make_cell ()
     if (! make_cell_options_dialog ()->exec_dialog (cv->layout (), m_make_cell_name, m_origin_mode_x, m_origin_mode_y)) {
       return;
     }
- #endif
+#endif
 
     //  Compute the selection's bbox to establish a good origin for the new cell
     db::Box selection_bbox;
@@ -1160,9 +1127,7 @@ MainService::cm_make_cell ()
           db::Shapes &target_shapes = target_cell.shapes (r->layer ());
           db::Shape new_shape = target_shapes.insert (r->shape ());
           target_shapes.transform (new_shape, to * db::ICplxTrans (r->trans ()));
-
         }
-
       }
 
       //  delete all the objects currently selected and set the new selection
@@ -1177,19 +1142,15 @@ MainService::cm_make_cell ()
         new_selection.back ().add_path (db::InstElement (target_cell_inst));
       }
       (*es)->set_selection (new_selection.begin (), new_selection.end ());
-
     }
 
     if (manager ()) {
       manager ()->commit ();
     }
-
   }
-
 }
 
-void
-MainService::cm_convert_to_cell ()
+void MainService::cm_convert_to_cell ()
 {
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
@@ -1202,7 +1163,7 @@ MainService::cm_convert_to_cell ()
       manager ()->transaction (tl::to_string (tr ("Convert to static cell")));
     }
 
-    std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+    std::vector<edt::Service *> edt_services = view ()->get_plugins<edt::Service> ();
 
     std::set<db::Layout *> needs_cleanup;
 
@@ -1229,15 +1190,10 @@ MainService::cm_convert_to_cell ()
               parent.replace (s->back ().inst_ptr, na);
 
               needs_cleanup.insert (&cv->layout ());
-
             }
-
           }
-
         }
-
       }
-
     }
 
     if (needs_cleanup.empty ()) {
@@ -1264,8 +1220,7 @@ MainService::cm_convert_to_cell ()
   }
 }
 
-void
-MainService::cm_convert_to_pcell ()
+void MainService::cm_convert_to_pcell ()
 {
 #if ! defined(HAVE_QT)
   tl_assert (false); // see TODO
@@ -1274,7 +1229,7 @@ MainService::cm_convert_to_pcell ()
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
 
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view ()->get_plugins<edt::Service> ();
 
   //  check whether the selection contains instances and reject it in that case
   size_t num_selected = 0;
@@ -1291,7 +1246,7 @@ MainService::cm_convert_to_pcell ()
   std::vector<std::string> pcell_items;
 
   //  Collect the libraries and PCells within these libraries that are candidates here
-  std::vector<std::pair<db::Library *, db::pcell_id_type> > pcells;
+  std::vector<std::pair<db::Library *, db::pcell_id_type>> pcells;
   for (db::LibraryManager::iterator l = db::LibraryManager::instance ().begin (); l != db::LibraryManager::instance ().end (); ++l) {
 
     db::Library *lib = db::LibraryManager::instance ().lib (l->second);
@@ -1321,9 +1276,7 @@ MainService::cm_convert_to_pcell ()
       } catch (...) {
         //  ignore errors in can_create_from_shape
       }
-
     }
-
   }
 
   if (pcell_items.empty ()) {
@@ -1403,7 +1356,7 @@ MainService::cm_convert_to_pcell ()
               new_selection.back ().add_path (db::InstElement (cell_inst));
 
               //  mark the shape for delete (later)
-              to_delete.push_back (s.operator-> ());
+              to_delete.push_back (s.operator->());
 
               any_converted = true;
 
@@ -1412,13 +1365,9 @@ MainService::cm_convert_to_pcell ()
             }
 
             ++progress;
-
           }
-
         }
-
       }
-
     }
 
     if (! any_converted) {
@@ -1471,7 +1420,7 @@ void MainService::cm_area_perimeter ()
 
   double dbu = 0.0;
 
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view ()->get_plugins<edt::Service> ();
 
   db::Region region;
 
@@ -1485,7 +1434,7 @@ void MainService::cm_area_perimeter ()
       }
 
       db::Polygon poly;
-      if (!s->shape ().polygon (poly)) {
+      if (! s->shape ().polygon (poly)) {
         continue;
       }
 
@@ -1501,16 +1450,14 @@ void MainService::cm_area_perimeter ()
       } else {
         region.insert ((db::ICplxTrans (shape_dbu / dbu) * s->trans ()) * poly);
       }
-
     }
-
   }
 
 #if defined(HAVE_QT)
   if (region.count () > 100000) {
     if (QMessageBox::warning (lay::widget_from_view (view ()), tr ("Warning: Big Selection"),
-                                    tr ("The selection contains many shapes. Area and perimeter computation may take a long time.\nContinue anyway?"),
-                                    QMessageBox::Yes, QMessageBox::No) == QMessageBox::No) {
+                              tr ("The selection contains many shapes. Area and perimeter computation may take a long time.\nContinue anyway?"),
+                              QMessageBox::Yes, QMessageBox::No) == QMessageBox::No) {
       return;
     }
   }
@@ -1524,9 +1471,9 @@ void MainService::cm_area_perimeter ()
 #endif
 }
 
-static bool extract_rad (std::vector <db::Polygon> &poly, double &rinner, double &router, unsigned int &n)
+static bool extract_rad (std::vector<db::Polygon> &poly, double &rinner, double &router, unsigned int &n)
 {
-  std::vector <db::Point> new_pts;
+  std::vector<db::Point> new_pts;
   bool any_extracted = false;
 
   for (std::vector<db::Polygon>::iterator p = poly.begin (); p != poly.end (); ++p) {
@@ -1554,18 +1501,15 @@ static bool extract_rad (std::vector <db::Polygon> &poly, double &rinner, double
         new_poly.insert_hole (new_pts.begin (), new_pts.end (), true /*compress*/);
         any_extracted = true;
       }
-
     }
 
     p->swap (new_poly);
-
   }
 
   return any_extracted;
 }
 
-void
-MainService::cm_round_corners ()
+void MainService::cm_round_corners ()
 {
 #if ! defined(HAVE_QT)
   tl_assert (false); // see TODO
@@ -1577,7 +1521,7 @@ MainService::cm_round_corners ()
   int cv_index = -1;
   int layer_index = -1;
 
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view ()->get_plugins<edt::Service> ();
 
   std::vector<db::Polygon> primary;
 
@@ -1601,11 +1545,8 @@ MainService::cm_round_corners ()
         primary.push_back (db::Polygon ());
         s->shape ().polygon (primary.back ());
         primary.back ().transform (s->trans ());
-
       }
-
     }
-
   }
 
   if (cv_index < 0 || layer_index < 0) {
@@ -1614,13 +1555,13 @@ MainService::cm_round_corners ()
 
   //  prepare: merge to remove cutlines and smooth to remove effects of cutlines
   db::EdgeProcessor ep;
-  std::vector <db::Polygon> in;
+  std::vector<db::Polygon> in;
   ep.merge (primary, in, 0 /*min_wc*/, false /*resolve holes*/, true /*min coherence*/);
-  for (std::vector <db::Polygon>::iterator p = in.begin (); p != in.end (); ++p) {
+  for (std::vector<db::Polygon>::iterator p = in.begin (); p != in.end (); ++p) {
     *p = smooth (*p, 1, true);
   }
 
-  std::vector <db::Polygon> out = in;
+  std::vector<db::Polygon> out = in;
 
   unsigned int n = 100;
   double rinner = 0.0, router = 0.0;
@@ -1643,7 +1584,7 @@ MainService::cm_round_corners ()
     out.swap (in);
   }
 
-  for (std::vector <db::Polygon>::iterator p = out.begin (); p != out.end (); ++p) {
+  for (std::vector<db::Polygon>::iterator p = out.begin (); p != out.end (); ++p) {
     *p = compute_rounded (*p, m_rinner / dbu, m_router / dbu, m_npoints);
   }
 
@@ -1675,9 +1616,9 @@ MainService::cm_round_corners ()
   std::vector<lay::ObjectInstPath> new_selection;
   new_selection.reserve (primary.size ());
 
-  //  create the new shapes 
+  //  create the new shapes
   db::Shapes &target_shapes = cv->layout ().cell (cv.cell_index ()).shapes (layer_index);
-  for (std::vector <db::Polygon>::const_iterator p = primary.begin (); p != primary.end (); ++p) {
+  for (std::vector<db::Polygon>::const_iterator p = primary.begin (); p != primary.end (); ++p) {
     db::Shape new_shape = target_shapes.insert (*p);
     new_selection.push_back (lay::ObjectInstPath ());
     new_selection.back ().set_topcell (cv.cell_index ());
@@ -1685,10 +1626,10 @@ MainService::cm_round_corners ()
     new_selection.back ().set_layer (layer_index);
     new_selection.back ().set_shape (new_shape);
   }
-  
+
   //  set the new selection on the polygon service (because now we have polygons)
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    if (dynamic_cast <edt::PolygonService *> (*es) != 0) {
+    if (dynamic_cast<edt::PolygonService *> (*es) != 0) {
       (*es)->set_selection (new_selection.begin (), new_selection.end ());
       break;
     }
@@ -1699,8 +1640,7 @@ MainService::cm_round_corners ()
   }
 }
 
-void
-MainService::cm_size ()
+void MainService::cm_size ()
 {
 #if ! defined(HAVE_QT)
   tl_assert (false); // see TODO
@@ -1712,7 +1652,7 @@ MainService::cm_size ()
   int cv_index = -1;
   int layer_index = -1;
 
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view ()->get_plugins<edt::Service> ();
 
   std::vector<db::Polygon> primary;
 
@@ -1735,9 +1675,7 @@ MainService::cm_size ()
         primary.push_back (db::Polygon ());
         s->shape ().polygon (primary.back ());
         primary.back ().transform (s->trans ());
-
       }
-
     }
   }
 
@@ -1753,10 +1691,10 @@ MainService::cm_size ()
   QString s = QInputDialog::getText (lay::widget_from_view (view ()),
                                      tr ("Sizing"),
                                      tr ("Sizing (in micron, positive or negative). Two values (dx, dy) for anisotropic sizing."),
-                                     QLineEdit::Normal, QString::fromUtf8 ("0.0"), 
+                                     QLineEdit::Normal, QString::fromUtf8 ("0.0"),
                                      &ok);
 
-  if (!ok) {
+  if (! ok) {
     return;
   }
 
@@ -1777,7 +1715,7 @@ MainService::cm_size ()
   db::Coord idx = db::coord_traits<db::Coord>::rounded (dx / dbu);
   db::Coord idy = db::coord_traits<db::Coord>::rounded (dy / dbu);
 
-  std::vector <db::Polygon> out;
+  std::vector<db::Polygon> out;
   db::EdgeProcessor ep;
   ep.size (primary, idx, idy, out, 2 /*mode, TODO: make variable*/, true /*resolve holes*/, true /*min coherence*/);
 
@@ -1805,9 +1743,9 @@ MainService::cm_size ()
   std::vector<lay::ObjectInstPath> new_selection;
   new_selection.reserve (out.size ());
 
-  //  create the new shapes 
+  //  create the new shapes
   db::Shapes &target_shapes = cv->layout ().cell (cv.cell_index ()).shapes (layer_index);
-  for (std::vector <db::Polygon>::const_iterator p = out.begin (); p != out.end (); ++p) {
+  for (std::vector<db::Polygon>::const_iterator p = out.begin (); p != out.end (); ++p) {
     db::Shape new_shape = target_shapes.insert (*p);
     new_selection.push_back (lay::ObjectInstPath ());
     new_selection.back ().set_topcell (cv.cell_index ());
@@ -1815,10 +1753,10 @@ MainService::cm_size ()
     new_selection.back ().set_layer (layer_index);
     new_selection.back ().set_shape (new_shape);
   }
-  
+
   //  set the new selection on the polygon service (because now we have polygons)
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    if (dynamic_cast <edt::PolygonService *> (*es) != 0) {
+    if (dynamic_cast<edt::PolygonService *> (*es) != 0) {
       (*es)->set_selection (new_selection.begin (), new_selection.end ());
       break;
     }
@@ -1829,8 +1767,7 @@ MainService::cm_size ()
   }
 }
 
-void
-MainService::boolean_op (int mode)
+void MainService::boolean_op (int mode)
 {
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
@@ -1838,7 +1775,7 @@ MainService::boolean_op (int mode)
   int cv_index = -1;
   int layer_index = -1;
 
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view ()->get_plugins<edt::Service> ();
 
   std::vector<db::Polygon> primary;
 
@@ -1861,9 +1798,7 @@ MainService::boolean_op (int mode)
         primary.push_back (db::Polygon ());
         s->shape ().polygon (primary.back ());
         primary.back ().transform (s->trans ());
-
       }
-
     }
   }
 
@@ -1889,13 +1824,11 @@ MainService::boolean_op (int mode)
 
         //  HINT: this transforms the shape without any grid snapping precautions ..
         secondary.back ().transform (db::CplxTrans (dbu_sec / dbu_prim) * s->trans ());
-
       }
-
     }
   }
 
-  std::vector <db::Polygon> out;
+  std::vector<db::Polygon> out;
   db::EdgeProcessor ep;
 
   if (mode == -1 /*== separate*/) {
@@ -1932,9 +1865,9 @@ MainService::boolean_op (int mode)
   std::vector<lay::ObjectInstPath> new_selection;
   new_selection.reserve (out.size ());
 
-  //  create the new shapes 
+  //  create the new shapes
   db::Shapes &target_shapes = cv->layout ().cell (cv.cell_index ()).shapes (layer_index);
-  for (std::vector <db::Polygon>::const_iterator p = out.begin (); p != out.end (); ++p) {
+  for (std::vector<db::Polygon>::const_iterator p = out.begin (); p != out.end (); ++p) {
     db::Shape new_shape = target_shapes.insert (*p);
     new_selection.push_back (lay::ObjectInstPath ());
     new_selection.back ().set_topcell (cv.cell_index ());
@@ -1942,10 +1875,10 @@ MainService::boolean_op (int mode)
     new_selection.back ().set_layer (layer_index);
     new_selection.back ().set_shape (new_shape);
   }
-  
+
   //  set the new selection on the polygon service (because now we have polygons)
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    if (dynamic_cast <edt::PolygonService *> (*es) != 0) {
+    if (dynamic_cast<edt::PolygonService *> (*es) != 0) {
       (*es)->set_selection (new_selection.begin (), new_selection.end ());
       break;
     }
@@ -1956,32 +1889,27 @@ MainService::boolean_op (int mode)
   }
 }
 
-void 
-MainService::cm_union ()
+void MainService::cm_union ()
 {
   boolean_op (db::BooleanOp::Or);
 }
 
-void 
-MainService::cm_intersection ()
+void MainService::cm_intersection ()
 {
   boolean_op (db::BooleanOp::And);
 }
 
-void
-MainService::cm_difference ()
+void MainService::cm_difference ()
 {
   boolean_op (db::BooleanOp::ANotB);
 }
 
-void
-MainService::cm_separate ()
+void MainService::cm_separate ()
 {
   boolean_op (-1); // == separate (And + ANotB)
 }
 
-static
-db::DVector compute_alignment_vector (const db::DBox &prim_box, const db::DBox &box, int hmode, int vmode)
+static db::DVector compute_alignment_vector (const db::DBox &prim_box, const db::DBox &box, int hmode, int vmode)
 {
   double dx = 0.0;
   if (hmode == 1) {
@@ -2004,7 +1932,7 @@ db::DVector compute_alignment_vector (const db::DBox &prim_box, const db::DBox &
   return db::DVector (dx, dy);
 }
 
-static db::DBox 
+static db::DBox
 inst_bbox (const db::CplxTrans &tr, lay::LayoutViewBase *view, int cv_index, const db::InstElement &inst_element, bool visible_only)
 {
   db::DBox box;
@@ -2026,8 +1954,7 @@ inst_bbox (const db::CplxTrans &tr, lay::LayoutViewBase *view, int cv_index, con
   return box;
 }
 
-void 
-MainService::cm_align ()
+void MainService::cm_align ()
 {
 #if ! defined(HAVE_QT)
   tl_assert (false); // see TODO
@@ -2036,7 +1963,7 @@ MainService::cm_align ()
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
 
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view ()->get_plugins<edt::Service> ();
 
 #if defined(HAVE_QT)
   //  TODO: make parameters persistent so we can set them externally
@@ -2066,7 +1993,6 @@ MainService::cm_align ()
       } else {
         has_secondary = true;
       }
-
     }
   }
 
@@ -2081,14 +2007,14 @@ MainService::cm_align ()
     for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 
       //  create a transformation vector that describes each shape's transformation
-      std::vector <db::DCplxTrans> tv;
+      std::vector<db::DCplxTrans> tv;
       tv.reserve ((*es)->selection_size ());
 
       for (EditableSelectionIterator s = (*es)->begin_selection (); ! s.at_end (); ++s) {
 
         db::DVector v;
 
-        if (s->seq () > 0 || !has_secondary) {
+        if (s->seq () > 0 || ! has_secondary) {
 
           db::Layout &layout = view ()->cellview (s->cv_index ())->layout ();
           db::CplxTrans tr = db::CplxTrans (layout.dbu ()) * s->trans ();
@@ -2102,29 +2028,23 @@ MainService::cm_align ()
 
             db::DBox box = inst_bbox (tr, view (), s->cv_index (), s->back (), m_align_visible_layers);
             v = compute_alignment_vector (prim_box, box, m_align_hmode, m_align_vmode);
-
           }
-
         }
 
         tv.push_back (db::DCplxTrans (db::DTrans (v)));
-
       }
 
       //  use the "transform" method to transform the shapes and instances (with individual transformations)
       (*es)->transform (db::DCplxTrans () /*dummy*/, &tv);
-
     }
 
     if (manager ()) {
       manager ()->commit ();
     }
-
   }
 }
 
-void
-MainService::cm_distribute ()
+void MainService::cm_distribute ()
 {
 #if ! defined(HAVE_QT)
   tl_assert (false); // see TODO
@@ -2133,7 +2053,7 @@ MainService::cm_distribute ()
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
 
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view ()->get_plugins<edt::Service> ();
 
 #if defined(HAVE_QT)
   //  TODO: make parameters persistent so we can set them externally
@@ -2156,7 +2076,7 @@ MainService::cm_distribute ()
     }
   }
 
-  std::vector<std::pair<size_t, size_t> > objects_for_service;
+  std::vector<std::pair<size_t, size_t>> objects_for_service;
   std::vector<db::DCplxTrans> transformations;
 
   {
@@ -2189,11 +2109,9 @@ MainService::cm_distribute ()
         placer.insert (box, i);
 
         ++i;
-
       }
 
       objects_for_service.back ().second = i;
-
     }
 
     int href = int (m_distribute_hmode - 2);
@@ -2211,9 +2129,8 @@ MainService::cm_distribute ()
     transformations.resize (org_boxes.size ());
 
     for (edt::distributed_placer<db::DBox, size_t>::iterator i = placer.begin (); i != placer.end (); ++i) {
-      transformations[i->second] = db::DCplxTrans (i->first.p1 () - org_boxes[i->second].p1 ());
+      transformations [i->second] = db::DCplxTrans (i->first.p1 () - org_boxes [i->second].p1 ());
     }
-
   }
 
   {
@@ -2228,22 +2145,19 @@ MainService::cm_distribute ()
       size_t ie = es - edt_services.begin ();
 
       //  create a transformation vector that describes each shape's transformation
-      std::vector <db::DCplxTrans> tv (transformations.begin () + objects_for_service [ie].first, transformations.begin () + objects_for_service [ie].second);
+      std::vector<db::DCplxTrans> tv (transformations.begin () + objects_for_service [ie].first, transformations.begin () + objects_for_service [ie].second);
 
       //  use the "transform" method to transform the shapes and instances (with individual transformations)
       (*es)->transform (db::DCplxTrans () /*dummy*/, &tv);
-
     }
 
     if (manager ()) {
       manager ()->commit ();
     }
-
   }
 }
 
-void
-MainService::cm_make_array ()
+void MainService::cm_make_array ()
 {
 #if ! defined(HAVE_QT)
   tl_assert (false); // see TODO
@@ -2251,7 +2165,7 @@ MainService::cm_make_array ()
 
   check_no_guiding_shapes ();
 
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view ()->get_plugins<edt::Service> ();
 
   bool any = false;
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end () && ! any; ++es) {
@@ -2289,21 +2203,18 @@ MainService::cm_make_array ()
         } else {
           bbox += inst_bbox (tr, view (), s->cv_index (), s->back (), m_array_options.use_visible_layers);
         }
-
       }
     }
 
     //  compute pitch vectors
-    a = db::DVector (0.0, m_array_options.space.y () + bbox.height ());   //  row-pitch
-    b = db::DVector (m_array_options.space.x () + bbox.width (), 0.0);    //  column-pitch
-
+    a = db::DVector (0.0, m_array_options.space.y () + bbox.height ()); //  row-pitch
+    b = db::DVector (m_array_options.space.x () + bbox.width (), 0.0);  //  column-pitch
   }
 
   make_array (na, nb, a, b);
 }
 
-void
-MainService::make_array (unsigned int na, unsigned int nb, const db::DVector &a, const db::DVector &b)
+void MainService::make_array (unsigned int na, unsigned int nb, const db::DVector &a, const db::DVector &b)
 {
   view ()->cancel_edits ();
 
@@ -2319,7 +2230,7 @@ MainService::make_array (unsigned int na, unsigned int nb, const db::DVector &a,
     }
   }
 
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view ()->get_plugins<edt::Service> ();
 
   //  count selected items for progress
   size_t n = 0;
@@ -2359,9 +2270,7 @@ MainService::make_array (unsigned int na, unsigned int nb, const db::DVector &a,
             target_cell.transform (new_inst, itrans);
 
             ++progress;
-
           }
-
         }
 
       } else {
@@ -2383,14 +2292,10 @@ MainService::make_array (unsigned int na, unsigned int nb, const db::DVector &a,
             target_shapes.transform (new_shape, itrans);
 
             ++progress;
-
           }
         }
-
       }
-
     }
-
   }
 
   if (has_undo && manager ()) {
@@ -2398,8 +2303,7 @@ MainService::make_array (unsigned int na, unsigned int nb, const db::DVector &a,
   }
 }
 
-void 
-MainService::cm_tap ()
+void MainService::cm_tap ()
 {
 #if ! defined(HAVE_QT)
   tl_assert (false); //  TODO
@@ -2414,31 +2318,26 @@ MainService::cm_tap ()
       db::DPoint pt = view ()->canvas ()->mouse_position_um ();
       es->tap (pt);
     }
-
   }
 #endif
 }
 
-void
-MainService::cm_via ()
+void MainService::cm_via ()
 {
   via_impl (0);
 }
 
-void
-MainService::cm_via_up ()
+void MainService::cm_via_up ()
 {
   via_impl (1);
 }
 
-void
-MainService::cm_via_down ()
+void MainService::cm_via_down ()
 {
   via_impl (-1);
 }
 
-void
-MainService::via_impl (int dir)
+void MainService::via_impl (int dir)
 {
 #if ! defined(HAVE_QT)
   tl_assert (false); // see TODO
@@ -2463,8 +2362,7 @@ MainService::via_impl (int dir)
   }
 }
 
-void
-MainService::cm_change_layer ()
+void MainService::cm_change_layer ()
 {
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
@@ -2488,7 +2386,7 @@ MainService::cm_change_layer ()
     if (cl.is_null ()) {
       throw tl::Exception (tl::to_string (tr ("Please select a layer first")).c_str ());
     }
-    
+
     if (cv_index != cl->cellview_index ()) {
       throw tl::Exception (tl::to_string (tr ("Shapes cannot be moved to a different layout")).c_str ());
     }
@@ -2520,14 +2418,12 @@ MainService::cm_change_layer ()
 
         //  update the layer index inside the layer view
         cl->realize_source ();
-          
-        //  Hint: we could have taken the new index from insert_layer, but this 
+
+        //  Hint: we could have taken the new index from insert_layer, but this
         //  is a nice test:
         layer = cl->layer_index ();
         tl_assert (layer >= 0);
-
       }
-
     }
 
     view ()->cancel_edits ();
@@ -2542,7 +2438,7 @@ MainService::cm_change_layer ()
     //  this is important since the selection potentially contains the same shape multiple times.
     for (EditableSelectionIterator s = begin_objects_selected (view ()); ! s.at_end (); ++s) {
 
-      if (!s->is_cell_inst () && int (s->layer ()) != layer) {
+      if (! s->is_cell_inst () && int (s->layer ()) != layer) {
 
         db::Cell &cell = layout.cell (s->cell_index ());
         if (cell.shapes (s->layer ()).is_valid (s->shape ())) {
@@ -2565,7 +2461,7 @@ MainService::cm_change_layer ()
             size_t layer_par_index = 0;
             int n_layer_par = 0;
             for (std::vector<db::PCellParameterDeclaration>::const_iterator d = pcell_decl->parameter_declarations ().begin (); d != pcell_decl->parameter_declarations ().end () && n_layer_par < 2; ++d) {
-              if (d->get_type () == db::PCellParameterDeclaration::t_layer && !d->is_hidden () && !d->is_readonly ()) {
+              if (d->get_type () == db::PCellParameterDeclaration::t_layer && ! d->is_hidden () && ! d->is_readonly ()) {
                 ++n_layer_par;
                 layer_par_index = size_t (d - pcell_decl->parameter_declarations ().begin ());
               }
@@ -2577,15 +2473,11 @@ MainService::cm_change_layer ()
               parameters [layer_par_index] = layout.get_properties (layer);
               cell.change_pcell_parameters (inst, parameters);
             }
-
           }
-
         }
-
       }
-
     }
-    
+
     //  remove superfluous proxies
     layout.cleanup ();
 
@@ -2599,13 +2491,11 @@ MainService::cm_change_layer ()
   } else {
     throw tl::Exception (tl::to_string (tr ("Nothing selected to switch layers for")));
   }
-
 }
 
-void
-MainService::check_no_guiding_shapes ()
+void MainService::check_no_guiding_shapes ()
 {
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view ()->get_plugins<edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
     for (EditableSelectionIterator s = (*es)->begin_selection (); ! s.at_end (); ++s) {
       if (! s->is_cell_inst ()) {
@@ -2618,24 +2508,24 @@ MainService::check_no_guiding_shapes ()
 }
 
 /**
- *  @brief Implementation of the insert notification object 
+ *  @brief Implementation of the insert notification object
  *
  *  The basic purpose of this object is to provide a new selection for the
  *  new shapes inserted.
  */
 class NewObjectsSelection
- : public db::ClipboardDataInsertReceiver 
+  : public db::ClipboardDataInsertReceiver
 {
 public:
   NewObjectsSelection (int cv_index, db::cell_index_type topcell, lay::LayoutViewBase *view)
     : m_cv_index (cv_index), m_topcell (topcell)
   {
-    mp_polygon_service = view->get_plugin <edt::PolygonService> ();
-    mp_box_service = view->get_plugin <edt::BoxService> ();
-    mp_point_service = view->get_plugin <edt::PointService> ();
-    mp_text_service = view->get_plugin <edt::TextService> ();
-    mp_path_service = view->get_plugin <edt::PathService> ();
-    mp_inst_service = view->get_plugin <edt::InstService> ();
+    mp_polygon_service = view->get_plugin<edt::PolygonService> ();
+    mp_box_service = view->get_plugin<edt::BoxService> ();
+    mp_point_service = view->get_plugin<edt::PointService> ();
+    mp_text_service = view->get_plugin<edt::TextService> ();
+    mp_path_service = view->get_plugin<edt::PathService> ();
+    mp_inst_service = view->get_plugin<edt::InstService> ();
     tl_assert (mp_polygon_service);
     tl_assert (mp_box_service);
     tl_assert (mp_text_service);
@@ -2643,7 +2533,7 @@ public:
     tl_assert (mp_inst_service);
   }
 
-  void shape_inserted (db::cell_index_type cell, int layer, const db::Shape &shape) 
+  void shape_inserted (db::cell_index_type cell, int layer, const db::Shape &shape)
   {
     lay::ObjectInstPath sel;
     sel.set_cv_index (m_cv_index);
@@ -2663,10 +2553,10 @@ public:
       mp_text_service->add_selection (sel);
     } else if (shape.is_path ()) {
       mp_path_service->add_selection (sel);
-    } 
+    }
   }
 
-  void instance_inserted (db::cell_index_type cell, const db::Instance &instance) 
+  void instance_inserted (db::cell_index_type cell, const db::Instance &instance)
   {
     lay::ObjectInstPath sel;
     sel.set_cv_index (m_cv_index);
@@ -2691,8 +2581,7 @@ private:
   db::cell_index_type m_topcell;
 };
 
-void 
-MainService::paste ()
+void MainService::paste ()
 {
   if (view ()->is_editable ()) {
 
@@ -2731,10 +2620,7 @@ MainService::paste ()
       view ()->add_new_layers (new_layers, cv_index);
     }
     view ()->update_content ();
-
   }
 }
 
 } // namespace edt
-
-

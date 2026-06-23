@@ -46,7 +46,7 @@ class GDS2TextFormatDeclaration
   virtual std::string format_title () const { return "GDS2 (ASCII text representation)"; }
   virtual std::string file_format () const { return "GDS2 Text files (*.txt *.TXT )"; }
 
-  virtual bool detect (tl::InputStream &s) const 
+  virtual bool detect (tl::InputStream &s) const
   {
     try {
 
@@ -60,8 +60,7 @@ class GDS2TextFormatDeclaration
           //  ignore comment or empty lines
         } else {
           return (ex.test ("HEADER") || ex.test ("BGNLIB") || ex.test ("UNITS"));
-        } 
-
+        }
       }
 
     } catch (...) {
@@ -70,14 +69,14 @@ class GDS2TextFormatDeclaration
     return false;
   }
 
-  virtual ReaderBase *create_reader (tl::InputStream &s) const 
+  virtual ReaderBase *create_reader (tl::InputStream &s) const
   {
-    return new db::GDS2ReaderText(s);
+    return new db::GDS2ReaderText (s);
   }
 
-  virtual WriterBase *create_writer () const 
+  virtual WriterBase *create_writer () const
   {
-    return new db::GDS2WriterText();
+    return new db::GDS2WriterText ();
   }
 
   virtual bool can_read () const
@@ -96,7 +95,6 @@ class GDS2TextFormatDeclaration
   }
 };
 
-static tl::RegisteredClass<db::StreamFormatDeclaration> format_txt_decl (new GDS2TextFormatDeclaration(), 1, "GDS2Text");
+static tl::RegisteredClass<db::StreamFormatDeclaration> format_txt_decl (new GDS2TextFormatDeclaration (), 1, "GDS2Text");
 
 }
-

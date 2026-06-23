@@ -33,19 +33,21 @@
 namespace gsi
 {
 
-struct MetaInfo
-{
+struct MetaInfo {
   MetaInfo (const std::string &n, const std::string &d, const tl::Variant &v, bool p)
     : name (n), description (d), value (v), persisted (p)
-  { }
+  {
+  }
 
   MetaInfo (const std::string &n, const db::MetaInfo &mi)
     : name (n), description (mi.description), value (mi.value), persisted (mi.persisted)
-  { }
+  {
+  }
 
   MetaInfo ()
     : name (), description (), value (), persisted (false)
-  { }
+  {
+  }
 
   std::string name;
   std::string description;
@@ -53,8 +55,7 @@ struct MetaInfo
   bool persisted;
 };
 
-struct MetaInfoIterator
-{
+struct MetaInfoIterator {
   typedef std::forward_iterator_tag iterator_category;
   typedef MetaInfo value_type;
   typedef void difference_type;
@@ -63,15 +64,17 @@ struct MetaInfoIterator
 
   MetaInfoIterator ()
     : mp_layout (), m_b (), m_e ()
-  { }
+  {
+  }
 
   MetaInfoIterator (const db::Layout *layout, db::Layout::meta_info_iterator b, db::Layout::meta_info_iterator e)
     : mp_layout (const_cast<db::Layout *> (layout)), m_b (b), m_e (e)
-  { }
+  {
+  }
 
   bool at_end () const
   {
-    return !mp_layout || m_b == m_e;
+    return ! mp_layout || m_b == m_e;
   }
 
   void operator++ ()

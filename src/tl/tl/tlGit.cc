@@ -31,7 +31,7 @@
 
 #include <git2.h>
 #if LIBGIT2_VER_MAJOR > 1 || (LIBGIT2_VER_MAJOR == 1 && LIBGIT2_VER_MINOR >= 8)
-    #include <git2/sys/errors.h>
+#include <git2/sys/errors.h>
 #endif
 #include <cstdio>
 
@@ -41,7 +41,8 @@ namespace tl
 // ---------------------------------------------------------------
 //  Library initialization helper
 
-namespace {
+namespace
+{
 
 class InitHelper
 {
@@ -126,7 +127,7 @@ fetch_progress (const git_transfer_progress *stats, void *payload)
 }
 
 static void
-checkout_progress(const char * /*path*/, size_t cur, size_t tot, void *payload)
+checkout_progress (const char * /*path*/, size_t cur, size_t tot, void *payload)
 {
   tl::RelativeProgress *progress = reinterpret_cast<tl::RelativeProgress *> (payload);
 
@@ -154,7 +155,7 @@ static void check (int error)
 static bool
 ref_matches (const char *name, const std::string &ref)
 {
-  if (!name) {
+  if (! name) {
     return false;
   } else if (name == ref) {
     return true;
@@ -230,7 +231,7 @@ checkout_branch (git_repository *repo, git_remote *remote, const git_checkout_op
   bool found = false;
 
   for (size_t i = 0; i < n; ++i) {
-    const git_remote_head *rh = ls[i];
+    const git_remote_head *rh = ls [i];
     if (tl::verbosity () >= 20) {
       char oid_fmt [80];
       git_oid_tostr (oid_fmt, sizeof (oid_fmt), &rh->oid);
@@ -270,11 +271,9 @@ credentials_cb (git_cred ** /*out*/, const char * /*url*/, const char * /*userna
   giterr_set_str (GITERR_NONE, "anonymous access is supported only, but server requests credentials");
 #endif
   return GIT_EUSER;
-
 }
 
-void
-GitObject::read (const std::string &org_url, const std::string &org_filter, const std::string &subfolder, const std::string &branch, double timeout, tl::InputHttpStreamCallback *callback)
+void GitObject::read (const std::string &org_url, const std::string &org_filter, const std::string &subfolder, const std::string &branch, double timeout, tl::InputHttpStreamCallback *callback)
 {
   std::string url = org_url;
 
@@ -295,8 +294,8 @@ GitObject::read (const std::string &org_url, const std::string &org_filter, cons
   git_checkout_options checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
   checkout_opts.checkout_strategy = GIT_CHECKOUT_FORCE;
 
-  const char *paths_cstr[1];
-  paths_cstr[0] = filter.c_str ();
+  const char *paths_cstr [1];
+  paths_cstr [0] = filter.c_str ();
   if (! filter.empty ()) {
     checkout_opts.paths.count = 1;
     checkout_opts.paths.strings = (char **) &paths_cstr;
@@ -312,7 +311,7 @@ GitObject::read (const std::string &org_url, const std::string &org_filter, cons
   fetch_opts.download_tags = GIT_REMOTE_DOWNLOAD_TAGS_AUTO;
 
 #if LIBGIT2_VER_MAJOR > 1 || (LIBGIT2_VER_MAJOR == 1 && LIBGIT2_VER_MINOR >= 7)
-  fetch_opts.depth = 1;  // shallow (single commit)
+  fetch_opts.depth = 1; // shallow (single commit)
 #endif
   fetch_opts.callbacks.transfer_progress = &fetch_progress;
   fetch_opts.callbacks.credentials = &credentials_cb;
@@ -330,7 +329,7 @@ GitObject::read (const std::string &org_url, const std::string &org_filter, cons
 
   //  build refspecs in case they are needed
 
-  char *refs[] = { (char *) branch.c_str () };
+  char *refs [] = {(char *) branch.c_str ()};
   git_strarray refspecs;
   refspecs.count = 1;
   refspecs.strings = refs;
@@ -385,7 +384,7 @@ GitObject::read (const std::string &org_url, const std::string &org_filter, cons
 
     //  rename the source to a temporary folder so we don't overwrite the source folder with something from within
     std::string tmp_dir = "__temp__";
-    for (unsigned int i = 0; ; ++i) {
+    for (unsigned int i = 0;; ++i) {
       if (! tl::file_exists (tl::combine_path (m_local_path, tmp_dir + tl::to_string (i)))) {
         tmp_dir += tl::to_string (i);
         break;
@@ -400,12 +399,10 @@ GitObject::read (const std::string &org_url, const std::string &org_filter, cons
     if (! tl::mv_dir_recursive (tl::combine_path (m_local_path, tl::join (pc, "/")), m_local_path)) {
       throw tl::Exception (tl::to_string (tr ("Error cloning Git repo - failed to move subdir components")));
     }
-
   }
 }
 
-bool
-GitObject::download (const std::string &url, const std::string &target, const std::string &subfolder, const std::string &branch, double timeout, tl::InputHttpStreamCallback *callback)
+bool GitObject::download (const std::string &url, const std::string &target, const std::string &subfolder, const std::string &branch, double timeout, tl::InputHttpStreamCallback *callback)
 {
   try {
 
@@ -419,7 +416,6 @@ GitObject::download (const std::string &url, const std::string &target, const st
     tl::error << tl::sprintf (tl::to_string (tr ("Error downloading Git repo from %s (subdir '%s', ref '%s')")), url, subfolder, branch);
 
     return false;
-
   }
 }
 

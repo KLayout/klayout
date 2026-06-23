@@ -31,7 +31,7 @@
 
 static void run_test (tl::TestBase *_this, const std::string &base, const char *file, const char *file_au, const char *map = 0, double dbu = 0.001)
 {
-  db::MALYReaderOptions *opt = new db::MALYReaderOptions();
+  db::MALYReaderOptions *opt = new db::MALYReaderOptions ();
   opt->dbu = dbu;
 
   db::LayerMap lm;
@@ -73,7 +73,7 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
   db::compare_layouts (_this, layout, fn_au, db::WriteOAS);
 }
 
-TEST(1_Basic)
+TEST (1_Basic)
 {
   std::string fn (tl::testdata ());
   fn += "/maly/MALY_test1.maly";
@@ -84,15 +84,14 @@ TEST(1_Basic)
   db::MALYData data = reader.read_maly_file ();
 
   EXPECT_EQ (data.to_string (),
-    "Mask A\n"
-    "  Size 127000\n"
-    "    Title \"<SERIAL>\" m90 0,-50 1,1,1 [Standard]\n"
-    "    Title \"MaskA1\" m90 50,50 1,1,1 [Standard]\n"
-    "    Title \"WITH \"QUOTES\"\" r270 -50,0 1,1,1 [Standard]\n"
-    "    Ref A1.oas{CHIP_A}(1) (0,0;10,10) m90 *1 20,0\n"
-    "    Ref A2.oas{CHIP_A}(2) ename(e001) dname(d001) (0,0;50,50) m90 *0.8 20,0 [2x5,1x2]\n"
-    "    Ref B3.oas{CHIP_A}(2) (0,0;12,12) m90 *1 20,0"
-  )
+             "Mask A\n"
+             "  Size 127000\n"
+             "    Title \"<SERIAL>\" m90 0,-50 1,1,1 [Standard]\n"
+             "    Title \"MaskA1\" m90 50,50 1,1,1 [Standard]\n"
+             "    Title \"WITH \"QUOTES\"\" r270 -50,0 1,1,1 [Standard]\n"
+             "    Ref A1.oas{CHIP_A}(1) (0,0;10,10) m90 *1 20,0\n"
+             "    Ref A2.oas{CHIP_A}(2) ename(e001) dname(d001) (0,0;50,50) m90 *0.8 20,0 [2x5,1x2]\n"
+             "    Ref B3.oas{CHIP_A}(2) (0,0;12,12) m90 *1 20,0")
 }
 
 static std::string run_test_with_error (tl::TestBase * /*_this*/, const std::string &file)
@@ -113,7 +112,7 @@ static std::string run_test_with_error (tl::TestBase * /*_this*/, const std::str
   }
 }
 
-TEST(2_Errors)
+TEST (2_Errors)
 {
   EXPECT_EQ (run_test_with_error (_this, "MALY_test2a.maly").find ("Line break inside quoted string (line=17,"), size_t (0));
   EXPECT_EQ (run_test_with_error (_this, "MALY_test2b.maly").find ("/*...*/ comment not closed (line=43,"), size_t (0));
@@ -131,15 +130,14 @@ TEST(2_Errors)
   EXPECT_EQ (run_test_with_error (_this, "MALY_test2n.maly").find ("Header expected ('BEGIN MALY') (line=2, "), size_t (0));
 }
 
-TEST(10_BasicLayout)
+TEST (10_BasicLayout)
 {
   run_test (_this, tl::testdata (), "MALY_test10.maly", "maly_test10_au.oas");
   run_test (_this, tl::testdata (), "MALY_test10.maly", "maly_test10_lm_au.oas", "A: 10, B: 11, C: 12, D: 13");
   run_test (_this, tl::testdata (), "MALY_test10.maly", "maly_test10_dbu10nm_au.oas", 0, 0.01);
 }
 
-TEST(11_Titles)
+TEST (11_Titles)
 {
   run_test (_this, tl::testdata (), "MALY_test11.maly", "maly_test11_au.oas");
 }
-

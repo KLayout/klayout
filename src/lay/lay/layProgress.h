@@ -47,18 +47,19 @@ class LAY_PUBLIC ProgressBar
   : public tl::Object
 {
 public:
-  virtual ~ProgressBar () { }
+  virtual ~ProgressBar () {}
 
   virtual void update_progress (tl::Progress *progress) = 0;
   virtual bool progress_wants_widget () const { return false; }
-  virtual void progress_add_widget (QWidget * /*widget*/) { }
-  virtual void progress_remove_widget () { }
+  virtual void progress_add_widget (QWidget * /*widget*/) {}
+  virtual void progress_remove_widget () {}
   virtual QWidget *progress_get_widget () const { return 0; }
   virtual void show_progress_bar (bool show) = 0;
 };
 
-class LAY_PUBLIC ProgressReporter 
-  : public QObject, public tl::ProgressAdaptor
+class LAY_PUBLIC ProgressReporter
+  : public QObject,
+    public tl::ProgressAdaptor
 {
 public:
   ProgressReporter ();
@@ -92,4 +93,3 @@ LAY_PUBLIC void mark_widget_alive (QWidget *w, bool alive);
 }
 
 #endif
-

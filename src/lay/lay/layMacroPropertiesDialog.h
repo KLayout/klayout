@@ -36,9 +36,10 @@ namespace lay
  *  @brief A dialog to edit the properties of a macro
  */
 class MacroPropertiesDialog
-  : public QDialog, private Ui::MacroPropertiesDialog
+  : public QDialog,
+    private Ui::MacroPropertiesDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   MacroPropertiesDialog (QWidget *parent);
@@ -56,4 +57,3 @@ private:
 }
 
 #endif
-

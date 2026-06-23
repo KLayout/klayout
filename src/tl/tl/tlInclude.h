@@ -43,8 +43,8 @@ class InputStream;
 class TL_PUBLIC IncludeFileResolver
 {
 public:
-  IncludeFileResolver () { }
-  virtual ~IncludeFileResolver () { }
+  IncludeFileResolver () {}
+  virtual ~IncludeFileResolver () {}
 
   virtual std::string get_text (const std::string &path) const = 0;
 };
@@ -111,7 +111,7 @@ public:
   }
 
 private:
-  std::map<int, std::pair<std::string, int> > m_sections;
+  std::map<int, std::pair<std::string, int>> m_sections;
 
   void read (const std::string &path, tl::InputStream &is, std::string &expanded_text, int &line_counter, const IncludeFileResolver *mp_resolver);
 };
@@ -119,4 +119,3 @@ private:
 }
 
 #endif
-

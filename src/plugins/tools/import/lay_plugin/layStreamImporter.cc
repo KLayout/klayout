@@ -49,11 +49,10 @@ StreamImporter::StreamImporter ()
   // .. nothing yet ..
 }
 
-void 
-StreamImporter::read (db::Layout &target, db::cell_index_type target_cell_index, std::vector <unsigned int> &new_layers)
+void StreamImporter::read (db::Layout &target, db::cell_index_type target_cell_index, std::vector<unsigned int> &new_layers)
 {
   //  Clear the undo buffer
-  if (target.manager () && !target.manager ()->transacting ()) {
+  if (target.manager () && ! target.manager ()->transacting ()) {
     target.manager ()->clear ();
   }
 
@@ -65,13 +64,13 @@ StreamImporter::read (db::Layout &target, db::cell_index_type target_cell_index,
   db::DCplxTrans global_trans (m_global_trans);
   if (! m_reference_points.empty ()) {
 
-    db::DPoint p1_pcb = m_reference_points[0].first;
-    db::DPoint p1_ly = m_reference_points[0].second;
+    db::DPoint p1_pcb = m_reference_points [0].first;
+    db::DPoint p1_ly = m_reference_points [0].second;
 
     if (m_reference_points.size () > 1) {
 
-      db::DPoint p2_pcb = m_reference_points[1].first;
-      db::DPoint p2_ly = m_reference_points[1].second;
+      db::DPoint p2_pcb = m_reference_points [1].first;
+      db::DPoint p2_ly = m_reference_points [1].second;
 
       db::DVector d12_pcb = (p2_pcb - p1_pcb) * (1.0 / p2_pcb.distance (p1_pcb));
       db::DVector d12_ly = (p2_ly - p1_ly) * (1.0 / p2_ly.distance (p1_ly));
@@ -95,8 +94,8 @@ StreamImporter::read (db::Layout &target, db::cell_index_type target_cell_index,
 
       if (m_reference_points.size () > 2) {
 
-        db::DPoint p3_pcb = m_reference_points[2].first;
-        db::DPoint p3_ly = m_reference_points[2].second;
+        db::DPoint p3_pcb = m_reference_points [2].first;
+        db::DPoint p3_ly = m_reference_points [2].second;
 
         db::DVector d13_pcb = (p3_pcb - p1_pcb) * (1.0 / p3_pcb.distance (p1_pcb));
         db::DVector d13_ly = (p3_ly - p1_ly) * (1.0 / p3_ly.distance (p1_ly));
@@ -117,41 +116,36 @@ StreamImporter::read (db::Layout &target, db::cell_index_type target_cell_index,
         } else {
           global_trans = db::DCplxTrans (db::DFTrans (ru));
         }
-
       }
-
     }
 
     global_trans = db::DCplxTrans (p1_ly - (db::DPoint () + global_trans.disp ())) * global_trans * db::DCplxTrans (db::DPoint () - p1_pcb);
-
   }
 
   //  Issue a warning, if the transformation is not ortho etc.
   if (fabs (global_trans.mag () - floor (global_trans.mag () + 0.5)) > 1e-6 || ! global_trans.is_ortho ()) {
 
     if (QMessageBox::warning (QApplication::activeWindow (),
-      QObject::tr ("Complex Transformation"),
-      tl::to_qstring (tl::sprintf (tl::to_string (QObject::tr ("The specified transformation (%s) is complex.\nGrid snapping to the database unit grid can occur and\neffectively alter the geometry of the layout.\nPress 'Ok' to continue.")), global_trans.to_string ())),
-      QMessageBox::Ok | QMessageBox::Cancel,
-      QMessageBox::Ok) != QMessageBox::Ok) {
+                              QObject::tr ("Complex Transformation"),
+                              tl::to_qstring (tl::sprintf (tl::to_string (QObject::tr ("The specified transformation (%s) is complex.\nGrid snapping to the database unit grid can occur and\neffectively alter the geometry of the layout.\nPress 'Ok' to continue.")), global_trans.to_string ())),
+                              QMessageBox::Ok | QMessageBox::Cancel,
+                              QMessageBox::Ok) != QMessageBox::Ok) {
       return;
     }
-
   }
 
   //  TODO: Currently no merging is provided for non-unity transformations
   if (m_cell_mapping == StreamImportData::Merge && ! global_trans.equal (db::DCplxTrans ())) {
 
     if (QMessageBox::warning (QApplication::activeWindow (),
-      QObject::tr ("Merge Mode Is Not Available"),
-      tl::to_qstring (tl::sprintf (tl::to_string (QObject::tr ("Merge mode is not supported for the specified transformation (%s).\nSimple mode will be used instead.\nPress 'Ok' to continue.")), global_trans.to_string ())),
-      QMessageBox::Ok | QMessageBox::Cancel,
-      QMessageBox::Ok) != QMessageBox::Ok) {
+                              QObject::tr ("Merge Mode Is Not Available"),
+                              tl::to_qstring (tl::sprintf (tl::to_string (QObject::tr ("Merge mode is not supported for the specified transformation (%s).\nSimple mode will be used instead.\nPress 'Ok' to continue.")), global_trans.to_string ())),
+                              QMessageBox::Ok | QMessageBox::Cancel,
+                              QMessageBox::Ok) != QMessageBox::Ok) {
       return;
     }
 
     m_cell_mapping = StreamImportData::Simple;
-
   }
 
   for (size_t file_index = 0; file_index < m_files.size (); ++file_index) {
@@ -173,9 +167,9 @@ StreamImporter::read (db::Layout &target, db::cell_index_type target_cell_index,
 
     //  Locate the top cell in the source file
     db::cell_index_type source_topcell;
-    std::vector <db::cell_index_type> source_cells;
+    std::vector<db::cell_index_type> source_cells;
 
-    if (m_cell_mapping != StreamImportData::Extra || !m_topcell.empty ()) {
+    if (m_cell_mapping != StreamImportData::Extra || ! m_topcell.empty ()) {
 
       if (m_topcell.empty ()) {
 
@@ -199,7 +193,6 @@ StreamImporter::read (db::Layout &target, db::cell_index_type target_cell_index,
         }
 
         source_topcell = t.second;
-
       }
 
       source_cells.push_back (source_topcell);
@@ -210,11 +203,10 @@ StreamImporter::read (db::Layout &target, db::cell_index_type target_cell_index,
       for (db::Layout::top_down_const_iterator t = source.begin_top_down (); t != source.end_top_cells (); ++t) {
         source_cells.push_back (*t);
       }
-
     }
 
     //  Create a layer map
-    std::map <unsigned int, unsigned int> layer_map;
+    std::map<unsigned int, unsigned int> layer_map;
     for (db::Layout::layer_iterator l = source.begin_layers (); l != source.end_layers (); ++l) {
 
       db::LayerProperties lp (*(*l).second);
@@ -235,14 +227,13 @@ StreamImporter::read (db::Layout &target, db::cell_index_type target_cell_index,
         layer_map.insert (std::make_pair ((*l).first, new_layer));
         new_layers.push_back (new_layer);
       }
-
     }
 
     //  Computes the final global transformation
     db::DCplxTrans gt = global_trans;
 
     //  Create a cell map
-    std::map <db::cell_index_type, db::cell_index_type> cell_map;
+    std::map<db::cell_index_type, db::cell_index_type> cell_map;
 
     if (m_cell_mapping == StreamImportData::Simple) {
 
@@ -277,14 +268,11 @@ StreamImporter::read (db::Layout &target, db::cell_index_type target_cell_index,
       db::CellMapping cm;
       cm.create_from_geometry (target, target_cell_index, source, source_topcell);
       cell_map.insert (cm.begin (), cm.end ());
-
     }
 
     //  And actually merge
     db::merge_layouts (target, source, db::VCplxTrans (1.0 / target.dbu ()) * gt * db::CplxTrans (source.dbu ()), source_cells, cell_map, layer_map);
-
   }
 }
 
 }
-

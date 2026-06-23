@@ -34,7 +34,7 @@ class ClassBase;
 
 /**
  *  @brief Implements an object holder
- *  This is some kind of auto pointer which acts on generic objects based on the 
+ *  This is some kind of auto pointer which acts on generic objects based on the
  *  gsi::ClassBase scheme.
  */
 class GSI_PUBLIC ObjectHolder
@@ -85,4 +85,3 @@ private:
 }
 
 #endif
-

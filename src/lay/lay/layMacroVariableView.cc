@@ -30,7 +30,7 @@
 
 #include <cstdio>
 
-namespace 
+namespace
 {
 
 /**
@@ -63,8 +63,8 @@ namespace lay
 /**
  *  @brief Converts a tl::Variant to a nice string
  */
-QString 
-pretty_print (const tl::Variant &v) 
+QString
+pretty_print (const tl::Variant &v)
 {
   if (v.is_nil ()) {
 
@@ -90,7 +90,7 @@ pretty_print (const tl::Variant &v)
 }
 
 /**
- *  @brief Return an inspector's description 
+ *  @brief Return an inspector's description
  *
  *  This function also adds an error catch to show evaluation errors
  */
@@ -249,9 +249,7 @@ void MacroVariableView::sync_item (QTreeWidgetItem *parent, gsi::Inspector *insp
       while (item->childCount () > 0) {
         delete item->takeChild (0);
       }
-
     }
-
   }
 }
 
@@ -262,7 +260,7 @@ void MacroVariableView::sync (QTreeWidgetItem *parent, gsi::Inspector *inspector
     //  collect all top-level items
     std::map<QString, size_t> keys;
 
-    for (size_t n = inspector->count (); n-- > 0; ) {
+    for (size_t n = inspector->count (); n-- > 0;) {
       gsi::Inspector::Visibility vis = inspector->visibility (n);
       if (vis == gsi::Inspector::Always || (m_show_all && vis == gsi::Inspector::IfRequested)) {
         QString k = tl::to_qstring (inspector->key (n));
@@ -299,11 +297,9 @@ void MacroVariableView::sync (QTreeWidgetItem *parent, gsi::Inspector *inspector
 
     //  insert or update new items
     for (size_t i = 0; i < n; ++i) {
-      sync_item (parent, inspector, QString::fromUtf8("[%1]").arg (i), i, int (i), fresh);
+      sync_item (parent, inspector, QString::fromUtf8 ("[%1]").arg (i), i, int (i), fresh);
     }
-
   }
 }
 
 }
-

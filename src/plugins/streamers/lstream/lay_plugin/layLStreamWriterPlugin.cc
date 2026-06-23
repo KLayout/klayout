@@ -46,8 +46,7 @@ LStreamWriterOptionPage::~LStreamWriterOptionPage ()
   delete mp_ui;
 }
 
-void 
-LStreamWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/)
+void LStreamWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/)
 {
   const lstr::WriterOptions *options = dynamic_cast<const lstr::WriterOptions *> (o);
   if (options) {
@@ -56,8 +55,7 @@ LStreamWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const 
   }
 }
 
-void 
-LStreamWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/, bool gzip)
+void LStreamWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/, bool gzip)
 {
   lstr::WriterOptions *options = dynamic_cast<lstr::WriterOptions *> (o);
   if (options) {
@@ -93,7 +91,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> plugin_decl (new lay::LStreamWriterPluginDeclaration (), 10002, "LStreamWriter");
 
 }
-
-
-
-

@@ -35,8 +35,7 @@ JoinEdgesCluster::JoinEdgesCluster (db::PolygonSink *output, coord_type ext_b, c
   //  .. nothing yet ..
 }
 
-void
-JoinEdgesCluster::finish ()
+void JoinEdgesCluster::finish ()
 {
   std::multimap<db::Point, iterator> objects_by_p1;
   std::multimap<db::Point, iterator> objects_by_p2;
@@ -141,9 +140,7 @@ JoinEdgesCluster::finish ()
 
       db::BooleanOp2 op (db::BooleanOp::ANotB, mode_a, mode_b);
       ep.process (pg, op);
-
     }
-
   }
 }
 
@@ -162,7 +159,7 @@ extended_edge (const db::Edge &edge, db::Coord ext_b, db::Coord ext_e, db::Coord
 
   db::DVector n (-d.y (), d.x ());
 
-  db::Point pts[4] = {
+  db::Point pts [4] = {
     db::Point (db::DPoint (edge.p1 ()) - d * double (ext_b) + n * double (ext_o)),
     db::Point (db::DPoint (edge.p2 ()) + d * double (ext_e) + n * double (ext_o)),
     db::Point (db::DPoint (edge.p2 ()) + d * double (ext_e) - n * double (ext_i)),
@@ -179,13 +176,14 @@ extended_edge (const db::Edge &edge, db::Coord ext_b, db::Coord ext_e, db::Coord
 
 EdgeSegmentSelector::EdgeSegmentSelector (int mode, Edge::distance_type length, double fraction)
   : m_mode (mode), m_length (length), m_fraction (fraction)
-{ }
+{
+}
 
 EdgeSegmentSelector::~EdgeSegmentSelector ()
-{ }
+{
+}
 
-void
-EdgeSegmentSelector::process (const db::EdgeWithProperties &edge, std::vector<db::EdgeWithProperties> &res) const
+void EdgeSegmentSelector::process (const db::EdgeWithProperties &edge, std::vector<db::EdgeWithProperties> &res) const
 {
   double l = std::max (edge.double_length () * m_fraction, double (m_length));
 
@@ -208,7 +206,6 @@ EdgeSegmentSelector::process (const db::EdgeWithProperties &edge, std::vector<db
     db::DPoint center = db::DPoint (edge.p1 ()) + db::DVector (edge.p2 () - edge.p1 ()) * 0.5;
 
     res.push_back (db::EdgeWithProperties (db::Edge (db::Point (center - dl), db::Point (center + dl)), edge.properties_id ()));
-
   }
 }
 
@@ -235,8 +232,7 @@ EdgeAngleChecker::EdgeAngleChecker (double angle_start, bool include_angle_start
   m_inverse = inverse;
 }
 
-bool
-EdgeAngleChecker::check (const db::Vector &a, const db::Vector &b) const
+bool EdgeAngleChecker::check (const db::Vector &a, const db::Vector &b) const
 {
   db::Vector vout (b);
 
@@ -248,8 +244,8 @@ EdgeAngleChecker::check (const db::Vector &a, const db::Vector &b) const
   bool opp1 = vps1 == 0 && (db::sprod_sign (v1, vout) < 0);
   bool opp2 = vps2 == 0 && (db::sprod_sign (v2, vout) < 0);
 
-  bool vp1 = !opp1 && (m_include_start ? (db::vprod_sign (v1, vout) >= 0) : (db::vprod_sign (v1, vout) > 0));
-  bool vp2 = !opp2 && (m_include_end ? (db::vprod_sign (v2, vout) <= 0) : (db::vprod_sign (v2, vout) < 0));
+  bool vp1 = ! opp1 && (m_include_start ? (db::vprod_sign (v1, vout) >= 0) : (db::vprod_sign (v1, vout) > 0));
+  bool vp2 = ! opp2 && (m_include_end ? (db::vprod_sign (v2, vout) <= 0) : (db::vprod_sign (v2, vout) < 0));
 
   if (m_big_angle && (vp1 || vp2)) {
     return true;
@@ -275,8 +271,7 @@ EdgeOrientationFilter::EdgeOrientationFilter (double a, bool inverse, bool absol
   //  .. nothing yet ..
 }
 
-bool
-EdgeOrientationFilter::selected (const db::Edge &edge, db::properties_id_type) const
+bool EdgeOrientationFilter::selected (const db::Edge &edge, db::properties_id_type) const
 {
   db::Vector en = db::Vector (std::max (edge.dx_abs (), edge.dy_abs ()), 0);
 
@@ -300,23 +295,19 @@ SpecialEdgeOrientationFilter::SpecialEdgeOrientationFilter (FilterType type, boo
 
 static EdgeAngleChecker s_ortho_checkers [] = {
   EdgeAngleChecker (0.0, true, 0.0, true, false, false),
-  EdgeAngleChecker (90.0, true, 90.0, true, false, false)
-};
+  EdgeAngleChecker (90.0, true, 90.0, true, false, false)};
 
 static EdgeAngleChecker s_diagonal_checkers [] = {
   EdgeAngleChecker (-45.0, true, -45.0, true, false, false),
-  EdgeAngleChecker (45.0, true, 45.0, true, false, false)
-};
+  EdgeAngleChecker (45.0, true, 45.0, true, false, false)};
 
 static EdgeAngleChecker s_orthodiagonal_checkers [] = {
   EdgeAngleChecker (-45.0, true, -45.0, true, false, false),
   EdgeAngleChecker (0.0, true, 0.0, true, false, false),
   EdgeAngleChecker (45.0, true, 45.0, true, false, false),
-  EdgeAngleChecker (90.0, true, 90.0, true, false, false)
-};
+  EdgeAngleChecker (90.0, true, 90.0, true, false, false)};
 
-bool
-SpecialEdgeOrientationFilter::selected (const db::Edge &edge, properties_id_type) const
+bool SpecialEdgeOrientationFilter::selected (const db::Edge &edge, properties_id_type) const
 {
   const EdgeAngleChecker *eb, *ee;
 
@@ -391,15 +382,15 @@ bool edge_interacts (const db::Edge &a, const db::Polygon &b)
   return db::interact (b, a);
 }
 
-namespace {
+namespace
+{
 
 struct DetectTagEdgeSink
-  : public db::EdgeSink
-{
+  : public db::EdgeSink {
   DetectTagEdgeSink (int tag)
-    : fail_tag (tag), result (true) { }
+    : fail_tag (tag), result (true) {}
 
-  virtual void put (const db::Edge &) { }
+  virtual void put (const db::Edge &) {}
 
   virtual void put (const db::Edge &, int tag)
   {
@@ -429,19 +420,18 @@ edge_is_inside_or_outside (bool outside, const db::Edge &a, const db::Polygon &b
 
     ep.insert (a, 1);
 
-    DetectTagEdgeSink es (outside ? 1 : 2);   //  2 is the "outside" tag in "Both" mode -> this makes inside fail
-    db::EdgePolygonOp op (db::EdgePolygonOp::Both, !outside /*include borders in inside*/);
+    DetectTagEdgeSink es (outside ? 1 : 2); //  2 is the "outside" tag in "Both" mode -> this makes inside fail
+    db::EdgePolygonOp op (db::EdgePolygonOp::Both, ! outside /*include borders in inside*/);
     ep.process (es, op);
 
     return es.result;
-
   }
 }
 
 bool edge_is_inside (const db::Edge &a, const db::Polygon &b)
 {
   //  shortcuts
-  if (!a.bbox ().inside (b.box ())) {
+  if (! a.bbox ().inside (b.box ())) {
     return false;
   }
 

@@ -58,7 +58,7 @@ public:
    */
   bool operator!= (const SaltGrains &other) const
   {
-    return !operator== (other);
+    return ! operator== (other);
   }
 
   /**

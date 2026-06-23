@@ -23,4 +23,4 @@
 #include "../pymodHelper.h"
 
 #include "antMain.h"
-DEFINE_PYMOD(antcore, "ant", "KLayout core module 'ant'")
+DEFINE_PYMOD (antcore, "ant", "KLayout core module 'ant'")

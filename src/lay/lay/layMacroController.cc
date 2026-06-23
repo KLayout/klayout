@@ -50,8 +50,7 @@ MacroController::MacroController ()
   //  .. nothing yet ..
 }
 
-void
-MacroController::add_macro_category (const std::string &name, const std::string &description, const std::vector<std::string> &folders)
+void MacroController::add_macro_category (const std::string &name, const std::string &description, const std::vector<std::string> &folders)
 {
   lay::MacroController::MacroCategory cat;
   cat.name = name;
@@ -69,8 +68,7 @@ MacroController::add_macro_category (const std::string &name, const std::string 
   m_macro_categories.push_back (cat);
 }
 
-void
-MacroController::finish ()
+void MacroController::finish ()
 {
   lym::MacroCollection &root = lym::MacroCollection::root ();
 
@@ -87,7 +85,7 @@ MacroController::finish ()
   sync_macro_sources ();
 
   //  Scan for macros and set interpreter path
-  for (std::vector <InternalPathDescriptor>::const_iterator p = m_internal_paths.begin (); p != m_internal_paths.end (); ++p) {
+  for (std::vector<InternalPathDescriptor>::const_iterator p = m_internal_paths.begin (); p != m_internal_paths.end (); ++p) {
 
     if (! m_no_implicit_macros) {
 
@@ -95,27 +93,23 @@ MacroController::finish ()
 
         if (p->cat.empty ()) {
 
-          for (std::vector<std::string>::const_iterator f = m_macro_categories[c].folders.begin (); f != m_macro_categories[c].folders.end (); ++f) {
+          for (std::vector<std::string>::const_iterator f = m_macro_categories [c].folders.begin (); f != m_macro_categories [c].folders.end (); ++f) {
 
             std::string mp = tl::to_string (QDir (tl::to_qstring (p->path)).absoluteFilePath (tl::to_qstring (*f)));
 
             std::string description = p->description;
-            if (*f != m_macro_categories[c].name) {
+            if (*f != m_macro_categories [c].name) {
               description += " - " + tl::to_string (tr ("%1 branch").arg (tl::to_qstring (*f)));
             }
 
-            root.add_folder (description, mp, m_macro_categories[c].name, p->readonly);
-
+            root.add_folder (description, mp, m_macro_categories [c].name, p->readonly);
           }
 
-        } else if (p->cat == m_macro_categories[c].name) {
+        } else if (p->cat == m_macro_categories [c].name) {
 
-          root.add_folder (p->description, p->path, m_macro_categories[c].name, p->readonly);
-
+          root.add_folder (p->description, p->path, m_macro_categories [c].name, p->readonly);
         }
-
       }
-
     }
 
     //  Add the unspecific paths as "package locations", so we get "ruby", "python" and similar folders as
@@ -125,14 +119,13 @@ MacroController::finish ()
         i->add_package_location (p->path);
       }
     }
-
   }
 
 
   //  Scan for macros in packages and techs
 
   if (! m_no_implicit_macros) {
-    for (std::vector <ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
+    for (std::vector<ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
       lym::MacroCollection *mc = root.add_folder (p->description, p->path, p->cat, p->readonly);
       if (mc) {
         mc->set_virtual_mode (p->type);
@@ -145,8 +138,7 @@ MacroController::finish ()
   sync_package_paths ();
 }
 
-void
-MacroController::initialized (lay::Dispatcher *root)
+void MacroController::initialized (lay::Dispatcher *root)
 {
   connect (&m_temp_macros, SIGNAL (menu_needs_update ()), this, SLOT (macro_collection_changed ()));
   connect (&m_temp_macros, SIGNAL (macro_collection_changed (lym::MacroCollection *)), this, SLOT (macro_collection_changed ()));
@@ -181,8 +173,7 @@ MacroController::initialized (lay::Dispatcher *root)
   macro_collection_changed ();
 }
 
-void
-MacroController::uninitialize (lay::Dispatcher * /*root*/)
+void MacroController::uninitialize (lay::Dispatcher * /*root*/)
 {
   disconnect (&lym::MacroCollection::root (), SIGNAL (menu_needs_update ()), this, SLOT (macro_collection_changed ()));
   disconnect (&lym::MacroCollection::root (), SIGNAL (macro_collection_changed (lym::MacroCollection *)), this, SLOT (macro_collection_changed ()));
@@ -206,20 +197,17 @@ MacroController::uninitialize (lay::Dispatcher * /*root*/)
   mp_mw = 0;
 }
 
-bool
-MacroController::configure (const std::string & /*key*/, const std::string & /*value*/)
+bool MacroController::configure (const std::string & /*key*/, const std::string & /*value*/)
 {
   return false;
 }
 
-void
-MacroController::config_finalize()
+void MacroController::config_finalize ()
 {
   //  .. nothing yet ..
 }
 
-bool
-MacroController::can_exit (lay::Dispatcher * /*root*/) const
+bool MacroController::can_exit (lay::Dispatcher * /*root*/) const
 {
   if (mp_macro_editor) {
     return mp_macro_editor->can_exit ();
@@ -228,8 +216,7 @@ MacroController::can_exit (lay::Dispatcher * /*root*/) const
   }
 }
 
-bool
-MacroController::accepts_drop (const std::string &path_or_url) const
+bool MacroController::accepts_drop (const std::string &path_or_url) const
 {
   QUrl url (tl::to_qstring (path_or_url));
   QFileInfo file_info (url.path ());
@@ -251,8 +238,7 @@ MacroController::accepts_drop (const std::string &path_or_url) const
   return false;
 }
 
-void
-MacroController::drop_url (const std::string &path_or_url)
+void MacroController::drop_url (const std::string &path_or_url)
 {
   //  Normalize the URL to become either a normal path or a URL
   std::string path = path_or_url;
@@ -312,7 +298,6 @@ MacroController::drop_url (const std::string &path_or_url)
         }
 
         macro->save ();
-
       }
 
     } else {
@@ -324,7 +309,6 @@ MacroController::drop_url (const std::string &path_or_url)
         //  .. or add as temporary macro so it is shown in the menu.
         add_temp_macro (macro.release ());
       }
-
     }
 
   } else {
@@ -332,8 +316,7 @@ MacroController::drop_url (const std::string &path_or_url)
   }
 }
 
-void
-MacroController::show_editor (const std::string &cat, bool force_add)
+void MacroController::show_editor (const std::string &cat, bool force_add)
 {
   if (macro_categories ().empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Application has not been compiled with scripting support - no macro IDE available")));
@@ -344,14 +327,12 @@ MacroController::show_editor (const std::string &cat, bool force_add)
   }
 }
 
-void
-MacroController::enable_implicit_macros (bool enable)
+void MacroController::enable_implicit_macros (bool enable)
 {
-  m_no_implicit_macros = !enable;
+  m_no_implicit_macros = ! enable;
 }
 
-void
-MacroController::sync_package_paths ()
+void MacroController::sync_package_paths ()
 {
   std::vector<std::string> package_locations;
 
@@ -382,9 +363,9 @@ MacroController::sync_package_paths ()
       i->remove_package_location (*p);
     }
   }
-  
+
   m_package_locations = package_locations;
-  
+
   for (std::vector<std::string>::const_iterator p = m_package_locations.begin (); p != m_package_locations.end (); ++p) {
     for (tl::Registrar<gsi::Interpreter>::iterator i = gsi::interpreters.begin (); i != gsi::interpreters.end (); ++i) {
       i->add_package_location (*p);
@@ -392,8 +373,7 @@ MacroController::sync_package_paths ()
   }
 }
 
-void
-MacroController::sync_implicit_macros (bool ask_before_autorun)
+void MacroController::sync_implicit_macros (bool ask_before_autorun)
 {
   //  determine the paths currently in use
   std::map<std::string, ExternalPathDescriptor> prev_folders_by_path;
@@ -417,7 +397,7 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
     //  determine the paths that will be in use
     std::map<std::string, const ExternalPathDescriptor *> new_folders_by_path;
     for (std::vector<ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
-      new_folders_by_path.insert (std::make_pair (p->path, p.operator-> ()));
+      new_folders_by_path.insert (std::make_pair (p->path, p.operator->()));
     }
 
     lym::MacroCollection *root = &lym::MacroCollection::root ();
@@ -463,7 +443,6 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
           if (mc) {
             new_folders.push_back (mc);
           }
-
         }
 
       } else {
@@ -482,9 +461,7 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
           mc->set_virtual_mode (p->type);
           new_folders.push_back (mc);
         }
-
       }
-
     }
 
     {
@@ -504,19 +481,17 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
         }
       }
     }
-
   }
 }
 
-void
-MacroController::sync_macro_sources ()
+void MacroController::sync_macro_sources ()
 {
   std::vector<ExternalPathDescriptor> external_paths;
 
   //  Add additional places where the technologies define some macros
 
-  std::map<std::string, std::vector<std::string> > tech_names_by_path;
-  std::map<std::string, std::vector<std::string> > grain_names_by_path;
+  std::map<std::string, std::vector<std::string>> tech_names_by_path;
+  std::map<std::string, std::vector<std::string>> grain_names_by_path;
   std::set<std::string> readonly_paths;
 
   for (db::Technologies::const_iterator t = db::Technologies::instance ()->begin (); t != db::Technologies::instance ()->end (); ++t) {
@@ -535,7 +510,7 @@ MacroController::sync_macro_sources ()
     }
   }
 
-  for (std::map<std::string, std::vector<std::string> >::const_iterator t = tech_names_by_path.begin (); t != tech_names_by_path.end (); ++t) {
+  for (std::map<std::string, std::vector<std::string>>::const_iterator t = tech_names_by_path.begin (); t != tech_names_by_path.end (); ++t) {
 
     for (size_t c = 0; c < macro_categories ().size (); ++c) {
 
@@ -552,7 +527,7 @@ MacroController::sync_macro_sources ()
             description = tl::to_string (tr ("Technologies %1").arg (tl::to_qstring (tl::join (t->second, ","))));
           }
 
-          std::map<std::string, std::vector<std::string> >::const_iterator gn = grain_names_by_path.find (t->first);
+          std::map<std::string, std::vector<std::string>>::const_iterator gn = grain_names_by_path.find (t->first);
           if (gn != grain_names_by_path.end ()) {
             description += " - ";
             if (gn->second.size () == 1) {
@@ -567,13 +542,9 @@ MacroController::sync_macro_sources ()
           }
 
           external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.canonicalPath ()), description, macro_categories () [c].name, lym::MacroCollection::TechFolder, readonly_paths.find (t->first) != readonly_paths.end ()));
-
         }
-
       }
-
     }
-
   }
 
   //  Add additional places where the salt defines macros
@@ -599,29 +570,22 @@ MacroController::sync_macro_sources ()
               description += " - " + tl::to_string (tr ("%1 branch").arg (tl::to_qstring (*f)));
             }
             external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.canonicalPath ()), description, macro_categories () [c].name, lym::MacroCollection::SaltFolder, g->is_readonly (), g->version ()));
-
           }
-
         }
-
       }
-
     }
-
   }
 
   //  store new paths
   m_external_paths = external_paths;
 }
 
-void
-MacroController::add_path (const std::string &path, const std::string &description, const std::string &category, bool readonly)
+void MacroController::add_path (const std::string &path, const std::string &description, const std::string &category, bool readonly)
 {
   m_internal_paths.push_back (InternalPathDescriptor (path, description, category, readonly));
 }
 
-void
-MacroController::add_temp_macro (lym::Macro *m)
+void MacroController::add_temp_macro (lym::Macro *m)
 {
   m_temp_macros.add_unspecific (m);
 }
@@ -661,14 +625,14 @@ static std::string menu_name (std::set<std::string> &used_names, const std::stri
         }
       }
     }
-
   }
 
   used_names.insert (name);
   return name;
 }
 
-namespace {
+namespace
+{
 
 class RunMacroAction
   : public lay::Action
@@ -702,8 +666,7 @@ private:
 
 }
 
-void
-MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, std::set<std::string> &used_names, std::set<std::string> &groups, const db::Technology *tech)
+void MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, std::set<std::string> &used_names, std::set<std::string> &groups, const db::Technology *tech)
 {
   for (lym::MacroCollection::child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
 
@@ -713,7 +676,7 @@ MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, std:
       consider = true;
     } else {
       const std::vector<lay::MacroController::MacroCategory> &mc = macro_categories ();
-      for (std::vector<lay::MacroController::MacroCategory>::const_iterator cc = mc.begin (); cc != mc.end () && !consider; ++cc) {
+      for (std::vector<lay::MacroController::MacroCategory>::const_iterator cc = mc.begin (); cc != mc.end () && ! consider; ++cc) {
         consider = (c->second->path () == tl::to_string (QDir (tl::to_qstring (tech->base_path ())).filePath (tl::to_qstring (cc->name))));
       }
     }
@@ -721,7 +684,6 @@ MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, std:
     if (consider) {
       add_macro_items_to_menu (*c->second, used_names, groups, 0 /*don't check 2nd level and below*/);
     }
-
   }
 
   for (lym::MacroCollection::iterator c = collection.begin (); c != collection.end (); ++c) {
@@ -758,20 +720,16 @@ MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, std:
       a->set_shortcut (sc);
       m_macro_actions.push_back (a);
       mp_mw->addAction (a->qaction ());
-
     }
-
   }
 }
 
-void
-MacroController::sync_with_external_sources ()
+void MacroController::sync_with_external_sources ()
 {
   dm_do_sync_with_external_sources ();
 }
 
-void
-MacroController::do_sync_with_external_sources ()
+void MacroController::do_sync_with_external_sources ()
 {
   try {
     sync_implicit_macros (true);
@@ -780,18 +738,16 @@ MacroController::do_sync_with_external_sources ()
   }
 }
 
-void
-MacroController::macro_collection_changed ()
+void MacroController::macro_collection_changed ()
 {
   //  empty action to macro table now we know it's invalid
   dm_do_update_menu_with_macros ();
   dm_sync_file_watcher ();
 }
 
-void
-MacroController::do_update_menu_with_macros ()
+void MacroController::do_update_menu_with_macros ()
 {
-  if (!mp_mw) {
+  if (! mp_mw) {
     return;
   }
 
@@ -803,8 +759,8 @@ MacroController::do_update_menu_with_macros ()
   //  delete all existing items
   std::vector<lay::Action *> actions;
   for (tl::weak_collection<lay::Action>::iterator a = m_macro_actions.begin (); a != m_macro_actions.end (); ++a) {
-    if (a.operator-> ()) {
-      actions.push_back (a.operator-> ());
+    if (a.operator->()) {
+      actions.push_back (a.operator->());
     }
   }
   for (std::vector<lay::Action *>::const_iterator a = actions.begin (); a != actions.end (); ++a) {
@@ -822,8 +778,7 @@ MacroController::do_update_menu_with_macros ()
   mp_mw->apply_hidden ();
 }
 
-void
-MacroController::file_watcher_triggered ()
+void MacroController::file_watcher_triggered ()
 {
   dm_sync_files ();
 }
@@ -832,15 +787,14 @@ static void
 add_collections_to_file_watcher (const lym::MacroCollection &collection, tl::FileSystemWatcher *watcher)
 {
   for (lym::MacroCollection::const_child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
-    if (! c->second->path ().empty () && c->second->path ()[0] != ':') {
+    if (! c->second->path ().empty () && c->second->path () [0] != ':') {
       watcher->add_file (c->second->path ());
       add_collections_to_file_watcher (*c->second, watcher);
     }
   }
 }
 
-void
-MacroController::sync_file_watcher ()
+void MacroController::sync_file_watcher ()
 {
   if (m_file_watcher) {
     m_file_watcher->clear ();
@@ -850,8 +804,7 @@ MacroController::sync_file_watcher ()
   }
 }
 
-void
-MacroController::sync_files ()
+void MacroController::sync_files ()
 {
   tl::log << tl::to_string (tr ("Detected file system change in macro folders - updating"));
   lym::MacroCollection::root ().reload (true /*safe*/);
@@ -861,7 +814,7 @@ MacroController *
 MacroController::instance ()
 {
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    MacroController *mc = dynamic_cast <MacroController *> (cls.operator-> ());
+    MacroController *mc = dynamic_cast<MacroController *> (cls.operator->());
     if (mc) {
       return mc;
     }
@@ -879,16 +832,12 @@ static lym::Macro *macro_for_action (const lay::Action *action)
 }
 
 //  extend lay::Action with the ability to associate a macro with it
-static
-gsi::ClassExt<lay::Action> decl_ext_action (
+static gsi::ClassExt<lay::Action> decl_ext_action (
   gsi::method_ext ("macro", &macro_for_action,
-    "@brief Gets the macro associated with the action\n"
-    "If the action is associated with a macro, this method returns a reference to the \\Macro object. "
-    "Otherwise, this method returns nil.\n"
-    "\n"
-    "\nThis method has been added in version 0.25.\n"
-  )
-);
+                   "@brief Gets the macro associated with the action\n"
+                   "If the action is associated with a macro, this method returns a reference to the \\Macro object. "
+                   "Otherwise, this method returns nil.\n"
+                   "\n"
+                   "\nThis method has been added in version 0.25.\n"));
 
 }
-

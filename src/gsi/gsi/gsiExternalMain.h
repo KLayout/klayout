@@ -36,4 +36,3 @@ GSI_PUBLIC void initialize_external ();
 }
 
 #endif
-

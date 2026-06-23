@@ -97,10 +97,10 @@ public:
   /**
    *  @brief Access operator
    */
-  pointer operator-> () const
+  pointer operator->() const
   {
     tl_assert (mp_holder != 0);
-    return mp_holder->operator-> ();
+    return mp_holder->operator->();
   }
 
   /**
@@ -254,7 +254,7 @@ public:
     if (this != &other) {
       clear ();
       for (auto i = other.begin (); i != other.end (); ++i) {
-        push_back (const_cast<T *> (i.operator-> ()));
+        push_back (const_cast<T *> (i.operator->()));
       }
     }
     return *this;
@@ -314,7 +314,7 @@ public:
   void erase (T *t)
   {
     holder_type *h = mp_first;
-    while (h && h->operator-> () != t) {
+    while (h && h->operator->() != t) {
       h = h->next;
     }
 
@@ -400,7 +400,7 @@ public:
    */
   typename iterator::pointer front ()
   {
-    return mp_first->operator-> ();
+    return mp_first->operator->();
   }
 
   /**
@@ -408,7 +408,7 @@ public:
    */
   typename iterator::pointer back ()
   {
-    return mp_last->operator-> ();
+    return mp_last->operator->();
   }
 
   /**
@@ -416,7 +416,7 @@ public:
    */
   typename const_iterator::pointer front () const
   {
-    return mp_first->operator-> ();
+    return mp_first->operator->();
   }
 
   /**
@@ -424,7 +424,7 @@ public:
    */
   typename const_iterator::pointer back () const
   {
-    return mp_last->operator-> ();
+    return mp_last->operator->();
   }
 
   /**
@@ -434,7 +434,7 @@ public:
   {
     return iterator (mp_first);
   }
-  
+
   /**
    *  @brief Gets the end iterator
    */
@@ -442,7 +442,7 @@ public:
   {
     return iterator (0);
   }
-  
+
   /**
    *  @brief Gets the begin iterator (const version)
    */
@@ -450,7 +450,7 @@ public:
   {
     return const_iterator (mp_first);
   }
-  
+
   /**
    *  @brief Gets the end iterator (const version)
    */
@@ -532,7 +532,6 @@ private:
       if (before == mp_first) {
         mp_first = h;
       }
-
     }
 
     ++m_size;
@@ -553,7 +552,8 @@ class weak_collection
 public:
   weak_collection ()
     : weak_or_shared_collection<T, false> ()
-  { }
+  {
+  }
 };
 
 /**
@@ -566,10 +566,10 @@ class shared_collection
 public:
   shared_collection ()
     : weak_or_shared_collection<T, true> ()
-  { }
+  {
+  }
 };
 
 }
 
 #endif
-

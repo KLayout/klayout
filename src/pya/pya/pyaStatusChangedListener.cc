@@ -34,8 +34,7 @@ StatusChangedListener::StatusChangedListener (PYAObjectBase *pya_object)
   //  .. nothing yet ..
 }
 
-void
-StatusChangedListener::object_status_changed (gsi::ObjectBase::StatusEventType type)
+void StatusChangedListener::object_status_changed (gsi::ObjectBase::StatusEventType type)
 {
   if (type == gsi::ObjectBase::ObjectDestroyed) {
     mp_pya_object->object_destroyed ();

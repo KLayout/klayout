@@ -34,7 +34,7 @@
 namespace ant
 {
 
-/** 
+/**
  *  @brief Declaration of the configuration names
  */
 extern ANT_PUBLIC const std::string cfg_max_number_of_rulers;
@@ -51,43 +51,36 @@ extern ANT_PUBLIC const std::string cfg_current_ruler_template;
 // ------------------------------------------------------------
 //  Helper functions to get and set the configuration
 
-struct StyleConverter 
-{
+struct StyleConverter {
   std::string to_string (ant::Object::style_type s);
   void from_string (const std::string &s, ant::Object::style_type &style);
 };
 
-struct OutlineConverter 
-{
+struct OutlineConverter {
   std::string to_string (ant::Object::outline_type s);
   void from_string (const std::string &s, ant::Object::outline_type &outline);
 };
 
-struct PositionConverter
-{
+struct PositionConverter {
   std::string to_string (ant::Object::position_type p);
   void from_string (const std::string &s, ant::Object::position_type &pos);
 };
 
-struct AlignmentConverter
-{
+struct AlignmentConverter {
   std::string to_string (ant::Object::alignment_type a);
   void from_string (const std::string &s, ant::Object::alignment_type &a);
 };
 
-struct RulerModeConverter
-{
+struct RulerModeConverter {
   std::string to_string (ant::Template::ruler_mode_type a);
   void from_string (const std::string &s, ant::Template::ruler_mode_type &a);
 };
 
-struct TemplatesConverter
-{
-  std::string to_string (const std::vector <ant::Template> &t);
-  void from_string (const std::string &s, std::vector <ant::Template> &t);
+struct TemplatesConverter {
+  std::string to_string (const std::vector<ant::Template> &t);
+  void from_string (const std::string &s, std::vector<ant::Template> &t);
 };
 
 }
 
 #endif
-

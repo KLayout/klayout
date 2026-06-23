@@ -58,9 +58,9 @@ public:
    *  @brief The type of the node
    */
   enum node_type {
-    Internal,      //  an internal node, not related to a port
-    VertexPort,    //  a node related to a vertex port
-    PolygonPort    //  a node related to a polygon port
+    Internal,   //  an internal node, not related to a port
+    VertexPort, //  a node related to a vertex port
+    PolygonPort //  a node related to a polygon port
   };
 
   /**
@@ -115,9 +115,10 @@ protected:
 
   RNode (RNetwork *network, node_type _type, const db::DBox &_location, unsigned int _port_index, unsigned int _layer)
     : type (_type), location (_location), port_index (_port_index), layer (_layer), mp_network (network)
-  { }
+  {
+  }
 
-  ~RNode () { }
+  ~RNode () {}
 
 private:
   RNode (const RNode &other);
@@ -204,7 +205,8 @@ protected:
 
   RElement (RNetwork *network, double _conductivity, const RNode *a, const RNode *b)
     : conductance (_conductivity), mp_network (network), mp_a (a), mp_b (b)
-  { }
+  {
+  }
 
   ~RElement ()
   {
@@ -371,7 +373,7 @@ private:
   node_list m_nodes;
   element_list m_elements;
   std::map<std::pair<RNode *, RNode *>, RElement *> m_elements_by_nodes;
-  std::map<std::pair<RNode::node_type, std::pair<unsigned int, unsigned int> >, RNode *> m_nodes_by_type;
+  std::map<std::pair<RNode::node_type, std::pair<unsigned int, unsigned int>>, RNode *> m_nodes_by_type;
 
   RNetwork (const RNetwork &);
   RNetwork &operator= (const RNetwork &);
@@ -382,4 +384,3 @@ private:
 }
 
 #endif
-

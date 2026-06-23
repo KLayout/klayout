@@ -54,7 +54,8 @@ public:
 
   ExpressionMethodTableEntry (const std::string &name)
     : m_name (name)
-  { }
+  {
+  }
 
   const std::string &name () const
   {
@@ -70,7 +71,7 @@ public:
   {
     //  remove duplicate entries in the method list
     std::vector<const gsi::MethodBase *> m = m_methods;
-    std::sort(m.begin (), m.end ());
+    std::sort (m.begin (), m.end ());
     m_methods.assign (m.begin (), std::unique (m.begin (), m.end ()));
   }
 
@@ -100,7 +101,7 @@ class ExpressionMethodTable
 public:
   /**
    *  @brief Find a method by name and static flag
-   *  This method will return a pair of true and the method ID if a method with 
+   *  This method will return a pair of true and the method ID if a method with
    *  the static attribute and the name is found. Otherwise the first value of
    *  the returned pair will be false.
    */
@@ -131,7 +132,7 @@ public:
    */
   ExpressionMethodTableEntry::method_iterator begin (size_t mid) const
   {
-    return m_table[mid].begin ();
+    return m_table [mid].begin ();
   }
 
   /**
@@ -139,12 +140,12 @@ public:
    */
   ExpressionMethodTableEntry::method_iterator end (size_t mid) const
   {
-    return m_table[mid].end ();
+    return m_table [mid].end ();
   }
 
   static const ExpressionMethodTable *method_table_by_class (const gsi::ClassBase *cls_decl)
   {
-    const ExpressionMethodTable *mt = dynamic_cast<const ExpressionMethodTable *>(cls_decl->gsi_data ());
+    const ExpressionMethodTable *mt = dynamic_cast<const ExpressionMethodTable *> (cls_decl->gsi_data ());
     tl_assert (mt != 0);
     return mt;
   }
@@ -163,21 +164,20 @@ private:
   /**
    *  @brief Adds the given method with the given name to the list of methods registered under that name
    */
-  void add_method (const std::string &name, const gsi::MethodBase *mb) 
+  void add_method (const std::string &name, const gsi::MethodBase *mb)
   {
     bool st = mb->is_static ();
 
     std::map<std::pair<bool, std::string>, size_t>::iterator n = m_name_map.find (std::make_pair (st, name));
     if (n == m_name_map.end ()) {
 
-      m_name_map.insert (std::make_pair (std::make_pair(st, name), m_table.size ()));
+      m_name_map.insert (std::make_pair (std::make_pair (st, name), m_table.size ()));
       m_table.push_back (ExpressionMethodTableEntry (name));
       m_table.back ().add (mb);
 
     } else {
 
       m_table [n->second].add (mb);
-
     }
   }
 
@@ -192,7 +192,7 @@ private:
    */
   ExpressionMethodTable (const gsi::ClassBase *cls_decl)
     : mp_cls_decl (cls_decl)
-  { 
+  {
     for (gsi::ClassBase::method_iterator m = cls_decl->begin_methods (); m != cls_decl->end_methods (); ++m) {
 
       if (! (*m)->is_callback ()) {
@@ -207,9 +207,7 @@ private:
             add_method (syn->name, *m);
           }
         }
-
       }
-
     }
 
     //  do some cleanup
@@ -248,7 +246,6 @@ void *get_object_raw (tl::Variant &var)
     if (p) {
       obj = p->raw_obj ();
     }
-
   }
   return obj;
 }
@@ -284,7 +281,7 @@ private:
   const tl::VariantUserClassBase *mp_var_cls;
 };
 
-void GSI_PUBLIC 
+void GSI_PUBLIC
 initialize_expressions ()
 {
   //  just in case this did not happen yet ...
@@ -298,7 +295,7 @@ initialize_expressions ()
       //  skip external classes
       continue;
     } else if ((*c)->declaration () != *c) {
-      tl_assert ((*c)->parent () != 0);  //  top-level classes should be merged
+      tl_assert ((*c)->parent () != 0); //  top-level classes should be merged
       continue;
     }
 
@@ -314,7 +311,6 @@ initialize_expressions ()
       if (cc) {
         tl::Eval::define_global_function ((*c)->name (), new EvalClassFunction (cc));
       }
-
     }
   }
 }
@@ -322,14 +318,13 @@ initialize_expressions ()
 // -------------------------------------------------------------------------
 //  VariantUserClassImpl implementation
 
-VariantUserClassImpl::VariantUserClassImpl () 
+VariantUserClassImpl::VariantUserClassImpl ()
   : mp_cls (0), mp_self (0), mp_object_cls (0), m_is_const (false)
-{ 
+{
   //  .. nothing yet ..
 }
 
-void 
-VariantUserClassImpl::initialize (const gsi::ClassBase *cls, const tl::VariantUserClassBase *self, const tl::VariantUserClassBase *object_cls, bool is_const)
+void VariantUserClassImpl::initialize (const gsi::ClassBase *cls, const tl::VariantUserClassBase *self, const tl::VariantUserClassBase *object_cls, bool is_const)
 {
   mp_cls = cls;
   mp_self = self;
@@ -337,13 +332,12 @@ VariantUserClassImpl::initialize (const gsi::ClassBase *cls, const tl::VariantUs
   m_is_const = is_const;
 }
 
-VariantUserClassImpl::~VariantUserClassImpl () 
-{ 
+VariantUserClassImpl::~VariantUserClassImpl ()
+{
   mp_cls = 0;
 }
 
-bool
-VariantUserClassImpl::has_method (const std::string &method) const
+bool VariantUserClassImpl::has_method (const std::string &method) const
 {
   const gsi::ClassBase *cls = mp_cls;
 
@@ -357,8 +351,7 @@ VariantUserClassImpl::has_method (const std::string &method) const
   return false;
 }
 
-bool 
-VariantUserClassImpl::equal_impl (void *obj, void *other) const 
+bool VariantUserClassImpl::equal_impl (void *obj, void *other) const
 {
   if (obj) {
 
@@ -376,21 +369,19 @@ VariantUserClassImpl::equal_impl (void *obj, void *other) const
       tl::Variant object (obj, mp_object_cls, false);
       std::vector<tl::Variant> vv;
       vv.resize (1, tl::Variant ());
-      vv[0].set_user (other, mp_object_cls, false);
+      vv [0].set_user (other, mp_object_cls, false);
 
       execute_gsi (context, out, object, "==", vv);
 
       return out.to_bool ();
-
     }
 
   } else {
-    return false; 
+    return false;
   }
 }
 
-bool 
-VariantUserClassImpl::less_impl (void *obj, void *other) const 
+bool VariantUserClassImpl::less_impl (void *obj, void *other) const
 {
   if (obj) {
 
@@ -408,21 +399,20 @@ VariantUserClassImpl::less_impl (void *obj, void *other) const
       tl::Variant object (obj, mp_object_cls, false);
       std::vector<tl::Variant> vv;
       vv.resize (1, tl::Variant ());
-      vv[0].set_user (other, mp_object_cls, false);
+      vv [0].set_user (other, mp_object_cls, false);
 
       execute_gsi (context, out, object, "<", vv);
 
       return out.to_bool ();
-
     }
 
   } else {
-    return false; 
+    return false;
   }
 }
 
-std::string 
-VariantUserClassImpl::to_string_impl (void *obj) const 
+std::string
+VariantUserClassImpl::to_string_impl (void *obj) const
 {
   if (obj) {
 
@@ -443,11 +433,10 @@ VariantUserClassImpl::to_string_impl (void *obj) const
       execute_gsi (context, out, object, "to_s", vv);
 
       return out.to_string ();
-
     }
 
   } else {
-    return std::string (); 
+    return std::string ();
   }
 }
 
@@ -473,7 +462,6 @@ VariantUserClassImpl::to_variant_impl (void *obj) const
       execute_gsi (context, out, object, "to_v", vv);
 
       return out;
-
     }
 
   } else {
@@ -481,8 +469,7 @@ VariantUserClassImpl::to_variant_impl (void *obj) const
   }
 }
 
-int
-VariantUserClassImpl::to_int_impl (void *obj) const
+int VariantUserClassImpl::to_int_impl (void *obj) const
 {
   if (obj) {
 
@@ -503,7 +490,6 @@ VariantUserClassImpl::to_int_impl (void *obj) const
       execute_gsi (context, out, object, "to_i", vv);
 
       return out.to_int ();
-
     }
 
   } else {
@@ -533,7 +519,6 @@ VariantUserClassImpl::to_double_impl (void *obj) const
       execute_gsi (context, out, object, "to_f", vv);
 
       return out.to_double ();
-
     }
 
   } else {
@@ -541,8 +526,7 @@ VariantUserClassImpl::to_double_impl (void *obj) const
   }
 }
 
-void
-VariantUserClassImpl::execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const
+void VariantUserClassImpl::execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const
 {
   if (mp_object_cls == 0 && method == "is_a") {
 
@@ -661,7 +645,7 @@ special_method_impl (gsi::MethodBase::special_method_type smt, tl::Variant &self
 
   } else if (smt == gsi::MethodBase::Assign) {
     tl_assert (args.size () == 1);
-    if (!args.front ().is_user () || self.user_cls () != args.front ().user_cls ()) {
+    if (! args.front ().is_user () || self.user_cls () != args.front ().user_cls ()) {
       throw tl::Exception (tl::to_string (tr ("Source and target object must be of the same type for assignment")));
     }
     self.user_assign (args.front ());
@@ -697,7 +681,6 @@ static std::pair<const ExpressionMethodTable *, size_t> find_method (const gsi::
     }
 
     cls = cls->base ();
-
   }
 
   return std::make_pair ((const ExpressionMethodTable *) 0, size_t (0));
@@ -725,7 +708,6 @@ static const gsi::ClassBase *find_class_scope (const gsi::ClassBase *cls, const 
     }
 
     cls = cls->base ();
-
   }
 
   return 0;
@@ -832,7 +814,6 @@ compatible_with_args (const gsi::MethodBase *m, int argc, const std::map<std::st
     }
 
     return true;
-
   }
 }
 
@@ -871,8 +852,7 @@ get_kwarg (const gsi::ArgType &atype, const std::map<std::string, tl::Variant> *
   return 0;
 }
 
-void
-VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context*/, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const
+void VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context*/, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const
 {
   tl_assert (object.is_user ());
 
@@ -912,7 +892,6 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
     } else {
       throw tl::Exception (tl::to_string (tr ("Unknown method '%s' of class '%s'")), method, clsact->name ());
     }
-
   }
 
   const gsi::MethodBase *meth = 0;
@@ -920,15 +899,14 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
 
   for (ExpressionMethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
 
-    if ((*m)->is_signal()) {
+    if ((*m)->is_signal ()) {
       throw tl::Exception (tl::sprintf (tl::to_string (tr ("Signals are not supported inside expressions (event %s)")), method.c_str ()));
-    } else if ((*m)->is_callback()) {
+    } else if ((*m)->is_callback ()) {
       //  ignore callbacks
     } else if (compatible_with_args (*m, int (args.size ()), kwargs)) {
       ++candidates;
       meth = *m;
     }
-
   }
 
   //  no candidate -> error
@@ -953,7 +931,7 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
         int sc = 0;
         int i = 0;
         for (gsi::MethodBase::argument_iterator a = (*m)->begin_arguments (); is_valid && a != (*m)->end_arguments (); ++a, ++i) {
-          const tl::Variant *arg = i >= int (args.size ()) ? get_kwarg (*a, kwargs) : &args[i];
+          const tl::Variant *arg = i >= int (args.size ()) ? get_kwarg (*a, kwargs) : &args [i];
           if (! arg) {
             is_valid = a->spec ()->has_default ();
           } else if (gsi::test_arg (*a, *arg, false /*strict*/, false /*no object substitution*/)) {
@@ -980,7 +958,6 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
             const_matching = true;
             candidates = 0;
           }
-
         }
 
         if (is_valid) {
@@ -1000,13 +977,9 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
             meth = *m;
             score = sc;
           }
-
         }
-
       }
-
     }
-
   }
 
   if (! meth) {
@@ -1047,7 +1020,7 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
 
       try {
 
-        const tl::Variant *arg = iarg >= int (args.size ()) ? get_kwarg (*a, kwargs) : &args[iarg];
+        const tl::Variant *arg = iarg >= int (args.size ()) ? get_kwarg (*a, kwargs) : &args [iarg];
         if (! arg) {
           if (a->spec ()->has_default ()) {
             if (kwargs_taken == nkwargs) {
@@ -1074,7 +1047,6 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
         std::string msg = ex.msg () + tl::sprintf (tl::to_string (tr (" (argument '%s')")), a->spec ()->name ());
         throw tl::Exception (msg);
       }
-
     }
 
     if (kwargs_taken != nkwargs) {
@@ -1087,7 +1059,6 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
       } else if (invalid_names.size () == 1) {
         throw tl::Exception (tl::to_string (tr ("Unknown keyword parameter: ")) + *invalid_names.begin ());
       }
-
     }
 
     SerialArgs retlist (meth->retsize ());
@@ -1106,9 +1077,7 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
         throw tl::Exception (msg);
       }
     }
-
   }
 }
 
 }
-

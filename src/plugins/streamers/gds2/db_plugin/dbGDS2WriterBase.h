@@ -31,7 +31,7 @@
 
 namespace tl
 {
-  class OutputStream;
+class OutputStream;
 }
 
 namespace db
@@ -121,7 +121,7 @@ protected:
   void write_string_record (short record, const std::string &t);
 
   /**
-   *  @brief Write an instance 
+   *  @brief Write an instance
    */
   void write_inst (double sf, const db::Instance &instance, bool normalize, bool resolve_skew_arrays, const db::Layout &layout, db::properties_id_type prop_id);
 
@@ -180,12 +180,11 @@ private:
   void write_properties (const db::Layout &layout, db::properties_id_type prop_id);
   void write_context_cell (db::Layout &layout, const short *time_data, const std::vector<cell_index_type> &cells);
   void write_context_string (size_t n, const std::string &s);
-  void write_cell (db::Layout &layout, const db::Cell &cref, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers,
-                   const std::set <db::cell_index_type> &cell_set, double sf, short *time_data, bool skip_body);
+  void write_cell (db::Layout &layout, const db::Cell &cref, const std::vector<std::pair<unsigned int, db::LayerProperties>> &layers,
+                   const std::set<db::cell_index_type> &cell_set, double sf, short *time_data, bool skip_body);
   void write_shape (const db::Layout &layout, int layer, int datatype, const db::Shape &shape, double sf);
 };
 
 } // namespace db
 
 #endif
-

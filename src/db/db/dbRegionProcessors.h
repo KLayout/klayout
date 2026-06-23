@@ -56,11 +56,13 @@ class DB_PUBLIC CornerRectDelivery
 public:
   CornerRectDelivery (db::Coord dim, std::vector<db::Polygon> &result)
     : m_d (dim, dim), mp_result (&result), mp_result_wp (0)
-  { }
+  {
+  }
 
   CornerRectDelivery (db::Coord dim, std::vector<db::PolygonWithProperties> &result_wp)
     : m_d (dim, dim), mp_result (0), mp_result_wp (&result_wp)
-  { }
+  {
+  }
 
   virtual void make_point (const db::Point &pt, const db::Edge &, const db::Edge &) const
   {
@@ -91,11 +93,13 @@ class DB_PUBLIC CornerDotDelivery
 public:
   CornerDotDelivery (std::vector<db::Edge> &result)
     : mp_result (&result), mp_result_wp (0)
-  { }
+  {
+  }
 
   CornerDotDelivery (std::vector<db::EdgeWithProperties> &result)
     : mp_result (0), mp_result_wp (&result)
-  { }
+  {
+  }
 
   virtual void make_point (const db::Point &pt, const db::Edge &, const db::Edge &) const
   {
@@ -126,11 +130,13 @@ class DB_PUBLIC CornerEdgePairDelivery
 public:
   CornerEdgePairDelivery (std::vector<db::EdgePair> &result)
     : mp_result (&result), mp_result_wp (0)
-  { }
+  {
+  }
 
   CornerEdgePairDelivery (std::vector<db::EdgePairWithProperties> &result)
     : mp_result (0), mp_result_wp (&result)
-  { }
+  {
+  }
 
   virtual void make_point (const db::Point &, const db::Edge &e1, const db::Edge &e2) const
   {
@@ -158,7 +164,7 @@ class DB_PUBLIC CornerDetectorCore
 {
 public:
   CornerDetectorCore (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end, bool inverse, bool absolute);
-  virtual ~CornerDetectorCore () { }
+  virtual ~CornerDetectorCore () {}
 
   void detect_corners (const db::Polygon &poly, const CornerPointDelivery &delivery) const;
   void detect_corners (const db::PolygonWithProperties &poly, const CornerPointDelivery &delivery) const;
@@ -171,7 +177,8 @@ private:
  *  @brief A corner detector delivering small retangles (2*dim x 2*dim) per detected corner
  */
 class DB_PUBLIC CornersAsRectangles
-  : public db::PolygonProcessorBase, private CornerDetectorCore
+  : public db::PolygonProcessorBase,
+    private CornerDetectorCore
 {
 public:
   CornersAsRectangles (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end, bool inverse, bool absolute, db::Coord dim = 1)
@@ -200,7 +207,8 @@ private:
  *  @brief A corner detector delivering degenerated edges (dots) for the corners
  */
 class DB_PUBLIC CornersAsDots
-  : public db::PolygonToEdgeProcessorBase, private CornerDetectorCore
+  : public db::PolygonToEdgeProcessorBase,
+    private CornerDetectorCore
 {
 public:
   CornersAsDots (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end, bool inverse, bool absolute)
@@ -216,7 +224,7 @@ public:
 
   virtual const TransformationReducer *vars () const { return 0; }
   virtual bool result_is_merged () const { return false; }
-  virtual bool result_must_not_be_merged () const { return true; }  //  to preserve dots
+  virtual bool result_must_not_be_merged () const { return true; } //  to preserve dots
   virtual bool requires_raw_input () const { return false; }
   virtual bool wants_variants () const { return false; }
 };
@@ -225,7 +233,8 @@ public:
  *  @brief A corner detector delivering edge pairs for the corners
  */
 class DB_PUBLIC CornersAsEdgePairs
-  : public db::PolygonToEdgePairProcessorBase, private CornerDetectorCore
+  : public db::PolygonToEdgePairProcessorBase,
+    private CornerDetectorCore
 {
 public:
   CornersAsEdgePairs (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end, bool inverse, bool absolute)
@@ -241,7 +250,7 @@ public:
 
   virtual const TransformationReducer *vars () const { return 0; }
   virtual bool result_is_merged () const { return false; }
-  virtual bool result_must_not_be_merged () const { return true; }  //  to preserve dots
+  virtual bool result_must_not_be_merged () const { return true; } //  to preserve dots
   virtual bool requires_raw_input () const { return false; }
   virtual bool wants_variants () const { return false; }
 };
@@ -267,7 +276,7 @@ public:
   virtual bool result_is_merged () const { return false; }
   virtual bool result_must_not_be_merged () const { return false; }
   virtual bool requires_raw_input () const { return false; }
-  virtual bool wants_variants () const { return false; }  //  variants are too common, so don't do this
+  virtual bool wants_variants () const { return false; } //  variants are too common, so don't do this
 };
 
 /**
@@ -291,7 +300,7 @@ public:
   virtual bool result_is_merged () const { return false; }
   virtual bool result_must_not_be_merged () const { return false; }
   virtual bool requires_raw_input () const { return false; }
-  virtual bool wants_variants () const { return false; }  //  variants are too common, so don't do this
+  virtual bool wants_variants () const { return false; } //  variants are too common, so don't do this
 
 private:
   double m_fx1, m_fy1, m_fx2, m_fy2;
@@ -323,7 +332,7 @@ public:
   virtual bool result_is_merged () const { return false; }
   virtual bool result_must_not_be_merged () const;
   virtual bool requires_raw_input () const { return false; }
-  virtual bool wants_variants () const { return false; }  //  variants are too common, so don't do this
+  virtual bool wants_variants () const { return false; } //  variants are too common, so don't do this
 
 private:
   double m_fx1, m_fy1, m_fx2, m_fy2;
@@ -338,8 +347,17 @@ class DB_PUBLIC PolygonToEdgeProcessor
   : public db::PolygonToEdgeProcessorBase
 {
 public:
-  enum EdgeMode { All = 0, Convex, Concave, StepIn, StepOut, Step,
-                           NotConvex, NotConcave, NotStepIn, NotStepOut, NotStep };
+  enum EdgeMode { All = 0,
+                  Convex,
+                  Concave,
+                  StepIn,
+                  StepOut,
+                  Step,
+                  NotConvex,
+                  NotConcave,
+                  NotStepIn,
+                  NotStepOut,
+                  NotStep };
 
   PolygonToEdgeProcessor (EdgeMode mode = All);
 
@@ -366,7 +384,7 @@ public:
 
   virtual const TransformationReducer *vars () const { return &m_vars; }
   virtual bool result_is_merged () const { return false; }
-  virtual bool result_must_not_be_merged () const { return true; }  //  would spoil the decomposition otherwise
+  virtual bool result_must_not_be_merged () const { return true; } //  would spoil the decomposition otherwise
   virtual bool requires_raw_input () const { return false; }
   virtual bool wants_variants () const { return true; }
 
@@ -392,7 +410,7 @@ public:
 
   virtual const TransformationReducer *vars () const { return &m_vars; }
   virtual bool result_is_merged () const { return false; }
-  virtual bool result_must_not_be_merged () const { return true; }  //  would spoil the decomposition otherwise
+  virtual bool result_must_not_be_merged () const { return true; } //  would spoil the decomposition otherwise
   virtual bool requires_raw_input () const { return false; }
   virtual bool wants_variants () const { return true; }
 
@@ -421,8 +439,8 @@ public:
 
   virtual const TransformationReducer *vars () const { return 0; }
   virtual bool result_is_merged () const { return false; }
-  virtual bool result_must_not_be_merged () const { return true; }  //  would spoil the decomposition otherwise
-  virtual bool requires_raw_input () const { return true; }  //  acts on original shapes
+  virtual bool result_must_not_be_merged () const { return true; } //  would spoil the decomposition otherwise
+  virtual bool requires_raw_input () const { return true; }        //  acts on original shapes
   virtual bool wants_variants () const { return false; }
 
 private:

@@ -108,7 +108,7 @@ SoftConnectionInfo::SoftConnectionInfo ()
 void SoftConnectionInfo::build (const db::Netlist &netlist, const db::hier_clusters<db::NetShape> &shape_clusters)
 {
   for (auto c = netlist.begin_bottom_up (); c != netlist.end_bottom_up (); ++c) {
-    build_graphs_for_circuit (c.operator-> (), shape_clusters.clusters_per_cell (c->cell_index ()));
+    build_graphs_for_circuit (c.operator->(), shape_clusters.clusters_per_cell (c->cell_index ()));
   }
 }
 
@@ -126,7 +126,7 @@ void SoftConnectionInfo::join_soft_connections (db::Netlist &netlist)
     size_t nnet_graphs = 0;
     size_t npartial = 0;
 
-    auto scc = m_scc_per_circuit.find (c.operator-> ());
+    auto scc = m_scc_per_circuit.find (c.operator->());
     if (scc == m_scc_per_circuit.end ()) {
       continue;
     }
@@ -146,7 +146,6 @@ void SoftConnectionInfo::join_soft_connections (db::Netlist &netlist)
           ++npartial;
         }
       }
-
     }
 
     nnet_graphs_tot += nnet_graphs;
@@ -155,7 +154,6 @@ void SoftConnectionInfo::join_soft_connections (db::Netlist &netlist)
     if (nnet_graphs > 0 && tl::verbosity () >= 30) {
       tl::info << "Circuit " << c->name () << ": joined " << nnet_graphs << " soft-connected net clusters with " << npartial << " partial nets.";
     }
-
   }
 
   if (tl::verbosity () >= 20) {
@@ -186,7 +184,7 @@ SoftConnectionInfo::representative_polygon (const db::Net *net, const db::Layout
   return db::DPolygon (bbox);
 }
 
-void SoftConnectionInfo::report_partial_nets (const db::Circuit *circuit, const SoftConnectionNetGraph &net_graph, db::LayoutToNetlist &l2n, const std::string &path, const db::DCplxTrans &trans, const std::string &top_cell, int &index, std::set<std::pair<const db::Net *, db::DCplxTrans> > &seen)
+void SoftConnectionInfo::report_partial_nets (const db::Circuit *circuit, const SoftConnectionNetGraph &net_graph, db::LayoutToNetlist &l2n, const std::string &path, const db::DCplxTrans &trans, const std::string &top_cell, int &index, std::set<std::pair<const db::Net *, db::DCplxTrans>> &seen)
 {
   for (auto cc = net_graph.begin_clusters (); cc != net_graph.end_clusters (); ++cc) {
 
@@ -204,7 +202,6 @@ void SoftConnectionInfo::report_partial_nets (const db::Circuit *circuit, const 
       entry.set_geometry (representative_polygon (net, l2n, trans * db::CplxTrans (l2n.internal_layout ()->dbu ())));
 
       l2n.log_entry (entry);
-
     }
 
     for (auto sc = net->begin_subcircuit_pins (); sc != net->end_subcircuit_pins (); ++sc) {
@@ -228,9 +225,7 @@ void SoftConnectionInfo::report_partial_nets (const db::Circuit *circuit, const 
       p += std::string ("/") + circuit_ref->name ();
       p += std::string ("[") + subcircuit->trans ().to_string (true /*short*/) + "]:" + subcircuit->expanded_name ();
       report_partial_nets (circuit_ref, *scci, l2n, p, trans * subcircuit->trans (), top_cell, index, seen);
-
     }
-
   }
 }
 
@@ -243,7 +238,7 @@ void SoftConnectionInfo::report (db::LayoutToNetlist &l2n)
 
   for (auto c = netlist->begin_bottom_up (); c != netlist->end_bottom_up (); ++c) {
 
-    auto scc = m_scc_per_circuit.find (c.operator-> ());
+    auto scc = m_scc_per_circuit.find (c.operator->());
     if (scc == m_scc_per_circuit.end ()) {
       continue;
     }
@@ -261,11 +256,9 @@ void SoftConnectionInfo::report (db::LayoutToNetlist &l2n)
       l2n.log_entry (log_entry);
 
       int index = 0;
-      std::set<std::pair<const db::Net *, db::DCplxTrans> > seen;
-      report_partial_nets (c.operator-> (), *sc, l2n, c->name (), db::DCplxTrans (), c->name (), index, seen);
-
+      std::set<std::pair<const db::Net *, db::DCplxTrans>> seen;
+      report_partial_nets (c.operator->(), *sc, l2n, c->name (), db::DCplxTrans (), c->name (), index, seen);
     }
-
   }
 }
 
@@ -348,15 +341,11 @@ void SoftConnectionInfo::build_graphs_for_circuit (const db::Circuit *circuit, c
         }
 
         sc_circuit_info.add_pin_info (pin, dir, sc_net_graph);
-
       }
 
       connected.swap (next_connected);
-
     }
-
   }
-
 }
 
 bool SoftConnectionInfo::net_has_up_or_down_subcircuit_connections (const db::Net *net, bool up)
@@ -404,9 +393,7 @@ void SoftConnectionInfo::get_net_connections_through_subcircuit (const db::SubCi
           }
         }
       }
-
     }
-
   }
 }
 

@@ -30,7 +30,8 @@
 #include "dbShapes.h"
 #include "tlCopyOnWrite.h"
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief An iterator delegate for the flat text set
@@ -85,7 +86,7 @@ public:
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
   virtual void insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const;
 
-  virtual void flatten () { }
+  virtual void flatten () {}
 
   void do_insert (const db::Text &text, properties_id_type prop_id);
 
@@ -139,4 +140,3 @@ private:
 }
 
 #endif
-

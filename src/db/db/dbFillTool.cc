@@ -179,9 +179,7 @@ private:
           m_area_maps.push_back (db::AreaMap ());
           m_area_maps.back ().swap (am);
         }
-
       }
-
     }
 
     //  adds the "dead corner" piece
@@ -205,9 +203,7 @@ private:
           m_area_maps.push_back (db::AreaMap ());
           m_area_maps.back ().swap (am);
         }
-
       }
-
     }
   }
 };
@@ -234,12 +230,12 @@ create_instances (GenericRasterizer &am, db::Cell *cell, db::cell_index_type fil
     //  Create the fill cell instances
     for (size_t i = 0; i < nx; ++i) {
 
-      for (size_t j = 0; j < ny; ) {
+      for (size_t j = 0; j < ny;) {
 
         size_t jj = j + 1;
-        if (am1.get (i, j) == am1.pixel_area () && (!am1_excl || am1_excl->get (i, j) == 0)) {
+        if (am1.get (i, j) == am1.pixel_area () && (! am1_excl || am1_excl->get (i, j) == 0)) {
 
-          while (jj != ny && am1.get (i, jj) == am1.pixel_area () && (!am1_excl || am1_excl->get (i, jj) == 0)) {
+          while (jj != ny && am1.get (i, jj) == am1.pixel_area () && (! am1_excl || am1_excl->get (i, jj) == 0)) {
             ++jj;
           }
 
@@ -250,10 +246,10 @@ create_instances (GenericRasterizer &am, db::Cell *cell, db::cell_index_type fil
 
           //  try to expand the array in x direction
           size_t ii = i + 1;
-          for ( ; ii < nx; ++ii) {
+          for (; ii < nx; ++ii) {
             bool all = true;
             for (size_t k = j; k < jj && all; ++k) {
-              all = (am1.get (ii, k) == am1.pixel_area () && (!am1_excl || am1_excl->get (ii, k) == 0));
+              all = (am1.get (ii, k) == am1.pixel_area () && (! am1_excl || am1_excl->get (ii, k) == 0));
             }
             if (all) {
               for (size_t k = j; k < jj; ++k) {
@@ -294,15 +290,11 @@ create_instances (GenericRasterizer &am, db::Cell *cell, db::cell_index_type fil
               }
             }
           }
-
         }
 
         j = jj;
-
       }
-
     }
-
   }
 
   return ninsts;
@@ -310,7 +302,7 @@ create_instances (GenericRasterizer &am, db::Cell *cell, db::cell_index_type fil
 
 static bool
 fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_cell_index, const db::Box &fc_bbox, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
-                   std::vector <db::Polygon> *remaining_parts, const db::Vector &fill_margin, const db::Box &glue_box, const db::Region &exclude_area)
+                   std::vector<db::Polygon> *remaining_parts, const db::Vector &fill_margin, const db::Box &glue_box, const db::Region &exclude_area)
 {
   if (row_step.x () <= 0 || column_step.y () <= 0) {
     throw tl::Exception (tl::to_string (tr ("Invalid row or column step vectors in fill_region: row step must have a positive x component while column step must have a positive y component")));
@@ -370,14 +362,11 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
         excluded.clear ();
 
         exclude_rasterized.reset (new GenericRasterizer (excluded_poly, rasterized_area, row_step, column_step, origin, fc_bbox.p2 () - fc_bbox.p1 ()));
-
       }
-
     }
-
   }
 
-  std::vector <db::Polygon> filled_poly, filled_poly_uncleaned;
+  std::vector<db::Polygon> filled_poly, filled_poly_uncleaned;
 
   //  save the uncleaned polygons, so we subtract the filled parts to
   //  form the remaining parts
@@ -407,7 +396,7 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
 
   fr.clear ();
 
-  std::vector <db::Polygon> filled_regions;
+  std::vector<db::Polygon> filled_regions;
   bool any_fill = false;
 
   if (filled_poly.empty ()) {
@@ -461,9 +450,7 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
         tl::info << "Part " << fp->to_string ();
         tl::info << "Created " << ninsts << " instances";
       }
-
     }
-
   }
 
   if (any_fill || has_exclude_area) {
@@ -482,14 +469,14 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
 
 DB_PUBLIC bool
 fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_cell_index, const Box &fc_box, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
-             std::vector <db::Polygon> *remaining_parts, const db::Vector &fill_margin, const db::Box &glue_box, const db::Region &exclude_area)
+             std::vector<db::Polygon> *remaining_parts, const db::Vector &fill_margin, const db::Box &glue_box, const db::Region &exclude_area)
 {
   return fill_polygon_impl (cell, fp0, fill_cell_index, fc_box, row_step, column_step, origin, enhanced_fill, remaining_parts, fill_margin, glue_box, exclude_area);
 }
 
 DB_PUBLIC bool
 fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_cell_index, const db::Box &fc_bbox, const db::Point &origin, bool enhanced_fill,
-             std::vector <db::Polygon> *remaining_parts, const db::Vector &fill_margin, const db::Box &glue_box, const db::Region &exclude_area)
+             std::vector<db::Polygon> *remaining_parts, const db::Vector &fill_margin, const db::Box &glue_box, const db::Region &exclude_area)
 {
   if (fc_bbox.empty () || fc_bbox.width () == 0 || fc_bbox.height () == 0) {
     throw tl::Exception (tl::to_string (tr ("Invalid fill cell footprint (empty or zero width/height)")));
@@ -513,7 +500,7 @@ fill_region_impl (db::Cell *cell, const db::Region &fr, db::cell_index_type fill
   std::vector<db::Polygon> rem_pp, rem_poly;
 
   size_t n = 0;
-  for (db::Region::const_iterator p = fr.begin_merged (); !p.at_end (); ++p) {
+  for (db::Region::const_iterator p = fr.begin_merged (); ! p.at_end (); ++p) {
     ++n;
   }
 
@@ -526,7 +513,7 @@ fill_region_impl (db::Cell *cell, const db::Region &fr, db::cell_index_type fill
     }
     tl::RelativeProgress progress (progress_title, n);
 
-    for (db::Region::const_iterator p = fr.begin_merged (); !p.at_end (); ++p) {
+    for (db::Region::const_iterator p = fr.begin_merged (); ! p.at_end (); ++p) {
       if (! fill_polygon_impl (cell, *p, fill_cell_index, fc_bbox, row_step, column_step, origin, enhanced_fill, remaining_parts ? &rem_pp : 0, fill_margin, glue_box, exclude_area)) {
         if (remaining_polygons) {
           rem_poly.push_back (*p);
@@ -595,7 +582,6 @@ fill_region_repeat (db::Cell *cell, const db::Region &fr, db::cell_index_type fi
 
     new_fill_region.swap (remaining);
     fill_region = &new_fill_region;
-
   }
 }
 

@@ -77,7 +77,6 @@ LayoutHandle::LayoutHandle (db::Layout *layout, const std::string &filename)
 
     m_name = n;
     ms_dict.insert (std::make_pair (n, this));
-
   }
 
   mp_layout->hier_changed_event.add (this, &LayoutHandle::layout_changed);
@@ -107,36 +106,31 @@ LayoutHandle::~LayoutHandle ()
   remove_file_from_watcher (filename ());
 }
 
-void
-LayoutHandle::remove_file_from_watcher (const std::string &path)
+void LayoutHandle::remove_file_from_watcher (const std::string &path)
 {
 #if defined(HAVE_QT)
   file_watcher ().remove_file (path);
 #endif
 }
 
-void
-LayoutHandle::add_file_to_watcher (const std::string &path)
+void LayoutHandle::add_file_to_watcher (const std::string &path)
 {
 #if defined(HAVE_QT)
   file_watcher ().add_file (path);
 #endif
 }
 
-void
-LayoutHandle::on_technology_changed ()
+void LayoutHandle::on_technology_changed ()
 {
   technology_changed_event ();
 }
 
-void
-LayoutHandle::layout_changed ()
+void LayoutHandle::layout_changed ()
 {
   m_dirty = true;
 }
 
-void
-LayoutHandle::rename (const std::string &name, bool force)
+void LayoutHandle::rename (const std::string &name, bool force)
 {
   std::string n (name);
 
@@ -176,7 +170,6 @@ LayoutHandle::rename (const std::string &name, bool force)
     m_name = n;
     ms_dict.insert (std::make_pair (n, this));
     return;
-
   }
 }
 
@@ -186,8 +179,7 @@ LayoutHandle::layout () const
   return *mp_layout;
 }
 
-void
-LayoutHandle::set_filename (const std::string &fn)
+void LayoutHandle::set_filename (const std::string &fn)
 {
   remove_file_from_watcher (m_filename);
   m_filename = fn;
@@ -206,8 +198,7 @@ LayoutHandle::name () const
   return m_name;
 }
 
-void
-LayoutHandle::add_ref ()
+void LayoutHandle::add_ref ()
 {
   if (tl::verbosity () >= 50) {
     tl::info << "Add reference to " << m_name;
@@ -215,8 +206,7 @@ LayoutHandle::add_ref ()
   ++m_ref_count;
 }
 
-void
-LayoutHandle::remove_ref ()
+void LayoutHandle::remove_ref ()
 {
   if (tl::verbosity () >= 50) {
     tl::info << "Remove reference from " << m_name;
@@ -240,16 +230,14 @@ LayoutHandle::technology () const
   return mp_layout ? mp_layout->technology () : 0;
 }
 
-void
-LayoutHandle::apply_technology (const std::string &tn)
+void LayoutHandle::apply_technology (const std::string &tn)
 {
   set_tech_name (tn);
   apply_technology_event ();
   apply_technology_with_sender_event (this);
 }
 
-void
-LayoutHandle::set_tech_name (const std::string &tn)
+void LayoutHandle::set_tech_name (const std::string &tn)
 {
   if (mp_layout && tn != tech_name ()) {
     mp_layout->set_technology_name (tn);
@@ -259,7 +247,7 @@ LayoutHandle::set_tech_name (const std::string &tn)
 LayoutHandle *
 LayoutHandle::find (const std::string &name)
 {
-  std::map <std::string, LayoutHandle *>::const_iterator h = ms_dict.find (name);
+  std::map<std::string, LayoutHandle *>::const_iterator h = ms_dict.find (name);
   if (h == ms_dict.end ()) {
     return 0;
   } else {
@@ -278,25 +266,22 @@ LayoutHandle::find_layout (const db::Layout *layout)
   return 0;
 }
 
-void
-LayoutHandle::get_names (std::vector <std::string> &names)
+void LayoutHandle::get_names (std::vector<std::string> &names)
 {
   names.clear ();
   names.reserve (ms_dict.size ());
-  for (std::map <std::string, LayoutHandle *>::const_iterator h = ms_dict.begin (); h != ms_dict.end (); ++h) {
+  for (std::map<std::string, LayoutHandle *>::const_iterator h = ms_dict.begin (); h != ms_dict.end (); ++h) {
     names.push_back (h->first);
   }
 }
 
-void
-LayoutHandle::set_save_options (const db::SaveLayoutOptions &options, bool valid)
+void LayoutHandle::set_save_options (const db::SaveLayoutOptions &options, bool valid)
 {
   m_save_options = options;
   m_save_options_valid = valid;
 }
 
-void
-LayoutHandle::save_as (const std::string &fn, tl::OutputStream::OutputStreamMode om, const db::SaveLayoutOptions &options, bool update, int keep_backups)
+void LayoutHandle::save_as (const std::string &fn, tl::OutputStream::OutputStreamMode om, const db::SaveLayoutOptions &options, bool update, int keep_backups)
 {
   if (update) {
 
@@ -310,7 +295,6 @@ LayoutHandle::save_as (const std::string &fn, tl::OutputStream::OutputStreamMode
 
     //  NOTE: we don't use set_filename since this would re-attach the file watcher
     m_filename = fn;
-
   }
 
   try {
@@ -339,7 +323,6 @@ LayoutHandle::save_as (const std::string &fn, tl::OutputStream::OutputStreamMode
     }
 
     throw;
-
   }
 }
 
@@ -415,7 +398,7 @@ LayoutHandle::file_watcher ()
 tl::FileSystemWatcher *LayoutHandle::mp_file_watcher = 0;
 #endif
 
-std::map <std::string, LayoutHandle *> LayoutHandle::ms_dict;
+std::map<std::string, LayoutHandle *> LayoutHandle::ms_dict;
 
 // -------------------------------------------------------------
 //  LayoutHandleRef implementation
@@ -443,8 +426,7 @@ LayoutHandleRef::~LayoutHandleRef ()
   set (0);
 }
 
-bool
-LayoutHandleRef::operator== (const LayoutHandleRef &r) const
+bool LayoutHandleRef::operator== (const LayoutHandleRef &r) const
 {
   return mp_handle == r.mp_handle;
 }
@@ -458,8 +440,7 @@ LayoutHandleRef::operator= (const LayoutHandleRef &r)
   return *this;
 }
 
-void
-LayoutHandleRef::set (LayoutHandle *h)
+void LayoutHandleRef::set (LayoutHandle *h)
 {
   if (mp_handle == h) {
     return;
@@ -476,7 +457,7 @@ LayoutHandleRef::set (LayoutHandle *h)
 }
 
 LayoutHandle *
-LayoutHandleRef::operator-> () const
+LayoutHandleRef::operator->() const
 {
   return mp_handle;
 }

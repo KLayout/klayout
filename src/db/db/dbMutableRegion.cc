@@ -46,40 +46,35 @@ MutableRegion::~MutableRegion ()
   //  .. nothing yet ..
 }
 
-void
-MutableRegion::insert (const db::Box &box)
+void MutableRegion::insert (const db::Box &box)
 {
   if (! box.empty () && box.width () > 0 && box.height () > 0) {
     do_insert (db::Polygon (box), 0);
   }
 }
 
-void
-MutableRegion::insert (const db::BoxWithProperties &box)
+void MutableRegion::insert (const db::BoxWithProperties &box)
 {
   if (! box.empty () && box.width () > 0 && box.height () > 0) {
     do_insert (db::Polygon (box), box.properties_id ());
   }
 }
 
-void
-MutableRegion::insert (const db::Path &path)
+void MutableRegion::insert (const db::Path &path)
 {
   if (path.points () > 0) {
     do_insert (path.polygon (), 0);
   }
 }
 
-void
-MutableRegion::insert (const db::PathWithProperties &path)
+void MutableRegion::insert (const db::PathWithProperties &path)
 {
   if (path.points () > 0) {
     do_insert (path.polygon (), path.properties_id ());
   }
 }
 
-void
-MutableRegion::insert (const db::SimplePolygon &polygon)
+void MutableRegion::insert (const db::SimplePolygon &polygon)
 {
   if (polygon.vertices () > 0) {
     db::Polygon poly;
@@ -88,8 +83,7 @@ MutableRegion::insert (const db::SimplePolygon &polygon)
   }
 }
 
-void
-MutableRegion::insert (const db::SimplePolygonWithProperties &polygon)
+void MutableRegion::insert (const db::SimplePolygonWithProperties &polygon)
 {
   if (polygon.vertices () > 0) {
     db::Polygon poly;
@@ -98,8 +92,7 @@ MutableRegion::insert (const db::SimplePolygonWithProperties &polygon)
   }
 }
 
-void
-MutableRegion::insert (const db::Shape &shape)
+void MutableRegion::insert (const db::Shape &shape)
 {
   if (shape.is_polygon () || shape.is_path () || shape.is_box ()) {
     db::Polygon poly;

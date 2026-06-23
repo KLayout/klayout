@@ -31,17 +31,18 @@
 
 namespace db
 {
-  
+
 /**
  *  @brief Generic base class of GDS2 Text reader exceptions
  */
 class DB_PLUGIN_PUBLIC GDS2ReaderTextException
-  : public ReaderException 
+  : public ReaderException
 {
 public:
   GDS2ReaderTextException (const std::string &msg, size_t n, const std::string &cell, const std::string &source)
-    : ReaderException (tl::sprintf (tl::to_string (tr ("%s (line number=%ld, cell=%s), in file: %s")).c_str (), msg.c_str (),  n, cell.c_str (), source))
-  { }
+    : ReaderException (tl::sprintf (tl::to_string (tr ("%s (line number=%ld, cell=%s), in file: %s")).c_str (), msg.c_str (), n, cell.c_str (), source))
+  {
+  }
 };
 
 /**
@@ -57,12 +58,12 @@ public:
    *
    *  @param s The stream delegate from which to read stream data from
    */
-  GDS2ReaderText(tl::InputStream &s, int _iChunkSize = 1024);
+  GDS2ReaderText (tl::InputStream &s, int _iChunkSize = 1024);
 
   /**
    *  @brief Destructor
    */
-  ~GDS2ReaderText();
+  ~GDS2ReaderText ();
 
   /**
    *  @brief Format
@@ -87,18 +88,18 @@ private:
   int get_int ();
   short get_short ();
   unsigned short get_ushort ();
-  double get_double();
-  short get_record();
+  double get_double ();
+  short get_record ();
   void unget_record (short rec_id);
   void get_time (unsigned int *mod_time, unsigned int *access_time);
   GDS2XY *get_xy_data (unsigned int &xy_length);
   void progress_checkpoint ();
-  short siExtractData(std::string &sInput, std::string &sToken, std::string &sArguments);
+  short siExtractData (std::string &sInput, std::string &sToken, std::string &sArguments);
 
   /**
    *  @brief append XY datas into the aulpoints vector for later use
    */
-  void vConvertToXY(const std::string &_sArg);
+  void vConvertToXY (const std::string &_sArg);
 
   void error (const std::string &txt);
   void warn (const std::string &txt, int warn_level = 1);
@@ -106,4 +107,3 @@ private:
 
 }
 #endif
-

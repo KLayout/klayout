@@ -25,7 +25,7 @@
 #include "tlUnitTest.h"
 #include "tlFileUtils.h"
 
-TEST(1_Basic)
+TEST (1_Basic)
 {
   db::Technology tech ("name", "description");
 
@@ -48,7 +48,7 @@ TEST(1_Basic)
   EXPECT_EQ (tech.dbu (), 2.5);
 }
 
-TEST(2_BasePath)
+TEST (2_BasePath)
 {
   db::Technology tech ("x", "description");
 

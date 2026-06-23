@@ -34,7 +34,7 @@
 
 namespace Ui
 {
-  class NetExportDialog;
+class NetExportDialog;
 }
 
 namespace lay
@@ -88,4 +88,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

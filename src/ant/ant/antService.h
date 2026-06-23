@@ -39,12 +39,13 @@
 #include <map>
 #include <vector>
 
-#if defined (HAVE_QT)
-#  include <QTimer>
-#  include <QObject>
+#if defined(HAVE_QT)
+#include <QTimer>
+#include <QObject>
 #endif
 
-namespace ant {
+namespace ant
+{
 
 class LayoutViewBase;
 class LayoutCanvas;
@@ -55,7 +56,7 @@ class Service;
 class ANT_PUBLIC View
   : public lay::ViewObject
 {
-public: 
+public:
   /**
    *  @brief Constructor attaching to a certain object
    */
@@ -110,7 +111,7 @@ class ANT_PUBLIC AnnotationIterator
 {
 public:
   typedef const ant::Object value_type;
-  typedef const value_type *pointer; 
+  typedef const value_type *pointer;
   typedef const value_type &reference;
   typedef std::forward_iterator_tag iterator_category;
   typedef void difference_type;
@@ -144,15 +145,15 @@ public:
 
   const ant::Object &operator* () const
   {
-    return *(dynamic_cast <const ant::Object *> (m_current->ptr ()));
+    return *(dynamic_cast<const ant::Object *> (m_current->ptr ()));
   }
 
-  const ant::Object *operator-> () const
+  const ant::Object *operator->() const
   {
-    return dynamic_cast <const ant::Object *> (m_current->ptr ());
+    return dynamic_cast<const ant::Object *> (m_current->ptr ());
   }
 
-  AnnotationIterator &operator++ () 
+  AnnotationIterator &operator++ ()
   {
     ++m_current;
     next_valid ();
@@ -183,15 +184,15 @@ private:
 // -------------------------------------------------------------
 
 class ANT_PUBLIC Service :
-#if defined (HAVE_QT)
-    public QObject,
+#if defined(HAVE_QT)
+  public QObject,
 #endif
-    public lay::EditorServiceBase,
-    public lay::Drawing,
-    public db::Object
+  public lay::EditorServiceBase,
+  public lay::Drawing,
+  public db::Object
 {
-#if defined (HAVE_QT)
-Q_OBJECT
+#if defined(HAVE_QT)
+  Q_OBJECT
 #endif
 
 public:
@@ -217,23 +218,32 @@ public:
    *    MoveP2Y - dragging P2.y (if box-like)
    *    MoveSelection - dragging a whole ruler (many)
    */
-  enum MoveMode { MoveNone, MoveP1, MoveP2, MoveP12, MoveP21, MoveP1X, MoveP2X, MoveP1Y, MoveP2Y, MoveSelected };
+  enum MoveMode { MoveNone,
+                  MoveP1,
+                  MoveP2,
+                  MoveP12,
+                  MoveP21,
+                  MoveP1X,
+                  MoveP2X,
+                  MoveP1Y,
+                  MoveP2Y,
+                  MoveSelected };
 
   Service (db::Manager *manager, lay::LayoutViewBase *view);
 
   ~Service ();
 
-  /** 
+  /**
    *  @brief Clear all highlights (for current object highlighting)
    */
   void clear_highlights ();
 
-  /** 
+  /**
    *  @brief Restore all highlights (for current object highlighting)
    */
   void restore_highlights ();
 
-  /** 
+  /**
    *  @brief Highlight a certain object
    */
   void highlight (unsigned int n);
@@ -248,27 +258,27 @@ public:
    */
   void edit_cancel ();
 
-  /** 
+  /**
    *  @brief Clear all rulers
    */
   void clear_rulers ();
 
-  /** 
+  /**
    *  @brief "delete" operation
    */
   virtual void del ();
 
-  /** 
+  /**
    *  @brief "cut" operation
    */
   virtual void cut ();
 
-  /** 
+  /**
    *  @brief "copy" operation
    */
   virtual void copy ();
 
-  /** 
+  /**
    *  @brief "paste" operation
    */
   virtual void paste ();
@@ -394,15 +404,15 @@ public:
   /**
    *  @brief Gets the selection for the properties page
    */
-  void get_selection (std::vector <obj_iterator> &selection) const;
+  void get_selection (std::vector<obj_iterator> &selection) const;
 
   /**
    *  @brief Sets the selection for the properties page
    */
-  void set_selection (const std::vector <obj_iterator> &selection);
+  void set_selection (const std::vector<obj_iterator> &selection);
 
   /**
-   *  @brief Direct access to the selection 
+   *  @brief Direct access to the selection
    */
   const std::set<obj_iterator> &selection () const
   {
@@ -410,12 +420,12 @@ public:
   }
 
   /**
-   *  @brief Change a specific ruler 
+   *  @brief Change a specific ruler
    */
   void change_ruler (obj_iterator pos, const ant::Object &to);
 
   /**
-   *  @brief Delete a specific ruler 
+   *  @brief Delete a specific ruler
    */
   void delete_ruler (obj_iterator pos);
 
@@ -512,7 +522,7 @@ public:
   /**
    *  @brief Implements the menu response function
    */
-  void menu_activated (const  std::string &symbol);
+  void menu_activated (const std::string &symbol);
 
   /**
    *  @brief Implements the toolbox widget response function
@@ -527,7 +537,7 @@ public:
   /**
    *  @brief Creates an auto-measure ruler at the given point with the given angle constraint
    */
-  ant::Object create_measure_ruler(const db::DPoint &pt, lay::angle_constraint_type ac);
+  ant::Object create_measure_ruler (const db::DPoint &pt, lay::angle_constraint_type ac);
 
   /**
    *  @brief Gets the annotation templates
@@ -554,7 +564,7 @@ public:
    */
   tl::Event annotation_selection_changed_event;
 
-#if defined (HAVE_QT)
+#if defined(HAVE_QT)
 public slots:
   void timeout ();
 #endif
@@ -614,7 +624,7 @@ private:
   bool m_hover_wait;
   db::DPoint m_hover_point;
   unsigned int m_hover_buttons;
-#if defined (HAVE_QT)
+#if defined(HAVE_QT)
   QTimer m_timer;
 #endif
 
@@ -689,13 +699,13 @@ private:
    *  @brief implementation of the "Drawing" interface: painting
    */
   void paint_on_planes (const db::DCplxTrans &trans,
-                        const std::vector <lay::CanvasPlane *> &planes,
+                        const std::vector<lay::CanvasPlane *> &planes,
                         lay::Renderer &renderer);
 
   /**
    *  @brief implementation of the "Drawing" interface: configuration
    */
-  std::vector <lay::ViewOp> get_view_ops (lay::RedrawThreadCanvas &canvas, tl::Color background, tl::Color foreground, tl::Color active) const;
+  std::vector<lay::ViewOp> get_view_ops (lay::RedrawThreadCanvas &canvas, tl::Color background, tl::Color foreground, tl::Color active) const;
 
   /**
    *  @brief Update m_rulers to reflect the selection
@@ -711,4 +721,3 @@ private:
 }
 
 #endif
-

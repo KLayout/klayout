@@ -29,7 +29,7 @@
 #include "lymMacro.h"
 #include "tlFileUtils.h"
 
-TEST(1)
+TEST (1)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_1.drc";
@@ -43,11 +43,10 @@ TEST(1)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = nil\n"
-        "$drc_test_target = '%s'\n"
-      , output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = nil\n"
+      "$drc_test_target = '%s'\n",
+      output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -67,7 +66,7 @@ TEST(1)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(2)
+TEST (2)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_2.drc";
@@ -84,11 +83,10 @@ TEST(2)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -108,7 +106,7 @@ TEST(2)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(3_Flat)
+TEST (3_Flat)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_3.drc";
@@ -125,11 +123,10 @@ TEST(3_Flat)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -149,7 +146,7 @@ TEST(3_Flat)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(4_Hierarchical)
+TEST (4_Hierarchical)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_4.drc";
@@ -166,11 +163,10 @@ TEST(4_Hierarchical)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -190,7 +186,7 @@ TEST(4_Hierarchical)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(5_FlatAntenna)
+TEST (5_FlatAntenna)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_5.drc";
@@ -207,11 +203,10 @@ TEST(5_FlatAntenna)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -231,7 +226,7 @@ TEST(5_FlatAntenna)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(5_FlatAntennaIncremental)
+TEST (5_FlatAntennaIncremental)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_5i.drc";
@@ -248,11 +243,10 @@ TEST(5_FlatAntennaIncremental)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -272,7 +266,7 @@ TEST(5_FlatAntennaIncremental)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(6_HierarchicalAntenna)
+TEST (6_HierarchicalAntenna)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_6.drc";
@@ -289,11 +283,10 @@ TEST(6_HierarchicalAntenna)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -313,7 +306,7 @@ TEST(6_HierarchicalAntenna)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(7_AntennaWithDiodes)
+TEST (7_AntennaWithDiodes)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_7.drc";
@@ -330,11 +323,10 @@ TEST(7_AntennaWithDiodes)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -354,7 +346,7 @@ TEST(7_AntennaWithDiodes)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(8_TextsAndPolygons)
+TEST (8_TextsAndPolygons)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_8.drc";
@@ -371,11 +363,10 @@ TEST(8_TextsAndPolygons)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -416,7 +407,7 @@ static void compare_netlists (tl::TestBase *_this, const std::string &cir, const
   db::compare_netlist (_this, nl, nl_au);
 }
 
-TEST(9_NetlistExtraction)
+TEST (9_NetlistExtraction)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_9.drc";
@@ -437,12 +428,11 @@ TEST(9_NetlistExtraction)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-        "$drc_test_target_simplified = '%s'\n"
-      , input, output, output_simplified)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n"
+      "$drc_test_target_simplified = '%s'\n",
+      input, output, output_simplified));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -461,7 +451,7 @@ TEST(9_NetlistExtraction)
   compare_netlists (_this, output_simplified, au_simplified);
 }
 
-TEST(10_NetlistExtractionFlat)
+TEST (10_NetlistExtractionFlat)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_10.drc";
@@ -482,12 +472,11 @@ TEST(10_NetlistExtractionFlat)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-        "$drc_test_target_simplified = '%s'\n"
-      , input, output, output_simplified)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n"
+      "$drc_test_target_simplified = '%s'\n",
+      input, output, output_simplified));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -506,7 +495,7 @@ TEST(10_NetlistExtractionFlat)
   compare_netlists (_this, output_simplified, au_simplified);
 }
 
-TEST(11_CustomDevices)
+TEST (11_CustomDevices)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_11.drc";
@@ -527,12 +516,11 @@ TEST(11_CustomDevices)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-        "$drc_test_target_simplified = '%s'\n"
-      , input, output, output_simplified)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n"
+      "$drc_test_target_simplified = '%s'\n",
+      input, output, output_simplified));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -551,7 +539,7 @@ TEST(11_CustomDevices)
   compare_netlists (_this, output_simplified, au_simplified);
 }
 
-TEST(12_NetlistJoinLabels)
+TEST (12_NetlistJoinLabels)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_12.drc";
@@ -568,12 +556,11 @@ TEST(12_NetlistJoinLabels)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-        "$drc_test_target_simplified = nil\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n"
+      "$drc_test_target_simplified = nil\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -588,7 +575,7 @@ TEST(12_NetlistJoinLabels)
   compare_netlists (_this, output, au);
 }
 
-TEST(13a_KissingCorners)
+TEST (13a_KissingCorners)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_13a.drc";
@@ -605,11 +592,10 @@ TEST(13a_KissingCorners)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -632,7 +618,7 @@ TEST(13a_KissingCorners)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(13b_KissingCornersDeep)
+TEST (13b_KissingCornersDeep)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_13b.drc";
@@ -649,11 +635,10 @@ TEST(13b_KissingCornersDeep)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -676,7 +661,7 @@ TEST(13b_KissingCornersDeep)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(14_SwitchingTargets)
+TEST (14_SwitchingTargets)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_14.drc";
@@ -697,12 +682,11 @@ TEST(14_SwitchingTargets)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-        "$drc_test_target2 = '%s'\n"
-      , input, output, output2)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n"
+      "$drc_test_target2 = '%s'\n",
+      input, output, output2));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -732,7 +716,7 @@ TEST(14_SwitchingTargets)
   db::compare_layouts (_this, layout2, au2, db::NoNormalization);
 }
 
-TEST(14b_SideTargetsAndReports)
+TEST (14b_SideTargetsAndReports)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_14b.drc";
@@ -761,14 +745,13 @@ TEST(14b_SideTargetsAndReports)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-        "$drc_test_target2 = '%s'\n"
-        "$drc_test_report = '%s'\n"
-        "$drc_test_report2 = '%s'\n"
-      , input, output, output2, report, report2)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n"
+      "$drc_test_target2 = '%s'\n"
+      "$drc_test_report = '%s'\n"
+      "$drc_test_report2 = '%s'\n",
+      input, output, output2, report, report2));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -801,7 +784,7 @@ TEST(14b_SideTargetsAndReports)
   compare_text_files (report2, au_report2);
 }
 
-TEST(14c_OnlySpecialInputsAndReports)
+TEST (14c_OnlySpecialInputsAndReports)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_14c.drc";
@@ -832,14 +815,13 @@ TEST(14c_OnlySpecialInputsAndReports)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-        "$drc_test_target2 = '%s'\n"
-        "$drc_test_report = '%s'\n"
-        "$drc_test_report2 = '%s'\n"
-      , input, output, output2, report, report2)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n"
+      "$drc_test_target2 = '%s'\n"
+      "$drc_test_report = '%s'\n"
+      "$drc_test_report2 = '%s'\n",
+      input, output, output2, report, report2));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -872,7 +854,7 @@ TEST(14c_OnlySpecialInputsAndReports)
   compare_text_files (report2, au_report2);
 }
 
-TEST(15_issue548)
+TEST (15_issue548)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_15.drc";
@@ -889,11 +871,10 @@ TEST(15_issue548)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -914,7 +895,7 @@ TEST(15_issue548)
 }
 
 //  Edges::extents isn't deep-enabled
-TEST(16_issue570)
+TEST (16_issue570)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_16.drc";
@@ -931,11 +912,10 @@ TEST(16_issue570)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -956,7 +936,7 @@ TEST(16_issue570)
 }
 
 //  Problems with Source#select
-TEST(17_issue570)
+TEST (17_issue570)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_17.drc";
@@ -973,11 +953,10 @@ TEST(17_issue570)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -997,7 +976,7 @@ TEST(17_issue570)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(18_forget)
+TEST (18_forget)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_18.drc";
@@ -1014,11 +993,10 @@ TEST(18_forget)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -1038,7 +1016,7 @@ TEST(18_forget)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(19_shielding)
+TEST (19_shielding)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_19.drc";
@@ -1055,11 +1033,10 @@ TEST(19_shielding)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -1079,7 +1056,7 @@ TEST(19_shielding)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(20_interact_with_count)
+TEST (20_interact_with_count)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_20.drc";
@@ -1096,11 +1073,10 @@ TEST(20_interact_with_count)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -1120,7 +1096,7 @@ TEST(20_interact_with_count)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(21_breaking)
+TEST (21_breaking)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_21.drc";
@@ -1137,11 +1113,10 @@ TEST(21_breaking)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -1161,7 +1136,7 @@ TEST(21_breaking)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(22_opposite_filter)
+TEST (22_opposite_filter)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_22.drc";
@@ -1178,11 +1153,10 @@ TEST(22_opposite_filter)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -1202,7 +1176,7 @@ TEST(22_opposite_filter)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(23_rect_filter)
+TEST (23_rect_filter)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_23.drc";
@@ -1219,11 +1193,10 @@ TEST(23_rect_filter)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -1243,7 +1216,7 @@ TEST(23_rect_filter)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(24_enclosing)
+TEST (24_enclosing)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_24.drc";
@@ -1260,11 +1233,10 @@ TEST(24_enclosing)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -1303,12 +1275,11 @@ static void run_test (tl::TestBase *_this, const std::string &number, bool deep,
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = '%s'\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-        "$drc_test_deep = %s\n"
-      , force_gc, input, output, deep ? "true" : "false")
-    );
+      "$drc_force_gc = '%s'\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n"
+      "$drc_test_deep = %s\n",
+      force_gc, input, output, deep ? "true" : "false"));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -1328,337 +1299,337 @@ static void run_test (tl::TestBase *_this, const std::string &number, bool deep,
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(25_spaceWithOptions)
+TEST (25_spaceWithOptions)
 {
   run_test (_this, "25", false);
 }
 
-TEST(25d_spaceWithOptions)
+TEST (25d_spaceWithOptions)
 {
   run_test (_this, "25", true);
 }
 
-TEST(26_attributes)
+TEST (26_attributes)
 {
   run_test (_this, "26", false);
 }
 
-TEST(26d_attributes)
+TEST (26d_attributes)
 {
   run_test (_this, "26", true);
 }
 
-TEST(27_advancedShielding)
+TEST (27_advancedShielding)
 {
   run_test (_this, "27", false);
 }
 
-TEST(27d_advancedShielding)
+TEST (27d_advancedShielding)
 {
   run_test (_this, "27", true);
 }
 
-TEST(28_inputFragmentation)
+TEST (28_inputFragmentation)
 {
   run_test (_this, "28", true);
 }
 
-TEST(29_holes)
+TEST (29_holes)
 {
   run_test (_this, "29", false);
 }
 
-TEST(29d_holes)
+TEST (29d_holes)
 {
   run_test (_this, "29", true);
 }
 
-TEST(30_density)
+TEST (30_density)
 {
   run_test (_this, "30", false);
 }
 
-TEST(31_globaTransformation)
+TEST (31_globaTransformation)
 {
   run_test (_this, "31", false);
 }
 
-TEST(31d_globalTransformation)
+TEST (31d_globalTransformation)
 {
   run_test (_this, "31", true);
 }
 
-TEST(32_globalTransformationWithClip)
+TEST (32_globalTransformationWithClip)
 {
   run_test (_this, "32", false);
 }
 
-TEST(32d_globalTransformationWithClip)
+TEST (32d_globalTransformationWithClip)
 {
   run_test (_this, "32", true);
 }
 
-TEST(33_globalTransformationWithTiles)
+TEST (33_globalTransformationWithTiles)
 {
   run_test (_this, "33", true);
 }
 
-TEST(40_fill)
+TEST (40_fill)
 {
   run_test (_this, "40", false);
 }
 
-TEST(41_fillTiled)
+TEST (41_fillTiled)
 {
   run_test (_this, "41", false);
 }
 
-TEST(42_fillWithLeft)
+TEST (42_fillWithLeft)
 {
   run_test (_this, "42", false);
 }
 
-TEST(43_fillWithLeftTiled)
+TEST (43_fillWithLeftTiled)
 {
   run_test (_this, "43", false);
 }
 
-TEST(44_fillWithOverlappingBoxes)
+TEST (44_fillWithOverlappingBoxes)
 {
   run_test (_this, "44", false);
 }
 
-TEST(45_fillWithOverlappingBoxesTiled)
+TEST (45_fillWithOverlappingBoxesTiled)
 {
   run_test (_this, "45", false);
 }
 
-TEST(46_fillWithOverlappingBoxes)
+TEST (46_fillWithOverlappingBoxes)
 {
   run_test (_this, "46", false);
 }
 
-TEST(47_fillWithOverlappingBoxesTiled)
+TEST (47_fillWithOverlappingBoxesTiled)
 {
   run_test (_this, "47", false);
 }
 
-TEST(47b_fillWithUsingOutput)
+TEST (47b_fillWithUsingOutput)
 {
   run_test (_this, "47b", false);
 }
 
-TEST(47bd_fillWithUsingOutputDeep)
+TEST (47bd_fillWithUsingOutputDeep)
 {
   run_test (_this, "47b", true);
 }
 
-TEST(47c_fillWithExcludeArea)
+TEST (47c_fillWithExcludeArea)
 {
   run_test (_this, "47c", false);
 }
 
-TEST(47cd_fillWithExcludeAreaDeep)
+TEST (47cd_fillWithExcludeAreaDeep)
 {
   run_test (_this, "47c", true);
 }
 
-TEST(48_drcWithFragments)
+TEST (48_drcWithFragments)
 {
   run_test (_this, "48", false);
 }
 
-TEST(48d_drcWithFragments)
+TEST (48d_drcWithFragments)
 {
   run_test (_this, "48", true);
 }
 
-TEST(49_epAngle)
+TEST (49_epAngle)
 {
   run_test (_this, "49", false);
 }
 
-TEST(49d_epAngle)
+TEST (49d_epAngle)
 {
   run_test (_this, "49", true);
 }
 
-TEST(50_issue826)
+TEST (50_issue826)
 {
   run_test (_this, "50", false, true /*OASIS*/);
 }
 
-TEST(51_epInternalAngle)
+TEST (51_epInternalAngle)
 {
   run_test (_this, "51", false);
 }
 
-TEST(52_cellWiseExtent)
+TEST (52_cellWiseExtent)
 {
   run_test (_this, "52", false);
 }
 
-TEST(53_cellWiseExtentWithClip)
+TEST (53_cellWiseExtentWithClip)
 {
   run_test (_this, "53", false);
 }
 
-TEST(54_issue1011)
+TEST (54_issue1011)
 {
   run_test (_this, "54", false);
 }
 
-TEST(55_drccount)
+TEST (55_drccount)
 {
   run_test (_this, "55", false);
 }
 
-TEST(55d_drccount)
+TEST (55d_drccount)
 {
   run_test (_this, "55", true);
 }
 
-TEST(56_angle_classes)
+TEST (56_angle_classes)
 {
   run_test (_this, "56", false);
 }
 
-TEST(56d_angle_classes)
+TEST (56d_angle_classes)
 {
   run_test (_this, "56", true);
 }
 
-TEST(57_issue_1190)
+TEST (57_issue_1190)
 {
   run_test (_this, "57", false);
 }
 
-TEST(57d_issue_1190)
+TEST (57d_issue_1190)
 {
   run_test (_this, "57", true);
 }
 
-TEST(58_in_and_out)
+TEST (58_in_and_out)
 {
   run_test (_this, "58", false);
 }
 
-TEST(58d_in_and_out)
+TEST (58d_in_and_out)
 {
   run_test (_this, "58", true);
 }
 
-TEST(60_issue1216)
+TEST (60_issue1216)
 {
   run_test (_this, "60", false);
 }
 
-TEST(60d_issue1216)
+TEST (60d_issue1216)
 {
   run_test (_this, "60", true);
 }
 
-TEST(61_issue1485)
+TEST (61_issue1485)
 {
   run_test (_this, "61", false);
 }
 
-TEST(61d_issue1485)
+TEST (61d_issue1485)
 {
   run_test (_this, "61", true);
 }
 
-TEST(70_props)
+TEST (70_props)
 {
   run_test (_this, "70", false);
 }
 
-TEST(70d_props)
+TEST (70d_props)
 {
   run_test (_this, "70", true);
 }
 
-TEST(71_netter)
+TEST (71_netter)
 {
   run_test (_this, "71", false);
 }
 
-TEST(71d_netter)
+TEST (71d_netter)
 {
   run_test (_this, "71", true);
 }
 
-TEST(80_deep_with_mag_width)
+TEST (80_deep_with_mag_width)
 {
   run_test (_this, "80", true);
 }
 
-TEST(81_deep_with_mag_space)
+TEST (81_deep_with_mag_space)
 {
   run_test (_this, "81", true);
 }
 
-TEST(82_deep_with_mag_cop_width)
+TEST (82_deep_with_mag_cop_width)
 {
   run_test (_this, "82", true);
 }
 
-TEST(83_deep_with_mag_cop_space)
+TEST (83_deep_with_mag_cop_space)
 {
   run_test (_this, "83", true);
 }
 
-TEST(84_deep_with_mag_edge_width)
+TEST (84_deep_with_mag_edge_width)
 {
   run_test (_this, "84", true);
 }
 
-TEST(85_deep_with_mag_edge_space)
+TEST (85_deep_with_mag_edge_space)
 {
   run_test (_this, "85", true);
 }
 
-TEST(86_deep_with_mag_size)
+TEST (86_deep_with_mag_size)
 {
   run_test (_this, "86", true);
 }
 
-TEST(87_deep_with_mag_size_aniso)
+TEST (87_deep_with_mag_size_aniso)
 {
   run_test (_this, "87", true);
 }
 
-TEST(88_deep_with_mag_cop_size)
+TEST (88_deep_with_mag_cop_size)
 {
   run_test (_this, "88", true);
 }
 
-TEST(89_deep_with_mag_cop_size_aniso)
+TEST (89_deep_with_mag_cop_size_aniso)
 {
   run_test (_this, "89", true);
 }
 
-TEST(90_zero_distance_mode)
+TEST (90_zero_distance_mode)
 {
   run_test (_this, "90", false);
 }
 
-TEST(90d_zero_distance_mode)
+TEST (90d_zero_distance_mode)
 {
   run_test (_this, "90", true);
 }
 
-TEST(91_zero_distance_mode)
+TEST (91_zero_distance_mode)
 {
   run_test (_this, "91", false);
 }
 
-TEST(91d_zero_distance_mode)
+TEST (91d_zero_distance_mode)
 {
   run_test (_this, "91", true);
 }
 
-TEST(92_issue1594_dual_top)
+TEST (92_issue1594_dual_top)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/issue_1594.drc";
@@ -1675,11 +1646,10 @@ TEST(92_issue1594_dual_top)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -1694,57 +1664,57 @@ TEST(92_issue1594_dual_top)
   compare_netlists (_this, output, au);
 }
 
-TEST(93_withAngle)
+TEST (93_withAngle)
 {
   run_test (_this, "93", false);
 }
 
-TEST(93d_withAngle)
+TEST (93d_withAngle)
 {
   run_test (_this, "93", true);
 }
 
-TEST(94_texts_in_region_xor)
+TEST (94_texts_in_region_xor)
 {
   run_test (_this, "94", false);
 }
 
-TEST(94d_texts_in_region_xor)
+TEST (94d_texts_in_region_xor)
 {
   run_test (_this, "94", true);
 }
 
-TEST(100_edge_interaction_with_count)
+TEST (100_edge_interaction_with_count)
 {
   run_test (_this, "100", false);
 }
 
-TEST(100d_edge_interaction_with_count)
+TEST (100d_edge_interaction_with_count)
 {
   run_test (_this, "100", true);
 }
 
-TEST(101_edge_booleans_with_dots)
+TEST (101_edge_booleans_with_dots)
 {
   run_test (_this, "101", false);
 }
 
-TEST(101d_edge_booleans_with_dots)
+TEST (101d_edge_booleans_with_dots)
 {
   run_test (_this, "101", true);
 }
 
-TEST(102_edge_modes)
+TEST (102_edge_modes)
 {
   run_test (_this, "102", false);
 }
 
-TEST(102d_edge_modes)
+TEST (102d_edge_modes)
 {
   run_test (_this, "102", true);
 }
 
-TEST(110_RDBVariantAssignment)
+TEST (110_RDBVariantAssignment)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_110.drc";
@@ -1763,11 +1733,10 @@ TEST(110_RDBVariantAssignment)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_report = '%s'\n"
-      , input, report)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_report = '%s'\n",
+      input, report));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -1779,7 +1748,7 @@ TEST(110_RDBVariantAssignment)
   compare_text_files (report, au_report);
 }
 
-TEST(111_RDBCategoryHierarchy)
+TEST (111_RDBCategoryHierarchy)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_111.drc";
@@ -1798,11 +1767,10 @@ TEST(111_RDBCategoryHierarchy)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_report = '%s'\n"
-      , input, report)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_report = '%s'\n",
+      input, report));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -1814,7 +1782,7 @@ TEST(111_RDBCategoryHierarchy)
   compare_text_files (report, au_report);
 }
 
-TEST(112_Waiving)
+TEST (112_Waiving)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_112.drc";
@@ -1833,11 +1801,10 @@ TEST(112_Waiving)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_force_gc = true\n"
-        "$drc_test_source = '%s'\n"
-        "$drc_test_report = '%s'\n"
-      , input, report)
-    );
+      "$drc_force_gc = true\n"
+      "$drc_test_source = '%s'\n"
+      "$drc_test_report = '%s'\n",
+      input, report));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -1858,7 +1825,7 @@ TEST(112_Waiving)
 }
 
 
-TEST(120_ShapesOfPin)
+TEST (120_ShapesOfPin)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_120.drc";
@@ -1877,10 +1844,9 @@ TEST(120_ShapesOfPin)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -1900,7 +1866,7 @@ TEST(120_ShapesOfPin)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(121_ShapesOfTerminal)
+TEST (121_ShapesOfTerminal)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_121.drc";
@@ -1919,10 +1885,9 @@ TEST(121_ShapesOfTerminal)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -1942,7 +1907,7 @@ TEST(121_ShapesOfTerminal)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(122_NamedLayers)
+TEST (122_NamedLayers)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_122.drc";
@@ -1959,10 +1924,9 @@ TEST(122_NamedLayers)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -1974,109 +1938,109 @@ TEST(122_NamedLayers)
   compare_text_files (output, au_output);
 }
 
-TEST(123_DirectInsert)
+TEST (123_DirectInsert)
 {
   run_test (_this, "123", false);
 }
 
-TEST(130_size_inside_outside)
+TEST (130_size_inside_outside)
 {
   run_test (_this, "130", false);
 }
 
-TEST(130d_size_inside_outside)
+TEST (130d_size_inside_outside)
 {
   run_test (_this, "130", true);
 }
 
-TEST(131_edge_pair_interactions)
+TEST (131_edge_pair_interactions)
 {
   run_test (_this, "131", false);
 }
 
-TEST(131d_edge_pair_interactions)
+TEST (131d_edge_pair_interactions)
 {
   run_test (_this, "131", true);
 }
 
-TEST(132d_sensitive_breaking)
+TEST (132d_sensitive_breaking)
 {
   run_test (_this, "132", true);
 }
 
-TEST(140_target_modification)
+TEST (140_target_modification)
 {
   run_test (_this, "140", false);
 }
 
-TEST(140d_target_modification)
+TEST (140d_target_modification)
 {
   run_test (_this, "140", true);
 }
 
-TEST(141_merge_properties)
+TEST (141_merge_properties)
 {
   run_test (_this, "141", false);
 }
 
-TEST(141d_merge_properties)
+TEST (141d_merge_properties)
 {
   run_test (_this, "141", true);
 }
 
-TEST(142_evaluate_nets)
+TEST (142_evaluate_nets)
 {
   run_test (_this, "142", false);
 }
 
-TEST(142d_evaluate_nets)
+TEST (142d_evaluate_nets)
 {
   run_test (_this, "142", true);
 }
 
-TEST(143_evaluate_and_filter)
+TEST (143_evaluate_and_filter)
 {
   run_test (_this, "143", false);
 }
 
-TEST(143d_evaluate_and_filter)
+TEST (143d_evaluate_and_filter)
 {
   run_test (_this, "143", true);
 }
 
-TEST(144_combined_antennas)
+TEST (144_combined_antennas)
 {
   run_test (_this, "144", false);
 }
 
-TEST(144d_combined_antennas)
+TEST (144d_combined_antennas)
 {
   run_test (_this, "144", true);
 }
 
 //  issue 2134
-TEST(145_edges_merge)
+TEST (145_edges_merge)
 {
   run_test (_this, "145", false);
 }
 
-TEST(145d_edges_merge)
+TEST (145d_edges_merge)
 {
   run_test (_this, "145", true);
 }
 
 //  issue 2141
-TEST(146_edges_and_corners)
+TEST (146_edges_and_corners)
 {
   run_test (_this, "146", false);
 }
 
-TEST(146d_edges_and_corners)
+TEST (146d_edges_and_corners)
 {
   run_test (_this, "146", true);
 }
 
-TEST(147_MeasureNetsWithL2N)
+TEST (147_MeasureNetsWithL2N)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_147.drc";
@@ -2093,10 +2057,9 @@ TEST(147_MeasureNetsWithL2N)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_test_source = '%s'\n"
-        "$drc_test_target = '%s'\n"
-      , input, output)
-    );
+      "$drc_test_source = '%s'\n"
+      "$drc_test_target = '%s'\n",
+      input, output));
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
   }
@@ -2108,8 +2071,7 @@ TEST(147_MeasureNetsWithL2N)
   compare_text_files (output, au_output);
 }
 
-TEST(148_sparse_array_limit)
+TEST (148_sparse_array_limit)
 {
   run_test (_this, "148", true);
 }
-

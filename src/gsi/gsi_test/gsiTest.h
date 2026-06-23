@@ -38,7 +38,7 @@
 #include "tlString.h"
 
 #if defined(HAVE_QT)
-#  include <QObject>
+#include <QObject>
 #endif
 
 namespace gsi_test
@@ -47,8 +47,7 @@ namespace gsi_test
 /**
  *  @brief A test enum
  */
-enum Enum
-{
+enum Enum {
   Enum_a = 1,
   Enum_b = 2,
   Enum_c = 11
@@ -56,13 +55,12 @@ enum Enum
 
 /**
  *  @brief A simple class for testing
- *  The class is managed (derived from gsi::ObjectBase). 
+ *  The class is managed (derived from gsi::ObjectBase).
  *  It provides instance counting and tracking of one instance.
  *  It provides copy semantics.
  */
 struct A
-  : public gsi::ObjectBase
-{
+  : public gsi::ObjectBase {
   /**
    *  @brief Constructor
    */
@@ -114,10 +112,10 @@ struct A
    *  @brief Byte sequences: tests access to QByteArray
    */
   static std::vector<int> qba_cref_to_ia (const QByteArray &ba);
-  static std::vector<int> qba_ref_to_ia (QByteArray &ba)           { return qba_cref_to_ia (ba); }
-  static std::vector<int> qba_cptr_to_ia (const QByteArray *ba)    { return qba_cref_to_ia (*ba); }
-  static std::vector<int> qba_ptr_to_ia (QByteArray *ba)           { return qba_cref_to_ia (*ba); }
-  static std::vector<int> qba_to_ia (QByteArray ba)                { return qba_cref_to_ia (ba); }
+  static std::vector<int> qba_ref_to_ia (QByteArray &ba) { return qba_cref_to_ia (ba); }
+  static std::vector<int> qba_cptr_to_ia (const QByteArray *ba) { return qba_cref_to_ia (*ba); }
+  static std::vector<int> qba_ptr_to_ia (QByteArray *ba) { return qba_cref_to_ia (*ba); }
+  static std::vector<int> qba_to_ia (QByteArray ba) { return qba_cref_to_ia (ba); }
 
 #if QT_VERSION >= 0x60000
 
@@ -125,10 +123,10 @@ struct A
    *  @brief Byte sequences: tests access to QByteArrayView
    */
   static std::vector<int> qbav_cref_to_ia (const QByteArrayView &ba);
-  static std::vector<int> qbav_ref_to_ia (QByteArrayView &ba)           { return qbav_cref_to_ia (ba); }
-  static std::vector<int> qbav_cptr_to_ia (const QByteArrayView *ba)    { return qbav_cref_to_ia (*ba); }
-  static std::vector<int> qbav_ptr_to_ia (QByteArrayView *ba)           { return qbav_cref_to_ia (*ba); }
-  static std::vector<int> qbav_to_ia (QByteArrayView ba)                { return qbav_cref_to_ia (ba); }
+  static std::vector<int> qbav_ref_to_ia (QByteArrayView &ba) { return qbav_cref_to_ia (ba); }
+  static std::vector<int> qbav_cptr_to_ia (const QByteArrayView *ba) { return qbav_cref_to_ia (*ba); }
+  static std::vector<int> qbav_ptr_to_ia (QByteArrayView *ba) { return qbav_cref_to_ia (*ba); }
+  static std::vector<int> qbav_to_ia (QByteArrayView ba) { return qbav_cref_to_ia (ba); }
 
 #endif
 
@@ -136,10 +134,10 @@ struct A
    *  @brief Byte sequences: tests access to QString
    */
   static std::vector<int> qs_cref_to_ia (const QString &qs);
-  static std::vector<int> qs_ref_to_ia (QString &qs)                    { return qs_cref_to_ia (qs); }
-  static std::vector<int> qs_cptr_to_ia (const QString *qs)             { return qs_cref_to_ia (*qs); }
-  static std::vector<int> qs_ptr_to_ia (QString *qs)                    { return qs_cref_to_ia (*qs); }
-  static std::vector<int> qs_to_ia (QString qs)                         { return qs_cref_to_ia (qs); }
+  static std::vector<int> qs_ref_to_ia (QString &qs) { return qs_cref_to_ia (qs); }
+  static std::vector<int> qs_cptr_to_ia (const QString *qs) { return qs_cref_to_ia (*qs); }
+  static std::vector<int> qs_ptr_to_ia (QString *qs) { return qs_cref_to_ia (*qs); }
+  static std::vector<int> qs_to_ia (QString qs) { return qs_cref_to_ia (qs); }
 
 #if QT_VERSION >= 0x50000
 
@@ -147,10 +145,10 @@ struct A
    *  @brief Byte sequences: tests access to QLatin1String
    */
   static std::vector<int> ql1s_cref_to_ia (const QLatin1String &qs);
-  static std::vector<int> ql1s_ref_to_ia (QLatin1String &qs)            { return ql1s_cref_to_ia (qs); }
-  static std::vector<int> ql1s_cptr_to_ia (const QLatin1String *qs)     { return ql1s_cref_to_ia (*qs); }
-  static std::vector<int> ql1s_ptr_to_ia (QLatin1String *qs)            { return ql1s_cref_to_ia (*qs); }
-  static std::vector<int> ql1s_to_ia (QLatin1String qs)                 { return ql1s_cref_to_ia (qs); }
+  static std::vector<int> ql1s_ref_to_ia (QLatin1String &qs) { return ql1s_cref_to_ia (qs); }
+  static std::vector<int> ql1s_cptr_to_ia (const QLatin1String *qs) { return ql1s_cref_to_ia (*qs); }
+  static std::vector<int> ql1s_ptr_to_ia (QLatin1String *qs) { return ql1s_cref_to_ia (*qs); }
+  static std::vector<int> ql1s_to_ia (QLatin1String qs) { return ql1s_cref_to_ia (qs); }
 
 #endif
 
@@ -160,10 +158,10 @@ struct A
    *  @brief Byte sequences: tests access to QStringView
    */
   static std::vector<int> qsv_cref_to_ia (const QStringView &qs);
-  static std::vector<int> qsv_ref_to_ia (QStringView &qs)               { return qsv_cref_to_ia (qs); }
-  static std::vector<int> qsv_cptr_to_ia (const QStringView *qs)        { return qsv_cref_to_ia (*qs); }
-  static std::vector<int> qsv_ptr_to_ia (QStringView *qs)               { return qsv_cref_to_ia (*qs); }
-  static std::vector<int> qsv_to_ia (QStringView qs)                    { return qsv_cref_to_ia (qs); }
+  static std::vector<int> qsv_ref_to_ia (QStringView &qs) { return qsv_cref_to_ia (qs); }
+  static std::vector<int> qsv_cptr_to_ia (const QStringView *qs) { return qsv_cref_to_ia (*qs); }
+  static std::vector<int> qsv_ptr_to_ia (QStringView *qs) { return qsv_cref_to_ia (*qs); }
+  static std::vector<int> qsv_to_ia (QStringView qs) { return qsv_cref_to_ia (qs); }
 
 #endif
 
@@ -172,9 +170,9 @@ struct A
    */
   static QByteArray ia_cref_to_qba (const std::vector<int> &ia);
   static QByteArray &ia_cref_to_qba_ref (const std::vector<int> &ia);
-  static const QByteArray &ia_cref_to_qba_cref (const std::vector<int> &ia)         { return ia_cref_to_qba_ref (ia); }
-  static const QByteArray *ia_cref_to_qba_cptr (const std::vector<int> &ia)         { return &ia_cref_to_qba_ref (ia); }
-  static QByteArray *ia_cref_to_qba_ptr (const std::vector<int> &ia)                { return &ia_cref_to_qba_ref (ia); }
+  static const QByteArray &ia_cref_to_qba_cref (const std::vector<int> &ia) { return ia_cref_to_qba_ref (ia); }
+  static const QByteArray *ia_cref_to_qba_cptr (const std::vector<int> &ia) { return &ia_cref_to_qba_ref (ia); }
+  static QByteArray *ia_cref_to_qba_ptr (const std::vector<int> &ia) { return &ia_cref_to_qba_ref (ia); }
 
 #if QT_VERSION >= 0x60000
 
@@ -183,9 +181,9 @@ struct A
    */
   static QByteArrayView ia_cref_to_qbav (const std::vector<int> &ia);
   static QByteArrayView &ia_cref_to_qbav_ref (const std::vector<int> &ia);
-  static const QByteArrayView &ia_cref_to_qbav_cref (const std::vector<int> &ia)   { return ia_cref_to_qbav_ref (ia); }
-  static const QByteArrayView *ia_cref_to_qbav_cptr (const std::vector<int> &ia)   { return &ia_cref_to_qbav_ref (ia); }
-  static QByteArrayView *ia_cref_to_qbav_ptr (const std::vector<int> &ia)          { return &ia_cref_to_qbav_ref (ia); }
+  static const QByteArrayView &ia_cref_to_qbav_cref (const std::vector<int> &ia) { return ia_cref_to_qbav_ref (ia); }
+  static const QByteArrayView *ia_cref_to_qbav_cptr (const std::vector<int> &ia) { return &ia_cref_to_qbav_ref (ia); }
+  static QByteArrayView *ia_cref_to_qbav_ptr (const std::vector<int> &ia) { return &ia_cref_to_qbav_ref (ia); }
 
 #endif
 
@@ -194,9 +192,9 @@ struct A
    */
   static QString ia_cref_to_qs (const std::vector<int> &ia);
   static QString &ia_cref_to_qs_ref (const std::vector<int> &ia);
-  static const QString &ia_cref_to_qs_cref (const std::vector<int> &ia)           { return ia_cref_to_qs_ref (ia); }
-  static const QString *ia_cref_to_qs_cptr (const std::vector<int> &ia)           { return &ia_cref_to_qs_ref (ia); }
-  static QString *ia_cref_to_qs_ptr (const std::vector<int> &ia)                  { return &ia_cref_to_qs_ref (ia); }
+  static const QString &ia_cref_to_qs_cref (const std::vector<int> &ia) { return ia_cref_to_qs_ref (ia); }
+  static const QString *ia_cref_to_qs_cptr (const std::vector<int> &ia) { return &ia_cref_to_qs_ref (ia); }
+  static QString *ia_cref_to_qs_ptr (const std::vector<int> &ia) { return &ia_cref_to_qs_ref (ia); }
 
 #if QT_VERSION >= 0x50000
 
@@ -205,9 +203,9 @@ struct A
    */
   static QLatin1String ia_cref_to_ql1s (const std::vector<int> &ia);
   static QLatin1String &ia_cref_to_ql1s_ref (const std::vector<int> &ia);
-  static const QLatin1String &ia_cref_to_ql1s_cref (const std::vector<int> &ia)   { return ia_cref_to_ql1s_ref (ia); }
-  static const QLatin1String *ia_cref_to_ql1s_cptr (const std::vector<int> &ia)   { return &ia_cref_to_ql1s_ref (ia); }
-  static QLatin1String *ia_cref_to_ql1s_ptr (const std::vector<int> &ia)          { return &ia_cref_to_ql1s_ref (ia); }
+  static const QLatin1String &ia_cref_to_ql1s_cref (const std::vector<int> &ia) { return ia_cref_to_ql1s_ref (ia); }
+  static const QLatin1String *ia_cref_to_ql1s_cptr (const std::vector<int> &ia) { return &ia_cref_to_ql1s_ref (ia); }
+  static QLatin1String *ia_cref_to_ql1s_ptr (const std::vector<int> &ia) { return &ia_cref_to_ql1s_ref (ia); }
 
 #endif
 
@@ -218,9 +216,9 @@ struct A
    */
   static QStringView ia_cref_to_qsv (const std::vector<int> &ia);
   static QStringView &ia_cref_to_qsv_ref (const std::vector<int> &ia);
-  static const QStringView &ia_cref_to_qsv_cref (const std::vector<int> &ia)     { return ia_cref_to_qsv_ref (ia); }
-  static const QStringView *ia_cref_to_qsv_cptr (const std::vector<int> &ia)     { return &ia_cref_to_qsv_ref (ia); }
-  static QStringView *ia_cref_to_qsv_ptr (const std::vector<int> &ia)            { return &ia_cref_to_qsv_ref (ia); }
+  static const QStringView &ia_cref_to_qsv_cref (const std::vector<int> &ia) { return ia_cref_to_qsv_ref (ia); }
+  static const QStringView *ia_cref_to_qsv_cptr (const std::vector<int> &ia) { return &ia_cref_to_qsv_ref (ia); }
+  static QStringView *ia_cref_to_qsv_ptr (const std::vector<int> &ia) { return &ia_cref_to_qsv_ref (ia); }
 
 #endif
 
@@ -230,19 +228,19 @@ struct A
    *  @brief Byte sequences: tests access to std::vector<char> (another byte array)
    */
   static std::vector<int> ba_cref_to_ia (const std::vector<char> &ba);
-  static std::vector<int> ba_ref_to_ia (std::vector<char> &ba)           { return ba_cref_to_ia (ba); }
-  static std::vector<int> ba_cptr_to_ia (const std::vector<char> *ba)    { return ba_cref_to_ia (*ba); }
-  static std::vector<int> ba_ptr_to_ia (std::vector<char> *ba)           { return ba_cref_to_ia (*ba); }
-  static std::vector<int> ba_to_ia (std::vector<char> ba)                { return ba_cref_to_ia (ba); }
+  static std::vector<int> ba_ref_to_ia (std::vector<char> &ba) { return ba_cref_to_ia (ba); }
+  static std::vector<int> ba_cptr_to_ia (const std::vector<char> *ba) { return ba_cref_to_ia (*ba); }
+  static std::vector<int> ba_ptr_to_ia (std::vector<char> *ba) { return ba_cref_to_ia (*ba); }
+  static std::vector<int> ba_to_ia (std::vector<char> ba) { return ba_cref_to_ia (ba); }
 
   /**
    *  @brief Byte sequences: tests return of std::vector<char>
    */
   static std::vector<char> ia_cref_to_ba (const std::vector<int> &ia);
   static std::vector<char> &ia_cref_to_ba_ref (const std::vector<int> &ia);
-  static const std::vector<char> &ia_cref_to_ba_cref (const std::vector<int> &ia)   { return ia_cref_to_ba_ref (ia); }
-  static std::vector<char> *ia_cref_to_ba_ptr (const std::vector<int> &ia)          { return &ia_cref_to_ba_ref (ia); }
-  static const std::vector<char> *ia_cref_to_ba_cptr (const std::vector<int> &ia)   { return &ia_cref_to_ba_ref (ia); }
+  static const std::vector<char> &ia_cref_to_ba_cref (const std::vector<int> &ia) { return ia_cref_to_ba_ref (ia); }
+  static std::vector<char> *ia_cref_to_ba_ptr (const std::vector<int> &ia) { return &ia_cref_to_ba_ref (ia); }
+  static const std::vector<char> *ia_cref_to_ba_cptr (const std::vector<int> &ia) { return &ia_cref_to_ba_ref (ia); }
 
   /*
    *  @brief A dummy method providing a chance to set a breakpoint in the script
@@ -256,125 +254,338 @@ struct A
   bool af1 (bool /*dummy*/) { return f; }
 
   static int instance_count ();
-  int a1 () { 
-    return n; 
+  int a1 ()
+  {
+    return n;
   }
-  int a1c () const { 
-    return n; 
+  int a1c () const
+  {
+    return n;
   }
-  void a2 () const { }
-  int a3 (const std::string &x) { 
+  void a2 () const {}
+  int a3 (const std::string &x)
+  {
     return int (x.size ());
   }
-  int a3_ba (const std::vector<char> &x) {
+  int a3_ba (const std::vector<char> &x)
+  {
     return int (x.size ());
   }
 #if defined(HAVE_QT)
-  int a3_qstr (const QString &x) { 
-    return x.size (); 
+  int a3_qstr (const QString &x)
+  {
+    return x.size ();
   }
-  int a3_qstrref (const QStringRef &x) { 
-    return x.size (); 
+  int a3_qstrref (const QStringRef &x)
+  {
+    return x.size ();
   }
-  int a3_qba (const QByteArray &x) { 
-    return x.size (); 
+  int a3_qba (const QByteArray &x)
+  {
+    return x.size ();
   }
 #endif
-  double a4 (const std::vector<double> &d) {
+  double a4 (const std::vector<double> &d)
+  {
     m_d = d;
-    return d.back (); 
+    return d.back ();
   }
-  void a5 (int nn) { 
-    n = nn; 
+  void a5 (int nn)
+  {
+    n = nn;
   }
-  std::vector<double>::iterator a6b () {
+  std::vector<double>::iterator a6b ()
+  {
     return m_d.begin ();
   }
-  std::vector<double>::iterator a6e () {
+  std::vector<double>::iterator a6e ()
+  {
     return m_d.end ();
   }
-  double *a7b () {
+  double *a7b ()
+  {
     return &*m_d.begin ();
   }
-  double *a7e () {
+  double *a7e ()
+  {
     return a7b () + m_d.size ();
   }
-  const double *a8b () const {
+  const double *a8b () const
+  {
     return &*m_d.begin ();
   }
-  const double *a8e () const {
+  const double *a8e () const
+  {
     return a8b () + m_d.size ();
   }
 
   bool a9a (int i) const { return i == 5; }
   int a9b (bool f) const { return f ? 5 : -5; }
 
-  short a11_s (double f) { return short(a11_l(f)); }
-  unsigned short a11_us (double f) { return (unsigned short)(a11_ul(f)); }
-  int a11_i (double f) { return int(a11_l(f)); }
-  unsigned int a11_ui (double f) { return (unsigned int)(a11_ul(f)); }
-  long a11_l (double f) { return long(f); }
-  unsigned long a11_ul (double f) { return (unsigned long)(f); }
-  long long a11_ll (double f) { return (long long)(f); }
-  unsigned long long a11_ull (double f) { return (unsigned long long)(f); }
+  short a11_s (double f) { return short (a11_l (f)); }
+  unsigned short a11_us (double f) { return (unsigned short) (a11_ul (f)); }
+  int a11_i (double f) { return int (a11_l (f)); }
+  unsigned int a11_ui (double f) { return (unsigned int) (a11_ul (f)); }
+  long a11_l (double f) { return long (f); }
+  unsigned long a11_ul (double f) { return (unsigned long) (f); }
+  long long a11_ll (double f) { return (long long) (f); }
+  unsigned long long a11_ull (double f) { return (unsigned long long) (f); }
 
   std::string a10_d (double f) { return tl::to_string (f); }
-  std::vector<char> a10_d_ba (double f) { std::string s = tl::to_string (f); return std::vector<char> (s.begin (), s.end ()); }
+  std::vector<char> a10_d_ba (double f)
+  {
+    std::string s = tl::to_string (f);
+    return std::vector<char> (s.begin (), s.end ());
+  }
 
 #if defined(HAVE_QT)
   QByteArray a10_d_qba (double f) { return tl::to_qstring (tl::to_string (f)).toUtf8 (); }
   QString a10_d_qstr (double f) { return tl::to_qstring (tl::to_string (f)); }
-  QStringRef a10_d_qstrref (double f) { m_s = tl::to_qstring (tl::to_string (f)); return QStringRef (&m_s); }
+  QStringRef a10_d_qstrref (double f)
+  {
+    m_s = tl::to_qstring (tl::to_string (f));
+    return QStringRef (&m_s);
+  }
 #endif
 
-  std::string a10_f (float f) { return tl::to_string(f); }
-  std::string a10_s (short l) { return tl::to_string(int (l)); }
-  std::string a10_us (unsigned short l) { return tl::to_string(int (l)); }
-  std::string a10_i (int l) { return tl::to_string(l); }
-  std::string a10_ui (unsigned int l) { return tl::to_string(l); }
-  std::string a10_l (long l) { return tl::to_string(l); }
-  std::string a10_ul (unsigned long l) { return tl::to_string(l); }
-  std::string a10_ll (long long l) { return tl::to_string(l); }
-  std::string a10_ull (unsigned long long l) { return tl::to_string(l); }
-  std::string a10_fptr (float *f) { if (f) { *f += 5; return tl::to_string(*f); } else { return "nil"; } }
-  std::string a10_dptr (double *f) { if (f) { *f += 6; return tl::to_string(*f); } else { return "nil"; } }
-  std::string a10_iptr (int *f) { if (f) { *f += 7; return tl::to_string(*f); } else { return "nil"; } }
-  std::string a10_bptr (bool *f) { if (f) { *f = true; return tl::to_string(*f); } else { return "nil"; } }
-  std::string a10_uiptr (unsigned int *f) { if (f) { *f += 10; return tl::to_string(*f); } else { return "nil"; } }
-  std::string a10_ulptr (unsigned long *f) { if (f) { *f += 11; return tl::to_string(*f); } else { return "nil"; } }
-  std::string a10_lptr (long *f) { if (f) { *f += 12; return tl::to_string(*f); } else { return "nil"; } }
-  std::string a10_llptr (long long *f) { if (f) { *f += 13; return tl::to_string(*f); } else { return "nil"; } }
-  std::string a10_ullptr (unsigned long long *f) { if (f) { *f += 14; return tl::to_string(*f); } else { return "nil"; } }
-  std::string a10_cfptr (const float *f) { if (f) { return tl::to_string(*f); } else { return "nil"; } }
-  std::string a10_cdptr (const double *f) { if (f) { return tl::to_string(*f); } else { return "nil"; } }
-  std::string a10_ciptr (const int *f) { if (f) { return tl::to_string(*f); } else { return "nil"; } }
-  std::string a10_cbptr (const bool *f) { if (f) { return tl::to_string(*f); } else { return "nil"; } }
-  std::string a10_cuiptr (const unsigned int *f) { if (f) { return tl::to_string(*f); } else { return "nil"; } }
-  std::string a10_culptr (const unsigned long *f) { if (f) { return tl::to_string(*f); } else { return "nil"; } }
-  std::string a10_clptr (const long *f) { if (f) { return tl::to_string(*f); } else { return "nil"; } }
-  std::string a10_cllptr (const long long *f) { if (f) { return tl::to_string(*f); } else { return "nil"; } }
-  std::string a10_cullptr (const unsigned long long *f) { if (f) { return tl::to_string(*f); } else { return "nil"; } }
-  std::string a10_sptr (std::string *f) { if (f) { *f += "x"; return *f; } else { return "nil"; } }
-  std::string a10_csptr (const std::string *f) { if (f) { return *f; } else { return "nil"; } }
-  std::string a10_fref (float &f) { f += 10; return tl::to_string(f); }
-  std::string a10_dref (double &f) { f += 11; return tl::to_string(f); }
-  std::string a10_iref (int &f) { f += 12; return tl::to_string(f); }
-  std::string a10_bref (bool &f) { f = true; return tl::to_string(f); }
-  std::string a10_uiref (unsigned int &f) { f += 14; return tl::to_string(f); }
-  std::string a10_ulref (unsigned long &f) { f += 15; return tl::to_string(f); }
-  std::string a10_lref (long &f) { f += 16; return tl::to_string(f); }
-  std::string a10_llref (long long &f) { f += 17; return tl::to_string(f); }
-  std::string a10_ullref (unsigned long long &f) { f += 18; return tl::to_string(f); }
-  std::string a10_sref (std::string &f) { f += "y"; return f; }
-  std::string a10_cfref (const float &f) { return tl::to_string(f); }
-  std::string a10_cdref (const double &f) { return tl::to_string(f); }
-  std::string a10_ciref (const int &f) { return tl::to_string(f); }
-  std::string a10_cbref (const bool &f) { return tl::to_string(f); }
-  std::string a10_cuiref (const unsigned int &f) { return tl::to_string(f); }
-  std::string a10_culref (const unsigned long &f) { return tl::to_string(f); }
-  std::string a10_clref (const long &f) { return tl::to_string(f); }
-  std::string a10_cllref (const long long &f) { return tl::to_string(f); }
-  std::string a10_cullref (const unsigned long long &f) { return tl::to_string(f); }
+  std::string a10_f (float f) { return tl::to_string (f); }
+  std::string a10_s (short l) { return tl::to_string (int (l)); }
+  std::string a10_us (unsigned short l) { return tl::to_string (int (l)); }
+  std::string a10_i (int l) { return tl::to_string (l); }
+  std::string a10_ui (unsigned int l) { return tl::to_string (l); }
+  std::string a10_l (long l) { return tl::to_string (l); }
+  std::string a10_ul (unsigned long l) { return tl::to_string (l); }
+  std::string a10_ll (long long l) { return tl::to_string (l); }
+  std::string a10_ull (unsigned long long l) { return tl::to_string (l); }
+  std::string a10_fptr (float *f)
+  {
+    if (f) {
+      *f += 5;
+      return tl::to_string (*f);
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_dptr (double *f)
+  {
+    if (f) {
+      *f += 6;
+      return tl::to_string (*f);
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_iptr (int *f)
+  {
+    if (f) {
+      *f += 7;
+      return tl::to_string (*f);
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_bptr (bool *f)
+  {
+    if (f) {
+      *f = true;
+      return tl::to_string (*f);
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_uiptr (unsigned int *f)
+  {
+    if (f) {
+      *f += 10;
+      return tl::to_string (*f);
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_ulptr (unsigned long *f)
+  {
+    if (f) {
+      *f += 11;
+      return tl::to_string (*f);
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_lptr (long *f)
+  {
+    if (f) {
+      *f += 12;
+      return tl::to_string (*f);
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_llptr (long long *f)
+  {
+    if (f) {
+      *f += 13;
+      return tl::to_string (*f);
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_ullptr (unsigned long long *f)
+  {
+    if (f) {
+      *f += 14;
+      return tl::to_string (*f);
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_cfptr (const float *f)
+  {
+    if (f) {
+      return tl::to_string (*f);
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_cdptr (const double *f)
+  {
+    if (f) {
+      return tl::to_string (*f);
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_ciptr (const int *f)
+  {
+    if (f) {
+      return tl::to_string (*f);
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_cbptr (const bool *f)
+  {
+    if (f) {
+      return tl::to_string (*f);
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_cuiptr (const unsigned int *f)
+  {
+    if (f) {
+      return tl::to_string (*f);
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_culptr (const unsigned long *f)
+  {
+    if (f) {
+      return tl::to_string (*f);
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_clptr (const long *f)
+  {
+    if (f) {
+      return tl::to_string (*f);
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_cllptr (const long long *f)
+  {
+    if (f) {
+      return tl::to_string (*f);
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_cullptr (const unsigned long long *f)
+  {
+    if (f) {
+      return tl::to_string (*f);
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_sptr (std::string *f)
+  {
+    if (f) {
+      *f += "x";
+      return *f;
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_csptr (const std::string *f)
+  {
+    if (f) {
+      return *f;
+    } else {
+      return "nil";
+    }
+  }
+  std::string a10_fref (float &f)
+  {
+    f += 10;
+    return tl::to_string (f);
+  }
+  std::string a10_dref (double &f)
+  {
+    f += 11;
+    return tl::to_string (f);
+  }
+  std::string a10_iref (int &f)
+  {
+    f += 12;
+    return tl::to_string (f);
+  }
+  std::string a10_bref (bool &f)
+  {
+    f = true;
+    return tl::to_string (f);
+  }
+  std::string a10_uiref (unsigned int &f)
+  {
+    f += 14;
+    return tl::to_string (f);
+  }
+  std::string a10_ulref (unsigned long &f)
+  {
+    f += 15;
+    return tl::to_string (f);
+  }
+  std::string a10_lref (long &f)
+  {
+    f += 16;
+    return tl::to_string (f);
+  }
+  std::string a10_llref (long long &f)
+  {
+    f += 17;
+    return tl::to_string (f);
+  }
+  std::string a10_ullref (unsigned long long &f)
+  {
+    f += 18;
+    return tl::to_string (f);
+  }
+  std::string a10_sref (std::string &f)
+  {
+    f += "y";
+    return f;
+  }
+  std::string a10_cfref (const float &f) { return tl::to_string (f); }
+  std::string a10_cdref (const double &f) { return tl::to_string (f); }
+  std::string a10_ciref (const int &f) { return tl::to_string (f); }
+  std::string a10_cbref (const bool &f) { return tl::to_string (f); }
+  std::string a10_cuiref (const unsigned int &f) { return tl::to_string (f); }
+  std::string a10_culref (const unsigned long &f) { return tl::to_string (f); }
+  std::string a10_clref (const long &f) { return tl::to_string (f); }
+  std::string a10_cllref (const long long &f) { return tl::to_string (f); }
+  std::string a10_cullref (const unsigned long long &f) { return tl::to_string (f); }
   std::string a10_csref (const std::string &f) { return f; }
 
   Enum get_e () const { return e; }
@@ -387,7 +598,11 @@ struct A
   void set_ecptr (const Enum *_e) { e = _e ? *_e : Enum (0); }
   void set_eref (Enum &_e) { e = _e; }
   void set_ecref (const Enum &_e) { e = _e; }
-  void mod_eptr (Enum *_e, Enum ee) { if (_e) *_e = ee; }
+  void mod_eptr (Enum *_e, Enum ee)
+  {
+    if (_e)
+      *_e = ee;
+  }
   void mod_eref (Enum &_e, Enum ee) { _e = ee; }
   void push_ev (Enum e) { ee.push_back (e); }
   const std::vector<Enum> &ev () const { return ee; }
@@ -403,12 +618,16 @@ struct A
   void set_efcptr (const QFlags<Enum> *_ef) { ef = _ef ? *_ef : Enum (0); }
   void set_efref (QFlags<Enum> &_ef) { ef = _ef; }
   void set_efcref (const QFlags<Enum> &_ef) { ef = _ef; }
-  void mod_efptr (QFlags<Enum> *_ef, Enum ee) { if (_ef) *_ef |= ee; }
+  void mod_efptr (QFlags<Enum> *_ef, Enum ee)
+  {
+    if (_ef)
+      *_ef |= ee;
+  }
   void mod_efref (QFlags<Enum> &_ef, Enum ee) { _ef |= ee; }
 #endif
 
-  const char *a_vp1 (void *s) { return (const char *)s; }
-  void *a_vp2 () { return (void *)"abc"; }
+  const char *a_vp1 (void *s) { return (const char *) s; }
+  void *a_vp2 () { return (void *) "abc"; }
 
   static void a20 (A *ptr);
   static A *a20_get ();
@@ -446,21 +665,19 @@ struct A
 
 
 struct A_NC
-  : public A
-{
-  A_NC () : A () { }
-  A_NC (int nn) : A (nn) { }
-  
+  : public A {
+  A_NC () : A () {}
+  A_NC (int nn) : A (nn) {}
+
 private:
   friend struct B;
 
-  A_NC (const A_NC &a) : A (a) { }
+  A_NC (const A_NC &a) : A (a) {}
   A_NC &operator= (const A_NC &);
 };
 
-template<class Iter>
-struct ValueIter
-{
+template <class Iter>
+struct ValueIter {
 public:
   typedef typename std::iterator_traits<Iter> it_traits;
   typedef typename it_traits::value_type value_type;
@@ -468,32 +685,31 @@ public:
   typedef value_type reference;
   typedef void pointer;
   typedef void difference_type;
-  
-  ValueIter (Iter i) : iter(i) { }
 
-  value_type operator*() const
+  ValueIter (Iter i) : iter (i) {}
+
+  value_type operator* () const
   {
     return *iter;
   }
-  
-  ValueIter &operator++() 
+
+  ValueIter &operator++ ()
   {
     ++iter;
     return *this;
   }
-  
+
   bool operator== (const ValueIter &d) const
   {
     return iter == d.iter;
   }
-  
+
 private:
   Iter iter;
 };
 
-template<class Iter>
-struct FreeIter
-{
+template <class Iter>
+struct FreeIter {
 public:
   typedef typename std::iterator_traits<Iter> it_traits;
   typedef typename it_traits::value_type value_type;
@@ -501,20 +717,20 @@ public:
   typedef value_type reference;
   typedef void pointer;
   typedef void difference_type;
-  
-  FreeIter (Iter b, Iter e) : mb(b), me(e) { }
 
-  value_type operator*() const
+  FreeIter (Iter b, Iter e) : mb (b), me (e) {}
+
+  value_type operator* () const
   {
     return *mb;
   }
-  
-  FreeIter &operator++() 
+
+  FreeIter &operator++ ()
   {
     ++mb;
     return *this;
   }
-  
+
   bool operator== (const FreeIter &d) const
   {
     return mb == d.mb;
@@ -524,14 +740,13 @@ public:
   {
     return mb == me;
   }
-  
+
 private:
   Iter mb, me;
 };
 
-template<class Iter>
-struct FreeIterUseRef
-{
+template <class Iter>
+struct FreeIterUseRef {
 public:
   typedef typename std::iterator_traits<Iter> it_traits;
   typedef typename it_traits::value_type value_type;
@@ -539,20 +754,20 @@ public:
   typedef typename it_traits::reference reference;
   typedef void pointer;
   typedef void difference_type;
-  
-  FreeIterUseRef (Iter b, Iter e) : mb(b), me(e) { }
 
-  reference operator*() const
+  FreeIterUseRef (Iter b, Iter e) : mb (b), me (e) {}
+
+  reference operator* () const
   {
     return *mb;
   }
-  
-  FreeIterUseRef &operator++() 
+
+  FreeIterUseRef &operator++ ()
   {
     ++mb;
     return *this;
   }
-  
+
   bool operator== (const FreeIterUseRef &d) const
   {
     return mb == d.mb;
@@ -562,14 +777,13 @@ public:
   {
     return mb == me;
   }
-  
+
 private:
   Iter mb, me;
 };
 
-template<class Iter>
-struct FreeIterUsePtr
-{
+template <class Iter>
+struct FreeIterUsePtr {
 public:
   typedef typename std::iterator_traits<Iter> it_traits;
   typedef typename it_traits::pointer value_type;
@@ -577,20 +791,20 @@ public:
   typedef typename it_traits::pointer reference;
   typedef void pointer;
   typedef void difference_type;
-  
-  FreeIterUsePtr (Iter b, Iter e) : mb(b), me(e) { }
 
-  reference operator*() const
+  FreeIterUsePtr (Iter b, Iter e) : mb (b), me (e) {}
+
+  reference operator* () const
   {
     return &*mb;
   }
-  
-  FreeIterUsePtr &operator++() 
+
+  FreeIterUsePtr &operator++ ()
   {
     ++mb;
     return *this;
   }
-  
+
   bool operator== (const FreeIterUsePtr &d) const
   {
     return mb == d.mb;
@@ -600,14 +814,13 @@ public:
   {
     return mb == me;
   }
-  
+
 private:
   Iter mb, me;
 };
 
-struct B
-{
-  B (); 
+struct B {
+  B ();
   B (const B &d);
   B &operator= (const B &d);
   ~B ();
@@ -629,116 +842,120 @@ struct B
    *  @brief std::optional for simple and complex types
    */
 
-  static std::optional<int> int_to_optional (int value, bool exists)                { return exists ? std::optional<int> (value) : std::optional<int> (); }
-  static std::optional<A> int_to_optional_a (int value, bool exists)                { return exists ? std::optional<A> (A (value)) : std::optional<A> (); }
+  static std::optional<int> int_to_optional (int value, bool exists) { return exists ? std::optional<int> (value) : std::optional<int> (); }
+  static std::optional<A> int_to_optional_a (int value, bool exists) { return exists ? std::optional<A> (A (value)) : std::optional<A> (); }
 
-  static int optional_to_int (std::optional<int> optional, int def)                 { return optional ? optional.value () : def; }
-  static int optional_cref_to_int (const std::optional<int> &optional, int def)     { return optional_to_int (optional, def); }
-  static int optional_ref_to_int (std::optional<int> &optional, int def)            { return optional_to_int (optional, def); }
-  static int optional_cptr_to_int (const std::optional<int> *optional, int def)     { return optional_to_int (*optional, def); }
-  static int optional_ptr_to_int (std::optional<int> optional, int def)             { return optional_to_int (*optional, def); }
+  static int optional_to_int (std::optional<int> optional, int def) { return optional ? optional.value () : def; }
+  static int optional_cref_to_int (const std::optional<int> &optional, int def) { return optional_to_int (optional, def); }
+  static int optional_ref_to_int (std::optional<int> &optional, int def) { return optional_to_int (optional, def); }
+  static int optional_cptr_to_int (const std::optional<int> *optional, int def) { return optional_to_int (*optional, def); }
+  static int optional_ptr_to_int (std::optional<int> optional, int def) { return optional_to_int (*optional, def); }
 
-  static int optional_a_to_int (std::optional<A> optional, int def)                 { return optional ? optional.value ().a1 () : def; }
-  static int optional_a_cref_to_int (const std::optional<A> &optional, int def)     { return optional_a_to_int (optional, def); }
-  static int optional_a_ref_to_int (std::optional<A> &optional, int def)            { return optional_a_to_int (optional, def); }
-  static int optional_a_cptr_to_int (const std::optional<A> *optional, int def)     { return optional_a_to_int (*optional, def); }
-  static int optional_a_ptr_to_int (std::optional<A> optional, int def)             { return optional_a_to_int (*optional, def); }
+  static int optional_a_to_int (std::optional<A> optional, int def) { return optional ? optional.value ().a1 () : def; }
+  static int optional_a_cref_to_int (const std::optional<A> &optional, int def) { return optional_a_to_int (optional, def); }
+  static int optional_a_ref_to_int (std::optional<A> &optional, int def) { return optional_a_to_int (optional, def); }
+  static int optional_a_cptr_to_int (const std::optional<A> *optional, int def) { return optional_a_to_int (*optional, def); }
+  static int optional_a_ptr_to_int (std::optional<A> optional, int def) { return optional_a_to_int (*optional, def); }
 #endif
 
   std::string addr () const;
 
-  int always_5 () const {
-    return 5; 
+  int always_5 () const
+  {
+    return 5;
   }
 
   void set_str (const char *s) { m = s; }
   const std::string &str () const { return m; }
   const char *str_ccptr () const { return m.c_str (); }
 
-  void set_str_combine (const char *p1, const char *p2) 
-  { 
-    m = p1; 
+  void set_str_combine (const char *p1, const char *p2)
+  {
+    m = p1;
     m += p2;
   }
 
-  int b3 (A *aptr) const { 
-    return aptr->n; 
+  int b3 (A *aptr) const
+  {
+    return aptr->n;
   }
 
-  std::string aref_to_s (const A &aref) {
-    return tl::sprintf ("b4_result: %d", aref.n); 
+  std::string aref_to_s (const A &aref)
+  {
+    return tl::sprintf ("b4_result: %d", aref.n);
   }
 
-  A make_a (int n) {
-    return A(n);
+  A make_a (int n)
+  {
+    return A (n);
   }
 
   void set_an (int n)
-  { 
+  {
     m_a.n = n;
   }
 
   int an (A a)
-  { 
+  {
     return a.n;
   }
 
   void set_an_cref (const int &n)
-  { 
+  {
     m_a.n = n;
   }
 
   const int &an_cref (const A &a)
-  { 
+  {
     return a.n;
   }
 
-  std::vector <A>::const_iterator b10b () const
+  std::vector<A>::const_iterator b10b () const
   {
     return m_av.begin ();
   }
 
-  std::vector <A>::const_iterator b10e () const
+  std::vector<A>::const_iterator b10e () const
   {
     return m_av.end ();
   }
 
-  std::vector <A>::iterator b10b_nc ()
+  std::vector<A>::iterator b10b_nc ()
   {
     return m_av.begin ();
   }
 
-  std::vector <A>::iterator b10e_nc ()
+  std::vector<A>::iterator b10e_nc ()
   {
     return m_av.end ();
   }
 
-  ValueIter<std::vector <A>::const_iterator> b11b () const
+  ValueIter<std::vector<A>::const_iterator> b11b () const
   {
-    return ValueIter<std::vector <A>::const_iterator> (m_av.begin ());
+    return ValueIter<std::vector<A>::const_iterator> (m_av.begin ());
   }
 
-  ValueIter<std::vector <A>::const_iterator> b11e () const
+  ValueIter<std::vector<A>::const_iterator> b11e () const
   {
-    return ValueIter<std::vector <A>::const_iterator> (m_av.end ());
+    return ValueIter<std::vector<A>::const_iterator> (m_av.end ());
   }
 
-  std::vector <A_NC *>::const_iterator b12b () const
+  std::vector<A_NC *>::const_iterator b12b () const
   {
     return m_av_nc.begin ();
   }
 
-  std::vector <A_NC *>::const_iterator b12e () const
+  std::vector<A_NC *>::const_iterator b12e () const
   {
     return m_av_nc.end ();
   }
 
-  std::vector <const A_NC *>::const_iterator b13b () const
+  std::vector<const A_NC *>::const_iterator b13b () const
   {
     return m_avc_nc.begin ();
   }
 
-  std::vector <const A_NC *>::const_iterator b13e () const
+  std::vector<const A_NC *>::const_iterator b13e () const
   {
     return m_avc_nc.end ();
   }
@@ -754,37 +971,37 @@ struct B
     return a != 0;
   }
 
-  std::vector <A> av () const
+  std::vector<A> av () const
   {
     return m_av;
   }
 
-  const std::vector <A> &av_cref () const
+  const std::vector<A> &av_cref () const
   {
     return m_av;
   }
 
-  std::vector <A> &av_ref ()
+  std::vector<A> &av_ref ()
   {
     return m_av;
   }
 
-  void set_av_cref (const std::vector <A> &v)
+  void set_av_cref (const std::vector<A> &v)
   {
     m_av = v;
   }
 
-  void set_av_ref (std::vector <A> &v)
+  void set_av_ref (std::vector<A> &v)
   {
     m_av = v;
   }
 
-  void set_av (std::vector <A> v)
+  void set_av (std::vector<A> v)
   {
     m_av = v;
   }
 
-  void set_av_cptr (const std::vector <A> *v)
+  void set_av_cptr (const std::vector<A> *v)
   {
     if (v) {
       m_av = *v;
@@ -793,7 +1010,7 @@ struct B
     }
   }
 
-  void set_av_ptr (std::vector <A> *v)
+  void set_av_ptr (std::vector<A> *v)
   {
     if (v) {
       m_av = *v;
@@ -831,19 +1048,19 @@ struct B
     }
   }
 
-  FreeIter<std::vector <A>::const_iterator> b18 () const
+  FreeIter<std::vector<A>::const_iterator> b18 () const
   {
-    return FreeIter<std::vector <A>::const_iterator> (m_av.begin (), m_av.end ());
+    return FreeIter<std::vector<A>::const_iterator> (m_av.begin (), m_av.end ());
   }
 
-  FreeIterUseRef<std::vector <A>::const_iterator> b18b () const
+  FreeIterUseRef<std::vector<A>::const_iterator> b18b () const
   {
-    return FreeIterUseRef<std::vector <A>::const_iterator> (m_av.begin (), m_av.end ());
+    return FreeIterUseRef<std::vector<A>::const_iterator> (m_av.begin (), m_av.end ());
   }
 
-  FreeIterUsePtr<std::vector <A>::const_iterator> b18c () const
+  FreeIterUsePtr<std::vector<A>::const_iterator> b18c () const
   {
-    return FreeIterUsePtr<std::vector <A>::const_iterator> (m_av.begin (), m_av.end ());
+    return FreeIterUsePtr<std::vector<A>::const_iterator> (m_av.begin (), m_av.end ());
   }
 
   bool b20a (const tl::Variant &var) const { return var.is_nil (); }
@@ -856,7 +1073,8 @@ struct B
   double b21b (const tl::Variant &var) const { return var.to_double (); }
   long b21c (const tl::Variant &var) const { return var.to_long (); }
 
-  long b22a (const std::vector<tl::Variant> &vars) {
+  long b22a (const std::vector<tl::Variant> &vars)
+  {
     if (vars.empty ()) {
       m_var = tl::Variant ();
     } else {
@@ -866,7 +1084,8 @@ struct B
     return long (vars.size ());
   }
 
-  long set_vars (const std::vector<tl::Variant> &vars) {
+  long set_vars (const std::vector<tl::Variant> &vars)
+  {
     m_vars = vars;
     return long (vars.size ());
   }
@@ -881,7 +1100,7 @@ struct B
   tl::Variant &var_ref () { return m_vars.back (); }
   tl::Variant *var_ptr () { return m_vars.empty () ? 0 : &m_vars.back (); }
 
-   std::vector<tl::Variant> b23a () { return m_vars; }
+  std::vector<tl::Variant> b23a () { return m_vars; }
   const std::vector<tl::Variant> &b23b () const { return m_vars; }
   std::vector<tl::Variant> &b23c () { return m_vars; }
   tl::Variant b23d () { return tl::Variant (m_vars.begin (), m_vars.end ()); }
@@ -899,7 +1118,7 @@ struct B
   const char *b34 (A /*a*/, int /*x*/) const { return "aref+i"; }
   double b32 (const char *, int) const { return 20.5; }
 
-  void insert_map1 (int k, const std::string &v) { m_map1[k] = v; }
+  void insert_map1 (int k, const std::string &v) { m_map1 [k] = v; }
   std::map<int, std::string> map1 () const { return m_map1; }
   const std::map<int, std::string> &map1_cref () const { return m_map1; }
   const std::map<int, std::string> *map1_cptr () const { return &m_map1; }
@@ -909,38 +1128,48 @@ struct B
   std::map<int, std::string> *map1_ptr_null () { return 0; }
   void set_map1_cref (const std::map<int, std::string> &m) { m_map1 = m; }
   void set_map1_ref (std::map<int, std::string> &m) { m_map1 = m; }
-  void set_map1_cptr (const std::map<int, std::string> *m) { if (m) { m_map1 = *m; } }
-  void set_map1_ptr (std::map<int, std::string> *m) { if (m) { m_map1 = *m; } }
+  void set_map1_cptr (const std::map<int, std::string> *m)
+  {
+    if (m) {
+      m_map1 = *m;
+    }
+  }
+  void set_map1_ptr (std::map<int, std::string> *m)
+  {
+    if (m) {
+      m_map1 = *m;
+    }
+  }
   void set_map1 (std::map<int, std::string> m) { m_map1 = m; }
 
-  void insert_map2 (const tl::Variant &k, const tl::Variant &v) { m_map2[k] = v; }
+  void insert_map2 (const tl::Variant &k, const tl::Variant &v) { m_map2 [k] = v; }
   const std::map<tl::Variant, tl::Variant> *map2 () const { return &m_map2; }
   const std::map<tl::Variant, tl::Variant> *map2_null () const { return 0; }
   void set_map2 (const std::map<tl::Variant, tl::Variant> &m) { m_map2 = m; }
 
-  FreeIter<std::vector <B>::const_iterator> each_b_copy () const
+  FreeIter<std::vector<B>::const_iterator> each_b_copy () const
   {
-    return FreeIter<std::vector <B>::const_iterator> (m_bv.begin (), m_bv.end ());
+    return FreeIter<std::vector<B>::const_iterator> (m_bv.begin (), m_bv.end ());
   }
 
-  FreeIterUseRef<std::vector <B>::const_iterator> each_b_cref () const
+  FreeIterUseRef<std::vector<B>::const_iterator> each_b_cref () const
   {
-    return FreeIterUseRef<std::vector <B>::const_iterator> (m_bv.begin (), m_bv.end ());
+    return FreeIterUseRef<std::vector<B>::const_iterator> (m_bv.begin (), m_bv.end ());
   }
 
-  FreeIterUsePtr<std::vector <B>::const_iterator> each_b_cptr () const
+  FreeIterUsePtr<std::vector<B>::const_iterator> each_b_cptr () const
   {
-    return FreeIterUsePtr<std::vector <B>::const_iterator> (m_bv.begin (), m_bv.end ());
+    return FreeIterUsePtr<std::vector<B>::const_iterator> (m_bv.begin (), m_bv.end ());
   }
 
-  FreeIterUseRef<std::vector <B>::iterator> each_b_ref () 
+  FreeIterUseRef<std::vector<B>::iterator> each_b_ref ()
   {
-    return FreeIterUseRef<std::vector <B>::iterator> (m_bv.begin (), m_bv.end ());
+    return FreeIterUseRef<std::vector<B>::iterator> (m_bv.begin (), m_bv.end ());
   }
 
-  FreeIterUsePtr<std::vector <B>::iterator> each_b_ptr ()
+  FreeIterUsePtr<std::vector<B>::iterator> each_b_ptr ()
   {
-    return FreeIterUsePtr<std::vector <B>::iterator> (m_bv.begin (), m_bv.end ());
+    return FreeIterUsePtr<std::vector<B>::iterator> (m_bv.begin (), m_bv.end ());
   }
 
   void push_b (const B &b) { m_bv.push_back (b); }
@@ -956,8 +1185,8 @@ struct B
   void set_map_iaptr_cref (const std::map<int, A *> &m) { m_map_iaptr = m; }
   void set_map_iaptr_ref (std::map<int, A *> &m) { m_map_iaptr = m; }
 
-  void set_map_iaptr_cptr (const std::map<int, A *> *m) 
-  { 
+  void set_map_iaptr_cptr (const std::map<int, A *> *m)
+  {
     if (! m) {
       m_map_iaptr.clear ();
     } else {
@@ -965,8 +1194,8 @@ struct B
     }
   }
 
-  void set_map_iaptr_ptr (const std::map<int, A *> *m) 
-  { 
+  void set_map_iaptr_ptr (const std::map<int, A *> *m)
+  {
     if (! m) {
       m_map_iaptr.clear ();
     } else {
@@ -982,23 +1211,23 @@ struct B
   const std::map<int, A> &map_ia () { return m_map_ia; }
   void set_map_ia (const std::map<int, A> &m) { m_map_ia = m; }
 
-  static void insert_map_iav (std::map<int, std::vector<A> > &m, int k, const std::vector<A> &v) { m.insert (std::make_pair (k, v)); }
-  static void push_map_iav (std::map<int, std::vector<A> > &m, int k, const A &v) { m[k].push_back (v); }
-  const std::map<int, std::vector<A> > &map_iav () { return m_map_iav; }
-  void set_map_iav (const std::map<int, std::vector<A> > &m) { m_map_iav = m; }
+  static void insert_map_iav (std::map<int, std::vector<A>> &m, int k, const std::vector<A> &v) { m.insert (std::make_pair (k, v)); }
+  static void push_map_iav (std::map<int, std::vector<A>> &m, int k, const A &v) { m [k].push_back (v); }
+  const std::map<int, std::vector<A>> &map_iav () { return m_map_iav; }
+  void set_map_iav (const std::map<int, std::vector<A>> &m) { m_map_iav = m; }
 
-  static void push_vvs (std::vector<std::vector<std::string> > &m, const std::vector<std::string> &v) { m.push_back (v); }
-  std::vector<std::vector<std::string> > vvs () { return m_vvs; }
-  std::vector<std::vector<std::string> > &vvs_ref () { return m_vvs; }
-  std::vector<std::vector<std::string> > *vvs_ptr () { return &m_vvs; }
-  const std::vector<std::vector<std::string> > &vvs_cref () const { return m_vvs; }
-  const std::vector<std::vector<std::string> > *vvs_cptr () const { return &m_vvs; }
-  void set_vvs (std::vector<std::vector<std::string> > v) { m_vvs = v; }
-  void set_vvs_ref (std::vector<std::vector<std::string> > &v) { m_vvs = v; }
-  void set_vvs_cref (const std::vector<std::vector<std::string> > &v) { m_vvs = v; }
+  static void push_vvs (std::vector<std::vector<std::string>> &m, const std::vector<std::string> &v) { m.push_back (v); }
+  std::vector<std::vector<std::string>> vvs () { return m_vvs; }
+  std::vector<std::vector<std::string>> &vvs_ref () { return m_vvs; }
+  std::vector<std::vector<std::string>> *vvs_ptr () { return &m_vvs; }
+  const std::vector<std::vector<std::string>> &vvs_cref () const { return m_vvs; }
+  const std::vector<std::vector<std::string>> *vvs_cptr () const { return &m_vvs; }
+  void set_vvs (std::vector<std::vector<std::string>> v) { m_vvs = v; }
+  void set_vvs_ref (std::vector<std::vector<std::string>> &v) { m_vvs = v; }
+  void set_vvs_cref (const std::vector<std::vector<std::string>> &v) { m_vvs = v; }
 
-  void set_vvs_cptr (const std::vector<std::vector<std::string> > *v) 
-  { 
+  void set_vvs_cptr (const std::vector<std::vector<std::string>> *v)
+  {
     if (! v) {
       m_vvs.clear ();
     } else {
@@ -1006,8 +1235,8 @@ struct B
     }
   }
 
-  void set_vvs_ptr (std::vector<std::vector<std::string> > *v) 
-  { 
+  void set_vvs_ptr (std::vector<std::vector<std::string>> *v)
+  {
     if (! v) {
       m_vvs.clear ();
     } else {
@@ -1055,10 +1284,10 @@ struct B
 
   std::string m;
   A m_a;
-  std::vector <B> m_bv;
-  std::vector <A> m_av;
-  std::vector <A_NC *> m_av_nc;
-  std::vector <const A_NC *> m_avc_nc;
+  std::vector<B> m_bv;
+  std::vector<A> m_av;
+  std::vector<A_NC *> m_av_nc;
+  std::vector<const A_NC *> m_avc_nc;
   tl::Variant m_var;
   std::vector<tl::Variant> m_vars;
   std::map<int, std::string> m_map1;
@@ -1066,8 +1295,8 @@ struct B
   std::map<int, A *> m_map_iaptr;
   std::map<int, const A *> m_map_iacptr;
   std::map<int, A> m_map_ia;
-  std::map<int, std::vector<A> > m_map_iav;
-  std::vector<std::vector<std::string> > m_vvs; 
+  std::map<int, std::vector<A>> m_map_iav;
+  std::vector<std::vector<std::string>> m_vvs;
   std::list<std::string> m_ls;
   std::set<std::string> m_ss;
 #if defined(HAVE_QT)
@@ -1088,15 +1317,18 @@ class CopyDetector
 public:
   CopyDetector (int x)
     : m_x (x), m_xx (x)
-  { }
+  {
+  }
 
   CopyDetector ()
     : m_x (0), m_xx (0)
-  { }
+  {
+  }
 
   CopyDetector (const CopyDetector &d)
-    : m_x (d.m_x), m_xx (d.m_xx + 1)  //  this detects the copy
-  { }
+    : m_x (d.m_x), m_xx (d.m_xx + 1) //  this detects the copy
+  {
+  }
 
   CopyDetector &operator= (const CopyDetector &d)
   {
@@ -1115,7 +1347,7 @@ private:
 class C
 {
 public:
-  virtual ~C () { }
+  virtual ~C () {}
 
   virtual unsigned int f (const std::string & /*s*/) const
   {
@@ -1124,7 +1356,7 @@ public:
 
   unsigned int g (const std::string s) const
   {
-    return f(s);
+    return f (s);
   }
 
   virtual void vfunc (const CopyDetector &)
@@ -1172,26 +1404,25 @@ public:
 };
 
 struct E
-  : public gsi::ObjectBase
-{
+  : public gsi::ObjectBase {
   E ();
   ~E ();
 
   static void reset_inst ();
-  static int inst_count();
+  static int inst_count ();
 
-  void s1() { ev0(); }
-  void s2() { ev1(this); }
-  void s3() { ev2(18, "hallo"); }
+  void s1 () { ev0 (); }
+  void s2 () { ev1 (this); }
+  void s3 () { ev2 (18, "hallo"); }
   // no events with return available currently:
   // int s1r(const std::string &s) { return ev0r(s); }
-  void bindme() const { }
+  void bindme () const {}
   static const E *ic ();
   static E *inc ();
   static const E &icref ();
   static E &incref ();
-  void set_x(int i) { x = i; }
-  int get_x() const { return x; }
+  void set_x (int i) { x = i; }
+  int get_x () const { return x; }
 
   tl::Event ev0;
   tl::event<E *> ev1;
@@ -1206,30 +1437,32 @@ private:
 };
 
 //  Same as "E", but not based on ObjectBase
-struct F
-{
-  F() : x(0) { }
-  static const F *ic();
-  static F *inc();
-  static const F &icref();
-  static F &incref();
-  void set_x(int i) { x = i; }
-  int get_x() const { return x; }
+struct F {
+  F () : x (0) {}
+  static const F *ic ();
+  static F *inc ();
+  static const F &icref ();
+  static F &incref ();
+  void set_x (int i) { x = i; }
+  int get_x () const { return x; }
 
   int x;
   static std::unique_ptr<F> f_inst;
 };
 
-struct G
-{
-  G () : m_iv (0) { }
-  int iv() const { return m_iv; }
-  std::string sv() const { return m_sv; }
+struct G {
+  G () : m_iv (0) {}
+  int iv () const { return m_iv; }
+  std::string sv () const { return m_sv; }
 
   void set_iv (int v) { m_iv = v; }
   void set_sv1 (const char *s) { m_sv = s; }
   void set_sv2 (const std::string &s) { m_sv = s; }
-  void set_vv (int i, const std::string &s) { m_iv = i; m_sv = s; }
+  void set_vv (int i, const std::string &s)
+  {
+    m_iv = i;
+    m_sv = s;
+  }
 
   int m_iv;
   std::string m_sv;
@@ -1275,8 +1508,8 @@ public:
   Y (const char *x);
   ~Y ();
 
-  int x1() const { return 1; }
-  int y1() const { return 117; }
+  int x1 () const { return 1; }
+  int y1 () const { return 117; }
   static void init ();
   static const X *y_cptr ();
   static X *y_ptr ();
@@ -1288,7 +1521,7 @@ public:
   static std::vector<X *> vyasx_ptr ();
   static std::vector<const Y *> vy_cptr ();
   static std::vector<Y *> vy0_ptr ();
-  static std::vector<Y *> vy_ptr (); 
+  static std::vector<Y *> vy_ptr ();
   virtual std::string cls_name () const;
   int i () const;
 
@@ -1323,7 +1556,7 @@ class YY : public Y
 public:
   YY ();
   YY (const char *x);
-  virtual std::string cls_name() const;
+  virtual std::string cls_name () const;
 };
 
 class Z
@@ -1340,7 +1573,7 @@ public:
 private:
   X *mp_x;
 };
-    
+
 class Z_P
   : public Z
 {
@@ -1406,7 +1639,7 @@ public:
 class SQ
   : public QObject
 {
-Q_OBJECT
+  Q_OBJECT
 public:
   SQ ();
 
@@ -1462,6 +1695,7 @@ public:
 
   int get1 () { return m_value; }
   void set1 (int v) { m_value = v; }
+
 private:
   int m_value;
 };
@@ -1476,11 +1710,15 @@ class B3
 {
 public:
   B3 () {}
-  enum E { E3A = 100, E3B = 101, E3C = 102 };
+  enum E { E3A = 100,
+           E3B = 101,
+           E3C = 102 };
 };
 
 class BB
-  : public B1, public B2, public B3
+  : public B1,
+    public B2,
+    public B3
 {
 public:
   int d3 (B3::E a, B3::E b) { return b - a; }
@@ -1489,4 +1727,3 @@ public:
 }
 
 #endif
-

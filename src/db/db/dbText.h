@@ -39,7 +39,8 @@
 #include <string>
 #include <string.h>
 
-namespace db {
+namespace db
+{
 
 template <class Coord> class generic_repository;
 class ArrayRepository;
@@ -47,13 +48,13 @@ class StringRepository;
 
 /**
  *  @brief A text reference
- *  
+ *
  *  Text references are used in texts to refer to text strings through
  *  a proxy. Text references can change their strings without changing
- *  the text object's ordering. 
+ *  the text object's ordering.
  *  The main use is to provide late text binding as required for the OASIS
  *  reader in some cases.
- *  String references are reference counted and remove themselves. 
+ *  String references are reference counted and remove themselves.
  */
 class DB_PUBLIC StringRef
 {
@@ -62,7 +63,7 @@ public:
    *  @brief Increment the reference counter
    */
   void add_ref ();
- 
+
   /**
    *  @brief Decrement the reference counter and remove the object when it reaches 0
    */
@@ -134,7 +135,7 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
 }
 
 /**
- *  @brief A string repository class 
+ *  @brief A string repository class
  *
  *  A string repository holds StringRef objects.
  *  It acts as a factory for StringRef objects and allows one to rename strings.
@@ -155,14 +156,14 @@ public:
    */
   ~StringRepository ();
 
-  /** 
+  /**
    *  @brief Create a string reference object.
-   * 
-   *  String references are intended for keeping "static" strings and 
-   *  referring to them by text objects. String references are unique - 
-   *  even if the strings are the same, they are sematically different. 
+   *
+   *  String references are intended for keeping "static" strings and
+   *  referring to them by text objects. String references are unique -
+   *  even if the strings are the same, they are sematically different.
    *  The text objects will compare pointers rather than the content of
-   *  the string references. The string reference content can be changed 
+   *  the string references. The string reference content can be changed
    *  therefore. The main use case for these objects is the
    *  OASIS reader, where forward references of text strings requires a
    *  late binding of the text.
@@ -218,15 +219,15 @@ public:
   typedef db::vector<C> vector_type;
   typedef db::box<C> box_type;
   typedef db::simple_trans<C> trans_type;
-  typedef db::object_tag< text<C> > tag;
-  
+  typedef db::object_tag<text<C>> tag;
+
   /**
    *  @brief The standard constructor without a text
    *
    *  The standard constructor is taking a transformation (with point),
-   *  a text size value (which can be zero) and a font id which can 0 
+   *  a text size value (which can be zero) and a font id which can 0
    *  also.
-   * 
+   *
    *  @param t The transformation of the text
    *  @param h The size
    *  @param f The font id
@@ -241,11 +242,11 @@ public:
    *  @brief The standard constructor from a StringRef object
    *
    *  The standard constructor is taking a transformation (with point),
-   *  a text size value (which can be zero) and a font id which can 0 
+   *  a text size value (which can be zero) and a font id which can 0
    *  also.
-   *  The StringRef object must be owned by some other entity with a 
+   *  The StringRef object must be owned by some other entity with a
    *  lifetime that covers the text object's lifetime.
-   * 
+   *
    *  @param s The StringRef object
    *  @param t The transformation of the text
    *  @param h The size
@@ -254,18 +255,18 @@ public:
   text (const StringRef *sref, const trans_type &t, coord_type h = 0, Font f = NoFont, HAlign halign = NoHAlign, VAlign valign = NoVAlign)
     : m_trans (t), m_size (h), m_font (f), m_halign (halign), m_valign (valign)
   {
-    const_cast <StringRef *> (sref)->add_ref ();
-    mp_ptr = (char *)((size_t)sref | 1);
+    const_cast<StringRef *> (sref)->add_ref ();
+    mp_ptr = (char *) ((size_t) sref | 1);
   }
 
   /**
    *  @brief The standard constructor from a const char *
    *
    *  The standard constructor is taking a transformation (with point),
-   *  a text size value (which can be zero) and a font id which can 0 
+   *  a text size value (which can be zero) and a font id which can 0
    *  also.
-   * 
-   *  @param s The text 
+   *
+   *  @param s The text
    *  @param t The transformation of the text
    *  @param h The size
    *  @param f The font id
@@ -277,13 +278,13 @@ public:
   }
 
   /**
-   *  @brief The standard constructor 
+   *  @brief The standard constructor
    *
    *  The standard constructor is taking a transformation (with point),
-   *  a text size value (which can be zero) and a font id which can 0 
+   *  a text size value (which can be zero) and a font id which can 0
    *  also.
-   * 
-   *  @param s The text 
+   *
+   *  @param s The text
    *  @param t The transformation of the text
    *  @param h The size
    *  @param f The font id
@@ -294,7 +295,7 @@ public:
     set_string_internal (s.c_str ());
   }
 
-  /** 
+  /**
    *  @brief Default constructor
    *
    *  Creates an empty text object at (0,0) with empty text.
@@ -305,7 +306,7 @@ public:
     // .. nothing yet ..
   }
 
-  /** 
+  /**
    *  @brief Copy constructor
    */
   text (const text &d)
@@ -327,7 +328,7 @@ public:
   /**
    *  @brief The destructor
    */
-  ~text()
+  ~text ()
   {
     cleanup ();
   }
@@ -349,12 +350,11 @@ public:
 
       size_t p = (size_t) d.mp_ptr;
       if (p & 1) {
-        reinterpret_cast <StringRef *> (p - 1)->add_ref ();
+        reinterpret_cast<StringRef *> (p - 1)->add_ref ();
         mp_ptr = d.mp_ptr;
       } else if (d.mp_ptr) {
         set_string_internal (d.mp_ptr);
       }
-
     }
 
     return *this;
@@ -376,7 +376,7 @@ public:
 
     size_t p = (size_t) d.mp_ptr;
     if (p & 1) {
-      reinterpret_cast <StringRef *> (p - 1)->add_ref ();
+      reinterpret_cast<StringRef *> (p - 1)->add_ref ();
       mp_ptr = d.mp_ptr;
     } else if (d.mp_ptr) {
       set_string_internal (d.mp_ptr);
@@ -413,7 +413,7 @@ public:
   {
     if ((size_t (mp_ptr) & 1) != 0) {
       string (string ());
-    } 
+    }
   }
 
   /**
@@ -440,12 +440,12 @@ public:
     return text_equal (b);
   }
 
-  /** 
+  /**
    *  @brief Inequality test
    */
   bool operator!= (const text<C> &b) const
   {
-    return !operator== (b);
+    return ! operator== (b);
   }
 
   /**
@@ -477,18 +477,18 @@ public:
    */
   bool not_equal (const text<C> &b) const
   {
-    return !equal (b);
+    return ! equal (b);
   }
 
   /**
    *  @brief The text string write accessor
    */
   void string (const std::string &s)
-  { 
+  {
     cleanup ();
     set_string_internal (s);
   }
- 
+
   /**
    *  @brief The text string accessor
    */
@@ -522,90 +522,90 @@ public:
   /**
    *  @brief The transformation write accessor
    */
-  void trans (const trans_type &t) 
-  { 
+  void trans (const trans_type &t)
+  {
     m_trans = t;
   }
-   
+
   /**
    *  @brief The transformation accessor
    */
-  const trans_type &trans () const 
-  { 
+  const trans_type &trans () const
+  {
     return m_trans;
   }
-   
+
   /**
    *  @brief The size write accessor
    */
-  void size (coord_type s) 
-  { 
+  void size (coord_type s)
+  {
     m_size = s;
   }
-   
+
   /**
    *  @brief The size accessor
    */
-  coord_type size () const 
-  { 
+  coord_type size () const
+  {
     return m_size;
   }
-   
+
   /**
    *  @brief The font id write accessor
    */
   void font (Font f)
-  { 
+  {
     m_font = f;
   }
-   
+
   /**
    *  @brief The font id accessor
    */
-  Font font () const 
-  { 
+  Font font () const
+  {
     return m_font;
   }
-   
+
   /**
    *  @brief The horizontal alignment flags write accessor
    */
   void halign (HAlign a)
-  { 
+  {
     m_halign = a;
   }
-   
+
   /**
-   *  @brief The horizontal alignment flags 
+   *  @brief The horizontal alignment flags
    */
-  HAlign halign () const 
-  { 
+  HAlign halign () const
+  {
     return m_halign;
   }
-   
+
   /**
    *  @brief The vertical alignment flags write accessor
    */
   void valign (VAlign a)
-  { 
+  {
     m_valign = a;
   }
-   
+
   /**
-   *  @brief The vertical alignment flags 
+   *  @brief The vertical alignment flags
    */
-  VAlign valign () const 
-  { 
+  VAlign valign () const
+  {
     return m_valign;
   }
-   
+
   /**
    *  @brief Transform the text.
    *
    *  Transforms the text with the given transformation.
    *  Modifies the text with the transformed text.
    *  The transformation does not transform text size and alignment flags.
-   *  
+   *
    *  @param t The transformation to apply.
    *
    *  @return The transformed text.
@@ -626,7 +626,7 @@ public:
    *  Transforms the text with the given transformation.
    *  Does not modify the text but returns the transformed text.
    *  The transformation does not transform text size and alignment flags.
-   *  
+   *
    *  @param t The transformation to apply.
    *
    *  @return The transformed text.
@@ -660,26 +660,26 @@ public:
    *  @brief Return the moved text
    *
    *  @param p The distance to move the text.
-   * 
+   *
    *  @return The moved text.
    */
   text moved (const vector_type &p) const
-  { 
+  {
     text d (*this);
     d.move (p);
     return d;
   }
-   
+
   /**
    *  @brief Move by a distance
-   * 
+   *
    *  @param p The distance to move the path.
    */
   void move (const vector_type &p)
-  { 
+  {
     m_trans = trans_type (p) * m_trans;
   }
-   
+
   /**
    *  @brief Return the bounding box
    *
@@ -767,7 +767,7 @@ private:
       if (((size_t) mp_ptr & 1) == 0) {
         delete [] mp_ptr;
       } else {
-        reinterpret_cast<StringRef *>((size_t) mp_ptr - 1)->remove_ref ();
+        reinterpret_cast<StringRef *> ((size_t) mp_ptr - 1)->remove_ref ();
       }
     }
 
@@ -776,7 +776,7 @@ private:
 
   void set_string_internal (const std::string &s)
   {
-    mp_ptr = new char[s.size() + 1];
+    mp_ptr = new char [s.size () + 1];
     strncpy (mp_ptr, s.c_str (), s.size () + 1);
   }
 
@@ -838,7 +838,7 @@ private:
 /**
  *  @brief Binary * operator (transformation)
  *
- *  Transforms the text with the given transformation and 
+ *  Transforms the text with the given transformation and
  *  returns the result.
  *
  *  @param t The transformation to apply
@@ -846,7 +846,7 @@ private:
  *  @return t * s
  */
 template <class C, class Tr>
-inline text<typename Tr::target_coord_type> 
+inline text<typename Tr::target_coord_type>
 operator* (const Tr &t, const text<C> &s)
 {
   return s.transformed (t);
@@ -872,7 +872,7 @@ typedef text<db::Coord> Text;
  */
 typedef text<db::DCoord> DText;
 
-/** 
+/**
  *  @brief A text reference
  *
  *  A text reference is basically a proxy to a text and
@@ -881,19 +881,18 @@ typedef text<db::DCoord> DText;
 
 template <class Text, class Trans>
 struct text_ref
-  : public shape_ref<Text, Trans>
-{
+  : public shape_ref<Text, Trans> {
   typedef typename Text::coord_type coord_type;
   typedef typename Text::box_type box_type;
   typedef typename Text::point_type point_type;
   typedef Trans trans_type;
   typedef Text text_type;
   typedef db::generic_repository<coord_type> repository_type;
-  typedef db::object_tag< text_ref<Text, Trans> > tag;
+  typedef db::object_tag<text_ref<Text, Trans>> tag;
 
   /**
    *  @brief The default constructor.
-   *  
+   *
    *  The default constructor creates a invalid text reference
    */
   text_ref ()
@@ -924,7 +923,7 @@ struct text_ref
 
   /**
    *  @brief The translation constructor.
-   *  
+   *
    *  This constructor allows one to copy a text reference from one
    *  repository to another
    */
@@ -934,9 +933,9 @@ struct text_ref
     // .. nothing yet ..
   }
 
-  /** 
+  /**
    *  @brief Return the transformed object
-   * 
+   *
    *  This version does not change the object and is const.
    */
   template <class TargetTrans>
@@ -960,7 +959,7 @@ struct text_ref
 /**
  *  @brief Binary * operator (transformation)
  *
- *  Transforms the text reference with the given transformation and 
+ *  Transforms the text reference with the given transformation and
  *  returns the result.
  *
  *  @param t The transformation to apply
@@ -1020,15 +1019,14 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
 
 } // namespace db
 
-namespace tl 
+namespace tl
 {
-  template<> void DB_PUBLIC extractor_impl (tl::Extractor &ex, db::Text &p);
-  template<> void DB_PUBLIC extractor_impl (tl::Extractor &ex, db::DText &p);
+template <> void DB_PUBLIC extractor_impl (tl::Extractor &ex, db::Text &p);
+template <> void DB_PUBLIC extractor_impl (tl::Extractor &ex, db::DText &p);
 
-  template<> bool DB_PUBLIC test_extractor_impl (tl::Extractor &ex, db::Text &p);
-  template<> bool DB_PUBLIC test_extractor_impl (tl::Extractor &ex, db::DText &p);
+template <> bool DB_PUBLIC test_extractor_impl (tl::Extractor &ex, db::Text &p);
+template <> bool DB_PUBLIC test_extractor_impl (tl::Extractor &ex, db::DText &p);
 
 } // namespace tl
 
 #endif
-

@@ -165,11 +165,8 @@ void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s,
         } else {
           strings.push_back (comp_name);
         }
-
       }
-
     }
-
   }
 }
 
@@ -181,7 +178,6 @@ void NetlistSpiceReaderDelegate::def_values_per_element (const std::string &elem
     pv.insert (std::make_pair ("L", m_options.defl));
     pv.insert (std::make_pair ("AD", m_options.defad));
     pv.insert (std::make_pair ("AS", m_options.defas));
-
   }
 }
 
@@ -239,15 +235,15 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, const std:
     bool has_value = false;
     if (nn.size () == 2) {
       if (rv != pv.end ()) {
-        value = rv->second.to_double ();   //  (1)
+        value = rv->second.to_double (); //  (1)
         has_value = true;
       }
     } else if (nn.size () == 3) {
       if (try_read_value (nn.back (), value, variables)) {
-        has_value = true;     //  (2)
+        has_value = true; //  (2)
         nn.pop_back ();
       } else {
-        model = nn.back ();   //  (3)
+        model = nn.back (); //  (3)
         nn.pop_back ();
         if (rv != pv.end ()) {
           value = rv->second.to_double ();
@@ -256,30 +252,30 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, const std:
       }
     } else if (nn.size () == 4) {
       if (try_read_value (nn.back (), value, variables)) {
-        has_value = true;     //  (4)
+        has_value = true; //  (4)
         nn.pop_back ();
       } else if (rv != pv.end ()) {
-        value = rv->second.to_double ();   //  (5)
+        value = rv->second.to_double (); //  (5)
         has_value = true;
         model = nn.back ();
         nn.pop_back ();
-      } else if (try_read_value (nn[2], value, variables)) {
-        has_value = true;     //  (6)
+      } else if (try_read_value (nn [2], value, variables)) {
+        has_value = true; //  (6)
         model = nn.back ();
         nn.pop_back ();
         nn.pop_back ();
       } else {
-        model = nn.back ();   //  fall back to (5)
+        model = nn.back (); //  fall back to (5)
         nn.pop_back ();
       }
     } else {
       if (try_read_value (nn.back (), value, variables)) {
-        has_value = true;     //  (7)
+        has_value = true; //  (7)
         nn.pop_back ();
         model = nn.back ();
         nn.pop_back ();
-      } else if (try_read_value (nn[3], value, variables)) {
-        has_value = true;     //  (8)
+      } else if (try_read_value (nn [3], value, variables)) {
+        has_value = true; //  (8)
         model = nn.back ();
         nn.pop_back ();
         nn.pop_back ();
@@ -295,7 +291,7 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, const std:
     }
 
     //  store the value under the element name always
-    pv[element] = tl::Variant (value);
+    pv [element] = tl::Variant (value);
 
   } else {
 
@@ -323,7 +319,6 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, const std:
     }
 
     //  TODO: other devices?
-
   }
 }
 
@@ -349,7 +344,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
     if (nets.size () == 2) {
       if (cls) {
-        if (! dynamic_cast<db::DeviceClassResistor *>(cls)) {
+        if (! dynamic_cast<db::DeviceClassResistor *> (cls)) {
           error (tl::sprintf (tl::to_string (tr ("Class %s is not a resistor device class as required by 'R' element")), cn));
         }
       } else {
@@ -360,7 +355,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
       }
     } else if (nets.size () == 3) {
       if (cls) {
-        if (! dynamic_cast<db::DeviceClassResistorWithBulk *>(cls)) {
+        if (! dynamic_cast<db::DeviceClassResistorWithBulk *> (cls)) {
           error (tl::sprintf (tl::to_string (tr ("Class %s is not a three-terminal resistor device class as required by 'R' element")), cn));
         }
       } else {
@@ -375,11 +370,11 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
     //  Apply multiplier (divider, according to ngspice manual)
     value /= mult;
-    params["R"] = tl::Variant (value);
+    params ["R"] = tl::Variant (value);
 
     //  Apply multiplier to other parameters
-    static const char *scale_params[] = { "A", "P", "W" };
-    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params[0]); ++i) {
+    static const char *scale_params [] = {"A", "P", "W"};
+    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params [0]); ++i) {
       auto p = params.find (scale_params [i]);
       if (p != params.end ()) {
         p->second = tl::Variant (p->second.to_double () * mult);
@@ -390,7 +385,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
     if (nets.size () == 2) {
       if (cls) {
-        if (! dynamic_cast<db::DeviceClassInductor *>(cls)) {
+        if (! dynamic_cast<db::DeviceClassInductor *> (cls)) {
           error (tl::sprintf (tl::to_string (tr ("Class %s is not a inductor device class as required by 'L' element")), cn));
         }
       } else {
@@ -405,13 +400,13 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
     //  Apply multiplier (divider, according to ngspice manual)
     value /= mult;
-    params["L"] = tl::Variant (value);
+    params ["L"] = tl::Variant (value);
 
   } else if (element == "C") {
 
     if (nets.size () == 2) {
       if (cls) {
-        if (! dynamic_cast<db::DeviceClassCapacitor *>(cls)) {
+        if (! dynamic_cast<db::DeviceClassCapacitor *> (cls)) {
           error (tl::sprintf (tl::to_string (tr ("Class %s is not a capacitor device class as required by 'C' element")), cn));
         }
       } else {
@@ -422,7 +417,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
       }
     } else if (nets.size () == 3) {
       if (cls) {
-        if (! dynamic_cast<db::DeviceClassCapacitorWithBulk *>(cls)) {
+        if (! dynamic_cast<db::DeviceClassCapacitorWithBulk *> (cls)) {
           error (tl::sprintf (tl::to_string (tr ("Class %s is not a three-terminal capacitor device class as required by 'C' element")), cn));
         }
       } else {
@@ -437,11 +432,11 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
     //  Apply multiplier
     value *= mult;
-    params["C"] = tl::Variant (value);
+    params ["C"] = tl::Variant (value);
 
     //  Apply multiplier to other parameters
-    static const char *scale_params[] = { "A", "P" };
-    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params[0]); ++i) {
+    static const char *scale_params [] = {"A", "P"};
+    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params [0]); ++i) {
       auto p = params.find (scale_params [i]);
       if (p != params.end ()) {
         p->second = tl::Variant (p->second.to_double () * mult);
@@ -451,7 +446,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
   } else if (element == "D") {
 
     if (cls) {
-      if (! dynamic_cast<db::DeviceClassDiode *>(cls)) {
+      if (! dynamic_cast<db::DeviceClassDiode *> (cls)) {
         error (tl::sprintf (tl::to_string (tr ("Class %s is not a diode device class as required by 'D' element")), cn));
       }
     } else {
@@ -462,8 +457,8 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     }
 
     //  Apply multiplier
-    static const char *scale_params[] = { "A", "P" };
-    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params[0]); ++i) {
+    static const char *scale_params [] = {"A", "P"};
+    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params [0]); ++i) {
       auto p = params.find (scale_params [i]);
       if (p != params.end ()) {
         p->second = tl::Variant (p->second.to_double () * mult);
@@ -476,11 +471,11 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
       error (tl::to_string (tr ("'Q' element needs to have 3 or 4 terminals")));
     } else if (cls) {
       if (nets.size () == 3) {
-        if (! dynamic_cast<db::DeviceClassBJT3Transistor *>(cls)) {
+        if (! dynamic_cast<db::DeviceClassBJT3Transistor *> (cls)) {
           error (tl::sprintf (tl::to_string (tr ("Class %s is not a 3-terminal BJT device class as required by 'Q' element")), cn));
         }
       } else {
-        if (! dynamic_cast<db::DeviceClassBJT4Transistor *>(cls)) {
+        if (! dynamic_cast<db::DeviceClassBJT4Transistor *> (cls)) {
           error (tl::sprintf (tl::to_string (tr ("Class %s is not a 4-terminal BJT device class as required by 'Q' element")), cn));
         }
       }
@@ -499,8 +494,8 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     }
 
     //  Apply multiplier
-    static const char *scale_params[] = { "AE", "PE", "AB", "PB", "AC", "PC" };
-    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params[0]); ++i) {
+    static const char *scale_params [] = {"AE", "PE", "AB", "PB", "AC", "PC"};
+    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params [0]); ++i) {
       auto p = params.find (scale_params [i]);
       if (p != params.end ()) {
         p->second = tl::Variant (p->second.to_double () * mult);
@@ -510,7 +505,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
   } else if (element == "M") {
 
     if (cls) {
-      if (! dynamic_cast<db::DeviceClassMOS4Transistor *>(cls)) {
+      if (! dynamic_cast<db::DeviceClassMOS4Transistor *> (cls)) {
         error (tl::sprintf (tl::to_string (tr ("Class %s is not a 4-terminal MOS device class as required by 'M' element")), cn));
       }
     } else {
@@ -525,8 +520,8 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     }
 
     //  Apply multiplier
-    static const char *scale_params[] = { "W", "AD", "AS", "PD", "PS" };
-    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params[0]); ++i) {
+    static const char *scale_params [] = {"W", "AD", "AS", "PD", "PS"};
+    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params [0]); ++i) {
       auto p = params.find (scale_params [i]);
       if (p != params.end ()) {
         p->second = tl::Variant (p->second.to_double () * mult);
@@ -578,8 +573,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
   return true;
 }
 
-void
-NetlistSpiceReaderDelegate::apply_parameter_scaling (db::Device *device) const
+void NetlistSpiceReaderDelegate::apply_parameter_scaling (db::Device *device) const
 {
   if (! device || ! device->device_class ()) {
     return;
@@ -606,8 +600,7 @@ NetlistSpiceReaderDelegate::read_value (tl::Extractor &ex, const std::map<std::s
   return parser.read (ex);
 }
 
-bool
-NetlistSpiceReaderDelegate::try_read_value (const std::string &s, double &v, const std::map<std::string, tl::Variant> &variables)
+bool NetlistSpiceReaderDelegate::try_read_value (const std::string &s, double &v, const std::map<std::string, tl::Variant> &variables)
 {
   NetlistSpiceReaderExpressionParser parser (&variables);
 

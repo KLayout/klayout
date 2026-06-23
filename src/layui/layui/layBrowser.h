@@ -40,12 +40,12 @@ class LayoutViewBase;
 class Dispatcher;
 
 class LAYUI_PUBLIC Browser
-  : public QDialog, 
+  : public QDialog,
     public lay::Plugin
 {
 public:
   /**
-   *  @brief Constructor 
+   *  @brief Constructor
    */
 #if QT_VERSION >= 0x050000
   Browser (lay::Dispatcher *root, lay::LayoutViewBase *view, const char *name = "", Qt::WindowFlags fl = Qt::Window /*adds minimize button for example*/);
@@ -66,7 +66,7 @@ public:
    *  This handler is called immediately before the dialog becomes visible.
    *  The 'active' method returns a value indicating whether the dialog is active.
    */
-  virtual void activated () 
+  virtual void activated ()
   {
     //  the default implementation does nothing.
   }
@@ -78,11 +78,11 @@ public:
    *  request of the view or by closing the dialog. This method is supposed
    *  to release all resources related to the browsing, i.e. view objects etc.
    */
-  virtual void deactivated () 
+  virtual void deactivated ()
   {
     //  the default implementation does nothing.
   }
-  
+
   /**
    *  @brief Tell if the dialog is active
    */
@@ -91,8 +91,8 @@ public:
     return m_active;
   }
 
-  /** 
-   *  @brief Return the pointer to the layout view 
+  /**
+   *  @brief Return the pointer to the layout view
    */
   lay::LayoutViewBase *view ()
   {
@@ -145,4 +145,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

@@ -69,7 +69,7 @@ std::string cfg_edit_combine_mode ("combine-mode");
 // -----------------------------------------------------------------------------
 //  CMConverter implementation
 
-std::string 
+std::string
 CMConverter::to_string (const edt::combine_mode_type &m)
 {
   if (m == edt::CM_Add) {
@@ -87,8 +87,7 @@ CMConverter::to_string (const edt::combine_mode_type &m)
   }
 }
 
-void 
-CMConverter::from_string (const std::string &s, edt::combine_mode_type &m)
+void CMConverter::from_string (const std::string &s, edt::combine_mode_type &m)
 {
   std::string t (tl::trim (s));
   if (t == "add") {
@@ -109,7 +108,7 @@ CMConverter::from_string (const std::string &s, edt::combine_mode_type &m)
 // -----------------------------------------------------------------------------
 //  PathExtConverter implementation
 
-std::string 
+std::string
 PathExtConverter::to_string (const edt::path_ext_type &m)
 {
   if (m == edt::Flush) {
@@ -125,8 +124,7 @@ PathExtConverter::to_string (const edt::path_ext_type &m)
   }
 }
 
-void 
-PathExtConverter::from_string (const std::string &tt, edt::path_ext_type &m)
+void PathExtConverter::from_string (const std::string &tt, edt::path_ext_type &m)
 {
   std::string t (tl::trim (tt));
   if (t == "flush") {
@@ -143,4 +141,3 @@ PathExtConverter::from_string (const std::string &tt, edt::path_ext_type &m)
 }
 
 }
-

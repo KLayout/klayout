@@ -21,31 +21,31 @@
 */
 
 
-#if !defined(HDR_imgCommon_h)
-# define HDR_imgCommon_h
+#if ! defined(HDR_imgCommon_h)
+#define HDR_imgCommon_h
 
-# if defined _WIN32 || defined __CYGWIN__
+#if defined _WIN32 || defined __CYGWIN__
 
-#   ifdef MAKE_IMG_LIBRARY
-#     define IMG_PUBLIC __declspec(dllexport)
-#   else
-#     define IMG_PUBLIC __declspec(dllimport)
-#   endif
-#   define IMG_LOCAL
-#   define IMG_PUBLIC_TEMPLATE
+#ifdef MAKE_IMG_LIBRARY
+#define IMG_PUBLIC __declspec (dllexport)
+#else
+#define IMG_PUBLIC __declspec (dllimport)
+#endif
+#define IMG_LOCAL
+#define IMG_PUBLIC_TEMPLATE
 
-# else
+#else
 
-#   if __GNUC__ >= 4 || defined(__clang__)
-#     define IMG_PUBLIC __attribute__ ((visibility ("default")))
-#     define IMG_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
-#     define IMG_LOCAL  __attribute__ ((visibility ("hidden")))
-#   else
-#     define IMG_PUBLIC
-#     define IMG_PUBLIC_TEMPLATE
-#     define IMG_LOCAL
-#   endif
+#if __GNUC__ >= 4 || defined(__clang__)
+#define IMG_PUBLIC __attribute__ ((visibility ("default")))
+#define IMG_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
+#define IMG_LOCAL __attribute__ ((visibility ("hidden")))
+#else
+#define IMG_PUBLIC
+#define IMG_PUBLIC_TEMPLATE
+#define IMG_LOCAL
+#endif
 
-# endif
+#endif
 
 #endif

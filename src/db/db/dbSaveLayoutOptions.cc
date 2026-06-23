@@ -68,37 +68,33 @@ SaveLayoutOptions::operator= (const SaveLayoutOptions &d)
     m_dont_write_empty_cells = d.m_dont_write_empty_cells;
 
     release ();
-    for (std::map <std::string, FormatSpecificWriterOptions *>::const_iterator o = d.m_options.begin (); o != d.m_options.end (); ++o) {
+    for (std::map<std::string, FormatSpecificWriterOptions *>::const_iterator o = d.m_options.begin (); o != d.m_options.end (); ++o) {
       m_options.insert (std::make_pair (o->first, o->second->clone ()));
     }
-
   }
   return *this;
 }
 
-void
-SaveLayoutOptions::release ()
+void SaveLayoutOptions::release ()
 {
-  for (std::map <std::string, FormatSpecificWriterOptions *>::const_iterator o = m_options.begin (); o != m_options.end (); ++o) {
+  for (std::map<std::string, FormatSpecificWriterOptions *>::const_iterator o = m_options.begin (); o != m_options.end (); ++o) {
     delete o->second;
   }
   m_options.clear ();
 }
 
-void
-SaveLayoutOptions::set_options (const FormatSpecificWriterOptions &options)
+void SaveLayoutOptions::set_options (const FormatSpecificWriterOptions &options)
 {
   set_options (options.clone ());
 }
 
-void
-SaveLayoutOptions::set_options (FormatSpecificWriterOptions *options)
+void SaveLayoutOptions::set_options (FormatSpecificWriterOptions *options)
 {
-  if (!options) {
+  if (! options) {
     return;
   }
 
-  std::map <std::string, FormatSpecificWriterOptions *>::iterator o = m_options.find (options->format_name ());
+  std::map<std::string, FormatSpecificWriterOptions *>::iterator o = m_options.find (options->format_name ());
   if (o != m_options.end ()) {
     delete o->second;
     m_options.erase (o);
@@ -110,7 +106,7 @@ SaveLayoutOptions::set_options (FormatSpecificWriterOptions *options)
 const FormatSpecificWriterOptions *
 SaveLayoutOptions::get_options (const std::string &format) const
 {
-  std::map <std::string, FormatSpecificWriterOptions *>::const_iterator o = m_options.find (format);
+  std::map<std::string, FormatSpecificWriterOptions *>::const_iterator o = m_options.find (format);
   if (o != m_options.end ()) {
     return o->second;
   } else {
@@ -121,7 +117,7 @@ SaveLayoutOptions::get_options (const std::string &format) const
 FormatSpecificWriterOptions *
 SaveLayoutOptions::get_options (const std::string &format)
 {
-  std::map <std::string, FormatSpecificWriterOptions *>::const_iterator o = m_options.find (format);
+  std::map<std::string, FormatSpecificWriterOptions *>::const_iterator o = m_options.find (format);
   if (o != m_options.end ()) {
     return o->second;
   } else {
@@ -129,8 +125,7 @@ SaveLayoutOptions::get_options (const std::string &format)
   }
 }
 
-void
-SaveLayoutOptions::set_option_by_name (const std::string &method, const tl::Variant &value)
+void SaveLayoutOptions::set_option_by_name (const std::string &method, const tl::Variant &value)
 {
   //  Utilizes the GSI binding to set the values
   tl::Variant options_ref = tl::Variant::make_variant_ref (this);
@@ -158,92 +153,79 @@ SaveLayoutOptions::get_option_by_name (const std::string &method)
   return out;
 }
 
-void 
-SaveLayoutOptions::set_format (const std::string &format_name)
+void SaveLayoutOptions::set_format (const std::string &format_name)
 {
   m_format = format_name;
 }
 
-void 
-SaveLayoutOptions::add_layer (unsigned int layer, const db::LayerProperties &props)
+void SaveLayoutOptions::add_layer (unsigned int layer, const db::LayerProperties &props)
 {
   m_all_layers = false;
   m_layers.insert (std::make_pair (layer, props));
 }
 
-void
-SaveLayoutOptions::select_all_layers ()
+void SaveLayoutOptions::select_all_layers ()
 {
   m_all_layers = true;
   m_layers.clear ();
 }
 
-void
-SaveLayoutOptions::deselect_all_layers ()
+void SaveLayoutOptions::deselect_all_layers ()
 {
   m_all_layers = false;
   m_layers.clear ();
 }
 
-void 
-SaveLayoutOptions::add_cell (db::cell_index_type cell_index)
+void SaveLayoutOptions::add_cell (db::cell_index_type cell_index)
 {
   m_all_cells = false;
   m_cells.insert (cell_index);
   m_implied_children.insert (cell_index);
 }
 
-void 
-SaveLayoutOptions::add_this_cell (db::cell_index_type cell_index)
+void SaveLayoutOptions::add_this_cell (db::cell_index_type cell_index)
 {
   m_all_cells = false;
   m_cells.insert (cell_index);
 }
 
-void
-SaveLayoutOptions::clear_cells ()
+void SaveLayoutOptions::clear_cells ()
 {
   m_all_cells = false;
   m_cells.clear ();
   m_implied_children.clear ();
 }
 
-void
-SaveLayoutOptions::select_all_cells ()
+void SaveLayoutOptions::select_all_cells ()
 {
   m_all_cells = true;
   m_cells.clear ();
   m_implied_children.clear ();
 }
 
-void 
-SaveLayoutOptions::set_dbu (double dbu)
+void SaveLayoutOptions::set_dbu (double dbu)
 {
   m_dbu = dbu;
 }
 
-void
-SaveLayoutOptions::set_libname (const std::string &libname)
+void SaveLayoutOptions::set_libname (const std::string &libname)
 {
   m_libname = libname;
 }
 
-void
-SaveLayoutOptions::set_scale_factor (double f)
+void SaveLayoutOptions::set_scale_factor (double f)
 {
   m_scale_factor = f;
 }
 
-void 
-SaveLayoutOptions::set_dont_write_empty_cells (bool f)
+void SaveLayoutOptions::set_dont_write_empty_cells (bool f)
 {
   m_dont_write_empty_cells = f;
 }
 
-void 
-SaveLayoutOptions::get_valid_layers (const db::Layout &layout, std::vector <std::pair <unsigned int, db::LayerProperties> > &layers, db::SaveLayoutOptions::LayerAssignmentMode lm) const
+void SaveLayoutOptions::get_valid_layers (const db::Layout &layout, std::vector<std::pair<unsigned int, db::LayerProperties>> &layers, db::SaveLayoutOptions::LayerAssignmentMode lm) const
 {
-  std::vector<std::pair <unsigned int, db::LayerProperties> > all_layers;
+  std::vector<std::pair<unsigned int, db::LayerProperties>> all_layers;
 
   if (m_all_layers) {
 
@@ -259,7 +241,7 @@ SaveLayoutOptions::get_valid_layers (const db::Layout &layout, std::vector <std:
 
   } else {
 
-    //  collect the selected layers 
+    //  collect the selected layers
     for (unsigned int l = 0; l < layout.layers (); ++l) {
       if (layout.is_valid_layer (l)) {
         const db::LayerProperties &prop = layout.get_properties (l);
@@ -273,7 +255,6 @@ SaveLayoutOptions::get_valid_layers (const db::Layout &layout, std::vector <std:
         }
       }
     }
-
   }
 
   if (lm == LP_AsIs) {
@@ -330,14 +311,13 @@ SaveLayoutOptions::get_valid_layers (const db::Layout &layout, std::vector <std:
       }
     }
 
-    for (std::vector<std::pair <unsigned int, db::LayerProperties> >::const_iterator l = all_layers.begin (); l != all_layers.end (); ++l) {
+    for (std::vector<std::pair<unsigned int, db::LayerProperties>>::const_iterator l = all_layers.begin (); l != all_layers.end (); ++l) {
       layers.push_back (*l);
       if (! (l->second.layer >= 0 && l->second.datatype >= 0)) {
         layers.back ().second.layer = ++next_layer;
         layers.back ().second.datatype = 0;
       }
     }
-
   }
 }
 
@@ -357,8 +337,7 @@ collect_called_cells_unskipped (db::cell_index_type ci, const db::Layout &layout
   }
 }
 
-void 
-SaveLayoutOptions::get_cells (const db::Layout &layout, std::set <db::cell_index_type> &cells, const std::vector <std::pair <unsigned int, db::LayerProperties> > &valid_layers, bool require_unique_names) const
+void SaveLayoutOptions::get_cells (const db::Layout &layout, std::set<db::cell_index_type> &cells, const std::vector<std::pair<unsigned int, db::LayerProperties>> &valid_layers, bool require_unique_names) const
 {
   bool has_context = m_write_context_info;
   for (tl::Registrar<db::StreamFormatDeclaration>::iterator fmt = tl::Registrar<db::StreamFormatDeclaration>::begin (); fmt != tl::Registrar<db::StreamFormatDeclaration>::end (); ++fmt) {
@@ -406,12 +385,11 @@ SaveLayoutOptions::get_cells (const db::Layout &layout, std::set <db::cell_index
           cells.insert (cell->cell_index ());
         }
       }
-
     }
 
   } else {
 
-    for (std::set <db::cell_index_type>::const_iterator c = m_cells.begin (); c != m_cells.end (); ++c) {
+    for (std::set<db::cell_index_type>::const_iterator c = m_cells.begin (); c != m_cells.end (); ++c) {
       cells.insert (*c);
       if (m_implied_children.find (*c) != m_implied_children.end ()) {
         if (has_context) {
@@ -421,19 +399,18 @@ SaveLayoutOptions::get_cells (const db::Layout &layout, std::set <db::cell_index
         }
       }
     }
-
   }
 
   if (m_dont_write_empty_cells) {
 
-    std::set <db::cell_index_type> empty_cells;
+    std::set<db::cell_index_type> empty_cells;
 
-    for (std::set <db::cell_index_type>::const_iterator c = cells.begin (); c != cells.end (); ++c) {
+    for (std::set<db::cell_index_type>::const_iterator c = cells.begin (); c != cells.end (); ++c) {
 
       const db::Cell &cref (layout.cell (*c));
 
       bool is_empty = true;
-      for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = valid_layers.begin (); l != valid_layers.end () && is_empty; ++l) {
+      for (std::vector<std::pair<unsigned int, db::LayerProperties>>::const_iterator l = valid_layers.begin (); l != valid_layers.end () && is_empty; ++l) {
         if (! cref.shapes (l->first).empty ()) {
           is_empty = false;
         }
@@ -454,9 +431,7 @@ SaveLayoutOptions::get_cells (const db::Layout &layout, std::set <db::cell_index
         if (! is_top_cell) {
           empty_cells.insert (*c);
         }
-
       }
-
     }
 
     bool repeat;
@@ -464,7 +439,7 @@ SaveLayoutOptions::get_cells (const db::Layout &layout, std::set <db::cell_index
 
       repeat = false;
 
-      for (std::set <db::cell_index_type>::const_iterator c = empty_cells.begin (); c != empty_cells.end (); ) {
+      for (std::set<db::cell_index_type>::const_iterator c = empty_cells.begin (); c != empty_cells.end ();) {
         const db::Cell *cell = &layout.cell (*c);
         ++c;
         bool is_empty = true;
@@ -481,16 +456,15 @@ SaveLayoutOptions::get_cells (const db::Layout &layout, std::set <db::cell_index
 
     } while (repeat);
 
-    for (std::set <db::cell_index_type>::const_iterator c = empty_cells.begin (); c != empty_cells.end (); ++c) {
+    for (std::set<db::cell_index_type>::const_iterator c = empty_cells.begin (); c != empty_cells.end (); ++c) {
       cells.erase (*c);
     }
-
   }
 
   if (require_unique_names) {
 
     std::map<std::string, unsigned int> use_count;
-    for (std::set <db::cell_index_type>::const_iterator c = cells.begin (); c != cells.end (); ++c) {
+    for (std::set<db::cell_index_type>::const_iterator c = cells.begin (); c != cells.end (); ++c) {
       use_count.insert (std::make_pair (std::string (layout.cell_name (*c)), 0)).first->second += 1;
     }
 
@@ -504,7 +478,6 @@ SaveLayoutOptions::get_cells (const db::Layout &layout, std::set <db::cell_index
     if (! multi.empty ()) {
       throw tl::Exception (tl::to_string (tr ("The following cell name(s) are used for more than one cell - can't write this layout:\n  ")) + tl::join (multi, "\n  "));
     }
-
   }
 }
 
@@ -517,9 +490,9 @@ SaveLayoutOptions::set_format_from_filename (const std::string &fn)
   if (pat.match (fn, pat_parts) && pat_parts.size () == 2) {
 
     for (tl::Registrar<db::StreamFormatDeclaration>::iterator fmt = tl::Registrar<db::StreamFormatDeclaration>::begin (); fmt != tl::Registrar<db::StreamFormatDeclaration>::end (); ++fmt) {
-      if (tl::match_filename_to_format ("." + pat_parts[1], fmt->file_format ())) {
+      if (tl::match_filename_to_format ("." + pat_parts [1], fmt->file_format ())) {
         m_format = fmt->format_name ();
-        return std::make_pair (true, pat_parts[0]);
+        return std::make_pair (true, pat_parts [0]);
       }
     }
 
@@ -531,11 +504,9 @@ SaveLayoutOptions::set_format_from_filename (const std::string &fn)
         return std::make_pair (true, fn);
       }
     }
-
   }
 
   return std::make_pair (false, fn);
 }
 
 }
-

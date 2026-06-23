@@ -52,14 +52,14 @@ class MainWindow;
  *  initialization and configuration calls.
  */
 class LAY_PUBLIC LibraryController
-  : public lay::PluginDeclaration, public tl::Object
+  : public lay::PluginDeclaration,
+    public tl::Object
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
-  struct LibFileInfo
-  {
-    LibFileInfo () : name (), path (), replicate (true) { }
+  struct LibFileInfo {
+    LibFileInfo () : name (), path (), replicate (true) {}
     std::string name;
     std::string description;
     std::string path;
@@ -90,7 +90,7 @@ public:
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
-  void get_options (std::vector < std::pair<std::string, std::string> > &options) const;
+  void get_options (std::vector<std::pair<std::string, std::string>> &options) const;
 
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
@@ -105,7 +105,7 @@ public:
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
-  void config_finalize();
+  void config_finalize ();
 
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
@@ -141,9 +141,8 @@ private slots:
   void sync_with_external_sources ();
 
 private:
-  struct LibInfo
-  {
-    LibInfo () : name (), description (), time (), tech (), replicate (true) { }
+  struct LibInfo {
+    LibInfo () : name (), description (), time (), tech (), replicate (true) {}
     std::string name;
     std::string description;
     QDateTime time;
@@ -164,4 +163,3 @@ private:
 }
 
 #endif
-

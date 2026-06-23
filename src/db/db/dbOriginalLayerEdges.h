@@ -30,7 +30,8 @@
 #include "dbShapes.h"
 #include "dbRecursiveShapeIterator.h"
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief An original layerregion based on a RecursiveShapeIterator
@@ -87,4 +88,3 @@ private:
 }
 
 #endif
-

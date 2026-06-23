@@ -39,7 +39,7 @@
 
 namespace db
 {
-  class Technology;
+class Technology;
 }
 
 namespace lay
@@ -64,17 +64,17 @@ class Action;
  *  initialization and configuration calls.
  */
 class MacroController
-  : public lay::PluginDeclaration, public tl::Object
+  : public lay::PluginDeclaration,
+    public tl::Object
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
    *  @brief A structure describing a macro category
    */
-  struct MacroCategory
-  {
-    MacroCategory () { }
+  struct MacroCategory {
+    MacroCategory () {}
 
     std::string name;
     std::string description;
@@ -104,7 +104,7 @@ public:
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
-  virtual void config_finalize();
+  virtual void config_finalize ();
 
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
@@ -202,8 +202,7 @@ private:
   /**
    *  @brief A structure describing an external macro location
    */
-  struct ExternalPathDescriptor
-  {
+  struct ExternalPathDescriptor {
     ExternalPathDescriptor (const std::string &_path, const std::string &_description, const std::string &_cat, lym::MacroCollection::FolderType _type, bool _readonly, const std::string &_version = std::string ())
       : path (_path), description (_description), cat (_cat), type (_type), version (_version), readonly (_readonly)
     {
@@ -221,8 +220,7 @@ private:
   /**
    *  @brief A structure describing an internal macro location
    */
-  struct InternalPathDescriptor
-  {
+  struct InternalPathDescriptor {
     InternalPathDescriptor (const std::string &_path, const std::string &_description, const std::string &_cat, bool _readonly)
       : path (_path), description (_description), cat (_cat), readonly (_readonly)
     {
@@ -263,4 +261,3 @@ private:
 }
 
 #endif
-

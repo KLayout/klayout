@@ -50,15 +50,15 @@ LayoutPropertiesForm::LayoutPropertiesForm (QWidget *parent, lay::LayoutViewBase
 
   Ui::LayoutPropertiesForm::setupUi (this);
 
-  //  collect the distinct layout handles 
-  std::set <lay::LayoutHandle *> handles;
+  //  collect the distinct layout handles
+  std::set<lay::LayoutHandle *> handles;
   for (unsigned int n = 0; n < view->cellviews (); ++n) {
-    handles.insert (view->cellview (n).operator-> ());
+    handles.insert (view->cellview (n).operator->());
   }
-  
+
   m_handles.reserve (handles.size ());
   for (unsigned int n = 0; n < view->cellviews (); ++n) {
-    lay::LayoutHandle *h = view->cellview (n).operator-> ();
+    lay::LayoutHandle *h = view->cellview (n).operator->();
     if (handles.find (h) != handles.end ()) {
       m_handles.push_back (h);
       handles.erase (h);
@@ -77,17 +77,15 @@ LayoutPropertiesForm::LayoutPropertiesForm (QWidget *parent, lay::LayoutViewBase
   layout_selected (layout_cbx->currentIndex ());
 }
 
-void
-LayoutPropertiesForm::accept ()
+void LayoutPropertiesForm::accept ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   commit ();
   QDialog::accept ();
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-LayoutPropertiesForm::commit ()
+void LayoutPropertiesForm::commit ()
 {
   if (m_index >= int (m_handles.size ()) || m_index < 0) {
     return;
@@ -130,25 +128,21 @@ LayoutPropertiesForm::commit ()
     if (tech_has_changed && ! lyp_file.empty ()) {
 
       //  if the new technology has a layer properties file attached, ask whether to load it
-      if (QMessageBox::question (this, QObject::tr ("Load Layer Properties File"), 
-                                       tl::to_qstring (tl::to_string (QObject::tr ("The new technology specifies a layer properties file (")) + lyp_file + tl::to_string (QObject::tr (").\nLoad the new layer properties file?"))),
-                                       QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes) {
+      if (QMessageBox::question (this, QObject::tr ("Load Layer Properties File"),
+                                 tl::to_qstring (tl::to_string (QObject::tr ("The new technology specifies a layer properties file (")) + lyp_file + tl::to_string (QObject::tr (").\nLoad the new layer properties file?"))),
+                                 QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes) {
 
         //  Interpolate the layer properties file name and load the file
         tl::Eval expr;
         expr.set_var ("layoutfile", m_handles [m_index]->filename ());
         lyp_file = expr.interpolate (lyp_file);
         mp_view->load_layer_props (lyp_file);
-
       }
-
     }
-
   }
 }
 
-void 
-LayoutPropertiesForm::prop_pb_clicked ()
+void LayoutPropertiesForm::prop_pb_clicked ()
 {
   if (m_index >= int (m_handles.size ()) || m_index < 0) {
     return;
@@ -167,14 +161,12 @@ LayoutPropertiesForm::prop_pb_clicked ()
     if (mp_view->manager ()) {
       mp_view->manager ()->commit ();
     }
-
   }
 }
 
-void
-LayoutPropertiesForm::layout_selected (int index)
+void LayoutPropertiesForm::layout_selected (int index)
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   if (index == m_index) {
     return;
   }
@@ -205,12 +197,11 @@ BEGIN_PROTECTED
     if (t->name () == m_handles [index]->tech_name ()) {
       tech_cbx->setCurrentIndex (technology_index);
     }
-
   }
 
   dbu_le->setText (tl::to_qstring (tl::to_string (layout.dbu ())));
 
-END_PROTECTED
+  END_PROTECTED
 }
 
 }

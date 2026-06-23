@@ -94,8 +94,7 @@ public:
   /**
    *  @brief A algorithm to use
    */
-  enum Algorithm
-  {
+  enum Algorithm {
     /**
      *  @brief The square counting algorithm
      *  This algorithm is suitable for "long and thin" wires.
@@ -190,4 +189,3 @@ public:
 }
 
 #endif
-

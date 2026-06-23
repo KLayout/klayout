@@ -51,16 +51,14 @@ public:
     }
   }
 
-  void menu_activated (const std::string &symbol) 
+  void menu_activated (const std::string &symbol)
   {
     if (symbol == "lay::diff_tool") {
 
       if (mp_dialog && mp_dialog->exec_dialog (mp_view)) {
 
         // ... implementation is in layDiffToolDialog.cc ...
-
       }
-
     }
   }
 
@@ -77,8 +75,8 @@ public:
   {
     //  .. nothing yet ..
   }
-  
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
+
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> &options) const
   {
     options.push_back (std::pair<std::string, std::string> (cfg_diff_run_xor, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_diff_detailed, "false"));
@@ -118,4 +116,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new lay::DiffPluginDeclaration (), 3001, "lay::DiffPlugin");
 
 }
-

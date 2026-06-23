@@ -59,8 +59,7 @@ Executable::do_execute ()
   return res;
 }
 
-void
-Executable::do_cleanup ()
+void Executable::do_cleanup ()
 {
   try {
     cleanup ();
@@ -80,8 +79,7 @@ Executable::execute ()
   return tl::Variant ();
 }
 
-void
-Executable::cleanup ()
+void Executable::cleanup ()
 {
   //  .. the default implementation does nothing ..
 }
@@ -140,7 +138,7 @@ tl::Variant Recipe::make (const std::string &generator, const std::map<std::stri
   tl::Recipe *recipe_obj = 0;
   for (tl::Registrar<tl::Recipe>::iterator r = tl::Registrar<tl::Recipe>::begin (); r != tl::Registrar<tl::Recipe>::end (); ++r) {
     if (r->name () == recipe) {
-      recipe_obj = r.operator-> ();
+      recipe_obj = r.operator->();
     }
   }
 

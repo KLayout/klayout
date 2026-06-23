@@ -34,7 +34,7 @@ namespace lib
 /**
  *  @brief Implements the "TEXT" PCell of the basic library
  */
-class BasicText 
+class BasicText
   : public db::PCellDeclaration
 {
 public:
@@ -101,4 +101,3 @@ public:
 }
 
 #endif
-

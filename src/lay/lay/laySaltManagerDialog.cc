@@ -56,7 +56,8 @@ namespace lay
  *  @brief A tiny dialog to select a template and a name for the grain
  */
 class SaltGrainTemplateSelectionDialog
-  : public QDialog, private Ui::SaltGrainTemplateSelectionDialog
+  : public QDialog,
+    private Ui::SaltGrainTemplateSelectionDialog
 {
 public:
   SaltGrainTemplateSelectionDialog (QWidget *parent, lay::Salt *salt)
@@ -105,7 +106,6 @@ public:
       }
 
       QDialog::accept ();
-
     }
   }
 
@@ -120,8 +120,7 @@ private:
 class SaltAPIVersionCheck
 {
 public:
-  struct APIFeature
-  {
+  struct APIFeature {
     APIFeature (const std::string &_name, const std::string &_version, const std::string &_description)
       : name (_name), version (_version), description (_description)
     {
@@ -153,8 +152,7 @@ SaltAPIVersionCheck::SaltAPIVersionCheck ()
   populate_features ();
 }
 
-bool
-SaltAPIVersionCheck::check (const std::string &api_version)
+bool SaltAPIVersionCheck::check (const std::string &api_version)
 {
   tl::Extractor ex (api_version.c_str ());
 
@@ -181,7 +179,7 @@ SaltAPIVersionCheck::check (const std::string &api_version)
     }
 
     const APIFeature *f = find_feature (fname);
-    if (!f) {
+    if (! f) {
 
       if (! m_message.empty ()) {
         m_message += "\n";
@@ -207,9 +205,7 @@ SaltAPIVersionCheck::check (const std::string &api_version)
       m_message += tl::sprintf (tl::to_string (tr ("%s required with version %s or later (is %s).")), f->description, v, fv_short);
 
       good = false;
-
     }
-
   }
 
   if (any_not_available) {
@@ -237,14 +233,13 @@ SaltAPIVersionCheck::find_feature (const std::string &name) const
 {
   for (std::vector<APIFeature>::const_iterator f = m_features.begin (); f != m_features.end (); ++f) {
     if (f->name == name) {
-      return f.operator-> ();
+      return f.operator->();
     }
   }
   return 0;
 }
 
-void
-SaltAPIVersionCheck::populate_features ()
+void SaltAPIVersionCheck::populate_features ()
 {
   m_features.push_back (APIFeature (std::string (), lay::Version::version (), "KLayout API"));
 
@@ -272,11 +267,11 @@ SaltAPIVersionCheck::populate_features ()
   m_features.push_back (APIFeature ("qt_binding", std::string (), "Qt Binding for RBA or PYA"));
 #endif
 #if defined(HAVE_QT)
-#  if QT_VERSION >= 0x040000 && QT_VERSION < 0x050000
+#if QT_VERSION >= 0x040000 && QT_VERSION < 0x050000
   m_features.push_back (APIFeature ("qt4", std::string (), "Qt 4"));
-#  elif QT_VERSION >= 0x050000 && QT_VERSION < 0x060000
+#elif QT_VERSION >= 0x050000 && QT_VERSION < 0x060000
   m_features.push_back (APIFeature ("qt5", std::string (), "Qt 5"));
-#  endif
+#endif
 #endif
 
 #if defined(HAVE_64BIT_COORD)
@@ -405,8 +400,7 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent, lay::Salt *salt, const st
   refresh ();
 }
 
-void
-SaltManagerDialog::mode_changed ()
+void SaltManagerDialog::mode_changed ()
 {
   //  commits edits:
   setFocus (Qt::NoFocusReason);
@@ -424,7 +418,7 @@ SaltManagerDialog::mode_changed ()
   }
 
   //  keeps the splitters in sync
-  if (sizes.size () == 2 && sizes[1] > 0 /*visible*/) {
+  if (sizes.size () == 2 && sizes [1] > 0 /*visible*/) {
     splitter_new->setSizes (sizes);
     splitter_update->setSizes (sizes);
     splitter->setSizes (sizes);
@@ -442,54 +436,51 @@ SaltManagerDialog::mode_changed ()
   update_apply_state ();
 }
 
-void
-SaltManagerDialog::show_marked_only_new ()
+void SaltManagerDialog::show_marked_only_new ()
 {
   bool show_marked_only = actionShowMarkedOnlyNew->isChecked ();
 
   search_new_edit->clear ();
 
-  SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view_new->model ());
+  SaltModel *model = dynamic_cast<SaltModel *> (salt_mine_view_new->model ());
   if (! model) {
     return;
   }
 
   salt_mine_view_new->clearSelection ();
 
-  for (int i = model->rowCount (QModelIndex ()); i > 0; ) {
+  for (int i = model->rowCount (QModelIndex ()); i > 0;) {
     --i;
     SaltGrain *g = model->grain_from_index (model->index (i, 0, QModelIndex ()));
-    salt_mine_view_new->setRowHidden (i, show_marked_only && !(g && model->is_marked (g->name ())));
+    salt_mine_view_new->setRowHidden (i, show_marked_only && ! (g && model->is_marked (g->name ())));
     mine_new_selected_changed ();
   }
 }
 
-void
-SaltManagerDialog::show_marked_only_update ()
+void SaltManagerDialog::show_marked_only_update ()
 {
   bool show_marked_only = actionShowMarkedOnlyUpdate->isChecked ();
 
   search_update_edit->clear ();
 
-  SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view_update->model ());
+  SaltModel *model = dynamic_cast<SaltModel *> (salt_mine_view_update->model ());
   if (! model) {
     return;
   }
 
   salt_mine_view_new->clearSelection ();
 
-  for (int i = model->rowCount (QModelIndex ()); i > 0; ) {
+  for (int i = model->rowCount (QModelIndex ()); i > 0;) {
     --i;
     SaltGrain *g = model->grain_from_index (model->index (i, 0, QModelIndex ()));
-    salt_mine_view_update->setRowHidden (i, show_marked_only && !(g && model->is_marked (g->name ())));
+    salt_mine_view_update->setRowHidden (i, show_marked_only && ! (g && model->is_marked (g->name ())));
     mine_update_selected_changed ();
   }
 }
 
-void
-SaltManagerDialog::unmark_all_new ()
+void SaltManagerDialog::unmark_all_new ()
 {
-  SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view_new->model ());
+  SaltModel *model = dynamic_cast<SaltModel *> (salt_mine_view_new->model ());
   if (model) {
     model->clear_marked ();
     actionShowMarkedOnlyNew->setChecked (false);
@@ -498,10 +489,9 @@ SaltManagerDialog::unmark_all_new ()
   }
 }
 
-void
-SaltManagerDialog::mark_all_new ()
+void SaltManagerDialog::mark_all_new ()
 {
-  SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view_new->model ());
+  SaltModel *model = dynamic_cast<SaltModel *> (salt_mine_view_new->model ());
   if (model) {
     model->mark_all ();
     actionShowMarkedOnlyNew->setChecked (false);
@@ -510,10 +500,9 @@ SaltManagerDialog::mark_all_new ()
   }
 }
 
-void
-SaltManagerDialog::unmark_all_update ()
+void SaltManagerDialog::unmark_all_update ()
 {
-  SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view_update->model ());
+  SaltModel *model = dynamic_cast<SaltModel *> (salt_mine_view_update->model ());
   if (model) {
     model->clear_marked ();
     actionShowMarkedOnlyUpdate->setChecked (false);
@@ -522,10 +511,9 @@ SaltManagerDialog::unmark_all_update ()
   }
 }
 
-void
-SaltManagerDialog::mark_all_update ()
+void SaltManagerDialog::mark_all_update ()
 {
-  SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view_update->model ());
+  SaltModel *model = dynamic_cast<SaltModel *> (salt_mine_view_update->model ());
   if (model) {
     model->mark_all ();
     actionShowMarkedOnlyUpdate->setChecked (false);
@@ -534,8 +522,7 @@ SaltManagerDialog::mark_all_update ()
   }
 }
 
-void
-SaltManagerDialog::search_text_changed (const QString &text)
+void SaltManagerDialog::search_text_changed (const QString &text)
 {
   QListView *view = 0;
   if (sender () == search_installed_edit) {
@@ -548,14 +535,14 @@ SaltManagerDialog::search_text_changed (const QString &text)
     return;
   }
 
-  SaltModel *model = dynamic_cast <SaltModel *> (view->model ());
+  SaltModel *model = dynamic_cast<SaltModel *> (view->model ());
   if (! model) {
     return;
   }
 
   if (text.isEmpty ()) {
 
-    for (int i = model->rowCount (QModelIndex ()); i > 0; ) {
+    for (int i = model->rowCount (QModelIndex ()); i > 0;) {
       --i;
       view->setRowHidden (i, false);
     }
@@ -564,19 +551,17 @@ SaltManagerDialog::search_text_changed (const QString &text)
 
     QRegExp re (text, Qt::CaseInsensitive);
 
-    for (int i = model->rowCount (QModelIndex ()); i > 0; ) {
+    for (int i = model->rowCount (QModelIndex ()); i > 0;) {
       --i;
       QModelIndex index = model->index (i, 0, QModelIndex ());
       SaltGrain *g = model->grain_from_index (index);
-      bool hidden = (!g || re.indexIn (tl::to_qstring (g->name ())) < 0);
+      bool hidden = (! g || re.indexIn (tl::to_qstring (g->name ())) < 0);
       view->setRowHidden (i, hidden);
     }
-
   }
 }
 
-void
-SaltManagerDialog::mark_clicked ()
+void SaltManagerDialog::mark_clicked ()
 {
   QListView *view;
   if (sender () == salt_mine_view_new || sender () == mark_new_button || sender () == actionMarkNew || sender () == actionUnmarkNew) {
@@ -588,7 +573,7 @@ SaltManagerDialog::mark_clicked ()
   bool toggle = (sender () != actionMarkNew && sender () != actionUnmarkNew && sender () != actionMarkForUpdate && sender () != actionUnmarkForUpdate);
   bool set = (sender () == actionMarkNew || sender () == actionMarkForUpdate);
 
-  SaltModel *model = dynamic_cast <SaltModel *> (view->model ());
+  SaltModel *model = dynamic_cast<SaltModel *> (view->model ());
   if (! model) {
     return;
   }
@@ -604,17 +589,16 @@ SaltManagerDialog::mark_clicked ()
   update_apply_state ();
 }
 
-void
-SaltManagerDialog::update_apply_state ()
+void SaltManagerDialog::update_apply_state ()
 {
   SaltModel *model;
 
-  model = dynamic_cast <SaltModel *> (salt_mine_view_new->model ());
+  model = dynamic_cast<SaltModel *> (salt_mine_view_new->model ());
   if (model) {
 
     int marked = 0;
 
-    for (int i = model->rowCount (QModelIndex ()); i > 0; ) {
+    for (int i = model->rowCount (QModelIndex ()); i > 0;) {
       --i;
       QModelIndex index = model->index (i, 0, QModelIndex ());
       SaltGrain *g = model->grain_from_index (index);
@@ -631,15 +615,14 @@ SaltManagerDialog::update_apply_state ()
     } else if (marked > 1) {
       apply_label_new->setText (tr ("%1 packages selected").arg (marked));
     }
-
   }
 
-  model = dynamic_cast <SaltModel *> (salt_mine_view_update->model ());
+  model = dynamic_cast<SaltModel *> (salt_mine_view_update->model ());
   if (model) {
 
     int marked = 0;
 
-    for (int i = model->rowCount (QModelIndex ()); i > 0; ) {
+    for (int i = model->rowCount (QModelIndex ()); i > 0;) {
       --i;
       QModelIndex index = model->index (i, 0, QModelIndex ());
       SaltGrain *g = model->grain_from_index (index);
@@ -656,14 +639,12 @@ SaltManagerDialog::update_apply_state ()
     } else if (marked > 1) {
       apply_label_update->setText (tr ("%1 packages selected").arg (marked));
     }
-
   }
 }
 
-void
-SaltManagerDialog::apply ()
+void SaltManagerDialog::apply ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   bool update = (sender () == apply_update_button);
 
@@ -674,13 +655,13 @@ BEGIN_PROTECTED
   //  fetch all marked grains and register for download
   SaltModel *model;
   if (update) {
-    model = dynamic_cast <SaltModel *> (salt_mine_view_update->model ());
+    model = dynamic_cast<SaltModel *> (salt_mine_view_update->model ());
   } else {
-    model = dynamic_cast <SaltModel *> (salt_mine_view_new->model ());
+    model = dynamic_cast<SaltModel *> (salt_mine_view_new->model ());
   }
 
   if (model) {
-    for (int i = model->rowCount (QModelIndex ()); i > 0; ) {
+    for (int i = model->rowCount (QModelIndex ()); i > 0;) {
       --i;
       QModelIndex index = model->index (i, 0, QModelIndex ());
       SaltGrain *g = model->grain_from_index (index);
@@ -709,32 +690,30 @@ BEGIN_PROTECTED
     }
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-SaltManagerDialog::edit_properties ()
+void SaltManagerDialog::edit_properties ()
 {
   SaltGrain *g = current_grain ();
   if (g) {
     if (g->is_readonly ()) {
       QMessageBox::critical (this, tr ("Package is not Editable"),
-                                   tr ("This package cannot be edited.\n\nEither you don't have write permissions on the directory or the package was installed from a repository."));
+                             tr ("This package cannot be edited.\n\nEither you don't have write permissions on the directory or the package was installed from a repository."));
     } else if (mp_properties_dialog->exec_dialog (g, mp_salt)) {
       selected_changed ();
     }
   }
 }
 
-void
-SaltManagerDialog::set_current_grain_by_name (const std::string &current)
+void SaltManagerDialog::set_current_grain_by_name (const std::string &current)
 {
-  SaltModel *model = dynamic_cast <SaltModel *> (salt_view->model ());
-  if (!model) {
+  SaltModel *model = dynamic_cast<SaltModel *> (salt_view->model ());
+  if (! model) {
     return;
   }
 
-  for (int i = model->rowCount (QModelIndex ()); i > 0; ) {
+  for (int i = model->rowCount (QModelIndex ()); i > 0;) {
     --i;
     QModelIndex index = model->index (i, 0, QModelIndex ());
     SaltGrain *g = model->grain_from_index (index);
@@ -746,10 +725,9 @@ SaltManagerDialog::set_current_grain_by_name (const std::string &current)
   }
 }
 
-void
-SaltManagerDialog::create_grain ()
+void SaltManagerDialog::create_grain ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   SaltGrainTemplateSelectionDialog temp_dialog (this, mp_salt);
   if (temp_dialog.exec ()) {
@@ -760,37 +738,34 @@ BEGIN_PROTECTED
     if (mp_salt->create_grain (temp_dialog.templ (), target)) {
 
       //  select the new one
-      SaltModel *model = dynamic_cast <SaltModel *> (salt_view->model ());
+      SaltModel *model = dynamic_cast<SaltModel *> (salt_view->model ());
       if (model) {
 
         //  NOTE: this is basically redundant (because it happens in the background later
         //  through dm_update_models). But we need this now to establish the selection.
-        model->update();
+        model->update ();
 
         set_current_grain_by_name (target.name ());
-
       }
 
     } else {
       throw tl::Exception (tl::to_string (tr ("Initialization of new package failed - see log window (File/Log Viewer) for details")));
     }
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-SaltManagerDialog::delete_grain ()
+void SaltManagerDialog::delete_grain ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   std::vector<SaltGrain *> gg = current_grains ();
   if (gg.empty ()) {
     throw tl::Exception (tl::to_string (tr ("No package selected to delete")));
   }
 
-  std::vector <std::string> failed;
+  std::vector<std::string> failed;
 
   if (gg.size () == 1) {
     SaltGrain *g = gg.front ();
@@ -815,39 +790,35 @@ BEGIN_PROTECTED
     throw tl::Exception (tl::to_string (tr ("Failed to remove the following packages:\n  %1").arg (tl::to_qstring (tl::join (failed, "\n  ")))));
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-SaltManagerDialog::salt_about_to_change ()
+void SaltManagerDialog::salt_about_to_change ()
 {
-  SaltModel *model = dynamic_cast <SaltModel *> (salt_view->model ());
+  SaltModel *model = dynamic_cast<SaltModel *> (salt_view->model ());
   tl_assert (model != 0);
   model->begin_update ();
 }
 
-void
-SaltManagerDialog::salt_changed ()
+void SaltManagerDialog::salt_changed ()
 {
   dm_update_models ();
 }
 
-void
-SaltManagerDialog::salt_mine_about_to_change ()
+void SaltManagerDialog::salt_mine_about_to_change ()
 {
   SaltModel *model;
 
-  model = dynamic_cast <SaltModel *> (salt_mine_view_new->model ());
+  model = dynamic_cast<SaltModel *> (salt_mine_view_new->model ());
   tl_assert (model != 0);
   model->begin_update ();
 
-  model = dynamic_cast <SaltModel *> (salt_mine_view_update->model ());
+  model = dynamic_cast<SaltModel *> (salt_mine_view_update->model ());
   tl_assert (model != 0);
   model->begin_update ();
 }
 
-void
-SaltManagerDialog::refresh ()
+void SaltManagerDialog::refresh ()
 {
   m_salt_grain_cache.clear ();
 
@@ -866,18 +837,15 @@ SaltManagerDialog::refresh ()
     } else {
       salt_mine_data_ready ();
     }
-
   }
 }
 
-void
-SaltManagerDialog::salt_mine_download_started ()
+void SaltManagerDialog::salt_mine_download_started ()
 {
   QApplication::setOverrideCursor (Qt::WaitCursor);
 }
 
-void
-SaltManagerDialog::salt_mine_download_finished ()
+void SaltManagerDialog::salt_mine_download_finished ()
 {
   QApplication::restoreOverrideCursor ();
   if (m_salt_mine_reader.get ()) {
@@ -886,10 +854,9 @@ SaltManagerDialog::salt_mine_download_finished ()
   }
 }
 
-void
-SaltManagerDialog::salt_mine_data_ready ()
+void SaltManagerDialog::salt_mine_data_ready ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   try {
 
@@ -898,7 +865,6 @@ BEGIN_PROTECTED
       lay::Salt new_mine;
       new_mine.load (m_salt_mine_url, *m_salt_mine_reader);
       m_salt_mine = new_mine;
-
     }
 
     salt_mine_download_finished ();
@@ -910,22 +876,20 @@ BEGIN_PROTECTED
 
   salt_mine_changed ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-SaltManagerDialog::salt_mine_changed ()
+void SaltManagerDialog::salt_mine_changed ()
 {
   dm_update_models ();
 }
 
-void
-SaltManagerDialog::update_models ()
+void SaltManagerDialog::update_models ()
 {
   actionShowMarkedOnlyNew->setChecked (false);
   actionShowMarkedOnlyUpdate->setChecked (false);
 
-  SaltModel *model = dynamic_cast <SaltModel *> (salt_view->model ());
+  SaltModel *model = dynamic_cast<SaltModel *> (salt_view->model ());
   tl_assert (model != 0);
 
   model->clear_messages ();
@@ -967,13 +931,12 @@ SaltManagerDialog::update_models ()
     if (! salt_view->currentIndex ().isValid () && model->rowCount (QModelIndex ()) > 0) {
       salt_view->setCurrentIndex (model->index (0, 0, QModelIndex ()));
     }
-
   }
 
   SaltAPIVersionCheck svc;
   SaltModel *mine_model;
 
-  mine_model = dynamic_cast <SaltModel *> (salt_mine_view_update->model ());
+  mine_model = dynamic_cast<SaltModel *> (salt_mine_view_update->model ());
   tl_assert (mine_model != 0);
 
   mine_model->clear_order ();
@@ -1020,7 +983,7 @@ SaltManagerDialog::update_models ()
     salt_mine_view_update->selectionModel ()->blockSignals (false);
   }
 
-  mine_model = dynamic_cast <SaltModel *> (salt_mine_view_new->model ());
+  mine_model = dynamic_cast<SaltModel *> (salt_mine_view_new->model ());
   tl_assert (mine_model != 0);
 
   mine_model->clear_order ();
@@ -1048,12 +1011,11 @@ SaltManagerDialog::update_models ()
   mode_changed ();
 }
 
-void
-SaltManagerDialog::selected_changed ()
+void SaltManagerDialog::selected_changed ()
 {
   SaltGrain *g = current_grain ();
   details_text->set_grain (g);
-  if (!g) {
+  if (! g) {
     details_frame->setEnabled (false);
   } else {
     details_frame->setEnabled (true);
@@ -1066,7 +1028,7 @@ SaltManagerDialog::selected_changed ()
 lay::SaltGrain *
 SaltManagerDialog::current_grain ()
 {
-  SaltModel *model = dynamic_cast <SaltModel *> (salt_view->model ());
+  SaltModel *model = dynamic_cast<SaltModel *> (salt_view->model ());
 
   QModelIndexList indexes = salt_view->selectionModel ()->selectedIndexes ();
   if (indexes.size () == 1 && model) {
@@ -1081,7 +1043,7 @@ SaltManagerDialog::current_grains ()
 {
   std::vector<lay::SaltGrain *> res;
 
-  SaltModel *model = dynamic_cast <SaltModel *> (salt_view->model ());
+  SaltModel *model = dynamic_cast<SaltModel *> (salt_view->model ());
   if (model) {
 
     QModelIndexList indexes = salt_view->selectionModel ()->selectedIndexes ();
@@ -1091,26 +1053,23 @@ SaltManagerDialog::current_grains ()
         res.push_back (g);
       }
     }
-
   }
 
   return res;
 }
 
-void
-SaltManagerDialog::mine_update_selected_changed ()
+void SaltManagerDialog::mine_update_selected_changed ()
 {
   dm_mine_update_selected_changed ();
 }
 
-void
-SaltManagerDialog::do_mine_update_selected_changed ()
+void SaltManagerDialog::do_mine_update_selected_changed ()
 {
-  SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view_update->model ());
+  SaltModel *model = dynamic_cast<SaltModel *> (salt_mine_view_update->model ());
   tl_assert (model != 0);
 
   SaltGrain *g = 0;
-  QModelIndexList indexes = salt_mine_view_update->selectionModel ()->selectedIndexes();
+  QModelIndexList indexes = salt_mine_view_update->selectionModel ()->selectedIndexes ();
   if (indexes.size () == 1) {
     g = model->grain_from_index (indexes.front ());
   }
@@ -1120,20 +1079,18 @@ SaltManagerDialog::do_mine_update_selected_changed ()
   get_remote_grain_info (g, details_update_text);
 }
 
-void
-SaltManagerDialog::mine_new_selected_changed ()
+void SaltManagerDialog::mine_new_selected_changed ()
 {
   dm_mine_new_selected_changed ();
 }
 
-void
-SaltManagerDialog::do_mine_new_selected_changed ()
+void SaltManagerDialog::do_mine_new_selected_changed ()
 {
-  SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view_new->model ());
+  SaltModel *model = dynamic_cast<SaltModel *> (salt_mine_view_new->model ());
   tl_assert (model != 0);
 
   SaltGrain *g = 0;
-  QModelIndexList indexes = salt_mine_view_new->selectionModel ()->selectedIndexes();
+  QModelIndexList indexes = salt_mine_view_new->selectionModel ()->selectedIndexes ();
   if (indexes.size () == 1) {
     g = model->grain_from_index (indexes.front ());
   }
@@ -1210,8 +1167,7 @@ private:
 
 }
 
-void
-SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTextWidget *details)
+void SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTextWidget *details)
 {
   //  NOTE: we don't want to interfere with download here, so refuse to do update
   //  the info while a package is downloaded.
@@ -1240,17 +1196,16 @@ SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTex
       }
 
       QString html = tr (
-        "<html>"
-          "<body>"
-            "<font color=\"#c0c0c0\">"
-              "<h2>Fetching Package Definition ...</h2>"
-              "<p><b>URL</b>: %1</p>"
-              "<p>%2</p>"
-            "</font>"
-          "</body>"
-        "</html>"
-      )
-      .arg (tl::to_qstring (g->url ()));
+                       "<html>"
+                       "<body>"
+                       "<font color=\"#c0c0c0\">"
+                       "<h2>Fetching Package Definition ...</h2>"
+                       "<p><b>URL</b>: %1</p>"
+                       "<p>%2</p>"
+                       "</font>"
+                       "</body>"
+                       "</html>")
+                       .arg (tl::to_qstring (g->url ()));
 
       details->setHtml (html.arg (QString ()));
 
@@ -1282,7 +1237,6 @@ SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTex
 
         m_downloaded_grain.reset (new SaltGrain (sg->second));
         data_ready ();
-
       }
 
     } catch (tl::Exception &ex) {
@@ -1294,12 +1248,10 @@ SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTex
     //  Download denied - take information from index
     m_downloaded_grain.reset (new SaltGrain (*g));
     data_ready ();
-
   }
 }
 
-void
-SaltManagerDialog::data_ready ()
+void SaltManagerDialog::data_ready ()
 {
   if (! m_salt_mine_grain.get () || ! m_downloaded_grain.get () || ! mp_downloaded_target) {
     return;
@@ -1341,28 +1293,26 @@ SaltManagerDialog::data_ready ()
   }
 }
 
-void
-SaltManagerDialog::show_error (tl::Exception &ex)
+void SaltManagerDialog::show_error (tl::Exception &ex)
 {
   QString html = tr (
-    "<html>"
-      "<body>"
-        "<font color=\"#ff0000\">"
-          "<h2>Error Fetching Package Definition</h2>"
-          "<p><b>URL</b>: %1</p>"
-          "<p><b>Error</b>: %2</p>"
-        "</font>"
-      "</body>"
-    "</html>"
-  )
-  .arg (tl::to_qstring (m_downloaded_grain.get () ? m_downloaded_grain->url () : ""))
-  .arg (tl::to_qstring (tl::escaped_to_html (ex.msg ())));
+                   "<html>"
+                   "<body>"
+                   "<font color=\"#ff0000\">"
+                   "<h2>Error Fetching Package Definition</h2>"
+                   "<p><b>URL</b>: %1</p>"
+                   "<p><b>Error</b>: %2</p>"
+                   "</font>"
+                   "</body>"
+                   "</html>")
+                   .arg (tl::to_qstring (m_downloaded_grain.get () ? m_downloaded_grain->url () : ""))
+                   .arg (tl::to_qstring (tl::escaped_to_html (ex.msg ())));
   mp_downloaded_target->setHtml (html);
 
   m_downloaded_grain.reset (0);
   if (m_downloaded_grain_reader.get ()) {
     //  NOTE: don't delete the reader in the slot it triggered
-    m_downloaded_grain_reader->close();
+    m_downloaded_grain_reader->close ();
   }
   m_salt_mine_grain.reset (0);
 }

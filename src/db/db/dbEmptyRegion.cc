@@ -181,17 +181,14 @@ EmptyRegion::edges (const EdgeFilterBase *, const PolygonToEdgeProcessorBase *) 
   return new EmptyEdges ();
 }
 
-bool
-EmptyRegion::equals (const Region &other) const
+bool EmptyRegion::equals (const Region &other) const
 {
   return other.empty ();
 }
 
-bool
-EmptyRegion::less (const Region &other) const
+bool EmptyRegion::less (const Region &other) const
 {
   return other.empty () ? false : true;
 }
 
 }
-

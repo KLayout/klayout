@@ -29,8 +29,7 @@ namespace db
 /**
  *  @brief An enum describing the way how net information is attached to shapes as properties in "build_nets"
  */
-enum NetPropertyMode
-{
+enum NetPropertyMode {
   /**
    *  @brief Do no generate properties
    */
@@ -60,8 +59,7 @@ enum NetPropertyMode
 /**
  *  @brief An enum describing the way the net hierarchy is mapped
  */
-enum BuildNetHierarchyMode
-{
+enum BuildNetHierarchyMode {
   /**
    *  @brief Flatten the net
    *  Collects all shapes of a net and puts that into the net cell or circuit cell

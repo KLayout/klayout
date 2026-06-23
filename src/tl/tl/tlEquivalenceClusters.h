@@ -254,7 +254,7 @@ private:
   }
 
   std::map<T, size_t> m_cluster_id_by_attr;
-  std::vector<std::vector<typename std::map<T, size_t>::iterator> > m_clusters;
+  std::vector<std::vector<typename std::map<T, size_t>::iterator>> m_clusters;
   std::vector<size_t> m_free_slots;
 };
 

@@ -35,16 +35,17 @@
 #include <string>
 #include <functional>
 
-namespace db {
+namespace db
+{
 
 template <class Coord> class generic_repository;
 class ArrayRepository;
 
 template <class C>
-inline  C box_world_min () { return std::numeric_limits<C>::min (); }
+inline C box_world_min () { return std::numeric_limits<C>::min (); }
 
 template <class C>
-inline  C box_world_max () { return std::numeric_limits<C>::max (); }
+inline C box_world_max () { return std::numeric_limits<C>::max (); }
 
 //  NOTE: for 64bit coordinates the world coordinates do not fully exploit the coordinate
 //  range but only as much as can represented exactly by double (64bit) values.
@@ -59,21 +60,20 @@ inline int64_t box_world_max<int64_t> () { return (int64_t (1) << 53); }
  *  @brief A box class
  *
  *  This object represents a box (a rectangular shape).
- *  Notation is: p1 is the lower left point, p2 the 
- *  upper right one. 
+ *  Notation is: p1 is the lower left point, p2 the
+ *  upper right one.
  *  A box can be empty. An empty box represents no area
  *  (not even a point). A box can be a point or a single
  *  line. In this case, the area is zero but the box still
- *  can overlap other boxes. 
+ *  can overlap other boxes.
  *  The template parameter C is the type to use for coordinate
  *  values. "R" is the type actually used for representing the
- *  coordinates internally (i.e. R=short, C=int for a 16bit 
+ *  coordinates internally (i.e. R=short, C=int for a 16bit
  *  coordinates box).
  */
 
 template <class C, class R>
-struct DB_PUBLIC_TEMPLATE box
-{
+struct DB_PUBLIC_TEMPLATE box {
   typedef C coord_type;
   typedef box<C, R> box_type;
   typedef point<C> point_type;
@@ -81,7 +81,7 @@ struct DB_PUBLIC_TEMPLATE box
   typedef typename coord_traits<C>::area_type area_type;
   typedef typename coord_traits<C>::distance_type distance_type;
   typedef typename coord_traits<C>::perimeter_type perimeter_type;
-  typedef object_tag< box<C, R> > tag;
+  typedef object_tag<box<C, R>> tag;
 
   /**
    *  @brief Empty box constructor
@@ -94,18 +94,18 @@ struct DB_PUBLIC_TEMPLATE box
 
   /**
    *  @brief Standard constructor with four coordinates
-   *  
+   *
    *  Creates a box from four coordinates (left, bottom,
    *  right, top). The coordinates are sorted, so left and
    *  right can be swapped as well as top and bottom.
    *
-   *  @param x1 The first x coordinate 
+   *  @param x1 The first x coordinate
    *  @param y1 The first y coordinate
    *  @param x2 The second x coordinate
    *  @param y2 The second y coordinate
    */
   box (C x1, C y1, C x2, C y2)
-    : m_p1 (x1 < x2 ? x1 : x2, y1 < y2 ? y1 : y2), 
+    : m_p1 (x1 < x2 ? x1 : x2, y1 < y2 ? y1 : y2),
       m_p2 (x2 > x1 ? x2 : x1, y2 > y1 ? y2 : y1)
   {
     //  .. nothing else ..
@@ -122,7 +122,7 @@ struct DB_PUBLIC_TEMPLATE box
    *  @param p2 The second point
    */
   box (const point<C> &p1, const point<C> &p2)
-    : m_p1 (p1.x () < p2.x () ? p1.x () : p2.x (), p1.y () < p2.y () ? p1.y () : p2.y ()), 
+    : m_p1 (p1.x () < p2.x () ? p1.x () : p2.x (), p1.y () < p2.y () ? p1.y () : p2.y ()),
       m_p2 (p2.x () > p1.x () ? p2.x () : p1.x (), p2.y () > p1.y () ? p2.y () : p1.y ())
   {
     //  .. nothing else ..
@@ -132,7 +132,7 @@ struct DB_PUBLIC_TEMPLATE box
    *  @brief The copy constructor that also does type conversions
    *
    *  The implementation relies on the ability of the point constructor
-   *  to convert between types. It assumes that the conversion is 
+   *  to convert between types. It assumes that the conversion is
    *  maintaining the order of the coordinates and the emptyness condition.
    */
   template <class D, class DR>
@@ -147,7 +147,7 @@ struct DB_PUBLIC_TEMPLATE box
    *
    *  Hint: this box is likely to be somewhat misfunctional. It cannot be transformed well for example.
    */
-  static box world () 
+  static box world ()
   {
     return box (box_world_min<C> (), box_world_min<C> (), box_world_max<C> (), box_world_max<C> ());
   }
@@ -188,7 +188,7 @@ struct DB_PUBLIC_TEMPLATE box
    */
   bool not_equal (const box_type &b) const
   {
-    return !equal (b);
+    return ! equal (b);
   }
 
   /**
@@ -204,12 +204,12 @@ struct DB_PUBLIC_TEMPLATE box
   /**
    *  @brief Convolve boxes.
    *
-   *  The *= operator convolves the box with the one given as 
+   *  The *= operator convolves the box with the one given as
    *  the argument. The box resulting from "convolution" is the
-   *  outer boundary of the union set formed by placing 
+   *  outer boundary of the union set formed by placing
    *  the second box at every point of the first. In other words,
    *  the returned box of (p1,p2)*(q1,q2) is (p1+q1,p2+q2).
-   * 
+   *
    *  @param b The box to convolve with *this.
    *
    *  @return The convolved box.
@@ -224,12 +224,12 @@ struct DB_PUBLIC_TEMPLATE box
   /**
    *  @brief Joining of boxes.
    *
-   *  The += operator joins the box with the one given as 
+   *  The += operator joins the box with the one given as
    *  the argument. Joining constructs a box that encloses
    *  both boxes given. Empty boxes are neutral: they do not
    *  change another box when joining. Overwrites *this
    *  with the result.
-   * 
+   *
    *  @param b The box to join with *this.
    *
    *  @return The joined box.
@@ -247,7 +247,7 @@ struct DB_PUBLIC_TEMPLATE box
    *  The += operator joins the box with a point such that
    *  the new box encloses the point and the old box.
    *  Overwrites *this with the result.
-   * 
+   *
    *  @param p The point to join with *this.
    *
    *  @return The joined box.
@@ -279,7 +279,7 @@ struct DB_PUBLIC_TEMPLATE box
    *  @brief Intersection of boxes.
    *
    *  The intersection of two boxes is the largest
-   *  box common to both boxes. The intersection may be 
+   *  box common to both boxes. The intersection may be
    *  empty if both boxes to not touch. If the boxes do
    *  not overlap but touch the result may be a single
    *  line or point with an area of zero. Overwrites *this
@@ -330,7 +330,7 @@ struct DB_PUBLIC_TEMPLATE box
 
   /**
    *  @brief Transformation of the box
-   * 
+   *
    *  Transforms the box with a given transformation and
    *  writes the result to *this. If the transformation is non-orthogonal,
    *  the result will still be a box (which is not correct strictly spoken)
@@ -537,33 +537,33 @@ struct DB_PUBLIC_TEMPLATE box
   C bottom () const;
 
   /**
-   *  @brief Set the left margin 
+   *  @brief Set the left margin
    *
-   *  If the left margin gets larger that the right one, the value given will become the 
+   *  If the left margin gets larger that the right one, the value given will become the
    *  right margin
    */
   void set_left (C l);
 
   /**
-   *  @brief Set the right margin 
+   *  @brief Set the right margin
    *
-   *  If the right margin gets less that the left one, the value given will become the 
+   *  If the right margin gets less that the left one, the value given will become the
    *  left margin
    */
   void set_right (C r);
 
   /**
-   *  @brief Set the bottom margin 
+   *  @brief Set the bottom margin
    *
-   *  If the bottom margin gets larger that the top one, the value given will become the 
+   *  If the bottom margin gets larger that the top one, the value given will become the
    *  top margin
    */
   void set_bottom (C b);
 
   /**
-   *  @brief Set the top margin 
+   *  @brief Set the top margin
    *
-   *  If the top margin gets less that the bottom one, the value given will become the 
+   *  If the top margin gets less that the bottom one, the value given will become the
    *  bottom margin
    */
   void set_top (C t);
@@ -622,7 +622,7 @@ struct DB_PUBLIC_TEMPLATE box
    *
    *  @param b The box to test against.
    *
-   *  @return true if the box is overlapping b (the area of the 
+   *  @return true if the box is overlapping b (the area of the
    *  intersection box is non-empty)
    */
   bool overlaps (const box<C, R> &b) const;
@@ -633,22 +633,22 @@ struct DB_PUBLIC_TEMPLATE box
    *  @return The perimeter of the box. 0 if empty.
    */
   perimeter_type perimeter () const;
-  
+
   /**
    *  @brief Computation of the area of a box
    *
    *  @return The area of the box. 0 if empty.
    */
   area_type area () const;
-  
+
   /**
-   *  @brief Computation of the area of a box in double 
+   *  @brief Computation of the area of a box in double
    *
    *  @return The area of the box. 0 if empty.
    */
   double double_area () const;
-  
-  /** 
+
+  /**
    *  @brief Conversion to string
    *
    *  If dbu is set, it determines the factor by which the coordinates are multiplied to render
@@ -669,14 +669,14 @@ private:
 };
 
 template <class C, class R>
-inline void 
+inline void
 box<C, R>::translate (const box<C, R> &d, db::generic_repository<C> &, db::ArrayRepository &)
 {
   *this = d;
 }
 
 template <class C, class R> template <class T>
-inline void 
+inline void
 box<C, R>::translate (const box<C, R> &d, const T &t, db::generic_repository<C> &, db::ArrayRepository &)
 {
   *this = d;
@@ -684,14 +684,14 @@ box<C, R>::translate (const box<C, R> &d, const T &t, db::generic_repository<C> 
 }
 
 template <class C, class R>
-inline bool 
+inline bool
 box<C, R>::operator< (const box<C, R> &b) const
 {
   return m_p1 < b.m_p1 || (m_p1 == b.m_p1 && m_p2 < b.m_p2);
 }
 
 template <class C, class R>
-inline bool 
+inline bool
 box<C, R>::less (const box<C, R> &b) const
 {
   if (! m_p1.equal (b.p1 ())) {
@@ -704,7 +704,7 @@ box<C, R>::less (const box<C, R> &b) const
 }
 
 template <class C, class R>
-inline bool 
+inline bool
 box<C, R>::operator== (const box<C, R> &b) const
 {
   if (empty () && b.empty ()) {
@@ -717,14 +717,14 @@ box<C, R>::operator== (const box<C, R> &b) const
 }
 
 template <class C, class R>
-inline bool 
+inline bool
 box<C, R>::operator!= (const box<C, R> &b) const
 {
-  return !operator== (b);
+  return ! operator== (b);
 }
 
 template <class C, class R>
-inline bool 
+inline bool
 box<C, R>::equal (const box<C, R> &b) const
 {
   return m_p1.equal (b.p1 ()) && m_p2.equal (b.p2 ());
@@ -744,14 +744,14 @@ box<C, R>::operator*= (const box<C, R> &b)
 }
 
 template <class C, class R>
-inline box<C, R> 
+inline box<C, R>
 box<C, R>::scaled (double s) const
 {
   return box<C, R> (*this * s);
 }
 
 template <class C, class R>
-inline box<C, R> 
+inline box<C, R>
 box<C, R>::convolved (const box<C, R> &b) const
 {
   box<C, R> r (*this);
@@ -779,7 +779,7 @@ box<C, R>::operator+= (const box<C, R> &b)
 }
 
 template <class C, class R>
-inline box<C, R> 
+inline box<C, R>
 box<C, R>::joined (const box<C, R> &b) const
 {
   box<C, R> r (*this);
@@ -862,12 +862,12 @@ box<C, R>::operator&= (const box<C, R> &b)
                  m_p2.y () < b.m_p2.y () ? m_p2.y () : b.m_p2.y ());
     m_p1 = p1;
     m_p2 = p2;
-  } 
+  }
   return *this;
 }
 
 template <class C, class R>
-inline box<C, R> 
+inline box<C, R>
 box<C, R>::intersection (const box<C, R> &b) const
 {
   box<C, R> r (*this);
@@ -876,7 +876,7 @@ box<C, R>::intersection (const box<C, R> &b) const
 }
 
 template <class C, class R>
-inline box<C, R> 
+inline box<C, R>
 box<C, R>::moved (const vector<C> &p) const
 {
   box<C, R> b (*this);
@@ -885,7 +885,7 @@ box<C, R>::moved (const vector<C> &p) const
 }
 
 template <class C, class R>
-inline box<C, R> 
+inline box<C, R>
 box<C, R>::enlarged (const vector<C> &p) const
 {
   box<C, R> b (*this);
@@ -906,12 +906,12 @@ box<C, R>::transform (const Tr &t)
       b += point<C> (t * lower_right ());
       *this = b;
     }
-  } 
+  }
   return *this;
 }
 
 template <class C, class R> template <class Tr>
-inline box<typename Tr::target_coord_type> 
+inline box<typename Tr::target_coord_type>
 box<C, R>::transformed (const Tr &t) const
 {
   if (! empty ()) {
@@ -979,91 +979,91 @@ box<C, R>::upper_right () const
 }
 
 template <class C, class R>
-inline point<R> 
+inline point<R>
 box<C, R>::upper_left () const
 {
   return point<R> (m_p1.x (), m_p2.y ());
 }
 
 template <class C, class R>
-inline point<R> 
+inline point<R>
 box<C, R>::lower_right () const
 {
   return point<R> (m_p2.x (), m_p1.y ());
 }
 
 template <class C, class R>
-inline bool 
+inline bool
 box<C, R>::is_point () const
 {
   return m_p1 == m_p2;
 }
 
 template <class C, class R>
-inline void 
+inline void
 box<C, R>::set_p1 (const point<C> &_p1)
 {
   *this = box_type (_p1, p2 ());
 }
 
 template <class C, class R>
-inline void 
+inline void
 box<C, R>::set_p2 (const point<C> &_p2)
 {
   *this = box_type (p1 (), _p2);
 }
 
 template <class C, class R>
-inline point<C> 
+inline point<C>
 box<C, R>::center () const
 {
   return point<C> (m_p1.x () + width () / 2, m_p1.y () + height () / 2);
 }
 
 template <class C, class R>
-inline typename box<C, R>::distance_type 
+inline typename box<C, R>::distance_type
 box<C, R>::width () const
 {
   return m_p2.x () - m_p1.x ();
 }
 
 template <class C, class R>
-inline typename box<C, R>::distance_type 
+inline typename box<C, R>::distance_type
 box<C, R>::height () const
 {
   return m_p2.y () - m_p1.y ();
 }
 
 template <class C, class R>
-inline C 
+inline C
 box<C, R>::left () const
 {
   return m_p1.x ();
 }
 
 template <class C, class R>
-inline C 
+inline C
 box<C, R>::right () const
 {
   return m_p2.x ();
 }
 
 template <class C, class R>
-inline C 
+inline C
 box<C, R>::top () const
 {
   return m_p2.y ();
 }
 
 template <class C, class R>
-inline C 
+inline C
 box<C, R>::bottom () const
 {
   return m_p1.y ();
 }
 
 template <class C, class R>
-inline void 
+inline void
 box<C, R>::set_left (C l)
 {
   if (empty ()) {
@@ -1074,7 +1074,7 @@ box<C, R>::set_left (C l)
 }
 
 template <class C, class R>
-inline void 
+inline void
 box<C, R>::set_right (C r)
 {
   if (empty ()) {
@@ -1085,7 +1085,7 @@ box<C, R>::set_right (C r)
 }
 
 template <class C, class R>
-inline void 
+inline void
 box<C, R>::set_bottom (C b)
 {
   if (empty ()) {
@@ -1096,7 +1096,7 @@ box<C, R>::set_bottom (C b)
 }
 
 template <class C, class R>
-inline void 
+inline void
 box<C, R>::set_top (C t)
 {
   if (empty ()) {
@@ -1107,14 +1107,14 @@ box<C, R>::set_top (C t)
 }
 
 template <class C, class R>
-inline bool 
+inline bool
 box<C, R>::empty () const
 {
   return m_p1.x () > m_p2.x () || m_p1.y () > m_p2.y ();
 }
 
 template <class C, class R>
-inline bool 
+inline bool
 box<C, R>::contains (const point<C> &p) const
 {
   if (empty ()) {
@@ -1126,7 +1126,7 @@ box<C, R>::contains (const point<C> &p) const
 }
 
 template <class C, class R>
-inline bool 
+inline bool
 box<C, R>::inside (const box<C, R> &b) const
 {
   if (b.empty () || empty ()) {
@@ -1138,7 +1138,7 @@ box<C, R>::inside (const box<C, R> &b) const
 }
 
 template <class C, class R>
-inline bool 
+inline bool
 box<C, R>::touches (const box<C, R> &b) const
 {
   if (b.empty () || empty ()) {
@@ -1150,7 +1150,7 @@ box<C, R>::touches (const box<C, R> &b) const
 }
 
 template <class C, class R>
-inline bool 
+inline bool
 box<C, R>::overlaps (const box<C, R> &b) const
 {
   if (b.empty () || empty ()) {
@@ -1162,7 +1162,7 @@ box<C, R>::overlaps (const box<C, R> &b) const
 }
 
 template <class C, class R>
-inline typename box<C, R>::area_type 
+inline typename box<C, R>::area_type
 box<C, R>::area () const
 {
   if (empty ()) {
@@ -1173,7 +1173,7 @@ box<C, R>::area () const
 }
 
 template <class C, class R>
-inline typename box<C, R>::perimeter_type 
+inline typename box<C, R>::perimeter_type
 box<C, R>::perimeter () const
 {
   if (empty ()) {
@@ -1184,7 +1184,7 @@ box<C, R>::perimeter () const
 }
 
 template <class C, class R>
-inline double 
+inline double
 box<C, R>::double_area () const
 {
   if (empty ()) {
@@ -1198,7 +1198,7 @@ box<C, R>::double_area () const
  *  @brief The left side as a unary function
  */
 template <class Box>
-struct box_left 
+struct box_left
 #if __cplusplus < 201703L
   : public std::unary_function<Box, typename Box::coord_type>
 #endif
@@ -1213,7 +1213,7 @@ struct box_left
  *  @brief The right side as a unary function
  */
 template <class Box>
-struct box_right 
+struct box_right
 #if __cplusplus < 201703L
   : public std::unary_function<Box, typename Box::coord_type>
 #endif
@@ -1228,7 +1228,7 @@ struct box_right
  *  @brief The bottom side as a unary function
  */
 template <class Box>
-struct box_bottom 
+struct box_bottom
 #if __cplusplus < 201703L
   : public std::unary_function<Box, typename Box::coord_type>
 #endif
@@ -1243,7 +1243,7 @@ struct box_bottom
  *  @brief The top side as a unary function
  */
 template <class Box>
-struct box_top 
+struct box_top
 #if __cplusplus < 201703L
   : public std::unary_function<Box, typename Box::coord_type>
 #endif
@@ -1293,7 +1293,7 @@ struct boxes_touch
  *  @return The box b transformed by t.
  */
 template <class R, class Tr>
-inline box<typename Tr::target_coord_type> 
+inline box<typename Tr::target_coord_type>
 operator* (const Tr &t, const box<typename Tr::coord_type, R> &b)
 {
   return b.transformed (t);
@@ -1306,9 +1306,9 @@ operator* (const Tr &t, const box<typename Tr::coord_type, R> &b)
  *  @param b2 The second box.
  *
  *  @return The intersection of b1 and b2.
- */ 
+ */
 template <class C>
-inline box<C> 
+inline box<C>
 operator& (const box<C> &b1, const box<C> &b2)
 {
   box<C> bb (b1);
@@ -1323,9 +1323,9 @@ operator& (const box<C> &b1, const box<C> &b2)
  *  @param s The scaling factor
  *
  *  @return The scaled box
- */ 
+ */
 template <class C>
-inline box<double> 
+inline box<double>
 operator* (const box<C> &b, double s)
 {
   if (b.empty ()) {
@@ -1342,9 +1342,9 @@ operator* (const box<C> &b, double s)
  *  @param s The scaling factor
  *
  *  @return The scaled box
- */ 
+ */
 template <class C>
-inline box<C> 
+inline box<C>
 operator* (const box<C> &b, long s)
 {
   if (b.empty ()) {
@@ -1361,9 +1361,9 @@ operator* (const box<C> &b, long s)
  *  @param s The scaling factor
  *
  *  @return The scaled box
- */ 
+ */
 template <class C>
-inline box<C> 
+inline box<C>
 operator* (const box<C> &b, int s)
 {
   if (b.empty ()) {
@@ -1380,9 +1380,9 @@ operator* (const box<C> &b, int s)
  *  @param s The scaling factor
  *
  *  @return The scaled box
- */ 
+ */
 template <class C>
-inline box<C> 
+inline box<C>
 operator* (const box<C> &b, unsigned int s)
 {
   if (b.empty ()) {
@@ -1399,9 +1399,9 @@ operator* (const box<C> &b, unsigned int s)
  *  @param s The scaling factor
  *
  *  @return The scaled box
- */ 
+ */
 template <class C>
-inline box<C> 
+inline box<C>
 operator* (const box<C> &b, unsigned long s)
 {
   if (b.empty ()) {
@@ -1418,9 +1418,9 @@ operator* (const box<C> &b, unsigned long s)
  *  @param b2 The second box.
  *
  *  @return b1 joined with b2.
- */ 
+ */
 template <class C>
-inline box<C> 
+inline box<C>
 operator+ (const box<C> &b1, const box<C> &b2)
 {
   box<C> bb (b1);
@@ -1452,9 +1452,9 @@ operator- (const box<C> &b1, const box<C> &b2)
  *  @param b2 The second box.
  *
  *  @return b1 folded with b2 (see db::box::operator*= ()).
- */ 
+ */
 template <class C>
-inline box<C> 
+inline box<C>
 operator* (const box<C> &b1, const box<C> &b2)
 {
   box<C> bb (b1);
@@ -1472,15 +1472,15 @@ operator<< (std::ostream &os, const box<C> &b)
   return (os << b.to_string ());
 }
 
-/** 
+/**
  *  @brief A helper inserter that adds a point to a box
  */
 
 template <class Box>
-class box_inserter 
+class box_inserter
 {
 public:
-  box_inserter (Box &box) 
+  box_inserter (Box &box)
     : mp_box (&box)
   {
     //  .. nothing yet ..
@@ -1522,15 +1522,14 @@ typedef box<db::DCoord> DBox;
  *  @brief Special extractors for the boxes
  */
 
-namespace tl 
+namespace tl
 {
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Box &b);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DBox &b);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Box &b);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DBox &b);
 
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Box &b);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DBox &b);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Box &b);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DBox &b);
 
 } // namespace tl
 
 #endif
-

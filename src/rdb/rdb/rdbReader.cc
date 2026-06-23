@@ -29,8 +29,7 @@
 namespace rdb
 {
 
-bool 
-match_filename_to_format (const std::string &fn, const std::string &fmt)
+bool match_filename_to_format (const std::string &fn, const std::string &fmt)
 {
   const char *fp = fmt.c_str ();
   while (*fp && *fp != '(') {
@@ -83,4 +82,3 @@ Reader::~Reader ()
 }
 
 }
-

@@ -23,4 +23,4 @@
 #include "../pymodHelper.h"
 
 #include "lymMain.h"
-DEFINE_PYMOD(lymcore, "lym", "KLayout core module 'lym'")
+DEFINE_PYMOD (lymcore, "lym", "KLayout core module 'lym'")

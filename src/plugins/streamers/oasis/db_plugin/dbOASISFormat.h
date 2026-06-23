@@ -55,7 +55,7 @@ public:
    *  This mode is only provided for testing and writing such a layout will probably
    *  result in duplicate entries.
    */
-  bool read_all_properties; 
+  bool read_all_properties;
 
   /**
    *  @brief Indicates that the reader expects strict mode or note
@@ -113,10 +113,10 @@ public:
    *  This level describes how hard the OASIS writer will try to compress the shapes
    *  using shape arrays. Building shape arrays may take some time and requires some memory.
    *    0 - no shape array building
-   *    1 - nearest neighbor shape array formation 
+   *    1 - nearest neighbor shape array formation
    *    2++ - enhanced shape array search algorithm using 2nd and further neighbor distances as well
    */
-  int compression_level; 
+  int compression_level;
 
   /**
    *  @brief CBLOCK compression
@@ -135,7 +135,7 @@ public:
   /**
    *  @brief Recompressions
    *
-   *  If the recompression flag is true, existing shape arrays will be resolved and 
+   *  If the recompression flag is true, existing shape arrays will be resolved and
    *  put into the compressor again (may take longer).
    */
   bool recompress;
@@ -154,7 +154,7 @@ public:
    *  @brief Write global standard properties
    *
    *  If this value is 0, no standard properties are written. If it's 1, global
-   *  standard properties such as S_TOP_CELL are written. If 2, bounding box 
+   *  standard properties such as S_TOP_CELL are written. If 2, bounding box
    *  standard properties are written for every cell too.
    */
   int write_std_properties;
@@ -162,7 +162,7 @@ public:
   /**
    *  @brief Substitution character
    *
-   *  If non-empty, this string (first character) will be used for 
+   *  If non-empty, this string (first character) will be used for
    *  substituting invalid characters in a-strings and n-strings.
    */
   std::string subst_char;
@@ -172,7 +172,7 @@ public:
    */
   bool tables_at_end;
 
-  /** 
+  /**
    *  @brief Implementation of FormatSpecificWriterOptions
    */
   virtual FormatSpecificWriterOptions *clone () const

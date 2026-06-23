@@ -67,7 +67,7 @@ public:
     // ...
   }
 
-  void menu_activated (const std::string &symbol) 
+  void menu_activated (const std::string &symbol)
   {
     if (symbol == "lay::boolean") {
       boolean ();
@@ -80,16 +80,18 @@ public:
 
   void boolean ()
   {
-    struct { int *cv; int *layer; } specs [] = {
-      { &m_boolean_cva, &m_boolean_layera },
-      { &m_boolean_cvb, &m_boolean_layerb },
-      { &m_boolean_cvr, &m_boolean_layerr }
-    };
+    struct {
+      int *cv;
+      int *layer;
+    } specs [] = {
+      {&m_boolean_cva, &m_boolean_layera},
+      {&m_boolean_cvb, &m_boolean_layerb},
+      {&m_boolean_cvr, &m_boolean_layerr}};
 
-    for (unsigned int i = 0; i < sizeof (specs) / sizeof (specs[0]); ++i) {
+    for (unsigned int i = 0; i < sizeof (specs) / sizeof (specs [0]); ++i) {
 
-      int &cv = *(specs[i].cv);
-      int &layer = *(specs[i].layer);
+      int &cv = *(specs [i].cv);
+      int &layer = *(specs [i].layer);
 
       if (cv >= int (mp_view->cellviews ())) {
         cv = -1;
@@ -103,7 +105,6 @@ public:
       if (cv < 0 || ! mp_view->cellview (cv)->layout ().is_valid_layer ((unsigned int) layer)) {
         layer = -1;
       }
-
     }
 
     lay::BooleanOptionsDialog dialog (parent_widget ());
@@ -116,7 +117,7 @@ public:
       if (mp_view->manager () && mp_view->manager ()->is_enabled ()) {
 
         lay::TipDialog td (QApplication::activeWindow (),
-                           tl::to_string (QObject::tr ("Undo buffering for the following operation can be memory and time consuming.\nChoose \"Yes\" to use undo buffering or \"No\" for no undo buffering. Warning: in the latter case, the undo history will be lost.\n\nChoose undo buffering?")), 
+                           tl::to_string (QObject::tr ("Undo buffering for the following operation can be memory and time consuming.\nChoose \"Yes\" to use undo buffering or \"No\" for no undo buffering. Warning: in the latter case, the undo history will be lost.\n\nChoose undo buffering?")),
                            "boolean-undo-buffering",
                            lay::TipDialog::yesnocancel_buttons);
 
@@ -136,7 +137,7 @@ public:
         if (! supports_undo) {
           mp_view->manager ()->clear ();
         } else {
-          mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Boolean operation"))); 
+          mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Boolean operation")));
         }
       }
 
@@ -144,20 +145,20 @@ public:
 
         db::BooleanOp::BoolOp op_mode;
         switch (m_boolean_mode) {
-        default: 
-          op_mode = db::BooleanOp::Or; 
+        default:
+          op_mode = db::BooleanOp::Or;
           break;
-        case 1: 
-          op_mode = db::BooleanOp::And; 
+        case 1:
+          op_mode = db::BooleanOp::And;
           break;
-        case 2: 
-          op_mode = db::BooleanOp::ANotB; 
+        case 2:
+          op_mode = db::BooleanOp::ANotB;
           break;
-        case 3: 
-          op_mode = db::BooleanOp::BNotA; 
+        case 3:
+          op_mode = db::BooleanOp::BNotA;
           break;
-        case 4: 
-          op_mode = db::BooleanOp::Xor; 
+        case 4:
+          op_mode = db::BooleanOp::Xor;
           break;
         }
 
@@ -168,7 +169,7 @@ public:
           p.boolean (mp_view->cellview (m_boolean_cva)->layout (), *mp_view->cellview (m_boolean_cva).cell (), m_boolean_layera,
                      mp_view->cellview (m_boolean_cvb)->layout (), *mp_view->cellview (m_boolean_cvb).cell (), m_boolean_layerb,
                      mp_view->cellview (m_boolean_cvr).cell ()->shapes (m_boolean_layerr), op_mode, true, true, m_boolean_mincoh);
-          
+
           //  clear the result layer for all called cells in flat mode
           std::set<db::cell_index_type> called_cells;
           mp_view->cellview (m_boolean_cvr).cell ()->collect_called_cells (called_cells);
@@ -183,7 +184,7 @@ public:
           p.boolean (mp_view->cellview (m_boolean_cva)->layout (), *mp_view->cellview (m_boolean_cva).cell (), m_boolean_layera,
                      mp_view->cellview (m_boolean_cvb)->layout (), *mp_view->cellview (m_boolean_cvb).cell (), m_boolean_layerb,
                      mp_view->cellview (m_boolean_cvr).cell ()->shapes (m_boolean_layerr), op_mode, false, true, m_boolean_mincoh);
-          
+
         } else if (m_boolean_hier_mode == 2) {
 
           //  subcells cell by cell
@@ -199,7 +200,6 @@ public:
                        layout, cell, m_boolean_layerb,
                        cell.shapes (m_boolean_layerr), op_mode, false, true, m_boolean_mincoh);
           }
-
         }
 
         if (supports_undo && mp_view->manager ()) {
@@ -212,21 +212,22 @@ public:
         }
         throw;
       }
-
     }
   }
 
   void merge ()
   {
-    struct { int *cv; int *layer; } specs [] = {
-      { &m_boolean_cva, &m_boolean_layera },
-      { &m_boolean_cvr, &m_boolean_layerr }
-    };
+    struct {
+      int *cv;
+      int *layer;
+    } specs [] = {
+      {&m_boolean_cva, &m_boolean_layera},
+      {&m_boolean_cvr, &m_boolean_layerr}};
 
-    for (unsigned int i = 0; i < sizeof (specs) / sizeof (specs[0]); ++i) {
+    for (unsigned int i = 0; i < sizeof (specs) / sizeof (specs [0]); ++i) {
 
-      int &cv = *(specs[i].cv);
-      int &layer = *(specs[i].layer);
+      int &cv = *(specs [i].cv);
+      int &layer = *(specs [i].layer);
 
       if (cv >= int (mp_view->cellviews ())) {
         cv = -1;
@@ -240,7 +241,6 @@ public:
       if (cv < 0 || ! mp_view->cellview (cv)->layout ().is_valid_layer ((unsigned int) layer)) {
         layer = -1;
       }
-
     }
 
     lay::MergeOptionsDialog dialog (parent_widget ());
@@ -253,7 +253,7 @@ public:
       if (mp_view->manager () && mp_view->manager ()->is_enabled ()) {
 
         lay::TipDialog td (QApplication::activeWindow (),
-                           tl::to_string (QObject::tr ("Undo buffering for the following operation can be memory and time consuming.\nChoose \"Yes\" to use undo buffering or \"No\" for no undo buffering. Warning: in the latter case, the undo history will be lost.\n\nChoose undo buffering?")), 
+                           tl::to_string (QObject::tr ("Undo buffering for the following operation can be memory and time consuming.\nChoose \"Yes\" to use undo buffering or \"No\" for no undo buffering. Warning: in the latter case, the undo history will be lost.\n\nChoose undo buffering?")),
                            "merge-undo-buffering",
                            lay::TipDialog::yesnocancel_buttons);
 
@@ -273,7 +273,7 @@ public:
         if (! supports_undo) {
           mp_view->manager ()->clear ();
         } else {
-          mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Merge operation"))); 
+          mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Merge operation")));
         }
       }
 
@@ -285,7 +285,7 @@ public:
           db::ShapeProcessor p (true);
           p.merge (mp_view->cellview (m_boolean_cva)->layout (), *mp_view->cellview (m_boolean_cva).cell (), m_boolean_layera,
                    mp_view->cellview (m_boolean_cvr).cell ()->shapes (m_boolean_layerr), true, m_boolean_minwc, true, m_boolean_mincoh);
-          
+
           //  clear the result layer for all called cells in flat mode
           std::set<db::cell_index_type> called_cells;
           mp_view->cellview (m_boolean_cvr).cell ()->collect_called_cells (called_cells);
@@ -299,7 +299,7 @@ public:
           db::ShapeProcessor p (true);
           p.merge (mp_view->cellview (m_boolean_cva)->layout (), *mp_view->cellview (m_boolean_cva).cell (), m_boolean_layera,
                    mp_view->cellview (m_boolean_cvr).cell ()->shapes (m_boolean_layerr), false, m_boolean_minwc, true, m_boolean_mincoh);
-          
+
         } else if (m_boolean_hier_mode == 2) {
 
           //  subcells cell by cell
@@ -314,7 +314,6 @@ public:
             p.merge (layout, cell, m_boolean_layera,
                      cell.shapes (m_boolean_layerr), false, m_boolean_minwc, true, m_boolean_mincoh);
           }
-
         }
 
         if (supports_undo && mp_view->manager ()) {
@@ -327,21 +326,22 @@ public:
         }
         throw;
       }
-
     }
   }
 
   void size ()
   {
-    struct { int *cv; int *layer; } specs [] = {
-      { &m_boolean_cva, &m_boolean_layera },
-      { &m_boolean_cvr, &m_boolean_layerr }
-    };
+    struct {
+      int *cv;
+      int *layer;
+    } specs [] = {
+      {&m_boolean_cva, &m_boolean_layera},
+      {&m_boolean_cvr, &m_boolean_layerr}};
 
-    for (unsigned int i = 0; i < sizeof (specs) / sizeof (specs[0]); ++i) {
+    for (unsigned int i = 0; i < sizeof (specs) / sizeof (specs [0]); ++i) {
 
-      int &cv = *(specs[i].cv);
-      int &layer = *(specs[i].layer);
+      int &cv = *(specs [i].cv);
+      int &layer = *(specs [i].layer);
 
       if (cv >= int (mp_view->cellviews ())) {
         cv = -1;
@@ -355,7 +355,6 @@ public:
       if (cv < 0 || ! mp_view->cellview (cv)->layout ().is_valid_layer ((unsigned int) layer)) {
         layer = -1;
       }
-
     }
 
     lay::SizingOptionsDialog dialog (parent_widget ());
@@ -368,7 +367,7 @@ public:
       if (mp_view->manager () && mp_view->manager ()->is_enabled ()) {
 
         lay::TipDialog td (QApplication::activeWindow (),
-                           tl::to_string (QObject::tr ("Undo buffering for the following operation can be memory and time consuming.\nChoose \"Yes\" to use undo buffering or \"No\" for no undo buffering. Warning: in the latter case, the undo history will be lost.\n\nChoose undo buffering?")), 
+                           tl::to_string (QObject::tr ("Undo buffering for the following operation can be memory and time consuming.\nChoose \"Yes\" to use undo buffering or \"No\" for no undo buffering. Warning: in the latter case, the undo history will be lost.\n\nChoose undo buffering?")),
                            "size-undo-buffering",
                            lay::TipDialog::yesnocancel_buttons);
 
@@ -392,7 +391,7 @@ public:
         if (! supports_undo) {
           mp_view->manager ()->clear ();
         } else {
-          mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Sizing operation"))); 
+          mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Sizing operation")));
         }
       }
 
@@ -404,7 +403,7 @@ public:
           db::ShapeProcessor p (true);
           p.size (mp_view->cellview (m_boolean_cva)->layout (), *mp_view->cellview (m_boolean_cva).cell (), m_boolean_layera,
                   mp_view->cellview (m_boolean_cvr).cell ()->shapes (m_boolean_layerr), dx_int, dy_int, m_boolean_size_mode, true, true, m_boolean_mincoh);
-          
+
           //  clear the result layer for all called cells in flat mode
           std::set<db::cell_index_type> called_cells;
           mp_view->cellview (m_boolean_cvr).cell ()->collect_called_cells (called_cells);
@@ -418,7 +417,7 @@ public:
           db::ShapeProcessor p (true);
           p.size (mp_view->cellview (m_boolean_cva)->layout (), *mp_view->cellview (m_boolean_cva).cell (), m_boolean_layera,
                   mp_view->cellview (m_boolean_cvr).cell ()->shapes (m_boolean_layerr), dx_int, dy_int, m_boolean_size_mode, false, true, m_boolean_mincoh);
-          
+
         } else if (m_boolean_hier_mode == 2) {
 
           //  subcells cell by cell
@@ -433,7 +432,6 @@ public:
             p.size (layout, cell, m_boolean_layera,
                     cell.shapes (m_boolean_layerr), dx_int, dy_int, m_boolean_size_mode, false, true, m_boolean_mincoh);
           }
-
         }
 
         if (supports_undo && mp_view->manager ()) {
@@ -446,7 +444,6 @@ public:
         }
         throw;
       }
-
     }
   }
 
@@ -469,8 +466,8 @@ public:
   {
     //  .. nothing yet ..
   }
-  
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > & /*options*/) const
+
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> & /*options*/) const
   {
     //  .. nothing yet ..
   }
@@ -509,4 +506,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new lay::BooleanOperationsPluginDeclaration (), 3010, "lay::BooleanOperationsPlugin");
 
 }
-

@@ -37,8 +37,7 @@
  *  DECLARE_DB_PLUGIN (plugin_desc);
  *  @endcode
  */
-struct DbPlugin
-{
+struct DbPlugin {
   const char *version;
   const char *description;
 };
@@ -48,23 +47,24 @@ struct DbPlugin
  */
 typedef void (*dbp_init_func_t) (const char **version, const char **description);
 
-# if defined _WIN32 || defined __CYGWIN__
-#   define DBP_PUBLIC __declspec(dllexport)
-# else
-#   if __GNUC__ >= 4 || defined(__clang__)
-#     define DBP_PUBLIC __attribute__ ((visibility ("default")))
-#   else
-#     define DBP_PUBLIC
-#   endif
+#if defined _WIN32 || defined __CYGWIN__
+#define DBP_PUBLIC __declspec (dllexport)
+#else
+#if __GNUC__ >= 4 || defined(__clang__)
+#define DBP_PUBLIC __attribute__ ((visibility ("default")))
+#else
+#define DBP_PUBLIC
+#endif
 
-# endif
+#endif
 
-#define DECLARE_DB_PLUGIN(desc) \
-  extern "C" { \
-    DBP_PUBLIC void dbp_init (const char **version, const char **description) { \
-      *version = desc.version; \
-      *description = desc.description; \
-    } \
+#define DECLARE_DB_PLUGIN(desc)                                             \
+  extern "C" {                                                              \
+  DBP_PUBLIC void dbp_init (const char **version, const char **description) \
+  {                                                                         \
+    *version = desc.version;                                                \
+    *description = desc.description;                                        \
+  }                                                                         \
   }
 
 #endif

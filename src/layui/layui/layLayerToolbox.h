@@ -60,7 +60,7 @@ class StipplePalette;
 class LCPRemitter
   : public QObject
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LCPRemitter (int index, QObject *parent, const char *name = 0);
@@ -75,7 +75,7 @@ private:
   int m_index;
 };
 
-/** 
+/**
  *  @brief A color palette
  *
  *  This class implements a color chooser palette.
@@ -86,10 +86,10 @@ private:
 class LCPColorPalette
   : public QFrame
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
-  LCPColorPalette (QWidget *parent, const char *name = 0); 
+  LCPColorPalette (QWidget *parent, const char *name = 0);
 
   void set_palette (const lay::ColorPalette &p);
 
@@ -102,10 +102,10 @@ signals:
 
 private:
   lay::ColorPalette m_palette;
-  std::vector <LCPActiveLabel *> m_color_buttons;
+  std::vector<LCPActiveLabel *> m_color_buttons;
 };
 
-/** 
+/**
  *  @brief A animation palette
  *
  *  This class implements a animation chooser palette.
@@ -115,10 +115,10 @@ private:
 class LCPAnimationPalette
   : public QFrame
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
-  LCPAnimationPalette (QWidget *parent, const char *name = 0); 
+  LCPAnimationPalette (QWidget *parent, const char *name = 0);
 
 public slots:
   void button_clicked (int index);
@@ -127,7 +127,7 @@ signals:
   void animation_selected (int mode);
 };
 
-/** 
+/**
  *  @brief A style palette
  *
  *  This class implements a style chooser palette.
@@ -139,10 +139,10 @@ signals:
 class LCPStylePalette
   : public QFrame
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
-  LCPStylePalette (QWidget *parent, const char *name = 0); 
+  LCPStylePalette (QWidget *parent, const char *name = 0);
 
   void set_view (LayoutViewBase *view)
   {
@@ -166,10 +166,10 @@ private:
 
   lay::LineStylePalette m_palette;
   lay::LayoutViewBase *mp_view;
-  std::vector <LCPActiveLabel *> m_style_buttons;
+  std::vector<LCPActiveLabel *> m_style_buttons;
 };
 
-/** 
+/**
  *  @brief A dither pattern palette
  *
  *  This class implements a dither pattern palette.
@@ -179,10 +179,10 @@ private:
 class LCPDitherPalette
   : public QFrame
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
-  LCPDitherPalette (QWidget *parent, const char *name = 0); 
+  LCPDitherPalette (QWidget *parent, const char *name = 0);
 
   void set_palette (const lay::StipplePalette &p);
 
@@ -201,7 +201,7 @@ signals:
 private:
   lay::StipplePalette m_palette;
   lay::LayoutViewBase *mp_view;
-  std::vector <LCPActiveLabel *> m_stipple_buttons;
+  std::vector<LCPActiveLabel *> m_stipple_buttons;
 
   void create_pixmap_for (LCPActiveLabel *b, int n);
 };
@@ -210,17 +210,17 @@ private:
  *  @brief A palette with the buttons for visibility settings
  *
  *  This palette exhibits two button groups: for visibility
- *  and transparency. Two signals are emitted: 
+ *  and transparency. Two signals are emitted:
  *  visibility_change if "show" or "hide" are clicked,
  *  transparency_changed if "transparent" or "opaque" are clicked.
  */
 class LCPVisibilityPalette
   : public QFrame
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
-  LCPVisibilityPalette (QWidget *parent, const char *name = 0); 
+  LCPVisibilityPalette (QWidget *parent, const char *name = 0);
 
 public slots:
   void button_clicked (int index);
@@ -238,10 +238,10 @@ signals:
  *  "clicked" with an integer value that can be assigned to
  *  the button.
  */
-class LCPActiveLabel 
+class LCPActiveLabel
   : public QLabel
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
   LCPActiveLabel (int index, QWidget *parent, const char *name = "button");
@@ -249,7 +249,7 @@ public:
   virtual void mousePressEvent (QMouseEvent *e);
   virtual void mouseReleaseEvent (QMouseEvent *e);
 
-signals: 
+signals:
   void clicked (int);
 
 private:
@@ -263,7 +263,7 @@ private:
 class LAYUI_PUBLIC LayerToolbox
   : public QWidget
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -303,17 +303,17 @@ public:
    */
   virtual QSize sizeHint () const;
 
-  /** 
+  /**
    *  @brief The Qt resize event
    */
   virtual void resizeEvent (QResizeEvent *re);
 
-  /** 
+  /**
    *  @brief The Qt resize function that does the layout management
    */
   virtual void resize (int w, int h);
 
-  /** 
+  /**
    *  @brief The Qt geometry setting function that also does the layout management
    */
   virtual void setGeometry (int x, int y, int w, int h);
@@ -337,7 +337,7 @@ protected slots:
 
 private:
   LayoutViewBase *mp_view;
-  std::vector <std::pair <QWidget *, QWidget *> > m_tool_panels;
+  std::vector<std::pair<QWidget *, QWidget *>> m_tool_panels;
   LCPDitherPalette *mp_dither_palette;
   LCPStylePalette *mp_style_palette;
   LCPColorPalette *mp_palette;
@@ -353,4 +353,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

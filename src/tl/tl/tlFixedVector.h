@@ -38,7 +38,7 @@ namespace tl
  *  It allows one to push and pop, but not to exceed the given length.
  */
 template <class T, size_t N>
-class fixed_vector 
+class fixed_vector
 {
 public:
   typedef T value_type;
@@ -64,7 +64,7 @@ public:
   }
 
   /**
-   *  @brief Assignment of a several items 
+   *  @brief Assignment of a several items
    */
   fixed_vector (const T &l, size_t n)
     : m_size (n)
@@ -78,7 +78,7 @@ public:
   /**
    *  @brief Clears the vector
    */
-  void clear () 
+  void clear ()
   {
     m_size = 0;
   }
@@ -104,7 +104,7 @@ public:
   /**
    *  @brief Random access operator
    */
-  T &operator[] (size_t i) 
+  T &operator[] (size_t i)
   {
     return m_values [i];
   }
@@ -143,7 +143,7 @@ public:
   }
 
   /**
-   *  @brief begin iterator 
+   *  @brief begin iterator
    */
   T *begin ()
   {
@@ -151,7 +151,7 @@ public:
   }
 
   /**
-   *  @brief end iterator 
+   *  @brief end iterator
    */
   T *end ()
   {
@@ -234,4 +234,3 @@ private:
 }
 
 #endif
-

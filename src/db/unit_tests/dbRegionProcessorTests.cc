@@ -28,9 +28,9 @@
 #include "dbRegionProcessors.h"
 
 
-TEST(1_RegionToEdgesProcessor)
+TEST (1_RegionToEdgesProcessor)
 {
-  db::Point hull[] = {
+  db::Point hull [] = {
     db::Point (0, 0),
     db::Point (0, 1000),
     db::Point (1000, 1000),
@@ -38,19 +38,17 @@ TEST(1_RegionToEdgesProcessor)
     db::Point (2000, 2000),
     db::Point (2000, 1000),
     db::Point (3000, 1000),
-    db::Point (3000, 0)
-  };
+    db::Point (3000, 0)};
 
-  db::Point hole[] = {
+  db::Point hole [] = {
     db::Point (100, 100),
     db::Point (2900, 100),
     db::Point (2900, 900),
-    db::Point (100, 900)
-  };
+    db::Point (100, 900)};
 
   db::PolygonWithProperties poly;
-  poly.assign_hull (hull + 0, hull + sizeof (hull) / sizeof (hull[0]));
-  poly.insert_hole (hole + 0, hole + sizeof (hole) / sizeof (hole[0]));
+  poly.assign_hull (hull + 0, hull + sizeof (hull) / sizeof (hull [0]));
+  poly.insert_hole (hole + 0, hole + sizeof (hole) / sizeof (hole [0]));
 
   std::vector<db::EdgeWithProperties> result;
 

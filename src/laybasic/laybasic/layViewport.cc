@@ -31,7 +31,7 @@ namespace lay
 Viewport::Viewport ()
   : m_width (0), m_height (0)
 {
-  //  .. nothing yet .. 
+  //  .. nothing yet ..
 }
 
 Viewport::Viewport (unsigned int width, unsigned int height, const db::DBox &target_box)
@@ -40,16 +40,14 @@ Viewport::Viewport (unsigned int width, unsigned int height, const db::DBox &tar
   set_box (target_box);
 }
 
-void 
-Viewport::set_size (unsigned int w, unsigned int h)
+void Viewport::set_size (unsigned int w, unsigned int h)
 {
   m_width = w;
   m_height = h;
   set_box (m_target_box);
 }
 
-void 
-Viewport::set_global_trans (const db::DCplxTrans &trans)
+void Viewport::set_global_trans (const db::DCplxTrans &trans)
 {
   if (! trans.equal (m_global_trans)) {
     db::DBox b = box ();
@@ -58,15 +56,13 @@ Viewport::set_global_trans (const db::DCplxTrans &trans)
   }
 }
 
-void 
-Viewport::set_trans (const db::DCplxTrans &trans)
+void Viewport::set_trans (const db::DCplxTrans &trans)
 {
   m_trans = trans;
   m_target_box = trans * db::DBox (0.0, 0.0, double (width ()), double (height ()));
 }
 
-void 
-Viewport::set_box (const db::DBox &in_box)
+void Viewport::set_box (const db::DBox &in_box)
 {
   m_target_box = in_box;
 
@@ -95,7 +91,7 @@ Viewport::set_box (const db::DBox &in_box)
   m_trans = db::DCplxTrans (1.0 / f /*mag*/, 0.0 /*angle*/, false, db::DVector (-dx, -dy)) * m_global_trans;
 }
 
-db::DBox 
+db::DBox
 Viewport::box () const
 {
   db::DPoint p1 = trans ().inverted () * db::DPoint (0, 0);
@@ -104,4 +100,3 @@ Viewport::box () const
 }
 
 }
-

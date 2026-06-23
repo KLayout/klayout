@@ -42,4 +42,3 @@ TL_PUBLIC std::string arch_string ();
 }
 
 #endif
-

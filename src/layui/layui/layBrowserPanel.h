@@ -43,7 +43,7 @@ class QStringListModel;
 
 namespace Ui
 {
-  class BrowserPanel;
+class BrowserPanel;
 }
 
 namespace lay
@@ -171,7 +171,8 @@ private:
  *  @brief The source for BrowserDialog's "int" URL's
  */
 class LAYUI_PUBLIC BrowserSource
-  : public gsi::ObjectBase, public tl::Object
+  : public gsi::ObjectBase,
+    public tl::Object
 {
 public:
   /**
@@ -194,7 +195,7 @@ public:
   /**
    *  @brief Get the HTML code for a given "int" URL.
    *
-   *  If this method returns an empty string, the browser will not be set to 
+   *  If this method returns an empty string, the browser will not be set to
    *  a new location. This allows implementing any functionality behind such links.
    */
   virtual std::string get (const std::string &url);
@@ -220,7 +221,7 @@ public:
   virtual QImage get_image (const std::string &url);
 
   /**
-   *  @brief Get the CSS resource for a given "int" URL 
+   *  @brief Get the CSS resource for a given "int" URL
    */
   virtual std::string get_css (const std::string &url);
 
@@ -271,7 +272,7 @@ public:
   {
     //  .. nothing yet ..
   }
-  
+
   void set_panel (BrowserPanel *panel)
   {
     mp_panel = panel;
@@ -286,9 +287,8 @@ private:
 /**
  *  @brief A structure describing a bookmark item
  */
-struct LAYUI_PUBLIC BookmarkItem
-{
-  BookmarkItem () : position (0) { }
+struct LAYUI_PUBLIC BookmarkItem {
+  BookmarkItem () : position (0) {}
 
   bool operator== (const BookmarkItem &other) const
   {
@@ -311,7 +311,7 @@ class LAYUI_PUBLIC BrowserPanel
 {
   friend class BrowserTextWidget;
 
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -353,7 +353,7 @@ public:
   std::string url () const;
 
   /**
-   *  @brief Gets the title of the page currently 
+   *  @brief Gets the title of the page currently
    */
   std::string title () const;
 
@@ -411,7 +411,7 @@ public slots:
    *  @brief Navigate forward
    */
   void forward ();
-  
+
   /**
    *  @brief Navigate to previous topic
    */
@@ -421,7 +421,7 @@ public slots:
    *  @brief Navigate to next topic
    */
   void next ();
-  
+
   /**
    *  @brief Navigate to home and force reload if required
    */
@@ -435,12 +435,12 @@ public slots:
   /**
    *  @brief "bookmark" activated
    */
-  void bookmark();
+  void bookmark ();
 
 protected slots:
   void page_search_edited ();
-  void page_search_next();
-  void search_text_changed(const QString &text);
+  void page_search_next ();
+  void search_text_changed (const QString &text);
   void search_edited ();
   void source_changed ();
   void anchor_clicked (const QUrl &url);
@@ -488,4 +488,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

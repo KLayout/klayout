@@ -34,98 +34,98 @@ namespace db
 namespace
 {
 
-  class OriginalLayerTextsIterator
-    : public TextsIteratorDelegate
+class OriginalLayerTextsIterator
+  : public TextsIteratorDelegate
+{
+public:
+  typedef db::Text value_type;
+
+  OriginalLayerTextsIterator (const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans)
+    : m_rec_iter (iter), m_iter_trans (trans), m_prop_id (0)
   {
-  public:
-    typedef db::Text value_type;
+    set ();
+  }
 
-    OriginalLayerTextsIterator (const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans)
-      : m_rec_iter (iter), m_iter_trans (trans), m_prop_id (0)
-    {
-      set ();
+  virtual bool is_addressable () const
+  {
+    return false;
+  }
+
+  virtual bool at_end () const
+  {
+    return m_rec_iter.at_end ();
+  }
+
+  virtual void increment ()
+  {
+    do_increment ();
+    set ();
+  }
+
+  virtual const value_type *get () const
+  {
+    return &m_shape;
+  }
+
+  virtual db::properties_id_type prop_id () const
+  {
+    return m_prop_id;
+  }
+
+  virtual OriginalLayerTextsIterator *clone () const
+  {
+    return new OriginalLayerTextsIterator (*this);
+  }
+
+  virtual bool equals (const generic_shape_iterator_delegate_base<value_type> *other) const
+  {
+    const OriginalLayerTextsIterator *o = dynamic_cast<const OriginalLayerTextsIterator *> (other);
+    return o && o->m_rec_iter == m_rec_iter && o->m_iter_trans.equal (m_iter_trans);
+  }
+
+  virtual void do_reset (const db::Box &region, bool overlapping)
+  {
+    if (region == db::Box::world ()) {
+      m_rec_iter.set_region (region);
+    } else {
+      m_rec_iter.set_region (m_iter_trans.inverted () * region);
     }
+    m_rec_iter.set_overlapping (overlapping);
+    set ();
+  }
 
-    virtual bool is_addressable() const
-    {
-      return false;
+  virtual db::Box bbox () const
+  {
+    return m_iter_trans * m_rec_iter.bbox ();
+  }
+
+private:
+  friend class Texts;
+
+  db::RecursiveShapeIterator m_rec_iter;
+  db::ICplxTrans m_iter_trans;
+  value_type m_shape;
+  db::properties_id_type m_prop_id;
+
+  void set ()
+  {
+    while (! m_rec_iter.at_end () && ! m_rec_iter.shape ().is_text ()) {
+      ++m_rec_iter;
     }
-
-    virtual bool at_end () const
-    {
-      return m_rec_iter.at_end ();
+    if (! m_rec_iter.at_end ()) {
+      m_rec_iter->text (m_shape);
+      m_shape.transform (m_iter_trans * m_rec_iter.trans ());
+      m_prop_id = m_rec_iter.prop_id ();
     }
+  }
 
-    virtual void increment ()
-    {
-      do_increment ();
-      set ();
+  void do_increment ()
+  {
+    if (! m_rec_iter.at_end ()) {
+      ++m_rec_iter;
     }
-
-    virtual const value_type *get () const
-    {
-      return &m_shape;
-    }
-
-    virtual db::properties_id_type prop_id () const
-    {
-      return m_prop_id;
-    }
-
-    virtual OriginalLayerTextsIterator *clone () const
-    {
-      return new OriginalLayerTextsIterator (*this);
-    }
-
-    virtual bool equals (const generic_shape_iterator_delegate_base<value_type> *other) const
-    {
-      const OriginalLayerTextsIterator *o = dynamic_cast<const OriginalLayerTextsIterator *> (other);
-      return o && o->m_rec_iter == m_rec_iter && o->m_iter_trans.equal (m_iter_trans);
-    }
-
-    virtual void do_reset (const db::Box &region, bool overlapping)
-    {
-      if (region == db::Box::world ()) {
-        m_rec_iter.set_region (region);
-      } else {
-        m_rec_iter.set_region (m_iter_trans.inverted () * region);
-      }
-      m_rec_iter.set_overlapping (overlapping);
-      set ();
-    }
-
-    virtual db::Box bbox () const
-    {
-      return m_iter_trans * m_rec_iter.bbox ();
-    }
-
-  private:
-    friend class Texts;
-
-    db::RecursiveShapeIterator m_rec_iter;
-    db::ICplxTrans m_iter_trans;
-    value_type m_shape;
-    db::properties_id_type m_prop_id;
-
-    void set ()
-    {
-      while (! m_rec_iter.at_end () && !m_rec_iter.shape ().is_text ()) {
-        ++m_rec_iter;
-      }
-      if (! m_rec_iter.at_end ()) {
-        m_rec_iter->text (m_shape);
-        m_shape.transform (m_iter_trans * m_rec_iter.trans ());
-        m_prop_id = m_rec_iter.prop_id ();
-      }
-    }
-
-    void do_increment ()
-    {
-      if (! m_rec_iter.at_end ()) {
-        ++m_rec_iter;
-      }
-    }
-  };
+  }
+};
 
 }
 
@@ -178,8 +178,7 @@ OriginalLayerTexts::begin_iter () const
   return std::make_pair (m_iter, m_iter_trans);
 }
 
-bool
-OriginalLayerTexts::empty () const
+bool OriginalLayerTexts::empty () const
 {
   return m_iter.at_end_no_lock ();
 }
@@ -196,8 +195,7 @@ OriginalLayerTexts::nth_prop_id (size_t) const
   throw tl::Exception (tl::to_string (tr ("Random access to texts is available only for flat collections")));
 }
 
-bool
-OriginalLayerTexts::has_valid_texts () const
+bool OriginalLayerTexts::has_valid_texts () const
 {
   return false;
 }
@@ -208,14 +206,12 @@ OriginalLayerTexts::iter () const
   return &m_iter;
 }
 
-void
-OriginalLayerTexts::apply_property_translator (const db::PropertiesTranslator &pt)
+void OriginalLayerTexts::apply_property_translator (const db::PropertiesTranslator &pt)
 {
   m_iter.apply_property_translator (pt);
 }
 
-bool
-OriginalLayerTexts::equals (const Texts &other) const
+bool OriginalLayerTexts::equals (const Texts &other) const
 {
   const OriginalLayerTexts *other_delegate = dynamic_cast<const OriginalLayerTexts *> (other.delegate ());
   if (other_delegate && other_delegate->m_iter == m_iter && other_delegate->m_iter_trans == m_iter_trans) {
@@ -225,8 +221,7 @@ OriginalLayerTexts::equals (const Texts &other) const
   }
 }
 
-bool
-OriginalLayerTexts::less (const Texts &other) const
+bool OriginalLayerTexts::less (const Texts &other) const
 {
   const OriginalLayerTexts *other_delegate = dynamic_cast<const OriginalLayerTexts *> (other.delegate ());
   if (other_delegate && other_delegate->m_iter == m_iter && other_delegate->m_iter_trans == m_iter_trans) {
@@ -236,8 +231,7 @@ OriginalLayerTexts::less (const Texts &other) const
   }
 }
 
-void
-OriginalLayerTexts::init ()
+void OriginalLayerTexts::init ()
 {
   //  .. nothing yet ..
 }

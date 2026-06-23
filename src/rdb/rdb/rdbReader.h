@@ -39,18 +39,18 @@ class Database;
 /**
  *  @brief A RDB import format declaration
  */
-class RDB_PUBLIC FormatDeclaration 
+class RDB_PUBLIC FormatDeclaration
 {
 public:
   /**
    *  @brief Constructor
    */
-  FormatDeclaration () { }
+  FormatDeclaration () {}
 
   /**
    *  @brief Destructor
    */
-  virtual ~FormatDeclaration () { }
+  virtual ~FormatDeclaration () {}
 
   /**
    *  @brief Obtain the format name
@@ -87,12 +87,13 @@ extern bool match_filename_to_format (const std::string &fn, const std::string &
  *  @brief Generic base class of reader exceptions
  */
 class RDB_PUBLIC ReaderException
-  : public tl::Exception 
+  : public tl::Exception
 {
 public:
   ReaderException (const std::string &msg)
     : tl::Exception (msg)
-  { }
+  {
+  }
 };
 
 /**
@@ -101,26 +102,26 @@ public:
 class RDB_PUBLIC ReaderBase
 {
 public:
-  ReaderBase () { }
-  virtual ~ReaderBase () { }
+  ReaderBase () {}
+  virtual ~ReaderBase () {}
 
   virtual void read (Database &db) = 0;
   virtual const char *format () const = 0;
 };
 
 /**
- *  @brief The generic reader 
+ *  @brief The generic reader
  *
  *  This reader is supposed to fork to one of the specific readers
  *  depending on the format detected.
  */
 class RDB_PUBLIC Reader
 {
-public: 
+public:
   /**
    *  @brief Construct a reader object
    *
-   *  If no valid format can be detected, the constructor will throw 
+   *  If no valid format can be detected, the constructor will throw
    *  an exception. The stream must be opened already in order to allow
    *  format detection.
    *
@@ -128,13 +129,13 @@ public:
    */
   Reader (tl::InputStream &s);
 
-  /**  
+  /**
    *  @brief Destructor
    */
   ~Reader ();
 
-  /** 
-   *  @brief The basic read method 
+  /**
+   *  @brief The basic read method
    *
    *  This method will read the stream data and translate this to
    *  insert calls into the database object.
@@ -161,4 +162,3 @@ private:
 }
 
 #endif
-

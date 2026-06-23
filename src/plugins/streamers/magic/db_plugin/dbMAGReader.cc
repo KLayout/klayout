@@ -118,13 +118,12 @@ MAGReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 
     while (! m_cells_to_read.empty ()) {
 
-      std::pair<std::string, std::pair<std::string, db::cell_index_type> > next = *m_cells_to_read.begin ();
+      std::pair<std::string, std::pair<std::string, db::cell_index_type>> next = *m_cells_to_read.begin ();
       m_cells_to_read.erase (m_cells_to_read.begin ());
 
       tl::InputStream stream (next.second.first);
       tl::TextInputStream text_stream (stream);
       do_read (layout, next.second.second, text_stream);
-
     }
   }
 
@@ -132,14 +131,12 @@ MAGReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   return layer_map_out ();
 }
 
-void 
-MAGReader::error (const std::string &msg)
+void MAGReader::error (const std::string &msg)
 {
   throw MAGReaderException (msg, mp_current_stream->line_number (), mp_current_stream->source ());
 }
 
-void 
-MAGReader::warn (const std::string &msg, int wl)
+void MAGReader::warn (const std::string &msg, int wl)
 {
   if (warn_level () < wl) {
     return;
@@ -203,15 +200,14 @@ MAGReader::cell_name_from_path (const std::string &path)
 static bool find_and_normalize_file (const tl::URI &uri, std::string &path)
 {
   //  TODO: sync with plugin definition
-  static const char *extensions[] = {
-    ".mag", ".mag.gz", ".MAG", ".MAG.gz"
-  };
+  static const char *extensions [] = {
+    ".mag", ".mag.gz", ".MAG", ".MAG.gz"};
 
   for (size_t e = 0; e < sizeof (extensions) / sizeof (extensions [0]); ++e) {
 
     if (uri.scheme ().empty () || uri.scheme () == "file") {
 
-      std::string fp = uri.path () + extensions[e];
+      std::string fp = uri.path () + extensions [e];
 
       if (tl::verbosity () >= 30) {
         tl::log << tl::to_string (tr ("Trying layout file: ")) << fp;
@@ -226,7 +222,7 @@ static bool find_and_normalize_file (const tl::URI &uri, std::string &path)
 
       //  TODO: this is not quite efficient, but the only thing we can do for now
       tl::URI uri_with_ext = uri;
-      uri_with_ext.set_path (uri_with_ext.path () + extensions[e]);
+      uri_with_ext.set_path (uri_with_ext.path () + extensions [e]);
       std::string us = uri_with_ext.to_abstract_path ();
 
       if (tl::verbosity () >= 30) {
@@ -242,9 +238,7 @@ static bool find_and_normalize_file (const tl::URI &uri, std::string &path)
       } catch (...) {
         //  .. nothing yet ..
       }
-
     }
-
   }
 
   return false;
@@ -259,7 +253,7 @@ class EnvInterpolator
 {
 public:
   EnvInterpolator ()
-    : tl::Eval (0, 0, false)  //  safe mode
+    : tl::Eval (0, 0, false) //  safe mode
   {
     //  .. nothing yet ..
   }
@@ -274,7 +268,7 @@ public:
         value = &i->second;
       } else {
         std::string v = tl::get_env (name);
-        tl::Variant *vv = &m_values[name];
+        tl::Variant *vv = &m_values [name];
         *vv = v;
         value = vv;
       }
@@ -287,8 +281,7 @@ private:
 
 }
 
-bool
-MAGReader::resolve_path (const std::string &path, const db::Layout & /*layout*/, std::string &real_path)
+bool MAGReader::resolve_path (const std::string &path, const db::Layout & /*layout*/, std::string &real_path)
 {
   EnvInterpolator expr;
 
@@ -319,7 +312,6 @@ MAGReader::resolve_path (const std::string &path, const db::Layout & /*layout*/,
     } else {
       return true;
     }
-
   }
 
   tl::URI source_uri (mp_current_stream->source ());
@@ -345,8 +337,7 @@ MAGReader::resolve_path (const std::string &path, const db::Layout & /*layout*/,
   return false;
 }
 
-void
-MAGReader::do_read (db::Layout &layout, db::cell_index_type cell_index, tl::TextInputStream &stream)
+void MAGReader::do_read (db::Layout &layout, db::cell_index_type cell_index, tl::TextInputStream &stream)
 {
   try {
 
@@ -362,8 +353,7 @@ MAGReader::do_read (db::Layout &layout, db::cell_index_type cell_index, tl::Text
   }
 }
 
-void 
-MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl::TextInputStream &stream)
+void MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl::TextInputStream &stream)
 {
   tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("File read: ")) + m_stream.source ());
 
@@ -406,7 +396,6 @@ MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl:
         if (! mp_klayout_tech) {
           layout.add_meta_info ("technology", db::MetaInfo (tl::to_string (tr ("Technology name")), m_tech));
         }
-
       }
 
       ex.expect_end ();
@@ -494,14 +483,11 @@ MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl:
     } else if (ex.test ("use")) {
 
       read_cell_instance (ex, stream, layout, cell_index, scale);
-
     }
-
   }
 }
 
-void
-MAGReader::do_merge_part (Layout &layout, cell_index_type cell_index)
+void MAGReader::do_merge_part (Layout &layout, cell_index_type cell_index)
 {
   tl::SelfTimer timer (tl::verbosity () >= 31, "Merge step");
 
@@ -534,12 +520,10 @@ MAGReader::do_merge_part (Layout &layout, cell_index_type cell_index)
     for (std::vector<db::Text>::const_iterator t = saved_texts.begin (); t != saved_texts.end (); ++t) {
       shapes.insert (*t);
     }
-
   }
 }
 
-void
-MAGReader::read_rect (tl::Extractor &ex, Layout &layout, cell_index_type cell_index, unsigned int layer, double scale)
+void MAGReader::read_rect (tl::Extractor &ex, Layout &layout, cell_index_type cell_index, unsigned int layer, double scale)
 {
   double l, b, r, t;
   ex.read (l);
@@ -552,8 +536,7 @@ MAGReader::read_rect (tl::Extractor &ex, Layout &layout, cell_index_type cell_in
   layout.cell (cell_index).shapes (layer).insert ((box * scale).transformed (m_dbu_trans_inv));
 }
 
-void
-MAGReader::read_tri (tl::Extractor &ex, Layout &layout, cell_index_type cell_index, unsigned int layer, double scale)
+void MAGReader::read_tri (tl::Extractor &ex, Layout &layout, cell_index_type cell_index, unsigned int layer, double scale)
 {
   double l, b, r, t;
   ex.read (l);
@@ -599,8 +582,7 @@ MAGReader::read_tri (tl::Extractor &ex, Layout &layout, cell_index_type cell_ind
   layout.cell (cell_index).shapes (layer).insert ((poly * scale).transformed (m_dbu_trans_inv));
 }
 
-void
-MAGReader::read_rlabel (tl::Extractor &ex, Layout &layout, cell_index_type cell_index, double scale)
+void MAGReader::read_rlabel (tl::Extractor &ex, Layout &layout, cell_index_type cell_index, double scale)
 {
   std::string lname;
   ex.read (lname);
@@ -643,7 +625,7 @@ MAGReader::read_rlabel (tl::Extractor &ex, Layout &layout, cell_index_type cell_
 
   text.move (db::DVector (x, y));
 
-  if (true || lname != "space") {   //  really? "space"? ignore it?
+  if (true || lname != "space") { //  really? "space"? ignore it?
     std::pair<bool, unsigned int> ll = open_layer (layout, lname);
     if (ll.first) {
       layout.cell (cell_index).shapes (ll.second).insert ((text * scale).transformed (m_dbu_trans_inv));
@@ -651,8 +633,7 @@ MAGReader::read_rlabel (tl::Extractor &ex, Layout &layout, cell_index_type cell_
   }
 }
 
-void
-MAGReader::read_cell_instance (tl::Extractor &ex, tl::TextInputStream &stream, Layout &layout, cell_index_type cell_index, double scale)
+void MAGReader::read_cell_instance (tl::Extractor &ex, tl::TextInputStream &stream, Layout &layout, cell_index_type cell_index, double scale)
 {
   const char *include_chars_in_files = "$_,.-$+#:;[]()<>|/\\";
 
@@ -734,7 +715,6 @@ MAGReader::read_cell_instance (tl::Extractor &ex, tl::TextInputStream &stream, L
       //  ignored
       break;
     }
-
   }
 
   //  create the instance
@@ -754,4 +734,3 @@ MAGReader::read_cell_instance (tl::Extractor &ex, tl::TextInputStream &stream, L
 }
 
 }
-

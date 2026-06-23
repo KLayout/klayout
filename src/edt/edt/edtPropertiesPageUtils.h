@@ -50,8 +50,8 @@ namespace edt
 class ChangeApplicator
 {
 public:
-  ChangeApplicator () { }
-  virtual ~ChangeApplicator () { }
+  ChangeApplicator () {}
+  virtual ~ChangeApplicator () {}
 
   virtual bool supports_relative_mode () const
   {
@@ -59,12 +59,12 @@ public:
   }
 
   virtual db::Shape do_apply (db::Shapes & /*shapes*/, const db::Shape & /*shape*/, double /*dbu*/, unsigned int /*cv_index*/, unsigned int /*layer*/, bool /*relative*/) const
-  { 
-    return db::Shape (); 
+  {
+    return db::Shape ();
   }
 
-  virtual db::Instance do_apply_inst (db::Cell & /*cell*/, const db::Instance & /*instance*/, double /*dbu*/, bool /*relative*/) const 
-  { 
+  virtual db::Instance do_apply_inst (db::Cell & /*cell*/, const db::Instance & /*instance*/, double /*dbu*/, bool /*relative*/) const
+  {
     return db::Instance ();
   }
 
@@ -74,7 +74,7 @@ private:
 };
 
 /**
- *  @brief A combined applicator 
+ *  @brief A combined applicator
  *  This class combines the actions of multiple applicators into a single one.
  *  The combined applicator takes ownership over the given individual applicators.
  */
@@ -86,7 +86,7 @@ public:
   CombinedChangeApplicator (ChangeApplicator *a1);
   CombinedChangeApplicator (ChangeApplicator *a1, ChangeApplicator *a2);
   ~CombinedChangeApplicator ();
-      
+
   void add (ChangeApplicator *a);
 
   bool supports_relative_mode () const;

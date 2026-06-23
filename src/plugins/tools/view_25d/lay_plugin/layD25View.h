@@ -32,20 +32,20 @@
 
 namespace Ui
 {
-  class D25View;
+class D25View;
 }
 
 namespace lay
 {
-  class LayoutViewBase;
+class LayoutViewBase;
 }
 
 namespace db
 {
-  class Region;
-  class Edges;
-  class EdgePairs;
-  struct LayerProperties;
+class Region;
+class Edges;
+class EdgePairs;
+struct LayerProperties;
 }
 
 namespace lay
@@ -54,7 +54,7 @@ namespace lay
 class D25View
   : public lay::Browser
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
   D25View (lay::Dispatcher *root, lay::LayoutViewBase *view);
@@ -114,4 +114,3 @@ private:
 }
 
 #endif
-

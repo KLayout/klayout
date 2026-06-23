@@ -39,7 +39,7 @@ class Object;
 
 /**
  *  @brief An atomic operation.
- * 
+ *
  *  See Manager::queue for a detailed description.
  */
 
@@ -57,10 +57,12 @@ private:
 
 public:
   Op (bool done = true) : m_done (done)
-  { }
+  {
+  }
 
-  virtual ~Op () 
-  { }
+  virtual ~Op ()
+  {
+  }
 
   bool is_done () const
   {
@@ -86,7 +88,7 @@ public:
    *  @brief Default constructor
    */
   Manager (bool enabled = true);
-  
+
   /**
    *  @brief Destructor
    */
@@ -120,10 +122,10 @@ public:
    *
    *  For the given id, retrieve the object pointer.
    *  Returns 0 if the id is not a valid one.
-   */  
+   */
   db::Object *object_by_id (ident_t id);
 
-  /** 
+  /**
    *  @brief Begin a transaction
    *
    *  This call will open a new transaction. A transaction consists
@@ -229,25 +231,25 @@ public:
    *  @brief Queue a operation for undo
    *
    *  With this method a atomic undoable operation can be registered.
-   *  The operation is an object derived from db::Op. 
+   *  The operation is an object derived from db::Op.
    *  This object's pointer is passed to the 'undo' method of the
    *  object in charge once a undo operation is requested.
    *  The same object is passed also to the 'redo' method to redo
-   *  to operation. 
+   *  to operation.
    *  The operation also holds the state: initially the operation
    *  signals "done" which means that the operation defined by the
    *  db::Op object was performed. Upon 'undo' the state changes to
    *  'undone' which signals that the operation was undone. Upon 'redo'
    *  then the state again changes to 'done'.
    *  If the 'op' object is passed in 'undone' state to the queue method,
-   *  it will be brought into done state by issueing a 'redo'. This 
+   *  it will be brought into done state by issueing a 'redo'. This
    *  way the operation can be implemented fully implicitly through
    *  db::Object's undo and redo methods.
    *  The db::Op object will be owned by the manager and there will
    *  be no copying for the object. Therefore the db::Op object is
    *  a good place for storing pointers to objects created in the
    *  process of the operation for example.
-   */ 
+   */
   void queue (db::Object *object, db::Op *op);
 
   /**
@@ -262,8 +264,8 @@ public:
    */
   db::Op *last_queued (db::Object *object);
 
-  /** 
-   *  @brief Clear all transactions 
+  /**
+   *  @brief Clear all transactions
    */
   void clear ();
 
@@ -304,7 +306,7 @@ private:
 /**
  *  @brief A transaction controller utility class
  *
- *  This object controls a transaction through it's lifetime. On construction, the 
+ *  This object controls a transaction through it's lifetime. On construction, the
  *  transaction is started, on destruction, the transaction is committed.
  *
  *  "cancel" can be used to cancel the operation. This will undo all operations collected
@@ -390,4 +392,3 @@ private:
 } // namespace db
 
 #endif
-

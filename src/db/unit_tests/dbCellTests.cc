@@ -26,7 +26,7 @@
 #include "tlString.h"
 #include "tlUnitTest.h"
 
-TEST(1) 
+TEST (1)
 {
   db::Manager m (true);
   db::Layout g (&m);
@@ -34,7 +34,7 @@ TEST(1)
   db::Cell &c2 (g.cell (g.add_cell ()));
 
   EXPECT_EQ (c1.bbox (), db::Box ());
-  EXPECT_EQ (c1.bbox_with_empty (), db::Box (db::Point(), db::Point ()));
+  EXPECT_EQ (c1.bbox_with_empty (), db::Box (db::Point (), db::Point ()));
 
   db::Box b (0, 100, 1000, 1200);
   c1.shapes (0).insert (b);
@@ -52,7 +52,7 @@ TEST(1)
   db::FTrans f (1, true);
   db::Vector p (-10, 20);
   db::Trans t (f.rot (), p);
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
   EXPECT_EQ (c2.bbox (), t * (b + bb));
   EXPECT_EQ (c2.bbox (0), t * b);
   EXPECT_EQ (c2.bbox (1), t * bb);
@@ -63,35 +63,37 @@ TEST(1)
   int n;
   n = 0;
   for (db::Cell::touching_iterator r = c2.begin_touching (t * db::Box (-100, 0, 0, 100));
-       ! r.at_end (); ++r) ++n; 
+       ! r.at_end (); ++r)
+    ++n;
   EXPECT_EQ (n, 1);
   n = 0;
   for (db::Cell::overlapping_iterator r = c2.begin_overlapping (t * db::Box (-100, 0, 0, 100));
-       ! r.at_end (); ++r) ++n; 
+       ! r.at_end (); ++r)
+    ++n;
   EXPECT_EQ (n, 0);
   n = 0;
   for (db::Cell::overlapping_iterator r = c2.begin_overlapping (t * db::Box (-100, 0, 1, 100));
-       ! r.at_end (); ++r) ++n; 
+       ! r.at_end (); ++r)
+    ++n;
   EXPECT_EQ (n, 1);
   n = 0;
   for (db::Cell::touching_iterator r = c2.begin_touching (t * db::Box (-100, 0, -1, 100));
-       ! r.at_end (); ++r) ++n; 
+       ! r.at_end (); ++r)
+    ++n;
   EXPECT_EQ (n, 0);
 
   //  try adding a new instance into c2
   db::FTrans ff (2, true);
   db::Vector pp (10, -20);
   db::Trans tt (ff.rot (), pp);
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
+  c2.insert (db::array<db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
   EXPECT_EQ (c2.bbox (), t * (b + bb) + tt * (b + bb));
   EXPECT_EQ (c2.bbox (0), t * b + tt * b);
   EXPECT_EQ (c2.bbox (1), t * bb + tt * bb);
-
 }
 
-struct p2s_compare 
-{  
-  bool operator() (const db::Cell::parent_inst_iterator &p1, const db::Cell::parent_inst_iterator &p2) 
+struct p2s_compare {
+  bool operator() (const db::Cell::parent_inst_iterator &p1, const db::Cell::parent_inst_iterator &p2)
   {
     if (p1->inst ().object ().cell_index () != p2->inst ().object ().cell_index ()) {
       return p1->inst ().object ().cell_index () < p2->inst ().object ().cell_index ();
@@ -121,9 +123,8 @@ std::string p2s (const db::Cell &c)
   return r;
 }
 
-struct pc2s_compare 
-{  
-  bool operator() (const db::Cell::parent_cell_iterator &p1, const db::Cell::parent_cell_iterator &p2) 
+struct pc2s_compare {
+  bool operator() (const db::Cell::parent_cell_iterator &p1, const db::Cell::parent_cell_iterator &p2)
   {
     return *p1 < *p2;
   }
@@ -147,9 +148,8 @@ std::string pc2s (const db::Cell &c)
   return r;
 }
 
-struct c2s_compare 
-{  
-  bool operator() (const db::Cell::const_iterator &p1, const db::Cell::const_iterator &p2) 
+struct c2s_compare {
+  bool operator() (const db::Cell::const_iterator &p1, const db::Cell::const_iterator &p2)
   {
     if (p1->cell_index () != p2->cell_index ()) {
       return p1->cell_index () < p2->cell_index ();
@@ -194,9 +194,8 @@ std::string c2s_unsorted (const db::Cell &c)
   return r;
 }
 
-struct ct2s_compare 
-{  
-  bool operator() (const db::Cell::touching_iterator &p1, const db::Cell::touching_iterator &p2) 
+struct ct2s_compare {
+  bool operator() (const db::Cell::touching_iterator &p1, const db::Cell::touching_iterator &p2)
   {
     if (p1->cell_index () != p2->cell_index ()) {
       return p1->cell_index () < p2->cell_index ();
@@ -229,9 +228,8 @@ std::string ct2s (const db::Cell &c)
   return r;
 }
 
-struct cc2s_compare 
-{  
-  bool operator() (const db::Cell::child_cell_iterator &p1, const db::Cell::child_cell_iterator &p2) 
+struct cc2s_compare {
+  bool operator() (const db::Cell::child_cell_iterator &p1, const db::Cell::child_cell_iterator &p2)
   {
     return *p1 < *p2;
   }
@@ -270,7 +268,7 @@ void insert_ci (db::Cell &c, size_t ci, const db::Trans &t)
   pi = (pi + 1) % 3;
 }
 
-TEST(2) 
+TEST (2)
 {
   ::pi = 0;
 
@@ -310,170 +308,170 @@ TEST(2)
   insert_ci (c3, c4.cell_index (), t);
   insert_ci (c4, c5.cell_index (), t);
 
-  EXPECT_EQ (p2s(c0), "");
-  EXPECT_EQ (p2s(c1), "0[r0 *1 0,0]#{}");
-  EXPECT_EQ (p2s(c2), "1[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (p2s(c3), "2[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (p2s(c4), "3[r0 *1 0,0]#{}");
-  EXPECT_EQ (p2s(c5), "4[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (pc2s(c0), "");
-  EXPECT_EQ (pc2s(c1), "0");
-  EXPECT_EQ (pc2s(c2), "1");
-  EXPECT_EQ (pc2s(c3), "2");
-  EXPECT_EQ (pc2s(c4), "3");
-  EXPECT_EQ (pc2s(c5), "4");
-  EXPECT_EQ (c2s(c0), "1[r0 *1 0,0]#{}");
-  EXPECT_EQ (c2s(c1), "2[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (c2s(c2), "3[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (c2s(c3), "4[r0 *1 0,0]#{}");
-  EXPECT_EQ (c2s(c4), "5[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (c2s(c5), "");
-  EXPECT_EQ (ct2s(c0), "1[r0 *1 0,0]#{}");
-  EXPECT_EQ (ct2s(c1), "2[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (ct2s(c2), "3[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (ct2s(c3), "4[r0 *1 0,0]#{}");
-  EXPECT_EQ (ct2s(c4), "5[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (ct2s(c5), "");
-  EXPECT_EQ (cc2s(c0), "1");
-  EXPECT_EQ (cc2s(c1), "2");
-  EXPECT_EQ (cc2s(c2), "3");
-  EXPECT_EQ (cc2s(c3), "4");
-  EXPECT_EQ (cc2s(c4), "5");
-  EXPECT_EQ (cc2s(c5), "");
-   
+  EXPECT_EQ (p2s (c0), "");
+  EXPECT_EQ (p2s (c1), "0[r0 *1 0,0]#{}");
+  EXPECT_EQ (p2s (c2), "1[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (p2s (c3), "2[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (p2s (c4), "3[r0 *1 0,0]#{}");
+  EXPECT_EQ (p2s (c5), "4[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (pc2s (c0), "");
+  EXPECT_EQ (pc2s (c1), "0");
+  EXPECT_EQ (pc2s (c2), "1");
+  EXPECT_EQ (pc2s (c3), "2");
+  EXPECT_EQ (pc2s (c4), "3");
+  EXPECT_EQ (pc2s (c5), "4");
+  EXPECT_EQ (c2s (c0), "1[r0 *1 0,0]#{}");
+  EXPECT_EQ (c2s (c1), "2[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s (c2), "3[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s (c3), "4[r0 *1 0,0]#{}");
+  EXPECT_EQ (c2s (c4), "5[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s (c5), "");
+  EXPECT_EQ (ct2s (c0), "1[r0 *1 0,0]#{}");
+  EXPECT_EQ (ct2s (c1), "2[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (ct2s (c2), "3[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (ct2s (c3), "4[r0 *1 0,0]#{}");
+  EXPECT_EQ (ct2s (c4), "5[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (ct2s (c5), "");
+  EXPECT_EQ (cc2s (c0), "1");
+  EXPECT_EQ (cc2s (c1), "2");
+  EXPECT_EQ (cc2s (c2), "3");
+  EXPECT_EQ (cc2s (c3), "4");
+  EXPECT_EQ (cc2s (c4), "5");
+  EXPECT_EQ (cc2s (c5), "");
+
   insert_ci (c0, c2.cell_index (), t);
   insert_ci (c1, c3.cell_index (), t);
   insert_ci (c2, c4.cell_index (), t);
   insert_ci (c3, c5.cell_index (), t);
-  EXPECT_EQ (p2s(c0), "");
-  EXPECT_EQ (p2s(c1), "0[r0 *1 0,0]#{}");
-  EXPECT_EQ (p2s(c2), "0[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (p2s(c3), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (p2s(c4), "2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{}");
-  EXPECT_EQ (p2s(c5), "3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (pc2s(c0), "");
-  EXPECT_EQ (pc2s(c1), "0");
-  EXPECT_EQ (pc2s(c2), "0,1");
-  EXPECT_EQ (pc2s(c3), "1,2");
-  EXPECT_EQ (pc2s(c4), "2,3");
-  EXPECT_EQ (pc2s(c5), "3,4");
-  EXPECT_EQ (c2s(c0), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (c2s(c1), "2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{}");
-  EXPECT_EQ (c2s(c2), "3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (c2s(c3), "4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (c2s(c4), "5[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (c2s(c5), "");
-  EXPECT_EQ (ct2s(c0), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (ct2s(c1), "2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{}");
-  EXPECT_EQ (ct2s(c2), "3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (ct2s(c3), "4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (ct2s(c4), "5[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (ct2s(c5), "");
-  EXPECT_EQ (cc2s(c0), "1,2");
-  EXPECT_EQ (cc2s(c1), "2,3");
-  EXPECT_EQ (cc2s(c2), "3,4");
-  EXPECT_EQ (cc2s(c3), "4,5");
-  EXPECT_EQ (cc2s(c4), "5");
-  EXPECT_EQ (cc2s(c5), "");
+  EXPECT_EQ (p2s (c0), "");
+  EXPECT_EQ (p2s (c1), "0[r0 *1 0,0]#{}");
+  EXPECT_EQ (p2s (c2), "0[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (p2s (c3), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (p2s (c4), "2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{}");
+  EXPECT_EQ (p2s (c5), "3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (pc2s (c0), "");
+  EXPECT_EQ (pc2s (c1), "0");
+  EXPECT_EQ (pc2s (c2), "0,1");
+  EXPECT_EQ (pc2s (c3), "1,2");
+  EXPECT_EQ (pc2s (c4), "2,3");
+  EXPECT_EQ (pc2s (c5), "3,4");
+  EXPECT_EQ (c2s (c0), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s (c1), "2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{}");
+  EXPECT_EQ (c2s (c2), "3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s (c3), "4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s (c4), "5[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s (c5), "");
+  EXPECT_EQ (ct2s (c0), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (ct2s (c1), "2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{}");
+  EXPECT_EQ (ct2s (c2), "3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (ct2s (c3), "4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (ct2s (c4), "5[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (ct2s (c5), "");
+  EXPECT_EQ (cc2s (c0), "1,2");
+  EXPECT_EQ (cc2s (c1), "2,3");
+  EXPECT_EQ (cc2s (c2), "3,4");
+  EXPECT_EQ (cc2s (c3), "4,5");
+  EXPECT_EQ (cc2s (c4), "5");
+  EXPECT_EQ (cc2s (c5), "");
 
   insert_ci (c0, c3.cell_index (), t);
   insert_ci (c1, c4.cell_index (), t);
   insert_ci (c2, c5.cell_index (), t);
-  EXPECT_EQ (p2s(c0), "");
-  EXPECT_EQ (p2s(c1), "0[r0 *1 0,0]#{}");
-  EXPECT_EQ (p2s(c2), "0[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (p2s(c3), "0[r0 *1 0,0]#{},1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (p2s(c4), "1[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{}");
-  EXPECT_EQ (p2s(c5), "2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (pc2s(c0), "");
-  EXPECT_EQ (pc2s(c1), "0");
-  EXPECT_EQ (pc2s(c2), "0,1");
-  EXPECT_EQ (pc2s(c3), "0,1,2");
-  EXPECT_EQ (pc2s(c4), "1,2,3");
-  EXPECT_EQ (pc2s(c5), "2,3,4");
-  EXPECT_EQ (c2s(c0), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{}");
-  EXPECT_EQ (c2s(c1), "2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (c2s(c2), "3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (c2s(c3), "4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (c2s(c4), "5[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (c2s(c5), "");
-  EXPECT_EQ (ct2s(c0), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{}");
-  EXPECT_EQ (ct2s(c1), "2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (ct2s(c2), "3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (ct2s(c3), "4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (ct2s(c4), "5[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (ct2s(c5), "");
-  EXPECT_EQ (cc2s(c0), "1,2,3");
-  EXPECT_EQ (cc2s(c1), "2,3,4");
-  EXPECT_EQ (cc2s(c2), "3,4,5");
-  EXPECT_EQ (cc2s(c3), "4,5");
-  EXPECT_EQ (cc2s(c4), "5");
-  EXPECT_EQ (cc2s(c5), "");
+  EXPECT_EQ (p2s (c0), "");
+  EXPECT_EQ (p2s (c1), "0[r0 *1 0,0]#{}");
+  EXPECT_EQ (p2s (c2), "0[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (p2s (c3), "0[r0 *1 0,0]#{},1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (p2s (c4), "1[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{}");
+  EXPECT_EQ (p2s (c5), "2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (pc2s (c0), "");
+  EXPECT_EQ (pc2s (c1), "0");
+  EXPECT_EQ (pc2s (c2), "0,1");
+  EXPECT_EQ (pc2s (c3), "0,1,2");
+  EXPECT_EQ (pc2s (c4), "1,2,3");
+  EXPECT_EQ (pc2s (c5), "2,3,4");
+  EXPECT_EQ (c2s (c0), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{}");
+  EXPECT_EQ (c2s (c1), "2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s (c2), "3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s (c3), "4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s (c4), "5[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s (c5), "");
+  EXPECT_EQ (ct2s (c0), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{}");
+  EXPECT_EQ (ct2s (c1), "2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (ct2s (c2), "3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (ct2s (c3), "4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (ct2s (c4), "5[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (ct2s (c5), "");
+  EXPECT_EQ (cc2s (c0), "1,2,3");
+  EXPECT_EQ (cc2s (c1), "2,3,4");
+  EXPECT_EQ (cc2s (c2), "3,4,5");
+  EXPECT_EQ (cc2s (c3), "4,5");
+  EXPECT_EQ (cc2s (c4), "5");
+  EXPECT_EQ (cc2s (c5), "");
 
   insert_ci (c0, c4.cell_index (), t);
   insert_ci (c1, c5.cell_index (), t);
-  EXPECT_EQ (p2s(c0), "");
-  EXPECT_EQ (p2s(c1), "0[r0 *1 0,0]#{}");
-  EXPECT_EQ (p2s(c2), "0[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (p2s(c3), "0[r0 *1 0,0]#{},1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (p2s(c4), "0[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{}");
-  EXPECT_EQ (p2s(c5), "1[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (pc2s(c0), "");
-  EXPECT_EQ (pc2s(c1), "0");
-  EXPECT_EQ (pc2s(c2), "0,1");
-  EXPECT_EQ (pc2s(c3), "0,1,2");
-  EXPECT_EQ (pc2s(c4), "0,1,2,3");
-  EXPECT_EQ (pc2s(c5), "1,2,3,4");
-  EXPECT_EQ (c2s(c0), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{}");
-  EXPECT_EQ (c2s(c1), "2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (c2s(c2), "3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (c2s(c3), "4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (c2s(c4), "5[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (c2s(c5), "");
-  EXPECT_EQ (ct2s(c0), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{}");
-  EXPECT_EQ (ct2s(c1), "2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (ct2s(c2), "3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (ct2s(c3), "4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (ct2s(c4), "5[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (ct2s(c5), "");
-  EXPECT_EQ (cc2s(c0), "1,2,3,4");
-  EXPECT_EQ (cc2s(c1), "2,3,4,5");
-  EXPECT_EQ (cc2s(c2), "3,4,5");
-  EXPECT_EQ (cc2s(c3), "4,5");
-  EXPECT_EQ (cc2s(c4), "5");
-  EXPECT_EQ (cc2s(c5), "");
+  EXPECT_EQ (p2s (c0), "");
+  EXPECT_EQ (p2s (c1), "0[r0 *1 0,0]#{}");
+  EXPECT_EQ (p2s (c2), "0[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (p2s (c3), "0[r0 *1 0,0]#{},1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (p2s (c4), "0[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{}");
+  EXPECT_EQ (p2s (c5), "1[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (pc2s (c0), "");
+  EXPECT_EQ (pc2s (c1), "0");
+  EXPECT_EQ (pc2s (c2), "0,1");
+  EXPECT_EQ (pc2s (c3), "0,1,2");
+  EXPECT_EQ (pc2s (c4), "0,1,2,3");
+  EXPECT_EQ (pc2s (c5), "1,2,3,4");
+  EXPECT_EQ (c2s (c0), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{}");
+  EXPECT_EQ (c2s (c1), "2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s (c2), "3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s (c3), "4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s (c4), "5[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s (c5), "");
+  EXPECT_EQ (ct2s (c0), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{}");
+  EXPECT_EQ (ct2s (c1), "2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (ct2s (c2), "3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (ct2s (c3), "4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (ct2s (c4), "5[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (ct2s (c5), "");
+  EXPECT_EQ (cc2s (c0), "1,2,3,4");
+  EXPECT_EQ (cc2s (c1), "2,3,4,5");
+  EXPECT_EQ (cc2s (c2), "3,4,5");
+  EXPECT_EQ (cc2s (c3), "4,5");
+  EXPECT_EQ (cc2s (c4), "5");
+  EXPECT_EQ (cc2s (c5), "");
 
   insert_ci (c0, c5.cell_index (), t);
-  EXPECT_EQ (p2s(c0), "");
-  EXPECT_EQ (p2s(c1), "0[r0 *1 0,0]#{}");
-  EXPECT_EQ (p2s(c2), "0[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (p2s(c3), "0[r0 *1 0,0]#{},1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (p2s(c4), "0[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{}");
-  EXPECT_EQ (p2s(c5), "0[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (pc2s(c0), "");
-  EXPECT_EQ (pc2s(c1), "0");
-  EXPECT_EQ (pc2s(c2), "0,1");
-  EXPECT_EQ (pc2s(c3), "0,1,2");
-  EXPECT_EQ (pc2s(c4), "0,1,2,3");
-  EXPECT_EQ (pc2s(c5), "0,1,2,3,4");
-  EXPECT_EQ (c2s(c0), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (c2s(c1), "2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (c2s(c2), "3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (c2s(c3), "4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (c2s(c4), "5[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (c2s(c5), "");
-  EXPECT_EQ (ct2s(c0), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (ct2s(c1), "2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (ct2s(c2), "3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (ct2s(c3), "4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (ct2s(c4), "5[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (ct2s(c5), "");
-  EXPECT_EQ (cc2s(c0), "1,2,3,4,5");
-  EXPECT_EQ (cc2s(c1), "2,3,4,5");
-  EXPECT_EQ (cc2s(c2), "3,4,5");
-  EXPECT_EQ (cc2s(c3), "4,5");
-  EXPECT_EQ (cc2s(c4), "5");
-  EXPECT_EQ (cc2s(c5), "");
+  EXPECT_EQ (p2s (c0), "");
+  EXPECT_EQ (p2s (c1), "0[r0 *1 0,0]#{}");
+  EXPECT_EQ (p2s (c2), "0[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (p2s (c3), "0[r0 *1 0,0]#{},1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (p2s (c4), "0[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{}");
+  EXPECT_EQ (p2s (c5), "0[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (pc2s (c0), "");
+  EXPECT_EQ (pc2s (c1), "0");
+  EXPECT_EQ (pc2s (c2), "0,1");
+  EXPECT_EQ (pc2s (c3), "0,1,2");
+  EXPECT_EQ (pc2s (c4), "0,1,2,3");
+  EXPECT_EQ (pc2s (c5), "0,1,2,3,4");
+  EXPECT_EQ (c2s (c0), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s (c1), "2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s (c2), "3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s (c3), "4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s (c4), "5[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s (c5), "");
+  EXPECT_EQ (ct2s (c0), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (ct2s (c1), "2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (ct2s (c2), "3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (ct2s (c3), "4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (ct2s (c4), "5[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (ct2s (c5), "");
+  EXPECT_EQ (cc2s (c0), "1,2,3,4,5");
+  EXPECT_EQ (cc2s (c1), "2,3,4,5");
+  EXPECT_EQ (cc2s (c2), "3,4,5");
+  EXPECT_EQ (cc2s (c3), "4,5");
+  EXPECT_EQ (cc2s (c4), "5");
+  EXPECT_EQ (cc2s (c5), "");
 
   ::pi = 1;
   insert_ci (c0, c1.cell_index (), t);
@@ -481,60 +479,60 @@ TEST(2)
   insert_ci (c2, c3.cell_index (), t);
   insert_ci (c3, c4.cell_index (), t);
   insert_ci (c4, c5.cell_index (), t);
-  EXPECT_EQ (p2s(c0), "");
-  EXPECT_EQ (p2s(c1), "0[r0 *1 0,0]#{},0[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (p2s(c2), "0[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1},1[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (p2s(c3), "0[r0 *1 0,0]#{},1[r0 *1 0,0]#{},2[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (p2s(c4), "0[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{},3[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (p2s(c5), "0[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},4[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (pc2s(c0), "");
-  EXPECT_EQ (pc2s(c1), "0");
-  EXPECT_EQ (pc2s(c2), "0,1");
-  EXPECT_EQ (pc2s(c3), "0,1,2");
-  EXPECT_EQ (pc2s(c4), "0,1,2,3");
-  EXPECT_EQ (pc2s(c5), "0,1,2,3,4");
-  EXPECT_EQ (c2s(c0), "1[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (c2s(c1), "2[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (c2s(c2), "3[r0 *1 0,0]#{},3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (c2s(c3), "4[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (c2s(c4), "5[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (c2s(c5), "");
-  EXPECT_EQ (c2s_unsorted(c0), "1[r0 *1 0,0]#{},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2},5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (c2s_unsorted(c1), "3[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>1},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (c2s_unsorted(c2), "3[r0 *1 0,0]#{},3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (c2s_unsorted(c3), "4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (c2s_unsorted(c4), "5[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (c2s_unsorted(c5), "");
-  EXPECT_EQ (ct2s(c0), "1[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (ct2s(c1), "2[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>1}");
-  EXPECT_EQ (ct2s(c2), "3[r0 *1 0,0]#{},3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (ct2s(c3), "4[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (ct2s(c4), "5[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
-  EXPECT_EQ (ct2s(c5), "");
-  EXPECT_EQ (cc2s(c0), "1,2,3,4,5");
-  EXPECT_EQ (cc2s(c1), "2,3,4,5");
-  EXPECT_EQ (cc2s(c2), "3,4,5");
-  EXPECT_EQ (cc2s(c3), "4,5");
-  EXPECT_EQ (cc2s(c4), "5");
-  EXPECT_EQ (cc2s(c5), "");
+  EXPECT_EQ (p2s (c0), "");
+  EXPECT_EQ (p2s (c1), "0[r0 *1 0,0]#{},0[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (p2s (c2), "0[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1},1[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (p2s (c3), "0[r0 *1 0,0]#{},1[r0 *1 0,0]#{},2[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (p2s (c4), "0[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{},3[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (p2s (c5), "0[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},4[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (pc2s (c0), "");
+  EXPECT_EQ (pc2s (c1), "0");
+  EXPECT_EQ (pc2s (c2), "0,1");
+  EXPECT_EQ (pc2s (c3), "0,1,2");
+  EXPECT_EQ (pc2s (c4), "0,1,2,3");
+  EXPECT_EQ (pc2s (c5), "0,1,2,3,4");
+  EXPECT_EQ (c2s (c0), "1[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s (c1), "2[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s (c2), "3[r0 *1 0,0]#{},3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s (c3), "4[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s (c4), "5[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s (c5), "");
+  EXPECT_EQ (c2s_unsorted (c0), "1[r0 *1 0,0]#{},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2},5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s_unsorted (c1), "3[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>1},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s_unsorted (c2), "3[r0 *1 0,0]#{},3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s_unsorted (c3), "4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s_unsorted (c4), "5[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s_unsorted (c5), "");
+  EXPECT_EQ (ct2s (c0), "1[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (ct2s (c1), "2[r0 *1 0,0]#{id=>1},2[r0 *1 0,0]#{id=>2},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (ct2s (c2), "3[r0 *1 0,0]#{},3[r0 *1 0,0]#{id=>2},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (ct2s (c3), "4[r0 *1 0,0]#{},4[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (ct2s (c4), "5[r0 *1 0,0]#{id=>1},5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (ct2s (c5), "");
+  EXPECT_EQ (cc2s (c0), "1,2,3,4,5");
+  EXPECT_EQ (cc2s (c1), "2,3,4,5");
+  EXPECT_EQ (cc2s (c2), "3,4,5");
+  EXPECT_EQ (cc2s (c3), "4,5");
+  EXPECT_EQ (cc2s (c4), "5");
+  EXPECT_EQ (cc2s (c5), "");
 
   db::Cell::const_iterator inst = c0.begin ();
-  EXPECT_EQ (c2s_unsorted(c0), "1[r0 *1 0,0]#{},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2},5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s_unsorted (c0), "1[r0 *1 0,0]#{},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2},5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
   db::Trans t1 (1, db::Vector (100, -200));
   c0.replace (*inst, db::CellInstArray (db::CellInst (c2.cell_index ()), t1));
-  EXPECT_EQ (c2s_unsorted(c0), "2[r90 *1 100,-200]#{},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2},5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s_unsorted (c0), "2[r90 *1 100,-200]#{},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>2},5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
   ++inst;
   ++inst;
   ++inst;
   c0.replace (*inst, db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (c3.cell_index ()), t1), pid17));
-  EXPECT_EQ (c2s_unsorted(c0), "2[r90 *1 100,-200]#{},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},3[r90 *1 100,-200]#{id=>17},5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s_unsorted (c0), "2[r90 *1 100,-200]#{},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},3[r90 *1 100,-200]#{id=>17},5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
   c0.replace_prop_id (*inst, pid11);
-  EXPECT_EQ (c2s_unsorted(c0), "2[r90 *1 100,-200]#{},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},3[r90 *1 100,-200]#{id=>11},5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s_unsorted (c0), "2[r90 *1 100,-200]#{},3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},3[r90 *1 100,-200]#{id=>11},5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
   inst = c0.begin ();
 
   //  replace a non-property array with one with properties:
   c0.replace (*inst, db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (c3.cell_index ()), db::Trans ()), pid13));
-  EXPECT_EQ (c2s_unsorted(c0), "3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},3[r90 *1 100,-200]#{id=>11},5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{id=>13}");
+  EXPECT_EQ (c2s_unsorted (c0), "3[r0 *1 0,0]#{},4[r0 *1 0,0]#{},3[r90 *1 100,-200]#{id=>11},5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{id=>13}");
 
   db::Cell &cx = g.cell (g.add_cell (g.cell_name (c0.cell_index ())));
 
@@ -545,25 +543,25 @@ TEST(2)
   //  HINT: doing a c2s_unsorted on c0 would disturb the index order of c0, because it uses a flat
   //  iterator. Therefore we make a copy in order to prevent that problem. See bug #{id=>120}.
   cx = c0;
-  EXPECT_EQ (c2s_unsorted(cx), "4[r0 *1 0,0]#{},3[r90 *1 100,-200]#{id=>11},5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{id=>13}");
+  EXPECT_EQ (c2s_unsorted (cx), "4[r0 *1 0,0]#{},3[r90 *1 100,-200]#{id=>11},5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{id=>13}");
   EXPECT_EQ (c0.cell_instances (), size_t (5));
   // not yet: EXPECT_EQ (c0.empty (), false);
   inst = c0.begin ();
   db::Instance i1 = *inst;
   c0.erase (inst);
   cx = c0;
-  EXPECT_EQ (c2s_unsorted(cx), "3[r90 *1 100,-200]#{id=>11},5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{id=>13}");
+  EXPECT_EQ (c2s_unsorted (cx), "3[r90 *1 100,-200]#{id=>11},5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{id=>13}");
   inst = c0.begin ();
   db::Instance i2 = *inst;
   c0.erase (inst);
   cx = c0;
-  EXPECT_EQ (c2s_unsorted(cx), "5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{id=>13}");
+  EXPECT_EQ (c2s_unsorted (cx), "5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{id=>13}");
   inst = c0.begin ();
   db::Instance i3 = *inst;
   db::Instance i4 = *++inst;
   db::Instance i5 = *++inst;
 
-  //  note: double delete is not supported in non-editable mode 
+  //  note: double delete is not supported in non-editable mode
   if (db::default_editable_mode ()) {
 
     /* currently does not issue an exception:
@@ -588,18 +586,17 @@ TEST(2)
     EXPECT_EQ (caught, true);
     */
     c0.erase (i1); //  already deleted
-
   }
 
   c0.erase (i5);
-  EXPECT_EQ (c2s_unsorted(c0), "5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s_unsorted (c0), "5[r0 *1 0,0]#{id=>2},1[r0 *1 0,0]#{id=>1}");
   EXPECT_EQ (c0.cell_instances (), size_t (2));
   c0.erase (i4);
-  EXPECT_EQ (c2s_unsorted(c0), "5[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s_unsorted (c0), "5[r0 *1 0,0]#{id=>2}");
   EXPECT_EQ (c0.cell_instances (), size_t (1));
   //  Not yet: EXPECT_EQ (c0.empty (), false);
 
-  //  note: double delete is not supported in non-editable mode 
+  //  note: double delete is not supported in non-editable mode
   if (db::default_editable_mode ()) {
 
     /* currently does not issue an exception:
@@ -623,16 +620,15 @@ TEST(2)
     EXPECT_EQ (caught, true);
     */
     c0.erase (i5); //  already deleted
-
   }
 
   c0.erase (i3);
-  EXPECT_EQ (c2s_unsorted(c0), "");
+  EXPECT_EQ (c2s_unsorted (c0), "");
   EXPECT_EQ (c0.cell_instances (), size_t (0));
   //  Not yet: EXPECT_EQ (c0.empty (), true);
 }
 
-TEST(3) 
+TEST (3)
 {
   ::pi = 0;
 
@@ -671,45 +667,48 @@ TEST(3)
   c0.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (c1.cell_index ()), t1), pid1));
   c0.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (c1.cell_index ()), t2), pid10));
 
-  EXPECT_EQ (c2s_unsorted(c0), "1[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},1[r0 *1 100,-100]#{id=>10}");
+  EXPECT_EQ (c2s_unsorted (c0), "1[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},1[r0 *1 100,-100]#{id=>10}");
 
   db::Cell::const_iterator i = c0.begin ();
-  ++i; ++i;
+  ++i;
+  ++i;
   db::Cell::const_iterator i2 = i;
   ++i;
   EXPECT_EQ (i.at_end (), true);
 
   c0.erase (i2);
-  EXPECT_EQ (c2s_unsorted(c0), "1[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s_unsorted (c0), "1[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1}");
 
   c0.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (c1.cell_index ()), t2), pid17));
-  EXPECT_EQ (c2s_unsorted(c0), "1[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},1[r0 *1 100,-100]#{id=>17}");
+  EXPECT_EQ (c2s_unsorted (c0), "1[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},1[r0 *1 100,-100]#{id=>17}");
 
   i = c0.begin ();
-  ++i; ++i;
+  ++i;
+  ++i;
   db::Instance inst2 = *i;
   ++i;
 
   c0.erase (inst2);
-  EXPECT_EQ (c2s_unsorted(c0), "1[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1}");
+  EXPECT_EQ (c2s_unsorted (c0), "1[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1}");
 
   c0.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (c1.cell_index ()), t2), pid18));
   c0.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (c1.cell_index ()), t2), pid21));
-  EXPECT_EQ (c2s_unsorted(c0), "1[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},1[r0 *1 100,-100]#{id=>18},1[r0 *1 100,-100]#{id=>21}");
+  EXPECT_EQ (c2s_unsorted (c0), "1[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},1[r0 *1 100,-100]#{id=>18},1[r0 *1 100,-100]#{id=>21}");
 
   i = c0.begin ();
   std::vector<db::Instance> insts;
   insts.push_back (*i);
-  ++i; ++i;
+  ++i;
+  ++i;
   insts.push_back (*i);
-  std::swap (insts[0], insts[1]);
+  std::swap (insts [0], insts [1]);
   std::sort (insts.begin (), insts.end ());
 
   c0.erase_insts (insts);
-  EXPECT_EQ (c2s_unsorted(c0), "1[r0 *1 0,0]#{id=>1},1[r0 *1 100,-100]#{id=>21}");
+  EXPECT_EQ (c2s_unsorted (c0), "1[r0 *1 0,0]#{id=>1},1[r0 *1 100,-100]#{id=>21}");
 }
 
-TEST(3a) 
+TEST (3a)
 {
   ::pi = 0;
 
@@ -778,7 +777,7 @@ TEST(3a)
   EXPECT_EQ (inst.to_string (), "cell_index=1 r315 *2.5 600,-570");
 }
 
-TEST(3b) 
+TEST (3b)
 {
   ::pi = 0;
 
@@ -818,9 +817,9 @@ TEST(3b)
     EXPECT_EQ (c0.shapes (1).size (), size_t (0));
     EXPECT_EQ (c1.shapes (0).size (), size_t (0));
     EXPECT_EQ (c1.shapes (1).size (), size_t (1));
- 
+
     EXPECT_EQ (c0.shapes (0).begin (db::ShapeIterator::All)->to_string (), "box (0,250;2500,3000) props={id=>17}");
-    EXPECT_EQ (c1.shapes (1).begin (db::ShapeIterator::All)->to_string (), "box (0,250;2500,3000)"); 
+    EXPECT_EQ (c1.shapes (1).begin (db::ShapeIterator::All)->to_string (), "box (0,250;2500,3000)");
 
     m.undo ();
 
@@ -832,9 +831,9 @@ TEST(3b)
     EXPECT_EQ (c0.shapes (1).size (), size_t (0));
     EXPECT_EQ (c1.shapes (0).size (), size_t (0));
     EXPECT_EQ (c1.shapes (1).size (), size_t (1));
- 
+
     EXPECT_EQ (c0.shapes (0).begin (db::ShapeIterator::All)->to_string (), "box (0,100;1000,1200) props={id=>17}");
-    EXPECT_EQ (c1.shapes (1).begin (db::ShapeIterator::All)->to_string (), "box (0,100;1000,1200)"); 
+    EXPECT_EQ (c1.shapes (1).begin (db::ShapeIterator::All)->to_string (), "box (0,100;1000,1200)");
 
     m.redo ();
 
@@ -846,14 +845,13 @@ TEST(3b)
     EXPECT_EQ (c0.shapes (1).size (), size_t (0));
     EXPECT_EQ (c1.shapes (0).size (), size_t (0));
     EXPECT_EQ (c1.shapes (1).size (), size_t (1));
- 
-    EXPECT_EQ (c0.shapes (0).begin (db::ShapeIterator::All)->to_string (), "box (0,250;2500,3000) props={id=>17}");
-    EXPECT_EQ (c1.shapes (1).begin (db::ShapeIterator::All)->to_string (), "box (0,250;2500,3000)"); 
 
+    EXPECT_EQ (c0.shapes (0).begin (db::ShapeIterator::All)->to_string (), "box (0,250;2500,3000) props={id=>17}");
+    EXPECT_EQ (c1.shapes (1).begin (db::ShapeIterator::All)->to_string (), "box (0,250;2500,3000)");
   }
 }
 
-TEST(3c)
+TEST (3c)
 {
   ::pi = 0;
 
@@ -924,16 +922,14 @@ TEST(3c)
 
     EXPECT_EQ (c0.shapes (0).begin (db::ShapeIterator::All)->to_string (), "box (0,250;2500,3000) props={id=>17}");
     EXPECT_EQ (c1.shapes (1).begin (db::ShapeIterator::All)->to_string (), "box (0,100;1000,1200)");
-
   }
 }
 
-struct map1
-{
-  db::cell_index_type operator() (db::cell_index_type i) const { return 3-i; }
+struct map1 {
+  db::cell_index_type operator() (db::cell_index_type i) const { return 3 - i; }
 };
 
-TEST(4) 
+TEST (4)
 {
   ::pi = 0;
 
@@ -962,24 +958,23 @@ TEST(4)
   c0.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (c1.cell_index ()), t1), pid1));
   c0.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (c2.cell_index ()), t2), pid10));
 
-  EXPECT_EQ (c2s_unsorted(c0), "1[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},2[r0 *1 100,-100]#{id=>10}");
+  EXPECT_EQ (c2s_unsorted (c0), "1[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},2[r0 *1 100,-100]#{id=>10}");
 
   db::Cell &c3 (g.cell (g.add_cell ()));
   for (db::Cell::const_iterator i = c0.begin (); ! i.at_end (); ++i) {
     c3.insert (*i);
   }
-  EXPECT_EQ (c2s_unsorted(c3), "1[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},2[r0 *1 100,-100]#{id=>10}");
+  EXPECT_EQ (c2s_unsorted (c3), "1[r0 *1 0,0]#{},1[r0 *1 0,0]#{id=>1},2[r0 *1 100,-100]#{id=>10}");
 
   db::Cell &c4 (g.cell (g.add_cell ()));
   for (db::Cell::const_iterator i = c0.begin (); ! i.at_end (); ++i) {
     map1 m1;
     c4.insert (*i, m1);
   }
-  EXPECT_EQ (c2s_unsorted(c4), "2[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>1},1[r0 *1 100,-100]#{id=>10}");
-
+  EXPECT_EQ (c2s_unsorted (c4), "2[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>1},1[r0 *1 100,-100]#{id=>10}");
 }
 
-TEST(5) 
+TEST (5)
 {
   db::Manager m (true);
   db::Layout g (&m);
@@ -996,21 +991,21 @@ TEST(5)
   c3.shapes (0).insert (b);
   c4.shapes (0).insert (b);
 
-  db::Cell *cells[] = { &c1, &c2, &c3, &c4 };
+  db::Cell *cells [] = {&c1, &c2, &c3, &c4};
 
-  db::Trans trans [] = { db::Trans (), 
-                         db::Trans (1, db::Vector (100, -200)),
-                         db::Trans (6, db::Vector (-20, 1000)) };
+  db::Trans trans [] = {db::Trans (),
+                        db::Trans (1, db::Vector (100, -200)),
+                        db::Trans (6, db::Vector (-20, 1000))};
 
   db::Trans tt;
   for (unsigned int p = 0; p < 1000; ++p) {
     if ((p % 17) == 0) {
-      c0.insert (db::CellInstArray (db::CellInst (cells[(p * 23) % (sizeof (cells) / sizeof (cells [0]))]->cell_index ()), tt));
+      c0.insert (db::CellInstArray (db::CellInst (cells [(p * 23) % (sizeof (cells) / sizeof (cells [0]))]->cell_index ()), tt));
     } else {
       //  NOTE: we don't use the properties ID, so they can be any number
-      c0.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (cells[(p * 23) % (sizeof (cells) / sizeof (cells [0]))]->cell_index ()), tt), p % 17));
+      c0.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (cells [(p * 23) % (sizeof (cells) / sizeof (cells [0]))]->cell_index ()), tt), p % 17));
     }
-    tt *= trans[p % (sizeof (trans) / sizeof (trans [0]))];
+    tt *= trans [p % (sizeof (trans) / sizeof (trans [0]))];
   }
 
   g.update ();
@@ -1026,7 +1021,7 @@ TEST(5)
   EXPECT_EQ (r, "1,2,3,4");
 }
 
-TEST(6) 
+TEST (6)
 {
   db::PropertiesSet props;
   props.insert (tl::Variant ("id"), 1);
@@ -1069,12 +1064,12 @@ TEST(6)
     r += tl::to_string (*cc);
   }
 
-  EXPECT_EQ (c2s_unsorted(c0), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{},3[r0 *1 0,0]#{},1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s_unsorted (c0), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{},3[r0 *1 0,0]#{},1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{id=>2}");
 
   db::Cell &cc (g.cell (g.add_cell ()));
   cc = c0;
 
-  EXPECT_EQ (c2s_unsorted(cc), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{},3[r0 *1 0,0]#{},1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{id=>2}");
+  EXPECT_EQ (c2s_unsorted (cc), "1[r0 *1 0,0]#{},2[r0 *1 0,0]#{},3[r0 *1 0,0]#{},1[r0 *1 0,0]#{},2[r0 *1 0,0]#{id=>1},3[r0 *1 0,0]#{id=>2}");
 
   //  Note: iterating and replace does not work in non-editable mode
   if (db::default_editable_mode ()) {
@@ -1087,19 +1082,17 @@ TEST(6)
       cc.replace_prop_id (*i, pid3);
     }
 
-    EXPECT_EQ (c2s_unsorted(cc), "1[r0 *1 0,0]#{id=>3},2[r0 *1 0,0]#{id=>3},3[r0 *1 0,0]#{id=>3},1[r0 *1 0,0]#{id=>3},2[r0 *1 0,0]#{id=>3},3[r0 *1 0,0]#{id=>3}");
+    EXPECT_EQ (c2s_unsorted (cc), "1[r0 *1 0,0]#{id=>3},2[r0 *1 0,0]#{id=>3},3[r0 *1 0,0]#{id=>3},1[r0 *1 0,0]#{id=>3},2[r0 *1 0,0]#{id=>3},3[r0 *1 0,0]#{id=>3}");
 
     for (db::Cell::const_iterator i = c0.begin (); ! i.at_end (); ++i) {
       c0.replace (*i, db::CellInstArrayWithProperties (i->cell_inst (), pid4));
     }
 
-    EXPECT_EQ (c2s_unsorted(c0), "1[r0 *1 0,0]#{id=>4},2[r0 *1 0,0]#{id=>4},3[r0 *1 0,0]#{id=>4},1[r0 *1 0,0]#{id=>4},2[r0 *1 0,0]#{id=>4},3[r0 *1 0,0]#{id=>4}");
-
+    EXPECT_EQ (c2s_unsorted (c0), "1[r0 *1 0,0]#{id=>4},2[r0 *1 0,0]#{id=>4},3[r0 *1 0,0]#{id=>4},1[r0 *1 0,0]#{id=>4},2[r0 *1 0,0]#{id=>4},3[r0 *1 0,0]#{id=>4}");
   }
-
 }
 
-TEST(10_HasShapesTouching)
+TEST (10_HasShapesTouching)
 {
   db::Layout ly;
   unsigned int l1 = ly.insert_layer (db::LayerProperties (1, 0));
@@ -1118,7 +1111,7 @@ TEST(10_HasShapesTouching)
   EXPECT_EQ (a.has_shapes_touching (l1, db::Box (1, 1, 1, 1)), false);
 }
 
-TEST(11_HasShapesTouchingWithHier)
+TEST (11_HasShapesTouchingWithHier)
 {
   db::Layout ly;
   unsigned int l1 = ly.insert_layer (db::LayerProperties (1, 0));

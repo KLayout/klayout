@@ -75,72 +75,61 @@ static void set_create_other_layers (db::LoadLayoutOptions *options, bool l)
 }
 
 //  extend lay::LoadLayoutOptions with the MALY options
-static
-gsi::ClassExt<db::LoadLayoutOptions> maly_reader_options (
+static gsi::ClassExt<db::LoadLayoutOptions> maly_reader_options (
   gsi::method_ext ("maly_set_layer_map", &set_layer_map, gsi::arg ("map"), gsi::arg ("create_other_layers"),
-    "@brief Sets the layer map\n"
-    "This sets a layer mapping for the reader. The layer map allows selection and translation of the original layers, for example to assign layer/datatype numbers to the named layers.\n"
-    "@param map The layer map to set.\n"
-    "@param create_other_layers The flag indicating whether other layers will be created as well. Set to false to read only the layers in the layer map.\n"
-    "\n"
-    "Layer maps can also be used to map the named MALY mask layers to GDS layer/datatypes.\n"
-    "\n"
-    "This method has been added in version 0.30.2."
-  ) +
-  gsi::method_ext ("maly_layer_map=", &set_layer_map1, gsi::arg ("map"),
-    "@brief Sets the layer map\n"
-    "This sets a layer mapping for the reader. Unlike \\maly_set_layer_map, the 'create_other_layers' flag is not changed.\n"
-    "@param map The layer map to set.\n"
-    "\n"
-    "Layer maps can also be used to map the named MALY mask layers to GDS layer/datatypes.\n"
-    "\n"
-    "This method has been added in version 0.30.2."
-  ) +
-  gsi::method_ext ("maly_select_all_layers", &select_all_layers,
-    "@brief Selects all layers and disables the layer map\n"
-    "\n"
-    "This disables any layer map and enables reading of all layers.\n"
-    "New layers will be created when required.\n"
-    "\n"
-    "This method has been added in version 0.30.2."
-  ) +
-  gsi::method_ext ("maly_layer_map", &get_layer_map,
-    "@brief Gets the layer map\n"
-    "@return A reference to the layer map\n"
-    "\n"
-    "This method has been added in version 0.30.2."
-  ) +
-  gsi::method_ext ("maly_create_other_layers?", &create_other_layers,
-    "@brief Gets a value indicating whether other layers shall be created\n"
-    "@return True, if other layers will be created.\n"
-    "This attribute acts together with a layer map (see \\maly_layer_map=). Layers not listed in this map are created as well when "
-    "\\maly_create_other_layers? is true. Otherwise they are ignored.\n"
-    "\n"
-    "This method has been added in version 0.30.2."
-  ) +
-  gsi::method_ext ("maly_create_other_layers=", &set_create_other_layers, gsi::arg ("create"),
-    "@brief Specifies whether other layers shall be created\n"
-    "@param create True, if other layers will be created.\n"
-    "See \\maly_create_other_layers? for a description of this attribute.\n"
-    "\n"
-    "This method has been added in version 0.30.2."
-  ) +
-  gsi::method_ext ("maly_dbu=", &set_maly_dbu, gsi::arg ("dbu"),
-    "@brief Specifies the database unit which the reader uses and produces\n"
-    "The database unit is the final resolution of the produced layout. This physical resolution is usually "
-    "defined by the layout system - GDS for example typically uses 1nm (maly_dbu=0.001).\n"
-    "All geometry in the MALY pattern files is brought to the database unit by scaling.\n"
-    "\n"
-    "This method has been added in version 0.30.2."
-  ) +
-  gsi::method_ext ("maly_dbu", &get_maly_dbu,
-    "@brief Specifies the database unit which the reader uses and produces\n"
-    "See \\maly_dbu= method for a description of this property.\n"
-    "\n"
-    "This method has been added in version 0.30.2."
-  ),
-  ""
-);
+                   "@brief Sets the layer map\n"
+                   "This sets a layer mapping for the reader. The layer map allows selection and translation of the original layers, for example to assign layer/datatype numbers to the named layers.\n"
+                   "@param map The layer map to set.\n"
+                   "@param create_other_layers The flag indicating whether other layers will be created as well. Set to false to read only the layers in the layer map.\n"
+                   "\n"
+                   "Layer maps can also be used to map the named MALY mask layers to GDS layer/datatypes.\n"
+                   "\n"
+                   "This method has been added in version 0.30.2.") +
+    gsi::method_ext ("maly_layer_map=", &set_layer_map1, gsi::arg ("map"),
+                     "@brief Sets the layer map\n"
+                     "This sets a layer mapping for the reader. Unlike \\maly_set_layer_map, the 'create_other_layers' flag is not changed.\n"
+                     "@param map The layer map to set.\n"
+                     "\n"
+                     "Layer maps can also be used to map the named MALY mask layers to GDS layer/datatypes.\n"
+                     "\n"
+                     "This method has been added in version 0.30.2.") +
+    gsi::method_ext ("maly_select_all_layers", &select_all_layers,
+                     "@brief Selects all layers and disables the layer map\n"
+                     "\n"
+                     "This disables any layer map and enables reading of all layers.\n"
+                     "New layers will be created when required.\n"
+                     "\n"
+                     "This method has been added in version 0.30.2.") +
+    gsi::method_ext ("maly_layer_map", &get_layer_map,
+                     "@brief Gets the layer map\n"
+                     "@return A reference to the layer map\n"
+                     "\n"
+                     "This method has been added in version 0.30.2.") +
+    gsi::method_ext ("maly_create_other_layers?", &create_other_layers,
+                     "@brief Gets a value indicating whether other layers shall be created\n"
+                     "@return True, if other layers will be created.\n"
+                     "This attribute acts together with a layer map (see \\maly_layer_map=). Layers not listed in this map are created as well when "
+                     "\\maly_create_other_layers? is true. Otherwise they are ignored.\n"
+                     "\n"
+                     "This method has been added in version 0.30.2.") +
+    gsi::method_ext ("maly_create_other_layers=", &set_create_other_layers, gsi::arg ("create"),
+                     "@brief Specifies whether other layers shall be created\n"
+                     "@param create True, if other layers will be created.\n"
+                     "See \\maly_create_other_layers? for a description of this attribute.\n"
+                     "\n"
+                     "This method has been added in version 0.30.2.") +
+    gsi::method_ext ("maly_dbu=", &set_maly_dbu, gsi::arg ("dbu"),
+                     "@brief Specifies the database unit which the reader uses and produces\n"
+                     "The database unit is the final resolution of the produced layout. This physical resolution is usually "
+                     "defined by the layout system - GDS for example typically uses 1nm (maly_dbu=0.001).\n"
+                     "All geometry in the MALY pattern files is brought to the database unit by scaling.\n"
+                     "\n"
+                     "This method has been added in version 0.30.2.") +
+    gsi::method_ext ("maly_dbu", &get_maly_dbu,
+                     "@brief Specifies the database unit which the reader uses and produces\n"
+                     "See \\maly_dbu= method for a description of this property.\n"
+                     "\n"
+                     "This method has been added in version 0.30.2."),
+  "");
 
 }
-

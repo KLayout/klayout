@@ -54,8 +54,7 @@ GridNetConfigPage::~GridNetConfigPage ()
   mp_ui = 0;
 }
 
-void
-GridNetConfigPage::setup (lay::Dispatcher *root)
+void GridNetConfigPage::setup (lay::Dispatcher *root)
 {
   std::string value;
 
@@ -100,8 +99,7 @@ GridNetConfigPage::setup (lay::Dispatcher *root)
   mp_ui->grid_density_sb->setValue (density);
 }
 
-void
-GridNetConfigPage::commit (lay::Dispatcher *root)
+void GridNetConfigPage::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_grid_visible, mp_ui->grid_group->isChecked ());
   root->config_set (cfg_grid_show_ruler, mp_ui->show_ruler->isChecked ());

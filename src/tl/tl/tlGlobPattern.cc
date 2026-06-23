@@ -32,8 +32,8 @@ namespace tl
 class GlobPatternOpBase
 {
 public:
-  GlobPatternOpBase () { }
-  virtual ~GlobPatternOpBase () { }
+  GlobPatternOpBase () {}
+  virtual ~GlobPatternOpBase () {}
 
   virtual GlobPatternOpBase *clone () const = 0;
   virtual bool match (const char *s, std::vector<std::string> *e) const = 0;
@@ -51,7 +51,7 @@ class GlobPatternOp
   : public GlobPatternOpBase
 {
 public:
-  GlobPatternOp () : m_next_owned (false), mp_next (0) { }
+  GlobPatternOp () : m_next_owned (false), mp_next (0) {}
 
   virtual ~GlobPatternOp ()
   {
@@ -183,7 +183,6 @@ public:
     } else {
 
       return false;
-
     }
   }
 
@@ -308,7 +307,7 @@ public:
     //  .. nothing yet ..
   }
 
-  GlobPatternCharClass (const std::vector<std::pair<uint32_t, uint32_t> > &intervals, bool negate, bool cs)
+  GlobPatternCharClass (const std::vector<std::pair<uint32_t, uint32_t>> &intervals, bool negate, bool cs)
     : m_negate (negate), m_cs (cs), m_intervals (intervals)
   {
     //  .. nothing yet ..
@@ -332,7 +331,7 @@ public:
 
   virtual bool match (const char *s, std::vector<std::string> *e) const
   {
-    if (!*s) {
+    if (! *s) {
       return false;
     }
 
@@ -341,7 +340,7 @@ public:
       c = utf32_downcase (c);
     }
 
-    for (std::vector<std::pair<uint32_t, uint32_t> >::const_iterator i = m_intervals.begin (); i != m_intervals.end (); ++i) {
+    for (std::vector<std::pair<uint32_t, uint32_t>>::const_iterator i = m_intervals.begin (); i != m_intervals.end (); ++i) {
       if (c >= i->first && c <= i->second) {
         if (m_negate) {
           return false;
@@ -360,7 +359,7 @@ public:
 
 private:
   bool m_negate, m_cs;
-  std::vector<std::pair<uint32_t, uint32_t> > m_intervals;
+  std::vector<std::pair<uint32_t, uint32_t>> m_intervals;
 
   GlobPatternCharClass (const GlobPatternCharClass &);
   GlobPatternCharClass &operator= (const GlobPatternCharClass &);
@@ -467,7 +466,7 @@ public:
   void set_inner (GlobPatternOp *op)
   {
     delete mp_inner;
-    op->set_tail (& m_cont);
+    op->set_tail (&m_cont);
     mp_inner = op;
   }
 
@@ -497,7 +496,6 @@ public:
 
       mp_s0 = 0;
       return res;
-
     }
     return false;
   }
@@ -521,11 +519,9 @@ private:
   GlobPatternBracket &operator= (const GlobPatternBracket &);
 };
 
-static
-GlobPatternOp *compile (const char *&p, bool exact, bool cs, bool hm, bool for_brace);
+static GlobPatternOp *compile (const char *&p, bool exact, bool cs, bool hm, bool for_brace);
 
-void
-compile_emit_op (GlobPatternOp *&op_head, GlobPatternOp *&op, GlobPatternOp *no)
+void compile_emit_op (GlobPatternOp *&op_head, GlobPatternOp *&op, GlobPatternOp *no)
 {
   if (op) {
     op->set_next (no, true);
@@ -535,8 +531,7 @@ compile_emit_op (GlobPatternOp *&op_head, GlobPatternOp *&op, GlobPatternOp *no)
   op = no;
 }
 
-void
-compile_emit_string (std::string &str, GlobPatternOp *&op_head, GlobPatternOp *&op, bool cs)
+void compile_emit_string (std::string &str, GlobPatternOp *&op_head, GlobPatternOp *&op, bool cs)
 {
   if (! str.empty ()) {
     compile_emit_op (op_head, op, new GlobPatternString (str, cs));
@@ -544,8 +539,7 @@ compile_emit_string (std::string &str, GlobPatternOp *&op_head, GlobPatternOp *&
   }
 }
 
-void
-compile_emit_char_class (GlobPatternOp *&op_head, GlobPatternOp *&op, const char *&p, bool cs)
+void compile_emit_char_class (GlobPatternOp *&op_head, GlobPatternOp *&op, const char *&p, bool cs)
 {
   bool negate = false;
   if (*p && *p == '^') {
@@ -577,14 +571,12 @@ compile_emit_char_class (GlobPatternOp *&op_head, GlobPatternOp *&op, const char
     }
 
     cc->add_interval (c1, c2);
-
   }
 
   compile_emit_op (op_head, op, cc);
 }
 
-void
-compile_emit_alt (GlobPatternOp *&op_head, GlobPatternOp *&op, const char *&p, bool cs)
+void compile_emit_alt (GlobPatternOp *&op_head, GlobPatternOp *&op, const char *&p, bool cs)
 {
   GlobPatternBranch *alt_op = new GlobPatternBranch ();
   while (*p) {
@@ -605,8 +597,7 @@ compile_emit_alt (GlobPatternOp *&op_head, GlobPatternOp *&op, const char *&p, b
   compile_emit_op (op_head, op, alt_op);
 }
 
-void
-compile_emit_bracket (GlobPatternOp *&op_head, GlobPatternOp *&op, const char *&p, bool cs)
+void compile_emit_bracket (GlobPatternOp *&op_head, GlobPatternOp *&op, const char *&p, bool cs)
 {
   GlobPatternBracket *br_op = new GlobPatternBracket ();
   GlobPatternOp *inner = compile (p, false, cs, false, true);
@@ -620,8 +611,7 @@ compile_emit_bracket (GlobPatternOp *&op_head, GlobPatternOp *&op, const char *&
   compile_emit_op (op_head, op, br_op);
 }
 
-static
-GlobPatternOp *compile (const char *&p, bool exact, bool cs, bool hm, bool for_brace)
+static GlobPatternOp *compile (const char *&p, bool exact, bool cs, bool hm, bool for_brace)
 {
   std::string str;
   GlobPatternOp *op = 0, *op_head = 0;
@@ -649,7 +639,7 @@ GlobPatternOp *compile (const char *&p, bool exact, bool cs, bool hm, bool for_b
     } else if (*p == '*') {
 
       compile_emit_string (str, op_head, op, cs);
-      if (p[1]) {
+      if (p [1]) {
         compile_emit_op (op_head, op, new GlobPatternAny (0, std::numeric_limits<size_t>::max ()));
       } else {
         compile_emit_op (op_head, op, new GlobPatternPass ());
@@ -682,9 +672,7 @@ GlobPatternOp *compile (const char *&p, bool exact, bool cs, bool hm, bool for_b
     } else {
 
       str += *p++;
-
     }
-
   }
 
   compile_emit_string (str, op_head, op, cs);
@@ -736,13 +724,11 @@ GlobPattern::operator= (const GlobPattern &other)
     m_p = other.m_p;
     mp_op = other.mp_op ? other.mp_op->clone () : 0;
     m_needs_compile = other.m_needs_compile;
-
   }
   return *this;
 }
 
-void
-GlobPattern::do_compile ()
+void GlobPattern::do_compile ()
 {
   delete mp_op;
 
@@ -756,8 +742,7 @@ GlobPattern::do_compile ()
   m_needs_compile = false;
 }
 
-void
-GlobPattern::needs_compile ()
+void GlobPattern::needs_compile ()
 {
   if (! m_needs_compile) {
 
@@ -765,7 +750,6 @@ GlobPattern::needs_compile ()
 
     delete mp_op;
     mp_op = 0;
-
   }
 }
 

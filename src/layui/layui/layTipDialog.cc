@@ -41,10 +41,9 @@ TipDialog::TipDialog (QWidget *parent, const std::string &text, const std::strin
   : QDialog (parent), m_key (key)
 {
   init (text, buttons);
-} 
+}
 
-void
-TipDialog::init (const std::string &text, buttons_type buttons)
+void TipDialog::init (const std::string &text, buttons_type buttons)
 {
   mp_ui = new Ui::TipDialog ();
   mp_ui->setupUi (this);
@@ -81,49 +80,42 @@ TipDialog::init (const std::string &text, buttons_type buttons)
   }
 }
 
-bool
-TipDialog::exec_dialog (button_type &button)
+bool TipDialog::exec_dialog (button_type &button)
 {
   return do_exec_dialog (&button);
 }
 
-bool
-TipDialog::exec_dialog ()
+bool TipDialog::exec_dialog ()
 {
   button_type b = no_button;
   return do_exec_dialog (&b);
 }
 
-void 
-TipDialog::close_pressed ()
+void TipDialog::close_pressed ()
 {
   *mp_res = close_button;
   accept ();
 }
 
-void 
-TipDialog::ok_pressed ()
+void TipDialog::ok_pressed ()
 {
   *mp_res = ok_button;
   accept ();
 }
 
-void 
-TipDialog::cancel_pressed ()
+void TipDialog::cancel_pressed ()
 {
   *mp_res = cancel_button;
   reject (); // don't set "show never again"
 }
 
-void 
-TipDialog::yes_pressed ()
+void TipDialog::yes_pressed ()
 {
   *mp_res = yes_button;
   accept ();
 }
 
-void 
-TipDialog::no_pressed ()
+void TipDialog::no_pressed ()
 {
   *mp_res = no_button;
   accept ();
@@ -155,14 +147,12 @@ tip_dialog_status (const std::string &key)
   return std::make_pair (true, -1);
 }
 
-bool
-TipDialog::will_be_shown ()
+bool TipDialog::will_be_shown ()
 {
   return tip_dialog_status (m_key).first;
 }
 
-bool
-TipDialog::do_exec_dialog (button_type *button)
+bool TipDialog::do_exec_dialog (button_type *button)
 {
   mp_res = button;
 
@@ -183,8 +173,7 @@ TipDialog::do_exec_dialog (button_type *button)
   }
 }
 
-void
-TipDialog::accept ()
+void TipDialog::accept ()
 {
   //  register this dialog as dont-show on next startup
   if (mp_ui->dont_show_cbx->isChecked ()) {
@@ -196,7 +185,7 @@ TipDialog::accept ()
 
     if (! th.empty ()) {
       th += ",";
-    } 
+    }
     th += m_key;
     th += "=";
     th += tl::to_string (int (*mp_res));
@@ -204,7 +193,6 @@ TipDialog::accept ()
     if (lay::Dispatcher::instance ()) {
       lay::Dispatcher::instance ()->config_set (cfg_tip_window_hidden, th);
     }
-
   }
 
   QDialog::accept ();

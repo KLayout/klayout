@@ -57,8 +57,7 @@ RegularRepetitionIterator::clone () const
   return new RegularRepetitionIterator (mp_rep, m_i, m_j);
 }
 
-void 
-RegularRepetitionIterator::inc ()
+void RegularRepetitionIterator::inc ()
 {
   ++m_i;
   if (m_i == mp_rep->m_n) {
@@ -71,24 +70,22 @@ db::Vector
 RegularRepetitionIterator::get () const
 {
   return db::Vector (mp_rep->m_a.x () * db::Coord (m_i) + mp_rep->m_b.x () * db::Coord (m_j),
-                    mp_rep->m_a.y () * db::Coord (m_i) + mp_rep->m_b.y () * db::Coord (m_j));
+                     mp_rep->m_a.y () * db::Coord (m_i) + mp_rep->m_b.y () * db::Coord (m_j));
 }
 
-unsigned int 
+unsigned int
 RegularRepetitionIterator::type () const
 {
   return 0;
 }
 
-bool 
-RegularRepetitionIterator::equals (const RepetitionIteratorBase *b) const
+bool RegularRepetitionIterator::equals (const RepetitionIteratorBase *b) const
 {
-  const RegularRepetitionIterator *r = dynamic_cast <const RegularRepetitionIterator *> (b);
+  const RegularRepetitionIterator *r = dynamic_cast<const RegularRepetitionIterator *> (b);
   return r && mp_rep == r->mp_rep && m_i == r->m_i && m_j == r->m_j;
 }
 
-bool 
-RegularRepetitionIterator::at_end () const
+bool RegularRepetitionIterator::at_end () const
 {
   return m_j == mp_rep->m_m;
 }
@@ -112,24 +109,22 @@ RegularRepetition::begin () const
   return new RegularRepetitionIterator (this, 0, 0);
 }
 
-unsigned int 
+unsigned int
 RegularRepetition::type () const
 {
   return 0;
 }
 
-bool 
-RegularRepetition::equals (const RepetitionBase *b) const
+bool RegularRepetition::equals (const RepetitionBase *b) const
 {
-  const RegularRepetition *r = dynamic_cast <const RegularRepetition *> (b);
+  const RegularRepetition *r = dynamic_cast<const RegularRepetition *> (b);
   tl_assert (r != 0);
   return m_a == r->m_a && m_b == r->m_b && m_n == r->m_n && m_m == r->m_m;
 }
 
-bool 
-RegularRepetition::less (const RepetitionBase *b) const
+bool RegularRepetition::less (const RepetitionBase *b) const
 {
-  const RegularRepetition *r = dynamic_cast <const RegularRepetition *> (b);
+  const RegularRepetition *r = dynamic_cast<const RegularRepetition *> (b);
   tl_assert (r != 0);
   if (m_a != r->m_a) {
     return m_a < r->m_a;
@@ -143,8 +138,7 @@ RegularRepetition::less (const RepetitionBase *b) const
   return m_m < r->m_m;
 }
 
-bool 
-RegularRepetition::is_regular (db::Vector &a, db::Vector &b, size_t &n, size_t &m) const
+bool RegularRepetition::is_regular (db::Vector &a, db::Vector &b, size_t &n, size_t &m) const
 {
   a = m_a;
   b = m_b;
@@ -173,8 +167,7 @@ IrregularRepetitionIterator::clone () const
   return new IrregularRepetitionIterator (mp_rep, m_i);
 }
 
-void 
-IrregularRepetitionIterator::inc ()
+void IrregularRepetitionIterator::inc ()
 {
   ++m_i;
 }
@@ -189,21 +182,19 @@ IrregularRepetitionIterator::get () const
   }
 }
 
-unsigned int 
+unsigned int
 IrregularRepetitionIterator::type () const
 {
   return 1;
 }
 
-bool 
-IrregularRepetitionIterator::equals (const RepetitionIteratorBase *b) const
+bool IrregularRepetitionIterator::equals (const RepetitionIteratorBase *b) const
 {
-  const IrregularRepetitionIterator *r = dynamic_cast <const IrregularRepetitionIterator *> (b);
+  const IrregularRepetitionIterator *r = dynamic_cast<const IrregularRepetitionIterator *> (b);
   return r && mp_rep == r->mp_rep && m_i == r->m_i;
 }
 
-bool 
-IrregularRepetitionIterator::at_end () const
+bool IrregularRepetitionIterator::at_end () const
 {
   return m_i == mp_rep->m_points.size () + 1;
 }
@@ -218,7 +209,7 @@ IrregularRepetition::IrregularRepetition ()
 RepetitionBase *
 IrregularRepetition::clone () const
 {
-  IrregularRepetition *r =  new IrregularRepetition ();
+  IrregularRepetition *r = new IrregularRepetition ();
   r->m_points = m_points;
   return r;
 }
@@ -229,30 +220,27 @@ IrregularRepetition::begin () const
   return new IrregularRepetitionIterator (this, 0);
 }
 
-unsigned int 
+unsigned int
 IrregularRepetition::type () const
 {
   return 1;
 }
 
-bool 
-IrregularRepetition::equals (const RepetitionBase *b) const
+bool IrregularRepetition::equals (const RepetitionBase *b) const
 {
-  const IrregularRepetition *r = dynamic_cast <const IrregularRepetition *> (b);
+  const IrregularRepetition *r = dynamic_cast<const IrregularRepetition *> (b);
   tl_assert (r != 0);
   return m_points == r->m_points;
 }
 
-bool 
-IrregularRepetition::less (const RepetitionBase *b) const
+bool IrregularRepetition::less (const RepetitionBase *b) const
 {
-  const IrregularRepetition *r = dynamic_cast <const IrregularRepetition *> (b);
+  const IrregularRepetition *r = dynamic_cast<const IrregularRepetition *> (b);
   tl_assert (r != 0);
   return m_points < r->m_points;
 }
 
-bool 
-IrregularRepetition::is_regular (db::Vector & /*a*/, db::Vector & /*b*/, size_t & /*n*/, size_t & /*m*/) const
+bool IrregularRepetition::is_regular (db::Vector & /*a*/, db::Vector & /*b*/, size_t & /*n*/, size_t & /*m*/) const
 {
   return false;
 }
@@ -293,8 +281,7 @@ RepetitionIterator::operator= (const RepetitionIterator &d)
   return *this;
 }
 
-bool 
-RepetitionIterator::operator== (const RepetitionIterator &d) const
+bool RepetitionIterator::operator== (const RepetitionIterator &d) const
 {
   if (mp_base->type () != d.mp_base->type ()) {
     return false;
@@ -302,8 +289,7 @@ RepetitionIterator::operator== (const RepetitionIterator &d) const
   return mp_base->equals (d.mp_base);
 }
 
-bool 
-RepetitionIterator::at_end () const
+bool RepetitionIterator::at_end () const
 {
   return mp_base->at_end ();
 }
@@ -322,7 +308,7 @@ RepetitionIterator::operator* () const
 }
 
 
-//  Repetition 
+//  Repetition
 
 Repetition::Repetition (RepetitionBase *base)
   : mp_base (base)
@@ -360,10 +346,9 @@ Repetition::operator= (RepetitionBase *base)
   return *this;
 }
 
-bool 
-Repetition::operator== (const Repetition &d) const
+bool Repetition::operator== (const Repetition &d) const
 {
-  if (mp_base == 0 && d.mp_base == 0) { 
+  if (mp_base == 0 && d.mp_base == 0) {
     return true;
   }
   if (! (mp_base != 0 && d.mp_base != 0)) {
@@ -375,10 +360,9 @@ Repetition::operator== (const Repetition &d) const
   return mp_base->equals (d.mp_base);
 }
 
-bool 
-Repetition::operator< (const Repetition &d) const
+bool Repetition::operator< (const Repetition &d) const
 {
-  if (mp_base == 0 || d.mp_base == 0) { 
+  if (mp_base == 0 || d.mp_base == 0) {
     return (mp_base == 0) < (d.mp_base == 0);
   }
   if (mp_base->type () != d.mp_base->type ()) {
@@ -387,8 +371,7 @@ Repetition::operator< (const Repetition &d) const
   return mp_base->less (d.mp_base);
 }
 
-void
-Repetition::set_base (RepetitionBase *base)
+void Repetition::set_base (RepetitionBase *base)
 {
   if (mp_base) {
     delete mp_base;
@@ -402,8 +385,7 @@ Repetition::size () const
   return mp_base ? mp_base->size () : 1;
 }
 
-bool 
-Repetition::is_regular (db::Vector &a, db::Vector &b, size_t &n, size_t &m) const
+bool Repetition::is_regular (db::Vector &a, db::Vector &b, size_t &n, size_t &m) const
 {
   return mp_base && mp_base->is_regular (a, b, n, m);
 }
@@ -414,7 +396,7 @@ Repetition::is_iterated () const
   return mp_base != 0 ? mp_base->is_iterated () : 0;
 }
 
-RepetitionIterator 
+RepetitionIterator
 Repetition::begin () const
 {
   tl_assert (mp_base != 0);
@@ -438,13 +420,13 @@ public:
   virtual std::string format_title () const { return "OASIS"; }
   virtual std::string file_format () const { return "OASIS files (*.oas *.OAS *.oas.gz *.OAS.gz)"; }
 
-  virtual bool detect (tl::InputStream &stream) const 
+  virtual bool detect (tl::InputStream &stream) const
   {
     const char *hdr = stream.get (4);
-    return (hdr && hdr[0] == 0x25 && hdr[1] == 0x53 && hdr[2] == 0x45 && hdr[3] == 0x4d);
+    return (hdr && hdr [0] == 0x25 && hdr [1] == 0x53 && hdr [2] == 0x45 && hdr [3] == 0x4d);
   }
 
-  virtual ReaderBase *create_reader (tl::InputStream &s) const 
+  virtual ReaderBase *create_reader (tl::InputStream &s) const
   {
     return new db::OASISReader (s);
   }
@@ -472,13 +454,12 @@ public:
   virtual tl::XMLElementBase *xml_writer_options_element () const
   {
     return new db::WriterOptionsXMLElement<db::OASISWriterOptions> ("oasis",
-      tl::make_member (&db::OASISWriterOptions::compression_level, "compression-level") +
-      tl::make_member (&db::OASISWriterOptions::write_cblocks, "write-cblocks") +
-      tl::make_member (&db::OASISWriterOptions::strict_mode, "strict-mode") +
-      tl::make_member (&db::OASISWriterOptions::write_std_properties, "write-std-properties") +
-      tl::make_member (&db::OASISWriterOptions::subst_char, "subst-char") +
-      tl::make_member (&db::OASISWriterOptions::permissive, "permissive")
-    );
+                                                                    tl::make_member (&db::OASISWriterOptions::compression_level, "compression-level") +
+                                                                      tl::make_member (&db::OASISWriterOptions::write_cblocks, "write-cblocks") +
+                                                                      tl::make_member (&db::OASISWriterOptions::strict_mode, "strict-mode") +
+                                                                      tl::make_member (&db::OASISWriterOptions::write_std_properties, "write-std-properties") +
+                                                                      tl::make_member (&db::OASISWriterOptions::subst_char, "subst-char") +
+                                                                      tl::make_member (&db::OASISWriterOptions::permissive, "permissive"));
   }
 };
 
@@ -488,5 +469,3 @@ static tl::RegisteredClass<db::StreamFormatDeclaration> reader_decl (new OASISFo
 int force_link_OASIS = 0;
 
 }
-
-

@@ -32,7 +32,7 @@
 #include "tlUnitTest.h"
 #include "tlStream.h"
 
-TEST(1_Basics)
+TEST (1_Basics)
 {
   db::Layout ly;
   {
@@ -82,11 +82,11 @@ TEST(1_Basics)
   db::Texts texts2_copy (texts2);
   texts2_copy.insert_into_as_polygons (&target, target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), 1);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_texts_au1.gds");
 }
 
-TEST(2_Interactions)
+TEST (2_Interactions)
 {
   db::Layout ly;
   {
@@ -142,11 +142,11 @@ TEST(2_Interactions)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), polygons);
   }
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_texts_au2.gds");
 }
 
-TEST(3_Filtering)
+TEST (3_Filtering)
 {
   db::Layout ly;
   {
@@ -176,6 +176,6 @@ TEST(3_Filtering)
   texts2.filter (db::TextPatternFilter ("L*A", true));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), texts2);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_texts_au3.gds");
 }

@@ -33,7 +33,7 @@
 
 namespace tl
 {
-  class XMLElementList;
+class XMLElementList;
 }
 
 namespace lay
@@ -46,20 +46,20 @@ class LAYBASIC_PUBLIC BookmarkListElement
   : public DisplayState
 {
 public:
-  BookmarkListElement () 
+  BookmarkListElement ()
   {
     //  .. nothing yet ..
   }
 
   BookmarkListElement (const DisplayState &state)
     : DisplayState (state)
-  { 
+  {
     //  .. nothing yet ..
   }
 
   BookmarkListElement (const std::string &n, const DisplayState &state)
     : DisplayState (state), m_name (n)
-  { 
+  {
     //  .. nothing yet ..
   }
 
@@ -74,7 +74,7 @@ public:
     return m_name;
   }
 
-  void set_name (const std::string &n) 
+  void set_name (const std::string &n)
   {
     m_name = n;
   }
@@ -98,7 +98,7 @@ public:
   /**
    *  @brief The begin iterator of all bookmark elements
    */
-  const_iterator begin () const 
+  const_iterator begin () const
   {
     return m_list.begin ();
   }
@@ -106,7 +106,7 @@ public:
   /**
    *  @brief The end iterator of all bookmark elements
    */
-  const_iterator end () const 
+  const_iterator end () const
   {
     return m_list.end ();
   }
@@ -120,7 +120,7 @@ public:
   }
 
   /**
-   *  @brief Add a bookmark 
+   *  @brief Add a bookmark
    */
   void add (const std::string &name, const DisplayState &state)
   {
@@ -142,7 +142,7 @@ public:
   {
     m_list.clear ();
   }
-  
+
   /**
    *  @brief Obtain the number of bookmarks
    */
@@ -158,7 +158,7 @@ public:
   {
     m_list [index].set_name (name);
   }
-  
+
   /**
    *  @brief Obtain the name of the element with the given index
    */
@@ -166,7 +166,7 @@ public:
   {
     return m_list [index].name ();
   }
-  
+
   /**
    *  @brief Set the state of the element with the given index
    */
@@ -174,7 +174,7 @@ public:
   {
     m_list [index] = state;
   }
-  
+
   /**
    *  @brief Obtain the name of the element with the given index
    */
@@ -189,7 +189,7 @@ public:
   std::string propose_new_bookmark_name () const;
 
   /**
-   *  @brief Save the list 
+   *  @brief Save the list
    */
   void save (const std::string &fn) const;
 

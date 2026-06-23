@@ -35,8 +35,7 @@ namespace tl
  *  @brief A copy duplicator (see copy_on_write_ptr below)
  */
 template <class X>
-struct copy_duplicator
-{
+struct copy_duplicator {
   X *operator() (const X &o)
   {
     return new X (o);
@@ -47,8 +46,7 @@ struct copy_duplicator
  *  @brief A clone duplicator (see copy_on_write_ptr below)
  */
 template <class X>
-struct clone_duplicator
-{
+struct clone_duplicator {
   X *operator() (const X &o)
   {
     return o.clone ();
@@ -73,7 +71,8 @@ class copy_on_write_holder
 public:
   copy_on_write_holder (X *x)
     : m_ref_count (1), mp_x (x)
-  { }
+  {
+  }
 
   ~copy_on_write_holder ()
   {
@@ -108,7 +107,7 @@ private:
  *  is provided through the "clone_duplicator", which assumes a "clone" method to supply the duplicated
  *  object.
  */
-template <class X, class Dup = copy_duplicator<X> >
+template <class X, class Dup = copy_duplicator<X>>
 class copy_on_write_ptr
   : public CopyOnWritePtrBase
 {
@@ -117,11 +116,13 @@ public:
 
   copy_on_write_ptr ()
     : mp_holder (0)
-  { }
+  {
+  }
 
   copy_on_write_ptr (X *x)
     : mp_holder (x ? new copy_on_write_holder<X> (x) : 0)
-  { }
+  {
+  }
 
   explicit copy_on_write_ptr (const copy_on_write_ptr<X, Dup> &other)
     : mp_holder (other.mp_holder)
@@ -204,7 +205,7 @@ public:
    *  @brief Gets the non-const pointer
    *  This is when we will create a new copy if the object is shared.
    */
-  X *operator-> ()
+  X *operator->()
   {
     return get_non_const ();
   }
@@ -213,7 +214,7 @@ public:
    *  @brief Gets the const pointer
    *  No copy will be created.
    */
-  const X *operator-> () const
+  const X *operator->() const
   {
     return get_const ();
   }

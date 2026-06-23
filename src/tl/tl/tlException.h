@@ -47,7 +47,8 @@ class TL_PUBLIC Exception
 public:
   Exception (const std::string &msg)
     : m_msg (msg), m_first_chance (true)
-  { }
+  {
+  }
 
   Exception (const std::string &fmt, const std::vector<tl::Variant> &a)
   {
@@ -124,7 +125,7 @@ public:
     init (fmt, a);
   }
 
-  virtual ~Exception () { }
+  virtual ~Exception () {}
 
   /**
    *  @brief Gets the full message text
@@ -173,11 +174,11 @@ private:
  *  @brief An exception thrown when the wrong type is provided as argument.
  */
 struct TL_PUBLIC TypeError
-  : public Exception
-{
+  : public Exception {
   TypeError (const std::string &msg)
     : Exception (msg)
-  { }
+  {
+  }
 };
 
 /**
@@ -185,22 +186,22 @@ struct TL_PUBLIC TypeError
  *  This exception is not shown.
  */
 struct TL_PUBLIC CancelException
-  : public Exception
-{
+  : public Exception {
   CancelException ()
     : Exception (tl::to_string (tr ("Operation cancelled")))
-  { }
+  {
+  }
 };
 
 /**
  *  @brief A special "internal" exception class used by tl_assert
  */
 struct TL_PUBLIC InternalException
-  : public Exception
-{
+  : public Exception {
   InternalException (const char *file, int line, const char *cond)
     : Exception (tl::to_string (tr ("Internal error: %s:%d %s was not true")).c_str (), file, line, cond)
-  { }
+  {
+  }
 };
 
 } // namespace tl

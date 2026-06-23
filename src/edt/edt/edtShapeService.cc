@@ -30,7 +30,7 @@
 #include "dbPolygonTools.h"
 
 #if defined(HAVE_QT)
-#  include "layTipDialog.h"
+#include "layTipDialog.h"
 #endif
 
 namespace edt
@@ -43,14 +43,13 @@ const char *ShapeEditService::connection_configure_name () { return "connection-
 const char *ShapeEditService::connection_function_name () { return "connection-toolkit-widget-commit"; }
 
 ShapeEditService::ShapeEditService (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type shape_types)
-  : edt::Service (manager, view, shape_types), 
+  : edt::Service (manager, view, shape_types),
     m_layer (0), m_cv_index (0), mp_cell (0), mp_layout (0), m_combine_mode (CM_Add), m_update_edit_layer_enabled (true)
 {
   view->current_layer_changed_event.add (this, &ShapeEditService::update_edit_layer);
 }
 
-bool 
-ShapeEditService::configure (const std::string &name, const std::string &value)
+bool ShapeEditService::configure (const std::string &name, const std::string &value)
 {
   if (name == cfg_edit_combine_mode) {
     CMConverter ().from_string (value, m_combine_mode);
@@ -59,9 +58,8 @@ ShapeEditService::configure (const std::string &name, const std::string &value)
     return edt::Service::configure (name, value);
   }
 }
-  
-void
-ShapeEditService::activated ()
+
+void ShapeEditService::activated ()
 {
   edt::Service::activated ();
 
@@ -71,8 +69,7 @@ ShapeEditService::activated ()
   }
 }
 
-void
-ShapeEditService::config_recent_for_layer (const db::LayerProperties &lp, int cv_index)
+void ShapeEditService::config_recent_for_layer (const db::LayerProperties &lp, int cv_index)
 {
   if (lp.is_null ()) {
     return;
@@ -91,8 +88,7 @@ ShapeEditService::config_recent_for_layer (const db::LayerProperties &lp, int cv
   }
 }
 
-void
-ShapeEditService::get_edit_layer ()
+void ShapeEditService::get_edit_layer ()
 {
   lay::LayerPropertiesConstIterator cl = view ()->current_layer ();
 
@@ -133,12 +129,11 @@ ShapeEditService::get_edit_layer ()
 
       //  update the layer index inside the layer view
       cl->realize_source ();
-        
-      //  Hint: we could have taken the new index from insert_layer, but this 
+
+      //  Hint: we could have taken the new index from insert_layer, but this
       //  is a nice test:
       layer = cl->layer_index ();
       tl_assert (layer >= 0);
-
     }
   }
 
@@ -155,8 +150,7 @@ ShapeEditService::get_edit_layer ()
   view ()->set_active_cellview_index_silent (cv_index);
 }
 
-void
-ShapeEditService::change_edit_layer (const db::LayerProperties &lp)
+void ShapeEditService::change_edit_layer (const db::LayerProperties &lp)
 {
   if (! mp_layout) {
     return;
@@ -184,8 +178,7 @@ ShapeEditService::change_edit_layer (const db::LayerProperties &lp)
   }
 }
 
-void
-ShapeEditService::set_layer (const db::LayerProperties &lp, unsigned int cv_index)
+void ShapeEditService::set_layer (const db::LayerProperties &lp, unsigned int cv_index)
 {
   const lay::CellView &cv = view ()->cellview (cv_index);
   if (! cv.is_valid ()) {
@@ -222,8 +215,7 @@ ShapeEditService::set_layer (const db::LayerProperties &lp, unsigned int cv_inde
   }
 }
 
-void
-ShapeEditService::update_edit_layer (const lay::LayerPropertiesConstIterator &cl)
+void ShapeEditService::update_edit_layer (const lay::LayerPropertiesConstIterator &cl)
 {
   if (! m_update_edit_layer_enabled) {
     return;
@@ -269,7 +261,6 @@ ShapeEditService::update_edit_layer (const lay::LayerPropertiesConstIterator &cl
       //  is a nice test:
       layer = cl->layer_index ();
       tl_assert (layer >= 0);
-
     }
 
     m_layer = (unsigned int) layer;
@@ -284,12 +275,10 @@ ShapeEditService::update_edit_layer (const lay::LayerPropertiesConstIterator &cl
     config_recent_for_layer (cv->layout ().get_properties ((unsigned int) layer), cv_index);
 
     open_editor_hooks ();
-
   }
 }
 
-void
-ShapeEditService::tap (const db::DPoint &initial)
+void ShapeEditService::tap (const db::DPoint &initial)
 {
   if (editing ()) {
     get_edit_layer ();
@@ -307,14 +296,14 @@ ShapeEditService::tap (const db::DPoint &initial)
  *
  *  This method returns the intersection point ("new o") and a flag if the search was successful (.first of return value).
  */
-std::pair <bool, db::DPoint>
+std::pair<bool, db::DPoint>
 ShapeEditService::interpolate (const db::DPoint &m, const db::DPoint &o, const db::DPoint &p) const
 {
   if (fabs (m.x () - o.x ()) < 1e-6 && fabs (m.y () - o.y ()) < 1e-6) {
-    return std::pair <bool, db::DPoint> (false, db::DPoint ());
+    return std::pair<bool, db::DPoint> (false, db::DPoint ());
   }
 
-  std::vector <db::DVector> delta;
+  std::vector<db::DVector> delta;
   delta.reserve (4);
   delta.push_back (db::DVector (1.0, 0.0));
   delta.push_back (db::DVector (0.0, 1.0));
@@ -325,8 +314,8 @@ ShapeEditService::interpolate (const db::DPoint &m, const db::DPoint &o, const d
 
   bool c_set = false;
   db::DPoint c;
-  for (std::vector <db::DVector>::const_iterator d = delta.begin (); d != delta.end (); ++d) {
-    std::pair <bool, db::DPoint> ip = db::DEdge (m, o).cut_point (db::DEdge (p - *d, p));
+  for (std::vector<db::DVector>::const_iterator d = delta.begin (); d != delta.end (); ++d) {
+    std::pair<bool, db::DPoint> ip = db::DEdge (m, o).cut_point (db::DEdge (p - *d, p));
     if (ip.first && (! c_set || o.sq_distance (ip.second) < o.sq_distance (c))) {
       c = ip.second;
       c_set = true;
@@ -336,18 +325,16 @@ ShapeEditService::interpolate (const db::DPoint &m, const db::DPoint &o, const d
   return std::make_pair (c_set, c);
 }
 
-void 
-ShapeEditService::do_mouse_move_inactive (const db::DPoint &p)
+void ShapeEditService::do_mouse_move_inactive (const db::DPoint &p)
 {
   //  display the next (snapped) position where editing would start
   db::DPoint pp = snap (p);
-  std::string pos = std::string ("x: ") + tl::micron_to_string (pp.x ()) + 
+  std::string pos = std::string ("x: ") + tl::micron_to_string (pp.x ()) +
                     std::string ("  y: ") + tl::micron_to_string (pp.y ());
   view ()->message (pos);
 }
 
-void 
-ShapeEditService::deliver_shape (const db::Polygon &poly)
+void ShapeEditService::deliver_shape (const db::Polygon &poly)
 {
   if (m_combine_mode == CM_Add) {
 
@@ -398,11 +385,9 @@ ShapeEditService::deliver_shape (const db::Polygon &poly)
         }
 
         shapes.push_back (*s);
-
-      } 
+      }
 
       ++s;
-
     }
 
     //  If nothing was found, simply pass the input to the result
@@ -424,12 +409,10 @@ ShapeEditService::deliver_shape (const db::Polygon &poly)
     for (std::vector<db::Polygon>::const_iterator p = input_left.begin (); p != input_left.end (); ++p) {
       cell ().shapes (layer ()).insert (*p);
     }
-
   }
 }
 
-void 
-ShapeEditService::deliver_shape (const db::Path &path)
+void ShapeEditService::deliver_shape (const db::Path &path)
 {
   if (m_combine_mode == CM_Add) {
     db::Transaction transaction (manager (), tl::to_string (tr ("Create path")));
@@ -439,8 +422,7 @@ ShapeEditService::deliver_shape (const db::Path &path)
   }
 }
 
-void 
-ShapeEditService::deliver_shape (const db::Box &box)
+void ShapeEditService::deliver_shape (const db::Box &box)
 {
   if (m_combine_mode == CM_Add) {
     db::Transaction transaction (manager (), tl::to_string (tr ("Create box")));
@@ -450,8 +432,7 @@ ShapeEditService::deliver_shape (const db::Box &box)
   }
 }
 
-void
-ShapeEditService::deliver_shape (const db::Point &point)
+void ShapeEditService::deliver_shape (const db::Point &point)
 {
   if (m_combine_mode == CM_Add) {
     db::Transaction transaction (manager (), tl::to_string (tr ("Create point")));
@@ -459,8 +440,7 @@ ShapeEditService::deliver_shape (const db::Point &point)
   }
 }
 
-void
-ShapeEditService::open_editor_hooks ()
+void ShapeEditService::open_editor_hooks ()
 {
   std::string technology;
   if (mp_layout && mp_layout->technology ()) {
@@ -473,8 +453,7 @@ ShapeEditService::open_editor_hooks ()
   call_editor_hooks<lay::CellViewRef &, const lay::LayerProperties &> (m_editor_hooks, &edt::EditorHooks::begin_create_shapes, cv_ref, *view ()->current_layer ());
 }
 
-void
-ShapeEditService::close_editor_hooks (bool with_commit)
+void ShapeEditService::close_editor_hooks (bool with_commit)
 {
   if (with_commit) {
     call_editor_hooks (m_editor_hooks, &edt::EditorHooks::commit_shapes);
@@ -485,8 +464,7 @@ ShapeEditService::close_editor_hooks (bool with_commit)
 }
 
 template <class Shape>
-void
-ShapeEditService::deliver_shape_to_hooks (const Shape &shape)
+void ShapeEditService::deliver_shape_to_hooks (const Shape &shape)
 {
   db::Shapes tmp (true);
   db::Shape s = tmp.insert (shape);
@@ -501,4 +479,3 @@ template void ShapeEditService::deliver_shape_to_hooks<db::Point> (const db::Poi
 template void ShapeEditService::deliver_shape_to_hooks<db::Text> (const db::Text &);
 
 } // namespace edt
-

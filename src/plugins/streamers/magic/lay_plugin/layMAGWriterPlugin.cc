@@ -50,8 +50,7 @@ MAGWriterOptionPage::~MAGWriterOptionPage ()
   mp_ui = 0;
 }
 
-void 
-MAGWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/)
+void MAGWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/)
 {
   const db::MAGWriterOptions *options = dynamic_cast<const db::MAGWriterOptions *> (o);
   if (options) {
@@ -65,8 +64,7 @@ MAGWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::
   }
 }
 
-void 
-MAGWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/, bool /*gzip*/)
+void MAGWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/, bool /*gzip*/)
 {
   db::MAGWriterOptions *options = dynamic_cast<db::MAGWriterOptions *> (o);
   if (options) {
@@ -107,4 +105,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> plugin_decl (new lay::MAGWriterPluginDeclaration (), 10000, "MAGWriter");
 
 }
-

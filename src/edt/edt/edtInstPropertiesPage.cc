@@ -72,10 +72,10 @@ static std::string cell_name_from_sel (EditableSelectionIterator::pointer pos, e
   }
 }
 
-namespace {
-
-struct SelectionPtrSort
+namespace
 {
+
+struct SelectionPtrSort {
   SelectionPtrSort (edt::Service *service)
     : mp_service (service)
   {
@@ -107,7 +107,7 @@ InstPropertiesPage::InstPropertiesPage (edt::Service *service, db::Manager *mana
 {
   m_selection_ptrs.reserve (service->selection_size ());
   for (EditableSelectionIterator s = service->begin_selection (); ! s.at_end (); ++s) {
-    m_selection_ptrs.push_back (s.operator-> ());
+    m_selection_ptrs.push_back (s.operator->());
   }
 
   std::sort (m_selection_ptrs.begin (), m_selection_ptrs.end (), SelectionPtrSort (service));
@@ -160,7 +160,6 @@ InstPropertiesPage::InstPropertiesPage (edt::Service *service, db::Manager *mana
     lib_cbx->setEnabled (false);
     array_grp->setCheckable (false);
     mirror_cbx->setEnabled (false);
-
   }
 
   QHBoxLayout *layout = new QHBoxLayout (pcell_tab);
@@ -173,20 +172,18 @@ InstPropertiesPage::~InstPropertiesPage ()
   mp_service->restore_highlights ();
 }
 
-void
-InstPropertiesPage::library_changed (int)
+void InstPropertiesPage::library_changed (int)
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   update_pcell_parameters ();
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-InstPropertiesPage::cell_name_changed (const QString &)
+void InstPropertiesPage::cell_name_changed (const QString &)
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   update_pcell_parameters ();
-END_PROTECTED
+  END_PROTECTED
 }
 
 static void
@@ -204,16 +201,15 @@ get_cell_or_pcell_ids_by_name (const db::Layout *layout, const std::string &name
   }
 }
 
-void
-InstPropertiesPage::browse_cell ()
+void InstPropertiesPage::browse_cell ()
 {
   if (m_indexes.empty ()) {
     return;
   }
 
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
-  //  find the layout the cell has to be looked up: that is either the layout of the current instance or 
+  //  find the layout the cell has to be looked up: that is either the layout of the current instance or
   //  the library selected
   db::Layout *layout = 0;
   db::Library *lib = 0;
@@ -253,14 +249,12 @@ BEGIN_PROTECTED
     update_pcell_parameters ();
 
     emit edited ();
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-InstPropertiesPage::show_props ()
+void InstPropertiesPage::show_props ()
 {
   if (m_indexes.empty ()) {
     return;
@@ -272,8 +266,7 @@ InstPropertiesPage::show_props ()
   }
 }
 
-void
-InstPropertiesPage::display_mode_changed (bool)
+void InstPropertiesPage::display_mode_changed (bool)
 {
   if (! m_enable_cb_callback) {
     return;
@@ -291,8 +284,7 @@ InstPropertiesPage::count () const
   return m_selection_ptrs.size ();
 }
 
-void
-InstPropertiesPage::select_entries (const std::vector<size_t> &entries)
+void InstPropertiesPage::select_entries (const std::vector<size_t> &entries)
 {
   m_indexes = entries;
 }
@@ -330,8 +322,7 @@ InstPropertiesPage::description () const
   return tl::to_string (tr ("Instances"));
 }
 
-void
-InstPropertiesPage::confine_selection (const std::vector<size_t> &remaining_entries)
+void InstPropertiesPage::confine_selection (const std::vector<size_t> &remaining_entries)
 {
   std::vector<lay::ObjectInstPath> new_selection;
   for (auto i = remaining_entries.begin (); i != remaining_entries.end (); ++i) {
@@ -343,21 +334,19 @@ InstPropertiesPage::confine_selection (const std::vector<size_t> &remaining_entr
   m_selection_ptrs.clear ();
   m_selection_ptrs.reserve (mp_service->selection_size ());
   for (edt::EditableSelectionIterator s = mp_service->begin_selection (); ! s.at_end (); ++s) {
-    m_selection_ptrs.push_back (s.operator-> ());
+    m_selection_ptrs.push_back (s.operator->());
   }
 
   m_prop_id = 0;
   mp_service->clear_highlights ();
 }
 
-void
-InstPropertiesPage::leave ()
+void InstPropertiesPage::leave ()
 {
   mp_service->clear_highlights ();
 }
 
-void 
-InstPropertiesPage::update ()
+void InstPropertiesPage::update ()
 {
   if (m_indexes.empty ()) {
     return;
@@ -449,7 +438,6 @@ InstPropertiesPage::update ()
       long row = pos->back ().array_inst.index_a ();
       long column = pos->back ().array_inst.index_b ();
       inst_lbl->setText (tl::to_qstring (tl::sprintf (tl::to_string (QObject::tr ("This is instance [%ld,%ld] of array with")), row, column)));
-
     }
 
     ortho_warning_frame->setEnabled (! is_orthogonal (db::CplxTrans (dbu) * rowv, db::CplxTrans (dbu) * columnv));
@@ -471,7 +459,6 @@ InstPropertiesPage::update ()
     inst_lbl->setText (QString ());
 
     ortho_warning_frame->setEnabled (false);
-
   }
 
   pos_x_le->setText (tl::to_qstring (coord_to_string ((gt * db::ICplxTrans (t)).disp ().x (), dbu, du)));
@@ -485,8 +472,7 @@ InstPropertiesPage::update ()
   update_pcell_parameters ();
 }
 
-void 
-InstPropertiesPage::show_cell ()
+void InstPropertiesPage::show_cell ()
 {
   if (m_indexes.empty ()) {
     return;
@@ -502,8 +488,7 @@ InstPropertiesPage::show_cell ()
   mp_service->view ()->set_current_cell_path (pos->cv_index (), path);
 }
 
-void
-InstPropertiesPage::show_inst ()
+void InstPropertiesPage::show_inst ()
 {
   if (m_indexes.empty ()) {
     return;
@@ -513,8 +498,7 @@ InstPropertiesPage::show_inst ()
   inst_form.show (mp_service->view (), *m_selection_ptrs [m_indexes.front ()]);
 }
 
-bool 
-InstPropertiesPage::readonly ()
+bool InstPropertiesPage::readonly ()
 {
   return ! mp_service->view ()->is_editable ();
 }
@@ -537,7 +521,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
   db::Layout *layout;
   db::Library *lib = lib_cbx->current_library ();
 
-  //  find the layout the cell has to be looked up: that is either the layout of the current instance or 
+  //  find the layout the cell has to be looked up: that is either the layout of the current instance or
   //  the library selected
   if (lib) {
     layout = &lib->layout ();
@@ -646,7 +630,6 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
 
       //  NOTE: changing the library only is a special case of the ChangeTargetPCellApplicator
       appl->add (new ChangeTargetPCellApplicator (0, false, lib, true, std::map<std::string, tl::Variant> ()));
-
     }
 
   } catch (tl::Exception &) {
@@ -789,7 +772,6 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
   } else if (is_array_org) {
 
     appl->add (new InstanceRemoveArrayApplicator ());
-
   }
 
   if (has_error || has_pcell_error) {
@@ -803,13 +785,12 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
   return appl.release ();
 }
 
-void
-InstPropertiesPage::recompute_selection_ptrs (const std::vector<lay::ObjectInstPath> &new_sel)
+void InstPropertiesPage::recompute_selection_ptrs (const std::vector<lay::ObjectInstPath> &new_sel)
 {
   std::map<lay::ObjectInstPath, EditableSelectionIterator::pointer> ptrs;
 
   for (EditableSelectionIterator pos = mp_service->begin_selection (); ! pos.at_end (); ++pos) {
-    ptrs.insert (std::make_pair (*pos, pos.operator -> ()));
+    ptrs.insert (std::make_pair (*pos, pos.operator->()));
   }
 
   m_selection_ptrs.clear ();
@@ -820,8 +801,7 @@ InstPropertiesPage::recompute_selection_ptrs (const std::vector<lay::ObjectInstP
   }
 }
 
-void 
-InstPropertiesPage::do_apply (bool current_only, bool relative)
+void InstPropertiesPage::do_apply (bool current_only, bool relative)
 {
   if (m_indexes.empty ()) {
     return;
@@ -901,7 +881,7 @@ InstPropertiesPage::do_apply (bool current_only, bool relative)
         db::Cell &cell = cv->layout ().cell (pos->cell_index ());
         double dbu = cv->layout ().dbu ();
 
-        if (!current_only || org_inst == current) {
+        if (! current_only || org_inst == current) {
           new_inst = applicator->do_apply_inst (cell, org_inst, dbu, relative_mode);
         }
 
@@ -914,15 +894,13 @@ InstPropertiesPage::do_apply (bool current_only, bool relative)
       if (new_inst != pos->back ().inst_ptr) {
 
         //  change selection to new instance
-        new_sel[index].back ().inst_ptr = new_inst;
+        new_sel [index].back ().inst_ptr = new_inst;
 
         mp_service->select (*pos, lay::Editable::Reset);
-        mp_service->select (new_sel[index], lay::Editable::Add);
+        mp_service->select (new_sel [index], lay::Editable::Add);
 
         update_required = true;
-
-      } 
-
+      }
     }
 
     if (update_required) {
@@ -946,26 +924,22 @@ InstPropertiesPage::do_apply (bool current_only, bool relative)
   update ();
 }
 
-void 
-InstPropertiesPage::apply (bool /*commit*/)
+void InstPropertiesPage::apply (bool /*commit*/)
 {
   do_apply (true, false);
 }
 
-bool
-InstPropertiesPage::can_apply_to_all () const
+bool InstPropertiesPage::can_apply_to_all () const
 {
   return m_selection_ptrs.size () > 1;
 }
 
-void 
-InstPropertiesPage::apply_to_all (bool relative, bool /*commit*/)
+void InstPropertiesPage::apply_to_all (bool relative, bool /*commit*/)
 {
   do_apply (false, relative);
 }
 
-void
-InstPropertiesPage::update_pcell_parameters ()
+void InstPropertiesPage::update_pcell_parameters ()
 {
   if (m_indexes.empty ()) {
     return;
@@ -973,7 +947,7 @@ InstPropertiesPage::update_pcell_parameters ()
 
   db::Layout *layout;
 
-  //  find the layout the cell has to be looked up: that is either the layout of the current instance or 
+  //  find the layout the cell has to be looked up: that is either the layout of the current instance or
   //  the library selected
   if (lib_cbx->current_library ()) {
 
@@ -984,7 +958,6 @@ InstPropertiesPage::update_pcell_parameters ()
     EditableSelectionIterator::pointer pos = m_selection_ptrs [m_indexes.front ()];
     const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
     layout = &cv->layout ();
-
   }
 
   std::pair<bool, db::pcell_id_type> pc;
@@ -1042,7 +1015,6 @@ InstPropertiesPage::update_pcell_parameters ()
       connect (mp_pcell_parameters, SIGNAL (edited ()), this, SIGNAL (edited ()));
       mp_pcell_parameters->setup (mp_service->view (), pos->cv_index (), layout->pcell_declaration (pc.second), parameters);
       pcell_tab->layout ()->addWidget (mp_pcell_parameters);
-
     }
 
     param_tab_widget->setTabEnabled (1, true);
@@ -1061,9 +1033,7 @@ InstPropertiesPage::update_pcell_parameters ()
       param_tab_widget->setCurrentIndex (0);
     }
     param_tab_widget->setTabEnabled (1, false);
-
   }
-
 }
 
 }

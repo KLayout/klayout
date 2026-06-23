@@ -94,7 +94,7 @@ void run_pythontest (tl::TestBase *_this, const std::string &fn)
 }
 
 #define PYTHONTEST(n, file) \
-  TEST(n) { run_pythontest(_this, file); }
+  TEST (n) { run_pythontest (_this, file); }
 
 PYTHONTEST (kwargs, "kwargs.py")
 PYTHONTEST (modTests, "modTests.py")

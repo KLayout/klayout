@@ -38,8 +38,7 @@ namespace db
 namespace plc
 {
 
-struct DB_PUBLIC ConvexDecompositionParameters
-{
+struct DB_PUBLIC ConvexDecompositionParameters {
   ConvexDecompositionParameters ()
     : with_segments (false),
       split_edges (false),
@@ -128,8 +127,7 @@ public:
 private:
   Graph *mp_graph;
 
-  struct ConcaveCorner
-  {
+  struct ConcaveCorner {
     ConcaveCorner ()
       : corner (0), incoming (0), outgoing (0)
     {
@@ -156,4 +154,3 @@ private:
 } //  namespace db
 
 #endif
-

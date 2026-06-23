@@ -43,7 +43,7 @@ void wait_for_ms (int ms)
   }
 }
 
-TEST(1)
+TEST (1)
 {
   QList<QVariant> args;
 
@@ -89,7 +89,7 @@ TEST(1)
   EXPECT_EQ (removed_spy.count (), 0);
 }
 
-TEST(2)
+TEST (2)
 {
   QList<QVariant> args;
 
@@ -102,7 +102,7 @@ TEST(2)
   QSignalSpy changed_spy (&w, SIGNAL (fileChanged (const QString &)));
   QSignalSpy removed_spy (&w, SIGNAL (fileRemoved (const QString &)));
 
-  w.add_file (d1);  //  actually a dir
+  w.add_file (d1); //  actually a dir
 
   {
     QFileInfo fi (tl::to_qstring (d1));
@@ -160,7 +160,7 @@ TEST(2)
   EXPECT_EQ (removed_spy.count (), 0);
 }
 
-TEST(3)
+TEST (3)
 {
   //  5k files
   QList<QVariant> args;
@@ -179,7 +179,6 @@ TEST(3)
     f1_file.close ();
 
     w.add_file (f1);
-
   }
 
   //  make sure the events get processed
@@ -201,7 +200,6 @@ TEST(3)
     f1_file.open (QFile::WriteOnly);
     f1_file.write ("something");
     f1_file.close ();
-
   }
 
   //  make sure the events get processed

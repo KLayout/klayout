@@ -41,7 +41,8 @@
 class QImage;
 #endif
 
-namespace tl {
+namespace tl
+{
 
 /**
  *  @brief An exception indicating that string extraction is not available for a certain type
@@ -69,7 +70,7 @@ template <class T> bool test_extractor_impl (tl::Extractor &, T &) { throw Extra
 
 /**
  *  @brief Another string class
- * 
+ *
  *  The purpose of this class is to provide a different string implementation
  *  that is optimized for special purposes. For example, the assign method
  *  and operator does reuse memory allocated so far. This way this object is
@@ -209,7 +210,7 @@ public:
    *  @brief Comparison operator
    */
   bool operator< (const char *c) const;
-   
+
   /**
    *  @brief Comparison operator
    */
@@ -219,7 +220,7 @@ public:
    *  @brief Comparison operator
    */
   bool operator<= (const char *c) const;
-   
+
   /**
    *  @brief Comparison operator
    */
@@ -229,7 +230,7 @@ public:
    *  @brief Comparison operator
    */
   bool operator> (const char *c) const;
-   
+
   /**
    *  @brief Comparison operator
    */
@@ -239,7 +240,7 @@ public:
    *  @brief Comparison operator
    */
   bool operator>= (const char *c) const;
-   
+
   /**
    *  @brief Comparison operator
    */
@@ -252,7 +253,7 @@ public:
   {
     return mp_rep == 0 ? "" : mp_rep;
   }
-   
+
   /**
    *  @brief Access to STL representation
    */
@@ -272,7 +273,7 @@ public:
    *  by this object.
    */
   void clear ();
-   
+
 private:
   size_t m_size;
   size_t m_capacity;
@@ -290,8 +291,12 @@ TL_PUBLIC std::string to_string_from_local (const char *cp);
 TL_PUBLIC std::string to_local (const std::string &s);
 
 template <class T, bool> struct __redirect_to_string;
-template <class T> struct __redirect_to_string<T, true> { static std::string to_string (const T &t) { return t.to_string (); } };
-template <class T> struct __redirect_to_string<T, false> { static std::string to_string  (const T &) { throw StringConversionException (typeid (T)); } };
+template <class T> struct __redirect_to_string<T, true> {
+  static std::string to_string (const T &t) { return t.to_string (); }
+};
+template <class T> struct __redirect_to_string<T, false> {
+  static std::string to_string (const T &) { throw StringConversionException (typeid (T)); }
+};
 template <class T> inline std::string to_string (const T &o) { return __redirect_to_string<T, tl::has_to_string<T>::value>::to_string (o); }
 
 template <> inline std::string to_string (const double &d) { return to_string (d, 12); }
@@ -306,10 +311,10 @@ template <> TL_PUBLIC std::string to_string (const unsigned long long &d);
 template <> TL_PUBLIC std::string to_string (const __int128 &d);
 template <> TL_PUBLIC std::string to_string (const unsigned __int128 &d);
 #endif
-template <> TL_PUBLIC std::string to_string (const char * const &cp);
-template <> TL_PUBLIC std::string to_string (char * const &cp);
-template <> TL_PUBLIC std::string to_string (const unsigned char * const &cp);
-template <> TL_PUBLIC std::string to_string (unsigned char * const &cp);
+template <> TL_PUBLIC std::string to_string (const char *const &cp);
+template <> TL_PUBLIC std::string to_string (char *const &cp);
+template <> TL_PUBLIC std::string to_string (const unsigned char *const &cp);
+template <> TL_PUBLIC std::string to_string (unsigned char *const &cp);
 template <> TL_PUBLIC std::string to_string (const bool &b);
 template <> inline std::string to_string (const std::string &s) { return s; }
 
@@ -333,18 +338,18 @@ std::wstring TL_PUBLIC to_wstring (const std::string &s);
 std::string TL_PUBLIC to_string (const std::wstring &ws);
 
 /**
- *  @brief Convert to a quoted string 
+ *  @brief Convert to a quoted string
  *
- *  The string returned by this method can be read from a corresponding extractor with 
+ *  The string returned by this method can be read from a corresponding extractor with
  *  the "read_quoted" method.
- */  
+ */
 TL_PUBLIC std::string to_quoted_string (const std::string &s);
 
 /**
  *  @brief Escape special characters in a string
  *
  *  Special characters are replaced by escape sequences with a backslash.
- *  The format of the sequence is \xxx where x is the octal number of the 
+ *  The format of the sequence is \xxx where x is the octal number of the
  *  character and \r, \n and \t representing the CR, LF and TAB character.
  */
 TL_PUBLIC std::string escape_string (const std::string &value);
@@ -353,7 +358,7 @@ TL_PUBLIC std::string escape_string (const std::string &value);
  *  @brief Remove escape sequences from a string
  *
  *  Special characters are replaced by escape sequences with a backslash.
- *  The format of the sequence is \xxx where x is the octal number of the 
+ *  The format of the sequence is \xxx where x is the octal number of the
  *  character and \r, \n and \t representing the CR, LF and TAB character.
  */
 TL_PUBLIC std::string unescape_string (const std::string &value);
@@ -362,15 +367,15 @@ TL_PUBLIC std::string unescape_string (const std::string &value);
  *  @brief Levenshtein distance
  *
  *  This function computes the edit distance ("Levenshtein distance") between two strings.
- */  
+ */
 TL_PUBLIC int edit_distance (const std::string &a, const std::string &b);
 
 /**
- *  @brief Convert to a word or quoted string 
+ *  @brief Convert to a word or quoted string
  *
- *  The string returned by this method can be read from a corresponding extractor with 
+ *  The string returned by this method can be read from a corresponding extractor with
  *  the "read_word_or_quoted" method with the given "non_term" characters.
- */  
+ */
 TL_PUBLIC std::string to_word_or_quoted_string (const std::string &s, const char *non_term = "_.$");
 
 /**
@@ -431,7 +436,7 @@ TL_PUBLIC std::string db_to_string (double d);
 /**
  *  @brief A standard method to convert a coordinate in database units (pixel) into a string for display
  */
-inline std::string db_to_string (int32_t d) 
+inline std::string db_to_string (int32_t d)
 {
   return to_string (d);
 }
@@ -439,7 +444,7 @@ inline std::string db_to_string (int32_t d)
 /**
  *  @brief A standard method to convert a coordinate in database units (pixel) into a string for display
  */
-inline std::string db_to_string (int64_t d) 
+inline std::string db_to_string (int64_t d)
 {
   return to_string (d);
 }
@@ -448,7 +453,7 @@ inline std::string db_to_string (int64_t d)
  *  @brief A generic extractor (parser) class
  *
  *  This class acts like a stream of which elements can be extracted on
- *  a character-by-character or element basis. The "stream" is initialized 
+ *  a character-by-character or element basis. The "stream" is initialized
  *  with a character pointer. Then, element by element can be extracted
  *  using the read or try_read methods.
  *  The stream in general consumes white spaces.
@@ -457,8 +462,9 @@ inline std::string db_to_string (int64_t d)
 class TL_PUBLIC Extractor
 {
 public:
-  struct end { };
-  
+  struct end {
+  };
+
   /**
    *  @brief Constructor
    *
@@ -480,7 +486,7 @@ public:
   /**
    *  @brief Destructor
    */
-  virtual ~Extractor () { }
+  virtual ~Extractor () {}
 
   /**
    *  @brief Read an unsigned integer
@@ -489,7 +495,7 @@ public:
    *  This method reads an unsigned integer and returns the value past the last
    *  valid character. It skips blanks at the beginning but not at the end.
    *  On error, an exception is thrown.
-   *  
+   *
    *  @param cp The current pointer (is being moved)
    *  @param value Where the value is stored
    */
@@ -544,9 +550,9 @@ public:
 
   /**
    *  @brief Generic extrator
-   * 
+   *
    *  This extractor requires a adaptor to actually to the extraction.
-   *  The adaptor is a functor taking the extractor and delivering the 
+   *  The adaptor is a functor taking the extractor and delivering the
    *  specified type (void tl::extractor_impl (tl::Extractor &, T &)).
    */
   template <class T>
@@ -581,7 +587,7 @@ public:
   Extractor &read_word (std::string &value, const char *non_term = "_.$");
 
   /**
-   *  @brief Read a quoted string 
+   *  @brief Read a quoted string
    *
    *  The string may be either quoted with single or double quotes. Quotes inside the string
    *  may be escaped with a backslash character.
@@ -590,8 +596,8 @@ public:
 
   /**
    *  @brief Read a string consisting of "word" characters or accept quoted strings
-   *  
-   *  The string may be either given in the form allowed by "read_word" (with the 
+   *
+   *  The string may be either given in the form allowed by "read_word" (with the
    *  non_term characters) or by "read_quoted".
    */
   Extractor &read_word_or_quoted (std::string &value, const char *non_term = "_.$");
@@ -599,9 +605,9 @@ public:
   /**
    *  @brief Try to read an unsigned integer
    *
-   *  Similar to "read" but does not throw an exception if the input is not 
+   *  Similar to "read" but does not throw an exception if the input is not
    *  a valid unsigned integer. In this case, the function returns false.
-   *  
+   *
    *  @param cp The current pointer (is being moved)
    *  @param value Where the value is stored
    *  @return true, if a value could be read
@@ -675,19 +681,19 @@ public:
    *  @brief Try to read a string consisting of "word" characters
    *
    *  A word is a non-empty string consisting of letters, digits and the special
-   *  characters "_.$" by default. 
+   *  characters "_.$" by default.
    */
   bool try_read_word (std::string &value, const char *non_term = "_.$");
 
   /**
-   *  @brief Try to read a quoted string 
+   *  @brief Try to read a quoted string
    *
    *  See "read_quoted" for details
    */
   bool try_read_quoted (std::string &value);
 
   /**
-   *  @brief Try to read a word or a quoted string 
+   *  @brief Try to read a word or a quoted string
    *
    *  See "read_word_or_quoted" for details
    */
@@ -695,9 +701,9 @@ public:
 
   /**
    *  @brief Generic extrator
-   * 
+   *
    *  This extractor requires a adaptor to actually to the extraction.
-   *  The adaptor is a functor taking the extractor and delivering the 
+   *  The adaptor is a functor taking the extractor and delivering the
    *  specified type (void tl::test_extractor_impl (tl::Extractor &, T &)).
    */
   template <class T>
@@ -741,7 +747,7 @@ public:
    *  @brief Skip blanks
    *
    *  A helper method to implement parsers on the character-by-character basis.
-   *  
+   *
    *  @param cp The current pointer (is being moved)
    *  @return The value of cp on return
    */
@@ -766,7 +772,7 @@ public:
   /**
    *  @brief Increment: advance to the next character
    */
-  Extractor &operator++ () 
+  Extractor &operator++ ()
   {
     ++m_cp;
     return *this;
@@ -778,7 +784,7 @@ public:
    *  This is not really a const method since it does a "skip" to determine if we
    *  are at the end already.
    */
-  bool at_end () 
+  bool at_end ()
   {
     return *skip () == 0;
   }
@@ -794,7 +800,7 @@ public:
    *  Allows extracting something this way: extractor >> x;
    */
   template <class X>
-  Extractor &operator>> (X &x) 
+  Extractor &operator>> (X &x)
   {
     return read (x);
   }
@@ -823,8 +829,8 @@ private:
   std::string m_str;
 };
 
-TL_PUBLIC void from_string (const std::string &s, const char * &result);
-TL_PUBLIC void from_string (const std::string &s, const unsigned char * &result);
+TL_PUBLIC void from_string (const std::string &s, const char *&result);
+TL_PUBLIC void from_string (const std::string &s, const unsigned char *&result);
 TL_PUBLIC void from_string (const std::string &s, double &v);
 TL_PUBLIC void from_string (const std::string &s, int &v);
 TL_PUBLIC void from_string (const std::string &s, long &v);
@@ -856,14 +862,14 @@ TL_PUBLIC std::string sprintf (const std::string &fmt, const std::vector<tl::Var
 inline std::string sprintf (const std::string &fmt)
 {
   std::vector<tl::Variant> a;
-  return sprintf(fmt, a);
+  return sprintf (fmt, a);
 }
 
 inline std::string sprintf (const std::string &fmt, const tl::Variant &a1)
 {
   std::vector<tl::Variant> a;
   a.push_back (a1);
-  return sprintf(fmt, a);
+  return sprintf (fmt, a);
 }
 
 inline std::string sprintf (const std::string &fmt, const tl::Variant &a1, const tl::Variant &a2)
@@ -871,7 +877,7 @@ inline std::string sprintf (const std::string &fmt, const tl::Variant &a1, const
   std::vector<tl::Variant> a;
   a.push_back (a1);
   a.push_back (a2);
-  return sprintf(fmt, a);
+  return sprintf (fmt, a);
 }
 
 inline std::string sprintf (const std::string &fmt, const tl::Variant &a1, const tl::Variant &a2, const tl::Variant &a3)
@@ -880,7 +886,7 @@ inline std::string sprintf (const std::string &fmt, const tl::Variant &a1, const
   a.push_back (a1);
   a.push_back (a2);
   a.push_back (a3);
-  return sprintf(fmt, a);
+  return sprintf (fmt, a);
 }
 
 inline std::string sprintf (const std::string &fmt, const tl::Variant &a1, const tl::Variant &a2, const tl::Variant &a3, const tl::Variant &a4)
@@ -890,7 +896,7 @@ inline std::string sprintf (const std::string &fmt, const tl::Variant &a1, const
   a.push_back (a2);
   a.push_back (a3);
   a.push_back (a4);
-  return sprintf(fmt, a);
+  return sprintf (fmt, a);
 }
 
 inline std::string sprintf (const std::string &fmt, const tl::Variant &a1, const tl::Variant &a2, const tl::Variant &a3, const tl::Variant &a4, const tl::Variant &a5)
@@ -901,7 +907,7 @@ inline std::string sprintf (const std::string &fmt, const tl::Variant &a1, const
   a.push_back (a3);
   a.push_back (a4);
   a.push_back (a5);
-  return sprintf(fmt, a);
+  return sprintf (fmt, a);
 }
 
 inline std::string sprintf (const std::string &fmt, const tl::Variant &a1, const tl::Variant &a2, const tl::Variant &a3, const tl::Variant &a4, const tl::Variant &a5, const tl::Variant &a6)
@@ -913,7 +919,7 @@ inline std::string sprintf (const std::string &fmt, const tl::Variant &a1, const
   a.push_back (a4);
   a.push_back (a5);
   a.push_back (a6);
-  return sprintf(fmt, a);
+  return sprintf (fmt, a);
 }
 
 inline std::string sprintf (const std::string &fmt, const tl::Variant &a1, const tl::Variant &a2, const tl::Variant &a3, const tl::Variant &a4, const tl::Variant &a5, const tl::Variant &a6, const tl::Variant &a7)
@@ -926,7 +932,7 @@ inline std::string sprintf (const std::string &fmt, const tl::Variant &a1, const
   a.push_back (a5);
   a.push_back (a6);
   a.push_back (a7);
-  return sprintf(fmt, a);
+  return sprintf (fmt, a);
 }
 
 TL_PUBLIC std::string trim (const std::string &s);
@@ -942,7 +948,7 @@ TL_PUBLIC_TEMPLATE std::string join (Iter from, Iter to, const std::string &sep)
 
   bool first = true;
   for (Iter i = from; i != to; ++i) {
-    if (!first) {
+    if (! first) {
       r << sep;
     }
     first = false;

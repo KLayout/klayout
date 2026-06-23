@@ -47,7 +47,10 @@ extern const std::string cfg_nt_window_dim;
 extern const std::string cfg_nt_max_shapes_highlighted;
 extern const std::string cfg_nt_trace_depth;
 
-enum nt_window_type { NTDontChange = 0, NTFitNet, NTCenter, NTCenterSize };
+enum nt_window_type { NTDontChange = 0,
+                      NTFitNet,
+                      NTCenter,
+                      NTCenterSize };
 
 class NetTracerWindowModeConverter
 {
@@ -60,7 +63,7 @@ class NetTracerConfigPage
   : public lay::ConfigPage,
     private Ui::NetTracerConfigPage
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   NetTracerConfigPage (QWidget *parent);
@@ -80,5 +83,3 @@ private:
 }
 
 #endif
-
-

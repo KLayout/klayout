@@ -36,7 +36,7 @@
 
 namespace tl
 {
-  class InputHttpStreamCallback;
+class InputHttpStreamCallback;
 }
 
 namespace lay
@@ -46,18 +46,19 @@ class Salt;
 class SaltManagerDialog;
 
 class ConfirmationDialog
-  : public QDialog, private Ui::SaltManagerInstallConfirmationDialog
+  : public QDialog,
+    private Ui::SaltManagerInstallConfirmationDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   ConfirmationDialog (QWidget *parent);
 
   void add_info (const std::string &name, bool update, const std::string &version, const std::string &url);
 
-  bool is_confirmed () const  { return m_confirmed; }
-  bool is_cancelled () const  { return m_cancelled; }
-  bool is_aborted () const  { return m_aborted; }
+  bool is_confirmed () const { return m_confirmed; }
+  bool is_cancelled () const { return m_cancelled; }
+  bool is_aborted () const { return m_aborted; }
 
   void start ();
   void separator ();
@@ -69,10 +70,10 @@ public:
   void set_progress (const std::string &name, double progress);
 
 private slots:
-  void confirm_pressed ()     { m_confirmed = true; }
-  void cancel_pressed ()      { m_cancelled = true; }
-  void abort_pressed ()       { m_aborted = true; }
-  void close_pressed ()       { hide (); }
+  void confirm_pressed () { m_confirmed = true; }
+  void cancel_pressed () { m_cancelled = true; }
+  void abort_pressed () { m_aborted = true; }
+  void close_pressed () { hide (); }
 
 private:
   bool m_confirmed, m_cancelled, m_aborted;
@@ -95,7 +96,7 @@ private:
 class LAY_PUBLIC SaltDownloadManager
   : public QObject
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -159,11 +160,11 @@ public:
   bool execute (lay::SaltManagerDialog *dialog, lay::Salt &salt);
 
 private:
-  struct Descriptor
-  {
+  struct Descriptor {
     Descriptor (const std::string &_name, const std::string &_token, const std::string &_url, const std::string &_version)
       : name (_name), token (_token), url (_url), version (_version), downloaded (false)
-    { }
+    {
+    }
 
     bool operator< (const Descriptor &other) const
     {

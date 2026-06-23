@@ -42,7 +42,7 @@ class LAYBASIC_PUBLIC EditorServiceBase
     public lay::Editable,
     public lay::Plugin
 {
-public: 
+public:
   /**
    *  @brief Constructor
    */
@@ -301,4 +301,3 @@ private:
 }
 
 #endif
-

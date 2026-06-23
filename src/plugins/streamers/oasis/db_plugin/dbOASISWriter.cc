@@ -36,23 +36,22 @@ namespace db
 // ---------------------------------------------------------------------------------
 //  Some definitions
 
-static const char *klayout_context_name               = "KLAYOUT_CONTEXT";
+static const char *klayout_context_name = "KLAYOUT_CONTEXT";
 
-static const char *s_gds_property_name                = "S_GDS_PROPERTY";
-static const char *s_cell_offset_name                 = "S_CELL_OFFSET";
-static const char *s_max_signed_integer_width_name    = "S_MAX_SIGNED_INTEGER_WIDTH";
-static const char *s_max_unsigned_integer_width_name  = "S_MAX_UNSIGNED_INTEGER_WIDTH";
-static const char *s_top_cell_name                    = "S_TOP_CELL";
-static const char *s_bounding_boxes_available_name    = "S_BOUNDING_BOXES_AVAILABLE";
-static const char *s_bounding_box_name                = "S_BOUNDING_BOX";
+static const char *s_gds_property_name = "S_GDS_PROPERTY";
+static const char *s_cell_offset_name = "S_CELL_OFFSET";
+static const char *s_max_signed_integer_width_name = "S_MAX_SIGNED_INTEGER_WIDTH";
+static const char *s_max_unsigned_integer_width_name = "S_MAX_UNSIGNED_INTEGER_WIDTH";
+static const char *s_top_cell_name = "S_TOP_CELL";
+static const char *s_bounding_boxes_available_name = "S_BOUNDING_BOXES_AVAILABLE";
+static const char *s_bounding_box_name = "S_BOUNDING_BOX";
 
 // ---------------------------------------------------------------------------------
 
 /**
  *  @brief Compare operator for points, distinct x clustered (with same y)
  */
-struct vector_cmp_x
-{
+struct vector_cmp_x {
   bool operator() (const db::Vector &a, const db::Vector &b) const
   {
     if (a.y () != b.y ()) {
@@ -66,8 +65,7 @@ struct vector_cmp_x
 /**
  *  @brief Compare operator for points, distinct y clustered (with same x)
  */
-struct vector_cmp_y
-{
+struct vector_cmp_y {
   bool operator() (const db::Vector &a, const db::Vector &b) const
   {
     if (a.x () != b.x ()) {
@@ -81,7 +79,7 @@ struct vector_cmp_y
 /**
  *  @brief Determines whether a property shall be produced as S_GDS_PROPERTY
  */
-static bool 
+static bool
 make_gds_property (const tl::Variant &name)
 {
   //  We write S_GDS_PROPERTY properties, because that is the only way to write properties
@@ -98,8 +96,8 @@ make_gds_property (const tl::Variant &name)
  *  @brief Within UTF-8 advance the pointer to the next character
  */
 
-static void 
-next_utf8 (const char * &s)
+static void
+next_utf8 (const char *&s)
 {
   int skip = 0;
   if (((unsigned char) *s) < 0x80) {
@@ -113,7 +111,7 @@ next_utf8 (const char * &s)
   } else if (((unsigned char) *s) < 0xf8) {
     //  four-byte character
     skip = 3;
-  } 
+  }
 
   ++s;
   while (skip > 0 && ((unsigned char) *s) >= 0x80 && ((unsigned char) *s) < 0xc0) {
@@ -125,7 +123,7 @@ next_utf8 (const char * &s)
 // ---------------------------------------------------------------------------------
 
 /**
- *  @brief Makes an nstring or astring from the given string 
+ *  @brief Makes an nstring or astring from the given string
  *  This function employs the substitution string to replace invalid characters.
  *  The substitution string must be a valid nstring itself.
  */
@@ -133,7 +131,7 @@ static std::string
 make_n_or_astring (const char *s, const std::string &subst, bool make_nstring)
 {
   //  Empty strings will render the substitution string when producing nstrings
-  if (make_nstring && !*s) {
+  if (make_nstring && ! *s) {
     return subst;
   }
 
@@ -154,7 +152,7 @@ make_n_or_astring (const char *s, const std::string &subst, bool make_nstring)
   } else {
 
     std::string nstr;
-    for (const char *c = s; *c; ) {
+    for (const char *c = s; *c;) {
       if (*c == 0x20 && make_nstring) {
         nstr += subst;
       } else if (((unsigned char) *c) < 0x20 || ((unsigned char) *c) > 0x7e) {
@@ -166,7 +164,6 @@ make_n_or_astring (const char *s, const std::string &subst, bool make_nstring)
     }
 
     return nstr;
-
   }
 }
 
@@ -178,7 +175,7 @@ make_n_or_astring (const char *s, const std::string &subst, bool make_nstring)
  *  The return value is determined in a way that the property value type can be
  *  determined by adding 10 or 13 for direct value or reference respectively.
  */
-static int 
+static int
 string_type (const char *s)
 {
   if (! *s) {
@@ -191,7 +188,7 @@ string_type (const char *s)
   while (*s) {
     unsigned char c = (unsigned char) *s;
     if (c == 0x20) {
-      //  space -> produces a-string instead of n-string 
+      //  space -> produces a-string instead of n-string
       is_nstring = false;
     } else if (c < 0x20 || c > 0x7e) {
       //  non-printable character: produces a b-string always
@@ -199,7 +196,7 @@ string_type (const char *s)
     }
     next_utf8 (s);
   }
-      
+
   return is_nstring ? 2 : 0;
 }
 
@@ -235,7 +232,7 @@ inline R safe_diff (R a, R b)
 /**
  *  @brief Convert a shape (basic object) to a repetition
  */
-template <class Tag> void create_repetition_by_type (const db::Shape &array_shape, db::Repetition &rep, const Tag &tag) 
+template <class Tag> void create_repetition_by_type (const db::Shape &array_shape, db::Repetition &rep, const Tag &tag)
 {
   const typename Tag::object_type *array = array_shape.basic_ptr (tag);
 
@@ -250,7 +247,7 @@ template <class Tag> void create_repetition_by_type (const db::Shape &array_shap
     // the first transformation already.
     tl_assert (! pts.empty ());
     db::Vector po = pts.front ();
-    std::vector<db::Vector>::iterator pw = pts.begin();
+    std::vector<db::Vector>::iterator pw = pts.begin ();
     for (std::vector<db::Vector>::iterator p = pw + 1; p != pts.end (); ++p) {
       *pw++ = *p - po;
     }
@@ -268,7 +265,7 @@ template <class Tag> void create_repetition_by_type (const db::Shape &array_shap
 
   } else {
     tl_assert (false);
-  }  
+  }
 }
 
 /**
@@ -295,7 +292,7 @@ void create_repetition (const db::Shape &array, db::Repetition &rep)
   case db::Shape::TextPtrArray:
     create_repetition_by_type (array, rep, db::Shape::text_ptr_array_type::tag ());
     break;
-  default: 
+  default:
     tl_assert (false);
     break;
   }
@@ -305,9 +302,8 @@ void create_repetition (const db::Shape &array, db::Repetition &rep)
  *  @brief Compare operator for points/abstract repetition pair with configurable point compare operator
  */
 template <class PC>
-struct rep_vector_cmp
-{
-  bool operator () (const std::pair <db::Vector, std::pair <db::Coord, int> > &a, const std::pair <db::Vector, std::pair <db::Coord, int> > &b)
+struct rep_vector_cmp {
+  bool operator() (const std::pair<db::Vector, std::pair<db::Coord, int>> &a, const std::pair<db::Vector, std::pair<db::Coord, int>> &b)
   {
     if (a.second != b.second) {
       return a.second < b.second;
@@ -319,9 +315,9 @@ struct rep_vector_cmp
 
 /**
  *  @brief Return the cost value of a coordinate difference (or coordinate)
- *  The cost is used to estimate the size cost of a coordinate difference 
+ *  The cost is used to estimate the size cost of a coordinate difference
  *  in the OASIS output.
- *  The cost is roughly the number of bytes required to represent the 
+ *  The cost is roughly the number of bytes required to represent the
  *  number. It does not consider gdelta compression, actual byte count or similar.
  */
 inline double cost_of (double d)
@@ -333,19 +329,18 @@ inline double cost_of (double d)
 
 
 template <class Obj>
-void 
-Compressor<Obj>::flush (db::OASISWriter *writer) 
+void Compressor<Obj>::flush (db::OASISWriter *writer)
 {
   static const db::Repetition rep_single;
 
   //  produce the repetitions
-  
-  disp_vector displacements;
-  typedef std::vector <std::pair <db::Vector, std::pair <db::Coord, int> > > tmp_rep_vector;
-  tmp_rep_vector repetitions;
-  std::vector<std::pair<db::Vector, db::Repetition> > rep_vector;
 
-  for (typename std::unordered_map <Obj, disp_vector>::iterator n = m_normalized.begin (); n != m_normalized.end (); ++n) {
+  disp_vector displacements;
+  typedef std::vector<std::pair<db::Vector, std::pair<db::Coord, int>>> tmp_rep_vector;
+  tmp_rep_vector repetitions;
+  std::vector<std::pair<db::Vector, db::Repetition>> rep_vector;
+
+  for (typename std::unordered_map<Obj, disp_vector>::iterator n = m_normalized.begin (); n != m_normalized.end (); ++n) {
 
     rep_vector.clear ();
 
@@ -356,7 +351,7 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
       std::sort (n->second.begin (), n->second.end (), vector_cmp_x ());
 
     } else {
-    
+
       disp_vector::iterator d;
       tmp_rep_vector::iterator rw;
 
@@ -374,12 +369,12 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
       double array_cost = 0;
 
       //  Try single-point compression to repetitions in the x and y direction. For the first
-      //  direction, use the one with more distinct values. For this, a better compression is 
+      //  direction, use the one with more distinct values. For this, a better compression is
       //  expected.
       for (int xypass = 0; xypass <= 1; ++xypass) {
 
         bool xrep = (xfirst == (xypass == 0));
-      
+
         displacements.clear ();
         repetitions.clear ();
 
@@ -392,14 +387,14 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
 
         if (xypass == 0 && m_level > 1) {
           //  Establish a baseline for the repetition cost
-          simple_rep_cost += cost_of (displacements.front ().x ()) + cost_of (displacements.front ().y ()); 
+          simple_rep_cost += cost_of (displacements.front ().x ()) + cost_of (displacements.front ().y ());
           for (d = displacements.begin () + 1; d != displacements.end (); ++d) {
-            simple_rep_cost += std::max (1.0, cost_of (double (d->x ()) - double (d[-1].x ())) + cost_of (double (d->y ()) - double (d[-1].y ()))); 
+            simple_rep_cost += std::max (1.0, cost_of (double (d->x ()) - double (d [-1].x ())) + cost_of (double (d->y ()) - double (d [-1].y ())));
           }
         }
 
         disp_vector::iterator dwindow = displacements.begin ();
-        for (d = displacements.begin (); d != displacements.end (); ) {
+        for (d = displacements.begin (); d != displacements.end ();) {
 
           if (m_level < 2) {
 
@@ -412,11 +407,10 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
             if (dd != displacements.end ()) {
 
               dxy = xrep ? db::Vector (safe_diff (dd->x (), d->x ()), 0) : db::Vector (0, safe_diff (dd->y (), d->y ()));
-              while (dd != displacements.end () && *dd == dd[-1] + dxy && nxy < std::numeric_limits<int>::max ()) {
+              while (dd != displacements.end () && *dd == dd [-1] + dxy && nxy < std::numeric_limits<int>::max ()) {
                 ++dd;
                 ++nxy;
-              } 
-
+              }
             }
 
             //  Note in level 1 optimization, no cost estimation is done, hence small arrays won't be removed.
@@ -429,7 +423,6 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
 
               repetitions.push_back (std::make_pair (*d, std::make_pair (xrep ? dxy.x () : dxy.y (), nxy)));
               d = dd;
-
             }
 
           } else {
@@ -440,7 +433,7 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
 
             //  move the window of identical x/y coordinates if necessary
             if (d == dwindow) {
-              for (dwindow = d + 1; dwindow != displacements.end () && (xrep ? (dwindow->y () == d->y ()) : (dwindow->x () == d->x ())); ++dwindow) 
+              for (dwindow = d + 1; dwindow != displacements.end () && (xrep ? (dwindow->y () == d->y ()) : (dwindow->x () == d->x ())); ++dwindow)
                 ;
             }
 
@@ -467,7 +460,6 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
                 nxy_max = nxy;
                 nn_max = nn;
               }
-
             }
 
             if (nxy_max < 2) {
@@ -496,18 +488,15 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
               repetitions.push_back (std::make_pair (*d, std::make_pair (xrep ? dxy_max.x () : dxy_max.y (), nxy_max)));
 
               d = dt;
-
             }
-
           }
-
         }
 
         //  Apply some heuristic criterion that allows the algorithm to determine whether it's worth doing the compression
 
         //  Try to compact these repetitions further, y direction first, then x direction
         for (int xypass2 = 1; xypass2 >= 0; --xypass2) {
-        
+
           if (xypass2) {
             std::sort (repetitions.begin (), repetitions.end (), rep_vector_cmp<vector_cmp_y> ());
           } else {
@@ -515,7 +504,7 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
           }
 
           rw = repetitions.begin ();
-          for (tmp_rep_vector::const_iterator r = repetitions.begin (); r != repetitions.end (); ) {
+          for (tmp_rep_vector::const_iterator r = repetitions.begin (); r != repetitions.end ();) {
 
             tmp_rep_vector::const_iterator rr = r;
             ++rr;
@@ -548,13 +537,10 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
             }
 
             r = rr;
-
           }
 
           repetitions.erase (rw, repetitions.end ());
-
         }
-
       }
 
       if (m_level > 1) {
@@ -563,9 +549,9 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
 
         if (! n->second.empty ()) {
           //  irregular repetition contribution
-          array_cost += cost_of (n->second.front ().x ()) + cost_of (n->second.front ().y ()); 
+          array_cost += cost_of (n->second.front ().x ()) + cost_of (n->second.front ().y ());
           for (std::vector<db::Vector>::const_iterator d = n->second.begin () + 1; d != n->second.end (); ++d) {
-            array_cost += std::max(1.0, cost_of (d->x () - d[-1].x ()) + cost_of (d->y () - d[-1].y ())); 
+            array_cost += std::max (1.0, cost_of (d->x () - d [-1].x ()) + cost_of (d->y () - d [-1].y ()));
           }
         }
 
@@ -575,7 +561,7 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
         bool ref_set = false;
         db::Coord x_ref = 0, y_ref = 0;
 
-        for (std::vector<std::pair<db::Vector, db::Repetition> >::const_iterator r = rep_vector.begin (); r != rep_vector.end (); ++r) {
+        for (std::vector<std::pair<db::Vector, db::Repetition>>::const_iterator r = rep_vector.begin (); r != rep_vector.end (); ++r) {
 
           db::Vector a, b;
           size_t in = 0, im = 0;
@@ -584,10 +570,10 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
           array_cost += 2; // two bytes for the shape
 
           //  The cost of the first point (takes into account compression by reuse of one coordinate)
-          if (!ref_set || x_ref != r->first.x ()) {
+          if (! ref_set || x_ref != r->first.x ()) {
             array_cost += cost_of (r->first.x ());
           }
-          if (!ref_set || y_ref != r->first.y ()) {
+          if (! ref_set || y_ref != r->first.y ()) {
             array_cost += cost_of (r->first.y ());
           }
           ref_set = true;
@@ -607,12 +593,11 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
           }
 
           //  Note: the pointlist is reused, hence does not contribute
-
         }
 
         //  And resolve the repetitions if it does not make sense to keep them
         if (array_cost > simple_rep_cost) {
-          for (std::vector<std::pair<db::Vector, db::Repetition> >::const_iterator r = rep_vector.begin (); r != rep_vector.end (); ++r) {
+          for (std::vector<std::pair<db::Vector, db::Repetition>>::const_iterator r = rep_vector.begin (); r != rep_vector.end (); ++r) {
             for (db::RepetitionIterator i = r->second.begin (); ! i.at_end (); ++i) {
               n->second.push_back (r->first + *i);
             }
@@ -620,12 +605,10 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
           rep_vector.clear ();
           std::sort (n->second.begin (), n->second.end (), vector_cmp_x ());
         }
-
       }
-
     }
 
-    for (std::vector<std::pair<db::Vector, db::Repetition> >::const_iterator r = rep_vector.begin (); r != rep_vector.end (); ++r) {
+    for (std::vector<std::pair<db::Vector, db::Repetition>>::const_iterator r = rep_vector.begin (); r != rep_vector.end (); ++r) {
       Obj obj = n->first;
       obj.move (r->first);
       writer->write (obj, r->second);
@@ -635,12 +618,12 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
 
       //  need to normalize?
       db::Vector p0 = n->second.front ();
-      std::vector<db::Vector>::iterator pw = n->second.begin();
+      std::vector<db::Vector>::iterator pw = n->second.begin ();
       for (std::vector<db::Vector>::iterator p = pw + 1; p != n->second.end (); ++p) {
         *pw++ = *p - p0;
       }
       n->second.erase (pw, n->second.end ());
-        
+
       IrregularRepetition *iterated_rep = new IrregularRepetition ();
       iterated_rep->points ().swap (n->second);
 
@@ -653,9 +636,7 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
       Obj obj = n->first;
       obj.move (n->second.front ());
       writer->write (obj, rep_single);
-
     }
-
   }
 }
 
@@ -683,22 +664,20 @@ OASISWriter::OASISWriter ()
 // 1M CBLOCK buffer size
 const size_t cblock_buffer_size = 1024 * 1024;
 
-void 
-OASISWriter::write_record_id (char b)
+void OASISWriter::write_record_id (char b)
 {
   if (m_in_cblock) {
     if (m_cblock_buffer.size () > cblock_buffer_size) {
       end_cblock ();
       begin_cblock ();
-    } 
+    }
     m_cblock_buffer.write ((const char *) &b, 1);
   } else {
     mp_stream->put ((const char *) &b, 1);
   }
 }
 
-void 
-OASISWriter::write_byte (char b)
+void OASISWriter::write_byte (char b)
 {
   if (m_in_cblock) {
     m_cblock_buffer.write ((const char *) &b, 1);
@@ -707,8 +686,7 @@ OASISWriter::write_byte (char b)
   }
 }
 
-void
-OASISWriter::write_bytes (const char *b, size_t n)
+void OASISWriter::write_bytes (const char *b, size_t n)
 {
   if (m_in_cblock) {
     m_cblock_buffer.write (b, n);
@@ -717,8 +695,7 @@ OASISWriter::write_bytes (const char *b, size_t n)
   }
 }
 
-void 
-OASISWriter::write (int64_t n)
+void OASISWriter::write (int64_t n)
 {
   if (n < 0) {
     write (((uint64_t) (-n) << 1) | 1);
@@ -727,8 +704,7 @@ OASISWriter::write (int64_t n)
   }
 }
 
-void 
-OASISWriter::write (uint64_t n)
+void OASISWriter::write (uint64_t n)
 {
   char buffer [50];
   char *bptr = buffer;
@@ -745,8 +721,7 @@ OASISWriter::write (uint64_t n)
   write_bytes (buffer, bptr - buffer);
 }
 
-void
-OASISWriter::write (float d) 
+void OASISWriter::write (float d)
 {
   if (fabs (d) >= 0.5 && fabs (floor (d + 0.5) - d) < 1e-6 && fabs (d) < double (std::numeric_limits<int64_t>::max ())) {
 
@@ -754,7 +729,7 @@ OASISWriter::write (float d)
     if (d < 0.0) {
       write_byte (1);
       write ((uint64_t) floor (-d + 0.5));
-    } else { 
+    } else {
       write_byte (0);
       write ((uint64_t) floor (d + 0.5));
     }
@@ -771,18 +746,16 @@ OASISWriter::write (float d)
 
     f2i.d = d;
     uint32_t i = f2i.i;
-    char b[sizeof (f2i.i)];
+    char b [sizeof (f2i.i)];
     for (size_t n = 0; n < sizeof (f2i.i); n++) {
-      b[n] = char (i & 0xff); 
+      b [n] = char (i & 0xff);
       i >>= 8;
     }
     write_bytes (b, sizeof (f2i.i));
-
   }
 }
 
-void
-OASISWriter::write (double d) 
+void OASISWriter::write (double d)
 {
   if (fabs (d) >= 0.5 && fabs (floor (d + 0.5) - d) < 1e-10 && fabs (d) < double (std::numeric_limits<int64_t>::max ())) {
 
@@ -790,7 +763,7 @@ OASISWriter::write (double d)
     if (d < 0.0) {
       write_byte (1);
       write ((uint64_t) floor (-d + 0.5));
-    } else { 
+    } else {
       write_byte (0);
       write ((uint64_t) floor (d + 0.5));
     }
@@ -807,18 +780,16 @@ OASISWriter::write (double d)
 
     f2i.d = d;
     uint64_t i = f2i.i;
-    char b[sizeof (f2i.i)];
+    char b [sizeof (f2i.i)];
     for (unsigned int n = 0; n < sizeof (f2i.i); n++) {
-      b[n] = char (i & 0xff); 
+      b [n] = char (i & 0xff);
       i >>= 8;
     }
     write_bytes (b, sizeof (f2i.i));
-
   }
 }
 
-void 
-OASISWriter::write_bstring (const char *s)
+void OASISWriter::write_bstring (const char *s)
 {
   size_t l = strlen (s);
   write ((uint64_t) l);
@@ -836,8 +807,7 @@ OASISWriter::make_astring (const char *s)
   }
 }
 
-void  
-OASISWriter::write_astring (const char *s)
+void OASISWriter::write_astring (const char *s)
 {
   std::string nstr = make_astring (s);
   write ((uint64_t) nstr.size ());
@@ -855,16 +825,14 @@ OASISWriter::make_nstring (const char *s)
   }
 }
 
-void  
-OASISWriter::write_nstring (const char *s)
+void OASISWriter::write_nstring (const char *s)
 {
   std::string nstr = make_nstring (s);
   write ((uint64_t) nstr.size ());
   write_bytes (nstr.c_str (), nstr.size ());
 }
 
-void
-OASISWriter::write_gdelta (const db::Vector &p, double sf)
+void OASISWriter::write_gdelta (const db::Vector &p, double sf)
 {
   db::Coord x = p.x ();
   db::Coord y = p.y ();
@@ -919,12 +887,10 @@ OASISWriter::write_gdelta (const db::Vector &p, double sf)
     }
     write (d);
     write (y);
-
   }
 }
 
-void
-OASISWriter::write_coord (db::Coord c, double sf)
+void OASISWriter::write_coord (db::Coord c, double sf)
 {
   if (sf == 1.0) {
     return write (c);
@@ -933,8 +899,7 @@ OASISWriter::write_coord (db::Coord c, double sf)
   }
 }
 
-void
-OASISWriter::write_ucoord (db::Coord c, double sf)
+void OASISWriter::write_ucoord (db::Coord c, double sf)
 {
   // HACK: we misuse distance type as unsigned coord type here.
   typedef db::coord_traits<db::Coord>::distance_type ucoord;
@@ -945,8 +910,7 @@ OASISWriter::write_ucoord (db::Coord c, double sf)
   }
 }
 
-void
-OASISWriter::write_coord (db::Coord c)
+void OASISWriter::write_coord (db::Coord c)
 {
   if (m_sf == 1.0) {
     return write (c);
@@ -955,8 +919,7 @@ OASISWriter::write_coord (db::Coord c)
   }
 }
 
-void
-OASISWriter::write_ucoord (db::Coord c)
+void OASISWriter::write_ucoord (db::Coord c)
 {
   // HACK: we misuse distance type as unsigned coord type here.
   typedef db::coord_traits<db::Coord>::distance_type ucoord;
@@ -967,8 +930,7 @@ OASISWriter::write_ucoord (db::Coord c)
   }
 }
 
-void
-OASISWriter::emit_propname_def (db::properties_id_type prop_id)
+void OASISWriter::emit_propname_def (db::properties_id_type prop_id)
 {
   auto props = db::properties (prop_id).to_map ();
   for (auto p = props.begin (); p != props.end (); ++p) {
@@ -983,12 +945,10 @@ OASISWriter::emit_propname_def (db::properties_id_type prop_id)
       write_nstring (name_str);
       ++m_propname_id;
     }
-
   }
 }
 
-void
-OASISWriter::emit_propstring_def (db::properties_id_type prop_id)
+void OASISWriter::emit_propstring_def (db::properties_id_type prop_id)
 {
   std::vector<tl::Variant> pv_list;
 
@@ -1003,7 +963,7 @@ OASISWriter::emit_propstring_def (db::properties_id_type prop_id)
 
       if (p->second.is_list ()) {
         pvl = &p->second.get_list ();
-      } else if (!p->second.is_nil ()) {
+      } else if (! p->second.is_nil ()) {
         pv_list.reserve (1);
         pv_list.push_back (p->second);
       }
@@ -1013,11 +973,10 @@ OASISWriter::emit_propstring_def (db::properties_id_type prop_id)
       pv_list.reserve (2);
       pv_list.push_back (name.to_ulong ());
       pv_list.push_back (p->second.to_string ());
-
     }
 
     for (std::vector<tl::Variant>::const_iterator pv = pvl->begin (); pv != pvl->end (); ++pv) {
-      if (!pv->is_double () && !pv->is_longlong () && !pv->is_ulonglong () && !pv->is_long () && !pv->is_ulong ()) {
+      if (! pv->is_double () && ! pv->is_longlong () && ! pv->is_ulonglong () && ! pv->is_long () && ! pv->is_ulong ()) {
         if (m_propstrings.insert (std::make_pair (pv->to_string (), m_propstring_id)).second) {
           write_record_id (9);
           write_bstring (pv->to_string ());
@@ -1025,20 +984,17 @@ OASISWriter::emit_propstring_def (db::properties_id_type prop_id)
         }
       }
     }
-
   }
 }
 
-void 
-OASISWriter::begin_cblock ()
+void OASISWriter::begin_cblock ()
 {
   tl_assert (! m_in_cblock);
 
   m_in_cblock = true;
 }
 
-void
-OASISWriter::end_cblock ()
+void OASISWriter::end_cblock ()
 {
   tl_assert (m_in_cblock);
 
@@ -1058,17 +1014,17 @@ OASISWriter::end_cblock ()
 
   if (m_cblock_buffer.size () > m_cblock_compressed.size () + compression_overhead) {
 
-    write_byte (34);  // CBLOCK
+    write_byte (34); // CBLOCK
 
     //  RFC1951 compression:
-    write_byte (0); 
+    write_byte (0);
 
     write ((uint64_t) m_cblock_buffer.size ());
     write ((uint64_t) m_cblock_compressed.size ());
 
     write_bytes (m_cblock_compressed.data (), m_cblock_compressed.size ());
 
-  } else if (m_cblock_buffer.size () > 0) {  //  Reasoning for if(...): we don't want to access data from an empty vector through data()
+  } else if (m_cblock_buffer.size () > 0) { //  Reasoning for if(...): we don't want to access data from an empty vector through data()
     write_bytes (m_cblock_buffer.data (), m_cblock_buffer.size ());
   }
 
@@ -1076,8 +1032,7 @@ OASISWriter::end_cblock ()
   m_cblock_compressed.clear ();
 }
 
-void 
-OASISWriter::begin_table (size_t &pos)
+void OASISWriter::begin_table (size_t &pos)
 {
   if (pos == 0) {
     pos = mp_stream->pos ();
@@ -1087,16 +1042,14 @@ OASISWriter::begin_table (size_t &pos)
   }
 }
 
-void 
-OASISWriter::end_table (size_t pos)
+void OASISWriter::end_table (size_t pos)
 {
   if (pos != 0 && m_options.write_cblocks) {
     end_cblock ();
   }
 }
 
-void 
-OASISWriter::reset_modal_variables ()
+void OASISWriter::reset_modal_variables ()
 {
   //  reset modal variables
   mm_repetition.reset ();
@@ -1126,12 +1079,11 @@ OASISWriter::reset_modal_variables ()
   mm_last_value_list.reset ();
 }
 
-void
-OASISWriter::write_propname_table (size_t &propnames_table_pos, const std::vector<db::cell_index_type> &cells, const db::Layout &layout, const std::vector<std::pair<unsigned int, LayerProperties> > &layers)
+void OASISWriter::write_propname_table (size_t &propnames_table_pos, const std::vector<db::cell_index_type> &cells, const db::Layout &layout, const std::vector<std::pair<unsigned int, LayerProperties>> &layers)
 {
   //  write the property names collected so far in the order of the ID's.
 
-  std::vector<std::pair<uint64_t, std::string> > rev_pn;
+  std::vector<std::pair<uint64_t, std::string>> rev_pn;
   rev_pn.reserve (m_propnames.size ());
   for (auto p = m_propnames.begin (); p != m_propnames.end (); ++p) {
     rev_pn.push_back (std::make_pair (p->second, p->first));
@@ -1139,7 +1091,7 @@ OASISWriter::write_propname_table (size_t &propnames_table_pos, const std::vecto
   std::sort (rev_pn.begin (), rev_pn.end ());
 
   for (auto p = rev_pn.begin (); p != rev_pn.end (); ++p) {
-    tl_assert (p->first == (uint64_t)(p - rev_pn.begin ()));
+    tl_assert (p->first == (uint64_t) (p - rev_pn.begin ()));
     begin_table (propnames_table_pos);
     write_record_id (7);
     write_nstring (p->second.c_str ());
@@ -1147,7 +1099,7 @@ OASISWriter::write_propname_table (size_t &propnames_table_pos, const std::vecto
 
   //  collect and write the future property names
 
-  std::set <db::properties_id_type> prop_ids_done;
+  std::set<db::properties_id_type> prop_ids_done;
 
   for (auto cell = cells.begin (); cell != cells.end (); ++cell) {
 
@@ -1179,7 +1131,6 @@ OASISWriter::write_propname_table (size_t &propnames_table_pos, const std::vecto
         shape.finish_array ();
       }
     }
-
   }
 
   //  if needed, emit property name required for the PCell or meta info context information
@@ -1198,18 +1149,16 @@ OASISWriter::write_propname_table (size_t &propnames_table_pos, const std::vecto
       write_record_id (7);
       write_nstring (klayout_context_name);
     }
-
   }
 
   end_table (propnames_table_pos);
 }
 
-void
-OASISWriter::write_propstring_table (size_t &propstrings_table_pos, const std::vector<db::cell_index_type> &cells, const db::Layout &layout, const std::vector<std::pair<unsigned int, LayerProperties> > &layers)
+void OASISWriter::write_propstring_table (size_t &propstrings_table_pos, const std::vector<db::cell_index_type> &cells, const db::Layout &layout, const std::vector<std::pair<unsigned int, LayerProperties>> &layers)
 {
   //  write the property strings collected so far in the order of the ID's.
 
-  std::vector<std::pair<uint64_t, const std::string *> > rev_ps;
+  std::vector<std::pair<uint64_t, const std::string *>> rev_ps;
   rev_ps.reserve (m_propstrings.size ());
   for (auto p = m_propstrings.begin (); p != m_propstrings.end (); ++p) {
     rev_ps.push_back (std::make_pair (p->second, &p->first));
@@ -1219,7 +1168,7 @@ OASISWriter::write_propstring_table (size_t &propstrings_table_pos, const std::v
   tl_assert (rev_ps.size () == size_t (m_propstring_id));
 
   for (auto p = rev_ps.begin (); p != rev_ps.end (); ++p) {
-    tl_assert (p->first == (uint64_t)(p - rev_ps.begin ()));
+    tl_assert (p->first == (uint64_t) (p - rev_ps.begin ()));
     begin_table (propstrings_table_pos);
     write_record_id (9);
     write_bstring (p->second->c_str ());
@@ -1227,7 +1176,7 @@ OASISWriter::write_propstring_table (size_t &propstrings_table_pos, const std::v
 
   //  collect and write the future property strings
 
-  std::set <db::properties_id_type> prop_ids_done;
+  std::set<db::properties_id_type> prop_ids_done;
 
   for (auto cell = cells.begin (); cell != cells.end (); ++cell) {
 
@@ -1260,13 +1209,12 @@ OASISWriter::write_propstring_table (size_t &propstrings_table_pos, const std::v
         shape.finish_array ();
       }
     }
-
   }
 
   if (m_write_context_info) {
 
     //  emit property string id's required for the PCell and meta info context information
-    std::vector <std::string> context_prop_strings;
+    std::vector<std::string> context_prop_strings;
 
     for (auto cell = cells.begin (); cell != cells.end (); ++cell) {
 
@@ -1283,18 +1231,14 @@ OASISWriter::write_propstring_table (size_t &propstrings_table_pos, const std::v
             ++m_propstring_id;
           }
         }
-
       }
-
     }
-
   }
 
   end_table (propstrings_table_pos);
 }
 
-void
-OASISWriter::write_cellname_table (size_t &cellnames_table_pos, const std::vector<db::cell_index_type> &cells_by_index, const std::map<db::cell_index_type, size_t> *cell_positions, const db::Layout &layout)
+void OASISWriter::write_cellname_table (size_t &cellnames_table_pos, const std::vector<db::cell_index_type> &cells_by_index, const std::map<db::cell_index_type, size_t> *cell_positions, const db::Layout &layout)
 {
   bool sequential = true;
   for (auto cell = cells_by_index.begin (); cell != cells_by_index.end () && sequential; ++cell) {
@@ -1338,7 +1282,6 @@ OASISWriter::write_cellname_table (size_t &cellnames_table_pos, const std::vecto
         values.push_back (tl::Variant (bbox.height ()));
 
         write_property_def (s_bounding_box_name, values, true);
-
       }
 
       //  PROPERTY record with S_CELL_OFFSET
@@ -1350,21 +1293,18 @@ OASISWriter::write_cellname_table (size_t &cellnames_table_pos, const std::vecto
           write_property_def (s_cell_offset_name, tl::Variant (size_t (0)), true);
         }
       }
-
     }
-
   }
 
   end_table (cellnames_table_pos);
 }
 
-void
-OASISWriter::write_textstring_table (size_t &textstrings_table_pos, const std::vector<db::cell_index_type> &cells, const db::Layout &layout, const std::vector<std::pair<unsigned int, LayerProperties> > &layers)
+void OASISWriter::write_textstring_table (size_t &textstrings_table_pos, const std::vector<db::cell_index_type> &cells, const db::Layout &layout, const std::vector<std::pair<unsigned int, LayerProperties>> &layers)
 {
   //  write present text strings
 
   //  collect present strings by ID
-  std::vector<std::pair<uint64_t, const std::string *> > rev_ts;
+  std::vector<std::pair<uint64_t, const std::string *>> rev_ts;
   rev_ts.reserve (m_textstrings.size ());
   for (auto p = m_textstrings.begin (); p != m_textstrings.end (); ++p) {
     rev_ts.push_back (std::make_pair (p->second, &p->first));
@@ -1374,7 +1314,7 @@ OASISWriter::write_textstring_table (size_t &textstrings_table_pos, const std::v
   tl_assert (rev_ts.size () == size_t (m_textstring_id));
 
   for (auto t = rev_ts.begin (); t != rev_ts.end (); ++t) {
-    tl_assert (t->first == (uint64_t)(t - rev_ts.begin ()));
+    tl_assert (t->first == (uint64_t) (t - rev_ts.begin ()));
     begin_table (textstrings_table_pos);
     write_record_id (5);
     write_nstring (t->second->c_str ());
@@ -1398,14 +1338,12 @@ OASISWriter::write_textstring_table (size_t &textstrings_table_pos, const std::v
         ++shape;
       }
     }
-
   }
 
   end_table (textstrings_table_pos);
 }
 
-void
-OASISWriter::write_layername_table (size_t &layernames_table_pos, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers)
+void OASISWriter::write_layername_table (size_t &layernames_table_pos, const std::vector<std::pair<unsigned int, db::LayerProperties>> &layers)
 {
   for (auto l = layers.begin (); l != layers.end (); ++l) {
 
@@ -1429,16 +1367,13 @@ OASISWriter::write_layername_table (size_t &layernames_table_pos, const std::vec
       write ((uint64_t) l->second.datatype);
 
       m_progress.set (mp_stream->pos ());
-
     }
-
   }
 
   end_table (layernames_table_pos);
 }
 
-void
-OASISWriter::create_cell_nstrings (const db::Layout &layout, const std::set <db::cell_index_type> &cell_set)
+void OASISWriter::create_cell_nstrings (const db::Layout &layout, const std::set<db::cell_index_type> &cell_set)
 {
   m_cell_nstrings.clear ();
 
@@ -1451,7 +1386,6 @@ OASISWriter::create_cell_nstrings (const db::Layout &layout, const std::set <db:
 
     m_cell_nstrings.insert (std::make_pair (*c, cn));
     names.insert (cn);
-
   }
 }
 
@@ -1463,8 +1397,7 @@ OASISWriter::cell_nstring (db::cell_index_type cell_index)
   return n->second.c_str ();
 }
 
-void 
-OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options)
+void OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options)
 {
   typedef db::coord_traits<db::Coord>::distance_type coord_distance_type;
 
@@ -1490,16 +1423,16 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
     m_sf = 1.0;
   }
 
-  std::vector <std::pair <unsigned int, db::LayerProperties> > layers;
+  std::vector<std::pair<unsigned int, db::LayerProperties>> layers;
   options.get_valid_layers (layout, layers, db::SaveLayoutOptions::LP_AssignNumber);
 
-  std::set <db::cell_index_type> cell_set;
+  std::set<db::cell_index_type> cell_set;
   options.get_cells (layout, cell_set, layers);
 
   create_cell_nstrings (layout, cell_set);
 
   //  create a cell index vector sorted bottom-up
-  std::vector <db::cell_index_type> cells, cells_by_index;
+  std::vector<db::cell_index_type> cells, cells_by_index;
 
   cells.reserve (cell_set.size ());
   cells_by_index.reserve (cell_set.size ());
@@ -1518,14 +1451,14 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
 
   //  write header
 
-  char magic[] = "%SEMI-OASIS\015\012";
+  char magic [] = "%SEMI-OASIS\015\012";
   write_bytes (magic, sizeof (magic) - 1);
 
   //  START record
-  write_record_id (1); 
+  write_record_id (1);
   write_bstring ("1.0");
   write (1.0 / dbu);
-  write_byte (m_options.strict_mode ? 1 : 0);  //  offset-flag (strict mode: at the end, non-strict mode: at the beginning)
+  write_byte (m_options.strict_mode ? 1 : 0); //  offset-flag (strict mode: at the end, non-strict mode: at the beginning)
 
   size_t cellnames_table_pos = 0;
   size_t textstrings_table_pos = 0;
@@ -1540,7 +1473,6 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
     for (unsigned int i = 0; i < 12; ++i) {
       write_byte (0);
     }
-
   }
 
   //  Reset the global variables
@@ -1548,17 +1480,17 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
   reset_modal_variables ();
 
   //  Prepare name tables
- 
+
   m_textstrings.clear ();
   m_propnames.clear ();
   m_propstrings.clear ();
 
   //  We will collect the standard properties here:
-  
+
   m_propstring_id = m_propname_id = 0;
   m_textstring_id = 0;
   m_proptables_written = false;
-  std::vector<std::pair<std::string, unsigned int> > init_props;
+  std::vector<std::pair<std::string, unsigned int>> init_props;
 
   //  write file properties (must happen before any other PROPNAME record since formally the
   //  PROPERTY records are associated with the names rather than the file)
@@ -1597,7 +1529,6 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
     if (m_options.write_std_properties > 1) {
       write_property_def (s_bounding_boxes_available_name, tl::Variant ((unsigned int) 2), true);
     }
-
   }
 
   if (m_options.write_std_properties > 1) {
@@ -1608,7 +1539,7 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
     write_props (layout.prop_id ());
   }
 
-  std::vector <std::string> context_prop_strings;
+  std::vector<std::string> context_prop_strings;
 
   //  write the global layout context information
 
@@ -1623,7 +1554,6 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
     write_property_def (klayout_context_name, values, false);
 
     context_prop_strings.clear ();
-
   }
 
   //  write the tables
@@ -1644,7 +1574,6 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
 
     write_textstring_table (textstrings_table_pos, cells, layout, layers);
     write_layername_table (layernames_table_pos, layers);
-
   }
 
   //  write cells
@@ -1653,7 +1582,7 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
 
     m_progress.set (mp_stream->pos ());
 
-    //  cell body 
+    //  cell body
     const db::Cell &cref (layout.cell (*cell));
     mp_cell = &cref;
 
@@ -1666,7 +1595,7 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
 
     cell_positions.insert (std::make_pair (*cell, mp_stream->pos ()));
 
-    write_record_id (13);  // CELL
+    write_record_id (13); // CELL
     write ((uint64_t) *cell);
 
     reset_modal_variables ();
@@ -1685,7 +1614,7 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
         write_record_id (28);
         write_byte (char (0xf6));
         uint64_t pnid = 0;
-        std::map <std::string, uint64_t>::const_iterator pni = m_propnames.find (klayout_context_name);
+        std::map<std::string, uint64_t>::const_iterator pni = m_propnames.find (klayout_context_name);
         if (pni == m_propnames.end ()) {
           pnid = m_propname_id++;
           m_propnames.insert (std::make_pair (klayout_context_name, pnid));
@@ -1696,10 +1625,10 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
 
         write ((uint64_t) context_prop_strings.size ());
 
-        for (std::vector <std::string>::const_iterator c = context_prop_strings.begin (); c != context_prop_strings.end (); ++c) {
+        for (std::vector<std::string>::const_iterator c = context_prop_strings.begin (); c != context_prop_strings.end (); ++c) {
           write_byte (14); // b-string by reference number
           uint64_t psid = 0;
-          std::map <std::string, uint64_t>::const_iterator psi = m_propstrings.find (*c);
+          std::map<std::string, uint64_t>::const_iterator psi = m_propstrings.find (*c);
           if (psi == m_propstrings.end ()) {
             psid = m_propstring_id++;
             m_propstrings.insert (std::make_pair (*c, psid)).second;
@@ -1712,9 +1641,7 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
         mm_last_property_name = klayout_context_name;
         mm_last_property_is_sprop = false;
         mm_last_value_list.reset ();
-
       }
-
     }
 
     if (cref.prop_id () != 0) {
@@ -1730,14 +1657,13 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
       }
 
       //  shapes
-      for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
+      for (std::vector<std::pair<unsigned int, db::LayerProperties>>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
         const db::Shapes &shapes = cref.shapes (l->first);
         if (! shapes.empty ()) {
           write_shapes (l->second, shapes);
           m_progress.set (mp_stream->pos ());
         }
       }
-
     }
 
     //  end CBLOCK if required
@@ -1746,7 +1672,6 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
     }
 
     //  end of cell
-
   }
 
   //  write the tables if at end
@@ -1755,7 +1680,7 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
 
     //  do not consider future items as everything has been collected
     std::vector<cell_index_type> no_cells;
-    std::vector <std::pair <unsigned int, db::LayerProperties> > no_layers;
+    std::vector<std::pair<unsigned int, db::LayerProperties>> no_layers;
 
     write_propname_table (propnames_table_pos, no_cells, layout, no_layers);
     write_propstring_table (propstrings_table_pos, no_cells, layout, no_layers);
@@ -1767,7 +1692,6 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
 
     //  write all layers here
     write_layername_table (layernames_table_pos, layers);
-
   }
 
   //  write cell table at the end in strict mode (in that mode we need the cell positions
@@ -1787,30 +1711,29 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
     //  offset table for strict mode (write it now since we have the table offsets now)
 
     //  cellnames
-    write_byte (1); 
+    write_byte (1);
     write ((uint64_t) cellnames_table_pos);
 
     //  textstrings
-    write_byte (1); 
+    write_byte (1);
     write ((uint64_t) textstrings_table_pos);
 
     //  propnames
-    write_byte (1); 
+    write_byte (1);
     write ((uint64_t) propnames_table_pos);
 
     //  propstrings
-    write_byte (1); 
+    write_byte (1);
     write ((uint64_t) propstrings_table_pos);
 
     //  layernames
-    write_byte (1); 
+    write_byte (1);
     write ((uint64_t) layernames_table_pos);
 
     //  xnames (not used)
-    write_byte (1); 
+    write_byte (1);
     write (0);
-
-  } 
+  }
 
   //  write a b-string to pad up to 255 bytes
   //  (this bstring consists of a "long zero" and no characters
@@ -1825,11 +1748,10 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
   m_progress.set (mp_stream->pos ());
 }
 
-void 
-OASISWriter::write (const Repetition &rep)
+void OASISWriter::write (const Repetition &rep)
 {
   if (mm_repetition == rep) {
-    write_byte (0);  // reuse
+    write_byte (0); // reuse
   } else {
 
     mm_repetition = rep;
@@ -1863,7 +1785,6 @@ OASISWriter::write (const Repetition &rep)
         if (y != 0) {
           g = (g == 0) ? y : tl::gcd (g, y);
         }
-
       }
 
       if (g <= 1) {
@@ -1889,7 +1810,7 @@ OASISWriter::write (const Repetition &rep)
       tl_assert (is_reg);
 
       //  currently there are only regular repetitions
-      //  TODO: optimize for orthogonal cases 
+      //  TODO: optimize for orthogonal cases
       tl_assert (is_reg);
       tl_assert (amax >= 2 || bmax >= 2);
 
@@ -1937,20 +1858,16 @@ OASISWriter::write (const Repetition &rep)
         write ((uint64_t) bmax - 2);
         write_gdelta (a);
         write_gdelta (b);
-
       }
-
     }
-
   }
 }
 
-void 
-OASISWriter::write_inst_with_rep (const db::CellInstArray &inst, db::properties_id_type prop_id, const db::Vector &disp, const db::Repetition &rep)
+void OASISWriter::write_inst_with_rep (const db::CellInstArray &inst, db::properties_id_type prop_id, const db::Vector &disp, const db::Repetition &rep)
 {
   db::Vector tr = inst.front ().disp () + disp;
 
-  unsigned char info = 0x40;  // by reference number
+  unsigned char info = 0x40; // by reference number
   if (mm_placement_cell != inst.object ().cell_index ()) {
     info |= 0x80;
   }
@@ -1985,7 +1902,7 @@ OASISWriter::write_inst_with_rep (const db::CellInstArray &inst, db::properties_
     write (inst.complex_trans ().mag ());
     write (inst.complex_trans ().angle ());
   }
-  
+
   if (info & 0x20) {
     mm_placement_x = tr.x ();
     write_coord (mm_placement_x.get ());
@@ -2004,8 +1921,7 @@ OASISWriter::write_inst_with_rep (const db::CellInstArray &inst, db::properties_
   }
 }
 
-void
-OASISWriter::write (const db::CellInstArray &inst, db::properties_id_type prop_id, const db::Repetition &rep)
+void OASISWriter::write (const db::CellInstArray &inst, db::properties_id_type prop_id, const db::Repetition &rep)
 {
   m_progress.set (mp_stream->pos ());
 
@@ -2019,7 +1935,7 @@ OASISWriter::write (const db::CellInstArray &inst, db::properties_id_type prop_i
     // Note: we can do so because below we instantiate the shape at the front of the array which includes
     // the first transformation already.
     db::Vector po = pts.front ();
-    std::vector<db::Vector>::iterator pw = pts.begin();
+    std::vector<db::Vector>::iterator pw = pts.begin ();
     for (std::vector<db::Vector>::iterator p = pw + 1; p != pts.end (); ++p) {
       *pw++ = *p - po;
     }
@@ -2040,9 +1956,9 @@ OASISWriter::write (const db::CellInstArray &inst, db::properties_id_type prop_i
 
   } else if (inst.is_regular_array (a, b, amax, bmax) && (amax > 1 || bmax > 1)) {
 
-    //  we cannot use the repetition - instead we write every single instance and use the repetition 
+    //  we cannot use the repetition - instead we write every single instance and use the repetition
     //  for the array information
-    
+
     db::Repetition array_rep (new db::RegularRepetition (a, b, amax, bmax));
 
     if (rep != db::Repetition ()) {
@@ -2058,8 +1974,7 @@ OASISWriter::write (const db::CellInstArray &inst, db::properties_id_type prop_i
   }
 }
 
-void 
-OASISWriter::write_insts (const std::set <db::cell_index_type> &cell_set)
+void OASISWriter::write_insts (const std::set<db::cell_index_type> &cell_set)
 {
   int level = m_options.compression_level;
 
@@ -2070,7 +1985,7 @@ OASISWriter::write_insts (const std::set <db::cell_index_type> &cell_set)
 
   db::Repetition single_rep;
 
-  //  Collect all instances 
+  //  Collect all instances
   for (db::Cell::const_iterator inst_iterator = mp_cell->begin (); ! inst_iterator.at_end (); ++inst_iterator) {
 
     if (cell_set.find (inst_iterator->cell_index ()) != cell_set.end ()) {
@@ -2094,21 +2009,17 @@ OASISWriter::write_insts (const std::set <db::cell_index_type> &cell_set)
         } else {
           inst_compressor.add (inst_array, disp);
         }
-
       }
-
     }
-
   }
 
   inst_compressor.flush (this);
   inst_with_properties_compressor.flush (this);
 }
 
-void
-OASISWriter::write_props (db::properties_id_type prop_id)
+void OASISWriter::write_props (db::properties_id_type prop_id)
 {
-  std::vector<tl::Variant> pv_list; 
+  std::vector<tl::Variant> pv_list;
 
   auto props = db::properties (prop_id).to_map ();
 
@@ -2131,7 +2042,7 @@ OASISWriter::write_props (db::properties_id_type prop_id)
 
       if (p->second.is_list ()) {
         pvl = &p->second.get_list ();
-      } else if (!p->second.is_nil ()) {
+      } else if (! p->second.is_nil ()) {
         pv_list.reserve (1);
         pv_list.push_back (p->second);
       }
@@ -2141,32 +2052,28 @@ OASISWriter::write_props (db::properties_id_type prop_id)
       pv_list.reserve (2);
       pv_list.push_back (name.to_ulong ());
       pv_list.push_back (p->second.to_string ());
-
     }
 
     write_property_def (name_str, *pvl, sflag);
-
   }
 }
 
-void
-OASISWriter::write_property_def (const char *name_str, const tl::Variant &pv, bool sflag)
-{ 
+void OASISWriter::write_property_def (const char *name_str, const tl::Variant &pv, bool sflag)
+{
   std::vector<tl::Variant> pvl;
   pvl.reserve (1);
   pvl.push_back (pv);
   write_property_def (name_str, pvl, sflag);
 }
 
-void
-OASISWriter::write_property_def (const char *name_str, const std::vector<tl::Variant> &pvl, bool sflag)
-{ 
+void OASISWriter::write_property_def (const char *name_str, const std::vector<tl::Variant> &pvl, bool sflag)
+{
   bool same_name = (mm_last_property_name == name_str);
   bool same_value = (mm_last_value_list == pvl);
   bool same_sflag = (mm_last_property_is_sprop == sflag);
 
   if (same_name && same_value && same_sflag) {
-    write_record_id (29); // repeat property 
+    write_record_id (29); // repeat property
   } else {
 
     write_record_id (28);
@@ -2178,15 +2085,15 @@ OASISWriter::write_property_def (const char *name_str, const std::vector<tl::Var
       if (pvl.size () >= 15) {
         info |= 0xf0;
       } else {
-        info |= ((unsigned char)pvl.size ()) << 4;
+        info |= ((unsigned char) pvl.size ()) << 4;
       }
     }
 
     if (! same_name) {
 
-      std::map <std::string, uint64_t>::const_iterator pni = m_propnames.find (name_str);
+      std::map<std::string, uint64_t>::const_iterator pni = m_propnames.find (name_str);
 
-      //  In strict mode always write property ID's: before we have issued the table we can 
+      //  In strict mode always write property ID's: before we have issued the table we can
       //  create new ID's.
       if (pni == m_propnames.end () && m_options.strict_mode) {
         tl_assert (! m_proptables_written);
@@ -2218,7 +2125,7 @@ OASISWriter::write_property_def (const char *name_str, const std::vector<tl::Var
       //  write property values
       for (uint64_t i = 0; i < pvl.size (); ++i) {
 
-        const tl::Variant &v = pvl[i];
+        const tl::Variant &v = pvl [i];
 
         if (v.is_double ()) {
 
@@ -2247,9 +2154,9 @@ OASISWriter::write_property_def (const char *name_str, const std::vector<tl::Var
         } else {
 
           const char *pvs = v.to_string ();
-          std::map <std::string, uint64_t>::const_iterator pvi = m_propstrings.find (pvs);
+          std::map<std::string, uint64_t>::const_iterator pvi = m_propstrings.find (pvs);
 
-          //  In strict mode always write property string ID's: before we have issued the table we can 
+          //  In strict mode always write property string ID's: before we have issued the table we can
           //  create new ID's.
           if (pvi == m_propstrings.end () && m_options.strict_mode) {
             tl_assert (! m_proptables_written);
@@ -2263,22 +2170,17 @@ OASISWriter::write_property_def (const char *name_str, const std::vector<tl::Var
             write_byte (10 + string_type (pvs));
             write_bstring (pvs);
           }
-
         }
-
       }
 
       mm_last_value_list = pvl;
-
     }
 
     mm_last_property_is_sprop = sflag;
-
   }
 }
 
-void
-OASISWriter::write_pointlist (const std::vector<db::Vector> &pointlist, bool for_polygons)
+void OASISWriter::write_pointlist (const std::vector<db::Vector> &pointlist, bool for_polygons)
 {
   tl_assert ((for_polygons && pointlist.size () > 1) || (! for_polygons && pointlist.size () > 0));
 
@@ -2298,7 +2200,7 @@ OASISWriter::write_pointlist (const std::vector<db::Vector> &pointlist, bool for
     }
     if (type == -1) {
       type = hv;
-    } else if (hv != !hvlast) {
+    } else if (hv != ! hvlast) {
       type = -1;
       break;
     }
@@ -2360,19 +2262,17 @@ OASISWriter::write_pointlist (const std::vector<db::Vector> &pointlist, bool for
         plast = ps;
       }
     }
-
   }
 }
 
-void 
-OASISWriter::write (const db::Text &text, db::properties_id_type prop_id, const db::Repetition &rep)
+void OASISWriter::write (const db::Text &text, db::properties_id_type prop_id, const db::Repetition &rep)
 {
   m_progress.set (mp_stream->pos ());
 
   db::Trans trans = text.trans ();
 
   uint64_t text_id = 0;
-  std::map <std::string, uint64_t>::const_iterator ts = m_textstrings.find (text.string ());
+  std::map<std::string, uint64_t>::const_iterator ts = m_textstrings.find (text.string ());
   if (ts == m_textstrings.end ()) {
     text_id = m_textstring_id++;
     m_textstrings.insert (std::make_pair (text.string (), text_id));
@@ -2433,13 +2333,12 @@ OASISWriter::write (const db::Text &text, db::properties_id_type prop_id, const 
   }
 }
 
-void 
-OASISWriter::write (const db::SimplePolygon &polygon, db::properties_id_type prop_id, const db::Repetition &rep)
+void OASISWriter::write (const db::SimplePolygon &polygon, db::properties_id_type prop_id, const db::Repetition &rep)
 {
   m_progress.set (mp_stream->pos ());
 
   //  TODO: how to deal with max vertex count?
- 
+
   db::Polygon::polygon_contour_iterator e = polygon.begin_hull ();
 
   //  don't write empty polygons
@@ -2516,8 +2415,7 @@ OASISWriter::write (const db::SimplePolygon &polygon, db::properties_id_type pro
   }
 }
 
-void 
-OASISWriter::write (const db::Polygon &polygon, db::properties_id_type prop_id, const db::Repetition &rep)
+void OASISWriter::write (const db::Polygon &polygon, db::properties_id_type prop_id, const db::Repetition &rep)
 {
   if (polygon.holes () > 0) {
 
@@ -2534,13 +2432,13 @@ OASISWriter::write (const db::Polygon &polygon, db::properties_id_type prop_id, 
     for (std::vector<db::Polygon>::const_iterator p = polygons.begin (); p != polygons.end (); ++p) {
       write (*p, prop_id, rep);
     }
-  
+
   } else {
 
     m_progress.set (mp_stream->pos ());
 
     //  TODO: how to deal with max vertex count?
-   
+
     db::Polygon::polygon_contour_iterator e = polygon.begin_hull ();
 
     //  don't write empty polygons
@@ -2615,17 +2513,15 @@ OASISWriter::write (const db::Polygon &polygon, db::properties_id_type prop_id, 
     if (prop_id != 0) {
       write_props (prop_id);
     }
-
   }
 }
 
-void 
-OASISWriter::write (const db::Box &box, db::properties_id_type prop_id, const db::Repetition &rep)
+void OASISWriter::write (const db::Box &box, db::properties_id_type prop_id, const db::Repetition &rep)
 {
   m_progress.set (mp_stream->pos ());
 
   unsigned char info = 0x00;
-  
+
   if (mm_layer != m_layer) {
     info |= 0x01;
   }
@@ -2634,7 +2530,7 @@ OASISWriter::write (const db::Box &box, db::properties_id_type prop_id, const db
   }
 
   if (box.width () == box.height ()) {
-    info |= 0x80;  // square
+    info |= 0x80; // square
   } else {
     if (mm_geometry_h != box.height ()) {
       info |= 0x20;
@@ -2650,7 +2546,7 @@ OASISWriter::write (const db::Box &box, db::properties_id_type prop_id, const db
   if (mm_geometry_y != box.bottom ()) {
     info |= 0x08;
   }
-  
+
   if (! rep.is_singular ()) {
     info |= 0x04;
   }
@@ -2695,8 +2591,7 @@ OASISWriter::write (const db::Box &box, db::properties_id_type prop_id, const db
   }
 }
 
-void 
-OASISWriter::write (const db::Path &path, db::properties_id_type prop_id, const db::Repetition &rep)
+void OASISWriter::write (const db::Path &path, db::properties_id_type prop_id, const db::Repetition &rep)
 {
   typedef db::coord_traits<db::Coord>::distance_type ucoord;
 
@@ -2893,7 +2788,6 @@ OASISWriter::write (const db::Path &path, db::properties_id_type prop_id, const 
 
       mm_path_start_extension = ext.first;
       mm_path_end_extension = ext.second;
-
     }
 
     if (info & 0x20) {
@@ -2992,14 +2886,11 @@ OASISWriter::write (const db::Path &path, db::properties_id_type prop_id, const 
       if (prop_id != 0) {
         write_props (prop_id);
       }
-
     }
-
   }
 }
 
-void 
-OASISWriter::write (const db::Edge &edge, db::properties_id_type prop_id, const db::Repetition &rep)
+void OASISWriter::write (const db::Edge &edge, db::properties_id_type prop_id, const db::Repetition &rep)
 {
   m_progress.set (mp_stream->pos ());
 
@@ -3051,7 +2942,7 @@ OASISWriter::write (const db::Edge &edge, db::properties_id_type prop_id, const 
   }
 
   if (info & 0x80) {
-    write_byte (0x05);  // flush
+    write_byte (0x05); // flush
     mm_path_start_extension = 0;
     mm_path_end_extension = 0;
   }
@@ -3077,8 +2968,7 @@ OASISWriter::write (const db::Edge &edge, db::properties_id_type prop_id, const 
   }
 }
 
-void 
-OASISWriter::write_shapes (const db::LayerProperties &lprops, const db::Shapes &shapes)
+void OASISWriter::write_shapes (const db::LayerProperties &lprops, const db::Shapes &shapes)
 {
   int level = m_options.compression_level;
   bool recompress = m_options.recompress;
@@ -3102,7 +2992,7 @@ OASISWriter::write_shapes (const db::LayerProperties &lprops, const db::Shapes &
 
   db::Repetition single_rep;
 
-  for (db::ShapeIterator shape = shapes.begin (db::ShapeIterator::All); ! shape.at_end (); ) {
+  for (db::ShapeIterator shape = shapes.begin (db::ShapeIterator::All); ! shape.at_end ();) {
 
     if (level <= 0) {
 
@@ -3274,7 +3164,7 @@ OASISWriter::write_shapes (const db::LayerProperties &lprops, const db::Shapes &
         break;
 
       case db::Shape::SimplePolygonPtrArrayMember:
-           
+
         if (shape->has_prop_id ()) {
           db::object_with_properties<db::Shape::simple_polygon_ptr_array_type> simple_polygon_ref = *shape->basic_ptr (db::object_with_properties<db::Shape::simple_polygon_ptr_array_type>::tag ());
           db::SimplePolygonWithProperties simple_polygon (simple_polygon_ref.object ().obj (), simple_polygon_ref.properties_id ());
@@ -3470,13 +3360,10 @@ OASISWriter::write_shapes (const db::LayerProperties &lprops, const db::Shapes &
 
       default:
         tl_assert (false);
-
       }
 
       ++shape;
-
     }
-
   }
 
   path_compressor.flush (this);
@@ -3495,4 +3382,3 @@ OASISWriter::write_shapes (const db::LayerProperties &lprops, const db::Shapes &
 }
 
 }
-

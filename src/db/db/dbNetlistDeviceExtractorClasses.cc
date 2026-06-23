@@ -41,29 +41,28 @@ void NetlistDeviceExtractorMOS3Transistor::setup ()
 {
   if (! is_strict ()) {
 
-    define_layer ("SD", "Source/drain diffusion");                        // #0
-    define_layer ("G", "Gate input");                                     // #1
+    define_layer ("SD", "Source/drain diffusion"); // #0
+    define_layer ("G", "Gate input");              // #1
     //  for backward compatibility
-    define_layer ("P", 1, "Gate terminal output");                        // #2 -> G
+    define_layer ("P", 1, "Gate terminal output"); // #2 -> G
 
     //  terminal output
-    define_layer ("tG", 2, "Gate terminal output");                       // #3 -> P -> G
-    define_layer ("tS", 0, "Source terminal output (default is SD)");     // #4
-    define_layer ("tD", 0, "Drain terminal output (default is SD)");      // #5
+    define_layer ("tG", 2, "Gate terminal output");                   // #3 -> P -> G
+    define_layer ("tS", 0, "Source terminal output (default is SD)"); // #4
+    define_layer ("tD", 0, "Drain terminal output (default is SD)");  // #5
 
   } else {
 
-    define_layer ("S", "Source diffusion");                               // #0
-    define_layer ("D", "Drain diffusion");                                // #1
-    define_layer ("G", "Gate input");                                     // #2
+    define_layer ("S", "Source diffusion"); // #0
+    define_layer ("D", "Drain diffusion");  // #1
+    define_layer ("G", "Gate input");       // #2
     //  for backward compatibility
-    define_layer ("P", 2, "Gate terminal output");                        // #3 -> G
+    define_layer ("P", 2, "Gate terminal output"); // #3 -> G
 
     //  terminal output
-    define_layer ("tG", 3, "Gate terminal output");                       // #4 -> P -> G
-    define_layer ("tS", 0, "Source terminal output (default is S)");      // #5
-    define_layer ("tD", 1, "Drain terminal output (default is D)");       // #6
-
+    define_layer ("tG", 3, "Gate terminal output");                  // #4 -> P -> G
+    define_layer ("tS", 0, "Source terminal output (default is S)"); // #5
+    define_layer ("tD", 1, "Drain terminal output (default is D)");  // #6
   }
 
   db::DeviceClass *cls = make_class ();
@@ -109,7 +108,6 @@ db::Connectivity NetlistDeviceExtractorMOS3Transistor::get_connectivity (const d
     conn.connect (sdiff, gate);
     conn.connect (ddiff, gate);
     return conn;
-
   }
 }
 
@@ -127,7 +125,7 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
     const db::Region &rdiff = layer_geometry [diff_geometry_index];
     const db::Region &rgates = layer_geometry [gate_geometry_index];
 
-    for (db::Region::const_iterator p = rgates.begin_merged (); !p.at_end (); ++p) {
+    for (db::Region::const_iterator p = rgates.begin_merged (); ! p.at_end (); ++p) {
 
       db::Region rgate (*p);
       rgate.set_base_verbosity (rgates.base_verbosity ());
@@ -162,7 +160,6 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
           } else {
             widths.push_back (l);
           }
-
         }
 
         if (widths.size () != 2) {
@@ -173,7 +170,7 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
         //  non-rectangular gates and circular gates. The computation is based on the
         //  relationship: A(gate) = L(gate) * W(gate). W(gate) is determined from the
         //  accumulated edge lengths (average of left and right length).
-        double param_w = sdbu () * (widths[0] + widths[1]) * 0.5;
+        double param_w = sdbu () * (widths [0] + widths [1]) * 0.5;
         double param_l = sdbu () * sdbu () * double (rgate.area ()) / param_w;
 
         db::Device *device = create_device ();
@@ -196,7 +193,6 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
 
           unsigned int sd_index = diff_index == 0 ? source_terminal_geometry_index : drain_terminal_geometry_index;
           define_terminal (device, diff_index == 0 ? db::DeviceClassMOS3Transistor::terminal_id_S : db::DeviceClassMOS3Transistor::terminal_id_D, sd_index, *d2g);
-
         }
 
         define_terminal (device, db::DeviceClassMOS3Transistor::terminal_id_G, gate_terminal_geometry_index, *p);
@@ -206,9 +202,7 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
 
         //  output the device for debugging
         device_out (device, rdiff2gate, rgate);
-
       }
-
     }
 
   } else {
@@ -225,7 +219,7 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
     const db::Region &ddiff = layer_geometry [drain_geometry_index];
     const db::Region &rgates = layer_geometry [gate_geometry_index];
 
-    for (db::Region::const_iterator p = rgates.begin_merged (); !p.at_end (); ++p) {
+    for (db::Region::const_iterator p = rgates.begin_merged (); ! p.at_end (); ++p) {
 
       db::Region rgate (*p);
       rgate.set_base_verbosity (rgates.base_verbosity ());
@@ -300,7 +294,6 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
 
           unsigned int sd_index = diff_index == 0 ? source_terminal_geometry_index : drain_terminal_geometry_index;
           define_terminal (device, diff_index == 0 ? db::DeviceClassMOS3Transistor::terminal_id_S : db::DeviceClassMOS3Transistor::terminal_id_D, sd_index, *diff);
-
         }
 
         define_terminal (device, db::DeviceClassMOS3Transistor::terminal_id_G, gate_terminal_geometry_index, *p);
@@ -311,11 +304,8 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
         //  output the device for debugging
         db::Region diff2gate = sdiff2gate + ddiff2gate;
         device_out (device, diff2gate, rgate);
-
       }
-
     }
-
   }
 }
 
@@ -332,39 +322,38 @@ void NetlistDeviceExtractorMOS4Transistor::setup ()
 {
   if (! is_strict ()) {
 
-    define_layer ("SD", "Source/drain diffusion");                      // #0
-    define_layer ("G", "Gate input");                                   // #1
+    define_layer ("SD", "Source/drain diffusion"); // #0
+    define_layer ("G", "Gate input");              // #1
     //  for backward compatibility
-    define_layer ("P", 1, "Gate terminal output");                      // #2 -> G
+    define_layer ("P", 1, "Gate terminal output"); // #2 -> G
 
     //  terminal output
-    define_layer ("tG", 2, "Gate terminal output");                     // #3 -> P -> G
-    define_layer ("tS", 0, "Source terminal output (default is SD)");   // #4
-    define_layer ("tD", 0, "Drain terminal output (default is SD)");    // #5
+    define_layer ("tG", 2, "Gate terminal output");                   // #3 -> P -> G
+    define_layer ("tS", 0, "Source terminal output (default is SD)"); // #4
+    define_layer ("tD", 0, "Drain terminal output (default is SD)");  // #5
 
     //  for backward compatibility
-    define_layer ("W", "Well (bulk) terminal output");                  // #6
+    define_layer ("W", "Well (bulk) terminal output"); // #6
 
-    define_layer ("tB", 6, "Well (bulk) terminal output");              // #7 -> W
+    define_layer ("tB", 6, "Well (bulk) terminal output"); // #7 -> W
 
   } else {
 
-    define_layer ("S", "Source diffusion");                             // #0
-    define_layer ("D", "Drain diffusion");                              // #1
-    define_layer ("G", "Gate input");                                   // #2
+    define_layer ("S", "Source diffusion"); // #0
+    define_layer ("D", "Drain diffusion");  // #1
+    define_layer ("G", "Gate input");       // #2
     //  for backward compatibility
-    define_layer ("P", 2, "Gate terminal output");                      // #3 -> G
+    define_layer ("P", 2, "Gate terminal output"); // #3 -> G
 
     //  terminal output
-    define_layer ("tG", 3, "Gate terminal output");                     // #4 -> P -> G
-    define_layer ("tS", 0, "Source terminal output (default is S)");    // #5
-    define_layer ("tD", 1, "Drain terminal output (default is D)");     // #6
+    define_layer ("tG", 3, "Gate terminal output");                  // #4 -> P -> G
+    define_layer ("tS", 0, "Source terminal output (default is S)"); // #5
+    define_layer ("tD", 1, "Drain terminal output (default is D)");  // #6
 
     //  for backward compatibility
-    define_layer ("W", "Well (bulk) terminal output");                  // #7
+    define_layer ("W", "Well (bulk) terminal output"); // #7
 
-    define_layer ("tB", 7, "Well (bulk) terminal output");              // #8 -> W
-
+    define_layer ("tB", 7, "Well (bulk) terminal output"); // #8 -> W
   }
 
   db::DeviceClass *cls = make_class ();
@@ -391,10 +380,10 @@ NetlistDeviceExtractorResistor::NetlistDeviceExtractorResistor (const std::strin
 
 void NetlistDeviceExtractorResistor::setup ()
 {
-  define_layer ("R", "Resistor");                 // #0
-  define_layer ("C", "Contacts");                 // #1
-  define_layer ("tA", 1, "A terminal output");    // #2 -> C
-  define_layer ("tB", 1, "B terminal output");    // #3 -> C
+  define_layer ("R", "Resistor");              // #0
+  define_layer ("C", "Contacts");              // #1
+  define_layer ("tA", 1, "A terminal output"); // #2 -> C
+  define_layer ("tB", 1, "B terminal output"); // #3 -> C
 
   register_device_class (make_class ());
 }
@@ -432,7 +421,7 @@ void NetlistDeviceExtractorResistor::extract_devices (const std::vector<db::Regi
   contact_wo_res.set_base_verbosity (contact.base_verbosity ());
   contact_wo_res -= res;
 
-  for (db::Region::const_iterator p = res_merged.begin_merged (); !p.at_end (); ++p) {
+  for (db::Region::const_iterator p = res_merged.begin_merged (); ! p.at_end (); ++p) {
 
     db::Region rres (*p);
     db::Region contacts_per_res = contact_wo_res.selected_interacting (rres);
@@ -471,7 +460,7 @@ void NetlistDeviceExtractorResistor::extract_devices (const std::vector<db::Regi
     //  collect and normalize the contact polygons (gives better reproducibility)
     std::vector<db::Polygon> contact_poly;
     contact_poly.reserve (2);
-    for (db::Region::const_iterator d = contacts_per_res.begin (); !d.at_end (); ++d) {
+    for (db::Region::const_iterator d = contacts_per_res.begin (); ! d.at_end (); ++d) {
       contact_poly.push_back (*d);
     }
     std::sort (contact_poly.begin (), contact_poly.end ());
@@ -487,7 +476,6 @@ void NetlistDeviceExtractorResistor::extract_devices (const std::vector<db::Regi
 
     //  output the device for debugging
     device_out (device, rres, contacts_per_res);
-
   }
 }
 
@@ -502,12 +490,12 @@ NetlistDeviceExtractorResistorWithBulk::NetlistDeviceExtractorResistorWithBulk (
 
 void NetlistDeviceExtractorResistorWithBulk::setup ()
 {
-  define_layer ("R", "Resistor");                 // #0
-  define_layer ("C", "Contacts");                 // #1
-  define_layer ("tA", 1, "A terminal output");    // #2 -> C
-  define_layer ("tB", 1, "B terminal output");    // #3 -> C
-  define_layer ("W", "Well/Bulk");                // #4
-  define_layer ("tW", 4, "W terminal output");    // #5 -> W
+  define_layer ("R", "Resistor");              // #0
+  define_layer ("C", "Contacts");              // #1
+  define_layer ("tA", 1, "A terminal output"); // #2 -> C
+  define_layer ("tB", 1, "B terminal output"); // #3 -> C
+  define_layer ("W", "Well/Bulk");             // #4
+  define_layer ("tW", 4, "W terminal output"); // #5 -> W
 
   register_device_class (make_class ());
 }
@@ -529,10 +517,10 @@ NetlistDeviceExtractorCapacitor::NetlistDeviceExtractorCapacitor (const std::str
 
 void NetlistDeviceExtractorCapacitor::setup ()
 {
-  define_layer ("P1", "Plate 1");                   // #0
-  define_layer ("P2", "Plate 2");                   // #1
-  define_layer ("tA", 0, "A terminal output");      // #2 -> P1
-  define_layer ("tB", 1, "B terminal output");      // #3 -> P2
+  define_layer ("P1", "Plate 1");              // #0
+  define_layer ("P2", "Plate 2");              // #1
+  define_layer ("tA", 0, "A terminal output"); // #2 -> P1
+  define_layer ("tB", 1, "B terminal output"); // #3 -> P2
 
   register_device_class (make_class ());
 }
@@ -569,7 +557,7 @@ void NetlistDeviceExtractorCapacitor::extract_devices (const std::vector<db::Reg
   overlap.set_base_verbosity (plate1.base_verbosity ());
   overlap &= plate2;
 
-  for (db::Region::const_iterator p = overlap.begin_merged (); !p.at_end (); ++p) {
+  for (db::Region::const_iterator p = overlap.begin_merged (); ! p.at_end (); ++p) {
 
     db::Device *device = create_device ();
 
@@ -589,7 +577,6 @@ void NetlistDeviceExtractorCapacitor::extract_devices (const std::vector<db::Reg
 
     //  output the device for debugging
     device_out (device, *p);
-
   }
 }
 
@@ -604,12 +591,12 @@ NetlistDeviceExtractorCapacitorWithBulk::NetlistDeviceExtractorCapacitorWithBulk
 
 void NetlistDeviceExtractorCapacitorWithBulk::setup ()
 {
-  define_layer ("P1", "Plate 1");                   // #0
-  define_layer ("P2", "Plate 2");                   // #1
-  define_layer ("tA", 0, "A terminal output");      // #2 -> P1
-  define_layer ("tB", 1, "B terminal output");      // #3 -> P2
-  define_layer ("W", "Well/Bulk");                  // #4
-  define_layer ("tW", 4, "W terminal output");      // #5 -> W
+  define_layer ("P1", "Plate 1");              // #0
+  define_layer ("P2", "Plate 2");              // #1
+  define_layer ("tA", 0, "A terminal output"); // #2 -> P1
+  define_layer ("tB", 1, "B terminal output"); // #3 -> P2
+  define_layer ("W", "Well/Bulk");             // #4
+  define_layer ("tW", 4, "W terminal output"); // #5 -> W
 
   register_device_class (make_class ());
 }
@@ -631,14 +618,14 @@ NetlistDeviceExtractorBJT3Transistor::NetlistDeviceExtractorBJT3Transistor (cons
 
 void NetlistDeviceExtractorBJT3Transistor::setup ()
 {
-  define_layer ("C", "Collector");                                      // #0
-  define_layer ("B", "Base");                                           // #1
-  define_layer ("E", "Emitter");                                        // #2
+  define_layer ("C", "Collector"); // #0
+  define_layer ("B", "Base");      // #1
+  define_layer ("E", "Emitter");   // #2
 
   //  terminal output
-  define_layer ("tC", 0, "Collector terminal output");                  // #3 -> C
-  define_layer ("tB", 1, "Base terminal output");                       // #4 -> B
-  define_layer ("tE", 2, "Emitter terminal output");                    // #5 -> E
+  define_layer ("tC", 0, "Collector terminal output"); // #3 -> C
+  define_layer ("tB", 1, "Base terminal output");      // #4 -> B
+  define_layer ("tE", 2, "Emitter terminal output");   // #5 -> E
 
   register_device_class (make_class ());
 }
@@ -673,7 +660,7 @@ void NetlistDeviceExtractorBJT3Transistor::extract_devices (const std::vector<db
   const db::Region &rcollectors = layer_geometry [collector_geometry_index];
   const db::Region &remitters = layer_geometry [emitter_geometry_index];
 
-  for (db::Region::const_iterator p = rbases.begin_merged (); !p.at_end (); ++p) {
+  for (db::Region::const_iterator p = rbases.begin_merged (); ! p.at_end (); ++p) {
 
     db::Region rbase (*p);
     rbase.set_base_verbosity (rbases.base_verbosity ());
@@ -716,7 +703,7 @@ void NetlistDeviceExtractorBJT3Transistor::extract_devices (const std::vector<db
       double ac = sdbu () * sdbu () * rcollector2base.area ();
       double pc = sdbu () * rcollector2base.perimeter ();
 
-      for (db::Region::const_iterator pe = remitter2base.begin_merged (); !pe.at_end (); ++pe) {
+      for (db::Region::const_iterator pe = remitter2base.begin_merged (); ! pe.at_end (); ++pe) {
 
         db::Device *device = create_device ();
 
@@ -742,11 +729,8 @@ void NetlistDeviceExtractorBJT3Transistor::extract_devices (const std::vector<db
 
         //  output the device for debugging
         device_out (device, rcollector, rbase, *pe);
-
       }
-
     }
-
   }
 }
 
@@ -761,19 +745,19 @@ NetlistDeviceExtractorBJT4Transistor::NetlistDeviceExtractorBJT4Transistor (cons
 
 void NetlistDeviceExtractorBJT4Transistor::setup ()
 {
-  define_layer ("C", "Collector");                                      // #0
-  define_layer ("B", "Base");                                           // #1
-  define_layer ("E", "Emitter");                                        // #2
+  define_layer ("C", "Collector"); // #0
+  define_layer ("B", "Base");      // #1
+  define_layer ("E", "Emitter");   // #2
 
   //  terminal output
-  define_layer ("tC", 0, "Collector terminal output");                  // #3 -> C
-  define_layer ("tB", 1, "Base terminal output");                       // #4 -> B
-  define_layer ("tE", 2, "Emitter terminal output");                    // #5 -> E
+  define_layer ("tC", 0, "Collector terminal output"); // #3 -> C
+  define_layer ("tB", 1, "Base terminal output");      // #4 -> B
+  define_layer ("tE", 2, "Emitter terminal output");   // #5 -> E
 
   //  for convenience and consistency with MOS4
-  define_layer ("S", "Substrate (bulk) terminal output");               // #6
+  define_layer ("S", "Substrate (bulk) terminal output"); // #6
 
-  define_layer ("tS", 6, "Substrate (bulk) terminal output");           // #7 -> S
+  define_layer ("tS", 6, "Substrate (bulk) terminal output"); // #7 -> S
 
   register_device_class (make_class ());
 }
@@ -795,10 +779,10 @@ NetlistDeviceExtractorDiode::NetlistDeviceExtractorDiode (const std::string &nam
 
 void NetlistDeviceExtractorDiode::setup ()
 {
-  define_layer ("P", "P region");                   // #0
-  define_layer ("N", "N region");                   // #1
-  define_layer ("tA", 0, "A terminal output");      // #2 -> P
-  define_layer ("tC", 1, "C terminal output");      // #3 -> N
+  define_layer ("P", "P region");              // #0
+  define_layer ("N", "N region");              // #1
+  define_layer ("tA", 0, "A terminal output"); // #2 -> P
+  define_layer ("tC", 1, "C terminal output"); // #3 -> N
 
   register_device_class (make_class ());
 }
@@ -835,7 +819,7 @@ void NetlistDeviceExtractorDiode::extract_devices (const std::vector<db::Region>
   overlap.set_base_verbosity (pregion.base_verbosity ());
   overlap &= nregion;
 
-  for (db::Region::const_iterator p = overlap.begin_merged (); !p.at_end (); ++p) {
+  for (db::Region::const_iterator p = overlap.begin_merged (); ! p.at_end (); ++p) {
 
     db::Device *device = create_device ();
 
@@ -854,7 +838,6 @@ void NetlistDeviceExtractorDiode::extract_devices (const std::vector<db::Region>
 
     //  output the device for debugging
     device_out (device, *p);
-
   }
 }
 

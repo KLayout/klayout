@@ -37,35 +37,39 @@
 #include "edtEditorHooks.h"
 
 #if defined(HAVE_QT)
-#  include <QObject>
-#  include <QTimer>
+#include <QObject>
+#include <QTimer>
 #endif
 
-namespace db {
-  class Manager;
+namespace db
+{
+class Manager;
 }
 
-namespace lay {
-  class Dispatcher;
-  class Marker;
-  class InstanceMarker;
+namespace lay
+{
+class Dispatcher;
+class Marker;
+class InstanceMarker;
 }
 
-namespace edt {
+namespace edt
+{
 
 // -------------------------------------------------------------
 //  A point with an unsigned index describing a certain point of a polygon or path
 
-struct PointWithIndex 
-  : public db::Point
-{
+struct PointWithIndex
+  : public db::Point {
   PointWithIndex ()
     : db::Point (), n (0), c (0)
-  { }
+  {
+  }
 
   PointWithIndex (const db::Point &p, unsigned int _n, unsigned int _c)
     : db::Point (p), n (_n), c (_c)
-  { }
+  {
+  }
 
   unsigned int n, c;
 
@@ -89,16 +93,17 @@ struct PointWithIndex
 // -------------------------------------------------------------
 //  An edge with two indices describing an edge of a polygon or segment of a path
 
-struct EdgeWithIndex 
-  : public db::Edge
-{
+struct EdgeWithIndex
+  : public db::Edge {
   EdgeWithIndex ()
-    : db::Edge (), n (0), nn (0), c (0) 
-  { }
+    : db::Edge (), n (0), nn (0), c (0)
+  {
+  }
 
   EdgeWithIndex (const db::Edge &e, unsigned int _n, unsigned int _nn, unsigned int _c)
-    : db::Edge (e), n (_n), nn (_nn), c (_c) 
-  { }
+    : db::Edge (e), n (_n), nn (_nn), c (_c)
+  {
+  }
 
   unsigned int n, nn, c;
 
@@ -142,17 +147,17 @@ struct EdgeWithIndex
  */
 class PartialService :
 #if defined(HAVE_QT)
-    public QObject,
+  public QObject,
 #endif
-    public lay::EditorServiceBase,
-    public db::Object
+  public lay::EditorServiceBase,
+  public db::Object
 {
 #if defined(HAVE_QT)
-Q_OBJECT
+  Q_OBJECT
 #endif
 
-public: 
-  typedef std::map<lay::ObjectInstPath, std::set<EdgeWithIndex> > partial_objects;
+public:
+  typedef std::map<lay::ObjectInstPath, std::set<EdgeWithIndex>> partial_objects;
 
   /**
    *  @brief The constructor
@@ -189,7 +194,7 @@ public:
     return this;
   }
 
-  /** 
+  /**
    *  @brief Implementation of the menu functions
    */
   virtual void menu_activated (const std::string &symbol);
@@ -225,7 +230,7 @@ public:
   virtual bool mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
 
   /**
-   *  @brief Implement the mouse mode: button double clicked 
+   *  @brief Implement the mouse mode: button double clicked
    */
   virtual bool mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
 
@@ -242,7 +247,7 @@ public:
   /**
    *  @brief Transforms the selection
    *
-   *  Currently only displacements are allowed which basically moves the partial selection 
+   *  Currently only displacements are allowed which basically moves the partial selection
    *  by the given distance
    */
   virtual void transform (const db::DCplxTrans &tr);
@@ -302,7 +307,7 @@ public:
    */
   virtual bool select (const db::DBox &box, SelectionMode mode);
 
-  /** 
+  /**
    *  @brief "delete" operation
    */
   virtual void del ();
@@ -393,13 +398,13 @@ private:
   db::DVector snap (const db::DVector &p) const;
   void update_vector_snapped_point (const db::DPoint &pt, db::DVector &vr, bool &result_set) const;
   db::DVector snap_marker_to_grid (const db::DVector &v, bool &snapped) const;
-  db::DVector snap_move(const db::DVector &p) const;
+  db::DVector snap_move (const db::DVector &p) const;
   void move_impl (const db::DPoint &p);
 
-  void enter_edge (const EdgeWithIndex &e, size_t &nmarker, partial_objects::const_iterator sel, const std::map <PointWithIndex, db::Point> &new_points, const std::map <EdgeWithIndex, db::Edge> &new_edges, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient);
-  void enter_vertices (size_t &nmarker, partial_objects::const_iterator sel, const std::map <PointWithIndex, db::Point> &new_points, const std::map <EdgeWithIndex, db::Edge> &new_edges, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient);
-  void enter_polygon (db::Polygon &p, size_t &nmarker, partial_objects::const_iterator sel, const std::map <PointWithIndex, db::Point> &new_points, const std::map <EdgeWithIndex, db::Edge> &new_edges, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient);
-  void enter_path (db::Path &p, size_t &nmarker, partial_objects::const_iterator sel, const std::map <PointWithIndex, db::Point> &new_points, const std::map <EdgeWithIndex, db::Edge> &new_edges, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient);
+  void enter_edge (const EdgeWithIndex &e, size_t &nmarker, partial_objects::const_iterator sel, const std::map<PointWithIndex, db::Point> &new_points, const std::map<EdgeWithIndex, db::Edge> &new_edges, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient);
+  void enter_vertices (size_t &nmarker, partial_objects::const_iterator sel, const std::map<PointWithIndex, db::Point> &new_points, const std::map<EdgeWithIndex, db::Edge> &new_edges, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient);
+  void enter_polygon (db::Polygon &p, size_t &nmarker, partial_objects::const_iterator sel, const std::map<PointWithIndex, db::Point> &new_points, const std::map<EdgeWithIndex, db::Edge> &new_edges, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient);
+  void enter_path (db::Path &p, size_t &nmarker, partial_objects::const_iterator sel, const std::map<PointWithIndex, db::Point> &new_points, const std::map<EdgeWithIndex, db::Edge> &new_edges, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient);
   lay::Marker *new_marker (size_t &nmarker, unsigned int cv_index, bool transient);
   lay::InstanceMarker *new_inst_marker (size_t &nmarker, unsigned int cv_index, bool transient);
   void resize_markers (size_t n, bool transient);
@@ -410,7 +415,7 @@ private:
   db::DEdge single_selected_edge () const;
   bool handle_guiding_shape_changes ();
   void transform_selection (const db::DTrans &move_trans);
-  db::Shape modify_shape (lay::TransformationVariants &tv, const db::Shape &shape_in, const lay::ObjectInstPath &path, const std::set<EdgeWithIndex> &sel, const db::DTrans &move_trans, std::map <EdgeWithIndex, db::Edge> &new_edges, std::map <PointWithIndex, db::Point> &new_points);
+  db::Shape modify_shape (lay::TransformationVariants &tv, const db::Shape &shape_in, const lay::ObjectInstPath &path, const std::set<EdgeWithIndex> &sel, const db::DTrans &move_trans, std::map<EdgeWithIndex, db::Edge> &new_edges, std::map<PointWithIndex, db::Point> &new_points);
 
   void open_editor_hooks ();
   void close_editor_hooks (bool commit);
@@ -419,4 +424,3 @@ private:
 }
 
 #endif
-

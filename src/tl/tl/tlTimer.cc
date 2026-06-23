@@ -26,17 +26,17 @@
 #include "tlString.h"
 
 #if defined(_MSC_VER) || defined(_WIN32)
-#  include <Windows.h>
-#  include <Psapi.h>
+#include <Windows.h>
+#include <Psapi.h>
 #elif defined(__MACH__) && defined(__APPLE__)
-#  include <mach/clock.h>
-#  include <mach/mach.h>
-#  include <sys/times.h>
-#  include <unistd.h>
-#  include <libproc.h>
+#include <mach/clock.h>
+#include <mach/mach.h>
+#include <sys/times.h>
+#include <unistd.h>
+#include <libproc.h>
 #else
-#  include <sys/times.h>
-#  include <unistd.h>
+#include <sys/times.h>
+#include <unistd.h>
 #endif
 
 #include <stdio.h>
@@ -59,9 +59,9 @@ void current_utc_time (struct timespec *ts)
 
   clock_serv_t cclock;
   mach_timespec_t mts;
-  host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
-  clock_get_time(cclock, &mts);
-  mach_port_deallocate(mach_task_self(), cclock);
+  host_get_clock_service (mach_host_self (), CALENDAR_CLOCK, &cclock);
+  clock_get_time (cclock, &mts);
+  mach_port_deallocate (mach_task_self (), cclock);
   ts->tv_sec = mts.tv_sec;
   ts->tv_nsec = mts.tv_nsec;
 
@@ -78,7 +78,7 @@ void current_utc_time (struct timespec *ts)
   ts->tv_sec = (t / 10000000);
 
 #else
-  clock_gettime(CLOCK_REALTIME, ts);
+  clock_gettime (CLOCK_REALTIME, ts);
 #endif
 }
 
@@ -91,15 +91,15 @@ static int64_t ns_time ()
 
   clock_serv_t cclock;
   mach_timespec_t mts;
-  host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
-  clock_get_time(cclock, &mts);
-  mach_port_deallocate(mach_task_self(), cclock);
+  host_get_clock_service (mach_host_self (), CALENDAR_CLOCK, &cclock);
+  clock_get_time (cclock, &mts);
+  mach_port_deallocate (mach_task_self (), cclock);
 
   return int64_t (mts.tv_sec) * 1000000000 + int64_t (mts.tv_nsec);
 
 #elif defined(_MSC_VER)
 
-  static LARGE_INTEGER freq = { 0 };
+  static LARGE_INTEGER freq = {0};
 
   if (freq.QuadPart == 0) {
     QueryPerformanceFrequency (&freq);
@@ -124,14 +124,13 @@ static int64_t ns_time ()
 //  Implementation of Timer
 
 Timer::Timer ()
-    : m_user_ms (0), m_sys_ms (0), m_wall_ns (0),
-      m_user_ms_res (0), m_sys_ms_res (0), m_wall_ns_res (0)
+  : m_user_ms (0), m_sys_ms (0), m_wall_ns (0),
+    m_user_ms_res (0), m_sys_ms_res (0), m_wall_ns_res (0)
 {
   // ..
 }
 
-void
-Timer::start ()
+void Timer::start ()
 {
 #ifdef _WIN32
   timer_t clks_ms = (timer_t) ((double) clock () * (1000.0 / CLOCKS_PER_SEC) + 0.5);
@@ -149,8 +148,7 @@ Timer::start ()
   m_wall_ns += ns_time ();
 }
 
-void
-Timer::stop ()
+void Timer::stop ()
 {
   m_user_ms = -m_user_ms;
   m_sys_ms = -m_sys_ms;
@@ -165,8 +163,7 @@ Timer::stop ()
   m_wall_ns = 0;
 }
 
-void
-Timer::take ()
+void Timer::take ()
 {
   timer_t user_ms = m_user_ms;
   timer_t sys_ms = m_sys_ms;
@@ -202,24 +199,23 @@ Timer::memory_size ()
     }
 
     CloseHandle (h_process);
-
   }
 
   return mem;
 
 #elif defined(__APPLE__)
 
-  pid_t pid = getpid();
+  pid_t pid = getpid ();
   struct proc_taskinfo taskinfo;
-  if (proc_pidinfo(pid, PROC_PIDTASKINFO, 0, &taskinfo, sizeof(taskinfo)) <= 0) {
-    perror("proc_pidinfo failed");
+  if (proc_pidinfo (pid, PROC_PIDTASKINFO, 0, &taskinfo, sizeof (taskinfo)) <= 0) {
+    perror ("proc_pidinfo failed");
     return 0;
   }
-  
+
   return taskinfo.pti_resident_size;
-  
+
 #elif defined(__linux__)
-    
+
   unsigned long memsize = 0;
   FILE *procfile = fopen ("/proc/self/stat", "r");
   if (procfile != NULL) {
@@ -263,8 +259,9 @@ Timer::memory_size ()
                               "%*d " // exit_signal
                               "%*d " // processor
                               "%*u " // rt_priority
-                              "%*u" // policy
-                              , &memsize);
+                              "%*u"  // policy
+                    ,
+                    &memsize);
     fclose (procfile);
     if (n == 0) {
       memsize = 0;
@@ -274,18 +271,16 @@ Timer::memory_size ()
   return size_t (memsize) * size_t (getpagesize ());
 
 #else
-#  error Unsupported platform
+#error Unsupported platform
 #endif
 }
 
-void
-SelfTimer::start_report () const
+void SelfTimer::start_report () const
 {
   tl::info << m_desc << ": " << tl::to_string (tr ("started"));
 }
 
-void
-SelfTimer::report () const
+void SelfTimer::report () const
 {
   size_t memsize = memory_size ();
 
@@ -308,14 +303,13 @@ Clock::Clock (double s)
   m_clock_ns = s * 1e9;
 }
 
-double 
+double
 Clock::seconds () const
 {
   return double (m_clock_ns) * 1e-9;
 }
 
-Clock
-Clock::current ()
+Clock Clock::current ()
 {
   Clock c;
   c.m_clock_ns += ns_time ();
@@ -323,4 +317,3 @@ Clock::current ()
 }
 
 }
-

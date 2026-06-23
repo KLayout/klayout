@@ -51,7 +51,7 @@ class SearchReplaceConfigPage
   : public lay::ConfigPage,
     private Ui::SearchReplaceConfigPage
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   SearchReplaceConfigPage (QWidget *parent);
@@ -66,4 +66,3 @@ public slots:
 }
 
 #endif
-

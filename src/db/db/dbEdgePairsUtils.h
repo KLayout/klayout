@@ -31,12 +31,15 @@
 
 #include <unordered_set>
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief The operation mode for the interaction filters
  */
-enum EdgePairInteractionMode { EdgePairsInteract, EdgePairsInside, EdgePairsOutside };
+enum EdgePairInteractionMode { EdgePairsInteract,
+                               EdgePairsInside,
+                               EdgePairsOutside };
 
 /**
  *  @brief A predicate defining edge pair a interacts with polygon b
@@ -71,8 +74,8 @@ public:
     : mp_output (output), m_mode (mode), m_min_count (min_count), m_max_count (max_count)
   {
     //  NOTE: "counting" does not really make much sense in Outside mode ...
-    m_counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
-    tl_assert (!m_counting || mode != EdgePairsOutside);
+    m_counting = ! (min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+    tl_assert (! m_counting || mode != EdgePairsOutside);
   }
 
   void finish (const OutputType *o)
@@ -95,7 +98,6 @@ public:
       if (m_mode == EdgePairsOutside && m_seen.find (o) == m_seen.end ()) {
         mp_output->insert (*o);
       }
-
     }
   }
 
@@ -129,8 +131,7 @@ public:
           (m_mode == EdgePairsOutside && ! db::edge_pair_is_outside (*e, *p))) {
 
         //  we report the result on "finish" here.
-        m_counts[ep] += 1;
-
+        m_counts [ep] += 1;
       }
 
     } else if (m_seen.find (ep) == m_seen.end ()) {
@@ -145,9 +146,7 @@ public:
 
         //  In this case we need to collect edges which are outside always - we report those on "finished".
         m_seen.insert (ep);
-
       }
-
     }
   }
 
@@ -182,7 +181,7 @@ public:
   edge_pair_to_edge_interaction_filter (OutputContainer *output, size_t min_count, size_t max_count)
     : mp_output (output), m_min_count (min_count), m_max_count (max_count)
   {
-    m_counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+    m_counting = ! (min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
   }
 
   void finish (const OutputType *o)
@@ -199,7 +198,6 @@ public:
       if (match) {
         mp_output->insert (*o);
       }
-
     }
   }
 
@@ -231,8 +229,7 @@ public:
       if (db::edge_pair_interacts (*e, *p)) {
 
         //  we report the result on "finish" here.
-        m_counts[ep] += 1;
-
+        m_counts [ep] += 1;
       }
 
     } else if (m_seen.find (ep) == m_seen.end ()) {
@@ -241,9 +238,7 @@ public:
 
         m_seen.insert (ep);
         mp_output->insert (*ep);
-
       }
-
     }
   }
 

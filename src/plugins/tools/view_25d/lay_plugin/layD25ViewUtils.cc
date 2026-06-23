@@ -83,8 +83,8 @@ static std::pair<bool, QVector3D> plane_or_face (const QVector3D &line, const QV
 std::pair<bool, QVector3D>
 hit_point_with_cuboid (const QVector3D &line, const QVector3D &line_dir, const QVector3D &corner, const QVector3D &dim)
 {
-  std::vector<std::pair<bool, QVector3D> > cutpoints;
-  cutpoints.reserve (6);  //  6 faces
+  std::vector<std::pair<bool, QVector3D>> cutpoints;
+  cutpoints.reserve (6); //  6 faces
 
   for (int pass = 0; pass < 2; ++pass) {
 
@@ -118,7 +118,7 @@ hit_point_with_cuboid (const QVector3D &line, const QVector3D &line_dir, const Q
     double min_dist = 0.0;
     int min_dist_index = -1;
 
-    for (std::vector<std::pair<bool, QVector3D> >::const_iterator i = cutpoints.begin (); i != cutpoints.end (); ++i) {
+    for (std::vector<std::pair<bool, QVector3D>>::const_iterator i = cutpoints.begin (); i != cutpoints.end (); ++i) {
       if (i->first) {
         double dist = QVector3D::dotProduct (i->second - line, line_dir);
         if (min_dist_index < 0 || dist < min_dist) {
@@ -131,7 +131,6 @@ hit_point_with_cuboid (const QVector3D &line, const QVector3D &line_dir, const Q
     if (min_dist_index >= 0) {
       return cutpoints [min_dist_index];
     }
-
   }
 
   return std::make_pair (false, QVector3D ());
@@ -146,12 +145,11 @@ camera_normal (const QMatrix4x4 &camera_trans, double x, double y)
 
   QMatrix4x4 m (camera_trans);
 
-  float values[] = {
-    float (x * pv.x ()),  float (x * pv.y ()),  float (x * pv.z ()),  0.0f,
-    float (y * pv.x ()),  float (y * pv.y ()),  float (y * pv.z ()),  0.0f,
-    float (pv.x ()),      float (pv.y ()),      float (pv.z ()),      0.0f,
-    0.0f,                 0.0f,                 0.0f,                 0.0f
-  };
+  float values [] = {
+    float (x * pv.x ()), float (x * pv.y ()), float (x * pv.z ()), 0.0f,
+    float (y * pv.x ()), float (y * pv.y ()), float (y * pv.z ()), 0.0f,
+    float (pv.x ()), float (pv.y ()), float (pv.z ()), 0.0f,
+    0.0f, 0.0f, 0.0f, 0.0f};
   m -= QMatrix4x4 (values);
 
   QMatrix3x3 nm = m.normalMatrix ();
@@ -160,8 +158,7 @@ camera_normal (const QMatrix4x4 &camera_trans, double x, double y)
   return (std::make_pair (p, u.normalized ()));
 }
 
-void
-normalize_scene_trans (const QMatrix4x4 &cam_trans, QVector3D &displacement, double &scale, double ztarget)
+void normalize_scene_trans (const QMatrix4x4 &cam_trans, QVector3D &displacement, double &scale, double ztarget)
 {
   //  Here is the theory:
   //  Let:

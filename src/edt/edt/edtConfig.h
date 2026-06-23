@@ -33,7 +33,7 @@
 namespace edt
 {
 
-/** 
+/**
  *  @brief Declaration of the configuration names
  */
 extern EDT_PUBLIC std::string cfg_edit_grid;
@@ -75,18 +75,24 @@ extern EDT_PUBLIC std::string cfg_edit_combine_mode;
 // ------------------------------------------------------------
 //  Helper functions to get and set the configuration
 
-enum combine_mode_type { CM_Add = 0, CM_Merge, CM_Erase, CM_Mask, CM_Diff };
+enum combine_mode_type { CM_Add = 0,
+                         CM_Merge,
+                         CM_Erase,
+                         CM_Mask,
+                         CM_Diff };
 
-struct EDT_PUBLIC CMConverter
-{
+struct EDT_PUBLIC CMConverter {
   std::string to_string (const edt::combine_mode_type &m);
   void from_string (const std::string &s, edt::combine_mode_type &m);
 };
 
-enum path_ext_type { Flush = 0, Square, Variable, Round, NumPEModes };
+enum path_ext_type { Flush = 0,
+                     Square,
+                     Variable,
+                     Round,
+                     NumPEModes };
 
-struct EDT_PUBLIC PathExtConverter
-{
+struct EDT_PUBLIC PathExtConverter {
   std::string to_string (const edt::path_ext_type &m);
   void from_string (const std::string &s, edt::path_ext_type &m);
 };
@@ -94,5 +100,3 @@ struct EDT_PUBLIC PathExtConverter
 }
 
 #endif
-
-

@@ -37,8 +37,7 @@ ClipboardData::~ClipboardData ()
   // .. nothing yet ..
 }
 
-void 
-ClipboardData::add (const db::Layout &layout, unsigned int layer, const db::Shape &shape)
+void ClipboardData::add (const db::Layout &layout, unsigned int layer, const db::Shape &shape)
 {
   //  create the layer in our temporary layout if we need to
   //  HINT: this requires all add operations are done from the same layout object
@@ -49,8 +48,7 @@ ClipboardData::add (const db::Layout &layout, unsigned int layer, const db::Shap
   m_layout.cell (m_container_cell_index).shapes (layer).insert (shape);
 }
 
-void 
-ClipboardData::add (const db::Layout &layout, unsigned int layer, const db::Shape &shape, const db::ICplxTrans &trans)
+void ClipboardData::add (const db::Layout &layout, unsigned int layer, const db::Shape &shape, const db::ICplxTrans &trans)
 {
   //  create the layer in our temporary layout if we need to
   //  HINT: this requires all add operations are done from the same layout object
@@ -62,13 +60,12 @@ ClipboardData::add (const db::Layout &layout, unsigned int layer, const db::Shap
   m_layout.cell (m_container_cell_index).shapes (layer).transform (new_shape, trans);
 }
 
-void 
-ClipboardData::add (const db::Layout &layout, const db::Instance &inst, unsigned int mode)
+void ClipboardData::add (const db::Layout &layout, const db::Instance &inst, unsigned int mode)
 {
   db::cell_index_type target_cell_index;
   db::cell_index_type source_cell_index = inst.cell_index ();
 
-  //  in mode 1 (deep), first add the target cell 
+  //  in mode 1 (deep), first add the target cell
   if (mode == 1 && ! layout.cell (source_cell_index).is_proxy ()) {
     const db::Cell &target_cell = layout.cell (source_cell_index);
     target_cell_index = add (layout, target_cell, 1);
@@ -81,14 +78,13 @@ ClipboardData::add (const db::Layout &layout, const db::Instance &inst, unsigned
   m_layout.cell (m_container_cell_index).insert (inst, im);
 }
 
-void 
-ClipboardData::add (const db::Layout &layout, const db::Instance &inst, unsigned int mode, const db::ICplxTrans &trans)
+void ClipboardData::add (const db::Layout &layout, const db::Instance &inst, unsigned int mode, const db::ICplxTrans &trans)
 {
   db::cell_index_type target_cell_index;
   db::cell_index_type source_cell_index = inst.cell_index ();
 
-  //  in mode 1 (deep) first add the target cell 
-  //  (don't use deep mode for proxy cells because we use the context information to restore 
+  //  in mode 1 (deep) first add the target cell
+  //  (don't use deep mode for proxy cells because we use the context information to restore
   //  a proxy cell)
   if (mode == 1 && ! layout.cell (source_cell_index).is_proxy ()) {
     const db::Cell &target_cell = layout.cell (source_cell_index);
@@ -103,11 +99,11 @@ ClipboardData::add (const db::Layout &layout, const db::Instance &inst, unsigned
   m_layout.cell (m_container_cell_index).transform (new_inst, trans);
 }
 
-db::cell_index_type 
+db::cell_index_type
 ClipboardData::add (const db::Layout &layout, const db::Cell &cell, unsigned int mode)
 {
   //  if the cell already exists and is stored in the right mode, do nothing
-  std::map <db::cell_index_type, db::cell_index_type>::const_iterator cm = m_cell_index_map.find (cell.cell_index ());
+  std::map<db::cell_index_type, db::cell_index_type>::const_iterator cm = m_cell_index_map.find (cell.cell_index ());
   if (cm != m_cell_index_map.end () && ! (m_incomplete_cells.find (cm->second) != m_incomplete_cells.end () && mode >= 1)) {
     return cm->second;
   }
@@ -116,7 +112,7 @@ ClipboardData::add (const db::Layout &layout, const db::Cell &cell, unsigned int
   if (mode >= 1) {
     m_incomplete_cells.erase (target_cell_index);
     m_context_info.erase (target_cell_index);
-  } 
+  }
 
   //  copy the shapes
   for (unsigned int l = 0; l < layout.layers (); ++l) {
@@ -131,9 +127,7 @@ ClipboardData::add (const db::Layout &layout, const db::Cell &cell, unsigned int
       for (db::Shapes::shape_iterator sh = cell.shapes (l).begin (db::Shapes::shape_iterator::All); ! sh.at_end (); ++sh) {
         shapes.insert (*sh);
       }
-
     }
-
   }
 
   //  copy the instances
@@ -156,9 +150,9 @@ ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::C
     callers.insert (cell->cell_index ());
   }
 
-  std::vector <unsigned int> new_layers;
+  std::vector<unsigned int> new_layers;
 
-  std::map <db::LayerProperties, unsigned int, db::LPLogicalLessFunc> layer_map;
+  std::map<db::LayerProperties, unsigned int, db::LPLogicalLessFunc> layer_map;
   for (unsigned int l = 0; l < layout.layers (); ++l) {
     if (layout.is_valid_layer (l)) {
       layer_map.insert (std::make_pair (layout.get_properties (l), l));
@@ -167,20 +161,20 @@ ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::C
 
   //  create the necessary target cells
 
-  std::map <db::cell_index_type, db::cell_index_type> cell_map;
+  std::map<db::cell_index_type, db::cell_index_type> cell_map;
   if (cell) {
     cell_map.insert (std::make_pair (m_container_cell_index, cell->cell_index ()));
   }
-  
+
   for (db::Layout::const_iterator c = m_layout.begin (); c != m_layout.end (); ++c) {
 
     if (c->cell_index () != m_container_cell_index) {
 
-      std::map <db::cell_index_type, std::vector<std::string> >::const_iterator ctx = m_context_info.find (c->cell_index ());
+      std::map<db::cell_index_type, std::vector<std::string>>::const_iterator ctx = m_context_info.find (c->cell_index ());
       if (ctx != m_context_info.end ()) {
 
         //  remember current layers
-        std::set <unsigned int> layers;
+        std::set<unsigned int> layers;
         for (db::LayerIterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
           layers.insert ((*l).first);
         }
@@ -188,7 +182,7 @@ ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::C
         //  restore cell from context info
         db::Cell *pc = layout.recover_proxy (ctx->second.begin (), ctx->second.end ());
 
-        //  detect new layers 
+        //  detect new layers
         for (db::LayerIterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
           if (layers.find ((*l).first) == layers.end ()) {
             new_layers.push_back ((*l).first);
@@ -206,7 +200,7 @@ ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::C
 
       } else {
 
-        std::pair <bool, db::cell_index_type> ci = layout.cell_by_name (m_layout.cell_name (c->cell_index ()));
+        std::pair<bool, db::cell_index_type> ci = layout.cell_by_name (m_layout.cell_name (c->cell_index ()));
         if (m_incomplete_cells.find (c->cell_index ()) != m_incomplete_cells.end ()) {
           if (ci.first) {
             cell_map.insert (std::make_pair (c->cell_index (), ci.second));
@@ -220,7 +214,6 @@ ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::C
           db::cell_index_type ci = layout.add_cell (m_layout, c->cell_index ());
           cell_map.insert (std::make_pair (c->cell_index (), ci));
         }
-
       }
     }
   }
@@ -232,7 +225,7 @@ ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::C
 
       //  look up the target layer
       unsigned int tl = 0;
-      std::map <db::LayerProperties, unsigned int, db::LPLogicalLessFunc>::const_iterator lm = layer_map.find (m_layout.get_properties (l));
+      std::map<db::LayerProperties, unsigned int, db::LPLogicalLessFunc>::const_iterator lm = layer_map.find (m_layout.get_properties (l));
       if (lm != layer_map.end ()) {
         tl = lm->second;
       } else {
@@ -243,7 +236,7 @@ ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::C
       //  actually copy the shapes
       for (db::Layout::const_iterator c = m_layout.begin (); c != m_layout.end (); ++c) {
 
-        std::map <db::cell_index_type, db::cell_index_type>::const_iterator cp = cell_map.find (c->cell_index ());
+        std::map<db::cell_index_type, db::cell_index_type>::const_iterator cp = cell_map.find (c->cell_index ());
         if (cp != cell_map.end ()) {
 
           db::Shapes &t = layout.cell (cp->second).shapes (tl);
@@ -257,13 +250,9 @@ ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::C
             if (insert_receiver) {
               insert_receiver->shape_inserted (cp->second, tl, new_shape);
             }
-
           }
-
         }
-
       }
-
     }
   }
 
@@ -271,7 +260,7 @@ ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::C
 
   for (db::Layout::const_iterator c = m_layout.begin (); c != m_layout.end (); ++c) {
 
-    std::map <db::cell_index_type, db::cell_index_type>::const_iterator cp = cell_map.find (c->cell_index ());
+    std::map<db::cell_index_type, db::cell_index_type>::const_iterator cp = cell_map.find (c->cell_index ());
     if (cp != cell_map.end ()) {
 
       db::Cell &t = layout.cell (cp->second);
@@ -294,11 +283,8 @@ ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::C
         } else {
           tl::warn << tl::sprintf (tl::to_string (tr ("Refusing to paste an instance for cell %s, as this would create a recursive hierarchy")), layout.cell_name (inst_cell));
         }
-
       }
-
     }
-
   }
 
   //  if requested, determine the new top cells and fill the result vector
@@ -313,10 +299,10 @@ ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::C
   return new_layers;
 }
 
-db::cell_index_type 
+db::cell_index_type
 ClipboardData::cell_for_cell (const db::Layout &layout, db::cell_index_type cell_index, bool incomplete)
 {
-  std::map <db::cell_index_type, db::cell_index_type>::const_iterator cm = m_cell_index_map.find (cell_index);
+  std::map<db::cell_index_type, db::cell_index_type>::const_iterator cm = m_cell_index_map.find (cell_index);
   if (cm != m_cell_index_map.end ()) {
     return cm->second;
   }
@@ -338,4 +324,3 @@ ClipboardData::cell_for_cell (const db::Layout &layout, db::cell_index_type cell
 }
 
 }
-

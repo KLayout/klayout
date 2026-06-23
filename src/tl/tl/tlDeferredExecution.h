@@ -41,13 +41,13 @@ class TL_PUBLIC DeferredMethodBase
   : public tl::Object
 {
 public:
-  DeferredMethodBase (bool compressed) 
+  DeferredMethodBase (bool compressed)
     : m_compressed (compressed), m_scheduled (false)
   {
     //  .. nothing yet ..
   }
 
-  virtual ~DeferredMethodBase () { }
+  virtual ~DeferredMethodBase () {}
   virtual void execute () = 0;
 
 private:
@@ -178,8 +178,8 @@ public:
  *  The method is not called immediately but as soon as the applications becomes
  *  idle - i.e. GUI events are being processed.
  *  This allows scheduling GUI update requests or similar.
- *  The compress parameter controls whether multiple calls to the same method are 
- *  compressed and combined into a single call. This is an efficient way to 
+ *  The compress parameter controls whether multiple calls to the same method are
+ *  compressed and combined into a single call. This is an efficient way to
  *  schedule a single GUI update request from frequently called and time critical
  *  code for example.
  *
@@ -189,7 +189,7 @@ public:
  *  public:
  *    T : m_def(this, &T::m) { }
  *    void f() {
- *      m_def(); // deferred call to m() 
+ *      m_def(); // deferred call to m()
  *    }
  *    void m() { .. }
  *  private:
@@ -208,7 +208,7 @@ public:
   /**
    *  @brief Construct a deferred method call from a non-const method
    */
-  DeferredMethod (T *t, void (T::*method)(), bool compressed = true)
+  DeferredMethod (T *t, void (T::*method) (), bool compressed = true)
     : DeferredMethodBase (compressed), mp_t (t), m_method (method)
   {
     //  .. nothing yet ..
@@ -260,8 +260,6 @@ private:
   T *mp_t;
   void (T::*m_method) ();
 };
-
 }
 
 #endif
-

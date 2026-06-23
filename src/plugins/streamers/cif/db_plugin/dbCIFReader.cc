@@ -83,14 +83,12 @@ CIFReader::read (db::Layout &layout)
   return read (layout, db::LoadLayoutOptions ());
 }
 
-void 
-CIFReader::error (const std::string &msg)
+void CIFReader::error (const std::string &msg)
 {
   throw CIFReaderException (msg, m_stream.line_number (), m_cellname, m_stream.source ());
 }
 
-void 
-CIFReader::warn (const std::string &msg, int wl)
+void CIFReader::warn (const std::string &msg, int wl)
 {
   if (warn_level () < wl) {
     return;
@@ -115,8 +113,7 @@ CIFReader::warn (const std::string &msg, int wl)
  *  @brief Skip blanks in the sense of CIF
  *  A blank in CIF is "any ASCII character except digit, upperChar, '-', '(', ')', or ';'"
  */
-void 
-CIFReader::skip_blanks()
+void CIFReader::skip_blanks ()
 {
   while (! m_stream.at_end ()) {
     char c = m_stream.peek_char ();
@@ -130,8 +127,7 @@ CIFReader::skip_blanks()
 /**
  *  @brief Skips separators
  */
-void 
-CIFReader::skip_sep ()
+void CIFReader::skip_sep ()
 {
   while (! m_stream.at_end ()) {
     char c = m_stream.peek_char ();
@@ -147,8 +143,7 @@ CIFReader::skip_sep ()
  *  This assumes that the reader is after the first '(' and it will stop
  *  after the final ')'.
  */
-void 
-CIFReader::skip_comment ()
+void CIFReader::skip_comment ()
 {
   char c;
   int bl = 0;
@@ -165,8 +160,7 @@ CIFReader::skip_comment ()
 /**
  *  @brief Gets a character and issues an error if the stream is at the end
  */
-char 
-CIFReader::get_char ()
+char CIFReader::get_char ()
 {
   if (m_stream.at_end ()) {
     error ("Unexpected end of file");
@@ -180,8 +174,7 @@ CIFReader::get_char ()
 /**
  *  @brief Tests whether the next character is a semicolon (after blanks)
  */
-bool 
-CIFReader::test_semi ()
+bool CIFReader::test_semi ()
 {
   skip_blanks ();
   if (! m_stream.at_end () && m_stream.peek_char () == ';') {
@@ -194,8 +187,7 @@ CIFReader::test_semi ()
 /**
  *  @brief Tests whether a semicolon follows and issue an error if not
  */
-void
-CIFReader::expect_semi ()
+void CIFReader::expect_semi ()
 {
   if (! test_semi ()) {
     error ("Expected ';' command terminator");
@@ -207,8 +199,7 @@ CIFReader::expect_semi ()
 /**
  *  @brief Skips all until the next semicolon
  */
-void
-CIFReader::skip_to_end ()
+void CIFReader::skip_to_end ()
 {
   while (! m_stream.at_end () && m_stream.get_char () != ';') {
     ;
@@ -218,8 +209,7 @@ CIFReader::skip_to_end ()
 /**
  *  @brief Fetches an integer
  */
-int 
-CIFReader::read_integer_digits ()
+int CIFReader::read_integer_digits ()
 {
   if (m_stream.at_end () || ! isdigit (m_stream.peek_char ())) {
     error ("Digit expected");
@@ -236,12 +226,10 @@ CIFReader::read_integer_digits ()
       }
 
       return 0;
-
     }
 
     char c = m_stream.get_char ();
     i = i * 10 + int (c - '0');
-
   }
 
   return i;
@@ -250,8 +238,7 @@ CIFReader::read_integer_digits ()
 /**
  *  @brief Fetches an integer
  */
-int 
-CIFReader::read_integer ()
+int CIFReader::read_integer ()
 {
   skip_sep ();
   return read_integer_digits ();
@@ -260,8 +247,7 @@ CIFReader::read_integer ()
 /**
  *  @brief Fetches a signed integer
  */
-int 
-CIFReader::read_sinteger ()
+int CIFReader::read_sinteger ()
 {
   skip_sep ();
 
@@ -329,10 +315,9 @@ CIFReader::read_string ()
 
   } else {
 
-    while (! m_stream.at_end () && !isspace (m_stream.peek_char ()) && m_stream.peek_char () != ';') {
+    while (! m_stream.at_end () && ! isspace (m_stream.peek_char ()) && m_stream.peek_char () != ';') {
       m_cmd_buffer += m_stream.get_char ();
     }
-
   }
 
   return m_cmd_buffer;
@@ -357,8 +342,7 @@ CIFReader::read_double ()
   return v;
 }
 
-bool
-CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
+bool CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
 {
   if (fabs (sf - floor (sf + 0.5)) > 1e-6) {
     warn ("Scaling factor is not an integer - snapping errors may occur in cell '" + m_cellname + "'");
@@ -370,7 +354,7 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
   size_t insts = 0;
   size_t shapes = 0;
   size_t layer_specs = 0;
-  std::vector <db::Point> poly_pts;
+  std::vector<db::Point> poly_pts;
 
   while (true) {
 
@@ -389,7 +373,7 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
 
       if (level > 0) {
         error ("'E' command must be outside a cell specification");
-      } 
+      }
 
       skip_blanks ();
       break;
@@ -419,14 +403,14 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
         std::string outer_cell = "C" + tl::to_string (n);
         std::swap (m_cellname, outer_cell);
 
-        std::map <unsigned int, db::cell_index_type>::const_iterator c = m_cells_by_id.find (n);
+        std::map<unsigned int, db::cell_index_type>::const_iterator c = m_cells_by_id.find (n);
         db::cell_index_type ci;
         if (c == m_cells_by_id.end ()) {
           ci = layout.add_cell (m_cellname.c_str ());
           m_cells_by_id.insert (std::make_pair (n, ci));
         } else {
           ci = c->second;
-        } 
+        }
 
         db::Cell &cell = layout.cell (ci);
 
@@ -440,7 +424,7 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
         // "D" blank* "F"
         if (level == 0) {
           error ("'DF' command must be inside a cell specification");
-        } 
+        }
 
         //  skip the rest of the command
         skip_to_end ();
@@ -460,7 +444,6 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
 
         error ("Invalid 'D' sub-command");
         skip_to_end ();
-
       }
 
     } else if (c == 'C') {
@@ -472,11 +455,11 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
       ++insts;
 
       unsigned int n = read_integer ();
-      std::map <unsigned int, db::cell_index_type>::const_iterator c = m_cells_by_id.find (n);
+      std::map<unsigned int, db::cell_index_type>::const_iterator c = m_cells_by_id.find (n);
       if (c == m_cells_by_id.end ()) {
         std::string cn = "C" + tl::to_string (n);
         c = m_cells_by_id.insert (std::make_pair (n, layout.add_cell (cn.c_str ()))).first;
-      } 
+      }
 
       db::DCplxTrans trans;
 
@@ -525,7 +508,6 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
             get_char ();
           }
         }
-
       }
 
       if (nx > 0 || ny > 0) {
@@ -614,11 +596,9 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
           db::Polygon p;
           p.assign_hull (points, points + 4);
           cell.shapes ((unsigned int) layer).insert (p);
-
         }
 
         expect_semi ();
-
       }
 
     } else if (c == 'P') {
@@ -642,7 +622,6 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
           int ry = read_sinteger ();
 
           poly_pts.push_back (db::Point (sf * rx, sf * ry));
-
         }
 
         db::Polygon p;
@@ -650,7 +629,6 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
         cell.shapes ((unsigned int) layer).insert (p);
 
         expect_semi ();
-
       }
 
     } else if (c == 'R') {
@@ -675,11 +653,10 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
 
         poly_pts.push_back (db::Point (sf * rx, sf * ry));
 
-        db::Path p (poly_pts.begin (), poly_pts.end (), db::coord_traits <db::Coord>::rounded (sf * w), db::coord_traits <db::Coord>::rounded (sf * w / 2), db::coord_traits <db::Coord>::rounded (sf * w / 2), true);
+        db::Path p (poly_pts.begin (), poly_pts.end (), db::coord_traits<db::Coord>::rounded (sf * w), db::coord_traits<db::Coord>::rounded (sf * w / 2), db::coord_traits<db::Coord>::rounded (sf * w / 2), true);
         cell.shapes ((unsigned int) layer).insert (p);
 
         expect_semi ();
-
       }
 
     } else if (c == 'W') {
@@ -706,25 +683,23 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
           int ry = read_sinteger ();
 
           poly_pts.push_back (db::Point (sf * rx, sf * ry));
-
         }
 
         if (path_mode == 0 || (path_mode < 0 && m_wire_mode == 1)) {
-          //  Flush-ended paths 
-          db::Path p (poly_pts.begin (), poly_pts.end (), db::coord_traits <db::Coord>::rounded (sf * w), 0, 0, false);
+          //  Flush-ended paths
+          db::Path p (poly_pts.begin (), poly_pts.end (), db::coord_traits<db::Coord>::rounded (sf * w), 0, 0, false);
           cell.shapes ((unsigned int) layer).insert (p);
         } else if (path_mode == 1 || (path_mode < 0 && m_wire_mode == 2)) {
           //  Round-ended paths
-          db::Path p (poly_pts.begin (), poly_pts.end (), db::coord_traits <db::Coord>::rounded (sf * w), db::coord_traits <db::Coord>::rounded (sf * w / 2), db::coord_traits <db::Coord>::rounded (sf * w / 2), true);
+          db::Path p (poly_pts.begin (), poly_pts.end (), db::coord_traits<db::Coord>::rounded (sf * w), db::coord_traits<db::Coord>::rounded (sf * w / 2), db::coord_traits<db::Coord>::rounded (sf * w / 2), true);
           cell.shapes ((unsigned int) layer).insert (p);
         } else {
           //  Square-ended paths
-          db::Path p (poly_pts.begin (), poly_pts.end (), db::coord_traits <db::Coord>::rounded (sf * w), db::coord_traits <db::Coord>::rounded (sf * w / 2), db::coord_traits <db::Coord>::rounded (sf * w / 2), false);
+          db::Path p (poly_pts.begin (), poly_pts.end (), db::coord_traits<db::Coord>::rounded (sf * w), db::coord_traits<db::Coord>::rounded (sf * w / 2), db::coord_traits<db::Coord>::rounded (sf * w / 2), false);
           cell.shapes ((unsigned int) layer).insert (p);
         }
 
         expect_semi ();
-
       }
 
     } else if (isdigit (c)) {
@@ -743,7 +718,7 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
 
         get_char ();
 
-        // label at location 
+        // label at location
         ++shapes;
 
         if (layer < 0) {
@@ -762,16 +737,15 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
             h = read_double ();
           }
 
-          db::Text t (text.c_str (), db::Trans (db::Vector (sf * rx, sf * ry)), db::coord_traits <db::Coord>::rounded (h / m_dbu));
+          db::Text t (text.c_str (), db::Trans (db::Vector (sf * rx, sf * ry)), db::coord_traits<db::Coord>::rounded (h / m_dbu));
           cell.shapes ((unsigned int) layer).insert (t);
-
         }
 
       } else if (c == '9' && cc == '5') {
 
         get_char ();
 
-        // label in box 
+        // label in box
         ++shapes;
 
         if (layer < 0) {
@@ -791,7 +765,6 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
 
           db::Text t (text.c_str (), db::Trans (db::Vector (sf * rx, sf * ry)));
           cell.shapes ((unsigned int) layer).insert (t);
-
         }
 
       } else if (c == '9' && cc == '8') {
@@ -808,19 +781,17 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
         layout.rename_cell (cell.cell_index (), m_cellname.c_str ());
 
       } else {
-        //  ignore the command 
+        //  ignore the command
       }
 
       skip_to_end ();
 
     } else {
 
-      //  ignore the command 
+      //  ignore the command
       warn ("Unknown command ignored");
       skip_to_end ();
-
     }
-    
   }
 
   //  The cell is considered non-empty if it contains more than one instance, at least one shape or
@@ -828,13 +799,12 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
   return insts > 1 || shapes > 0 || layer_specs > 0;
 }
 
-void 
-CIFReader::do_read (db::Layout &layout)
+void CIFReader::do_read (db::Layout &layout)
 {
   try {
 
     db::LayoutLocker locker (&layout);
-  
+
     double sf = 0.01 / m_dbu;
     check_dbu (m_dbu);
     layout.dbu (m_dbu);
@@ -866,4 +836,3 @@ CIFReader::do_read (db::Layout &layout)
 }
 
 }
-

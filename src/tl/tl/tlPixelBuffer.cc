@@ -25,7 +25,7 @@
 #include "tlLog.h"
 
 #if defined(HAVE_PNG)
-#  include <png.h>
+#include <png.h>
 #endif
 
 #include <memory>
@@ -172,8 +172,7 @@ PixelBuffer::~PixelBuffer ()
   //  .. nothing yet ..
 }
 
-bool
-PixelBuffer::operator== (const PixelBuffer &other) const
+bool PixelBuffer::operator== (const PixelBuffer &other) const
 {
   if (width () != other.width () || height () != other.height ()) {
     return false;
@@ -219,14 +218,12 @@ PixelBuffer::operator= (PixelBuffer &&other)
   return *this;
 }
 
-void
-PixelBuffer::set_transparent (bool f)
+void PixelBuffer::set_transparent (bool f)
 {
   m_transparent = f;
 }
 
-void
-PixelBuffer::swap (PixelBuffer &other)
+void PixelBuffer::swap (PixelBuffer &other)
 {
   if (this == &other) {
     return;
@@ -239,11 +236,10 @@ PixelBuffer::swap (PixelBuffer &other)
   m_texts.swap (other.m_texts);
 }
 
-void
-PixelBuffer::fill (tl::color_t c)
+void PixelBuffer::fill (tl::color_t c)
 {
   if (! transparent ()) {
-    c |= 0xff000000;  //  ensures that alpha is properly set
+    c |= 0xff000000; //  ensures that alpha is properly set
   }
 
   tl::color_t *d = data ();
@@ -311,8 +307,7 @@ PixelBuffer::from_image (const QImage &img)
 }
 #endif
 
-void
-PixelBuffer::patch (const PixelBuffer &other)
+void PixelBuffer::patch (const PixelBuffer &other)
 {
   tl_assert (width () == other.width ());
   tl_assert (height () == other.height ());
@@ -359,8 +354,7 @@ PixelBuffer::diff (const PixelBuffer &other) const
   return res;
 }
 
-void
-PixelBuffer::blowup (tl::PixelBuffer &dest, unsigned int os)
+void PixelBuffer::blowup (tl::PixelBuffer &dest, unsigned int os)
 {
   tl_assert (dest.width () == width () * os);
   tl_assert (dest.height () == height () * os);
@@ -382,47 +376,46 @@ PixelBuffer::blowup (tl::PixelBuffer &dest, unsigned int os)
   }
 }
 
-void
-PixelBuffer::subsample (tl::PixelBuffer &dest, unsigned int os, double g)
+void PixelBuffer::subsample (tl::PixelBuffer &dest, unsigned int os, double g)
 {
   //  TODO: this is probably not compatible with the endianess of SPARC ..
 
   //  LUT's for combining the RGB channels
 
   //  forward transformation table
-  unsigned short lut1[256];
+  unsigned short lut1 [256];
   for (unsigned int i = 0; i < 256; ++i) {
     double f = (65536 / (os * os)) - 1;
-    lut1[i] = (unsigned short)std::min (f, std::max (0.0, floor (0.5 + pow (i / 255.0, g) * f)));
+    lut1 [i] = (unsigned short) std::min (f, std::max (0.0, floor (0.5 + pow (i / 255.0, g) * f)));
   }
 
   //  backward transformation table
-  unsigned char lut2[65536];
+  unsigned char lut2 [65536];
   for (unsigned int i = 0; i < 65536; ++i) {
     double f = os * os * ((65536 / (os * os)) - 1);
-    lut2[i] = (unsigned char)std::min (255.0, std::max (0.0, floor (0.5 + pow (i / f, 1.0 / g) * 255.0)));
+    lut2 [i] = (unsigned char) std::min (255.0, std::max (0.0, floor (0.5 + pow (i / f, 1.0 / g) * 255.0)));
   }
 
   //  LUT's for alpha channel
 
   //  forward transformation table
-  unsigned short luta1[256];
+  unsigned short luta1 [256];
   for (unsigned int i = 0; i < 256; ++i) {
     double f = (65536 / (os * os)) - 1;
-    luta1[i] = (unsigned short)std::min (f, std::max (0.0, floor (0.5 + (i / 255.0) * f)));
+    luta1 [i] = (unsigned short) std::min (f, std::max (0.0, floor (0.5 + (i / 255.0) * f)));
   }
 
   //  backward transformation table
-  unsigned char luta2[65536];
+  unsigned char luta2 [65536];
   for (unsigned int i = 0; i < 65536; ++i) {
     double f = os * os * ((65536 / (os * os)) - 1);
-    luta2[i] = (unsigned char)std::min (255.0, std::max (0.0, floor (0.5 + (i / f) * 255.0)));
+    luta2 [i] = (unsigned char) std::min (255.0, std::max (0.0, floor (0.5 + (i / f) * 255.0)));
   }
 
   unsigned int ymax = dest.height ();
   unsigned int xmax = dest.width ();
 
-  unsigned short *buffer = new unsigned short[xmax * 4];
+  unsigned short *buffer = new unsigned short [xmax * 4];
 
   for (unsigned int y = 0; y < ymax; ++y) {
 
@@ -433,24 +426,22 @@ PixelBuffer::subsample (tl::PixelBuffer &dest, unsigned int os, double g)
 
       for (unsigned int x = 0; x < xmax; ++x) {
 
-        pdest[0] = lut1[psrc[0]];
-        pdest[1] = lut1[psrc[1]];
-        pdest[2] = lut1[psrc[2]];
-        pdest[3] = luta1[psrc[3]];
+        pdest [0] = lut1 [psrc [0]];
+        pdest [1] = lut1 [psrc [1]];
+        pdest [2] = lut1 [psrc [2]];
+        pdest [3] = luta1 [psrc [3]];
         psrc += 4;
 
         for (unsigned int j = os; j > 1; j--) {
-          pdest[0] += lut1[psrc[0]];
-          pdest[1] += lut1[psrc[1]];
-          pdest[2] += lut1[psrc[2]];
-          pdest[3] += luta1[psrc[3]];
+          pdest [0] += lut1 [psrc [0]];
+          pdest [1] += lut1 [psrc [1]];
+          pdest [2] += lut1 [psrc [2]];
+          pdest [3] += luta1 [psrc [3]];
           psrc += 4;
         }
 
         pdest += 4;
-
       }
-
     }
 
     for (unsigned int i = 1; i < os; ++i) {
@@ -461,17 +452,15 @@ PixelBuffer::subsample (tl::PixelBuffer &dest, unsigned int os, double g)
       for (unsigned int x = 0; x < xmax; ++x) {
 
         for (unsigned int j = os; j > 0; j--) {
-          pdest[0] += lut1[psrc[0]];
-          pdest[1] += lut1[psrc[1]];
-          pdest[2] += lut1[psrc[2]];
-          pdest[3] += luta1[psrc[3]];
+          pdest [0] += lut1 [psrc [0]];
+          pdest [1] += lut1 [psrc [1]];
+          pdest [2] += lut1 [psrc [2]];
+          pdest [3] += luta1 [psrc [3]];
           psrc += 4;
         }
 
         pdest += 4;
-
       }
-
     }
 
     {
@@ -480,17 +469,15 @@ PixelBuffer::subsample (tl::PixelBuffer &dest, unsigned int os, double g)
       const unsigned short *psrc = buffer;
 
       for (unsigned int x = 0; x < xmax; ++x) {
-        *pdest++ = lut2[*psrc++];
-        *pdest++ = lut2[*psrc++];
-        *pdest++ = lut2[*psrc++];
-        *pdest++ = luta2[*psrc++];
+        *pdest++ = lut2 [*psrc++];
+        *pdest++ = lut2 [*psrc++];
+        *pdest++ = lut2 [*psrc++];
+        *pdest++ = luta2 [*psrc++];
       }
-
     }
-
   }
 
-  delete[] buffer;
+  delete [] buffer;
 }
 
 
@@ -509,7 +496,7 @@ PixelBuffer::read_png (tl::InputStream &input)
   tl_assert (info_ptr != NULL);
 
   png_set_read_fn (png_ptr, (void *) &input, &read_from_stream_f);
-  png_set_bgr (png_ptr);    // compatible with tl::color_t
+  png_set_bgr (png_ptr); // compatible with tl::color_t
 
   png_read_png (png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
 
@@ -590,18 +577,16 @@ PixelBuffer::read_png (tl::InputStream &input)
 
   } else {
 
-    png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+    png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
     throw PixelBufferReadError (tl::sprintf (tl::to_string (tr ("PNG reader supports 8 bit G, GA, RGB or RGBA files only (file: %s, format is %d, bit depth is %d)")), input.filename (), fmt, bd));
-
   }
 
-  png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+  png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
 
   return res;
 }
 
-void
-PixelBuffer::write_png (tl::OutputStream &output) const
+void PixelBuffer::write_png (tl::OutputStream &output) const
 {
   png_structp png_ptr = NULL;
   png_infop info_ptr = NULL;
@@ -613,9 +598,9 @@ PixelBuffer::write_png (tl::OutputStream &output) const
   tl_assert (info_ptr != NULL);
 
   png_set_write_fn (png_ptr, (void *) &output, &write_to_stream_f, &flush_stream_f);
-  png_set_bgr (png_ptr);    // compatible with tl::color_t
+  png_set_bgr (png_ptr); // compatible with tl::color_t
 
-  unsigned int bd = 8;  // bit depth
+  unsigned int bd = 8; // bit depth
   unsigned int fmt = transparent () ? PNG_COLOR_TYPE_RGBA : PNG_COLOR_TYPE_RGB;
 
   png_set_IHDR (png_ptr, info_ptr, width (), height (), bd, fmt, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
@@ -627,7 +612,7 @@ PixelBuffer::write_png (tl::OutputStream &output) const
     tptrs.back ().key = const_cast<char *> (i->first.c_str ());
     tptrs.back ().text = const_cast<char *> (i->second.c_str ());
   }
-  png_set_text (png_ptr, info_ptr, tptrs.begin ().operator-> (), m_texts.size ());
+  png_set_text (png_ptr, info_ptr, tptrs.begin ().operator->(), m_texts.size ());
 
   png_write_info (png_ptr, info_ptr);
 
@@ -655,11 +640,10 @@ PixelBuffer::write_png (tl::OutputStream &output) const
       }
       png_write_row (png_ptr, png_const_bytep (buffer.get ()));
     }
-
   }
 
   png_write_end (png_ptr, info_ptr);
-  png_destroy_write_struct(&png_ptr, &info_ptr);
+  png_destroy_write_struct (&png_ptr, &info_ptr);
 }
 
 #endif
@@ -727,8 +711,7 @@ BitmapBuffer::~BitmapBuffer ()
   //  .. nothing yet ..
 }
 
-bool
-BitmapBuffer::operator== (const BitmapBuffer &other) const
+bool BitmapBuffer::operator== (const BitmapBuffer &other) const
 {
   if (width () != other.width () || height () != other.height ()) {
     return false;
@@ -777,8 +760,7 @@ BitmapBuffer::operator= (BitmapBuffer &&other)
   return *this;
 }
 
-void
-BitmapBuffer::swap (BitmapBuffer &other)
+void BitmapBuffer::swap (BitmapBuffer &other)
 {
   if (this == &other) {
     return;
@@ -791,8 +773,7 @@ BitmapBuffer::swap (BitmapBuffer &other)
   m_texts.swap (other.m_texts);
 }
 
-void
-BitmapBuffer::fill (bool value)
+void BitmapBuffer::fill (bool value)
 {
   uint8_t c = value ? 0xff : 0;
   uint8_t *d = data ();
@@ -901,18 +882,16 @@ BitmapBuffer::read_png (tl::InputStream &input)
 
   } else {
 
-    png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+    png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
     throw PixelBufferReadError (tl::sprintf (tl::to_string (tr ("PNG bitmap reader supports monochrome files only (file: %s, format is %d, bit depth is %d)")), input.filename (), fmt, bd));
-
   }
 
-  png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+  png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
 
   return res;
 }
 
-void
-BitmapBuffer::write_png (tl::OutputStream &output) const
+void BitmapBuffer::write_png (tl::OutputStream &output) const
 {
   png_structp png_ptr = NULL;
   png_infop info_ptr = NULL;
@@ -926,7 +905,7 @@ BitmapBuffer::write_png (tl::OutputStream &output) const
   png_set_write_fn (png_ptr, (void *) &output, &write_to_stream_f, &flush_stream_f);
   png_set_packswap (png_ptr); // compatible with BitmapBuffer
 
-  unsigned int bd = 1;  // bit depth
+  unsigned int bd = 1; // bit depth
   unsigned int fmt = PNG_COLOR_TYPE_GRAY;
 
   png_set_IHDR (png_ptr, info_ptr, width (), height (), bd, fmt, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
@@ -938,7 +917,7 @@ BitmapBuffer::write_png (tl::OutputStream &output) const
     tptrs.back ().key = const_cast<char *> (i->first.c_str ());
     tptrs.back ().text = const_cast<char *> (i->second.c_str ());
   }
-  png_set_text (png_ptr, info_ptr, tptrs.begin ().operator-> (), m_texts.size ());
+  png_set_text (png_ptr, info_ptr, tptrs.begin ().operator->(), m_texts.size ());
 
   png_write_info (png_ptr, info_ptr);
 
@@ -947,7 +926,7 @@ BitmapBuffer::write_png (tl::OutputStream &output) const
   }
 
   png_write_end (png_ptr, info_ptr);
-  png_destroy_write_struct(&png_ptr, &info_ptr);
+  png_destroy_write_struct (&png_ptr, &info_ptr);
 }
 
 #endif

@@ -103,15 +103,13 @@ EdgePairs::EdgePairs (DeepShapeStore &dss)
   mp_delegate = new DeepEdgePairs (DeepLayer (&dss, layout_index, dss.layout (layout_index).insert_layer ()));
 }
 
-void
-EdgePairs::convert_to_deep (const db::DeepLayer &layer)
+void EdgePairs::convert_to_deep (const db::DeepLayer &layer)
 {
   tl_assert (mp_delegate->deep () == 0);
   set_delegate (copy_data_id (new db::DeepEdgePairs (layer)));
 }
 
-void
-EdgePairs::write (const std::string &fn) const
+void EdgePairs::write (const std::string &fn) const
 {
   //  method provided for debugging purposes
 
@@ -259,31 +257,30 @@ MutableEdgePairs *EdgePairs::mutable_edge_pairs ()
 
 namespace tl
 {
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::EdgePairs &b)
-  {
-    db::EdgePair ep;
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::EdgePairs &b)
+{
+  db::EdgePair ep;
 
-    if (ex.at_end ()) {
-      return true;
-    }
-    if (! ex.try_read (ep)) {
-      return false;
-    }
-    b.insert (ep);
-
-    while (ex.test (";")) {
-      ex.read (ep);
-      b.insert (ep);
-    } 
-
+  if (ex.at_end ()) {
     return true;
   }
-
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::EdgePairs &b)
-  {
-    if (! test_extractor_impl (ex, b)) {
-      ex.error (tl::to_string (tr ("Expected an edge pair collection specification")));
-    }
+  if (! ex.try_read (ep)) {
+    return false;
   }
+  b.insert (ep);
+
+  while (ex.test (";")) {
+    ex.read (ep);
+    b.insert (ep);
+  }
+
+  return true;
 }
 
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::EdgePairs &b)
+{
+  if (! test_extractor_impl (ex, b)) {
+    ex.error (tl::to_string (tr ("Expected an edge pair collection specification")));
+  }
+}
+}

@@ -37,7 +37,8 @@
 #include <list>
 #include <unordered_set>
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief A base class for edge filters
@@ -50,9 +51,9 @@ public:
   /**
    *  @brief Constructor
    */
-  EdgeFilterBase () { }
+  EdgeFilterBase () {}
 
-  virtual ~EdgeFilterBase () { }
+  virtual ~EdgeFilterBase () {}
 
   /**
    *  @brief Filters the edge
@@ -96,12 +97,12 @@ public:
   /**
    *  @brief Constructor
    */
-  edge_processor () { }
+  edge_processor () {}
 
   /**
    *  @brief Destructor
    */
-  virtual ~edge_processor () { }
+  virtual ~edge_processor () {}
 
   /**
    *  @brief Performs the actual processing
@@ -152,7 +153,7 @@ class RegionDelegate;
 /**
  *  @brief The edge set iterator delegate
  */
-typedef db::generic_shape_iterator_delegate_base <db::Edge> EdgesIteratorDelegate;
+typedef db::generic_shape_iterator_delegate_base<db::Edge> EdgesIteratorDelegate;
 
 /**
  *  @brief The delegate for the actual edge set implementation
@@ -305,7 +306,7 @@ protected:
     return m_report_progress;
   }
 
-  virtual void merged_semantics_changed () { }
+  virtual void merged_semantics_changed () {}
 
 private:
   bool m_merged_semantics;
@@ -318,4 +319,3 @@ private:
 }
 
 #endif
-

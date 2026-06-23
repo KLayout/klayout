@@ -42,16 +42,16 @@
 
 namespace db
 {
-  class Region;
-  class Edges;
-  class EdgePairs;
-  class RecursiveShapeIterator;
-  struct LayerProperties;
+class Region;
+class Edges;
+class EdgePairs;
+class RecursiveShapeIterator;
+struct LayerProperties;
 }
 
 namespace tl
 {
-  class AbsoluteProgress;
+class AbsoluteProgress;
 }
 
 namespace lay
@@ -79,14 +79,13 @@ class D25ViewWidget
     private QOpenGLFunctions,
     public D25Camera
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
   typedef lay::mem_chunks<GLfloat, 1024 * 18> triangle_chunks_type;
   typedef lay::mem_chunks<GLfloat, 1024 * 6> line_chunks_type;
 
-  struct LayerInfo
-  {
+  struct LayerInfo {
     triangle_chunks_type *vertex_chunk;
     triangle_chunks_type *normals_chunk;
     line_chunks_type *line_chunk;
@@ -107,9 +106,9 @@ public:
   void mouseReleaseEvent (QMouseEvent *event);
   void mouseMoveEvent (QMouseEvent *event);
 
-  void attach_view(lay::LayoutViewBase *view);
+  void attach_view (lay::LayoutViewBase *view);
 
-  QVector3D hit_point_with_scene(const QVector3D &line_dir);
+  QVector3D hit_point_with_scene (const QVector3D &line_dir);
   void refresh ();
   void reset ();
 
@@ -217,4 +216,3 @@ private:
 }
 
 #endif
-

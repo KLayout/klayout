@@ -61,21 +61,21 @@ db::Coord div_exact (db::Coord a, db::coord_traits<db::Coord>::area_type b, db::
 namespace tl
 {
 
-template<> void extractor_impl (tl::Extractor &ex, db::Edge &e)
+template <> void extractor_impl (tl::Extractor &ex, db::Edge &e)
 {
   if (! test_extractor_impl (ex, e)) {
     ex.error (tl::to_string (tr ("Expected an edge specification")));
   }
 }
 
-template<> void extractor_impl (tl::Extractor &ex, db::DEdge &e)
+template <> void extractor_impl (tl::Extractor &ex, db::DEdge &e)
 {
   if (! test_extractor_impl (ex, e)) {
     ex.error (tl::to_string (tr ("Expected an edge specification")));
   }
 }
 
-template<class C> bool _test_extractor_impl (tl::Extractor &ex, db::edge<C> &e)
+template <class C> bool _test_extractor_impl (tl::Extractor &ex, db::edge<C> &e)
 {
   typedef db::point<C> point_type;
 
@@ -97,15 +97,14 @@ template<class C> bool _test_extractor_impl (tl::Extractor &ex, db::edge<C> &e)
   }
 }
 
-template<> bool test_extractor_impl (tl::Extractor &ex, db::Edge &e)
+template <> bool test_extractor_impl (tl::Extractor &ex, db::Edge &e)
 {
   return _test_extractor_impl (ex, e);
 }
 
-template<> bool test_extractor_impl (tl::Extractor &ex, db::DEdge &e)
+template <> bool test_extractor_impl (tl::Extractor &ex, db::DEdge &e)
 {
   return _test_extractor_impl (ex, e);
 }
 
 } // namespace tl
-

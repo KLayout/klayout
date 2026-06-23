@@ -57,11 +57,8 @@ void CornerDetectorCore::detect_corners (const db::Polygon &poly, const CornerPo
 
         pp = pt;
         pt = pn;
-
       }
-
     }
-
   }
 }
 
@@ -86,11 +83,8 @@ void CornerDetectorCore::detect_corners (const db::PolygonWithProperties &poly, 
 
         pp = pt;
         pt = pn;
-
       }
-
     }
-
   }
 }
 
@@ -125,10 +119,10 @@ const TransformationReducer *RelativeExtents::vars () const
 {
   if (m_dx == 0 && m_dy == 0 && fabs (m_fx1) < db::epsilon && fabs (m_fy1) < db::epsilon && fabs (1.0 - m_fx2) < db::epsilon && fabs (1.0 - m_fy2) < db::epsilon) {
     return 0;
-  } else if (m_dx == m_dy && fabs (m_fx1 - m_fy1) < db::epsilon && fabs (1.0 - (m_fx1 + m_fx2)) < db::epsilon  && fabs (m_fx2 - m_fy2) < db::epsilon && fabs (1.0 - (m_fy1 + m_fy2)) < db::epsilon) {
-    return & m_isotropic_reducer;
+  } else if (m_dx == m_dy && fabs (m_fx1 - m_fy1) < db::epsilon && fabs (1.0 - (m_fx1 + m_fx2)) < db::epsilon && fabs (m_fx2 - m_fy2) < db::epsilon && fabs (1.0 - (m_fy1 + m_fy2)) < db::epsilon) {
+    return &m_isotropic_reducer;
   } else {
-    return & m_anisotropic_reducer;
+    return &m_anisotropic_reducer;
   }
 }
 
@@ -149,10 +143,10 @@ const TransformationReducer *RelativeExtentsAsEdges::vars () const
 {
   if (fabs (m_fx1) < db::epsilon && fabs (m_fy1) < db::epsilon && fabs (1.0 - m_fx2) < db::epsilon && fabs (1.0 - m_fy2) < db::epsilon) {
     return 0;
-  } else if (fabs (m_fx1 - m_fy1) < db::epsilon && fabs (1.0 - (m_fx1 + m_fx2)) < db::epsilon  && fabs (m_fx2 - m_fy2) < db::epsilon && fabs (1.0 - (m_fy1 + m_fy2)) < db::epsilon) {
-    return & m_isotropic_reducer;
+  } else if (fabs (m_fx1 - m_fy1) < db::epsilon && fabs (1.0 - (m_fx1 + m_fx2)) < db::epsilon && fabs (m_fx2 - m_fy2) < db::epsilon && fabs (1.0 - (m_fy1 + m_fy2)) < db::epsilon) {
+    return &m_isotropic_reducer;
   } else {
-    return & m_anisotropic_reducer;
+    return &m_anisotropic_reducer;
   }
 }
 
@@ -245,7 +239,6 @@ contour_to_edges (const db::Polygon::contour_type &contour, PolygonToEdgeProcess
     next (p0, contour);
     next (p1, contour);
     next (p2, contour);
-
   }
 }
 
@@ -267,7 +260,6 @@ void PolygonToEdgeProcessor::process (const db::PolygonWithProperties &poly, std
     for (auto e = edges.begin (); e != edges.end (); ++e) {
       result.push_back (db::EdgeWithProperties (*e, poly.properties_id ()));
     }
-
   }
 }
 
@@ -278,7 +270,7 @@ void ConvexDecomposition::process (const db::PolygonWithProperties &poly, std::v
 {
   db::SimplePolygonContainer sp;
   db::decompose_convex (poly, m_mode, sp);
-  for (std::vector <db::SimplePolygon>::const_iterator i = sp.polygons ().begin (); i != sp.polygons ().end (); ++i) {
+  for (std::vector<db::SimplePolygon>::const_iterator i = sp.polygons ().begin (); i != sp.polygons ().end (); ++i) {
     result.push_back (db::PolygonWithProperties (db::simple_polygon_to_polygon (*i), poly.properties_id ()));
   }
 }
@@ -290,7 +282,7 @@ void TrapezoidDecomposition::process (const db::PolygonWithProperties &poly, std
 {
   db::SimplePolygonContainer sp;
   db::decompose_trapezoids (poly, m_mode, sp);
-  for (std::vector <db::SimplePolygon>::const_iterator i = sp.polygons ().begin (); i != sp.polygons ().end (); ++i) {
+  for (std::vector<db::SimplePolygon>::const_iterator i = sp.polygons ().begin (); i != sp.polygons ().end (); ++i) {
     result.push_back (db::PolygonWithProperties (db::simple_polygon_to_polygon (*i), poly.properties_id ()));
   }
 }
@@ -358,8 +350,7 @@ TriangulationProcessor::TriangulationProcessor (double max_area, double min_b)
   m_param.min_b = min_b;
 }
 
-void
-TriangulationProcessor::process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const
+void TriangulationProcessor::process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const
 {
   //  NOTE: we center the polygon for better numerical stability
   db::CplxTrans trans = db::CplxTrans (triangulation_dbu) * db::ICplxTrans (db::Trans (db::Point () - poly.box ().center ()));
@@ -434,7 +425,6 @@ static void create_edge_segment_euclidian (std::vector<db::Point> &points, const
       double a = i * da + a0;
       points.push_back (e.p2 () + db::Vector (d * (f2 * sin (a)) + n * (f2 * cos (a))));
     }
-
   }
 }
 
@@ -483,15 +473,13 @@ static void create_edge_segment (std::vector<db::Point> &points, db::metrics_typ
   }
 }
 
-void
-DRCHullProcessor::process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const
+void DRCHullProcessor::process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const
 {
   db::PolygonContainerWithProperties psink (result, poly.properties_id ());
   do_process (poly, psink);
 }
 
-void
-DRCHullProcessor::do_process (const db::Polygon &poly, db::PolygonSink &psink) const
+void DRCHullProcessor::do_process (const db::Polygon &poly, db::PolygonSink &psink) const
 {
   db::EdgeProcessor ep;
   std::vector<db::Point> points;
@@ -518,20 +506,17 @@ DRCHullProcessor::do_process (const db::Polygon &poly, db::PolygonSink &psink) c
       }
 
       create_edge_segment (points, m_metrics, db::Edge (*p, *pp), db::Edge (*pp, *ppp), m_d, m_n_circle);
-
     }
 
     for (auto p = points.begin (); p != points.end (); ++p) {
 
       auto pp = p;
-      if (++ pp == points.end ()) {
+      if (++pp == points.end ()) {
         pp = points.begin ();
       }
 
       ep.insert (db::Edge (*p, *pp));
-
     }
-
   }
 
   db::SimpleMerge op;

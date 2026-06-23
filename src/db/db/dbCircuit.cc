@@ -141,14 +141,14 @@ Circuit &Circuit::operator= (const Circuit &other)
     std::map<const Device *, Device *> device_table;
     for (const_device_iterator i = other.begin_devices (); i != other.end_devices (); ++i) {
       Device *d = new Device (*i);
-      device_table [i.operator-> ()] = d;
+      device_table [i.operator->()] = d;
       add_device (d);
     }
 
     std::map<const SubCircuit *, SubCircuit *> sc_table;
     for (const_subcircuit_iterator i = other.begin_subcircuits (); i != other.end_subcircuits (); ++i) {
       SubCircuit *sc = new SubCircuit (*i);
-      sc_table [i.operator-> ()] = sc;
+      sc_table [i.operator->()] = sc;
       add_subcircuit (sc);
     }
 
@@ -175,9 +175,7 @@ Circuit &Circuit::operator= (const Circuit &other)
         tl_assert (m != sc_table.end ());
         n->add_subcircuit_pin (NetSubcircuitPinRef (m->second, p->pin_id ()));
       }
-
     }
-
   }
 
   return *this;
@@ -197,7 +195,7 @@ const Pin *Circuit::pin_by_id (size_t id) const
     if (tl::is_null_iterator (pi)) {
       return 0;
     } else {
-      return pi.operator-> ();
+      return pi.operator->();
     }
   }
 }
@@ -215,7 +213,7 @@ const Pin *Circuit::pin_by_name (const std::string &name) const
 
   for (Circuit::const_pin_iterator p = begin_pins (); p != end_pins (); ++p) {
     if (p->name () == nn) {
-      return p.operator-> ();
+      return p.operator->();
     }
   }
   return 0;
@@ -295,13 +293,13 @@ Circuit::child_circuit_iterator Circuit::end_children ()
 Circuit::const_child_circuit_iterator Circuit::begin_children () const
 {
   tl_assert (mp_netlist != 0);
-  return reinterpret_cast<const tl::vector<const Circuit *> &> (mp_netlist->child_circuits (const_cast <Circuit *> (this))).begin ();
+  return reinterpret_cast<const tl::vector<const Circuit *> &> (mp_netlist->child_circuits (const_cast<Circuit *> (this))).begin ();
 }
 
 Circuit::const_child_circuit_iterator Circuit::end_children () const
 {
   tl_assert (mp_netlist != 0);
-  return reinterpret_cast<const tl::vector<const Circuit *> &> (mp_netlist->child_circuits (const_cast <Circuit *> (this))).end ();
+  return reinterpret_cast<const tl::vector<const Circuit *> &> (mp_netlist->child_circuits (const_cast<Circuit *> (this))).end ();
 }
 
 Circuit::child_circuit_iterator Circuit::begin_parents ()
@@ -319,13 +317,13 @@ Circuit::child_circuit_iterator Circuit::end_parents ()
 Circuit::const_child_circuit_iterator Circuit::begin_parents () const
 {
   tl_assert (mp_netlist != 0);
-  return reinterpret_cast<const tl::vector<const Circuit *> &> (mp_netlist->parent_circuits (const_cast <Circuit *> (this))).begin ();
+  return reinterpret_cast<const tl::vector<const Circuit *> &> (mp_netlist->parent_circuits (const_cast<Circuit *> (this))).begin ();
 }
 
 Circuit::const_child_circuit_iterator Circuit::end_parents () const
 {
   tl_assert (mp_netlist != 0);
-  return reinterpret_cast<const tl::vector<const Circuit *> &> (mp_netlist->parent_circuits (const_cast <Circuit *> (this))).end ();
+  return reinterpret_cast<const tl::vector<const Circuit *> &> (mp_netlist->parent_circuits (const_cast<Circuit *> (this))).end ();
 }
 
 void Circuit::clear_pins ()
@@ -539,7 +537,6 @@ void Circuit::flatten_subcircuit (SubCircuit *subcircuit)
         } else {
           outside_net = subcircuit->net_for_pin (pin_id);
         }
-
       }
 
     } else {
@@ -551,13 +548,11 @@ void Circuit::flatten_subcircuit (SubCircuit *subcircuit)
       add_net (outside_net);
 
       if (netlist ()->callbacks ()) {
-        outside_net->set_cluster_id (netlist ()->callbacks ()->link_net_to_parent_circuit (n.operator-> (), this, subcircuit->trans ()));
+        outside_net->set_cluster_id (netlist ()->callbacks ()->link_net_to_parent_circuit (n.operator->(), this, subcircuit->trans ()));
       }
-
     }
 
-    net2net.insert (std::make_pair (n.operator-> (), outside_net));
-
+    net2net.insert (std::make_pair (n.operator->(), outside_net));
   }
 
   //  copy the devices
@@ -580,9 +575,7 @@ void Circuit::flatten_subcircuit (SubCircuit *subcircuit)
         tl_assert (n2n != net2net.end ());
         device->connect_terminal (t->id (), n2n->second);
       }
-
     }
-
   }
 
   //  copy the subcircuits
@@ -605,9 +598,7 @@ void Circuit::flatten_subcircuit (SubCircuit *subcircuit)
         tl_assert (n2n != net2net.end ());
         new_subcircuit->connect_pin (p->id (), n2n->second);
       }
-
     }
-
   }
 
   delete subcircuit;
@@ -662,7 +653,7 @@ void Circuit::blank ()
 
   //  weak pointers are good because deleting a subcircuit might delete others ahead in
   //  this list:
-  std::list<tl::weak_ptr<db::Circuit> > called_circuits;
+  std::list<tl::weak_ptr<db::Circuit>> called_circuits;
   for (std::set<db::Circuit *>::const_iterator c = cs.begin (); c != cs.end (); ++c) {
     called_circuits.push_back (*c);
   }
@@ -671,7 +662,7 @@ void Circuit::blank ()
   m_subcircuits.clear ();
   m_devices.clear ();
 
-  for (std::list<tl::weak_ptr<db::Circuit> >::iterator c = called_circuits.begin (); c != called_circuits.end (); ++c) {
+  for (std::list<tl::weak_ptr<db::Circuit>>::iterator c = called_circuits.begin (); c != called_circuits.end (); ++c) {
     if (c->get () && ! (*c)->has_refs ()) {
       netlist ()->purge_circuit (c->get ());
     }
@@ -767,9 +758,7 @@ void Circuit::join_pins (size_t pin, size_t with)
       sc.erase_pin (with);
 
       sc.circuit ()->join_nets (sc.net_for_pin (pin), with_net);
-
     }
-
   }
 }
 
@@ -788,7 +777,7 @@ void Circuit::do_purge_nets (bool keep_pins)
   std::vector<db::Net *> nets_to_be_purged;
   for (net_iterator n = begin_nets (); n != end_nets (); ++n) {
     if (n->is_passive ()) {
-      nets_to_be_purged.push_back (n.operator-> ());
+      nets_to_be_purged.push_back (n.operator->());
     }
   }
 
@@ -807,7 +796,7 @@ void Circuit::do_purge_nets (bool keep_pins)
 
     //  remove the pin references of the pins we're going to delete
     for (refs_iterator r = begin_refs (); r != end_refs (); ++r) {
-      db::SubCircuit *subcircuit = r.operator-> ();
+      db::SubCircuit *subcircuit = r.operator->();
       for (std::set<size_t>::const_iterator p = pins_to_delete.begin (); p != pins_to_delete.end (); ++p) {
         db::Net *net = subcircuit->net_for_pin (*p);
         for (db::Net::subcircuit_pin_iterator sp = net->begin_subcircuit_pins (); sp != net->end_subcircuit_pins (); ++sp) {
@@ -823,7 +812,6 @@ void Circuit::do_purge_nets (bool keep_pins)
     for (std::set<size_t>::const_iterator p = pins_to_delete.begin (); p != pins_to_delete.end (); ++p) {
       remove_pin (*p);
     }
-
   }
 }
 
@@ -853,7 +841,7 @@ void Circuit::purge_devices ()
   std::vector<db::Device *> devices_to_be_purged;
   for (device_iterator d = begin_devices (); d != end_devices (); ++d) {
     if (can_purge_device (*d)) {
-      devices_to_be_purged.push_back (d.operator-> ());
+      devices_to_be_purged.push_back (d.operator->());
     }
   }
 
@@ -881,7 +869,7 @@ static void check_device_before_remove (db::Circuit *c, const db::Device *d)
 bool Circuit::combine_parallel_devices (const db::DeviceClass &cls)
 {
   typedef std::vector<const db::Net *> key_type;
-  std::map<key_type, std::vector<db::Device *> > combination_candidates;
+  std::map<key_type, std::vector<db::Device *>> combination_candidates;
 
   bool any = false;
 
@@ -904,19 +892,18 @@ bool Circuit::combine_parallel_devices (const db::DeviceClass &cls)
 
     std::sort (k.begin (), k.end ());
     k.erase (std::unique (k.begin (), k.end ()), k.end ());
-    combination_candidates[k].push_back (d.operator-> ());
-
+    combination_candidates [k].push_back (d.operator->());
   }
 
   //  actually combine the devices
-  for (std::map<key_type, std::vector<db::Device *> >::iterator cc = combination_candidates.begin (); cc != combination_candidates.end (); ++cc) {
+  for (std::map<key_type, std::vector<db::Device *>>::iterator cc = combination_candidates.begin (); cc != combination_candidates.end (); ++cc) {
 
     std::vector<db::Device *> &cl = cc->second;
     for (size_t i = 0; i < cl.size () - 1; ++i) {
-      for (size_t j = i + 1; j < cl.size (); ) {
+      for (size_t j = i + 1; j < cl.size ();) {
         if (cls.combine_devices (cl [i], cl [j])) {
           cl [i]->join_device (cl [j]);
-          check_device_before_remove (this, cl [j]);  //  sanity check
+          check_device_before_remove (this, cl [j]); //  sanity check
           delete cl [j];
           cl.erase (cl.begin () + j);
           any = true;
@@ -925,7 +912,6 @@ bool Circuit::combine_parallel_devices (const db::DeviceClass &cls)
         }
       }
     }
-
   }
 
   return any;
@@ -954,7 +940,7 @@ static std::pair<db::Device *, db::Device *> attached_two_devices (db::Net &net,
   }
 
   ++p;
-  if (p != net.end_terminals () || d1 == d2 || !d1 || !d2) {
+  if (p != net.end_terminals () || d1 == d2 || ! d1 || ! d2) {
     return std::make_pair ((db::Device *) 0, (db::Device *) 0);
   } else {
     return std::make_pair (d1, d2);
@@ -967,7 +953,7 @@ static bool same_or_swapped (const std::pair<T, T> &p1, const std::pair<T, T> &p
   return (p1.first == p2.first && p1.second == p2.second) || (p1.first == p2.second && p1.second == p2.first);
 }
 
-bool Circuit::combine_serial_devices(const db::DeviceClass &cls)
+bool Circuit::combine_serial_devices (const db::DeviceClass &cls)
 {
   bool any = false;
 
@@ -1001,18 +987,16 @@ bool Circuit::combine_serial_devices(const db::DeviceClass &cls)
     std::sort (other_nets.begin (), other_nets.end ());
     other_nets.erase (std::unique (other_nets.begin (), other_nets.end ()), other_nets.end ());
 
-    if (other_nets.size () <= cls.terminal_definitions().size ()) {
+    if (other_nets.size () <= cls.terminal_definitions ().size ()) {
 
       //  found a combination candidate
       if (cls.combine_devices (dd.first, dd.second)) {
         dd.first->join_device (dd.second);
-        check_device_before_remove (this, dd.second);  //  sanity check
+        check_device_before_remove (this, dd.second); //  sanity check
         delete dd.second;
         any = true;
       }
-
     }
-
   }
 
   return any;
@@ -1041,9 +1025,7 @@ void Circuit::combine_devices ()
           any = true;
         }
       }
-
     }
-
   }
 }
 

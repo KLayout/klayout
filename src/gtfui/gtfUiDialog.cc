@@ -57,7 +57,7 @@ static QBrush right_diff_brush_dep (QColor (64, 192, 64), Qt::Dense4Pattern);
  *    "max_lookahead": tell how far to look into the future to find "synchronized" parts.
  *    "min_sync": how many elements must be equal (in sequence) to resync.
  */
-template <class I, class O1, class O2, class O3, class O4, class EQ> 
+template <class I, class O1, class O2, class O3, class O4, class EQ>
 void diff (I b1, I e1, I b2, I e2, O1 common, O2 o1, O3 o2, O4 d, EQ equal = std::equal_to<typename std::iterator_traits<I>::value_type> (), unsigned long max_lookahead = 100, unsigned long min_sync = 3)
 {
   I i1 = b1;
@@ -100,29 +100,27 @@ void diff (I b1, I e1, I b2, I e2, O1 common, O2 o1, O3 o2, O4 d, EQ equal = std
         }
       }
 
-      if (sync1 && (!sync2 || s1 < s2)) {
+      if (sync1 && (! sync2 || s1 < s2)) {
         while (s1 > 0) {
           *o1 = *i1;
           ++o1;
           ++i1;
           --s1;
         }
-      } else if (sync2 && (!sync1 || s2 < s1)) {
+      } else if (sync2 && (! sync1 || s2 < s1)) {
         while (s2 > 0) {
           *o2 = *i2;
           ++o2;
           ++i2;
           --s2;
         }
-      } else { 
+      } else {
         *d = std::make_pair (*i1, *i2);
         ++d;
         ++i1;
         ++i2;
       }
-
     }
-
   }
 
   while (i1 != e1) {
@@ -130,7 +128,7 @@ void diff (I b1, I e1, I b2, I e2, O1 common, O2 o1, O3 o2, O4 d, EQ equal = std
     ++i1;
     ++o1;
   }
-    
+
   while (i2 != e2) {
     *o2 = *i2;
     ++i2;
@@ -146,7 +144,7 @@ StripedBar::StripedBar (QWidget *parent)
 {
   QObjectList cc = children ();
   for (QObjectList::const_iterator child = cc.begin (); child != cc.end (); ++child) {
-    QWidget *ww = dynamic_cast <QWidget *> (*child);
+    QWidget *ww = dynamic_cast<QWidget *> (*child);
     if (ww) {
       delete ww;
     }
@@ -155,8 +153,7 @@ StripedBar::StripedBar (QWidget *parent)
   //  ...
 }
 
-void
-StripedBar::paintEvent (QPaintEvent *e)
+void StripedBar::paintEvent (QPaintEvent *e)
 {
   QFrame::paintEvent (e);
 
@@ -212,18 +209,15 @@ StripedBar::paintEvent (QPaintEvent *e)
       col0 = mp_tv->indexBelow (col0);
 
       ++index;
-
     }
 
     if (ytop >= 0) {
       painter.fillRect (lw, ytop, width () - 2 * lw, ybottom - ytop, QColor (128, 128, 128, 128));
     }
-
   }
 }
 
-void 
-StripedBar::set_treeview (QTreeView *tv)
+void StripedBar::set_treeview (QTreeView *tv)
 {
   mp_tv = tv;
   connect (mp_tv->verticalScrollBar () /* Qt4.2 only*/, SIGNAL (valueChanged (int)), this, SLOT (force_update (int)));
@@ -231,14 +225,12 @@ StripedBar::set_treeview (QTreeView *tv)
   connect (mp_tv, SIGNAL (collapsed (const QModelIndex &)), this, SLOT (force_update (const QModelIndex &)));
 }
 
-void 
-StripedBar::force_update (int)
+void StripedBar::force_update (int)
 {
   update ();
 }
 
-void
-StripedBar::force_update (const QModelIndex &)
+void StripedBar::force_update (const QModelIndex &)
 {
   update ();
 }
@@ -251,8 +243,7 @@ static void diff_log_event_data (QTreeWidget *tv, QTreeWidgetItem *parent, const
 static void add_log_event_list (QTreeWidget *tv, int column, QTreeWidgetItem *parent, const tl::Variant &dlist);
 static void add_log_event_data (QTreeWidget *tv, int column, QTreeWidgetItem *parent, const tl::Variant &data);
 
-void 
-expand_path (QTreeWidget *tv, QTreeWidgetItem *item)
+void expand_path (QTreeWidget *tv, QTreeWidgetItem *item)
 {
   tv->expandItem (item);
   if (item->parent ()) {
@@ -277,9 +268,8 @@ log_event_to_text (const gtf::LogEventBase *e)
   return t;
 }
 
-struct make_entry_both 
-{
-  make_entry_both (QTreeWidget *tv) : mp_tv (tv) { }
+struct make_entry_both {
+  make_entry_both (QTreeWidget *tv) : mp_tv (tv) {}
 
   void operator= (std::pair<const gtf::LogEventBase *, const gtf::LogEventBase *> e) const
   {
@@ -287,8 +277,8 @@ struct make_entry_both
     item->setText (0, log_event_to_text (e.first).c_str ());
     item->setText (1, log_event_to_text (e.second).c_str ());
     add_log_event_data (mp_tv, -1, item, e.first->data ());
-    item->setData (0, Qt::UserRole + 2, QVariant::fromValue ((void *)e.first));
-    item->setData (1, Qt::UserRole + 2, QVariant::fromValue ((void *)e.second));
+    item->setData (0, Qt::UserRole + 2, QVariant::fromValue ((void *) e.first));
+    item->setData (1, Qt::UserRole + 2, QVariant::fromValue ((void *) e.second));
     mp_tv->addTopLevelItem (item);
   }
 
@@ -300,9 +290,8 @@ private:
   QTreeWidget *mp_tv;
 };
 
-struct make_entry_left 
-{
-  make_entry_left (QTreeWidget *tv) : mp_tv (tv) { }
+struct make_entry_left {
+  make_entry_left (QTreeWidget *tv) : mp_tv (tv) {}
 
   void operator= (const gtf::LogEventBase *e) const
   {
@@ -312,7 +301,7 @@ struct make_entry_left
     add_log_event_data (mp_tv, 0, item, e->data ());
     item->setData (0, Qt::BackgroundRole, QVariant (left_diff_brush));
     item->setData (0, Qt::UserRole, QVariant (true));
-    item->setData (0, Qt::UserRole + 2, QVariant::fromValue ((void *)e));
+    item->setData (0, Qt::UserRole + 2, QVariant::fromValue ((void *) e));
     mp_tv->addTopLevelItem (item);
     mp_tv->expandItem (item);
   }
@@ -325,9 +314,8 @@ private:
   QTreeWidget *mp_tv;
 };
 
-struct make_entry_right 
-{
-  make_entry_right (QTreeWidget *tv) : mp_tv (tv) { }
+struct make_entry_right {
+  make_entry_right (QTreeWidget *tv) : mp_tv (tv) {}
 
   void operator= (const gtf::LogEventBase *e) const
   {
@@ -337,7 +325,7 @@ struct make_entry_right
     add_log_event_data (mp_tv, 1, item, e->data ());
     item->setData (1, Qt::BackgroundRole, QVariant (right_diff_brush));
     item->setData (1, Qt::UserRole, QVariant (true));
-    item->setData (1, Qt::UserRole + 2, QVariant::fromValue ((void *)e));
+    item->setData (1, Qt::UserRole + 2, QVariant::fromValue ((void *) e));
     mp_tv->addTopLevelItem (item);
     mp_tv->expandItem (item);
   }
@@ -350,9 +338,8 @@ private:
   QTreeWidget *mp_tv;
 };
 
-struct make_entry_diff 
-{
-  make_entry_diff (QTreeWidget *tv) : mp_tv (tv) { }
+struct make_entry_diff {
+  make_entry_diff (QTreeWidget *tv) : mp_tv (tv) {}
 
   void operator= (std::pair<const gtf::LogEventBase *, const gtf::LogEventBase *> e) const
   {
@@ -363,11 +350,11 @@ struct make_entry_diff
     item->setText (0, tleft.c_str ());
     item->setData (0, Qt::BackgroundRole, QVariant (dep ? left_diff_brush_dep : left_diff_brush));
     item->setData (0, Qt::UserRole, QVariant (true));
-    item->setData (0, Qt::UserRole + 2, QVariant::fromValue ((void *)e.first));
+    item->setData (0, Qt::UserRole + 2, QVariant::fromValue ((void *) e.first));
     item->setText (1, tright.c_str ());
     item->setData (1, Qt::BackgroundRole, QVariant (dep ? right_diff_brush_dep : right_diff_brush));
     item->setData (1, Qt::UserRole, QVariant (true));
-    item->setData (1, Qt::UserRole + 2, QVariant::fromValue ((void *)e.second));
+    item->setData (1, Qt::UserRole + 2, QVariant::fromValue ((void *) e.second));
     diff_log_event_data (mp_tv, item, e.first->data (), e.second->data ());
     mp_tv->addTopLevelItem (item);
     mp_tv->expandItem (item);
@@ -381,8 +368,7 @@ private:
   QTreeWidget *mp_tv;
 };
 
-struct ptr_eq
-{
+struct ptr_eq {
   bool operator() (const gtf::LogEventBase *a, const gtf::LogEventBase *b) const
   {
     return *a == *b;
@@ -441,7 +427,7 @@ add_log_event_list (QTreeWidget *tv, int column, QTreeWidgetItem *parent, const 
 }
 
 static void
-add_log_event_data (QTreeWidget *tv, int column, QTreeWidgetItem *parent, const tl::Variant &data) 
+add_log_event_data (QTreeWidget *tv, int column, QTreeWidgetItem *parent, const tl::Variant &data)
 {
   if (! data.is_nil ()) {
     tl::Variant ddummy = tl::Variant::empty_list ();
@@ -454,11 +440,14 @@ add_log_event_data (QTreeWidget *tv, int column, QTreeWidgetItem *parent, const 
   }
 }
 
-struct enter_data 
-{
-  enter_data (QTreeWidget *tv, QTreeWidgetItem *item, int column) : mp_tv (tv), mp_item (item), m_column (column) { }
+struct enter_data {
+  enter_data (QTreeWidget *tv, QTreeWidgetItem *item, int column) : mp_tv (tv), mp_item (item), m_column (column) {}
 
-  enter_data &operator= (const tl::Variant &data) { add_log_event (mp_tv, m_column, mp_item, data); return *this; }
+  enter_data &operator= (const tl::Variant &data)
+  {
+    add_log_event (mp_tv, m_column, mp_item, data);
+    return *this;
+  }
   enter_data &operator= (const std::pair<tl::Variant, tl::Variant> &data) { return *this = data.first; }
 
   enter_data &operator* () { return *this; }
@@ -471,12 +460,11 @@ private:
   int m_column;
 };
 
-struct enter_data_diff 
-{
-  enter_data_diff (QTreeWidget *tv, QTreeWidgetItem *item) : mp_tv (tv), mp_item (item) { }
+struct enter_data_diff {
+  enter_data_diff (QTreeWidget *tv, QTreeWidgetItem *item) : mp_tv (tv), mp_item (item) {}
 
-  enter_data_diff &operator= (const std::pair<tl::Variant, tl::Variant> &data) 
-  { 
+  enter_data_diff &operator= (const std::pair<tl::Variant, tl::Variant> &data)
+  {
     QTreeWidgetItem *p = new QTreeWidgetItem (mp_item);
     if (data.first.is_list () && data.second.is_list ()) {
       p->setText (0, "block");
@@ -491,18 +479,18 @@ struct enter_data_diff
       p->setData (0, Qt::BackgroundRole, QVariant (left_diff_brush));
       p->setData (0, Qt::UserRole, QVariant (true));
       expand_path (mp_tv, p);
-      add_log_event_list (mp_tv, 0, mp_item, data.first); 
-      add_log_event (mp_tv, 1, mp_item, data.second, p); 
+      add_log_event_list (mp_tv, 0, mp_item, data.first);
+      add_log_event (mp_tv, 1, mp_item, data.second, p);
     } else if (data.second.is_list ()) {
       p->setText (1, "block");
       p->setData (1, Qt::BackgroundRole, QVariant (right_diff_brush));
       p->setData (1, Qt::UserRole, QVariant (true));
       expand_path (mp_tv, p);
-      add_log_event_list (mp_tv, 1, mp_item, data.second); 
-      add_log_event (mp_tv, 0, mp_item, data.first, p); 
+      add_log_event_list (mp_tv, 1, mp_item, data.second);
+      add_log_event (mp_tv, 0, mp_item, data.first, p);
     } else {
-      add_log_event (mp_tv, 0, mp_item, data.first, p); 
-      add_log_event (mp_tv, 1, mp_item, data.second, p); 
+      add_log_event (mp_tv, 0, mp_item, data.first, p);
+      add_log_event (mp_tv, 1, mp_item, data.second, p);
     }
     return *this;
   }
@@ -528,7 +516,7 @@ diff_log_event_list (QTreeWidget *tv, QTreeWidgetItem *parent, const tl::Variant
 }
 
 static void
-diff_log_event_data (QTreeWidget *tv, QTreeWidgetItem *parent, const tl::Variant &data_left, const tl::Variant &data_right) 
+diff_log_event_data (QTreeWidget *tv, QTreeWidgetItem *parent, const tl::Variant &data_left, const tl::Variant &data_right)
 {
   tl::Variant ddummyleft = tl::Variant::empty_list ();
   const tl::Variant *dleft = &data_left;
@@ -567,7 +555,6 @@ UiDialog::UiDialog ()
   connect (mp_ui->log_list, SIGNAL (currentItemChanged (QTreeWidgetItem *, QTreeWidgetItem *)), this, SLOT (item_selected (QTreeWidgetItem *, QTreeWidgetItem *)));
 
   // ...
-
 }
 
 UiDialog::~UiDialog ()
@@ -576,8 +563,7 @@ UiDialog::~UiDialog ()
   mp_ui = 0;
 }
 
-void 
-UiDialog::open_files (const std::string &fn_au, const std::string &fn_current)
+void UiDialog::open_files (const std::string &fn_au, const std::string &fn_current)
 {
   m_fn_au = fn_au;
   m_fn_current = fn_current;
@@ -599,10 +585,9 @@ UiDialog::open_files (const std::string &fn_au, const std::string &fn_current)
   diff (m_au_events.begin (), m_au_events.end (), m_current_events.begin (), m_current_events.end (), b, l, r, d, ptr_eq ());
 }
 
-void 
-UiDialog::item_selected (QTreeWidgetItem *current, QTreeWidgetItem *)
+void UiDialog::item_selected (QTreeWidgetItem *current, QTreeWidgetItem *)
 {
-  if (current->data (0, Qt::UserRole + 1) != QVariant () || 
+  if (current->data (0, Qt::UserRole + 1) != QVariant () ||
       current->data (1, Qt::UserRole + 1) != QVariant ()) {
 
     mp_ui->compare_stck->setCurrentIndex (1);
@@ -625,7 +610,7 @@ UiDialog::item_selected (QTreeWidgetItem *current, QTreeWidgetItem *)
       mp_ui->golden_lbl->setPixmap (QPixmap ());
       mp_ui->golden_lbl->setText ("");
     }
-    
+
     if (! img_right.isNull ()) {
       QPixmap pixmap;
       pixmap = img_right; // Qt 4.6.0 workaround
@@ -641,7 +626,7 @@ UiDialog::item_selected (QTreeWidgetItem *current, QTreeWidgetItem *)
       int w = std::min (img_left.width (), img_right.width ());
       int h = std::min (img_left.height (), img_right.height ());
       QImage delta (w, h, QImage::Format_RGB32);
-      
+
       for (int x = 0; x < w; ++x) {
         for (int y = 0; y < h; ++y) {
           QRgb p1 = img_left.pixel (x, y);
@@ -661,12 +646,12 @@ UiDialog::item_selected (QTreeWidgetItem *current, QTreeWidgetItem *)
       mp_ui->delta_lbl->setText ("");
     }
 
-  } else if (current->data (0, Qt::UserRole + 2) != QVariant () || 
+  } else if (current->data (0, Qt::UserRole + 2) != QVariant () ||
              current->data (1, Qt::UserRole + 2) != QVariant ()) {
 
     mp_ui->compare_stck->setCurrentIndex (2);
 
-    std::vector< std::pair<std::string, std::string> > attrs_left, attrs_right;
+    std::vector<std::pair<std::string, std::string>> attrs_left, attrs_right;
 
     mp_ui->au_event_list->clear ();
     mp_ui->curr_event_list->clear ();
@@ -689,8 +674,8 @@ UiDialog::item_selected (QTreeWidgetItem *current, QTreeWidgetItem *)
       same_type = true;
     }
 
-    std::vector< std::pair<std::string, std::string> >::const_iterator l = attrs_left.begin ();
-    std::vector< std::pair<std::string, std::string> >::const_iterator r = attrs_right.begin ();
+    std::vector<std::pair<std::string, std::string>>::const_iterator l = attrs_left.begin ();
+    std::vector<std::pair<std::string, std::string>>::const_iterator r = attrs_right.begin ();
 
     while (l != attrs_left.end () || r != attrs_right.end ()) {
       if (l != attrs_left.end ()) {
@@ -733,9 +718,6 @@ UiDialog::item_selected (QTreeWidgetItem *current, QTreeWidgetItem *)
   } else {
     mp_ui->compare_stck->setCurrentIndex (0);
   }
-
 }
 
 }
-
-

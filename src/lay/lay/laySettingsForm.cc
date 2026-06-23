@@ -44,7 +44,7 @@ namespace lay
 SettingsForm::SettingsForm (QWidget *parent, lay::Dispatcher *dispatcher, const char *name)
   : QDialog (parent), Ui::SettingsForm (),
     mp_dispatcher (dispatcher), m_finalize_recursion (false)
-{ 
+{
   setObjectName (QString::fromUtf8 (name));
 
   Ui::SettingsForm::setupUi (this);
@@ -59,7 +59,7 @@ SettingsForm::SettingsForm (QWidget *parent, lay::Dispatcher *dispatcher, const 
   items_tree->header ()->hide ();
 
   //  Collect all configuration pages
-  std::vector <std::pair <std::string, lay::ConfigPage *> > pages;
+  std::vector<std::pair<std::string, lay::ConfigPage *>> pages;
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
 
     std::string config_title;
@@ -68,9 +68,8 @@ SettingsForm::SettingsForm (QWidget *parent, lay::Dispatcher *dispatcher, const 
       pages.push_back (std::make_pair (config_title, config_page));
     }
 
-    std::vector <std::pair <std::string, lay::ConfigPage *> > pp = cls->config_pages (0);
+    std::vector<std::pair<std::string, lay::ConfigPage *>> pp = cls->config_pages (0);
     pages.insert (pages.end (), pp.begin (), pp.end ());
-
   }
 
   //  Create an empty dummy page as page 0
@@ -79,9 +78,9 @@ SettingsForm::SettingsForm (QWidget *parent, lay::Dispatcher *dispatcher, const 
   pages_stack->addWidget (page0);
 
   //  Create the pages in the stack widget
-  std::map <std::string, int> stack_headers;
-  std::vector <QTreeWidgetItem *> items;
-  for (std::vector <std::pair <std::string, lay::ConfigPage *> >::iterator p = pages.begin (); p != pages.end (); ++p) {
+  std::map<std::string, int> stack_headers;
+  std::vector<QTreeWidgetItem *> items;
+  for (std::vector<std::pair<std::string, lay::ConfigPage *>>::iterator p = pages.begin (); p != pages.end (); ++p) {
 
     std::string config_title = p->first;
     lay::ConfigPage *config_page = p->second;
@@ -90,7 +89,7 @@ SettingsForm::SettingsForm (QWidget *parent, lay::Dispatcher *dispatcher, const 
     if (config_page && config_title.empty ()) {
       delete config_page;
       config_page = 0;
-    } 
+    }
 
     if (config_page) {
 
@@ -103,7 +102,7 @@ SettingsForm::SettingsForm (QWidget *parent, lay::Dispatcher *dispatcher, const 
 
       m_config_pages.push_back (config_page);
 
-      std::map <std::string, int>::const_iterator t = stack_headers.find (config_title);
+      std::map<std::string, int>::const_iterator t = stack_headers.find (config_title);
       if (t == stack_headers.end ()) {
 
         //  not there yet ..
@@ -144,7 +143,7 @@ SettingsForm::SettingsForm (QWidget *parent, lay::Dispatcher *dispatcher, const 
 
           int current_index = config_title.empty () ? index : 0;
 
-          if (!child) {
+          if (! child) {
 
             if (parent) {
               child = new QTreeWidgetItem (parent);
@@ -165,7 +164,6 @@ SettingsForm::SettingsForm (QWidget *parent, lay::Dispatcher *dispatcher, const 
           }
 
           parent = child;
-
         }
 
       } else {
@@ -180,25 +178,22 @@ SettingsForm::SettingsForm (QWidget *parent, lay::Dispatcher *dispatcher, const 
             layout->addWidget (config_page);
           }
         }
-   
       }
-
     }
-
   }
 
-  for (std::vector <QTreeWidgetItem *>::iterator i = items.begin (); i != items.end (); ++i) {
-    if ((*i)->data (0, Qt::UserRole).toInt () == 0) { 
+  for (std::vector<QTreeWidgetItem *>::iterator i = items.begin (); i != items.end (); ++i) {
+    if ((*i)->data (0, Qt::UserRole).toInt () == 0) {
       (*i)->setFlags ((*i)->flags () & ~Qt::ItemIsSelectable);
     }
   }
 
-  for (std::map <std::string, int>::const_iterator t = stack_headers.begin (); t != stack_headers.end (); ++t) {
+  for (std::map<std::string, int>::const_iterator t = stack_headers.begin (); t != stack_headers.end (); ++t) {
     QScrollArea *page = dynamic_cast<QScrollArea *> (pages_stack->widget (t->second));
     if (page) {
       QFrame *page_frame = dynamic_cast<QFrame *> (page->widget ());
       if (page_frame) {
-        QVBoxLayout *layout = dynamic_cast <QVBoxLayout *> (page_frame->layout ());
+        QVBoxLayout *layout = dynamic_cast<QVBoxLayout *> (page_frame->layout ());
         if (layout) {
           layout->addStretch (0);
         }
@@ -209,14 +204,13 @@ SettingsForm::SettingsForm (QWidget *parent, lay::Dispatcher *dispatcher, const 
   items_tree->setCurrentItem (items_tree->topLevelItem (0));
 }
 
-void
-SettingsForm::item_changed (QTreeWidgetItem *current, QTreeWidgetItem *)
+void SettingsForm::item_changed (QTreeWidgetItem *current, QTreeWidgetItem *)
 {
   int index = -1;
   if (current) {
     index = current->data (0, Qt::UserRole).toInt ();
   }
-  
+
   if (index < 0 || index >= pages_stack->count ()) {
     index = 0;
   }
@@ -228,8 +222,7 @@ SettingsForm::item_changed (QTreeWidgetItem *current, QTreeWidgetItem *)
   }
 }
 
-void 
-SettingsForm::setup ()
+void SettingsForm::setup ()
 {
   //  recursion sentinel
   if (m_finalize_recursion || ! isVisible ()) {
@@ -237,22 +230,21 @@ SettingsForm::setup ()
   }
 
   //  setup the custom config pages
-  for (std::vector <lay::ConfigPage *>::iterator cp = m_config_pages.begin (); cp != m_config_pages.end (); ++cp) {
+  for (std::vector<lay::ConfigPage *>::iterator cp = m_config_pages.begin (); cp != m_config_pages.end (); ++cp) {
     (*cp)->setup (mp_dispatcher);
   }
 }
 
-void 
-SettingsForm::commit ()
+void SettingsForm::commit ()
 {
   //  commit the custom config pages
-  for (std::vector <lay::ConfigPage *>::iterator cp = m_config_pages.begin (); cp != m_config_pages.end (); ++cp) {
+  for (std::vector<lay::ConfigPage *>::iterator cp = m_config_pages.begin (); cp != m_config_pages.end (); ++cp) {
     (*cp)->commit (mp_dispatcher);
   }
 
   m_finalize_recursion = true;
   try {
-    //  config_end will make the main window call setup on the settings form. 
+    //  config_end will make the main window call setup on the settings form.
     //  the recursion sentinel takes care of that.
     mp_dispatcher->config_end ();
     m_finalize_recursion = false;
@@ -262,14 +254,13 @@ SettingsForm::commit ()
   }
 }
 
-void
-SettingsForm::reset_clicked ()
+void SettingsForm::reset_clicked ()
 {
-  if (QMessageBox::question (this, 
-    QObject::tr ("Confirm Reset"),
-    QObject::tr ("Are you sure to reset the configuration?\nThis operation will clear all custom settings and cannot be undone."),
-    QMessageBox::Yes | QMessageBox::No,
-    QMessageBox::No) == QMessageBox::Yes) {
+  if (QMessageBox::question (this,
+                             QObject::tr ("Confirm Reset"),
+                             QObject::tr ("Are you sure to reset the configuration?\nThis operation will clear all custom settings and cannot be undone."),
+                             QMessageBox::Yes | QMessageBox::No,
+                             QMessageBox::No) == QMessageBox::Yes) {
 
     BEGIN_PROTECTED
 
@@ -277,12 +268,10 @@ SettingsForm::reset_clicked ()
     setup ();
 
     END_PROTECTED
-
   }
 }
 
-void 
-SettingsForm::ok_clicked ()
+void SettingsForm::ok_clicked ()
 {
   BEGIN_PROTECTED
 
@@ -292,8 +281,7 @@ SettingsForm::ok_clicked ()
   END_PROTECTED
 }
 
-void 
-SettingsForm::apply_clicked ()
+void SettingsForm::apply_clicked ()
 {
   BEGIN_PROTECTED
 
@@ -303,4 +291,3 @@ SettingsForm::apply_clicked ()
 }
 
 }
-

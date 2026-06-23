@@ -70,7 +70,7 @@ public:
   {
     return m_point_mode;
   }
-  
+
 private:
   double m_default_text_size;
   db::Font m_default_font;
@@ -82,4 +82,3 @@ private:
 }
 
 #endif
-

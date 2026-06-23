@@ -25,7 +25,7 @@
 
 #include "tlUnitTest.h"
 
-TEST(1)
+TEST (1)
 {
   lay::LayoutViewBase lv (0, false, 0);
   lv.resize (200, 100);

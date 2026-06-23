@@ -237,12 +237,12 @@ public:
   }
 
   void begin (size_t /*nx*/, size_t /*ny*/, const db::DPoint & /*p0*/, double /*dx*/, double /*dy*/, const db::DBox & /*frame*/)
-  { 
+  {
     mp_layout->start_changes ();
   }
 
   void finish (bool /*success*/)
-  { 
+  {
     mp_layout->end_changes ();
   }
 
@@ -365,7 +365,7 @@ public:
     return m_has_tiles;
   }
 
-  void next_progress () 
+  void next_progress ()
   {
     tl::MutexLocker locker (&m_mutex);
     ++m_progress_count;
@@ -413,7 +413,7 @@ public:
   {
     return m_tile_desc;
   }
-  
+
   const db::DBox &clip_box () const
   {
     return m_clip_box;
@@ -423,17 +423,17 @@ public:
   {
     return m_ix;
   }
-  
+
   size_t iy () const
   {
     return m_iy;
   }
-  
+
   const db::DBox &region () const
   {
     return m_region;
   }
-  
+
   const std::string &script () const
   {
     return m_script;
@@ -462,9 +462,9 @@ public:
     //  .. nothing yet ..
   }
 
-  void perform_task (tl::Task *task) 
+  void perform_task (tl::Task *task)
   {
-    TilingProcessorTask *tile_task = dynamic_cast <TilingProcessorTask *> (task);
+    TilingProcessorTask *tile_task = dynamic_cast<TilingProcessorTask *> (task);
     if (tile_task) {
       do_perform (tile_task);
     }
@@ -514,7 +514,7 @@ public:
 private:
   TilingProcessor *mp_proc;
   size_t m_ix, m_iy;
-  db::Box m_tile_box; 
+  db::Box m_tile_box;
 };
 
 class TilingProcessorCountFunction
@@ -532,8 +532,7 @@ public:
   }
 };
 
-void
-TilingProcessorWorker::make_input_var (const TilingProcessor::InputSpec &is, const db::RecursiveShapeIterator *iter, tl::Eval &eval, double sf)
+void TilingProcessorWorker::make_input_var (const TilingProcessor::InputSpec &is, const db::RecursiveShapeIterator *iter, tl::Eval &eval, double sf)
 {
   if (! iter) {
     iter = &is.iter;
@@ -550,8 +549,7 @@ TilingProcessorWorker::make_input_var (const TilingProcessor::InputSpec &is, con
   }
 }
 
-void
-TilingProcessorWorker::do_perform (const TilingProcessorTask *tile_task)
+void TilingProcessorWorker::do_perform (const TilingProcessorTask *tile_task)
 {
   tl::Eval eval (&mp_job->processor ()->top_eval ());
 
@@ -559,7 +557,7 @@ TilingProcessorWorker::do_perform (const TilingProcessorTask *tile_task)
 
   eval.set_var ("_dbu", tl::Variant (mp_job->processor ()->dbu ()));
 
-  if (! mp_job->has_tiles ()) { 
+  if (! mp_job->has_tiles ()) {
     eval.set_var ("_tile", tl::Variant ());
   } else {
 
@@ -568,7 +566,6 @@ TilingProcessorWorker::do_perform (const TilingProcessorTask *tile_task)
     db::Region r;
     r.insert (clip_box_dbu);
     eval.set_var ("_tile", tl::Variant (r));
-
   }
 
   {
@@ -588,7 +585,7 @@ TilingProcessorWorker::do_perform (const TilingProcessorTask *tile_task)
 
     double sf = dbu / mp_job->processor ()->dbu ();
 
-    if (! mp_job->has_tiles ()) { 
+    if (! mp_job->has_tiles ()) {
 
       make_input_var (*i, 0, eval, sf);
 
@@ -604,9 +601,7 @@ TilingProcessorWorker::do_perform (const TilingProcessorTask *tile_task)
       }
 
       make_input_var (*i, &iter, eval, sf);
-
     }
-
   }
 
   eval.define_function ("_output", new TilingProcessorOutputFunction (mp_job->processor (), tile_task->ix (), tile_task->iy (), clip_box_dbu));
@@ -632,15 +627,13 @@ TilingProcessorJob::create_worker ()
   return new TilingProcessorWorker (this);
 }
 
-void
-TilingProcessorJob::after_sync_task (tl::Task * /*task*/)
+void TilingProcessorJob::after_sync_task (tl::Task * /*task*/)
 {
   //  This needs to be done here as there is no external loop to do this
   update_progress ();
 }
 
-void
-TilingProcessorJob::start (const std::string &job_description)
+void TilingProcessorJob::start (const std::string &job_description)
 {
   m_progress = tl::RelativeProgress (job_description, tasks (), 1);
   //  prevents child progress objects from showing
@@ -656,7 +649,7 @@ tl::Mutex TilingProcessor::s_output_lock;
 
 TilingProcessor::TilingProcessor ()
   : m_tile_width (0.0), m_tile_height (0.0),
-    m_ntiles_w (0), m_ntiles_h (0), 
+    m_ntiles_w (0), m_ntiles_h (0),
     m_tile_size_given (false), m_tile_count_given (false),
     m_tile_origin_x (0.0), m_tile_origin_y (0.0),
     m_tile_origin_given (false),
@@ -667,8 +660,7 @@ TilingProcessor::TilingProcessor ()
   //  .. nothing yet ..
 }
 
-void 
-TilingProcessor::input (const std::string &name, const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans, Type type, bool merged_semantics)
+void TilingProcessor::input (const std::string &name, const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans, Type type, bool merged_semantics)
 {
   if (m_inputs.empty () && iter.layout ()) {
     m_dbu = iter.layout ()->dbu ();
@@ -686,64 +678,55 @@ TilingProcessor::~TilingProcessor ()
   m_outputs.clear ();
 }
 
-void
-TilingProcessor::set_frame (const db::DBox &frame)
+void TilingProcessor::set_frame (const db::DBox &frame)
 {
   m_frame = frame;
 }
 
-void  
-TilingProcessor::tile_size (double w, double h)
+void TilingProcessor::tile_size (double w, double h)
 {
   m_tile_width = std::max (0.0, w);
   m_tile_height = std::max (0.0, h);
   m_tile_size_given = true;
 }
 
-void  
-TilingProcessor::tiles (size_t nx, size_t ny)
+void TilingProcessor::tiles (size_t nx, size_t ny)
 {
   m_ntiles_w = nx;
   m_ntiles_h = ny;
   m_tile_count_given = true;
 }
 
-void  
-TilingProcessor::tile_origin (double xo, double yo)
+void TilingProcessor::tile_origin (double xo, double yo)
 {
   m_tile_origin_x = xo;
   m_tile_origin_y = yo;
   m_tile_origin_given = true;
 }
 
-void  
-TilingProcessor::tile_border (double bx, double by)
+void TilingProcessor::tile_border (double bx, double by)
 {
   m_tile_bx = std::max (0.0, bx);
   m_tile_by = std::max (0.0, by);
 }
 
-void  
-TilingProcessor::set_threads (size_t n)
+void TilingProcessor::set_threads (size_t n)
 {
   m_threads = n;
 }
 
-void  
-TilingProcessor::queue (const std::string &script)
+void TilingProcessor::queue (const std::string &script)
 {
   m_scripts.push_back (script);
 }
 
-void  
-TilingProcessor::var (const std::string &name, const tl::Variant &value)
+void TilingProcessor::var (const std::string &name, const tl::Variant &value)
 {
   m_top_eval.set_var (name, value);
 }
 
 
-void  
-TilingProcessor::output (const std::string &name, size_t id, TileOutputReceiver *rec, const db::ICplxTrans &trans)
+void TilingProcessor::output (const std::string &name, size_t id, TileOutputReceiver *rec, const db::ICplxTrans &trans)
 {
   if (! rec) {
     return;
@@ -757,12 +740,11 @@ TilingProcessor::output (const std::string &name, size_t id, TileOutputReceiver 
   m_outputs.back ().trans = trans;
 }
 
-void   
-TilingProcessor::output (const std::string &name, db::Layout &layout, db::cell_index_type cell_index, const db::LayerProperties &lp, db::Coord ep_ext)
+void TilingProcessor::output (const std::string &name, db::Layout &layout, db::cell_index_type cell_index, const db::LayerProperties &lp, db::Coord ep_ext)
 {
   //  if we have a layer with the requested properties already, return this.
   db::Layout::layer_iterator li = layout.begin_layers ();
-  for ( ; li != layout.end_layers (); ++li) {
+  for (; li != layout.end_layers (); ++li) {
     if ((*li).second->log_equal (lp)) {
       break;
     }
@@ -778,8 +760,7 @@ TilingProcessor::output (const std::string &name, db::Layout &layout, db::cell_i
   output (name, layout, cell_index, layer, ep_ext);
 }
 
-void   
-TilingProcessor::output (const std::string &name, db::Layout &layout, db::cell_index_type cell_index, unsigned int layer, db::Coord ep_ext)
+void TilingProcessor::output (const std::string &name, db::Layout &layout, db::cell_index_type cell_index, unsigned int layer, db::Coord ep_ext)
 {
   m_top_eval.set_var (name, m_outputs.size ());
   m_outputs.push_back (OutputSpec ());
@@ -788,8 +769,7 @@ TilingProcessor::output (const std::string &name, db::Layout &layout, db::cell_i
   m_outputs.back ().receiver = new TileLayoutOutputReceiver (&layout, &layout.cell (cell_index), layer, ep_ext);
 }
 
-void 
-TilingProcessor::output (const std::string &name, db::Region &region, db::Coord ep_ext)
+void TilingProcessor::output (const std::string &name, db::Region &region, db::Coord ep_ext)
 {
   m_top_eval.set_var (name, m_outputs.size ());
   m_outputs.push_back (OutputSpec ());
@@ -798,8 +778,7 @@ TilingProcessor::output (const std::string &name, db::Region &region, db::Coord 
   m_outputs.back ().receiver = new TileRegionOutputReceiver (&region, ep_ext);
 }
 
-void 
-TilingProcessor::output (const std::string &name, db::EdgePairs &edge_pairs)
+void TilingProcessor::output (const std::string &name, db::EdgePairs &edge_pairs)
 {
   m_top_eval.set_var (name, m_outputs.size ());
   m_outputs.push_back (OutputSpec ());
@@ -808,8 +787,7 @@ TilingProcessor::output (const std::string &name, db::EdgePairs &edge_pairs)
   m_outputs.back ().receiver = new TileEdgePairsOutputReceiver (&edge_pairs);
 }
 
-void
-TilingProcessor::output (const std::string &name, db::Texts &texts)
+void TilingProcessor::output (const std::string &name, db::Texts &texts)
 {
   m_top_eval.set_var (name, m_outputs.size ());
   m_outputs.push_back (OutputSpec ());
@@ -818,8 +796,7 @@ TilingProcessor::output (const std::string &name, db::Texts &texts)
   m_outputs.back ().receiver = new TileTextsOutputReceiver (&texts);
 }
 
-void
-TilingProcessor::output (const std::string &name, db::Edges &edges)
+void TilingProcessor::output (const std::string &name, db::Edges &edges)
 {
   m_top_eval.set_var (name, m_outputs.size ());
   m_outputs.push_back (OutputSpec ());
@@ -837,21 +814,20 @@ TilingProcessor::receiver (const std::vector<tl::Variant> &args)
     throw tl::Exception (tl::to_string (tr ("_rec function requires one argument: the handle of the output channel")));
   }
 
-  size_t index = args[0].to<size_t> ();
+  size_t index = args [0].to<size_t> ();
   if (index >= m_outputs.size ()) {
     throw tl::Exception (tl::to_string (tr ("Invalid handle in _rec function call")));
   }
 
   gsi::Proxy *proxy = new gsi::Proxy (gsi::cls_decl<TileOutputReceiver> ());
-  proxy->set (m_outputs[index].receiver.get (), false, false, false);
+  proxy->set (m_outputs [index].receiver.get (), false, false, false);
 
   //  gsi::Object based objects are managed through a Proxy and
   //  shared pointers within tl::Variant. That means: copy by reference.
   return tl::Variant (proxy, gsi::cls_decl<TileOutputReceiver> ()->var_cls (true /*const*/), true);
 }
 
-void 
-TilingProcessor::put (size_t ix, size_t iy, const db::Box &tile, const std::vector<tl::Variant> &args)
+void TilingProcessor::put (size_t ix, size_t iy, const db::Box &tile, const std::vector<tl::Variant> &args)
 {
   tl::MutexLocker locker (&s_output_lock);
 
@@ -861,16 +837,15 @@ TilingProcessor::put (size_t ix, size_t iy, const db::Box &tile, const std::vect
 
   bool clip = ((args.size () <= 2 || args [2].to_bool ()) && ! tile.empty ());
 
-  size_t index = args[0].to<size_t> ();
+  size_t index = args [0].to<size_t> ();
   if (index >= m_outputs.size ()) {
     throw tl::Exception (tl::to_string (tr ("Invalid handle (first argument) in _output function call")));
   }
 
-  m_outputs[index].receiver->put (ix, iy, tile, m_outputs[index].id, args[1], dbu (), m_outputs[index].trans, clip);
+  m_outputs [index].receiver->put (ix, iy, tile, m_outputs [index].id, args [1], dbu (), m_outputs [index].trans, clip);
 }
 
-void  
-TilingProcessor::execute (const std::string &desc)
+void TilingProcessor::execute (const std::string &desc)
 {
   db::DBox tot_box = m_frame;
 
@@ -925,7 +900,6 @@ TilingProcessor::execute (const std::string &desc)
     ntiles_h = m_ntiles_h;
     tile_width = dbu () * floor (0.5 + m_tile_width / dbu () + 1e-10);
     tile_height = dbu () * floor (0.5 + m_tile_height / dbu () + 1e-10);
-
   }
 
   //  NOTE: we use an explicit frame specification as an indication that
@@ -961,12 +935,10 @@ TilingProcessor::execute (const std::string &desc)
         std::string tile_desc = tl::sprintf ("%d/%d,%d/%d", ix + 1, ntiles_w, iy + 1, ntiles_h);
 
         size_t si = 0;
-        for (std::vector <std::string>::const_iterator s = m_scripts.begin (); s != m_scripts.end (); ++s, ++si) {
+        for (std::vector<std::string>::const_iterator s = m_scripts.begin (); s != m_scripts.end (); ++s, ++si) {
           job.schedule (new TilingProcessorTask (tile_desc, ix, iy, clip_box, region, *s, si));
         }
-
       }
-
     }
 
   } else {
@@ -974,10 +946,9 @@ TilingProcessor::execute (const std::string &desc)
     ntiles_w = ntiles_h = 0;
 
     size_t si = 0;
-    for (std::vector <std::string>::const_iterator s = m_scripts.begin (); s != m_scripts.end (); ++s, ++si) {
+    for (std::vector<std::string>::const_iterator s = m_scripts.begin (); s != m_scripts.end (); ++s, ++si) {
       job.schedule (new TilingProcessorTask ("all", 0, 0, db::DBox (), db::DBox (), *s, si));
     }
-
   }
 
   try {
@@ -1000,7 +971,7 @@ TilingProcessor::execute (const std::string &desc)
 
       for (std::vector<OutputSpec>::iterator o = m_outputs.begin (); o != m_outputs.end (); ++o) {
         if (o->receiver) {
-          o->receiver->finish (!job.has_error ());
+          o->receiver->finish (! job.has_error ());
           o->receiver->set_processor (0);
         }
       }
@@ -1029,4 +1000,3 @@ TilingProcessor::execute (const std::string &desc)
 }
 
 }
-

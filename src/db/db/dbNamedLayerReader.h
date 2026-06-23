@@ -111,7 +111,7 @@ protected:
    *  The result's first attribute is true, if such a layer could be found
    *  or created. In this case, the second attribute is the layer index.
    */
-  std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &name);
+  std::pair<bool, unsigned int> open_layer (db::Layout &layout, const std::string &name);
 
   /**
    *  @brief Opens a new layer
@@ -119,7 +119,7 @@ protected:
    *  The result's first attribute is true, if such a layer could be found
    *  or created. In this case, the second attribute is the layer index.
    */
-  std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &name, bool keep_layer_name, bool create_layer);
+  std::pair<bool, unsigned int> open_layer (db::Layout &layout, const std::string &name, bool keep_layer_name, bool create_layer);
 
   /**
    *  @brief Force mapping of a name to a layer index
@@ -144,12 +144,12 @@ private:
   bool m_keep_layer_names;
   LayerMap m_layer_map;
   unsigned int m_next_layer_index;
-  std::map <std::string, unsigned int> m_new_layers;
+  std::map<std::string, unsigned int> m_new_layers;
   db::LayerMap m_layer_map_out;
-  std::map<std::string, std::pair <bool, unsigned int> > m_layer_cache;
+  std::map<std::string, std::pair<bool, unsigned int>> m_layer_cache;
   std::map<std::set<unsigned int>, unsigned int> m_multi_mapping_placeholders;
 
-  std::pair <bool, unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, bool keep_layer_name, bool create_layer);
+  std::pair<bool, unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, bool keep_layer_name, bool create_layer);
 };
 
 }

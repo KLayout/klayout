@@ -35,7 +35,7 @@ NetlistExtractor::NetlistExtractor ()
   //  .. nothing yet ..
 }
 
-void NetlistExtractor::set_joined_net_names (const std::list<tl::GlobPattern>  &jnn)
+void NetlistExtractor::set_joined_net_names (const std::list<tl::GlobPattern> &jnn)
 {
   m_joined_net_names = jnn;
 }
@@ -45,12 +45,12 @@ void NetlistExtractor::set_joined_net_names (const std::string &cellname, const 
   m_joined_net_names_per_cell.push_back (std::make_pair (cellname, jnn));
 }
 
-void NetlistExtractor::set_joined_nets (const std::list<std::set<std::string> > &jnn)
+void NetlistExtractor::set_joined_nets (const std::list<std::set<std::string>> &jnn)
 {
   m_joined_nets = jnn;
 }
 
-void NetlistExtractor::set_joined_nets (const std::string &cell_name, const std::list<std::set<std::string> > &jnn)
+void NetlistExtractor::set_joined_nets (const std::string &cell_name, const std::list<std::set<std::string>> &jnn)
 {
   m_joined_nets_per_cell.push_back (std::make_pair (cell_name, jnn));
 }
@@ -63,7 +63,7 @@ void NetlistExtractor::set_include_floating_subcircuits (bool f)
 static void
 build_net_name_equivalence (const db::Layout *layout, const db::Connectivity &conn, db::property_names_id_type net_name_id, const std::list<tl::GlobPattern> &jn_pattern, tl::equivalence_clusters<size_t> &eq)
 {
-  std::map<std::string, std::set<size_t> > prop_by_name;
+  std::map<std::string, std::set<size_t>> prop_by_name;
 
   {
     db::PropertiesRepository::properties_id_set with_name = db::PropertiesRepository::instance ().properties_ids_by_name (net_name_id);
@@ -93,12 +93,12 @@ build_net_name_equivalence (const db::Layout *layout, const db::Connectivity &co
     std::string nn = t->string ();
     for (std::list<tl::GlobPattern>::const_iterator jp = jn_pattern.begin (); jp != jn_pattern.end (); ++jp) {
       if (jp->match (nn)) {
-        prop_by_name [nn].insert (db::text_ref_to_attr (t.operator-> ()));
+        prop_by_name [nn].insert (db::text_ref_to_attr (t.operator->()));
       }
     }
   }
 
-  for (std::map<std::string, std::set<size_t> >::const_iterator pn = prop_by_name.begin (); pn != prop_by_name.end (); ++pn) {
+  for (std::map<std::string, std::set<size_t>>::const_iterator pn = prop_by_name.begin (); pn != prop_by_name.end (); ++pn) {
     std::set<size_t>::const_iterator p = pn->second.begin ();
     std::set<size_t>::const_iterator p0 = p;
     while (p != pn->second.end ()) {
@@ -111,7 +111,7 @@ build_net_name_equivalence (const db::Layout *layout, const db::Connectivity &co
 static void
 build_net_name_equivalence_for_explicit_connections (const db::Layout *layout, const db::Connectivity &conn, db::property_names_id_type net_name_id, const std::set<std::string> &nets_to_join, tl::equivalence_clusters<size_t> &eq)
 {
-  std::map<std::string, std::set<size_t> > prop_by_name;
+  std::map<std::string, std::set<size_t>> prop_by_name;
 
   {
     db::PropertiesRepository::properties_id_set with_name = db::PropertiesRepository::instance ().properties_ids_by_name (net_name_id);
@@ -136,12 +136,12 @@ build_net_name_equivalence_for_explicit_connections (const db::Layout *layout, c
   for (db::repository<db::Text>::iterator t = text_repository.begin (); t != text_repository.end (); ++t) {
     std::string nn = t->string ();
     if (nets_to_join.find (nn) != nets_to_join.end ()) {
-      prop_by_name [nn].insert (db::text_ref_to_attr (t.operator-> ()));
+      prop_by_name [nn].insert (db::text_ref_to_attr (t.operator->()));
     }
   }
 
   //  first inter-name equivalence (this implies implicit connections for all n1 and n2 labels)
-  for (std::map<std::string, std::set<size_t> >::const_iterator pn = prop_by_name.begin (); pn != prop_by_name.end (); ++pn) {
+  for (std::map<std::string, std::set<size_t>>::const_iterator pn = prop_by_name.begin (); pn != prop_by_name.end (); ++pn) {
     std::set<size_t>::const_iterator p = pn->second.begin ();
     std::set<size_t>::const_iterator p0 = p;
     while (p != pn->second.end ()) {
@@ -151,17 +151,16 @@ build_net_name_equivalence_for_explicit_connections (const db::Layout *layout, c
   }
 
   //  second intra-name equivalence
-  for (std::map<std::string, std::set<size_t> >::const_iterator pn1 = prop_by_name.begin (); pn1 != prop_by_name.end (); ++pn1) {
-    std::map<std::string, std::set<size_t> >::const_iterator pn2 = pn1;
+  for (std::map<std::string, std::set<size_t>>::const_iterator pn1 = prop_by_name.begin (); pn1 != prop_by_name.end (); ++pn1) {
+    std::map<std::string, std::set<size_t>>::const_iterator pn2 = pn1;
     ++pn2;
-    for ( ; pn2 != prop_by_name.end (); ++pn2) {
+    for (; pn2 != prop_by_name.end (); ++pn2) {
       eq.same (*pn1->second.begin (), *pn2->second.begin ());
     }
   }
 }
 
-void
-NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layout_index, const db::Connectivity &conn, db::Netlist &nl, hier_clusters_type &clusters)
+void NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layout_index, const db::Connectivity &conn, db::Netlist &nl, hier_clusters_type &clusters)
 {
   mp_clusters = &clusters;
   mp_layout = &dss.const_layout (layout_index);
@@ -181,13 +180,13 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
   //  TODO: this feature is not really used as must-connect nets now are handled in the LayoutToNetlist class on netlist level.
   //  Remove this later.
 
-  std::map<db::cell_index_type, tl::equivalence_clusters<size_t> > net_name_equivalence;
+  std::map<db::cell_index_type, tl::equivalence_clusters<size_t>> net_name_equivalence;
   if (m_text_annot_name_id.first) {
 
     if (! m_joined_net_names.empty ()) {
       build_net_name_equivalence (mp_layout, conn, m_text_annot_name_id.second, m_joined_net_names, net_name_equivalence [hier_clusters_type::top_cell_index]);
     }
-    for (std::list<std::pair<std::string, std::list<tl::GlobPattern> > >::const_iterator m = m_joined_net_names_per_cell.begin (); m != m_joined_net_names_per_cell.end (); ++m) {
+    for (std::list<std::pair<std::string, std::list<tl::GlobPattern>>>::const_iterator m = m_joined_net_names_per_cell.begin (); m != m_joined_net_names_per_cell.end (); ++m) {
       std::pair<bool, db::cell_index_type> cp = mp_layout->cell_by_name (m->first.c_str ());
       if (cp.first) {
         build_net_name_equivalence (mp_layout, conn, m_text_annot_name_id.second, m->second, net_name_equivalence [cp.second]);
@@ -195,19 +194,18 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
     }
 
     if (! m_joined_nets.empty ()) {
-      for (std::list<std::set<std::string> >::const_iterator n = m_joined_nets.begin (); n != m_joined_nets.end (); ++n) {
+      for (std::list<std::set<std::string>>::const_iterator n = m_joined_nets.begin (); n != m_joined_nets.end (); ++n) {
         build_net_name_equivalence_for_explicit_connections (mp_layout, conn, m_text_annot_name_id.second, *n, net_name_equivalence [hier_clusters_type::top_cell_index]);
       }
     }
-    for (std::list<std::pair<std::string, std::list<std::set<std::string> > > >::const_iterator m = m_joined_nets_per_cell.begin (); m != m_joined_nets_per_cell.end (); ++m) {
+    for (std::list<std::pair<std::string, std::list<std::set<std::string>>>>::const_iterator m = m_joined_nets_per_cell.begin (); m != m_joined_nets_per_cell.end (); ++m) {
       std::pair<bool, db::cell_index_type> cp = mp_layout->cell_by_name (m->first.c_str ());
       if (cp.first) {
-        for (std::list<std::set<std::string> >::const_iterator n = m->second.begin (); n != m->second.end (); ++n) {
+        for (std::list<std::set<std::string>>::const_iterator n = m->second.begin (); n != m->second.end (); ++n) {
           build_net_name_equivalence_for_explicit_connections (mp_layout, conn, m_text_annot_name_id.second, *n, net_name_equivalence [cp.second]);
         }
       }
     }
-
   }
 
   //  the big part: actually extract the nets
@@ -220,10 +218,10 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
   //  some circuits may be there because of device extraction
   for (db::Netlist::circuit_iterator c = nl.begin_circuits (); c != nl.end_circuits (); ++c) {
     tl_assert (mp_layout->is_valid_cell_index (c->cell_index ()));
-    circuits.insert (std::make_pair (c->cell_index (), c.operator-> ()));
+    circuits.insert (std::make_pair (c->cell_index (), c.operator->()));
   }
 
-  std::map<db::cell_index_type, std::map<size_t, size_t> > pins_per_cluster_per_cell;
+  std::map<db::cell_index_type, std::map<size_t, size_t>> pins_per_cluster_per_cell;
   for (db::Layout::bottom_up_const_iterator cid = mp_layout->begin_bottom_up (); cid != mp_layout->end_bottom_up (); ++cid) {
 
     const db::Cell &cell = mp_layout->cell (*cid);
@@ -244,7 +242,6 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
         //  skip this cell
         continue;
       }
-
     }
 
     db::DeviceAbstract *dm = nl.device_abstract_by_cell_index (*cid);
@@ -281,7 +278,6 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
           make_subcircuit (circuit, inst->cell_index (), inst->complex_trans (*ii), subcircuits, circuits);
         }
       }
-
     }
 
     for (connected_clusters_type::all_iterator c = per_cell_clusters.begin_all (); ! c.at_end (); ++c) {
@@ -342,14 +338,11 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
         size_t pin_id = make_pin (circuit, net);
         c2p.insert (std::make_pair (*c, pin_id));
       }
-
     }
-
   }
 }
 
-void
-NetlistExtractor::assign_net_names (db::Net *net, const std::set<std::string> &net_names)
+void NetlistExtractor::assign_net_names (db::Net *net, const std::set<std::string> &net_names)
 {
   std::string nn;
   for (std::set<std::string>::const_iterator n = net_names.begin (); n != net_names.end (); ++n) {
@@ -384,8 +377,7 @@ collect_soft_connected_clusters (size_t from_id, const NetlistExtractor::connect
   }
 }
 
-void
-NetlistExtractor::make_device_abstract_connections (db::DeviceAbstract *dm, connected_clusters_type &clusters)
+void NetlistExtractor::make_device_abstract_connections (db::DeviceAbstract *dm, connected_clusters_type &clusters)
 {
   //  make the terminal to cluster ID connections for the device abstract from the device cells
 
@@ -421,22 +413,16 @@ NetlistExtractor::make_device_abstract_connections (db::DeviceAbstract *dm, conn
               }
 
               dm->set_cluster_id_for_terminal (terminal_id, dc->id ());
-
             }
-
           }
-
         }
 
         if (join) {
           //  copy the terminal attributes and shapes so we attach the terminal here in the device connection step
           clusters.join_cluster_with (dc->id (), *id);
         }
-
       }
-
     }
-
   }
 
   //  check whether all connections have been made
@@ -468,15 +454,12 @@ void NetlistExtractor::collect_labels (const connected_clusters_type &clusters,
         if (m_text_annot_name_id.first && j->first == m_text_annot_name_id.second) {
           net_names.insert (db::property_value (j->second).to_string ());
         }
-
       }
 
     } else if (db::is_text_ref_attr (*a)) {
 
       net_names.insert (db::text_from_attr (*a));
-
     }
-
   }
 }
 
@@ -548,21 +531,17 @@ void NetlistExtractor::connect_devices (db::Circuit *circuit,
 
           size_t tid = db::property_value (j->second).to<size_t> ();
           device->connect_terminal (tid, net);
-
         }
-
       }
-
     }
-
   }
 }
 
-db::SubCircuit * NetlistExtractor::make_subcircuit (db::Circuit *circuit,
-                                                    db::cell_index_type inst_cell_index,
-                                                    const db::ICplxTrans &inst_trans,
-                                                    std::map<std::pair<db::cell_index_type, db::ICplxTrans>, db::SubCircuit *> &subcircuits,
-                                                    const std::map<db::cell_index_type, db::Circuit *> &circuits)
+db::SubCircuit *NetlistExtractor::make_subcircuit (db::Circuit *circuit,
+                                                   db::cell_index_type inst_cell_index,
+                                                   const db::ICplxTrans &inst_trans,
+                                                   std::map<std::pair<db::cell_index_type, db::ICplxTrans>, db::SubCircuit *> &subcircuits,
+                                                   const std::map<db::cell_index_type, db::Circuit *> &circuits)
 {
   db::SubCircuit *subcircuit = 0;
 
@@ -597,7 +576,7 @@ void NetlistExtractor::make_and_connect_subcircuits (db::Circuit *circuit,
                                                      db::Net *net,
                                                      std::map<std::pair<db::cell_index_type, db::ICplxTrans>, db::SubCircuit *> &subcircuits,
                                                      const std::map<db::cell_index_type, db::Circuit *> &circuits,
-                                                     const std::map<db::cell_index_type, std::map<size_t, size_t> > &pins_per_cluster)
+                                                     const std::map<db::cell_index_type, std::map<size_t, size_t>> &pins_per_cluster)
 {
   const connected_clusters_type::connections_type &connections = clusters.connections_for_cluster (cid);
   for (connected_clusters_type::connections_type::const_iterator i = connections.begin (); i != connections.end (); ++i) {
@@ -615,12 +594,11 @@ void NetlistExtractor::make_and_connect_subcircuits (db::Circuit *circuit,
     tl_assert (subcircuit != 0);
 
     //  create the pin connection to the subcircuit
-    std::map<db::cell_index_type, std::map<size_t, size_t> >::const_iterator icc2p = pins_per_cluster.find (inst_cell_index);
+    std::map<db::cell_index_type, std::map<size_t, size_t>>::const_iterator icc2p = pins_per_cluster.find (inst_cell_index);
     tl_assert (icc2p != pins_per_cluster.end ());
     std::map<size_t, size_t>::const_iterator ip = icc2p->second.find (i->id ());
     tl_assert (ip != icc2p->second.end ());
     subcircuit->connect_pin (ip->second, net);
-
   }
 }
 

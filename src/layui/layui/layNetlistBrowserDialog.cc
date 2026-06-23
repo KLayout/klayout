@@ -141,8 +141,7 @@ NetlistBrowserDialog::db ()
   return mp_ui->browser_page->db ();
 }
 
-int
-NetlistBrowserDialog::l2n_index ()
+int NetlistBrowserDialog::l2n_index ()
 {
   return m_l2n_index;
 }
@@ -158,8 +157,7 @@ NetlistBrowserDialog::current_path () const
   }
 }
 
-void
-NetlistBrowserDialog::set_current_path (const lay::NetlistObjectsPath &path)
+void NetlistBrowserDialog::set_current_path (const lay::NetlistObjectsPath &path)
 {
   if (mp_ui->browser_page) {
     mp_ui->browser_page->select_path (path);
@@ -177,8 +175,7 @@ NetlistBrowserDialog::selected_paths () const
   }
 }
 
-void
-NetlistBrowserDialog::configure_clicked ()
+void NetlistBrowserDialog::configure_clicked ()
 {
   release_mouse ();
 
@@ -186,8 +183,7 @@ NetlistBrowserDialog::configure_clicked ()
   config_dialog.exec ();
 }
 
-bool
-NetlistBrowserDialog::mouse_move_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool prio)
+bool NetlistBrowserDialog::mouse_move_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool prio)
 {
   if (prio && m_mouse_state != 0) {
     set_cursor (lay::Cursor::cross);
@@ -196,20 +192,18 @@ NetlistBrowserDialog::mouse_move_event (const db::DPoint & /*p*/, unsigned int /
   return false;
 }
 
-void
-NetlistBrowserDialog::sticky_mode_clicked ()
+void NetlistBrowserDialog::sticky_mode_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   if (! mp_ui->sticky_cbx->isChecked ()) {
     release_mouse ();
   } else {
     probe_button_pressed ();
   }
-END_PROTECTED
+  END_PROTECTED
 }
 
-bool
-NetlistBrowserDialog::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
+bool NetlistBrowserDialog::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (prio && (buttons & lay::LeftButton) != 0 && m_mouse_state != 0) {
 
@@ -230,16 +224,13 @@ NetlistBrowserDialog::mouse_click_event (const db::DPoint &p, unsigned int butto
       }
 
       probe_net (p, trace_path);
-
     }
-
   }
 
   return true;
 }
 
-void
-NetlistBrowserDialog::probe_net (const db::DPoint &p, bool trace_path)
+void NetlistBrowserDialog::probe_net (const db::DPoint &p, bool trace_path)
 {
   //  prepare for the net tracing
   double l = double (view ()->search_range ()) / ui ()->mouse_event_trans ().mag ();
@@ -276,7 +267,6 @@ NetlistBrowserDialog::probe_net (const db::DPoint &p, bool trace_path)
 
     cv_index = r->cv_index ();
     start_layer = r->layer ();
-
   }
 
   //  if the cv index is not corresponding to the one of the current netlist, ignore this event
@@ -301,7 +291,6 @@ NetlistBrowserDialog::probe_net (const db::DPoint &p, bool trace_path)
     db::CplxTrans tt = tv.front () * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ();
 
     start_point = tt.inverted ().trans (start_search_box.center ());
-
   }
 
   db::Net *net = 0;
@@ -335,13 +324,11 @@ NetlistBrowserDialog::probe_net (const db::DPoint &p, bool trace_path)
 
       //  probe the net
 
-      for (std::vector<db::Region *>::const_iterator r = regions.begin (); r != regions.end () && !net; ++r) {
+      for (std::vector<db::Region *>::const_iterator r = regions.begin (); r != regions.end () && ! net; ++r) {
         sc_path.clear ();
         net = l2ndb->probe_net (**r, start_point, &sc_path, root);
       }
-
     }
-
   }
 
   //  select the net if one was found
@@ -360,8 +347,7 @@ NetlistBrowserDialog::probe_net (const db::DPoint &p, bool trace_path)
   probe_event (mp_ui->browser_page->current_path ().first (), mp_ui->browser_page->current_path ().second ());
 }
 
-void
-NetlistBrowserDialog::release_mouse ()
+void NetlistBrowserDialog::release_mouse ()
 {
   m_mouse_state = 0;
   view ()->message ();
@@ -374,23 +360,21 @@ NetlistBrowserDialog::view_service_interface ()
   return this;
 }
 
-void
-NetlistBrowserDialog::probe_button_pressed ()
+void NetlistBrowserDialog::probe_button_pressed ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   m_mouse_state = 1;
 
   view ()->message (tl::to_string (QObject::tr ("Click on a point in the net")));
   ui ()->grab_mouse (this, false);
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-NetlistBrowserDialog::unload_all_clicked ()
+void NetlistBrowserDialog::unload_all_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   while (view ()->num_l2ndbs () > 0) {
     view ()->remove_l2ndb (0);
@@ -398,13 +382,12 @@ BEGIN_PROTECTED
 
   l2ndb_index_changed (-1);
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-NetlistBrowserDialog::unload_clicked ()
+void NetlistBrowserDialog::unload_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (m_l2n_index < int (view ()->num_l2ndbs ()) && m_l2n_index >= 0) {
 
@@ -419,24 +402,21 @@ BEGIN_PROTECTED
     if (new_l2n_index < int (view ()->num_l2ndbs ()) && new_l2n_index >= 0) {
       l2ndb_index_changed (new_l2n_index);
     }
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-NetlistBrowserDialog::export_clicked ()
+void NetlistBrowserDialog::export_clicked ()
 {
   if (m_l2n_index < int (view ()->num_l2ndbs ()) && m_l2n_index >= 0) {
     mp_ui->browser_page->export_all ();
   }
 }
 
-void
-NetlistBrowserDialog::saveas_clicked ()
+void NetlistBrowserDialog::saveas_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (m_l2n_index < int (view ()->num_l2ndbs ()) && m_l2n_index >= 0) {
 
@@ -454,7 +434,6 @@ BEGIN_PROTECTED
         tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Saving")));
 
         lvsdb->save (fn, true);
-
       }
 
     } else if (l2ndb) {
@@ -468,20 +447,16 @@ BEGIN_PROTECTED
         tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Saving")));
 
         l2ndb->save (fn, true);
-
       }
-
     }
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-NetlistBrowserDialog::reload_clicked ()
+void NetlistBrowserDialog::reload_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (m_l2n_index < int (view ()->num_l2ndbs ()) && m_l2n_index >= 0) {
 
@@ -506,18 +481,15 @@ BEGIN_PROTECTED
         current_db_changed_event ();
         throw;
       }
-
     }
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-NetlistBrowserDialog::open_clicked ()
+void NetlistBrowserDialog::open_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   std::string fmts = tl::to_string (QObject::tr ("All files (*)"));
 #if 0 //  TODO: would be good to have this:
@@ -541,14 +513,12 @@ BEGIN_PROTECTED
     mp_ui->l2ndb_cb->setCurrentIndex (l2n_index);
     //  it looks like the setCurrentIndex does not issue this signal:
     l2ndb_index_changed (l2n_index);
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-bool
-NetlistBrowserDialog::configure (const std::string &name, const std::string &value)
+bool NetlistBrowserDialog::configure (const std::string &name, const std::string &value)
 {
   bool need_update = false;
   bool taken = true;
@@ -659,8 +629,7 @@ NetlistBrowserDialog::configure (const std::string &name, const std::string &val
   return taken;
 }
 
-void
-NetlistBrowserDialog::load (int l2ndb_index, int cv_index)
+void NetlistBrowserDialog::load (int l2ndb_index, int cv_index)
 {
   if (! view ()->get_l2ndb (l2ndb_index)) {
     return;
@@ -682,8 +651,7 @@ NetlistBrowserDialog::load (int l2ndb_index, int cv_index)
   activate ();
 }
 
-void
-NetlistBrowserDialog::l2ndbs_changed ()
+void NetlistBrowserDialog::l2ndbs_changed ()
 {
   int l2n_index = -1;
 
@@ -711,14 +679,12 @@ NetlistBrowserDialog::l2ndbs_changed ()
   }
 }
 
-void
-NetlistBrowserDialog::cellview_changed (int)
+void NetlistBrowserDialog::cellview_changed (int)
 {
   mp_ui->browser_page->update_highlights ();
 }
 
-void
-NetlistBrowserDialog::cellviews_changed ()
+void NetlistBrowserDialog::cellviews_changed ()
 {
   int cv_index = -1;
 
@@ -736,8 +702,7 @@ NetlistBrowserDialog::cellviews_changed ()
   cv_index_changed (cv_index);
 }
 
-void
-NetlistBrowserDialog::l2ndb_index_changed (int index)
+void NetlistBrowserDialog::l2ndb_index_changed (int index)
 {
   if (m_l2n_index != index) {
     m_l2n_index = index;
@@ -747,8 +712,7 @@ NetlistBrowserDialog::l2ndb_index_changed (int index)
   }
 }
 
-void
-NetlistBrowserDialog::cv_index_changed (int index)
+void NetlistBrowserDialog::cv_index_changed (int index)
 {
   if (m_cv_index != index) {
     m_cv_index = index;
@@ -758,8 +722,7 @@ NetlistBrowserDialog::cv_index_changed (int index)
   }
 }
 
-void
-NetlistBrowserDialog::activated ()
+void NetlistBrowserDialog::activated ()
 {
   std::string state;
   view ()->config_get (cfg_l2ndb_window_state, state);
@@ -781,8 +744,7 @@ NetlistBrowserDialog::activated ()
   }
 }
 
-void
-NetlistBrowserDialog::update_content ()
+void NetlistBrowserDialog::update_content ()
 {
   release_mouse ();
 
@@ -803,7 +765,7 @@ NetlistBrowserDialog::update_content ()
   m_unload_all_action->setEnabled (l2ndb != 0);
   m_reload_action->setEnabled (l2ndb != 0);
 
-  mp_ui->browser_page->enable_updates (false);  //  Avoid building the internal lists several times ...
+  mp_ui->browser_page->enable_updates (false); //  Avoid building the internal lists several times ...
   db_changed = mp_ui->browser_page->set_db (l2ndb);
   mp_ui->browser_page->set_max_shape_count (m_max_shape_count);
   mp_ui->browser_page->set_highlight_style (m_marker_color, m_marker_line_width, m_marker_vertex_size, m_marker_halo, m_marker_dither_pattern, m_marker_intensity, m_use_original_colors, m_auto_color_enabled ? &m_auto_colors : 0);
@@ -836,8 +798,7 @@ NetlistBrowserDialog::update_content ()
   }
 }
 
-void
-NetlistBrowserDialog::deactivated ()
+void NetlistBrowserDialog::deactivated ()
 {
   release_mouse ();
 
@@ -857,8 +818,7 @@ NetlistBrowserDialog::deactivated ()
   }
 }
 
-void
-NetlistBrowserDialog::menu_activated (const std::string &symbol)
+void NetlistBrowserDialog::menu_activated (const std::string &symbol)
 {
   if (symbol == "netlist_browser::show") {
     view ()->deactivate_all_browsers ();

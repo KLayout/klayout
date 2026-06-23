@@ -157,7 +157,7 @@ private:
 class DB_PLUGIN_PUBLIC NetTracerNet
 {
 public:
-  typedef std::vector <db::NetTracerShape>::const_iterator iterator;
+  typedef std::vector<db::NetTracerShape>::const_iterator iterator;
 
   /**
    *  @brief Default constructor
@@ -346,10 +346,10 @@ private:
   std::string m_layout_name;
   std::string m_top_cell_name;
   bool m_incomplete;
-  std::vector <db::NetTracerShape> m_net_shapes;
+  std::vector<db::NetTracerShape> m_net_shapes;
   db::Shapes m_shapes;
-  std::map <unsigned int, std::pair <db::LayerProperties, db::LayerProperties> > m_layers;
-  std::map <unsigned int, std::string> m_cell_names;
+  std::map<unsigned int, std::pair<db::LayerProperties, db::LayerProperties>> m_layers;
+  std::map<unsigned int, std::string> m_cell_names;
   tl::Color m_color;
   db::DBox m_start_search_box, m_stop_search_box;
   bool m_trace_path;

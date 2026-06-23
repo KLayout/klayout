@@ -32,7 +32,7 @@
 //  This will prevent that issue:
 #undef linux
 
-#define STRINGIFY(s) _STRINGIFY(s)
+#define STRINGIFY(s) _STRINGIFY (s)
 #define _STRINGIFY(s) #s
 
 int run_pymodtest (tl::TestBase *_this, const std::string &fn)
@@ -62,7 +62,7 @@ int run_pymodtest (tl::TestBase *_this, const std::string &fn)
 #endif
 
     cmd += std::string ("\"") + STRINGIFY (PYTHON) + "\" " + fp + " 2>&1";
-    
+
     tl::info << cmd;
     tl::InputPipe pipe (cmd);
     tl::InputStream is (pipe);
@@ -78,7 +78,7 @@ int run_pymodtest (tl::TestBase *_this, const std::string &fn)
 }
 
 #define PYMODTEST(n, file) \
-  TEST(n) { EXPECT_EQ (run_pymodtest(_this, file), 0); }
+  TEST (n) { EXPECT_EQ (run_pymodtest (_this, file), 0); }
 
 PYMODTEST (bridge, "bridge.py")
 

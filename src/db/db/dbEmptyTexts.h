@@ -29,7 +29,8 @@
 #include "dbTextsDelegate.h"
 #include "dbRecursiveShapeIterator.h"
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief The delegate for the actual edge set implementation
@@ -75,13 +76,13 @@ public:
   virtual bool has_valid_texts () const { return true; }
 
   virtual const db::RecursiveShapeIterator *iter () const { return 0; }
-  virtual void apply_property_translator (const db::PropertiesTranslator &) { }
+  virtual void apply_property_translator (const db::PropertiesTranslator &) {}
 
   virtual bool equals (const Texts &other) const;
   virtual bool less (const Texts &other) const;
 
-  virtual void insert_into (Layout *, db::cell_index_type, unsigned int) const { }
-  virtual void insert_into_as_polygons (Layout *, db::cell_index_type, unsigned int, db::Coord) const { }
+  virtual void insert_into (Layout *, db::cell_index_type, unsigned int) const {}
+  virtual void insert_into_as_polygons (Layout *, db::cell_index_type, unsigned int, db::Coord) const {}
 
   virtual RegionDelegate *pull_interacting (const Region &) const;
   virtual TextsDelegate *selected_interacting (const Region &) const;
@@ -94,4 +95,3 @@ private:
 }
 
 #endif
-

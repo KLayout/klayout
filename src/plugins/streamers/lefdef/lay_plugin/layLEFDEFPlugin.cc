@@ -64,4 +64,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> plugin_decl (new LEFDEFPluginDeclaration (), 10001, "LEFDEFReader");
 
 }
-

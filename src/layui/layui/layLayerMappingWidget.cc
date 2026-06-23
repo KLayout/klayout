@@ -56,8 +56,8 @@ LayerMappingWidget::LayerMappingWidget (QWidget *parent)
 
   connect (mp_ui->tabs, SIGNAL (currentChanged (int)), this, SLOT (current_tab_changed (int)));
 
-  mp_layer_table_file_dialog = new lay::FileDialog (this, 
-                                                    tl::to_string (QObject::tr ("Load Layer Table")), 
+  mp_layer_table_file_dialog = new lay::FileDialog (this,
+                                                    tl::to_string (QObject::tr ("Load Layer Table")),
                                                     tl::to_string (QObject::tr ("Layer properties and text files (*.lyp *.txt);;Layer properties files (*.lyp);;Text files (*.txt);;All files (*)")));
 }
 
@@ -70,8 +70,7 @@ LayerMappingWidget::~LayerMappingWidget ()
   mp_layer_table_file_dialog = 0;
 }
 
-void 
-LayerMappingWidget::set_layer_map (const db::LayerMap &lm)
+void LayerMappingWidget::set_layer_map (const db::LayerMap &lm)
 {
   std::vector<unsigned int> layer_ids = lm.get_layers ();
 
@@ -87,11 +86,10 @@ LayerMappingWidget::set_layer_map (const db::LayerMap &lm)
     item->setData (Qt::DisplayRole, tl::to_qstring (mapping));
     item->setFlags (item->flags () | Qt::ItemIsEditable);
     mp_ui->layer_lv->addItem (item);
-
   }
 }
 
-db::LayerMap 
+db::LayerMap
 LayerMappingWidget::get_layer_map () const
 {
   return get_layer_map_from_tab (mp_ui->tabs->currentIndex ());
@@ -117,27 +115,24 @@ LayerMappingWidget::get_layer_map_from_tab (int tab) const
   } else {
 
     lm = db::LayerMap::from_string_file_format (tl::to_string (mp_ui->text_edit->toPlainText ()));
-
   }
 
   return lm;
 }
 
-bool
-LayerMappingWidget::is_empty () const
+bool LayerMappingWidget::is_empty () const
 {
   return (mp_ui->layer_lv->count () == 0);
 }
 
-void 
-LayerMappingWidget::load_button_pressed ()
+void LayerMappingWidget::load_button_pressed ()
 {
   BEGIN_PROTECTED
 
   if (mp_layer_table_file_dialog->get_open (m_layer_table_file)) {
 
     bool success = false;
-   
+
     //  try to load as .lyp file
     try {
 
@@ -180,16 +175,13 @@ LayerMappingWidget::load_button_pressed ()
         }
         emit layerListChanged ();
       }
-
     }
-
   }
 
   END_PROTECTED
 }
 
-void 
-LayerMappingWidget::add_button_pressed ()
+void LayerMappingWidget::add_button_pressed ()
 {
   BEGIN_PROTECTED
 
@@ -197,10 +189,10 @@ LayerMappingWidget::add_button_pressed ()
 
   if (mp_ui->layer_lv->currentItem ()) {
     mp_ui->layer_lv->reset ();
-  } 
+  }
   mp_ui->layer_lv->selectionModel ()->clear ();
 
-  std::string data = tl::to_string(mp_ui->layer_lv->count() + 1) + "/0";
+  std::string data = tl::to_string (mp_ui->layer_lv->count () + 1) + "/0";
   QListWidgetItem *item = new QListWidgetItem (mp_ui->layer_lv);
   item->setData (Qt::DisplayRole, QVariant (tl::to_qstring (data)));
   item->setFlags (item->flags () | Qt::ItemIsEditable);
@@ -209,15 +201,14 @@ LayerMappingWidget::add_button_pressed ()
   mp_ui->layer_lv->editItem (item);
 
   emit layerItemAdded ();
-  if (was_empty && !is_empty ()) {
+  if (was_empty && ! is_empty ()) {
     emit enable_all_layers (false);
   }
 
   END_PROTECTED
 }
 
-void 
-LayerMappingWidget::delete_button_pressed ()
+void LayerMappingWidget::delete_button_pressed ()
 {
   BEGIN_PROTECTED
 
@@ -234,14 +225,12 @@ LayerMappingWidget::delete_button_pressed ()
     if (! was_empty && is_empty ()) {
       emit enable_all_layers (true);
     }
-
   }
 
   END_PROTECTED
 }
 
-void
-LayerMappingWidget::edit_button_pressed ()
+void LayerMappingWidget::edit_button_pressed ()
 {
   BEGIN_PROTECTED
 
@@ -252,8 +241,7 @@ LayerMappingWidget::edit_button_pressed ()
   END_PROTECTED
 }
 
-void
-LayerMappingWidget::current_tab_changed (int index)
+void LayerMappingWidget::current_tab_changed (int index)
 {
   set_layer_map (get_layer_map_from_tab (1 - index));
 }

@@ -36,8 +36,7 @@ PixelBufferPainter::PixelBufferPainter (tl::PixelBuffer &img, unsigned int width
   // .. nothing yet ..
 }
 
-void
-PixelBufferPainter::set (const db::Point &p, tl::Color c)
+void PixelBufferPainter::set (const db::Point &p, tl::Color c)
 {
   if (m_resolution < 1.0 - 1e-10) {
     fill_rect (p, p, c);
@@ -46,8 +45,7 @@ PixelBufferPainter::set (const db::Point &p, tl::Color c)
   }
 }
 
-void
-PixelBufferPainter::draw_line (const db::Point &p1, const db::Point &p2, tl::Color c)
+void PixelBufferPainter::draw_line (const db::Point &p1, const db::Point &p2, tl::Color c)
 {
   if (m_resolution < 1.0 - 1e-10) {
     if (p1.x () == p2.x () || p1.y () == p2.y ()) {
@@ -60,8 +58,7 @@ PixelBufferPainter::draw_line (const db::Point &p1, const db::Point &p2, tl::Col
   }
 }
 
-void
-PixelBufferPainter::draw_line_int (const db::Point &p1, const db::Point &p2, tl::Color c)
+void PixelBufferPainter::draw_line_int (const db::Point &p1, const db::Point &p2, tl::Color c)
 {
   if (p1.x () == p2.x ()) {
 
@@ -95,8 +92,7 @@ PixelBufferPainter::draw_line_int (const db::Point &p1, const db::Point &p2, tl:
   }
 }
 
-void
-PixelBufferPainter::fill_rect (const db::Point &p1, const db::Point &p2, tl::Color c)
+void PixelBufferPainter::fill_rect (const db::Point &p1, const db::Point &p2, tl::Color c)
 {
   unsigned int f = (unsigned int) (1.0 / m_resolution + 1e-10);
   if (f == 1) {
@@ -106,8 +102,7 @@ PixelBufferPainter::fill_rect (const db::Point &p1, const db::Point &p2, tl::Col
   }
 }
 
-void
-PixelBufferPainter::fill_rect_int (const db::Point &p1, const db::Point &p2, tl::Color c)
+void PixelBufferPainter::fill_rect_int (const db::Point &p1, const db::Point &p2, tl::Color c)
 {
   int y1 = std::min (p1.y (), p2.y ());
   int y2 = std::max (p1.y (), p2.y ());
@@ -116,8 +111,7 @@ PixelBufferPainter::fill_rect_int (const db::Point &p1, const db::Point &p2, tl:
   }
 }
 
-void
-PixelBufferPainter::draw_rect (const db::Point &p1, const db::Point &p2, tl::Color c)
+void PixelBufferPainter::draw_rect (const db::Point &p1, const db::Point &p2, tl::Color c)
 {
   int y1 = std::min (p1.y (), p2.y ());
   int y2 = std::max (p1.y (), p2.y ());
@@ -129,8 +123,7 @@ PixelBufferPainter::draw_rect (const db::Point &p1, const db::Point &p2, tl::Col
   draw_line (db::Point (x2, y1), db::Point (x2, y2), c);
 }
 
-void
-PixelBufferPainter::draw_text (const char *t, const db::Point &p, tl::Color c, int halign, int valign)
+void PixelBufferPainter::draw_text (const char *t, const db::Point &p, tl::Color c, int halign, int valign)
 {
   const lay::FixedFont &ff = lay::FixedFont::get_font (m_font_resolution);
   int x = p.x (), y = p.y ();
@@ -174,7 +167,7 @@ PixelBufferPainter::draw_text (const char *t, const db::Point &p, tl::Color c, i
         for (unsigned int j = 0; j < ff.width (); ++j, ++ix) {
 
           if ((*ds & m) && ix >= 0 && ix < int (mp_img->width ())) {
-            d[ix] = c.rgb ();
+            d [ix] = c.rgb ();
           }
 
           m <<= 1;
@@ -183,17 +176,12 @@ PixelBufferPainter::draw_text (const char *t, const db::Point &p, tl::Color c, i
             ++ds;
             m = 1;
           }
-
         }
-
       }
-
     }
 
     x += ff.width ();
-
   }
-
 }
 
 }

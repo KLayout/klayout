@@ -37,15 +37,13 @@ MouseTracker::MouseTracker (lay::LayoutViewBase *view)
   ui ()->grab_mouse (this, false);
 }
 
-bool
-MouseTracker::leave_event (bool)
+bool MouseTracker::leave_event (bool)
 {
   mp_markers.clear ();
   return false;
 }
 
-bool
-MouseTracker::configure (const std::string &name, const std::string &value)
+bool MouseTracker::configure (const std::string &name, const std::string &value)
 {
   if (name == cfg_crosshair_cursor_color) {
 
@@ -75,14 +73,12 @@ MouseTracker::configure (const std::string &name, const std::string &value)
       m_cursor_enabled = f;
       mp_markers.clear ();
     }
-
   }
 
-  return false;  //  not taken
+  return false; //  not taken
 }
 
-bool 
-MouseTracker::mouse_move_event (const db::DPoint &p, unsigned int /*buttons*/, bool prio)
+bool MouseTracker::mouse_move_event (const db::DPoint &p, unsigned int /*buttons*/, bool prio)
 {
   //  NOTE: by catching events with low prio, the tracking position was already set by consumers
   //  with high prio
@@ -103,7 +99,7 @@ MouseTracker::mouse_move_event (const db::DPoint &p, unsigned int /*buttons*/, b
 
     if (m_cursor_enabled) {
 
-      double max_coord = 1e30;  //  big enough I guess
+      double max_coord = 1e30; //  big enough I guess
 
       for (int i = 0; i < 2; ++i) {
 
@@ -119,11 +115,8 @@ MouseTracker::mouse_move_event (const db::DPoint &p, unsigned int /*buttons*/, b
         } else {
           mp_markers.back ()->set (db::DEdge (db::DPoint (-max_coord, tp.y ()), db::DPoint (max_coord, tp.y ())));
         }
-
       }
-
     }
-
   }
 
   return false;

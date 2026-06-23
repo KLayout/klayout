@@ -39,7 +39,7 @@ class OASISReaderPluginDeclaration
   : public StreamReaderPluginDeclaration
 {
 public:
-  OASISReaderPluginDeclaration () 
+  OASISReaderPluginDeclaration ()
     : StreamReaderPluginDeclaration (db::OASISReaderOptions ().format_name ())
   {
     // .. nothing yet ..
@@ -59,8 +59,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> plugin_decl (new lay::OASISReaderPluginDeclaration (), 10000, "OASISReader");
 
 }
-
-
-
-
-

@@ -37,7 +37,8 @@
 #include "tlTimer.h"
 #include "tlOptional.h"
 
-namespace {
+namespace
+{
 
 // ---------------------------------------------------------------------
 
@@ -110,28 +111,24 @@ HealingCountingReceiver::HealingCountingReceiver (size_t *count, bool healing)
   //  .. nothing yet ..
 }
 
-void
-HealingCountingReceiver::put (size_t /*ix*/, size_t /*iy*/, const db::Box &tile, size_t /*id*/, const tl::Variant &obj, double /*dbu*/, const db::ICplxTrans & /*trans*/, bool clip)
+void HealingCountingReceiver::put (size_t /*ix*/, size_t /*iy*/, const db::Box &tile, size_t /*id*/, const tl::Variant &obj, double /*dbu*/, const db::ICplxTrans & /*trans*/, bool clip)
 {
   HealingCountingInserter inserter (tile, m_healing, this);
   db::insert_var (inserter, obj, tile, clip);
   *mp_count += inserter.count ();
 }
 
-void
-HealingCountingReceiver::keep_for_healing (const db::Polygon &poly)
+void HealingCountingReceiver::keep_for_healing (const db::Polygon &poly)
 {
   m_for_healing.insert (poly);
 }
 
-void
-HealingCountingReceiver::keep_for_healing (const db::Box &box)
+void HealingCountingReceiver::keep_for_healing (const db::Box &box)
 {
   m_for_healing.insert (box);
 }
 
-void
-HealingCountingReceiver::finish (bool)
+void HealingCountingReceiver::finish (bool)
 {
   if (m_healing) {
     *mp_count += m_for_healing.merged ().count ();
@@ -219,22 +216,19 @@ HealingTileLayoutOutputReceiver::HealingTileLayoutOutputReceiver (db::Layout *la
   //  .. nothing yet ..
 }
 
-void
-HealingTileLayoutOutputReceiver::put (size_t /*ix*/, size_t /*iy*/, const db::Box &tile, size_t /*id*/, const tl::Variant &obj, double dbu, const db::ICplxTrans &trans, bool clip)
+void HealingTileLayoutOutputReceiver::put (size_t /*ix*/, size_t /*iy*/, const db::Box &tile, size_t /*id*/, const tl::Variant &obj, double dbu, const db::ICplxTrans &trans, bool clip)
 {
   db::ICplxTrans tr (db::ICplxTrans (dbu / mp_layout->dbu ()) * trans);
   HealingTileLayoutOutputInserter inserter (tile, m_healing, tr, this);
   db::insert_var (inserter, obj, tile, clip);
 }
 
-void
-HealingTileLayoutOutputReceiver::begin (size_t /*nx*/, size_t /*ny*/, const db::DPoint & /*p0*/, double /*dx*/, double /*dy*/, const db::DBox & /*frame*/)
+void HealingTileLayoutOutputReceiver::begin (size_t /*nx*/, size_t /*ny*/, const db::DPoint & /*p0*/, double /*dx*/, double /*dy*/, const db::DBox & /*frame*/)
 {
   mp_layout->start_changes ();
 }
 
-void
-HealingTileLayoutOutputReceiver::finish (bool /*success*/)
+void HealingTileLayoutOutputReceiver::finish (bool /*success*/)
 {
   //  heal the polygons
   m_for_healing.merge ();
@@ -244,34 +238,29 @@ HealingTileLayoutOutputReceiver::finish (bool /*success*/)
   mp_layout->end_changes ();
 }
 
-void
-HealingTileLayoutOutputReceiver::keep_for_healing (const db::Polygon &poly)
+void HealingTileLayoutOutputReceiver::keep_for_healing (const db::Polygon &poly)
 {
   m_for_healing.insert (poly);
 }
 
-void
-HealingTileLayoutOutputReceiver::keep_for_healing (const db::Box &box)
+void HealingTileLayoutOutputReceiver::keep_for_healing (const db::Box &box)
 {
   m_for_healing.insert (box);
 }
 
-void
-HealingTileLayoutOutputReceiver::output (const db::Polygon &poly)
+void HealingTileLayoutOutputReceiver::output (const db::Polygon &poly)
 {
   mp_cell->shapes (m_layer).insert (poly);
 }
 
-void
-HealingTileLayoutOutputReceiver::output (const db::Box &box)
+void HealingTileLayoutOutputReceiver::output (const db::Box &box)
 {
   mp_cell->shapes (m_layer).insert (box);
 }
 
 // ---------------------------------------------------------------------
 
-struct ResultDescriptor
-{
+struct ResultDescriptor {
   ResultDescriptor ()
     : shape_count (0), flat_shape_count (0), layer_a (-1), layer_b (-1), layer_output (-1), layout (0), top_cell (0)
   {
@@ -331,8 +320,7 @@ struct ResultDescriptor
 
 // ---------------------------------------------------------------------
 
-struct XORData
-{
+struct XORData {
   XORData ()
     : layout_a (0), layout_b (0), cell_a (0), cell_b (0),
       tolerance_bump (0),
@@ -341,7 +329,8 @@ struct XORData
       tile_size (0.0), heal_results (false),
       output_layout (0), output_cell (0),
       layers_missing (0)
-  { }
+  {
+  }
 
   db::Layout *layout_a, *layout_b;
   db::cell_index_type cell_a, cell_b;
@@ -368,7 +357,7 @@ struct XORData
 static bool run_tiled_xor (const XORData &xor_data);
 static bool run_deep_xor (const XORData &xor_data);
 
-BD_PUBLIC int strmxor (int argc, char *argv[])
+BD_PUBLIC int strmxor (int argc, char *argv [])
 {
   gsi::initialize_expressions ();
 
@@ -403,66 +392,53 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   bd::GenericWriterOptions writer_options (def_writer_options);
   writer_options.add_options (cmd);
 
-  cmd << tl::arg ("input_a",                   &infile_a,   "The first input file (any format, may be gzip compressed)")
-      << tl::arg ("input_b",                   &infile_b,   "The second input file (any format, may be gzip compressed)")
-      << tl::arg ("?output",                   &output,     "The output file to which the XOR differences are written",
+  cmd << tl::arg ("input_a", &infile_a, "The first input file (any format, may be gzip compressed)")
+      << tl::arg ("input_b", &infile_b, "The second input file (any format, may be gzip compressed)")
+      << tl::arg ("?output", &output, "The output file to which the XOR differences are written",
                   "This argument is optional. If not given, the exit status alone will indicate whether the layouts "
                   "are identical or not. The output is a layout file. The format of the file is derived "
                   "from the file name's suffix (.oas for OASIS, .gds[.gz] for (gzipped) GDS2 etc.). "
                   "You can also use any name, and specify the desired suffix in square brackets after the file name. "
-                  "For example, 'file.xor[oas]' will create an OASIS file called 'file.xor'."
-                 )
-      << tl::arg ("-ta|--top-a=name",          &top_a,      "Specifies the top cell for the first layout",
+                  "For example, 'file.xor[oas]' will create an OASIS file called 'file.xor'.")
+      << tl::arg ("-ta|--top-a=name", &top_a, "Specifies the top cell for the first layout",
                   "Use this option to take a specific cell as the top cell from the first layout. All "
                   "cells not called directly or indirectly from this cell are ignored. If you use this option, "
-                  "--top-b must be specified too and can be different from the first layout's top cell."
-                 )
-      << tl::arg ("-tb|--top-b=name",          &top_b,      "Specifies the top cell for the second layout",
-                  "See --top-a for details."
-                 )
-      << tl::arg ("-to|--top-output=name",     &top_output, "Specifies the top cell for the output layout",
+                  "--top-b must be specified too and can be different from the first layout's top cell.")
+      << tl::arg ("-tb|--top-b=name", &top_b, "Specifies the top cell for the second layout",
+                  "See --top-a for details.")
+      << tl::arg ("-to|--top-output=name", &top_output, "Specifies the top cell for the output layout",
                   "This option is only used if an output layout is given. It will specify the name of top cell to use there. "
-                  "If not specified, KLayout uses the top cell name of the first layout or the one given with --top-a."
-                 )
-      << tl::arg ("-u|--deep",                 &deep,       "Deep (hierarchical mode)",
+                  "If not specified, KLayout uses the top cell name of the first layout or the one given with --top-a.")
+      << tl::arg ("-u|--deep", &deep, "Deep (hierarchical mode)",
                   "Enables hierarchical XOR (experimental). In this mode, tiling is not supported "
-                  "and the tiling arguments are ignored."
-                 )
-      << tl::arg ("-s|--silent",               &silent,     "Silent mode",
+                  "and the tiling arguments are ignored.")
+      << tl::arg ("-s|--silent", &silent, "Silent mode",
                   "In silent mode, no summary is printed, but the exit code indicates whether "
-                  "the layouts are the same (0) or differences exist (> 0)."
-                 )
-      << tl::arg ("#--no-summary",             &no_summary, "Don't print a summary")
-      << tl::arg ("-l|--layer-details",        &dont_summarize_missing_layers, "Treats missing layers as empty",
+                  "the layouts are the same (0) or differences exist (> 0).")
+      << tl::arg ("#--no-summary", &no_summary, "Don't print a summary")
+      << tl::arg ("-l|--layer-details", &dont_summarize_missing_layers, "Treats missing layers as empty",
                   "With this option, missing layers are treated as \"empty\" and the whole layer of the other "
                   "layout is output. Without this option, a message is printed for missing layers instead and the "
-                  "layer from the other layout is ignored."
-                 )
-      << tl::arg ("-t|--tolerances=values",     &tolerances, "Specifies tolerances for the geometry compare",
+                  "layer from the other layout is ignored.")
+      << tl::arg ("-t|--tolerances=values", &tolerances, "Specifies tolerances for the geometry compare",
                   "This option can take multiple tolerance values. The values are given in micrometer units and "
                   "are separated by a comma. If a tolerance is given, XOR differences are "
                   "only reported when they are larger than the tolerance value. Tolerance values must be given in "
-                  "ascending order."
-                 )
-      << tl::arg ("-n|--threads=threads",      &threads,   "Specifies the number of threads to use",
+                  "ascending order.")
+      << tl::arg ("-n|--threads=threads", &threads, "Specifies the number of threads to use",
                   "If given, multiple threads are used for the XOR computation. This way, multiple cores can "
-                  "be utilized."
-                 )
-      << tl::arg ("-p|--tiles=size",           &tile_size, "Specifies tiling mode",
+                  "be utilized.")
+      << tl::arg ("-p|--tiles=size", &tile_size, "Specifies tiling mode",
                   "In tiling mode, the layout is divided into tiles of the given size. Each tile is computed "
-                  "individually. Multiple tiles can be processed in parallel on multiple cores."
-                 )
-      << tl::arg ("-m|--heal",                 &heal_results, "Heal results in tiling mode",
+                  "individually. Multiple tiles can be processed in parallel on multiple cores.")
+      << tl::arg ("-m|--heal", &heal_results, "Heal results in tiling mode",
                   "This options runs a post-XOR merge to remove cuts implied by the tile formation. The resulting "
-                  "feature count is closer to the real number of differences."
-                 )
-      << tl::arg ("-b|--layer-bump=offset",    &tolerance_bump, "Specifies the layer number offset to add for every tolerance",
+                  "feature count is closer to the real number of differences.")
+      << tl::arg ("-b|--layer-bump=offset", &tolerance_bump, "Specifies the layer number offset to add for every tolerance",
                   "This value is the number added to the original layer number to form a layer set for each tolerance "
                   "value. If this value is set to 1000, the first tolerance value will produce XOR results on the "
                   "original layers. A second tolerance value will produce XOR results on the original layers + 1000. "
-                  "A third tolerance value will produce XOR results on the original layers + 2000."
-                 )
-    ;
+                  "A third tolerance value will produce XOR results on the original layers + 2000.");
 
   cmd.brief ("This program will compare two layout files with a geometrical XOR operation");
 
@@ -524,7 +500,6 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
         throw tl::Exception ("Top cell of second layout is not unique and cannot be determined automatically");
       }
     }
-
   }
 
   std::pair<bool, db::cell_index_type> index_a = layout_a.cell_by_name (top_a.c_str ());
@@ -595,7 +570,6 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
     tl::OutputStream stream (of);
     db::Writer writer (save_options);
     writer.write (*output_layout, stream);
-
   }
 
   if (! silent && ! no_summary) {
@@ -607,21 +581,24 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
       const char *line_format = "  %-10s %-12s %s";
 
       std::string headline = tl::sprintf (line_format, tl::to_string (tr ("Layer")), tl::to_string (tr ("Output")),
-                                                       deep ? tl::to_string (tr ("Differences (hierarchical/flat count)")) : tl::to_string (tr ("Differences (shape count)")));
+                                          deep ? tl::to_string (tr ("Differences (hierarchical/flat count)")) : tl::to_string (tr ("Differences (shape count)")));
 
       const char *sep = "  ----------------------------------------------------------------";
 
       tl::info << tl::to_string (tr ("Result summary (layers without differences are not shown):")) << tl::endl;
-      tl::info << headline << tl::endl << sep;
+      tl::info << headline << tl::endl
+               << sep;
 
       int ti = -1;
       for (std::map<std::pair<int, db::LayerProperties>, ResultDescriptor>::const_iterator r = results.begin (); r != results.end (); ++r) {
 
         if (r->first.first != ti) {
           ti = r->first.first;
-          if (tolerances[ti] > db::epsilon) {
-            tl::info << tl::endl << tl::to_string (tr ("Tolerance ")) << tl::micron_to_string (tolerances[ti]) << ":" << tl::endl;
-            tl::info << headline << tl::endl << sep;
+          if (tolerances [ti] > db::epsilon) {
+            tl::info << tl::endl
+                     << tl::to_string (tr ("Tolerance ")) << tl::micron_to_string (tolerances [ti]) << ":" << tl::endl;
+            tl::info << headline << tl::endl
+                     << sep;
           }
         }
 
@@ -644,13 +621,10 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
         if (! value.empty ()) {
           tl::info << tl::sprintf (line_format, r->first.second.to_string (), out, value);
         }
-
       }
 
       tl::info << "";
-
     }
-
   }
 
   return result ? 0 : 1;
@@ -688,7 +662,7 @@ bool run_tiled_xor (const XORData &xor_data)
 
   int index = 1;
 
-  for (std::map<db::LayerProperties, std::pair<int, int> >::const_iterator ll = xor_data.l2l_map.begin (); ll != xor_data.l2l_map.end (); ++ll) {
+  for (std::map<db::LayerProperties, std::pair<int, int>>::const_iterator ll = xor_data.l2l_map.begin (); ll != xor_data.l2l_map.end (); ++ll) {
 
     if ((ll->second.first < 0 || ll->second.second < 0) && ! xor_data.dont_summarize_missing_layers) {
 
@@ -710,7 +684,6 @@ bool run_tiled_xor (const XORData &xor_data)
         result.top_cell = xor_data.output_cell;
 
         ++tol_index;
-
       }
 
     } else {
@@ -767,18 +740,15 @@ bool run_tiled_xor (const XORData &xor_data)
         expr += "_output(" + out + ",x); ";
 
         ++tol_index;
-
       }
 
       if (tl::verbosity () >= 20) {
         tl::log << "Running expression: '" << expr << "' for layer " << ll->first;
       }
       proc.queue (expr);
-
     }
 
     ++index;
-
   }
 
   //  Runs the processor
@@ -866,7 +836,6 @@ public:
         result.top_cell = mp_xor_data->output_cell;
 
         ++tol_index;
-
       }
 
     } else {
@@ -906,7 +875,6 @@ public:
           tl::SelfTimer timer (tl::verbosity () >= 21, "Basic XOR on layer " + m_layer_props.to_string ());
           xor_res = in_a ^ in_b;
         }
-
       }
 
       int tol_index = 0;
@@ -944,9 +912,7 @@ public:
         }
 
         ++tol_index;
-
       }
-
     }
   }
 
@@ -963,13 +929,12 @@ XORWorker::XORWorker (XORJob *job)
 {
   //  TODO: this conflicts with the "set_for_merged_input" optimization below.
   //  It seems not to be very effective then. Why?
-  m_dss.set_wants_all_cells (true);  //  saves time for less cell mapping operations
+  m_dss.set_wants_all_cells (true); //  saves time for less cell mapping operations
 }
 
-void
-XORWorker::perform_task (tl::Task *task)
+void XORWorker::perform_task (tl::Task *task)
 {
-  XORTask *xor_task = dynamic_cast <XORTask *> (task);
+  XORTask *xor_task = dynamic_cast<XORTask *> (task);
   if (xor_task) {
     xor_task->run (this);
   }
@@ -998,7 +963,7 @@ bool run_deep_xor (const XORData &xor_data)
 
   XORJob job (xor_data.threads);
 
-  for (std::map<db::LayerProperties, std::pair<int, int> >::const_iterator ll = xor_data.l2l_map.begin (); ll != xor_data.l2l_map.end (); ++ll) {
+  for (std::map<db::LayerProperties, std::pair<int, int>>::const_iterator ll = xor_data.l2l_map.begin (); ll != xor_data.l2l_map.end (); ++ll) {
     job.schedule (new XORTask (&xor_data, ll->first, ll->second.first, ll->second.second, dbu));
   }
 
@@ -1018,7 +983,6 @@ bool run_deep_xor (const XORData &xor_data)
         r->second.results.value ().insert_into (xor_data.output_layout, xor_data.output_cell, r->second.layer_output);
       }
     }
-
   }
 
   //  Determine the output status

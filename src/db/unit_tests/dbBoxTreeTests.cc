@@ -32,7 +32,7 @@
 #include <stdlib.h>
 
 template <class Box>
-Box qbox (int q, const Box &bbox) 
+Box qbox (int q, const Box &bbox)
 {
   typedef typename Box::coord_type coord_type;
   typedef db::point<coord_type> point_type;
@@ -47,13 +47,13 @@ template <class Box, class Tree>
 void print_tree_node (const Tree *tree, const Box &bbox, size_t pos, db::box_tree_node<Tree> *node, const std::string &in)
 {
   std::cout << in << "x [\n";
-  if (! node) { 
+  if (! node) {
     for (size_t i = pos; i < pos + tree->size (); ++i) {
-      std::cout << in << "  " << tree->elements ()[i]->to_string () << "\n";
+      std::cout << in << "  " << tree->elements () [i]->to_string () << "\n";
     }
   } else {
     for (size_t i = pos; i < pos + node->lenq (-1); ++i) {
-      std::cout << in << "  " << tree->elements ()[i]->to_string () << "\n";
+      std::cout << in << "  " << tree->elements () [i]->to_string () << "\n";
     }
   }
   std::cout << in << "]\n";
@@ -63,12 +63,12 @@ void print_tree_node (const Tree *tree, const Box &bbox, size_t pos, db::box_tre
       Box qb (qbox (q, bbox));
       if (node->child (q)) {
         std::cout << in << q << " (" << qb.to_string () << ") [\n";
-        print_tree_node (tree, qb, pos, node->child (q), in + "  "); 
+        print_tree_node (tree, qb, pos, node->child (q), in + "  ");
         std::cout << in << "]\n";
       } else {
         std::cout << in << q << " (" << qb.to_string () << ") [\n";
         for (size_t i = pos; i < pos + node->lenq (q); ++i) {
-          std::cout << in << "  " << tree->elements ()[i]->to_string () << " #" << i << "\n";
+          std::cout << in << "  " << tree->elements () [i]->to_string () << " #" << i << "\n";
         }
         std::cout << in << "]\n";
       }
@@ -88,13 +88,13 @@ template <class Box, class Tree>
 void print_unstable_tree_node (const Tree *tree, const Box &bbox, size_t pos, db::box_tree_node<Tree> *node, const std::string &in)
 {
   std::cout << in << "x [\n";
-  if (! node) { 
+  if (! node) {
     for (size_t i = pos; i < pos + tree->size (); ++i) {
-      std::cout << in << "  " << tree->objects ()[i].to_string () << "\n";
+      std::cout << in << "  " << tree->objects () [i].to_string () << "\n";
     }
   } else {
     for (size_t i = pos; i < pos + node->lenq (-1); ++i) {
-      std::cout << in << "  " << tree->objects ()[i].to_string () << "\n";
+      std::cout << in << "  " << tree->objects () [i].to_string () << "\n";
     }
   }
   std::cout << in << "]\n";
@@ -104,12 +104,12 @@ void print_unstable_tree_node (const Tree *tree, const Box &bbox, size_t pos, db
       Box qb (qbox (q, bbox));
       if (node->child (q)) {
         std::cout << in << q << " (" << qb.to_string () << ") [\n";
-        print_unstable_tree_node (tree, qb, pos, node->child (q), in + "  "); 
+        print_unstable_tree_node (tree, qb, pos, node->child (q), in + "  ");
         std::cout << in << "]\n";
       } else {
         std::cout << in << q << " (" << qb.to_string () << ") [\n";
         for (size_t i = pos; i < pos + node->lenq (q); ++i) {
-          std::cout << in << "  " << tree->objects ()[i].to_string () << " #" << i << "\n";
+          std::cout << in << "  " << tree->objects () [i].to_string () << " #" << i << "\n";
         }
         std::cout << in << "]\n";
       }
@@ -150,19 +150,19 @@ typedef db::unstable_box_tree<db::Box, db::Box, Box2BoxCmplx> UnstableTestTreeCm
 template <class Tree, class Box, class BoxConv>
 static void test_tree_overlap (tl::TestBase *_this, const Tree &t, const Box &b, BoxConv conv)
 {
-  typedef typename Tree::object_type value_type; 
+  typedef typename Tree::object_type value_type;
 
   if (tl::verbose ()) {
     std::cout << "Testing vs. " << b << " overlapping" << std::endl;
   }
 
-  std::set <const value_type *> good_idx;
+  std::set<const value_type *> good_idx;
   for (typename Tree::const_iterator e = t.begin (); e != t.end (); ++e) {
     if (b.overlaps (*e)) {
       good_idx.insert (&*e);
     }
   }
-  
+
   if (tl::verbose ()) {
     for (typename Tree::const_iterator e = t.begin (); e != t.end (); ++e) {
       std::cout << " v=" << *e << std::endl;
@@ -188,19 +188,19 @@ static void test_tree_overlap (tl::TestBase *_this, const Tree &t, const Box &b,
 template <class Tree, class Box, class BoxConv>
 static void test_tree_touching (tl::TestBase *_this, const Tree &t, const Box &b, BoxConv conv)
 {
-  typedef typename Tree::object_type value_type; 
+  typedef typename Tree::object_type value_type;
 
   if (tl::verbose ()) {
     std::cout << "Testing vs. " << b << " touching" << std::endl;
   }
 
-  std::set <const value_type *> good_idx;
+  std::set<const value_type *> good_idx;
   for (typename Tree::const_iterator e = t.begin (); e != t.end (); ++e) {
     if (b.touches (*e)) {
       good_idx.insert (&*e);
     }
   }
-  
+
   if (tl::verbose ()) {
     for (typename Tree::const_iterator e = t.begin (); e != t.end (); ++e) {
       std::cout << " v=" << *e << std::endl;
@@ -223,7 +223,7 @@ static void test_tree_touching (tl::TestBase *_this, const Tree &t, const Box &b
   EXPECT_EQ (good_idx.size (), size_t (0));
 }
 
-inline int rvalue () 
+inline int rvalue ()
 {
   return (rand () % 10000) - 5000;
 }
@@ -258,7 +258,8 @@ class TestMemStatistics
 public:
   TestMemStatistics ()
     : used (0), reqd (0)
-  { }
+  {
+  }
 
   virtual void add (const std::type_info & /*ti*/, void * /*ptr*/, size_t r, size_t u, void * /*parent*/, purpose_t /*purpose*/ = None, int /*cat*/ = 0)
   {
@@ -277,12 +278,12 @@ public:
 
 }
 
-TEST(0)
+TEST (0)
 {
   Box2Box conv;
   db::Coord m = std::numeric_limits<db::Coord>::max ();
-  
-  db::Box b(-m, -m, m, m);
+
+  db::Box b (-m, -m, m, m);
   TestTree t;
 
   unsigned int bitset;
@@ -294,7 +295,7 @@ TEST(0)
 
   EXPECT_EQ (t.size (), size_t (1));
 
-  it = t.begin_touching (db::Box (db::Point (-m,-m), db::Point (m, m)), conv);
+  it = t.begin_touching (db::Box (db::Point (-m, -m), db::Point (m, m)), conv);
   bitset = 0;
   while (! it.at_end ()) {
     unsigned int b = 0;
@@ -320,7 +321,7 @@ TEST(0)
 
   EXPECT_EQ (t.size (), size_t (9));
 
-  it = t.begin_touching (db::Box (db::Point (-m,-m), db::Point (m, m)), conv);
+  it = t.begin_touching (db::Box (db::Point (-m, -m), db::Point (m, m)), conv);
   bitset = 0;
   while (! it.at_end ()) {
     unsigned int b = 0;
@@ -363,11 +364,11 @@ TEST(0)
   EXPECT_EQ (bitset, (unsigned int) 0);
 }
 
-TEST(1)
+TEST (1)
 {
   Box2Box conv;
-  
-  db::Box b(-10, -10, 10, 10);
+
+  db::Box b (-10, -10, 10, 10);
   TestTree t;
   t.sort (conv);
   test_tree_overlap (_this, t, b, conv);
@@ -383,7 +384,7 @@ TEST(1)
   test_tree_touching (_this, t, b, conv);
 }
 
-TEST(2)
+TEST (2)
 {
   Box2Box conv;
   TestTree t;
@@ -400,11 +401,10 @@ TEST(2)
     test_tree_overlap (_this, t, b, conv);
     test_tree_touching (_this, t, b, conv);
   }
-
 }
 
 
-TEST(3)
+TEST (3)
 {
   Box2Box conv;
   TestTree t;
@@ -426,14 +426,13 @@ TEST(3)
     test_tree_overlap (_this, t, b, conv);
     test_tree_touching (_this, t, b, conv);
   }
-
 }
 
-TEST(1C)
+TEST (1C)
 {
   Box2BoxCmplx conv;
-  
-  db::Box b(-10, -10, 10, 10);
+
+  db::Box b (-10, -10, 10, 10);
   TestTreeCmplx t;
   t.sort (conv);
   test_tree_overlap (_this, t, b, conv);
@@ -449,7 +448,7 @@ TEST(1C)
   test_tree_touching (_this, t, b, conv);
 }
 
-TEST(2C)
+TEST (2C)
 {
   Box2BoxCmplx conv;
   TestTreeCmplx t;
@@ -466,11 +465,10 @@ TEST(2C)
     test_tree_overlap (_this, t, b, conv);
     test_tree_touching (_this, t, b, conv);
   }
-
 }
 
 
-TEST(3C)
+TEST (3C)
 {
   Box2BoxCmplx conv;
   TestTreeCmplx t;
@@ -492,10 +490,9 @@ TEST(3C)
     test_tree_overlap (_this, t, b, conv);
     test_tree_touching (_this, t, b, conv);
   }
-
 }
 
-TEST(4)
+TEST (4)
 {
   Box2BoxCmplx conv;
   TestTreeCmplxL t;
@@ -524,8 +521,8 @@ TEST(4)
     db::Coord m = std::numeric_limits<db::Coord>::max ();
     size_t n = 0;
     for (unsigned int i = 0; i < 10; ++i) {
-      TestTreeCmplxL::touching_iterator it = t.begin_touching (db::Box (db::Point (-m,-m), db::Point (m, m)), conv);
-      while (!it.at_end ()) {
+      TestTreeCmplxL::touching_iterator it = t.begin_touching (db::Box (db::Point (-m, -m), db::Point (m, m)), conv);
+      while (! it.at_end ()) {
         ++it;
         ++n;
       }
@@ -536,12 +533,12 @@ TEST(4)
     tl::SelfTimer timer ("test 4 lookup");
     for (unsigned int i = 0; i < 10; ++i) {
       for (unsigned int j = 0; j < 10; ++j) {
-        db::Box sbox (bbox.left () + (bbox.width () * i) / 10, 
-                      bbox.bottom () + (bbox.height () * j) / 10, 
-                      bbox.left () + (bbox.width () * (i + 1)) / 10, 
+        db::Box sbox (bbox.left () + (bbox.width () * i) / 10,
+                      bbox.bottom () + (bbox.height () * j) / 10,
+                      bbox.left () + (bbox.width () * (i + 1)) / 10,
                       bbox.bottom () + (bbox.height () * (j + 1)) / 10);
         TestTreeCmplxL::touching_iterator it = t.begin_touching (sbox, conv);
-        while (!it.at_end ()) {
+        while (! it.at_end ()) {
           ++it;
         }
       }
@@ -553,7 +550,7 @@ TEST(4)
   tl::info << "Memory: " << ms.used;
 }
 
-TEST(4A)
+TEST (4A)
 {
   Box2BoxCmplx conv;
   TestTreeCmplxL t;
@@ -582,8 +579,8 @@ TEST(4A)
     db::Coord m = std::numeric_limits<db::Coord>::max ();
     size_t n = 0;
     for (unsigned int i = 0; i < 10; ++i) {
-      TestTreeCmplxL::touching_iterator it = t.begin_touching (db::Box (db::Point (-m,-m), db::Point (m, m)), conv);
-      while (!it.at_end ()) {
+      TestTreeCmplxL::touching_iterator it = t.begin_touching (db::Box (db::Point (-m, -m), db::Point (m, m)), conv);
+      while (! it.at_end ()) {
         ++it;
         ++n;
       }
@@ -594,12 +591,12 @@ TEST(4A)
     tl::SelfTimer timer ("test 4a lookup");
     for (unsigned int i = 0; i < 10; ++i) {
       for (unsigned int j = 0; j < 10; ++j) {
-        db::Box sbox (bbox.left () + (bbox.width () * i) / 10, 
-                      bbox.bottom () + (bbox.height () * j) / 10, 
-                      bbox.left () + (bbox.width () * (i + 1)) / 10, 
+        db::Box sbox (bbox.left () + (bbox.width () * i) / 10,
+                      bbox.bottom () + (bbox.height () * j) / 10,
+                      bbox.left () + (bbox.width () * (i + 1)) / 10,
                       bbox.bottom () + (bbox.height () * (j + 1)) / 10);
         TestTreeCmplxL::touching_iterator it = t.begin_touching (sbox, conv);
-        while (!it.at_end ()) {
+        while (! it.at_end ()) {
           ++it;
         }
       }
@@ -611,7 +608,7 @@ TEST(4A)
   tl::info << "Memory: " << ms.used;
 }
 
-TEST(4B)
+TEST (4B)
 {
   Box2BoxCmplx conv;
   TestTreeCmplxL t;
@@ -640,8 +637,8 @@ TEST(4B)
     db::Coord m = std::numeric_limits<db::Coord>::max ();
     size_t n = 0;
     for (unsigned int i = 0; i < 10; ++i) {
-      TestTreeCmplxL::touching_iterator it = t.begin_touching (db::Box (db::Point (-m,-m), db::Point (m, m)), conv);
-      while (!it.at_end ()) {
+      TestTreeCmplxL::touching_iterator it = t.begin_touching (db::Box (db::Point (-m, -m), db::Point (m, m)), conv);
+      while (! it.at_end ()) {
         ++it;
         ++n;
       }
@@ -652,12 +649,12 @@ TEST(4B)
     tl::SelfTimer timer ("test 4b lookup");
     for (unsigned int i = 0; i < 10; ++i) {
       for (unsigned int j = 0; j < 10; ++j) {
-        db::Box sbox (bbox.left () + (bbox.width () * i) / 10, 
-                      bbox.bottom () + (bbox.height () * j) / 10, 
-                      bbox.left () + (bbox.width () * (i + 1)) / 10, 
+        db::Box sbox (bbox.left () + (bbox.width () * i) / 10,
+                      bbox.bottom () + (bbox.height () * j) / 10,
+                      bbox.left () + (bbox.width () * (i + 1)) / 10,
                       bbox.bottom () + (bbox.height () * (j + 1)) / 10);
         TestTreeCmplxL::touching_iterator it = t.begin_touching (sbox, conv);
-        while (!it.at_end ()) {
+        while (! it.at_end ()) {
           ++it;
         }
       }
@@ -669,7 +666,7 @@ TEST(4B)
   tl::info << "Memory: " << ms.used;
 }
 
-TEST(5)
+TEST (5)
 {
   Box2BoxCmplx conv;
   TestTreeCmplxL t;
@@ -688,8 +685,8 @@ TEST(5)
     db::Coord m = std::numeric_limits<db::Coord>::max ();
     size_t n = 0;
     for (unsigned int i = 0; i < 10; ++i) {
-      TestTreeCmplxL::touching_iterator it = t.begin_touching (db::Box (db::Point (-m,-m), db::Point (m, m)), conv);
-      while (!it.at_end ()) {
+      TestTreeCmplxL::touching_iterator it = t.begin_touching (db::Box (db::Point (-m, -m), db::Point (m, m)), conv);
+      while (! it.at_end ()) {
         ++it;
         ++n;
       }
@@ -702,12 +699,12 @@ TEST(5)
   tl::info << "Memory: " << ms.used;
 }
 
-TEST(0U)
+TEST (0U)
 {
   Box2Box conv;
   db::Coord m = std::numeric_limits<db::Coord>::max ();
-  
-  db::Box b(-m, -m, m, m);
+
+  db::Box b (-m, -m, m, m);
   UnstableTestTree t;
 
   unsigned int bitset;
@@ -719,7 +716,7 @@ TEST(0U)
 
   EXPECT_EQ (t.size (), size_t (1));
 
-  it = t.begin_touching (db::Box (db::Point (-m,-m), db::Point (m, m)), conv);
+  it = t.begin_touching (db::Box (db::Point (-m, -m), db::Point (m, m)), conv);
   bitset = 0;
   while (! it.at_end ()) {
     bitset |= (1 << (it.index ()));
@@ -740,7 +737,7 @@ TEST(0U)
 
   EXPECT_EQ (t.size (), size_t (9));
 
-  it = t.begin_touching (db::Box (db::Point (-m,-m), db::Point (m, m)), conv);
+  it = t.begin_touching (db::Box (db::Point (-m, -m), db::Point (m, m)), conv);
   bitset = 0;
   while (! it.at_end ()) {
     bitset |= (1 << (it.index ()));
@@ -768,11 +765,11 @@ TEST(0U)
   EXPECT_EQ (bitset, (unsigned int) 0);
 }
 
-TEST(1U)
+TEST (1U)
 {
   Box2Box conv;
-  
-  db::Box b(-10, -10, 10, 10);
+
+  db::Box b (-10, -10, 10, 10);
   UnstableTestTree t;
   t.sort (conv);
   test_tree_overlap (_this, t, b, conv);
@@ -788,7 +785,7 @@ TEST(1U)
   test_tree_touching (_this, t, b, conv);
 }
 
-TEST(2U)
+TEST (2U)
 {
   Box2Box conv;
   UnstableTestTree t;
@@ -805,11 +802,10 @@ TEST(2U)
     test_tree_overlap (_this, t, b, conv);
     test_tree_touching (_this, t, b, conv);
   }
-
 }
 
 
-TEST(3U)
+TEST (3U)
 {
   Box2Box conv;
   UnstableTestTree t;
@@ -831,14 +827,13 @@ TEST(3U)
     test_tree_overlap (_this, t, b, conv);
     test_tree_touching (_this, t, b, conv);
   }
-
 }
 
-TEST(1CU)
+TEST (1CU)
 {
   Box2BoxCmplx conv;
-  
-  db::Box b(-10, -10, 10, 10);
+
+  db::Box b (-10, -10, 10, 10);
   UnstableTestTreeCmplx t;
   t.sort (conv);
   test_tree_overlap (_this, t, b, conv);
@@ -854,7 +849,7 @@ TEST(1CU)
   test_tree_touching (_this, t, b, conv);
 }
 
-TEST(2CU)
+TEST (2CU)
 {
   Box2BoxCmplx conv;
   UnstableTestTreeCmplx t;
@@ -874,10 +869,9 @@ TEST(2CU)
     test_tree_overlap (_this, t, b, conv);
     test_tree_touching (_this, t, b, conv);
   }
-
 }
 
-TEST(3CU)
+TEST (3CU)
 {
   Box2BoxCmplx conv;
   UnstableTestTreeCmplx t;
@@ -899,10 +893,9 @@ TEST(3CU)
     test_tree_overlap (_this, t, b, conv);
     test_tree_touching (_this, t, b, conv);
   }
-
 }
 
-TEST(4U)
+TEST (4U)
 {
   Box2BoxCmplx conv;
   UnstableTestTreeCmplxL t;
@@ -931,8 +924,8 @@ TEST(4U)
     db::Coord m = std::numeric_limits<db::Coord>::max ();
     size_t n = 0;
     for (unsigned int i = 0; i < 10; ++i) {
-      UnstableTestTreeCmplxL::touching_iterator it = t.begin_touching (db::Box (db::Point (-m,-m), db::Point (m, m)), conv);
-      while (!it.at_end ()) {
+      UnstableTestTreeCmplxL::touching_iterator it = t.begin_touching (db::Box (db::Point (-m, -m), db::Point (m, m)), conv);
+      while (! it.at_end ()) {
         ++it;
         ++n;
       }
@@ -943,12 +936,12 @@ TEST(4U)
     tl::SelfTimer timer ("test 4 lookup");
     for (unsigned int i = 0; i < 10; ++i) {
       for (unsigned int j = 0; j < 10; ++j) {
-        db::Box sbox (bbox.left () + (bbox.width () * i) / 10, 
-                      bbox.bottom () + (bbox.height () * j) / 10, 
-                      bbox.left () + (bbox.width () * (i + 1)) / 10, 
+        db::Box sbox (bbox.left () + (bbox.width () * i) / 10,
+                      bbox.bottom () + (bbox.height () * j) / 10,
+                      bbox.left () + (bbox.width () * (i + 1)) / 10,
                       bbox.bottom () + (bbox.height () * (j + 1)) / 10);
         UnstableTestTreeCmplxL::touching_iterator it = t.begin_touching (sbox, conv);
-        while (!it.at_end ()) {
+        while (! it.at_end ()) {
           ++it;
         }
       }
@@ -960,7 +953,7 @@ TEST(4U)
   tl::info << "Memory: " << ms.used;
 }
 
-TEST(5U)
+TEST (5U)
 {
   Box2BoxCmplx conv;
   UnstableTestTreeCmplxL t;
@@ -979,8 +972,8 @@ TEST(5U)
     db::Coord m = std::numeric_limits<db::Coord>::max ();
     size_t n = 0;
     for (unsigned int i = 0; i < 10; ++i) {
-      UnstableTestTreeCmplxL::touching_iterator it = t.begin_touching (db::Box (db::Point (-m,-m), db::Point (m, m)), conv);
-      while (!it.at_end ()) {
+      UnstableTestTreeCmplxL::touching_iterator it = t.begin_touching (db::Box (db::Point (-m, -m), db::Point (m, m)), conv);
+      while (! it.at_end ()) {
         ++it;
         ++n;
       }
@@ -993,7 +986,7 @@ TEST(5U)
   tl::info << "Memory: " << ms.used;
 }
 
-TEST(6)
+TEST (6)
 {
   Box2Box conv;
   TestTree t;
@@ -1009,10 +1002,9 @@ TEST(6)
     test_tree_overlap (_this, t, b, conv);
     test_tree_touching (_this, t, b, conv);
   }
-
 }
 
-TEST(6U)
+TEST (6U)
 {
   Box2Box conv;
   UnstableTestTree t;
@@ -1028,10 +1020,9 @@ TEST(6U)
     test_tree_overlap (_this, t, b, conv);
     test_tree_touching (_this, t, b, conv);
   }
-
 }
 
-TEST(7)
+TEST (7)
 {
   Box2Box conv;
   TestTree t;
@@ -1049,7 +1040,7 @@ TEST(7)
     for (unsigned int i = 0; i < 2000; ++i) {
       db::Coord sx = 0, sy = 0;
       TestTree::touching_iterator it = t.begin_touching (db::Box (db::Point (2000, 0), db::Point (3000, 0)), conv);
-      while (!it.at_end ()) {
+      while (! it.at_end ()) {
         sx += abs (it->left ());
         sy += abs (it->bottom ());
         ++it;
@@ -1066,8 +1057,8 @@ TEST(7)
     db::Coord m = std::numeric_limits<db::Coord>::max ();
     size_t n = 0;
     for (unsigned int i = 0; i < 10; ++i) {
-      TestTree::touching_iterator it = t.begin_touching (db::Box (db::Point (-m,-m), db::Point (m, m)), conv);
-      while (!it.at_end ()) {
+      TestTree::touching_iterator it = t.begin_touching (db::Box (db::Point (-m, -m), db::Point (m, m)), conv);
+      while (! it.at_end ()) {
         ++it;
         ++n;
       }
@@ -1076,7 +1067,7 @@ TEST(7)
   }
 }
 
-TEST(7U)
+TEST (7U)
 {
   Box2Box conv;
   UnstableTestTree t;
@@ -1094,7 +1085,7 @@ TEST(7U)
     for (unsigned int i = 0; i < 2000; ++i) {
       db::Coord sx = 0, sy = 0;
       UnstableTestTree::touching_iterator it = t.begin_touching (db::Box (db::Point (2000, 0), db::Point (3000, 0)), conv);
-      while (!it.at_end ()) {
+      while (! it.at_end ()) {
         sx += abs (it->left ());
         sy += abs (it->bottom ());
         ++it;
@@ -1111,8 +1102,8 @@ TEST(7U)
     db::Coord m = std::numeric_limits<db::Coord>::max ();
     size_t n = 0;
     for (unsigned int i = 0; i < 10; ++i) {
-      UnstableTestTree::touching_iterator it = t.begin_touching (db::Box (db::Point (-m,-m), db::Point (m, m)), conv);
-      while (!it.at_end ()) {
+      UnstableTestTree::touching_iterator it = t.begin_touching (db::Box (db::Point (-m, -m), db::Point (m, m)), conv);
+      while (! it.at_end ()) {
         ++it;
         ++n;
       }

@@ -34,7 +34,7 @@ static std::string collection2string (const tl::WebDAVObject &coll)
 {
   std::string s;
   for (tl::WebDAVObject::iterator c = coll.begin (); c != coll.end (); ++c) {
-    if (!s.empty ()) {
+    if (! s.empty ()) {
       s += "\n";
     }
     if (c->is_collection ()) {
@@ -47,7 +47,7 @@ static std::string collection2string (const tl::WebDAVObject &coll)
   return s;
 }
 
-TEST(1)
+TEST (1)
 {
   if (! tl::InputHttpStream::is_available ()) {
     throw tl::CancelException ();
@@ -67,14 +67,13 @@ TEST(1)
   s = tl::join (sl, "\n");
 
   EXPECT_EQ (s,
-    "[dir] dir1 http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/dir1/\n"
-    "[dir] dir2 http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/dir2/\n"
-    "text http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text\n"
-    "text2 http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text2"
-  );
+             "[dir] dir1 http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/dir1/\n"
+             "[dir] dir2 http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/dir2/\n"
+             "text http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text\n"
+             "text2 http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text2");
 }
 
-TEST(2)
+TEST (2)
 {
   if (! tl::InputHttpStream::is_available ()) {
     throw tl::CancelException ();
@@ -88,7 +87,7 @@ TEST(2)
   EXPECT_EQ (collection2string (collection), "");
 }
 
-TEST(3)
+TEST (3)
 {
   if (! tl::InputHttpStream::is_available ()) {
     throw tl::CancelException ();
@@ -102,7 +101,7 @@ TEST(3)
   EXPECT_EQ (collection2string (collection), "");
 }
 
-TEST(4)
+TEST (4)
 {
   if (! tl::InputHttpStream::is_available ()) {
     throw tl::CancelException ();
@@ -116,7 +115,7 @@ TEST(4)
   EXPECT_EQ (collection2string (collection), "");
 }
 
-TEST(5)
+TEST (5)
 {
   if (! tl::InputHttpStream::is_available ()) {
     throw tl::CancelException ();
@@ -152,4 +151,3 @@ TEST(5)
 }
 
 #endif
-

@@ -23,4 +23,4 @@
 #include "../pymodHelper.h"
 
 #include "QtSqlMain.h"
-DEFINE_PYMOD(QtSql, "QtSql", "KLayout/Qt module 'QtSql'")
+DEFINE_PYMOD (QtSql, "QtSql", "KLayout/Qt module 'QtSql'")

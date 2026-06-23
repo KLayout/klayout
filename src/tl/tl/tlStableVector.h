@@ -29,24 +29,24 @@
 #include <vector>
 #include <iterator>
 
-namespace tl 
+namespace tl
 {
 
 /**
  *  @brief A stable vector class
  *
- *  Unlike the normal vector, the stable vector guarantees that the  
+ *  Unlike the normal vector, the stable vector guarantees that the
  *  objects stored within are not relocated to other memory locations
  *  even if the vector reallocates memory.
  *  The stable vector does this by maintaining pointers rather than
  *  objects itself.
  *  This way, this container is able to store objects that do not have
  *  a copy semantics.
- *  
+ *
  *  The stable vector offers two iterators: a usual one and a stable one.
  *  While the usual iterator is invalidated if the vector reallocates
  *  (the iterator gets invalid, not the location of the objects them-
- *  selves), the stable iterator stays valid even if the container 
+ *  selves), the stable iterator stays valid even if the container
  *  reallocates. The stable iterator is a pointer to the container plus
  *  an index.
  */
@@ -59,7 +59,7 @@ public:
 
   class iterator;
 
-  class const_iterator 
+  class const_iterator
   {
   public:
     typedef std::random_access_iterator_tag iterator_category;
@@ -92,13 +92,13 @@ public:
       //  .. nothing yet ..
     }
 
-    const_iterator &operator= (const_iterator d) 
+    const_iterator &operator= (const_iterator d)
     {
       m_iter = d.m_iter;
       return *this;
     }
 
-    const iterator &operator= (iterator d) 
+    const iterator &operator= (iterator d)
     {
       m_iter = d.m_iter;
       return *this;
@@ -134,7 +134,7 @@ public:
       return m_iter + n;
     }
 
-    const_iterator &operator+= (ptrdiff_t n) 
+    const_iterator &operator+= (ptrdiff_t n)
     {
       m_iter += n;
       return *this;
@@ -182,7 +182,7 @@ public:
       return **m_iter;
     }
 
-    const X *operator-> () const
+    const X *operator->() const
     {
       return *m_iter;
     }
@@ -191,7 +191,7 @@ public:
     typename std::vector<X *>::const_iterator m_iter;
   };
 
-  class iterator 
+  class iterator
   {
   public:
     typedef std::random_access_iterator_tag iterator_category;
@@ -218,7 +218,7 @@ public:
       //  .. nothing yet ..
     }
 
-    iterator &operator= (iterator d) 
+    iterator &operator= (iterator d)
     {
       m_iter = d.m_iter;
       return *this;
@@ -254,7 +254,7 @@ public:
       return m_iter + n;
     }
 
-    iterator &operator+= (ptrdiff_t n) 
+    iterator &operator+= (ptrdiff_t n)
     {
       m_iter += n;
       return *this;
@@ -302,7 +302,7 @@ public:
       return **m_iter;
     }
 
-    X *operator-> () const
+    X *operator->() const
     {
       return *m_iter;
     }
@@ -314,7 +314,7 @@ public:
 
   class stable_iterator;
 
-  class stable_const_iterator 
+  class stable_const_iterator
   {
   public:
     typedef std::random_access_iterator_tag iterator_category;
@@ -347,14 +347,14 @@ public:
       //  .. nothing yet ..
     }
 
-    stable_const_iterator &operator= (stable_const_iterator d) 
+    stable_const_iterator &operator= (stable_const_iterator d)
     {
       mp_vector = d.mp_vector;
       m_index = d.m_index;
       return *this;
     }
 
-    stable_const_iterator &operator= (stable_iterator d) 
+    stable_const_iterator &operator= (stable_iterator d)
     {
       mp_vector = d.mp_vector;
       m_index = d.m_index;
@@ -368,7 +368,7 @@ public:
 
     bool operator!= (stable_const_iterator d) const
     {
-      return !operator== (d);
+      return ! operator== (d);
     }
 
     bool operator< (stable_const_iterator d) const
@@ -391,7 +391,7 @@ public:
       return stable_const_iterator (*mp_vector, m_index - n);
     }
 
-    stable_const_iterator &operator+= (ptrdiff_t n) 
+    stable_const_iterator &operator+= (ptrdiff_t n)
     {
       m_index += n;
       return *this;
@@ -439,7 +439,7 @@ public:
       return *(*mp_vector) [m_index];
     }
 
-    const X *operator-> () const
+    const X *operator->() const
     {
       return (*mp_vector) [m_index];
     }
@@ -454,7 +454,7 @@ public:
     size_t m_index;
   };
 
-  class stable_iterator 
+  class stable_iterator
   {
   public:
     typedef std::random_access_iterator_tag iterator_category;
@@ -481,7 +481,7 @@ public:
       //  .. nothing yet ..
     }
 
-    stable_iterator &operator= (stable_iterator d) 
+    stable_iterator &operator= (stable_iterator d)
     {
       mp_vector = d.mp_vector;
       m_index = d.m_index;
@@ -495,7 +495,7 @@ public:
 
     bool operator!= (stable_iterator d) const
     {
-      return !operator== (d);
+      return ! operator== (d);
     }
 
     bool operator< (stable_iterator d) const
@@ -518,7 +518,7 @@ public:
       return stable_iterator (*mp_vector, m_index - n);
     }
 
-    stable_iterator &operator+= (ptrdiff_t n) 
+    stable_iterator &operator+= (ptrdiff_t n)
     {
       m_index += n;
       return *this;
@@ -566,7 +566,7 @@ public:
       return *(*mp_vector) [m_index];
     }
 
-    X *operator-> () const
+    X *operator->() const
     {
       return (*mp_vector) [m_index];
     }
@@ -582,13 +582,13 @@ public:
     friend class stable_vector::stable_const_iterator;
   };
 
-  stable_vector () 
+  stable_vector ()
     : m_objects ()
   {
     //  .. nothing yet ..
   }
 
-  stable_vector (const stable_vector<X> &d) 
+  stable_vector (const stable_vector<X> &d)
     : m_objects ()
   {
     operator= (d);
@@ -609,7 +609,7 @@ public:
     if (&d != this) {
       delete_objects ();
       m_objects.reserve (d.size ());
-      for (typename std::vector <X *>::const_iterator c = d.m_objects.begin (); c != d.m_objects.end (); ++c) {
+      for (typename std::vector<X *>::const_iterator c = d.m_objects.begin (); c != d.m_objects.end (); ++c) {
         m_objects.push_back (new X (**c));
       }
     }
@@ -621,7 +621,7 @@ public:
     if (size () != d.size ()) {
       return false;
     }
-    for (typename std::vector <X *>::const_iterator a = m_objects.begin (), b = d.m_objects.begin (); a != m_objects.end (); ++a, ++b) {
+    for (typename std::vector<X *>::const_iterator a = m_objects.begin (), b = d.m_objects.begin (); a != m_objects.end (); ++a, ++b) {
       if (**a != **b) {
         return false;
       }
@@ -631,7 +631,7 @@ public:
 
   bool operator!= (const stable_vector<X> &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
 
   bool operator< (const stable_vector<X> &d) const
@@ -639,7 +639,7 @@ public:
     if (size () != d.size ()) {
       return size () < d.size ();
     }
-    for (typename std::vector <X *>::const_iterator a = m_objects.begin (), b = d.m_objects.begin (); a != m_objects.end (); ++a, ++b) {
+    for (typename std::vector<X *>::const_iterator a = m_objects.begin (), b = d.m_objects.begin (); a != m_objects.end (); ++a, ++b) {
       if (**a != **b) {
         return **a < **b;
       }
@@ -662,12 +662,12 @@ public:
     m_objects.swap (d.m_objects);
   }
 
-  void push_back (const X &o) 
+  void push_back (const X &o)
   {
     m_objects.push_back (new X (o));
   }
 
-  void push_back (X *o) 
+  void push_back (X *o)
   {
     m_objects.push_back (o);
   }
@@ -682,17 +682,17 @@ public:
     return *m_objects.front ();
   }
 
-  X &back () 
+  X &back ()
   {
     return *m_objects.back ();
   }
 
-  X &front () 
+  X &front ()
   {
     return *m_objects.front ();
   }
 
-  void pop_back () 
+  void pop_back ()
   {
     delete m_objects.back ();
     m_objects.pop_back ();
@@ -712,16 +712,16 @@ public:
 
   void erase (stable_iterator pos)
   {
-    typename std::vector <X *>::iterator p = m_objects.begin () + pos.index ();
+    typename std::vector<X *>::iterator p = m_objects.begin () + pos.index ();
     delete *p;
     m_objects.erase (p);
   }
 
   void erase (stable_iterator from, stable_iterator to)
   {
-    typename std::vector <X *>::iterator p = m_objects.begin () + from.index ();
-    typename std::vector <X *>::iterator q = m_objects.begin () + to.index ();
-    for (typename std::vector <X *>::iterator i = p; i != q; ++i) {
+    typename std::vector<X *>::iterator p = m_objects.begin () + from.index ();
+    typename std::vector<X *>::iterator q = m_objects.begin () + to.index ();
+    for (typename std::vector<X *>::iterator i = p; i != q; ++i) {
       delete *i;
     }
     m_objects.erase (p, q);
@@ -743,16 +743,16 @@ public:
 
   void erase (iterator pos)
   {
-    typename std::vector <X *>::iterator p = m_objects.begin () + (pos - begin ());
+    typename std::vector<X *>::iterator p = m_objects.begin () + (pos - begin ());
     delete *p;
     m_objects.erase (p);
   }
 
   void erase (iterator from, iterator to)
   {
-    typename std::vector <X *>::iterator p = m_objects.begin () + (from - begin ());
-    typename std::vector <X *>::iterator q = m_objects.begin () + (to - begin ());
-    for (typename std::vector <X *>::iterator i = p; i != q; ++i) {
+    typename std::vector<X *>::iterator p = m_objects.begin () + (from - begin ());
+    typename std::vector<X *>::iterator q = m_objects.begin () + (to - begin ());
+    for (typename std::vector<X *>::iterator i = p; i != q; ++i) {
       delete *i;
     }
     m_objects.erase (p, q);
@@ -768,7 +768,7 @@ public:
     return *m_objects [i];
   }
 
-  stable_iterator begin_stable () 
+  stable_iterator begin_stable ()
   {
     return stable_iterator (m_objects, 0);
   }
@@ -778,7 +778,7 @@ public:
     return stable_const_iterator (m_objects, 0);
   }
 
-  stable_iterator end_stable () 
+  stable_iterator end_stable ()
   {
     return stable_iterator (m_objects, size ());
   }
@@ -788,7 +788,7 @@ public:
     return stable_const_iterator (m_objects, size ());
   }
 
-  iterator begin () 
+  iterator begin ()
   {
     return iterator (m_objects.begin ());
   }
@@ -798,7 +798,7 @@ public:
     return const_iterator (m_objects.begin ());
   }
 
-  iterator end () 
+  iterator end ()
   {
     return iterator (m_objects.end ());
   }
@@ -814,11 +814,11 @@ public:
   }
 
 private:
-  std::vector <X *> m_objects;
+  std::vector<X *> m_objects;
 
-  void delete_objects () 
+  void delete_objects ()
   {
-    for (typename std::vector <X *>::iterator c = m_objects.begin (); c != m_objects.end (); ++c) {
+    for (typename std::vector<X *>::iterator c = m_objects.begin (); c != m_objects.end (); ++c) {
       delete *c;
     }
     m_objects.clear ();
@@ -829,4 +829,3 @@ private:
 } // namespace tl
 
 #endif
-

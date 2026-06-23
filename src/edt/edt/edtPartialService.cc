@@ -34,15 +34,15 @@
 #include "edtPlugin.h"
 
 #if defined(HAVE_QT)
-#  include "edtDialogs.h"
-#  include "edtEditorOptionsPages.h"
+#include "edtDialogs.h"
+#include "edtEditorOptionsPages.h"
 #endif
 
 #include <cmath>
 
 namespace tl
 {
-  class Progress;
+class Progress;
 }
 
 namespace edt
@@ -54,7 +54,7 @@ static int point_sel_tests = 10000; // TODO: is this a reasonable value?
 // -------------------------------------------------------------
 
 /**
- *  @brief A move constraint 
+ *  @brief A move constraint
  *
  *  A move constraint describes the degrees of freedom for a single point.
  *  Such a constraint can be: fixed (no freedom), unconstrained (point can move
@@ -63,21 +63,25 @@ static int point_sel_tests = 10000; // TODO: is this a reasonable value?
 class Constraint
 {
 public:
-  typedef enum { Free, Fixed, OneDim } constraint_mode;
+  typedef enum { Free,
+                 Fixed,
+                 OneDim } constraint_mode;
 
   /**
    *  @brief Construct an unconstrained constraint
    */
   Constraint ()
     : m_mode (Free)
-  { }
+  {
+  }
 
   /**
    *  @brief Construct an "fixed" constraint
    */
   Constraint (int)
     : m_mode (Fixed)
-  { }
+  {
+  }
 
   /**
    *  @brief Construct an "1-dimensional" constraint
@@ -86,12 +90,12 @@ public:
    */
   Constraint (db::Vector axis)
     : m_axis (axis)
-  { 
+  {
     if (axis == db::Vector ()) {
       m_mode = Fixed;
     } else {
       m_mode = OneDim;
-    } 
+    }
   }
 
   /**
@@ -246,7 +250,7 @@ insert_point_path (const db::Path &p, const std::set<EdgeWithIndex> &sel, db::Po
       if (! found && sel.find (EdgeWithIndex (db::Edge (p1, p2), n, n + 1, 0)) != sel.end ()) {
         //  project the point onto the edge
         db::Edge e (p1, p2);
-        std::pair <bool, db::Point> projected = e.projected (ins);
+        std::pair<bool, db::Point> projected = e.projected (ins);
         if (projected.first) {
           if (e.is_ortho ()) {
             //  NOTE: for skew edges we use the original point as the projected one usually
@@ -264,12 +268,12 @@ insert_point_path (const db::Path &p, const std::set<EdgeWithIndex> &sel, db::Po
 
   if (found) {
     new_path.assign (ctr.begin (), ctr.end ());
-  } 
+  }
   return found;
 }
 
-static void 
-remove_redundant_points (std::vector <db::Point> &ctr, bool cyclic)
+static void
+remove_redundant_points (std::vector<db::Point> &ctr, bool cyclic)
 {
   //  compress contour (remove redundant points)
   //  and assign to path
@@ -323,14 +327,14 @@ del_points_path (const db::Path &p, const std::set<EdgeWithIndex> &sel)
   return new_path;
 }
 
-static void 
-modify_path (db::Path &p, const std::map <PointWithIndex, db::Point> &new_points, const std::map <EdgeWithIndex, db::Edge> &new_edges, bool compress = false)
+static void
+modify_path (db::Path &p, const std::map<PointWithIndex, db::Point> &new_points, const std::map<EdgeWithIndex, db::Edge> &new_edges, bool compress = false)
 {
   std::vector<db::Point> ctr;
   ctr.reserve (p.points ());
 
-  std::map <PointWithIndex, db::Point>::const_iterator np;
-  std::map <EdgeWithIndex, db::Edge>::const_iterator ne;
+  std::map<PointWithIndex, db::Point>::const_iterator np;
+  std::map<EdgeWithIndex, db::Edge>::const_iterator ne;
 
   unsigned int n = 0;
   for (db::Path::iterator pt = p.begin (); pt != p.end (); ++n) {
@@ -366,7 +370,6 @@ modify_path (db::Path &p, const std::map <PointWithIndex, db::Point> &new_points
     } else {
       ctr.push_back (p1);
     }
-
   }
 
   if (compress) {
@@ -376,8 +379,7 @@ modify_path (db::Path &p, const std::map <PointWithIndex, db::Point> &new_points
   p.assign (ctr.begin (), ctr.end ());
 }
 
-bool
-insert_point_poly (const db::Polygon &p, const std::set<EdgeWithIndex> &sel, db::Point &ins, db::Polygon &new_poly)
+bool insert_point_poly (const db::Polygon &p, const std::set<EdgeWithIndex> &sel, db::Point &ins, db::Polygon &new_poly)
 {
   for (unsigned int c = 0; c < p.holes () + 1; ++c) {
 
@@ -398,7 +400,7 @@ insert_point_poly (const db::Polygon &p, const std::set<EdgeWithIndex> &sel, db:
       ctr.push_back ((*e).p1 ());
       if (! found && sel.find (EdgeWithIndex (*e, n, nn, c)) != sel.end ()) {
         //  project the point onto the edge - use the first edge the point projects to
-        std::pair <bool, db::Point> projected = (*e).projected (ins);
+        std::pair<bool, db::Point> projected = (*e).projected (ins);
         if (projected.first) {
           if ((*e).is_ortho ()) {
             //  NOTE: for skew edges we use the original point as the projected one usually
@@ -409,7 +411,6 @@ insert_point_poly (const db::Polygon &p, const std::set<EdgeWithIndex> &sel, db:
           found = true;
         }
       }
-
     }
 
     if (found) {
@@ -423,9 +424,7 @@ insert_point_poly (const db::Polygon &p, const std::set<EdgeWithIndex> &sel, db:
         new_poly.assign_hole (c - 1, ctr.begin (), ctr.end (), false /*don't compress*/);
       }
       return true;
-
     }
-
   }
 
   return false;
@@ -457,16 +456,15 @@ del_points_poly (const db::Polygon &p, const std::set<EdgeWithIndex> &sel)
     } else {
       new_poly.assign_hole (c - 1, ctr.begin (), ctr.end (), false /*compress*/);
     }
-
   }
 
   return new_poly;
 }
 
 static void
-modify_polygon (db::Polygon &p, 
-                const std::map <PointWithIndex, db::Point> &new_points, 
-                const std::map <EdgeWithIndex, db::Edge> &new_edges,
+modify_polygon (db::Polygon &p,
+                const std::map<PointWithIndex, db::Point> &new_points,
+                const std::map<EdgeWithIndex, db::Edge> &new_edges,
                 bool compress = false)
 {
   for (unsigned int c = 0; c < p.holes () + 1; ++c) {
@@ -475,8 +473,8 @@ modify_polygon (db::Polygon &p,
     size_t points = p.contour (c).size ();
     ctr.reserve (points);
 
-    std::map <PointWithIndex, db::Point>::const_iterator np;
-    std::map <EdgeWithIndex, db::Edge>::const_iterator ne;
+    std::map<PointWithIndex, db::Point>::const_iterator np;
+    std::map<EdgeWithIndex, db::Edge>::const_iterator ne;
 
     unsigned int n = 0;
     db::Shape::polygon_edge_iterator ee;
@@ -508,7 +506,6 @@ modify_polygon (db::Polygon &p,
       if (ne != new_edges.end () && ne->second.p2 () != p2) {
         ctr.push_back (ne->second.p2 ());
       }
-
     }
 
     if (compress) {
@@ -520,22 +517,21 @@ modify_polygon (db::Polygon &p,
     } else {
       p.assign_hole (c - 1, ctr.begin (), ctr.end (), false /*compress*/);
     }
-
   }
 }
 
-static void 
-constrain (std::map <PointWithIndex, Constraint> &constr, const EdgeWithIndex &edge)
+static void
+constrain (std::map<PointWithIndex, Constraint> &constr, const EdgeWithIndex &edge)
 {
   constr.insert (std::make_pair (edge.pi1 (), Constraint ())).first->second *= Constraint (edge.d ());
   constr.insert (std::make_pair (edge.pi2 (), Constraint ())).first->second *= Constraint (edge.d ());
 }
 
 static void
-create_shift_sets (const db::Shape &shape, const std::set <EdgeWithIndex> &sel, std::map <PointWithIndex, db::Point> &new_points, std::map <EdgeWithIndex, db::Edge> &new_edges, db::Vector mv)
+create_shift_sets (const db::Shape &shape, const std::set<EdgeWithIndex> &sel, std::map<PointWithIndex, db::Point> &new_points, std::map<EdgeWithIndex, db::Edge> &new_edges, db::Vector mv)
 {
   //  Set up a map of new edges and new points
-  for (std::set <EdgeWithIndex>::const_iterator e = sel.begin (); e != sel.end (); ++e) {
+  for (std::set<EdgeWithIndex>::const_iterator e = sel.begin (); e != sel.end (); ++e) {
     if (e->p1 () != e->p2 ()) {
       new_edges.insert (std::make_pair (*e, db::Edge (*e)));
     } else {
@@ -544,14 +540,14 @@ create_shift_sets (const db::Shape &shape, const std::set <EdgeWithIndex> &sel, 
   }
 
   //  new_points should only contain the selected points, not the start and end points of selected edges
-  for (std::set <EdgeWithIndex>::const_iterator e = sel.begin (); e != sel.end (); ++e) {
+  for (std::set<EdgeWithIndex>::const_iterator e = sel.begin (); e != sel.end (); ++e) {
     if (e->p1 () != e->p2 ()) {
       new_points.erase (e->pi1 ());
       new_points.erase (e->pi2 ());
     }
   }
 
-  std::map <PointWithIndex, Constraint> point_constr;
+  std::map<PointWithIndex, Constraint> point_constr;
 
   if (shape.is_polygon ()) {
 
@@ -567,7 +563,6 @@ create_shift_sets (const db::Shape &shape, const std::set <EdgeWithIndex> &sel, 
           constrain (point_constr, EdgeWithIndex (*e, n, nn, c));
         }
       }
-
     }
 
   } else if (shape.is_path ()) {
@@ -592,9 +587,7 @@ create_shift_sets (const db::Shape &shape, const std::set <EdgeWithIndex> &sel, 
 
         p1 = *pt;
         ++n;
-
       }
-
     }
 
   } else if (shape.is_box ()) {
@@ -610,7 +603,7 @@ create_shift_sets (const db::Shape &shape, const std::set <EdgeWithIndex> &sel, 
       EdgeWithIndex ewi (*e, n, nn, 0);
       if ((*e).p1 () != (*e).p2 () && sel.find (ewi) == sel.end ()) {
         //  add some moveable edges to impose manhattan constraints
-        if (new_points.find (ewi.pi1 ()) != new_points.end () || 
+        if (new_points.find (ewi.pi1 ()) != new_points.end () ||
             new_points.find (ewi.pi2 ()) != new_points.end ()) {
           new_edges.insert (std::make_pair (ewi, db::Edge ((*e))));
         } else {
@@ -618,18 +611,17 @@ create_shift_sets (const db::Shape &shape, const std::set <EdgeWithIndex> &sel, 
         }
       }
     }
-
-  } 
+  }
 
   //  Simply move the points
-  for (std::map <PointWithIndex, db::Point>::iterator np = new_points.begin (); np != new_points.end (); ++np) {
+  for (std::map<PointWithIndex, db::Point>::iterator np = new_points.begin (); np != new_points.end (); ++np) {
     np->second += mv;
   }
 
   //  The edges are treated somewhat more elaborate:
-  for (std::map <EdgeWithIndex, db::Edge>::iterator ne = new_edges.begin (); ne != new_edges.end (); ++ne) {
+  for (std::map<EdgeWithIndex, db::Edge>::iterator ne = new_edges.begin (); ne != new_edges.end (); ++ne) {
 
-    std::map <PointWithIndex, Constraint>::iterator c1, c2;
+    std::map<PointWithIndex, Constraint>::iterator c1, c2;
 
     //  compute normal of move vector
     db::DVector nmv;
@@ -642,11 +634,11 @@ create_shift_sets (const db::Shape &shape, const std::set <EdgeWithIndex> &sel, 
 
     c1 = point_constr.find (ne->first.pi1 ());
     if (c1 != point_constr.end ()) {
-      std::pair <bool, db::Point> pm = c1->second.move (p1, nmv);
+      std::pair<bool, db::Point> pm = c1->second.move (p1, nmv);
       if (pm.first) {
         p1e = p1 = pm.second;
       } else {
-        //  if the movement was not possible, create a new "detached" edge 
+        //  if the movement was not possible, create a new "detached" edge
         p1e = p1 + db::Vector (nmv);
       }
     } else {
@@ -656,11 +648,11 @@ create_shift_sets (const db::Shape &shape, const std::set <EdgeWithIndex> &sel, 
 
     c2 = point_constr.find (ne->first.pi2 ());
     if (c2 != point_constr.end ()) {
-      std::pair <bool, db::Point> pm = c2->second.move (p2, nmv);
+      std::pair<bool, db::Point> pm = c2->second.move (p2, nmv);
       if (pm.first) {
         p2e = p2 = pm.second;
       } else {
-        //  if the movement was not possible, create a new "detached" edge 
+        //  if the movement was not possible, create a new "detached" edge
         p2e = p2 + db::Vector (nmv);
       }
     } else {
@@ -668,7 +660,7 @@ create_shift_sets (const db::Shape &shape, const std::set <EdgeWithIndex> &sel, 
       p2e = p2;
     }
 
-    //  if the moved edge is 
+    //  if the moved edge is
     //    1. result of two constraints
     //    ( commented out: 2. inverted (the direction has changed) or the length grows 4x larger than the move distance )
     //  then create a "detached edge" as well
@@ -676,8 +668,7 @@ create_shift_sets (const db::Shape &shape, const std::set <EdgeWithIndex> &sel, 
     db::Vector ve (p2e - p1e);
     db::Vector vo (ne->second.p2 () - ne->second.p1 ());
 
-    if (c1 != point_constr.end () && c2 != point_constr.end () 
-        && (/* db::sprod_sign (ve, vo) <= 0 || */ (ve - vo).double_length () > 4.0 * nmv.double_length ())) {
+    if (c1 != point_constr.end () && c2 != point_constr.end () && (/* db::sprod_sign (ve, vo) <= 0 || */ (ve - vo).double_length () > 4.0 * nmv.double_length ())) {
 
 #if 0
       //  first try to detach just one (the one with the largest movement)
@@ -703,7 +694,6 @@ create_shift_sets (const db::Shape &shape, const std::set <EdgeWithIndex> &sel, 
       p2e = p2 + db::Vector (nmv);
       p1e = p1 + db::Vector (nmv);
 #endif
-
     }
 
     ne->second = db::Edge (p1e, p2e);
@@ -711,9 +701,7 @@ create_shift_sets (const db::Shape &shape, const std::set <EdgeWithIndex> &sel, 
     //  insert the end points into the point list in order to find them by looking up a point alone
     new_points.insert (std::make_pair (ne->first.pi1 (), db::Point ())).first->second = p1;
     new_points.insert (std::make_pair (ne->first.pi2 (), db::Point ())).first->second = p2;
-
   }
-
 }
 
 // -------------------------------------------------------------
@@ -728,7 +716,7 @@ class PartialShapeFinder
   : public lay::ShapeFinder
 {
 public:
-  typedef std::vector<std::pair <lay::ObjectInstPath, std::vector <EdgeWithIndex> > > founds_vector_type;
+  typedef std::vector<std::pair<lay::ObjectInstPath, std::vector<EdgeWithIndex>>> founds_vector_type;
   typedef founds_vector_type::const_iterator iterator;
 
   PartialShapeFinder (bool point_mode, bool top_level_sel, db::ShapeIterator::flags_type flags);
@@ -758,8 +746,7 @@ PartialShapeFinder::PartialShapeFinder (bool point_mode, bool top_level_sel, db:
   set_test_count (point_sel_tests);
 }
 
-void 
-PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int /*level*/)
+void PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int /*level*/)
 {
   if (! point_mode ()) {
 
@@ -793,7 +780,7 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
 
             for (unsigned int c = 0; c < shape->holes () + 1; ++c) {
 
-              unsigned int n = 0; 
+              unsigned int n = 0;
               db::Shape::polygon_edge_iterator ee;
               for (db::Shape::polygon_edge_iterator e = shape->begin_edge (c); ! e.at_end (); e = ee, ++n) {
 
@@ -805,11 +792,9 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
                   edges.push_back (EdgeWithIndex (db::Edge ((*e).p1 (), (*e).p1 ()), n, n, c));
                   if (hit_box.contains ((*e).p2 ())) {
                     edges.push_back (EdgeWithIndex (*e, n, nn, c));
-                  } 
-                } 
-
+                  }
+                }
               }
-
             }
 
           } else if (shape->is_path ()) {
@@ -834,7 +819,7 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
 
             //  convert to polygon and test those edges
             db::Polygon poly (box);
-            unsigned int n = 0; 
+            unsigned int n = 0;
             db::Shape::polygon_edge_iterator ee;
             for (db::Shape::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); e = ee, ++n) {
 
@@ -846,9 +831,8 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
                 edges.push_back (EdgeWithIndex (db::Edge ((*e).p1 (), (*e).p1 ()), n, n, 0));
                 if (hit_box.contains ((*e).p2 ())) {
                   edges.push_back (EdgeWithIndex (*e, n, nn, 0));
-                } 
-              } 
-
+                }
+              }
             }
 
           } else if (shape->is_point ()) {
@@ -878,9 +862,7 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
               if (hit_box.contains (tp)) {
                 edges.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
               }
-
             }
-
           }
 
           //  do not select shapes that do not have at least one edge selected
@@ -889,11 +871,8 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
           }
 
           ++shape;
-
-        } 
-
+        }
       }
-
     }
 
   } else {
@@ -905,7 +884,7 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
         checkpoint ();
 
         const db::Shapes &shapes = cell.shapes (*l);
-        std::vector <EdgeWithIndex> edge_sel;
+        std::vector<EdgeWithIndex> edge_sel;
 
         //  two passes - one with points, second with edges
 
@@ -948,9 +927,7 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
                       edge_sel.push_back (EdgeWithIndex (*e, n, nn, c));
                     }
                   }
-
                 }
-
               }
 
             } else if (shape->is_path ()) {
@@ -1007,7 +984,6 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
                     edge_sel.push_back (EdgeWithIndex (*e, n, nn, 0));
                   }
                 }
-
               }
 
             } else if (shape->is_point ()) {
@@ -1046,9 +1022,7 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
                   edge_sel.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
                   match = true;
                 }
-
               }
-
             }
 
             if (match && closer (d)) {
@@ -1069,21 +1043,14 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
               m_founds.back ().second = edge_sel;
 
               any = true;
-
             }
 
             ++shape;
-
           }
-
         }
-
       }
-
     }
-
   }
-
 }
 
 // -----------------------------------------------------------------------------
@@ -1091,24 +1058,24 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
 
 PartialService::PartialService (db::Manager *manager, lay::LayoutViewBase *view, lay::Dispatcher *root) :
 #if defined(HAVE_QT)
-    QObject (),
+                                                                                                          QObject (),
 #endif
-    lay::EditorServiceBase (view),
-    db::Object (manager),
-    mp_view (view),
-    mp_root (root),
-    m_moving (false),
-    m_keep_selection (true),
-    mp_box (0),
-    m_color (0),
-    m_buttons (0),
-    m_connect_ac (lay::AC_Any), m_move_ac (lay::AC_Any), m_alt_ac (lay::AC_Global),
-    m_snap_to_objects (true),
-    m_snap_objects_to_grid (true),
-    m_top_level_sel (false),
-    m_hover (false),
-    m_hover_wait (false),
-    dm_selection_to_view (this, &edt::PartialService::do_selection_to_view)
+                                                                                                          lay::EditorServiceBase (view),
+                                                                                                          db::Object (manager),
+                                                                                                          mp_view (view),
+                                                                                                          mp_root (root),
+                                                                                                          m_moving (false),
+                                                                                                          m_keep_selection (true),
+                                                                                                          mp_box (0),
+                                                                                                          m_color (0),
+                                                                                                          m_buttons (0),
+                                                                                                          m_connect_ac (lay::AC_Any), m_move_ac (lay::AC_Any), m_alt_ac (lay::AC_Global),
+                                                                                                          m_snap_to_objects (true),
+                                                                                                          m_snap_objects_to_grid (true),
+                                                                                                          m_top_level_sel (false),
+                                                                                                          m_hover (false),
+                                                                                                          m_hover_wait (false),
+                                                                                                          dm_selection_to_view (this, &edt::PartialService::do_selection_to_view)
 {
 #if defined(HAVE_QT)
   m_timer.setInterval (100 /*hover time*/);
@@ -1132,34 +1099,31 @@ PartialService::~PartialService ()
   }
 }
 
-lay::angle_constraint_type 
+lay::angle_constraint_type
 PartialService::connect_ac () const
 {
   //  m_alt_ac (which is set from mouse buttons) can override the specified connect angle constraint
   return m_alt_ac != lay::AC_Global ? m_alt_ac : m_connect_ac;
 }
 
-lay::angle_constraint_type 
+lay::angle_constraint_type
 PartialService::move_ac () const
 {
   //  m_alt_ac (which is set from mouse buttons) can override the specified move angle constraint
   return m_alt_ac != lay::AC_Global ? m_alt_ac : m_move_ac;
 }
 
-void  
-PartialService::deactivated ()
+void PartialService::deactivated ()
 {
   clear_partial_transient_selection ();
 }
 
-void  
-PartialService::activated ()
+void PartialService::activated ()
 {
   //  .. nothing yet ..
 }
 
-void 
-PartialService::hover_reset ()
+void PartialService::hover_reset ()
 {
   if (m_hover_wait) {
 #if defined(HAVE_QT)
@@ -1175,16 +1139,15 @@ PartialService::hover_reset ()
 
 //  TODO: should receive timer calls from regular timer update
 #if defined(HAVE_QT)
-void
-PartialService::timeout ()
+void PartialService::timeout ()
 {
   m_hover_wait = false;
   m_hover = true;
-  
+
   mp_view->clear_transient_selection ();
   clear_mouse_cursors ();
 
-  double le = catch_distance () * 3.0;  //  see Editables::selection_catch_bbox()
+  double le = catch_distance () * 3.0; //  see Editables::selection_catch_bbox()
   db::DBox sel_catch_box = selection_bbox ().enlarged (db::DVector (le, le));
   if (has_selection () && sel_catch_box.contains (m_hover_point)) {
 
@@ -1194,7 +1157,6 @@ PartialService::timeout ()
     resize_inst_markers (0, true);
 
     return;
-
   }
 
   //  compute search box
@@ -1210,9 +1172,9 @@ PartialService::timeout ()
   if (finder.begin () != finder.end ()) {
 
     partial_objects transient_selection;
-    transient_selection.insert (std::make_pair (finder.begin ()->first, std::set <EdgeWithIndex> (finder.begin ()->second.begin (), finder.begin ()->second.end ())));
+    transient_selection.insert (std::make_pair (finder.begin ()->first, std::set<EdgeWithIndex> (finder.begin ()->second.begin (), finder.begin ()->second.end ())));
 
-    partial_objects::const_iterator r = transient_selection.begin (); 
+    partial_objects::const_iterator r = transient_selection.begin ();
 
     //  build the transformation variants cache
     lay::TransformationVariants tv (view ());
@@ -1225,11 +1187,11 @@ PartialService::timeout ()
     if (! r->first.is_cell_inst ()) {
 
       const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (r->first.cv_index (), r->first.layer ());
-      if (tv_list && !tv_list->empty ()) {
+      if (tv_list && ! tv_list->empty ()) {
 
         //  dummy shift set
-        std::map <EdgeWithIndex, db::Edge> new_edges;
-        std::map <PointWithIndex, db::Point> new_points;
+        std::map<EdgeWithIndex, db::Edge> new_edges;
+        std::map<PointWithIndex, db::Point> new_points;
 
         //  create the markers to represent vertices and edges
         enter_vertices (n_marker, r, new_points, new_edges, gt, *tv_list, true);
@@ -1246,7 +1208,6 @@ PartialService::timeout ()
               unsigned int nn = ee.at_end () ? 0 : n + 1;
               enter_edge (EdgeWithIndex (*e, n, nn, c), n_marker, r, new_points, new_edges, gt, *tv_list, true);
             }
-
           }
 
         } else if (r->first.shape ().is_path ()) {
@@ -1263,14 +1224,12 @@ PartialService::timeout ()
               if (pt == r->first.shape ().end_point ()) {
                 break;
               }
-              
+
               enter_edge (EdgeWithIndex (db::Edge (p1, *pt), n, n + 1, 0), n_marker, r, new_points, new_edges, gt, *tv_list, true);
 
               p1 = *pt;
               ++n;
-
             }
-
           }
 
         } else if (r->first.shape ().is_box ()) {
@@ -1295,32 +1254,26 @@ PartialService::timeout ()
 
           db::Point tp (r->first.shape ().point ());
           enter_edge (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0), n_marker, r, new_points, new_edges, gt, *tv_list, true);
-
         }
-
       }
 
     } else {
 
       const std::vector<db::DCplxTrans> *tv_list = tv.per_cv (r->first.cv_index ());
-      if (tv_list  && ! tv_list->empty ()) {
+      if (tv_list && ! tv_list->empty ()) {
         lay::InstanceMarker *marker = new_inst_marker (n_inst_marker, r->first.cv_index (), true);
         marker->set (r->first.back ().inst_ptr, gt, *tv_list);
       }
-
     }
-
   }
 
   //  delete superfluous markers
   resize_markers (n_marker, true);
   resize_inst_markers (n_inst_marker, true);
-
 }
 #endif
 
-void
-PartialService::clear_partial_transient_selection ()
+void PartialService::clear_partial_transient_selection ()
 {
   mp_view->clear_transient_selection ();
 
@@ -1328,8 +1281,7 @@ PartialService::clear_partial_transient_selection ()
   resize_inst_markers (0, true);
 }
 
-void 
-PartialService::set_colors (tl::Color /*background*/, tl::Color color)
+void PartialService::set_colors (tl::Color /*background*/, tl::Color color)
 {
   m_color = color.rgb ();
   if (mp_box) {
@@ -1337,14 +1289,12 @@ PartialService::set_colors (tl::Color /*background*/, tl::Color color)
   }
 }
 
-void 
-PartialService::menu_activated (const std::string & /*symbol*/)
+void PartialService::menu_activated (const std::string & /*symbol*/)
 {
   // ...
 }
 
-bool 
-PartialService::configure (const std::string &name, const std::string &value)
+bool PartialService::configure (const std::string &name, const std::string &value)
 {
   lay::EditGridConverter egc;
   lay::ACConverter acc;
@@ -1353,33 +1303,32 @@ PartialService::configure (const std::string &name, const std::string &value)
     egc.from_string (value, m_global_grid);
   } else if (name == cfg_edit_grid) {
     egc.from_string (value, m_edit_grid);
-    return true;  //  taken
+    return true; //  taken
   } else if (name == cfg_edit_snap_to_objects) {
     tl::from_string (value, m_snap_to_objects);
-    return true;  //  taken
+    return true; //  taken
   } else if (name == cfg_edit_snap_objects_to_grid) {
     tl::from_string (value, m_snap_objects_to_grid);
-    return true;  //  taken
+    return true; //  taken
   } else if (name == cfg_edit_move_angle_mode) {
     acc.from_string (value, m_move_ac);
-    return true;  //  taken
+    return true; //  taken
   } else if (name == cfg_edit_connect_angle_mode) {
     acc.from_string (value, m_connect_ac);
-    return true;  //  taken
+    return true; //  taken
   } else if (name == cfg_edit_top_level_selection) {
     tl::from_string (value, m_top_level_sel);
   }
 
-  return false;  //  not taken
+  return false; //  not taken
 }
 
-void 
-PartialService::config_finalize ()
+void PartialService::config_finalize ()
 {
   // ...
 }
 
-db::DPoint 
+db::DPoint
 PartialService::snap (const db::DPoint &p) const
 {
   //  snap according to the grid
@@ -1407,8 +1356,7 @@ PartialService::snap (const db::DVector &v_org) const
   }
 }
 
-void
-PartialService::transform (const db::DCplxTrans &tr)
+void PartialService::transform (const db::DCplxTrans &tr)
 {
   //  ignore this function is non-editable mode
   if (! view ()->is_editable ()) {
@@ -1422,8 +1370,7 @@ PartialService::transform (const db::DCplxTrans &tr)
   selection_to_view ();
 }
 
-void
-PartialService::open_editor_hooks ()
+void PartialService::open_editor_hooks ()
 {
   lay::CellViewRef cv_ref (view ()->cellview_ref (view ()->active_cellview_index ()));
   if (! cv_ref.is_valid ()) {
@@ -1439,8 +1386,7 @@ PartialService::open_editor_hooks ()
   call_editor_hooks<lay::CellViewRef &> (m_editor_hooks, &edt::EditorHooks::begin_edit, (lay::CellViewRef &) cv_ref);
 }
 
-void
-PartialService::close_editor_hooks (bool commit)
+void PartialService::close_editor_hooks (bool commit)
 {
   if (commit) {
     call_editor_hooks (m_editor_hooks, &edt::EditorHooks::commit_edit);
@@ -1450,8 +1396,7 @@ PartialService::close_editor_hooks (bool commit)
   m_editor_hooks.clear ();
 }
 
-void
-PartialService::issue_editor_hook_calls (const tl::weak_collection<edt::EditorHooks> &hooks)
+void PartialService::issue_editor_hook_calls (const tl::weak_collection<edt::EditorHooks> &hooks)
 {
   if (hooks.empty ()) {
     return;
@@ -1468,7 +1413,7 @@ PartialService::issue_editor_hook_calls (const tl::weak_collection<edt::EditorHo
   //  since a shape reference may become invalid while moving it and
   //  because it creates ambiguities, we treat each shape separately:
   //  collect the valid selected items in a selection-per-shape map.
-  std::map <db::Shape, std::vector<partial_objects::iterator> > sel_per_shape;
+  std::map<db::Shape, std::vector<partial_objects::iterator>> sel_per_shape;
 
   for (partial_objects::iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
     if (! r->first.is_cell_inst ()) {
@@ -1481,16 +1426,15 @@ PartialService::issue_editor_hook_calls (const tl::weak_collection<edt::EditorHo
 
   db::Shapes tmp_shapes;
 
-  for (std::map <db::Shape, std::vector<partial_objects::iterator> >::iterator sps = sel_per_shape.begin (); sps != sel_per_shape.end (); ++sps) {
+  for (std::map<db::Shape, std::vector<partial_objects::iterator>>::iterator sps = sel_per_shape.begin (); sps != sel_per_shape.end (); ++sps) {
 
     db::Shape shape = tmp_shapes.insert (sps->first);
     for (std::vector<partial_objects::iterator>::const_iterator rr = sps->second.begin (); rr != sps->second.end (); ++rr) {
 
-      std::map <EdgeWithIndex, db::Edge> new_edges;
-      std::map <PointWithIndex, db::Point> new_points;
+      std::map<EdgeWithIndex, db::Edge> new_edges;
+      std::map<PointWithIndex, db::Point> new_points;
 
       shape = modify_shape (tv, shape, (*rr)->first, (*rr)->second, move_trans, new_edges, new_points);
-
     }
 
     for (std::vector<partial_objects::iterator>::const_iterator rr = sps->second.begin (); rr != sps->second.end (); ++rr) {
@@ -1510,23 +1454,21 @@ PartialService::issue_editor_hook_calls (const tl::weak_collection<edt::EditorHo
       }
 
       call_editor_hooks<const lay::ObjectInstPath &, const db::Shape &, const db::CplxTrans &> (hooks, &edt::EditorHooks::modified, (*rr)->first, shape, gt);
-
     }
-
   }
 
   //  Issue editor hook calls for the instance transformation events
 
   //  sort the selected objects (the instances) by the cell they are in
   //  The key is a pair: cell_index, cv_index
-  std::map <std::pair <db::cell_index_type, unsigned int>, std::vector <partial_objects::const_iterator> > insts_by_cell;
+  std::map<std::pair<db::cell_index_type, unsigned int>, std::vector<partial_objects::const_iterator>> insts_by_cell;
   for (partial_objects::const_iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
     if (r->first.is_cell_inst ()) {
-      insts_by_cell.insert (std::make_pair (std::make_pair (r->first.cell_index (), r->first.cv_index ()), std::vector <partial_objects::const_iterator> ())).first->second.push_back (r);
+      insts_by_cell.insert (std::make_pair (std::make_pair (r->first.cell_index (), r->first.cv_index ()), std::vector<partial_objects::const_iterator> ())).first->second.push_back (r);
     }
   }
 
-  for (std::map <std::pair <db::cell_index_type, unsigned int>, std::vector <partial_objects::const_iterator> >::const_iterator ibc = insts_by_cell.begin (); ibc != insts_by_cell.end (); ++ibc) {
+  for (std::map<std::pair<db::cell_index_type, unsigned int>, std::vector<partial_objects::const_iterator>>::const_iterator ibc = insts_by_cell.begin (); ibc != insts_by_cell.end (); ++ibc) {
 
     const lay::CellView &cv = view ()->cellview (ibc->first.second);
     if (cv.is_valid ()) {
@@ -1543,16 +1485,13 @@ PartialService::issue_editor_hook_calls (const tl::weak_collection<edt::EditorHo
         db::ICplxTrans applied = gt.inverted () * db::DCplxTrans (move_trans) * gt;
 
         call_editor_hooks<const lay::ObjectInstPath &, const db::ICplxTrans &, const db::CplxTrans &> (hooks, &edt::EditorHooks::transformed, (*inst)->first, applied, gt);
-
       }
-
     }
-
   }
 }
 
 db::Shape
-PartialService::modify_shape (lay::TransformationVariants &tv, const db::Shape &shape_in, const lay::ObjectInstPath &path, const std::set <EdgeWithIndex> &sel, const db::DTrans &move_trans, std::map <EdgeWithIndex, db::Edge> &new_edges, std::map <PointWithIndex, db::Point> &new_points)
+PartialService::modify_shape (lay::TransformationVariants &tv, const db::Shape &shape_in, const lay::ObjectInstPath &path, const std::set<EdgeWithIndex> &sel, const db::DTrans &move_trans, std::map<EdgeWithIndex, db::Edge> &new_edges, std::map<PointWithIndex, db::Point> &new_points)
 {
   tl_assert (shape_in.shapes () != 0);
   db::Shape shape = shape_in;
@@ -1608,7 +1547,7 @@ PartialService::modify_shape (lay::TransformationVariants &tv, const db::Shape &
     shape.text (t);
 
     db::Point tp (shape.text_trans () * db::Point ());
-    std::map <PointWithIndex, db::Point>::const_iterator np = new_points.find (PointWithIndex (tp, 0, 0));
+    std::map<PointWithIndex, db::Point>::const_iterator np = new_points.find (PointWithIndex (tp, 0, 0));
 
     if (np != new_points.end ()) {
       t.transform (db::Trans (np->second - tp));
@@ -1620,19 +1559,17 @@ PartialService::modify_shape (lay::TransformationVariants &tv, const db::Shape &
     db::Point p;
     shape.point (p);
 
-    std::map <PointWithIndex, db::Point>::const_iterator np = new_points.find (PointWithIndex (p, 0, 0));
+    std::map<PointWithIndex, db::Point>::const_iterator np = new_points.find (PointWithIndex (p, 0, 0));
 
     if (np != new_points.end ()) {
       shape = shapes.replace (shape, np->second);
     }
-
   }
 
   return shape;
 }
 
-void
-PartialService::transform_selection (const db::DTrans &move_trans)
+void PartialService::transform_selection (const db::DTrans &move_trans)
 {
   //  build the transformation variants cache
   lay::TransformationVariants tv (view ());
@@ -1640,7 +1577,7 @@ PartialService::transform_selection (const db::DTrans &move_trans)
   //  since a shape reference may become invalid while moving it and
   //  because it creates ambiguities, we treat each shape separately:
   //  collect the valid selected items in a selection-per-shape map.
-  std::map <db::Shape, std::vector<partial_objects::iterator> > sel_per_shape;
+  std::map<db::Shape, std::vector<partial_objects::iterator>> sel_per_shape;
 
   for (partial_objects::iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
     if (! r->first.is_cell_inst ()) {
@@ -1651,7 +1588,7 @@ PartialService::transform_selection (const db::DTrans &move_trans)
     }
   }
 
-  for (std::map <db::Shape, std::vector<partial_objects::iterator> >::iterator sps = sel_per_shape.begin (); sps != sel_per_shape.end (); ++sps) {
+  for (std::map<db::Shape, std::vector<partial_objects::iterator>>::iterator sps = sel_per_shape.begin (); sps != sel_per_shape.end (); ++sps) {
 
     db::Shape shape = sps->first;
 
@@ -1659,25 +1596,25 @@ PartialService::transform_selection (const db::DTrans &move_trans)
 
       partial_objects::iterator r = *rr;
 
-      std::map <EdgeWithIndex, db::Edge> new_edges;
-      std::map <PointWithIndex, db::Point> new_points;
+      std::map<EdgeWithIndex, db::Edge> new_edges;
+      std::map<PointWithIndex, db::Point> new_points;
       shape = modify_shape (tv, shape, r->first, r->second, move_trans, new_edges, new_points);
 
-      //  transform the selection 
-      
-      std::set <EdgeWithIndex> new_sel;
+      //  transform the selection
+
+      std::set<EdgeWithIndex> new_sel;
       new_sel.swap (r->second);
 
-      for (std::set <EdgeWithIndex>::const_iterator s = new_sel.begin (); s != new_sel.end () && m_keep_selection; ++s) {
+      for (std::set<EdgeWithIndex>::const_iterator s = new_sel.begin (); s != new_sel.end () && m_keep_selection; ++s) {
         if (s->p1 () == s->p2 ()) {
-          std::map <PointWithIndex, db::Point>::const_iterator np = new_points.find (s->pi1 ());
+          std::map<PointWithIndex, db::Point>::const_iterator np = new_points.find (s->pi1 ());
           if (np != new_points.end ()) {
             r->second.insert (EdgeWithIndex (db::Edge (np->second, np->second), s->n, s->n, s->c));
           } else {
             r->second.insert (*s);
           }
         } else {
-          std::map <EdgeWithIndex, db::Edge>::const_iterator ne = new_edges.find (*s);
+          std::map<EdgeWithIndex, db::Edge>::const_iterator ne = new_edges.find (*s);
           if (ne != new_edges.end ()) {
             r->second.insert (EdgeWithIndex (ne->second, s->n, s->nn, s->c));
           } else {
@@ -1685,47 +1622,43 @@ PartialService::transform_selection (const db::DTrans &move_trans)
           }
         }
       }
-
     }
 
     //  change the shape references if required
-      
+
     if (shape != sps->first) {
 
       for (std::vector<partial_objects::iterator>::const_iterator rr = sps->second.begin (); rr != sps->second.end (); ++rr) {
 
-        std::set <EdgeWithIndex> sel;
+        std::set<EdgeWithIndex> sel;
         sel.swap ((*rr)->second);
 
         lay::ObjectInstPath inst_path ((*rr)->first);
         inst_path.set_shape (shape);
 
         m_selection.erase ((*rr)->first);
-        m_selection.insert (std::make_pair (inst_path, std::set <EdgeWithIndex> ())).first->second.swap (sel);
-
+        m_selection.insert (std::make_pair (inst_path, std::set<EdgeWithIndex> ())).first->second.swap (sel);
       }
-
     }
-
   }
 
   //  then move all instances.
-  
+
   //  sort the selected objects (the instances) by the cell they are in
   //  The key is a pair: cell_index, cv_index
-  std::map <std::pair <db::cell_index_type, unsigned int>, std::vector <partial_objects::const_iterator> > insts_by_cell;
+  std::map<std::pair<db::cell_index_type, unsigned int>, std::vector<partial_objects::const_iterator>> insts_by_cell;
   for (partial_objects::const_iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
     if (r->first.is_cell_inst ()) {
-      insts_by_cell.insert (std::make_pair (std::make_pair (r->first.cell_index (), r->first.cv_index ()), std::vector <partial_objects::const_iterator> ())).first->second.push_back (r);
+      insts_by_cell.insert (std::make_pair (std::make_pair (r->first.cell_index (), r->first.cv_index ()), std::vector<partial_objects::const_iterator> ())).first->second.push_back (r);
     }
   }
 
-  std::vector <std::pair <db::Instance, db::ICplxTrans> > insts_to_transform;
-  for (std::map <std::pair <db::cell_index_type, unsigned int>, std::vector <partial_objects::const_iterator> >::const_iterator ibc = insts_by_cell.begin (); ibc != insts_by_cell.end (); ++ibc) {
+  std::vector<std::pair<db::Instance, db::ICplxTrans>> insts_to_transform;
+  for (std::map<std::pair<db::cell_index_type, unsigned int>, std::vector<partial_objects::const_iterator>>::const_iterator ibc = insts_by_cell.begin (); ibc != insts_by_cell.end (); ++ibc) {
 
     insts_to_transform.clear ();
     insts_to_transform.reserve (ibc->second.size ());
-    for (std::vector <partial_objects::const_iterator>::const_iterator i = ibc->second.begin (); i != ibc->second.end (); ++i) {
+    for (std::vector<partial_objects::const_iterator>::const_iterator i = ibc->second.begin (); i != ibc->second.end (); ++i) {
       insts_to_transform.push_back (std::make_pair ((*i)->first.back ().inst_ptr, (*i)->first.trans ()));
     }
 
@@ -1739,26 +1672,21 @@ PartialService::transform_selection (const db::DTrans &move_trans)
         db::ICplxTrans move_trans_dbu (tt.inverted () * db::DCplxTrans (move_trans) * tt);
 
         std::sort (insts_to_transform.begin (), insts_to_transform.end ());
-        std::vector <std::pair <db::Instance, db::ICplxTrans> >::const_iterator unique_end = std::unique (insts_to_transform.begin (), insts_to_transform.end ());
+        std::vector<std::pair<db::Instance, db::ICplxTrans>>::const_iterator unique_end = std::unique (insts_to_transform.begin (), insts_to_transform.end ());
         db::Cell &cell = cv->layout ().cell (ibc->first.first);
-        for (std::vector <std::pair <db::Instance, db::ICplxTrans> >::const_iterator inst = insts_to_transform.begin (); inst != unique_end; ++inst) {
+        for (std::vector<std::pair<db::Instance, db::ICplxTrans>>::const_iterator inst = insts_to_transform.begin (); inst != unique_end; ++inst) {
 
           db::ICplxTrans mt (inst->second.inverted () * move_trans_dbu * inst->second);
           cell.transform (inst->first, mt);
-
         }
-
       }
-
     }
-
   }
 
   handle_guiding_shape_changes ();
 }
 
-void 
-PartialService::edit_cancel ()
+void PartialService::edit_cancel ()
 {
   //  stop dragging, clear selection
   m_moving = false;
@@ -1776,8 +1704,7 @@ PartialService::edit_cancel ()
   selection_to_view ();
 }
 
-bool 
-PartialService::wheel_event (int /*delta*/, bool /*horizontal*/, const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/)
+bool PartialService::wheel_event (int /*delta*/, bool /*horizontal*/, const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/)
 {
   hover_reset ();
   return false;
@@ -1785,8 +1712,7 @@ PartialService::wheel_event (int /*delta*/, bool /*horizontal*/, const db::DPoin
 
 const int sr_pixels = 8; //  TODO: make variable
 
-void
-PartialService::move_impl (const db::DPoint &p)
+void PartialService::move_impl (const db::DPoint &p)
 {
   //  drag the vertex or edge/segment
   if (is_single_point_selection () || is_single_edge_selection ()) {
@@ -1796,7 +1722,8 @@ PartialService::move_impl (const db::DPoint &p)
     //  for a single selected point or edge, m_start is the original position and we snap the target -
     //  thus, we can bring the point on grid or to an object's edge or vertex
     double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (sr_pixels);
-    snap_details = lay::obj_snap (m_snap_to_objects ? view () : 0, m_start, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, lay::AC_Any, snap_range);;
+    snap_details = lay::obj_snap (m_snap_to_objects ? view () : 0, m_start, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, lay::AC_Any, snap_range);
+    ;
 
     if (snap_details.object_snap == lay::PointSnapToObjectResult::NoObject) {
 
@@ -1826,11 +1753,9 @@ PartialService::move_impl (const db::DPoint &p)
             m_current.set_x (cp.second.x ());
           }
         }
-
       }
 
       mouse_cursor_from_snap_details (snap_details);
-
     }
 
     if (is_single_edge_selection ()) {
@@ -1842,21 +1767,18 @@ PartialService::move_impl (const db::DPoint &p)
         db::DVector n = db::DVector (e.y (), -e.x ()) * (1.0 / e.double_length ());
         m_current = m_start + n * db::sprod (m_current - m_start, n);
       }
-
     }
 
   } else {
 
     //  snap movement to angle and grid without object
     m_current = m_start + snap_move (p - m_start);
-
   }
 
   selection_to_view ();
 }
 
-bool
-PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
+bool PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (m_moving) {
 
@@ -1864,7 +1786,7 @@ PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, boo
     return false;
 
   } else if (prio) {
-    
+
     if (mp_box) {
 
       m_alt_ac = lay::ac_from_buttons (buttons);
@@ -1881,10 +1803,8 @@ PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, boo
       m_timer.start ();
 #endif
       m_hover_point = p;
-
     }
-
-  } 
+  }
 
   //  pass on this event to other handlers
   return false;
@@ -1901,8 +1821,7 @@ projected_to_edge (const db::DEdge &edge, const db::DPoint &p)
   }
 }
 
-bool  
-PartialService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
+bool PartialService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   hover_reset ();
 
@@ -1934,10 +1853,10 @@ PartialService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bo
       //  clear other selection when this mode gets active
       view ()->clear_selection ();
 
-      //  nothing is selected yet: 
+      //  nothing is selected yet:
       //  try to select something here.
       //  (select is allowed to throw an exception)
-      
+
       try {
         partial_select (db::DBox (p, p), lay::Editable::Replace);
       } catch (tl::Exception &ex) {
@@ -1945,7 +1864,6 @@ PartialService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bo
         //  clear selection
         partial_select (db::DBox (), lay::Editable::Reset);
       }
-
     }
 
     if (m_selection.empty () || ((buttons & lay::ShiftButton) != 0) || ((buttons & lay::ControlButton) != 0)) {
@@ -1970,20 +1888,17 @@ PartialService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bo
 
       //  delegate further actions to move service, which will start a move operation
       mp_view->move_service ()->start_move ();
-
     }
 
     m_alt_ac = lay::AC_Global;
 
     return true;
-
   }
 
   return false;
 }
 
-bool  
-PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
+bool PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   hover_reset ();
 
@@ -2005,7 +1920,7 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
 
     return false;
 
-  } else if (ui ()->mouse_event_viewport ().contains (p)) { 
+  } else if (ui ()->mouse_event_viewport ().contains (p)) {
 
     //  clear other selection when this mode gets active
     //  (save the selection so our own selection does not get cleared)
@@ -2024,14 +1939,14 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
       mode = lay::Editable::Add;
     } else if (ctrl) {
       mode = lay::Editable::Reset;
-    } 
+    }
 
-    //  select is allowed to throw an exception 
+    //  select is allowed to throw an exception
     try {
 
       bool new_selection = true;
 
-      double le = catch_distance () * 3.0;  //  see Editables::selection_catch_bbox()
+      double le = catch_distance () * 3.0; //  see Editables::selection_catch_bbox()
       db::DBox sel_catch_box = selection_bbox ().enlarged (db::DVector (le, le));
       if (mode == lay::Editable::Replace && has_selection () && sel_catch_box.contains (p)) {
         //  drag current selection
@@ -2062,7 +1977,7 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
         if (f0 != finder.end () && f0->first.layer () == view ()->cellview (f0->first.cv_index ())->layout ().guiding_shape_layer ()) {
           m_selection.clear ();
         } else {
-          partial_objects::const_iterator s0 = m_selection.begin (); 
+          partial_objects::const_iterator s0 = m_selection.begin ();
           if (s0 != m_selection.end () && s0->first.layer () == view ()->cellview (s0->first.cv_index ())->layout ().guiding_shape_layer ()) {
             m_selection.clear ();
           }
@@ -2075,8 +1990,8 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
             //  select
             partial_objects::iterator sel = m_selection.find (f->first);
             if (sel == m_selection.end ()) {
-              sel = m_selection.insert (std::make_pair (f->first, std::set <EdgeWithIndex> ())).first;
-            } 
+              sel = m_selection.insert (std::make_pair (f->first, std::set<EdgeWithIndex> ())).first;
+            }
             sel->second.insert (f->second.begin (), f->second.end ());
           } else if (mode == lay::Editable::Reset) {
             //  unselect
@@ -2091,11 +2006,9 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
               m_selection.insert (std::make_pair (f->first, std::set<EdgeWithIndex> ())).first->second.insert (f->second.begin (), f->second.end ());
             }
           }
-
         }
-
       }
-      
+
       //  start dragging with the selection
       if (mode == lay::Editable::Replace && ! m_selection.empty ()) {
 
@@ -2105,7 +2018,6 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
         //  modify the decision to keep the selection (needs to come after the
         //  move service called begin_move)
         m_keep_selection = ! new_selection;
-
       }
 
       selection_to_view ();
@@ -2119,14 +2031,12 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
     m_alt_ac = lay::AC_Global;
 
     return true;
-
   }
 
   return false;
 }
 
-bool  
-PartialService::mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
+bool PartialService::mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   hover_reset ();
 
@@ -2203,9 +2113,7 @@ PartialService::mouse_double_click_event (const db::DPoint &p, unsigned int butt
               if (insert_point_poly (poly, r->second, new_point, new_poly)) {
                 shape = shapes.replace (shape, new_poly);
               }
-
             }
-
           }
 
           lay::ObjectInstPath obj = r->first;
@@ -2221,11 +2129,8 @@ PartialService::mouse_double_click_event (const db::DPoint &p, unsigned int butt
           }
 
           selection_to_view ();
-
         }
-
       }
-
     }
 
     m_alt_ac = lay::AC_Global;
@@ -2237,8 +2142,7 @@ PartialService::mouse_double_click_event (const db::DPoint &p, unsigned int butt
   }
 }
 
-bool  
-PartialService::mouse_release_event (const db::DPoint &p, unsigned int buttons, bool prio)
+bool PartialService::mouse_release_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   hover_reset ();
 
@@ -2251,7 +2155,7 @@ PartialService::mouse_release_event (const db::DPoint &p, unsigned int buttons, 
     delete mp_box;
     mp_box = 0;
 
-    if (ui ()->mouse_event_viewport ().contains (p)) { 
+    if (ui ()->mouse_event_viewport ().contains (p)) {
 
       lay::Editable::SelectionMode mode = lay::Editable::Replace;
       bool shift = ((buttons & lay::ShiftButton) != 0);
@@ -2262,9 +2166,9 @@ PartialService::mouse_release_event (const db::DPoint &p, unsigned int buttons, 
         mode = lay::Editable::Add;
       } else if (ctrl) {
         mode = lay::Editable::Reset;
-      } 
+      }
 
-      //  select is allowed to throw an exception 
+      //  select is allowed to throw an exception
       try {
         partial_select (db::DBox (m_p1, m_p2), mode);
       } catch (tl::Exception &ex) {
@@ -2272,20 +2176,17 @@ PartialService::mouse_release_event (const db::DPoint &p, unsigned int buttons, 
         //  clear selection
         partial_select (db::DBox (), lay::Editable::Reset);
       }
-
     }
 
     m_alt_ac = lay::AC_Global;
 
     return true;
-
   }
 
   return false;
 }
 
-bool
-PartialService::key_event (unsigned int key, unsigned int buttons)
+bool PartialService::key_event (unsigned int key, unsigned int buttons)
 {
   if (m_moving && buttons == 0 && (key == lay::KeyEnter || key == lay::KeyReturn)) {
     mp_view->move_service ()->finish_move ();
@@ -2295,8 +2196,7 @@ PartialService::key_event (unsigned int key, unsigned int buttons)
   }
 }
 
-bool
-PartialService::begin_move (MoveMode mode, const db::DPoint &p, lay::angle_constraint_type ac)
+bool PartialService::begin_move (MoveMode mode, const db::DPoint &p, lay::angle_constraint_type ac)
 {
   if (has_selection () && mode == lay::Editable::Selected) {
 
@@ -2326,8 +2226,7 @@ PartialService::begin_move (MoveMode mode, const db::DPoint &p, lay::angle_const
   }
 }
 
-void
-PartialService::update_vector_snapped_point (const db::DPoint &pt, db::DVector &vr, bool &result_set) const
+void PartialService::update_vector_snapped_point (const db::DPoint &pt, db::DVector &vr, bool &result_set) const
 {
   db::DVector v = snap (pt) - pt;
 
@@ -2363,7 +2262,7 @@ PartialService::snap_marker_to_grid (const db::DVector &v, bool &snapped) const
 
     const lay::CellView &cv = view ()->cellview (r->first.cv_index ());
     const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (r->first.cv_index (), r->first.layer ());
-    if (!tv_list || tv_list->empty ()) {
+    if (! tv_list || tv_list->empty ()) {
       continue;
     }
 
@@ -2377,7 +2276,6 @@ PartialService::snap_marker_to_grid (const db::DVector &v, bool &snapped) const
         --count;
       }
     }
-
   }
 
   if (snapped) {
@@ -2399,8 +2297,7 @@ PartialService::snap_move (const db::DVector &v) const
   return vs;
 }
 
-void
-PartialService::move (const db::DPoint &p, lay::angle_constraint_type ac)
+void PartialService::move (const db::DPoint &p, lay::angle_constraint_type ac)
 {
   if (! m_moving) {
     return;
@@ -2418,15 +2315,13 @@ PartialService::move (const db::DPoint &p, lay::angle_constraint_type ac)
   m_alt_ac = lay::AC_Global;
 }
 
-void
-PartialService::end_move (const db::DVector &v)
+void PartialService::end_move (const db::DVector &v)
 {
   m_current = m_start + v;
   end_move (db::DPoint (), lay::AC_Any);
 }
 
-void
-PartialService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type /*ac*/)
+void PartialService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type /*ac*/)
 {
   if (! m_moving) {
     return;
@@ -2439,7 +2334,6 @@ PartialService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type /
     db::DTrans move_trans = db::DTrans (m_current - m_start);
 
     transform_selection (move_trans);
-
   }
 
   if (! m_keep_selection) {
@@ -2456,8 +2350,7 @@ PartialService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type /
   m_alt_ac = lay::AC_Global;
 }
 
-bool
-PartialService::has_selection ()
+bool PartialService::has_selection ()
 {
   return ! m_selection.empty ();
 }
@@ -2512,27 +2405,23 @@ PartialService::selection_bbox ()
           box += *t * (ctx_trans * r->first.back ().bbox (bc));
         }
       }
-
     }
-
   }
 
   return box;
 }
 
-bool
-PartialService::has_transient_selection ()
+bool PartialService::has_transient_selection ()
 {
   //  there is no specific transient selection for the partial editor
   return false;
 }
 
-void
-PartialService::del ()
+void PartialService::del ()
 {
   std::set<db::Layout *> needs_cleanup;
 
-  std::map <std::pair <db::cell_index_type, std::pair <unsigned int, unsigned int> >, std::vector <partial_objects::const_iterator> > shapes_to_delete_by_cell;
+  std::map<std::pair<db::cell_index_type, std::pair<unsigned int, unsigned int>>, std::vector<partial_objects::const_iterator>> shapes_to_delete_by_cell;
 
   for (partial_objects::iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
 
@@ -2552,7 +2441,7 @@ PartialService::del ()
 
         db::Polygon new_poly = del_points_poly (poly, r->second);
         if (new_poly.hull ().size () < 3) {
-          shapes_to_delete_by_cell.insert (std::make_pair (std::make_pair (r->first.cell_index (), std::make_pair (r->first.cv_index (), r->first.layer ())), std::vector <partial_objects::const_iterator> ())).first->second.push_back (r);
+          shapes_to_delete_by_cell.insert (std::make_pair (std::make_pair (r->first.cell_index (), std::make_pair (r->first.cv_index (), r->first.layer ())), std::vector<partial_objects::const_iterator> ())).first->second.push_back (r);
         } else {
           shapes.replace (shape, new_poly);
         }
@@ -2564,7 +2453,7 @@ PartialService::del ()
 
         db::Path new_path = del_points_path (path, r->second);
         if (new_path.points () < 2) {
-          shapes_to_delete_by_cell.insert (std::make_pair (std::make_pair (r->first.cell_index (), std::make_pair (r->first.cv_index (), r->first.layer ())), std::vector <partial_objects::const_iterator> ())).first->second.push_back (r);
+          shapes_to_delete_by_cell.insert (std::make_pair (std::make_pair (r->first.cell_index (), std::make_pair (r->first.cv_index (), r->first.layer ())), std::vector<partial_objects::const_iterator> ())).first->second.push_back (r);
         } else {
           shapes.replace (shape, new_path);
         }
@@ -2574,44 +2463,41 @@ PartialService::del ()
         //  if more than one point is deleted, the box basically collapses, if one point is deleted
         //  nothing changes on the box.
         if (r->second.size () > 1) {
-          shapes_to_delete_by_cell.insert (std::make_pair (std::make_pair (r->first.cell_index (), std::make_pair (r->first.cv_index (), r->first.layer ())), std::vector <partial_objects::const_iterator> ())).first->second.push_back (r);
+          shapes_to_delete_by_cell.insert (std::make_pair (std::make_pair (r->first.cell_index (), std::make_pair (r->first.cv_index (), r->first.layer ())), std::vector<partial_objects::const_iterator> ())).first->second.push_back (r);
         }
 
       } else if (shape.is_text () || shape.is_point ()) {
 
-        shapes_to_delete_by_cell.insert (std::make_pair (std::make_pair (r->first.cell_index (), std::make_pair (r->first.cv_index (), r->first.layer ())), std::vector <partial_objects::const_iterator> ())).first->second.push_back (r);
-
+        shapes_to_delete_by_cell.insert (std::make_pair (std::make_pair (r->first.cell_index (), std::make_pair (r->first.cv_index (), r->first.layer ())), std::vector<partial_objects::const_iterator> ())).first->second.push_back (r);
       }
-
     }
-
   }
 
   //  delete all shapes that are really lost
-  std::vector <db::Shape> shapes_to_delete;
-  for (std::map <std::pair <db::cell_index_type, std::pair <unsigned int, unsigned int> >, std::vector <partial_objects::const_iterator> >::const_iterator sbc = shapes_to_delete_by_cell.begin (); sbc != shapes_to_delete_by_cell.end (); ++sbc) {
+  std::vector<db::Shape> shapes_to_delete;
+  for (std::map<std::pair<db::cell_index_type, std::pair<unsigned int, unsigned int>>, std::vector<partial_objects::const_iterator>>::const_iterator sbc = shapes_to_delete_by_cell.begin (); sbc != shapes_to_delete_by_cell.end (); ++sbc) {
     const lay::CellView &cv = view ()->cellview (sbc->first.second.first);
     if (cv.is_valid ()) {
       //  don't delete guiding shapes
       if (sbc->first.second.second != cv->layout ().guiding_shape_layer ()) {
-        for (std::vector <partial_objects::const_iterator>::const_iterator s = sbc->second.begin (); s != sbc->second.end (); ++s) {
+        for (std::vector<partial_objects::const_iterator>::const_iterator s = sbc->second.begin (); s != sbc->second.end (); ++s) {
           cv->layout ().cell (sbc->first.first).shapes (sbc->first.second.second).erase_shape ((*s)->first.shape ());
         }
       }
     }
   }
-  
+
   //  then delete all instances.
-  
+
   //  sort the selected objects (the instances) by the cell they are in
   //  The key is a pair: cell_index, cv_index
-  std::map <std::pair <db::cell_index_type, unsigned int>, std::vector <partial_objects::const_iterator> > insts_by_cell;
+  std::map<std::pair<db::cell_index_type, unsigned int>, std::vector<partial_objects::const_iterator>> insts_by_cell;
   for (partial_objects::const_iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
     if (r->first.is_cell_inst ()) {
       const lay::CellView &cv = view ()->cellview (r->first.cv_index ());
       if (cv.is_valid ()) {
         if (cv->layout ().cell (r->first.back ().inst_ptr.cell_index ()).is_proxy ()) {
-          needs_cleanup.insert (& cv->layout ());
+          needs_cleanup.insert (&cv->layout ());
         }
         cv->layout ().cell (r->first.cell_index ()).erase (r->first.back ().inst_ptr);
       }
@@ -2700,8 +2586,7 @@ PartialService::new_marker (size_t &nmarker, unsigned int cv_index, bool transie
   return marker;
 }
 
-void 
-PartialService::enter_path (db::Path &p, size_t &nmarker, partial_objects::const_iterator sel, const std::map <PointWithIndex, db::Point> &new_points, const std::map <EdgeWithIndex, db::Edge> &new_edges, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient)
+void PartialService::enter_path (db::Path &p, size_t &nmarker, partial_objects::const_iterator sel, const std::map<PointWithIndex, db::Point> &new_points, const std::map<EdgeWithIndex, db::Edge> &new_edges, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient)
 {
   lay::Marker *marker = new_marker (nmarker, sel->first.cv_index (), transient);
 
@@ -2713,8 +2598,7 @@ PartialService::enter_path (db::Path &p, size_t &nmarker, partial_objects::const
   marker->set (p, gt, tv);
 }
 
-void 
-PartialService::enter_polygon (db::Polygon &p, size_t &nmarker, partial_objects::const_iterator sel, const std::map <PointWithIndex, db::Point> &new_points, const std::map <EdgeWithIndex, db::Edge> &new_edges, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient)
+void PartialService::enter_polygon (db::Polygon &p, size_t &nmarker, partial_objects::const_iterator sel, const std::map<PointWithIndex, db::Point> &new_points, const std::map<EdgeWithIndex, db::Edge> &new_edges, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient)
 {
   lay::Marker *marker = new_marker (nmarker, sel->first.cv_index (), transient);
 
@@ -2726,34 +2610,29 @@ PartialService::enter_polygon (db::Polygon &p, size_t &nmarker, partial_objects:
   marker->set (p, gt, tv);
 }
 
-void 
-PartialService::enter_vertices (size_t &nmarker, partial_objects::const_iterator sel, const std::map <PointWithIndex, db::Point> &new_points, const std::map <EdgeWithIndex, db::Edge> & /*new_edges*/, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient)
+void PartialService::enter_vertices (size_t &nmarker, partial_objects::const_iterator sel, const std::map<PointWithIndex, db::Point> &new_points, const std::map<EdgeWithIndex, db::Edge> & /*new_edges*/, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient)
 {
-  //  TODO: create vertex markers only for vertices that are not for an edge 
+  //  TODO: create vertex markers only for vertices that are not for an edge
   //  and use "fat" vertices on the edge markers.
 
-  for (std::set <EdgeWithIndex>::const_iterator e = sel->second.begin (); e != sel->second.end (); ++e) {
+  for (std::set<EdgeWithIndex>::const_iterator e = sel->second.begin (); e != sel->second.end (); ++e) {
 
     if (e->p1 () == e->p2 ()) {
-  
+
       lay::Marker *marker = new_marker (nmarker, sel->first.cv_index (), transient);
 
       db::Point pnew = e->p1 ();
-      std::map <PointWithIndex, db::Point>::const_iterator np = new_points.find (PointWithIndex (pnew, e->n, e->c));
+      std::map<PointWithIndex, db::Point>::const_iterator np = new_points.find (PointWithIndex (pnew, e->n, e->c));
       if (np != new_points.end ()) {
         pnew = np->second;
       }
 
       marker->set (db::Edge (pnew, pnew), gt, tv);
-
     }
-
   }
-
 }
 
-void 
-PartialService::enter_edge (const EdgeWithIndex &e, size_t &nmarker, partial_objects::const_iterator sel, const std::map <PointWithIndex, db::Point> &new_points, const std::map <EdgeWithIndex, db::Edge> &new_edges, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient)
+void PartialService::enter_edge (const EdgeWithIndex &e, size_t &nmarker, partial_objects::const_iterator sel, const std::map<PointWithIndex, db::Point> &new_points, const std::map<EdgeWithIndex, db::Edge> &new_edges, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient)
 {
   db::Point ep1 (e.p1 ());
   db::Point ep2 (e.p2 ());
@@ -2761,11 +2640,11 @@ PartialService::enter_edge (const EdgeWithIndex &e, size_t &nmarker, partial_obj
   bool p1_sel = sel->second.find (EdgeWithIndex (db::Edge (ep1, ep1), e.n, e.n, e.c)) != sel->second.end ();
   bool p2_sel = sel->second.find (EdgeWithIndex (db::Edge (ep2, ep2), e.nn, e.nn, e.c)) != sel->second.end ();
   bool p12_sel = sel->second.find (e) != sel->second.end ();
-  
+
   if (p1_sel || p2_sel || p12_sel) {
 
     //  map points to moved ones
-    std::map <PointWithIndex, db::Point>::const_iterator np;
+    std::map<PointWithIndex, db::Point>::const_iterator np;
     np = new_points.find (e.pi1 ());
     if (np != new_points.end ()) {
       ep1 = np->second;
@@ -2777,7 +2656,7 @@ PartialService::enter_edge (const EdgeWithIndex &e, size_t &nmarker, partial_obj
 
     db::Edge enew (ep1, ep2);
 
-    std::map <EdgeWithIndex, db::Edge>::const_iterator ne;
+    std::map<EdgeWithIndex, db::Edge>::const_iterator ne;
     ne = new_edges.find (e);
     if (ne != new_edges.end ()) {
 
@@ -2794,10 +2673,9 @@ PartialService::enter_edge (const EdgeWithIndex &e, size_t &nmarker, partial_obj
         marker->set_vertex_size (0);
         marker->set (db::Edge (enew.p2 (), ep2), gt, tv);
       }
-
     }
 
-    if (p2_sel && !p12_sel) {
+    if (p2_sel && ! p12_sel) {
 
       lay::Marker *marker = new_marker (nmarker, sel->first.cv_index (), transient);
       marker->set_vertex_size (0);
@@ -2808,10 +2686,9 @@ PartialService::enter_edge (const EdgeWithIndex &e, size_t &nmarker, partial_obj
       if (transient && sel->second.size () == 1) {
         add_mouse_cursor (ep2, sel->first.cv_index (), gt, tv, true);
       }
+    }
 
-    } 
-
-    if (p1_sel && !p12_sel) {
+    if (p1_sel && ! p12_sel) {
 
       lay::Marker *marker = new_marker (nmarker, sel->first.cv_index (), transient);
       marker->set_vertex_size (0);
@@ -2822,7 +2699,6 @@ PartialService::enter_edge (const EdgeWithIndex &e, size_t &nmarker, partial_obj
       if (transient && sel->second.size () == 1) {
         add_mouse_cursor (ep1, sel->first.cv_index (), gt, tv, true);
       }
-
     }
 
     if (p12_sel) {
@@ -2834,11 +2710,8 @@ PartialService::enter_edge (const EdgeWithIndex &e, size_t &nmarker, partial_obj
       if (transient) {
         add_edge_marker (enew, sel->first.cv_index (), gt, tv, true);
       }
-
     }
-
   }
-
 }
 
 double
@@ -2856,21 +2729,20 @@ PartialService::catch_distance_box ()
 db::DPoint
 PartialService::single_selected_point () const
 {
-  //  build the transformation variants cache and 
-  //  use only the first one of the explicit transformations 
+  //  build the transformation variants cache and
+  //  use only the first one of the explicit transformations
   //  TODO: clarify how this can be implemented in a more generic form or leave it thus.
   lay::TransformationVariants tv (view ());
   const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (m_selection.begin ()->first.cv_index (), m_selection.begin ()->first.layer ());
 
   const lay::CellView &cv = view ()->cellview (m_selection.begin ()->first.cv_index ());
   db::ICplxTrans gt (cv.context_trans () * m_selection.begin ()->first.trans ());
-  db::CplxTrans tt = (*tv_list)[0] * db::CplxTrans (cv->layout ().dbu ()) * gt;
+  db::CplxTrans tt = (*tv_list) [0] * db::CplxTrans (cv->layout ().dbu ()) * gt;
 
   return tt * m_selection.begin ()->second.begin ()->p1 ();
 }
 
-bool 
-PartialService::is_single_point_selection () const
+bool PartialService::is_single_point_selection () const
 {
   return (m_selection.size () == 1 && ! m_selection.begin ()->first.is_cell_inst () && m_selection.begin ()->second.size () == 1 /*p*/);
 }
@@ -2886,7 +2758,7 @@ PartialService::single_selected_edge () const
 
   const lay::CellView &cv = view ()->cellview (m_selection.begin ()->first.cv_index ());
   db::ICplxTrans gt (cv.context_trans () * m_selection.begin ()->first.trans ());
-  db::CplxTrans tt = (*tv_list)[0] * db::CplxTrans (cv->layout ().dbu ()) * gt;
+  db::CplxTrans tt = (*tv_list) [0] * db::CplxTrans (cv->layout ().dbu ()) * gt;
 
   //  pick the edge from the selection (there is: p1, p2 and the edge between them)
   for (auto s = m_selection.begin ()->second.begin (); s != m_selection.begin ()->second.end (); ++s) {
@@ -2899,14 +2771,12 @@ PartialService::single_selected_edge () const
   return tt * *m_selection.begin ()->second.begin ();
 }
 
-bool
-PartialService::is_single_edge_selection () const
+bool PartialService::is_single_edge_selection () const
 {
   return (m_selection.size () == 1 && ! m_selection.begin ()->first.is_cell_inst () && m_selection.begin ()->second.size () == 3 /*p1,p2,edge*/);
 }
 
-bool
-PartialService::select (const db::DBox &box, SelectionMode mode)
+bool PartialService::select (const db::DBox &box, SelectionMode mode)
 {
   if (box.empty () && mode == lay::Editable::Reset) {
     //  clear selection
@@ -2917,14 +2787,12 @@ PartialService::select (const db::DBox &box, SelectionMode mode)
   return false;
 }
 
-void
-PartialService::selection_to_view ()
+void PartialService::selection_to_view ()
 {
   dm_selection_to_view ();
 }
 
-void
-PartialService::do_selection_to_view ()
+void PartialService::do_selection_to_view ()
 {
   //  if dragging, establish the current displacement
   db::DTrans move_trans;
@@ -2958,7 +2826,7 @@ PartialService::do_selection_to_view ()
       if (! r->first.is_cell_inst ()) {
 
         const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (r->first.cv_index (), r->first.layer ());
-        if (tv_list && !tv_list->empty ()) {
+        if (tv_list && ! tv_list->empty ()) {
 
           //  use only the first one of the explicit transformations
           //  TODO: clarify how this can be implemented in a more generic form or leave it thus.
@@ -2968,8 +2836,8 @@ PartialService::do_selection_to_view ()
 
           //  create the shift sets describing how points and edges are being moved
 
-          std::map <EdgeWithIndex, db::Edge> new_edges;
-          std::map <PointWithIndex, db::Point> new_points;
+          std::map<EdgeWithIndex, db::Edge> new_edges;
+          std::map<PointWithIndex, db::Point> new_points;
 
           if (m_moving) {
             create_shift_sets (r->first.shape (), r->second, new_points, new_edges, move_vector);
@@ -2991,7 +2859,6 @@ PartialService::do_selection_to_view ()
                 unsigned int nn = ee.at_end () ? 0 : n + 1;
                 enter_edge (EdgeWithIndex (*e, n, nn, c), n_marker, r, new_points, new_edges, gt, *tv_list, false);
               }
-
             }
 
             db::Polygon poly;
@@ -3019,7 +2886,6 @@ PartialService::do_selection_to_view ()
 
                 p1 = *pt;
                 ++n;
-
               }
 
               //  TODO: ... put this somewhere else:
@@ -3028,7 +2894,6 @@ PartialService::do_selection_to_view ()
 
               //  warning: path is modified:
               enter_path (path, n_marker, r, new_points, new_edges, gt, *tv_list, false);
-
             }
 
           } else if (r->first.shape ().is_box ()) {
@@ -3056,9 +2921,7 @@ PartialService::do_selection_to_view ()
 
             db::Point tp (r->first.shape ().point ());
             enter_edge (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0), n_marker, r, new_points, new_edges, gt, *tv_list, false);
-
           }
-
         }
 
       } else {
@@ -3068,15 +2931,12 @@ PartialService::do_selection_to_view ()
         gt *= (cv.context_trans () * r->first.trans ());
 
         const std::vector<db::DCplxTrans> *tv_list = tv.per_cv (r->first.cv_index ());
-        if (tv_list  && ! tv_list->empty ()) {
+        if (tv_list && ! tv_list->empty ()) {
           lay::InstanceMarker *marker = new_inst_marker (n_inst_marker, r->first.cv_index (), false);
           marker->set (r->first.back ().inst_ptr, gt, *tv_list);
         }
-
       }
-
     }
-
   }
 
   //  delete superfluous markers
@@ -3084,8 +2944,7 @@ PartialService::do_selection_to_view ()
   resize_inst_markers (n_inst_marker, false);
 }
 
-void 
-PartialService::resize_markers (size_t n, bool transient)
+void PartialService::resize_markers (size_t n, bool transient)
 {
   if (transient) {
     for (std::vector<lay::Marker *>::iterator r = m_transient_markers.begin () + n; r != m_transient_markers.end (); ++r) {
@@ -3100,8 +2959,7 @@ PartialService::resize_markers (size_t n, bool transient)
   }
 }
 
-void 
-PartialService::resize_inst_markers (size_t n, bool transient)
+void PartialService::resize_inst_markers (size_t n, bool transient)
 {
   if (transient) {
     for (std::vector<lay::InstanceMarker *>::iterator r = m_transient_inst_markers.begin () + n; r != m_transient_inst_markers.end (); ++r) {
@@ -3116,8 +2974,7 @@ PartialService::resize_inst_markers (size_t n, bool transient)
   }
 }
 
-bool 
-PartialService::partial_select (const db::DBox &box, lay::Editable::SelectionMode mode)
+bool PartialService::partial_select (const db::DBox &box, lay::Editable::SelectionMode mode)
 {
   clear_partial_transient_selection ();
 
@@ -3148,7 +3005,6 @@ PartialService::partial_select (const db::DBox &box, lay::Editable::SelectionMod
 
       //  extract all shapes
       //  ... not implemented yet ...
-
     }
 
   } else {
@@ -3178,11 +3034,11 @@ PartialService::partial_select (const db::DBox &box, lay::Editable::SelectionMod
     PartialShapeFinder finder (box.is_point (), m_top_level_sel, db::ShapeIterator::flags_type (shape_flags));
     finder.find (view (), search_box);
 
-    //  We must make sure that guiding shapes are only selected alone. The first selected object will 
+    //  We must make sure that guiding shapes are only selected alone. The first selected object will
     //  determine whether we take guiding shapes into account or not.
     bool gs_mode = (finder.begin () != finder.end () && finder.begin ()->first.layer () == view ()->cellview (finder.begin ()->first.cv_index ())->layout ().guiding_shape_layer ());
 
-    //  Clear the selection if it was consisting of a guiding shape or non-guiding shape before (depending on mode). 
+    //  Clear the selection if it was consisting of a guiding shape or non-guiding shape before (depending on mode).
     //  This way we make sure there is not mixture between guiding shapes and others.
     if (m_selection.begin () != m_selection.end ()) {
       if (gs_mode != (m_selection.begin ()->first.layer () == view ()->cellview (m_selection.begin ()->first.cv_index ())->layout ().guiding_shape_layer ())) {
@@ -3200,8 +3056,8 @@ PartialService::partial_select (const db::DBox &box, lay::Editable::SelectionMod
           //  select
           partial_objects::iterator sel = m_selection.find (f->first);
           if (sel == m_selection.end ()) {
-            sel = m_selection.insert (std::make_pair (f->first, std::set <EdgeWithIndex> ())).first;
-          } 
+            sel = m_selection.insert (std::make_pair (f->first, std::set<EdgeWithIndex> ())).first;
+          }
           sel->second.insert (f->second.begin (), f->second.end ());
         } else if (mode == lay::Editable::Reset) {
           //  unselect
@@ -3213,15 +3069,13 @@ PartialService::partial_select (const db::DBox &box, lay::Editable::SelectionMod
           if (m_selection.find (f->first) != m_selection.end ()) {
             m_selection.erase (f->first);
           } else {
-            m_selection.insert (std::make_pair (f->first, std::set <EdgeWithIndex> ())).first->second.insert (f->second.begin (), f->second.end ());
+            m_selection.insert (std::make_pair (f->first, std::set<EdgeWithIndex> ())).first->second.insert (f->second.begin (), f->second.end ());
           }
         }
 
         needs_update = true;
         any_selected = true;
-
       }
-
     }
 
     //  check, if there is a selected instance inside the box - in this case, we do not do a new selection
@@ -3235,7 +3089,7 @@ PartialService::partial_select (const db::DBox &box, lay::Editable::SelectionMod
 
         if (mode == lay::Editable::Replace || mode == lay::Editable::Add) {
           //  select
-          m_selection.insert (std::make_pair (*f, std::set <EdgeWithIndex> ()));
+          m_selection.insert (std::make_pair (*f, std::set<EdgeWithIndex> ()));
         } else if (mode == lay::Editable::Reset) {
           //  unselect
           if (m_selection.find (*f) != m_selection.end ()) {
@@ -3246,17 +3100,14 @@ PartialService::partial_select (const db::DBox &box, lay::Editable::SelectionMod
           if (m_selection.find (*f) != m_selection.end ()) {
             m_selection.erase (*f);
           } else {
-            m_selection.insert (std::make_pair (*f, std::set <EdgeWithIndex> ()));
+            m_selection.insert (std::make_pair (*f, std::set<EdgeWithIndex> ()));
           }
         }
 
         needs_update = true;
         any_selected = true;
-
       }
-
     }
-      
   }
 
   //  if required, update the list of objects to display the selection
@@ -3267,8 +3118,7 @@ PartialService::partial_select (const db::DBox &box, lay::Editable::SelectionMod
   return any_selected;
 }
 
-bool 
-PartialService::handle_guiding_shape_changes ()
+bool PartialService::handle_guiding_shape_changes ()
 {
   //  just allow one guiding shape to be selected
   if (m_selection.empty ()) {
@@ -3331,7 +3181,7 @@ PartialService::handle_guiding_shape_changes ()
 
   partial_objects new_sel;
 
-  if (parent_cell != std::numeric_limits <db::cell_index_type>::max ()) {
+  if (parent_cell != std::numeric_limits<db::cell_index_type>::max ()) {
 
     db::Instance new_inst = layout->cell (parent_cell).change_pcell_parameters (parent_inst, parameters_for_pcell);
 
@@ -3349,10 +3199,9 @@ PartialService::handle_guiding_shape_changes ()
       }
       ++sh;
     }
-    
   }
 
-  if (top_cell != std::numeric_limits <db::cell_index_type>::max ()) {
+  if (top_cell != std::numeric_limits<db::cell_index_type>::max ()) {
     // TODO: implement the case of a PCell variant being a top cell
     // Currently there is not way to create such a configuration ...
   }
@@ -3367,5 +3216,3 @@ PartialService::handle_guiding_shape_changes ()
 }
 
 } // namespace edt
-
-

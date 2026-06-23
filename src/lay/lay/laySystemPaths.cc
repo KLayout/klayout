@@ -31,13 +31,13 @@
 #include <QCoreApplication>
 
 #ifdef _WIN32
-#  include <windows.h>
+#include <windows.h>
 #endif
 
 namespace lay
 {
 
-std::string 
+std::string
 get_appdata_path ()
 {
   const char *klayout_home_env = "KLAYOUT_HOME";
@@ -57,7 +57,7 @@ get_appdata_path ()
 }
 
 static void
-split_path (const std::string &path, std::vector <std::string> &pc)
+split_path (const std::string &path, std::vector<std::string> &pc)
 {
   QString sep;
 #ifdef _WIN32
@@ -80,15 +80,13 @@ split_path (const std::string &path, std::vector <std::string> &pc)
 static std::vector<std::string> s_klayout_path;
 static bool s_klayout_path_set = false;
 
-void
-set_klayout_path (const std::vector<std::string> &path)
+void set_klayout_path (const std::vector<std::string> &path)
 {
   s_klayout_path = path;
   s_klayout_path_set = true;
 }
 
-void
-reset_klayout_path ()
+void reset_klayout_path ()
 {
   s_klayout_path.clear ();
   s_klayout_path_set = false;
@@ -123,7 +121,6 @@ get_klayout_path ()
     }
 
     return klayout_path;
-
   }
 }
 
@@ -134,4 +131,3 @@ salt_mine_url ()
 }
 
 }
-

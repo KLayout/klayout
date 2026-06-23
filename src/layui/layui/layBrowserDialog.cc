@@ -26,7 +26,7 @@
 #include "layBrowserDialog.h"
 #include "tlExceptions.h"
 
-namespace lay 
+namespace lay
 {
 
 BrowserDialog::BrowserDialog ()
@@ -55,7 +55,7 @@ BrowserDialog::BrowserDialog (const std::string &html)
   Ui::BrowserDialog::setupUi (this);
 
   setObjectName (QString::fromUtf8 ("html_browser"));
-  set_source (& m_default_source);
+  set_source (&m_default_source);
   set_home ("int:/index.html");
   show ();
 }
@@ -66,7 +66,7 @@ BrowserDialog::BrowserDialog (QWidget *parent, const std::string &html)
   Ui::BrowserDialog::setupUi (this);
 
   setObjectName (QString::fromUtf8 ("html_browser"));
-  set_source (& m_default_source);
+  set_source (&m_default_source);
   set_home ("int:/index.html");
   show ();
 }
@@ -76,50 +76,42 @@ BrowserDialog::~BrowserDialog ()
   set_source (0);
 }
 
-void 
-BrowserDialog::load (const std::string &s)
+void BrowserDialog::load (const std::string &s)
 {
   browser->load (s);
 }
 
-void 
-BrowserDialog::set_source (BrowserSource *source)
+void BrowserDialog::set_source (BrowserSource *source)
 {
   browser->set_source (source);
 }
 
-void 
-BrowserDialog::set_home (const std::string &url)
+void BrowserDialog::set_home (const std::string &url)
 {
   browser->set_home (url);
 }
 
-void 
-BrowserDialog::set_label (const std::string &label)
+void BrowserDialog::set_label (const std::string &label)
 {
   browser->set_label (label);
 }
 
-void 
-BrowserDialog::set_search_url (const std::string &url, const std::string &query_item)
+void BrowserDialog::set_search_url (const std::string &url, const std::string &query_item)
 {
   browser->set_search_url (url, query_item);
 }
 
-void 
-BrowserDialog::search (const std::string &s)
+void BrowserDialog::search (const std::string &s)
 {
   browser->search (s);
 }
 
-void 
-BrowserDialog::reload ()
+void BrowserDialog::reload ()
 {
   browser->reload ();
 }
 
-void
-BrowserDialog::accept ()
+void BrowserDialog::accept ()
 {
   BEGIN_PROTECTED
   closed ();
@@ -130,4 +122,3 @@ BrowserDialog::accept ()
 }
 
 #endif
-

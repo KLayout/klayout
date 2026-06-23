@@ -46,7 +46,7 @@ public:
 };
 
 /**
- *  @brief A helper compare function for the interval map 
+ *  @brief A helper compare function for the interval map
  *
  *  This version will not find preceding intervals
  */
@@ -56,7 +56,7 @@ class is_compare_f2
 public:
   bool operator() (const std::pair<I, I> &p, const I &i) const
   {
-    return !(i < p.second);
+    return ! (i < p.second);
   }
 };
 
@@ -95,11 +95,11 @@ public:
     if (lb == m_index_set.end () || ! (lb->first < i2)) {
 
       //  current and new interval do not overlap: create new interval(s):
-      //  we can simply insert, because we create a new entry 
+      //  we can simply insert, because we create a new entry
       m_index_set.insert (lb, index_pair (i1, i2));
 
     } else {
-      
+
       //  current and new interval do overlap: extend the intervals
       //  and join others if required
 
@@ -108,7 +108,7 @@ public:
       }
 
       typename index_set::iterator lb0 = lb;
-      while (lb != m_index_set.end () && !(i2 < lb->first)) {
+      while (lb != m_index_set.end () && ! (i2 < lb->first)) {
         if (i2 < lb->second) {
           i2 = lb->second;
         }
@@ -120,10 +120,8 @@ public:
       ++lb0;
       if (lb0 != lb) {
         m_index_set.erase (lb0, lb);
-      } 
-
+      }
     }
-
   }
 
   /**
@@ -145,7 +143,7 @@ public:
       ++n;
       ++lb;
     }
-    
+
     if (n == 0) {
 
       //  past the end: do nothing
@@ -170,7 +168,7 @@ public:
       --lb;
       if (lb != m_index_set.end () && i2 < lb->second) {
         //  the last one is overlapping above i2: cut it
-        lb->first = i2; 
+        lb->first = i2;
       } else {
         ++lb;
       }
@@ -179,11 +177,10 @@ public:
       if (lb0 != lb) {
         m_index_set.erase (lb0, lb);
       }
-
     }
   }
 
-  /** 
+  /**
    *  @brief Query a mapping
    *
    *  Given the index i, this method will return false if there is no mapping
@@ -207,7 +204,7 @@ public:
     while (lb != m_index_set.end ()) {
       typename index_set::const_iterator lbb = lb;
       ++lb;
-      if (lb != m_index_set.end () && !(lbb->second < lb->first)) {
+      if (lb != m_index_set.end () && ! (lbb->second < lb->first)) {
         return false;
       }
     }
@@ -225,7 +222,7 @@ public:
   /**
    *  @brief begin Iterator
    */
-  const_iterator begin () const 
+  const_iterator begin () const
   {
     return m_index_set.begin ();
   }
@@ -233,7 +230,7 @@ public:
   /**
    *  @brief end Iterator
    */
-  const_iterator end () const 
+  const_iterator end () const
   {
     return m_index_set.end ();
   }
@@ -241,7 +238,7 @@ public:
   /**
    *  @brief equality operator
    */
-  bool operator== (const interval_set<I> &d) const 
+  bool operator== (const interval_set<I> &d) const
   {
     return m_index_set == d.m_index_set;
   }
@@ -249,7 +246,7 @@ public:
   /**
    *  @brief inequality operator
    */
-  bool operator!= (const interval_set<I> &d) const 
+  bool operator!= (const interval_set<I> &d) const
   {
     return m_index_set != d.m_index_set;
   }
@@ -261,4 +258,3 @@ private:
 } // namespace tl
 
 #endif
-

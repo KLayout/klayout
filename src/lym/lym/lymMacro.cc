@@ -114,21 +114,20 @@ void Macro::assign (const lym::Macro &other)
 
 bool Macro::operator== (const Macro &other) const
 {
-  return 
-    m_description == other.m_description &&
-    m_version == other.m_version &&
-    m_epilog == other.m_epilog &&
-    m_prolog == other.m_prolog &&
-    m_category == other.m_category &&
-    m_text == other.m_text &&
-    m_autorun == other.m_autorun &&
-    m_autorun_early == other.m_autorun_early &&
-    m_priority == other.m_priority &&
-    m_show_in_menu == other.m_show_in_menu &&
-    m_shortcut == other.m_shortcut &&
-    m_interpreter == other.m_interpreter &&
-    m_dsl_interpreter == other.m_dsl_interpreter &&
-    m_format == other.m_format;
+  return m_description == other.m_description &&
+         m_version == other.m_version &&
+         m_epilog == other.m_epilog &&
+         m_prolog == other.m_prolog &&
+         m_category == other.m_category &&
+         m_text == other.m_text &&
+         m_autorun == other.m_autorun &&
+         m_autorun_early == other.m_autorun_early &&
+         m_priority == other.m_priority &&
+         m_show_in_menu == other.m_show_in_menu &&
+         m_shortcut == other.m_shortcut &&
+         m_interpreter == other.m_interpreter &&
+         m_dsl_interpreter == other.m_dsl_interpreter &&
+         m_format == other.m_format;
 }
 
 void Macro::save ()
@@ -148,21 +147,20 @@ bool Macro::del ()
   }
 }
 
-struct Interpreter2s
-{
+struct Interpreter2s {
   std::string to_string (Macro::Interpreter i) const
   {
     switch (i) {
-      case Macro::Ruby:
-        return "ruby";
-      case Macro::Python:
-        return "python";
-      case Macro::Text:
-        return "text";
-      case Macro::DSLInterpreter:
-        return "dsl";
-      default:
-        return "none";
+    case Macro::Ruby:
+      return "ruby";
+    case Macro::Python:
+      return "python";
+    case Macro::Text:
+      return "text";
+    case Macro::DSLInterpreter:
+      return "dsl";
+    default:
+      return "none";
     }
   }
 
@@ -185,24 +183,24 @@ struct Interpreter2s
 /**
  *  @brief Declaration of the XML structure of a macro
  */
-static tl::XMLStruct<lym::Macro> xml_struct ("klayout-macro", 
-  tl::make_member (&Macro::description, &Macro::set_description, "description") +
-  tl::make_member (&Macro::version, &Macro::set_version, "version") +
-  tl::make_member (&Macro::category, &Macro::set_category, "category") +
-  tl::make_member (&Macro::prolog, &Macro::set_prolog, "prolog") +
-  tl::make_member (&Macro::epilog, &Macro::set_epilog, "epilog") +
-  tl::make_member (&Macro::doc, &Macro::set_doc, "doc") +
-  tl::make_member (&Macro::is_autorun, &Macro::set_autorun, "autorun") +
-  tl::make_member (&Macro::is_autorun_early, &Macro::set_autorun_early, "autorun-early") +
-  tl::make_member (&Macro::priority, &Macro::set_priority, "priority") +
-  tl::make_member (&Macro::shortcut, &Macro::set_shortcut, "shortcut") +
-  tl::make_member (&Macro::show_in_menu, &Macro::set_show_in_menu, "show-in-menu") +
-  tl::make_member (&Macro::group_name, &Macro::set_group_name, "group-name") +
-  tl::make_member (&Macro::menu_path, &Macro::set_menu_path, "menu-path") +
-  tl::make_member (&Macro::interpreter, &Macro::set_interpreter, "interpreter", Interpreter2s ()) +
-  tl::make_member (&Macro::dsl_interpreter, &Macro::set_dsl_interpreter, "dsl-interpreter-name") +
-  tl::make_member (&Macro::text, &Macro::set_text, "text") +
-  tl::make_member<Macro> ("format")  //  for backward compatibility
+static tl::XMLStruct<lym::Macro> xml_struct ("klayout-macro",
+                                             tl::make_member (&Macro::description, &Macro::set_description, "description") +
+                                               tl::make_member (&Macro::version, &Macro::set_version, "version") +
+                                               tl::make_member (&Macro::category, &Macro::set_category, "category") +
+                                               tl::make_member (&Macro::prolog, &Macro::set_prolog, "prolog") +
+                                               tl::make_member (&Macro::epilog, &Macro::set_epilog, "epilog") +
+                                               tl::make_member (&Macro::doc, &Macro::set_doc, "doc") +
+                                               tl::make_member (&Macro::is_autorun, &Macro::set_autorun, "autorun") +
+                                               tl::make_member (&Macro::is_autorun_early, &Macro::set_autorun_early, "autorun-early") +
+                                               tl::make_member (&Macro::priority, &Macro::set_priority, "priority") +
+                                               tl::make_member (&Macro::shortcut, &Macro::set_shortcut, "shortcut") +
+                                               tl::make_member (&Macro::show_in_menu, &Macro::set_show_in_menu, "show-in-menu") +
+                                               tl::make_member (&Macro::group_name, &Macro::set_group_name, "group-name") +
+                                               tl::make_member (&Macro::menu_path, &Macro::set_menu_path, "menu-path") +
+                                               tl::make_member (&Macro::interpreter, &Macro::set_interpreter, "interpreter", Interpreter2s ()) +
+                                               tl::make_member (&Macro::dsl_interpreter, &Macro::set_dsl_interpreter, "dsl-interpreter-name") +
+                                               tl::make_member (&Macro::text, &Macro::set_text, "text") +
+                                               tl::make_member<Macro> ("format") //  for backward compatibility
 );
 
 void Macro::save_to (const std::string &path)
@@ -262,7 +260,6 @@ void Macro::load_from (const std::string &fn)
       if (m_format == PlainTextWithHashAnnotationsFormat) {
         sync_properties_with_text ();
       }
-
     }
 
   } else {
@@ -274,7 +271,6 @@ void Macro::load_from (const std::string &fn)
     tl::InputStream stream (fn);
     tl::TextInputStream text_stream (stream);
     m_text = text_stream.read_all ();
-
   }
 
   m_modified = true;
@@ -308,7 +304,6 @@ void Macro::load_from_string (const std::string &text, const std::string &url)
     } else if (m_format == PlainTextFormat) {
 
       m_text = text;
-
     }
 
   } else {
@@ -324,8 +319,7 @@ void Macro::load ()
   load_from (path ());
 }
 
-bool 
-Macro::format_from_suffix (const std::string &fn, Macro::Interpreter &interpreter, std::string &dsl_name, bool &autorun_pref, Macro::Format &format)
+bool Macro::format_from_suffix (const std::string &fn, Macro::Interpreter &interpreter, std::string &dsl_name, bool &autorun_pref, Macro::Format &format)
 {
   return format_from_suffix_string (tl::extension_last (fn), interpreter, dsl_name, autorun_pref, format);
 }
@@ -336,14 +330,13 @@ Macro::format_from_filename (const std::string &fn, Macro::Interpreter &interpre
   tl::GlobPattern pat ("(*)\\[(*)\\]");
   std::vector<std::string> pat_parts;
   if (pat.match (fn, pat_parts) && pat_parts.size () == 2) {
-    return std::make_pair (format_from_suffix_string (pat_parts[1], interpreter, dsl_name, autorun_pref, format), pat_parts[0]);
+    return std::make_pair (format_from_suffix_string (pat_parts [1], interpreter, dsl_name, autorun_pref, format), pat_parts [0]);
   } else {
     return std::make_pair (format_from_suffix (fn, interpreter, dsl_name, autorun_pref, format), fn);
   }
 }
 
-bool
-Macro::format_from_suffix_string (const std::string &suffix, Macro::Interpreter &interpreter, std::string &dsl_name, bool &autorun_pref, Macro::Format &format)
+bool Macro::format_from_suffix_string (const std::string &suffix, Macro::Interpreter &interpreter, std::string &dsl_name, bool &autorun_pref, Macro::Format &format)
 {
   interpreter = None;
   dsl_name = std::string ();
@@ -375,7 +368,7 @@ Macro::format_from_suffix_string (const std::string &suffix, Macro::Interpreter 
     format = MacroFormat;
     return true;
 
-  } else if (!suffix.empty ()) {
+  } else if (! suffix.empty ()) {
 
     //  locate the suffix in the DSL interpreter declarations
     for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
@@ -387,17 +380,14 @@ Macro::format_from_suffix_string (const std::string &suffix, Macro::Interpreter 
         format = cls->storage_scheme ();
 
         return true;
-
       }
-
     }
-
-  } 
+  }
 
   return false;
 }
 
-std::string 
+std::string
 Macro::suffix_for_format (Macro::Interpreter interpreter, const std::string &dsl_name, Macro::Format format)
 {
   std::string s;
@@ -565,8 +555,7 @@ const std::string &Macro::text () const
   return m_text;
 }
 
-struct PropertyField
-{
+struct PropertyField {
   const char *name;
   const std::string &(lym::Macro::*string_getter) () const;
   void (lym::Macro::*string_setter) (const std::string &);
@@ -576,27 +565,26 @@ struct PropertyField
   void (lym::Macro::*int_setter) (int);
 };
 
-static PropertyField property_fields[] = {
-  { "description",    &lym::Macro::description, &lym::Macro::set_description,   0, 0,                                                            0, 0 },
-  { "prolog",         &lym::Macro::prolog, &lym::Macro::set_prolog,             0, 0,                                                            0, 0 },
-  { "epilog",         &lym::Macro::epilog, &lym::Macro::set_epilog,             0, 0,                                                            0, 0 },
-  { "version",        &lym::Macro::version, &lym::Macro::set_version,           0, 0,                                                            0, 0 },
-  { "autorun",        0, 0,                                                     &lym::Macro::is_autorun, &lym::Macro::set_autorun,               0, 0 },
-  { "autorun-early",  0, 0,                                                     &lym::Macro::is_autorun_early, &lym::Macro::set_autorun_early,   0, 0 },
-  { "show-in-menu",   0, 0,                                                     &lym::Macro::show_in_menu, &lym::Macro::set_show_in_menu,        0, 0 },
-  { "group-name",     &lym::Macro::group_name, &lym::Macro::set_group_name,     0, 0,                                                            0, 0 },
-  { "menu-path",      &lym::Macro::menu_path, &lym::Macro::set_menu_path,       0, 0,                                                            0, 0 },
-  { "shortcut",       &lym::Macro::shortcut, &lym::Macro::set_shortcut,         0, 0,                                                            0, 0 },
-  { "priority",       0, 0,                                                     0, 0,                                                            &lym::Macro::priority, &lym::Macro::set_priority }
-};
+static PropertyField property_fields [] = {
+  {"description", &lym::Macro::description, &lym::Macro::set_description, 0, 0, 0, 0},
+  {"prolog", &lym::Macro::prolog, &lym::Macro::set_prolog, 0, 0, 0, 0},
+  {"epilog", &lym::Macro::epilog, &lym::Macro::set_epilog, 0, 0, 0, 0},
+  {"version", &lym::Macro::version, &lym::Macro::set_version, 0, 0, 0, 0},
+  {"autorun", 0, 0, &lym::Macro::is_autorun, &lym::Macro::set_autorun, 0, 0},
+  {"autorun-early", 0, 0, &lym::Macro::is_autorun_early, &lym::Macro::set_autorun_early, 0, 0},
+  {"show-in-menu", 0, 0, &lym::Macro::show_in_menu, &lym::Macro::set_show_in_menu, 0, 0},
+  {"group-name", &lym::Macro::group_name, &lym::Macro::set_group_name, 0, 0, 0, 0},
+  {"menu-path", &lym::Macro::menu_path, &lym::Macro::set_menu_path, 0, 0, 0, 0},
+  {"shortcut", &lym::Macro::shortcut, &lym::Macro::set_shortcut, 0, 0, 0, 0},
+  {"priority", 0, 0, 0, 0, &lym::Macro::priority, &lym::Macro::set_priority}};
 
-static std::string escape_pta_string (const char *cp) 
+static std::string escape_pta_string (const char *cp)
 {
   std::string res;
   while (*cp) {
     if (*cp == '\n') {
       res += "\\n";
-    } else if ((unsigned char)*cp < 0x20) {
+    } else if ((unsigned char) *cp < 0x20) {
       res += " ";
     } else if (*cp == '\\') {
       res += "\\\\";
@@ -608,11 +596,11 @@ static std::string escape_pta_string (const char *cp)
   return res;
 }
 
-static std::string unescape_pta_string (const char *cp) 
+static std::string unescape_pta_string (const char *cp)
 {
   std::string res;
   while (*cp) {
-    if (*cp == '\\' && cp[1]) {
+    if (*cp == '\\' && cp [1]) {
       ++cp;
       if (*cp == 'n') {
         res += "\n";
@@ -636,7 +624,7 @@ void Macro::sync_text_with_properties ()
   std::vector<std::string> lines = tl::split (m_text, "\n");
 
   std::vector<std::string> new_lines;
-  for (size_t i = 0; i < sizeof (property_fields) / sizeof (property_fields[0]); ++i) {
+  for (size_t i = 0; i < sizeof (property_fields) / sizeof (property_fields [0]); ++i) {
     const PropertyField *pf = property_fields + i;
     if (pf->string_getter) {
       std::string v = (this->*(pf->string_getter)) ();
@@ -666,7 +654,7 @@ void Macro::sync_text_with_properties ()
     if (stop_fishing) {
       //  done - no more lines are removed
     } else if (ex.test ("#") && ex.test ("$")) {
-      for (size_t i = 0; i < sizeof (property_fields) / sizeof (property_fields[0]) && !taken; ++i) {
+      for (size_t i = 0; i < sizeof (property_fields) / sizeof (property_fields [0]) && ! taken; ++i) {
         taken = ex.test (property_fields [i].name);
       }
     } else if (! ex.at_end ()) {
@@ -676,7 +664,6 @@ void Macro::sync_text_with_properties ()
     if (! taken) {
       new_lines.push_back (*l);
     }
-
   }
 
   std::string new_text = tl::join (new_lines, "\n");
@@ -694,7 +681,7 @@ void Macro::sync_properties_with_text ()
   }
 
   //  reset the properties first
-  for (size_t i = 0; i < sizeof (property_fields) / sizeof (property_fields[0]); ++i) {
+  for (size_t i = 0; i < sizeof (property_fields) / sizeof (property_fields [0]); ++i) {
     const PropertyField *pf = property_fields + i;
     if (pf->string_setter) {
       (this->*(pf->string_setter)) (std::string ());
@@ -715,7 +702,7 @@ void Macro::sync_properties_with_text ()
 
     if (ex.test ("#") && ex.test ("$")) {
 
-      for (size_t i = 0; i < sizeof (property_fields) / sizeof (property_fields[0]); ++i) {
+      for (size_t i = 0; i < sizeof (property_fields) / sizeof (property_fields [0]); ++i) {
 
         tl::Extractor pex = ex;
 
@@ -733,16 +720,13 @@ void Macro::sync_properties_with_text ()
           }
 
           break;
-
         }
-
       }
 
     } else if (! ex.at_end ()) {
       //  stop fishing
       break;
     }
-
   }
 }
 
@@ -875,24 +859,24 @@ public:
     set_return (a);
   }
 
-  virtual MethodBase *clone () const 
+  virtual MethodBase *clone () const
   {
     return new ExternalMethod (*this);
   }
 
   //  this class is not intended to go functional. It's just a hook for the documentation
-  virtual void call(void*, gsi::SerialArgs&, gsi::SerialArgs&) const
+  virtual void call (void *, gsi::SerialArgs &, gsi::SerialArgs &) const
   {
-    tl_assert (false); 
+    tl_assert (false);
   }
 };
 
-/** 
+/**
  *  @brief A descriptor for an external class (scripted)
  *
  *  This declaration is not intended to go functional. It's just a hook for the documentation.
  */
-class ExternalClass 
+class ExternalClass
   : public gsi::ClassBase
 {
 public:
@@ -977,8 +961,8 @@ void Macro::install_doc () const
         for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
           if (c->name () == cls_name) {
             const ExternalClass *ec = dynamic_cast<const ExternalClass *> (&*c);
-            if (!ec || ec->category () == category ()) {
-              cls = const_cast <gsi::ClassBase *> (&*c);
+            if (! ec || ec->category () == category ()) {
+              cls = const_cast<gsi::ClassBase *> (&*c);
             }
           }
         }
@@ -1029,13 +1013,9 @@ void Macro::install_doc () const
 
           ExternalMethod *meth = new ExternalMethod (n, doc, false, st);
           cls->add_method (meth);
-
         }
-
       }
-
     }
-
   }
 }
 
@@ -1050,7 +1030,7 @@ static gsi::Interpreter *script_interpreter (lym::Macro::Interpreter lang)
     ip = pya::PythonInterpreter::instance ();
   }
 
-  return (ip && ip->available() ? ip : 0);
+  return (ip && ip->available () ? ip : 0);
 }
 
 bool Macro::can_run () const
@@ -1085,20 +1065,17 @@ Macro::get_attribute (const std::string &name) const
   }
 }
 
-bool
-Macro::has_attribute (const std::string &name) const
+bool Macro::has_attribute (const std::string &name) const
 {
   return m_attributes.find (name) != m_attributes.end ();
 }
 
-void
-Macro::set_attribute (const std::string &name, const tl::Variant &value)
+void Macro::set_attribute (const std::string &name, const tl::Variant &value)
 {
-  m_attributes[name] = value;
+  m_attributes [name] = value;
 }
 
-void
-Macro::delete_attribute (const std::string &name)
+void Macro::delete_attribute (const std::string &name)
 {
   m_attributes.erase (name);
 }
@@ -1148,4 +1125,3 @@ int Macro::run () const
 }
 
 }
-

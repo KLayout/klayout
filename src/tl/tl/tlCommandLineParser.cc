@@ -58,7 +58,6 @@ ArgBase::ParsedOption::ParsedOption (const std::string &option)
     } else {
       break;
     }
-
   }
 
   while (! ex.at_end ()) {
@@ -77,7 +76,7 @@ ArgBase::ParsedOption::ParsedOption (const std::string &option)
     } else {
       ex.read_word_or_quoted (name);
     }
-    ex.test("|");
+    ex.test ("|");
   }
 }
 
@@ -92,10 +91,9 @@ ArgBase::~ArgBase ()
   //  .. nothing yet ..
 }
 
-bool
-ArgBase::is_option () const
+bool ArgBase::is_option () const
 {
-  return !m_option.short_option.empty () || !m_option.long_option.empty ();
+  return ! m_option.short_option.empty () || ! m_option.long_option.empty ();
 }
 
 std::string
@@ -223,8 +221,7 @@ public:
                "* 11: somewhat verbose plus timing information\n"
                "* 20: verbose\n"
                "* 21: verbose plus timing information\n"
-               "..."
-              )
+               "...")
   {
     //  .. nothing yet ..
   }
@@ -288,7 +285,7 @@ print_string_formatted (const std::string &indent, unsigned int columns, const s
     while (*t && *t != ' ' && *t != '\n') {
       ++t;
       ++c;
-      if (c == columns && !at_beginning) {
+      if (c == columns && ! at_beginning) {
         tl::info << "";
         tl::info << indent << tl::noendl;
         c = (unsigned int) (t - tt);
@@ -302,11 +299,13 @@ print_string_formatted (const std::string &indent, unsigned int columns, const s
     }
     if (*t == '\n') {
       ++t;
-      tl::info << tl::endl << indent << tl::noendl;
+      tl::info << tl::endl
+               << indent << tl::noendl;
       c = 0;
     } else {
       if (c + 1 == columns) {
-        tl::info << tl::endl << indent << tl::noendl;
+        tl::info << tl::endl
+                 << indent << tl::noendl;
         c = 0;
       } else {
         tl::info << " " << tl::noendl;
@@ -316,14 +315,12 @@ print_string_formatted (const std::string &indent, unsigned int columns, const s
     while (*t == ' ') {
       ++t;
     }
-
   }
 
   tl::info << "";
 }
 
-struct NameCompare
-{
+struct NameCompare {
   bool operator() (ArgBase *a, ArgBase *b)
   {
     if (a->is_option () != b->is_option ()) {
@@ -345,13 +342,12 @@ struct NameCompare
   }
 };
 
-void
-CommandLineOptions::produce_help (const std::string &program_name, bool advanced)
+void CommandLineOptions::produce_help (const std::string &program_name, bool advanced)
 {
   int columns = 70;
 
   tl::info << "Usage:" << tl::endl;
-  tl::info << "  "  << program_name << "  [options]" << tl::noendl;
+  tl::info << "  " << program_name << "  [options]" << tl::noendl;
 
   std::vector<ArgBase *> sorted_args = m_args;
   std::stable_sort (sorted_args.begin (), sorted_args.end (), NameCompare ());
@@ -402,7 +398,8 @@ CommandLineOptions::produce_help (const std::string &program_name, bool advanced
                           "(with two dashes). If a value is required, it can be specified either "
                           "as the following argument or added to the option with an equal sign (=).");
 
-  tl::info << tl::endl << "  List of options:" << tl::endl;
+  tl::info << tl::endl
+           << "  List of options:" << tl::endl;
 
   std::string prev_group;
   bool hidden = false;
@@ -411,7 +408,7 @@ CommandLineOptions::produce_help (const std::string &program_name, bool advanced
 
     if (! (*a)->is_option ()) {
       continue;
-    } else if ((*a)->option ().advanced && !advanced) {
+    } else if ((*a)->option ().advanced && ! advanced) {
       hidden = true;
       continue;
     } else if ((*a)->option ().non_advanced && advanced) {
@@ -420,7 +417,8 @@ CommandLineOptions::produce_help (const std::string &program_name, bool advanced
 
     if ((*a)->option ().group != prev_group) {
       prev_group = (*a)->option ().group;
-      tl::info << tl::endl << "  " << prev_group << ":" << tl::endl;
+      tl::info << tl::endl
+               << "  " << prev_group << ":" << tl::endl;
     }
 
     std::string name;
@@ -440,28 +438,25 @@ CommandLineOptions::produce_help (const std::string &program_name, bool advanced
       print_string_formatted ("          ", columns, (*a)->long_doc ());
       tl::info << "";
     }
-
   }
 
   if (hidden) {
-    tl::info << tl::endl << "  See --help-all for more options." << tl::endl;
+    tl::info << tl::endl
+             << "  See --help-all for more options." << tl::endl;
   }
 }
 
-void
-CommandLineOptions::produce_license ()
+void CommandLineOptions::produce_license ()
 {
   tl::info << m_license;
 }
 
-void
-CommandLineOptions::produce_version ()
+void CommandLineOptions::produce_version ()
 {
   tl::info << m_version;
 }
 
-void
-CommandLineOptions::parse (int argc, char *argv[])
+void CommandLineOptions::parse (int argc, char *argv [])
 {
   m_program_name = tl::filename (tl::to_string_from_local (argv [0]));
 
@@ -526,7 +521,6 @@ CommandLineOptions::parse (int argc, char *argv[])
       if (! arg->option ().repeated) {
         ++next_plain_arg;
       }
-
     }
 
     try {
@@ -550,7 +544,6 @@ CommandLineOptions::parse (int argc, char *argv[])
           std::string arg_as_utf8 = tl::to_string_from_local (argv [i]);
           tl::Extractor ex_value (arg_as_utf8);
           arg->take_value (ex_value);
-
         }
 
       } else {
@@ -563,7 +556,6 @@ CommandLineOptions::parse (int argc, char *argv[])
         if (arg->option ().inverted) {
           arg->invert_present ();
         }
-
       }
 
       //  Execute the action if there is one
@@ -586,12 +578,10 @@ CommandLineOptions::parse (int argc, char *argv[])
       msg += ex.msg ();
 
       throw tl::Exception (msg);
-
     }
-
   }
 
-  if (next_plain_arg != plain_args.end () && !(*next_plain_arg)->option ().optional) {
+  if (next_plain_arg != plain_args.end () && ! (*next_plain_arg)->option ().optional) {
     throw tl::Exception (tl::to_string (tr ("Additional arguments required (use -h for help)")));
   }
 }

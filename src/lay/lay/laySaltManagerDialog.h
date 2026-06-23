@@ -42,9 +42,11 @@ class SaltGrainPropertiesDialog;
  *  @brief The dialog for managing the Salt ("Packages")
  */
 class SaltManagerDialog
-  : public QDialog, private Ui::SaltManagerDialog, public tl::Object
+  : public QDialog,
+    private Ui::SaltManagerDialog,
+    public tl::Object
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**

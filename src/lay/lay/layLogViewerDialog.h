@@ -49,11 +49,18 @@ class LogFile;
 class LogFileEntry
 {
 public:
-  enum mode_type { Warning, WarningContinued, Error, ErrorContinued, Info, InfoContinued, Separator };
+  enum mode_type { Warning,
+                   WarningContinued,
+                   Error,
+                   ErrorContinued,
+                   Info,
+                   InfoContinued,
+                   Separator };
 
   LogFileEntry (mode_type mode, const std::string &s, bool cont)
     : m_mode (mode), m_text (s), m_continued (cont)
-  { }
+  {
+  }
 
   const std::string &text () const
   {
@@ -80,10 +87,10 @@ private:
  *  @brief The log receiver abstraction that connects a channel with the LogFile object
  */
 class LAY_PUBLIC LogReceiver
-  : public tl::Channel 
+  : public tl::Channel
 {
 public:
-  LogReceiver (LogFile *file, int verbosity, void (LogFile::*method)(const std::string &, bool));
+  LogReceiver (LogFile *file, int verbosity, void (LogFile::*method) (const std::string &, bool));
 
 protected:
   virtual void puts (const char *s);
@@ -94,7 +101,7 @@ protected:
 
 private:
   LogFile *mp_file;
-  void (LogFile::*m_method)(const std::string &, bool);
+  void (LogFile::*m_method) (const std::string &, bool);
   std::string m_text;
   int m_verbosity;
   QMutex m_lock;
@@ -114,7 +121,7 @@ private:
 class LAY_PUBLIC LogFile
   : public QAbstractListModel
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -128,12 +135,12 @@ public:
   /**
    *  @brief Implementation of the QAbstractItemModel interface
    */
-  int rowCount(const QModelIndex &parent) const;
+  int rowCount (const QModelIndex &parent) const;
 
   /**
    *  @brief Implementation of the QAbstractItemModel interface
    */
-  QVariant data(const QModelIndex &index, int role) const;
+  QVariant data (const QModelIndex &index, int role) const;
 
   /**
    *  @brief Gets a value indicating whether errors are present
@@ -269,10 +276,10 @@ private:
  *  @brief A dialog presenting the log file
  */
 class LAY_PUBLIC LogViewerDialog
-  : public QDialog, 
+  : public QDialog,
     public Ui::LogViewerDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -292,7 +299,7 @@ public:
 
 public slots:
   void verbosity_changed (int l);
-  
+
 private:
   LogFile m_file;
 };
@@ -303,7 +310,7 @@ private:
 class LAY_PUBLIC AlertLogButton
   : public QToolButton
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**

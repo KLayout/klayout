@@ -81,8 +81,7 @@ LockedObjectVault::~LockedObjectVault ()
   }
 }
 
-void
-LockedObjectVault::add (VALUE object)
+void LockedObjectVault::add (VALUE object)
 {
   auto i = m_objects.find (object);
   if (i != m_objects.end ()) {
@@ -92,8 +91,7 @@ LockedObjectVault::add (VALUE object)
   }
 }
 
-void
-LockedObjectVault::remove (VALUE object)
+void LockedObjectVault::remove (VALUE object)
 {
   auto i = m_objects.find (object);
   if (i != m_objects.end ()) {
@@ -104,22 +102,19 @@ LockedObjectVault::remove (VALUE object)
   }
 }
 
-void
-LockedObjectVault::mark_this ()
+void LockedObjectVault::mark_this ()
 {
   for (auto o = m_objects.begin (); o != m_objects.end (); ++o) {
     rb_gc_mark (o->first);
   }
 }
 
-void
-LockedObjectVault::mark (void *p)
+void LockedObjectVault::mark (void *p)
 {
   ((LockedObjectVault *) p)->mark_this ();
 }
 
-void
-LockedObjectVault::free (void *p)
+void LockedObjectVault::free (void *p)
 {
   delete ((LockedObjectVault *) p);
 }
@@ -133,8 +128,7 @@ LockedObjectVault::alloc (VALUE klass)
   return Data_Wrap_Struct (klass, &LockedObjectVault::mark, &LockedObjectVault::free, vault);
 }
 
-void
-LockedObjectVault::init (VALUE module, const char *name)
+void LockedObjectVault::init (VALUE module, const char *name)
 {
   if (m_instance != Qnil) {
     return;
@@ -147,22 +141,19 @@ LockedObjectVault::init (VALUE module, const char *name)
   rb_gc_register_address (&m_instance);
 }
 
-void
-make_locked_object_vault (VALUE module)
+void make_locked_object_vault (VALUE module)
 {
   LockedObjectVault::init (module, "RBALockedObjectVault");
 }
 
-void
-gc_lock_object (VALUE value)
+void gc_lock_object (VALUE value)
 {
   if (LockedObjectVault::instance ()) {
     LockedObjectVault::instance ()->add (value);
   }
 }
 
-void
-gc_unlock_object (VALUE value)
+void gc_unlock_object (VALUE value)
 {
   if (LockedObjectVault::instance ()) {
     LockedObjectVault::instance ()->remove (value);
@@ -198,10 +189,9 @@ Proxy::~Proxy ()
   m_destroyed = true;
 }
 
-void
-Proxy::mark ()
+void Proxy::mark ()
 {
-  for (std::map <const gsi::MethodBase *, VALUE>::const_iterator pt = m_signal_handlers.begin (); pt != m_signal_handlers.end (); ++pt) {
+  for (std::map<const gsi::MethodBase *, VALUE>::const_iterator pt = m_signal_handlers.begin (); pt != m_signal_handlers.end (); ++pt) {
     rb_gc_mark (pt->second);
   }
 }
@@ -209,13 +199,13 @@ Proxy::mark ()
 VALUE
 Proxy::signal_handler (const gsi::MethodBase *meth)
 {
-  std::map <const gsi::MethodBase *, VALUE>::iterator pt = m_signal_handlers.find (meth);
+  std::map<const gsi::MethodBase *, VALUE>::iterator pt = m_signal_handlers.find (meth);
   if (pt != m_signal_handlers.end ()) {
     return pt->second;
   }
 
   //  end register the new one
-  VALUE args[] = { m_self };
+  VALUE args [] = {m_self};
   VALUE sh = rba_class_new_instance_checked (1, args, SignalHandler::klass);
 
   m_signal_handlers.insert (std::make_pair (meth, sh));
@@ -233,13 +223,12 @@ bool Proxy::can_call () const
   return rba::RubyInterpreter::instance () != 0;
 }
 
-void
-Proxy::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
+void Proxy::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
 {
   tl_assert (id < int (m_cbfuncs.size ()) && id >= 0);
 
   const gsi::MethodBase *meth = m_cbfuncs [id].method;
-  ID mid  = m_cbfuncs [id].method_id;
+  ID mid = m_cbfuncs [id].method_id;
 
   try {
 
@@ -281,8 +270,7 @@ Proxy::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
   }
 }
 
-void
-Proxy::destroy ()
+void Proxy::destroy ()
 {
   if (! m_cls_decl) {
     m_obj = 0;
@@ -314,15 +302,14 @@ Proxy::destroy ()
   }
 }
 
-void
-Proxy::detach ()
+void Proxy::detach ()
 {
   if (! m_destroyed && m_cls_decl && m_cls_decl->is_managed ()) {
     gsi::ObjectBase *gsi_object = m_cls_decl->gsi_object (m_obj, false);
     if (gsi_object) {
       gsi_object->status_changed_event ().remove (this, &Proxy::object_status_changed);
     }
-    if (!m_owned && m_self != Qnil) {
+    if (! m_owned && m_self != Qnil) {
       gc_unlock_object (m_self);
     }
   }
@@ -343,8 +330,7 @@ Proxy::detach ()
 
 Proxy::callbacks_cache Proxy::s_callbacks_cache;
 
-void
-Proxy::initialize_callbacks ()
+void Proxy::initialize_callbacks ()
 {
 #if 0
 
@@ -448,23 +434,18 @@ Proxy::initialize_callbacks ()
           (*m)->set_callback (m_obj, gsi::Callback (id, this, (*m)->argsize (), (*m)->retsize ()));
 
           break;
-
         }
-
       }
-
     }
 
     //  consider base classes as well.
     cls = cls->base ();
-
   }
 
 #endif
 }
 
-void
-Proxy::clear_callbacks ()
+void Proxy::clear_callbacks ()
 {
   m_cbfuncs.clear ();
 
@@ -482,12 +463,10 @@ Proxy::clear_callbacks ()
 
     //  consider base classes as well.
     cls = cls->base ();
-
   }
 }
 
-void
-Proxy::release ()
+void Proxy::release ()
 {
   //  If the object is managed we first reset the ownership of all other clients
   //  and then make us the owner
@@ -501,18 +480,16 @@ Proxy::release ()
       }
     }
 
-    if (!m_owned) {
+    if (! m_owned) {
       if (cls->is_managed () && m_self != Qnil) {
         gc_unlock_object (m_self);
       }
       m_owned = true;
     }
-
   }
 }
 
-void
-Proxy::keep ()
+void Proxy::keep ()
 {
   const gsi::ClassBase *cls = cls_decl ();
   if (cls) {
@@ -527,8 +504,7 @@ Proxy::keep ()
   }
 }
 
-void
-Proxy::keep_internal ()
+void Proxy::keep_internal ()
 {
   if (m_owned) {
     //  Fallback: the object is not gsi-enabled: we use the ownership flag in this
@@ -541,8 +517,7 @@ Proxy::keep_internal ()
   }
 }
 
-void
-Proxy::set (void *obj, bool owned, bool const_ref, bool can_destroy, VALUE self)
+void Proxy::set (void *obj, bool owned, bool const_ref, bool can_destroy, VALUE self)
 {
   const gsi::ClassBase *cls = cls_decl ();
   tl_assert (cls);
@@ -562,7 +537,6 @@ Proxy::set (void *obj, bool owned, bool const_ref, bool can_destroy, VALUE self)
       if (prev_owned) {
         cls->destroy (prev_obj);
       }
-
     }
 
     m_obj = obj;
@@ -585,11 +559,9 @@ Proxy::set (void *obj, bool owned, bool const_ref, bool can_destroy, VALUE self)
         if (! m_owned) {
           gc_lock_object (m_self);
         }
-
       }
 
       initialize_callbacks ();
-
     }
 
   } else {
@@ -597,7 +569,6 @@ Proxy::set (void *obj, bool owned, bool const_ref, bool can_destroy, VALUE self)
     //  m_owned = owned;  - thou shalt not change the ownership status
     m_can_destroy = can_destroy;
     m_const_ref = const_ref;
-
   }
 
   //  now we have a valid object (or nil) - we can reset "destroyed" state. Note: this has to be done
@@ -611,7 +582,7 @@ Proxy::obj ()
   if (! m_obj) {
     if (m_destroyed) {
       throw tl::Exception (tl::to_string (tr ("Object has been destroyed already")));
-    } else if (cls_decl ()->can_default_create()) {
+    } else if (cls_decl ()->can_default_create ()) {
       //  delayed creation of a detached C++ object ..
       set (cls_decl ()->create (), true, false, true, m_self);
     } else {
@@ -622,11 +593,10 @@ Proxy::obj ()
   return m_obj;
 }
 
-void
-Proxy::object_status_changed (gsi::ObjectBase::StatusEventType type)
+void Proxy::object_status_changed (gsi::ObjectBase::StatusEventType type)
 {
   if (type == gsi::ObjectBase::ObjectDestroyed) {
-    m_destroyed = true;  //  NOTE: must be set before detach and indicates that the object was destroyed externally.
+    m_destroyed = true; //  NOTE: must be set before detach and indicates that the object was destroyed externally.
     detach ();
   } else if (type == gsi::ObjectBase::ObjectKeep) {
     keep_internal ();
@@ -650,34 +620,29 @@ SignalHandler::~SignalHandler ()
   clear_procs ();
 }
 
-void
-SignalHandler::initialize (VALUE obj)
+void SignalHandler::initialize (VALUE obj)
 {
   m_obj = obj;
 }
 
-void
-SignalHandler::assign (VALUE proc)
+void SignalHandler::assign (VALUE proc)
 {
   clear_procs ();
   add (proc);
 }
 
-void
-SignalHandler::clear ()
+void SignalHandler::clear ()
 {
   clear_procs ();
 }
 
-void
-SignalHandler::add (VALUE proc)
+void SignalHandler::add (VALUE proc)
 {
   remove (proc);
   m_procs.push_back (proc);
 }
 
-void
-SignalHandler::remove (VALUE proc)
+void SignalHandler::remove (VALUE proc)
 {
   for (std::list<VALUE>::iterator p = m_procs.begin (); p != m_procs.end (); ++p) {
     if (*p == proc) {
@@ -687,8 +652,7 @@ SignalHandler::remove (VALUE proc)
   }
 }
 
-void
-SignalHandler::mark_this ()
+void SignalHandler::mark_this ()
 {
   if (m_obj != Qnil) {
     rb_gc_mark (m_obj);
@@ -698,20 +662,17 @@ SignalHandler::mark_this ()
   }
 }
 
-void
-SignalHandler::clear_procs ()
+void SignalHandler::clear_procs ()
 {
   m_procs.clear ();
 }
 
-void
-SignalHandler::free (void *p)
+void SignalHandler::free (void *p)
 {
   delete ((SignalHandler *) p);
 }
 
-void
-SignalHandler::mark (void *p)
+void SignalHandler::mark (void *p)
 {
   ((SignalHandler *) p)->mark_this ();
 }
@@ -748,7 +709,7 @@ SignalHandler::static_assign (VALUE self, VALUE proc)
       std::string msg = tl::to_string (tr ("Single argument to signal must be a Proc object"));
       VALUE args [1];
       args [0] = rb_str_new2 (msg.c_str ());
-      rb_exc_raise (rb_class_new_instance(1, args, rb_eRuntimeError));
+      rb_exc_raise (rb_class_new_instance (1, args, rb_eRuntimeError));
     }
 
     SignalHandler *p = 0;
@@ -756,7 +717,6 @@ SignalHandler::static_assign (VALUE self, VALUE proc)
     if (p) {
       p->assign (proc);
     }
-
   }
 
   return Qnil;
@@ -769,7 +729,7 @@ SignalHandler::static_add (VALUE self, VALUE proc)
     std::string msg = tl::to_string (tr ("Single argument to signal's add method must be a Proc object"));
     VALUE args [1];
     args [0] = rb_str_new2 (msg.c_str ());
-    rb_exc_raise (rb_class_new_instance(1, args, rb_eRuntimeError));
+    rb_exc_raise (rb_class_new_instance (1, args, rb_eRuntimeError));
   }
 
   SignalHandler *p = 0;
@@ -802,8 +762,7 @@ SignalHandler::static_remove (VALUE self, VALUE proc)
   return self;
 }
 
-void
-SignalHandler::define_class (VALUE module, const char *name)
+void SignalHandler::define_class (VALUE module, const char *name)
 {
   klass = rb_define_class_under (module, name, rb_cObject);
   rb_define_alloc_func (klass, SignalHandler::alloc);
@@ -845,8 +804,8 @@ void SignalHandler::call (const gsi::MethodBase *meth, gsi::SerialArgs &args, gs
 // --------------------------------------------------------------------------
 //  Class map management
 
-static std::map <VALUE, const gsi::ClassBase *> cls_map;
-static std::map <std::pair<const gsi::ClassBase *, bool>, VALUE> rev_cls_map;
+static std::map<VALUE, const gsi::ClassBase *> cls_map;
+static std::map<std::pair<const gsi::ClassBase *, bool>, VALUE> rev_cls_map;
 
 void register_class (VALUE ruby_cls, const gsi::ClassBase *gsi_cls, bool as_static)
 {
@@ -875,7 +834,7 @@ const gsi::ClassBase *find_cclass (VALUE k)
 
 const gsi::ClassBase *find_cclass_maybe_null (VALUE k)
 {
-  std::map <VALUE, const gsi::ClassBase *>::const_iterator cls;
+  std::map<VALUE, const gsi::ClassBase *>::const_iterator cls;
 
   //  find the class that is bound to C++ (maybe a super class)
   while (k != rb_cObject) {
@@ -894,4 +853,3 @@ const gsi::ClassBase *find_cclass_maybe_null (VALUE k)
 }
 
 #endif
-

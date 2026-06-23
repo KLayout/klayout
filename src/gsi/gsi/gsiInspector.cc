@@ -50,7 +50,7 @@ std::string Inspector::key (size_t /*index*/) const
 {
   return std::string ();
 }
-  
+
 tl::Variant Inspector::keyv (size_t /*index*/) const
 {
   return tl::Variant ();
@@ -92,4 +92,3 @@ bool Inspector::equiv (const gsi::Inspector * /*other*/) const
 }
 
 }
-

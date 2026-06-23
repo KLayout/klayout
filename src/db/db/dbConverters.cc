@@ -26,7 +26,6 @@
 namespace db
 {
 
-  //  .. nothing yet ..
+//  .. nothing yet ..
 
 }
-

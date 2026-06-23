@@ -38,7 +38,7 @@
 namespace db
 {
 
-class TransformationMatrixSum 
+class TransformationMatrixSum
 {
 public:
   TransformationMatrixSum (const db::Layout &, const db::Cell &)
@@ -90,7 +90,7 @@ public:
 
   InstanceReferenceSum transformed (const db::CellInstArray &inst) const
   {
-    db::Matrix2d m_res; 
+    db::Matrix2d m_res;
     db::DVector p_res;
 
     m_res += db::Matrix2d (inst.complex_trans ()) * double (inst.size ());
@@ -145,8 +145,7 @@ inline double distance_func (double a, double b)
   }
 }
 
-struct CellSignature
-{
+struct CellSignature {
   size_t weight;
   db::Box bbox;
   size_t instances;
@@ -233,23 +232,23 @@ struct CellSignature
   std::string to_string () const
   {
     std::string st;
-    for (std::vector <size_t>::const_iterator s = shapes.begin (); s != shapes.end (); ++s) {
+    for (std::vector<size_t>::const_iterator s = shapes.begin (); s != shapes.end (); ++s) {
       if (! st.empty ()) {
         st += ",";
       }
       st += tl::to_string (*s);
     }
 
-    return "weight=" + tl::to_string (weight) + 
-           " bbox=" + bbox.to_string () + 
-           " instances=" + tl::to_string (instances) + 
-           " shapes=" + st + 
-           " tm_avg=" + tm_avg.to_string () + 
+    return "weight=" + tl::to_string (weight) +
+           " bbox=" + bbox.to_string () +
+           " instances=" + tl::to_string (instances) +
+           " shapes=" + st +
+           " tm_avg=" + tm_avg.to_string () +
            " p_avg=" + p_avg.to_string ();
   }
 };
 
-static void collect_cell_signatures (const db::Layout &layout, const std::vector <unsigned int> &layers, db::cell_index_type cell_index, std::map <db::cell_index_type, CellSignature> &metrics, const std::string &progress_report)
+static void collect_cell_signatures (const db::Layout &layout, const std::vector<unsigned int> &layers, db::cell_index_type cell_index, std::map<db::cell_index_type, CellSignature> &metrics, const std::string &progress_report)
 {
   db::InstanceStatistics<InstanceReferenceSum> rs (&layout, cell_index);
 
@@ -265,7 +264,7 @@ static void collect_cell_signatures (const db::Layout &layout, const std::vector
     CellSignature &m = metrics.insert (std::make_pair (*c, CellSignature ())).first->second;
 
     m.shapes.reserve (layers.size ());
-    for (std::vector <unsigned int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
+    for (std::vector<unsigned int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
       const db::Shapes &shapes = cell.shapes (*l);
       size_t n = 0;
       //  TODO: right now, the only way to get the "true" shape count is to iterate ...
@@ -291,12 +290,10 @@ static void collect_cell_signatures (const db::Layout &layout, const std::vector
     if (tl::verbosity () >= 40) {
       tl::info << "  " << layout.cell_name (*c) << " " << m.to_string ();
     }
-
   }
 }
 
-void 
-FuzzyCellMapping::create (const db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b)
+void FuzzyCellMapping::create (const db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Cell mapping")));
 
@@ -304,7 +301,7 @@ FuzzyCellMapping::create (const db::Layout &layout_a, db::cell_index_type cell_i
     tl::info << "Cell mapping";
   }
 
-  std::vector <unsigned int> la, lb;
+  std::vector<unsigned int> la, lb;
 
   for (db::Layout::layer_iterator l = layout_a.begin_layers (); l != layout_a.end_layers (); ++l) {
     for (db::Layout::layer_iterator ll = layout_b.begin_layers (); ll != layout_b.end_layers (); ++ll) {
@@ -320,19 +317,19 @@ FuzzyCellMapping::create (const db::Layout &layout_a, db::cell_index_type cell_i
     tl::info << "Signatures (a):";
   }
 
-  std::map <db::cell_index_type, CellSignature> ma;
+  std::map<db::cell_index_type, CellSignature> ma;
   collect_cell_signatures (layout_a, la, cell_index_a, ma, tl::to_string (tr ("Collecting cell signatures (A)")));
 
   if (tl::verbosity () >= 40) {
     tl::info << "Signatures (b):";
   }
 
-  std::map <db::cell_index_type, CellSignature> mb;
+  std::map<db::cell_index_type, CellSignature> mb;
   collect_cell_signatures (layout_b, lb, cell_index_b, mb, tl::to_string (tr ("Collecting cell signatures (B)")));
 
   tl::RelativeProgress progress (tl::to_string (tr ("Finding matching cells")), ma.size () * ma.size ());
 
-  for (std::map <db::cell_index_type, CellSignature>::const_iterator m = ma.begin (); m != ma.end (); ++m) {
+  for (std::map<db::cell_index_type, CellSignature>::const_iterator m = ma.begin (); m != ma.end (); ++m) {
 
     if (tl::verbosity () >= 30) {
       tl::info << "Treating cell (a) " << layout_a.cell_name (m->first);
@@ -342,8 +339,8 @@ FuzzyCellMapping::create (const db::Layout &layout_a, db::cell_index_type cell_i
 
     //  look up the nearest match in the "b" cells.
     double dmin = -1.0;
-    std::vector <db::cell_index_type> cmin;
-    for (std::map <db::cell_index_type, CellSignature>::const_iterator n = mb.begin (); n != mb.end (); ++n) {
+    std::vector<db::cell_index_type> cmin;
+    for (std::map<db::cell_index_type, CellSignature>::const_iterator n = mb.begin (); n != mb.end (); ++n) {
 
       ++progress;
 
@@ -356,9 +353,7 @@ FuzzyCellMapping::create (const db::Layout &layout_a, db::cell_index_type cell_i
 
         dmin = d;
         cmin.push_back (n->first);
-
       }
-
     }
 
     if (tl::verbosity () >= 40) {
@@ -369,30 +364,28 @@ FuzzyCellMapping::create (const db::Layout &layout_a, db::cell_index_type cell_i
       tl::info << "";
     }
 
-    std::vector <db::cell_index_type> cmin_confirmed;
+    std::vector<db::cell_index_type> cmin_confirmed;
 
     //  if a unique match was found, confirm the match by looking if there is a "a" cell matching better.
-    for (std::vector <db::cell_index_type>::const_iterator c = cmin.begin (); c != cmin.end (); ++c) {
+    for (std::vector<db::cell_index_type>::const_iterator c = cmin.begin (); c != cmin.end (); ++c) {
 
       bool confirmed = true;
 
       const CellSignature &mmin = mb [*c];
-      std::map <db::cell_index_type, CellSignature>::const_iterator mm = m;
+      std::map<db::cell_index_type, CellSignature>::const_iterator mm = m;
       ++mm;
-      for ( ; mm != ma.end () && confirmed; ++mm) {
+      for (; mm != ma.end () && confirmed; ++mm) {
 
         ++progress;
         double d = -1.0;
         if (mmin.distance_less_or_equal (mm->second, dmin, d) && distance_func (d, dmin) > 1e-6) {
           confirmed = false;
         }
-
       }
 
       if (confirmed) {
         cmin_confirmed.push_back (*c);
       }
-
     }
 
     std::swap (cmin, cmin_confirmed);
@@ -419,12 +412,10 @@ FuzzyCellMapping::create (const db::Layout &layout_a, db::cell_index_type cell_i
           min_ed = ed;
           min_ed_ci = *c;
         }
-
       }
 
       cmin.clear ();
       cmin.push_back (min_ed_ci);
-
     }
 
     if (tl::verbosity () >= 40) {
@@ -468,18 +459,14 @@ FuzzyCellMapping::create (const db::Layout &layout_a, db::cell_index_type cell_i
           tl::info << ""; // implies eol
         }
       }
-
     }
-
   }
-
 }
 
-void 
-FuzzyCellMapping::dump_mapping (const std::map <db::cell_index_type, std::vector<db::cell_index_type> > &candidates, 
-                           const db::Layout &layout_a, const db::Layout &layout_b)
+void FuzzyCellMapping::dump_mapping (const std::map<db::cell_index_type, std::vector<db::cell_index_type>> &candidates,
+                                     const db::Layout &layout_a, const db::Layout &layout_b)
 {
-  for (std::map <db::cell_index_type, std::vector<db::cell_index_type> >::const_iterator cand = candidates.begin (); cand != candidates.end (); ++cand) {
+  for (std::map<db::cell_index_type, std::vector<db::cell_index_type>>::const_iterator cand = candidates.begin (); cand != candidates.end (); ++cand) {
     tl::info << "  " << layout_a.cell_name (cand->first) << " ->" << tl::noendl;
     int n = 5;
     for (std::vector<db::cell_index_type>::const_iterator c = cand->second.begin (); c != cand->second.end () && --n > 0; ++c) {
@@ -493,10 +480,10 @@ FuzzyCellMapping::dump_mapping (const std::map <db::cell_index_type, std::vector
   }
 }
 
-std::pair<bool, db::cell_index_type> 
+std::pair<bool, db::cell_index_type>
 FuzzyCellMapping::cell_mapping_pair (db::cell_index_type cell_index_b) const
 {
-  std::map <db::cell_index_type, db::cell_index_type>::const_iterator m = m_b2a_mapping.find (cell_index_b);
+  std::map<db::cell_index_type, db::cell_index_type>::const_iterator m = m_b2a_mapping.find (cell_index_b);
   if (m == m_b2a_mapping.end ()) {
     return std::make_pair (false, 0);
   } else {
@@ -504,20 +491,18 @@ FuzzyCellMapping::cell_mapping_pair (db::cell_index_type cell_index_b) const
   }
 }
 
-bool 
-FuzzyCellMapping::has_mapping (db::cell_index_type cell_index_b) const
+bool FuzzyCellMapping::has_mapping (db::cell_index_type cell_index_b) const
 {
-  std::map <db::cell_index_type, db::cell_index_type>::const_iterator m = m_b2a_mapping.find (cell_index_b);
+  std::map<db::cell_index_type, db::cell_index_type>::const_iterator m = m_b2a_mapping.find (cell_index_b);
   return (m != m_b2a_mapping.end ());
 }
 
-db::cell_index_type 
+db::cell_index_type
 FuzzyCellMapping::cell_mapping (db::cell_index_type cell_index_b) const
 {
-  std::map <db::cell_index_type, db::cell_index_type>::const_iterator m = m_b2a_mapping.find (cell_index_b);
+  std::map<db::cell_index_type, db::cell_index_type>::const_iterator m = m_b2a_mapping.find (cell_index_b);
   tl_assert (m != m_b2a_mapping.end ());
   return m->second;
 }
 
 }
-

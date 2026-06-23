@@ -44,7 +44,8 @@ class DB_PUBLIC CatAndIds
 public:
   CatAndIds (size_t cat, size_t id1, size_t id2)
     : m_cat (cat), m_id1 (id1), m_id2 (id2)
-  { }
+  {
+  }
 
   bool operator== (const CatAndIds &other) const
   {
@@ -143,7 +144,7 @@ private:
 class DB_PUBLIC NetGraphNode
 {
 public:
-  typedef std::pair<std::vector<Transition>, std::pair<size_t, const db::Net *> > edge_type;
+  typedef std::pair<std::vector<Transition>, std::pair<size_t, const db::Net *>> edge_type;
 
   static void swap_edges (edge_type &e1, edge_type &e2)
   {
@@ -151,8 +152,7 @@ public:
     std::swap (e1.second, e2.second);
   }
 
-  struct EdgeToEdgeOnlyCompare
-  {
+  struct EdgeToEdgeOnlyCompare {
     bool operator() (const edge_type &a, const std::vector<Transition> &b) const
     {
       return a.first < b;
@@ -298,12 +298,12 @@ private:
 /**
  *  @brief A combination of a node and an edge reference
  */
-struct NodeEdgePair
-{
+struct NodeEdgePair {
 public:
   NodeEdgePair (const NetGraphNode *_node, NetGraphNode::edge_iterator _edge)
     : node (_node), edge (_edge)
-  { }
+  {
+  }
 
 public:
   const NetGraphNode *node;
@@ -313,8 +313,7 @@ public:
 /**
  *  @brief A comparator comparing the first node pointer from a node/edge pair
  */
-struct CompareNodeEdgePair
-{
+struct CompareNodeEdgePair {
   bool operator() (const NodeEdgePair &a, const NodeEdgePair &b) const
   {
     return a.node->less (*b.node, true);
@@ -324,8 +323,7 @@ struct CompareNodeEdgePair
 /**
  *  @brief A comparator comparing two node pointers
  */
-struct CompareNodePtr
-{
+struct CompareNodePtr {
   bool operator() (const NetGraphNode *a, const NetGraphNode *b) const
   {
     return a->less (*b, true);
@@ -336,10 +334,10 @@ struct CompareNodePtr
 
 namespace std
 {
-  inline void swap (db::NetGraphNode &a, db::NetGraphNode &b)
-  {
-    a.swap (b);
-  }
+inline void swap (db::NetGraphNode &a, db::NetGraphNode &b)
+{
+  a.swap (b);
+}
 }
 
 namespace db

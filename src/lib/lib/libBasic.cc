@@ -36,7 +36,7 @@ namespace lib
 {
 
 /**
- *  @brief Declaration of the Basic library 
+ *  @brief Declaration of the Basic library
  */
 class Basic
   : public db::Library
@@ -67,4 +67,3 @@ public:
 static tl::RegisteredClass<db::Library> basic_lib_registration (new Basic ());
 
 }
-

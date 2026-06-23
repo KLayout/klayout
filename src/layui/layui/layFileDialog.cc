@@ -26,8 +26,8 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QFileInfo>
-#if QT_VERSION>=0x050000
-#  include <QStandardPaths>
+#if QT_VERSION >= 0x050000
+#include <QStandardPaths>
 #endif
 
 #include "layFileDialog.h"
@@ -42,13 +42,13 @@ FileDialog::FileDialog (QWidget *parent, const std::string &title, const std::st
   : QObject (parent)
 {
 #ifdef _WIN32
-# if QT_VERSION>=0x050000
-  m_dir = QDir(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
-# else
-  //  On Windows the current directory does not have any meaning - it's usually the installation 
+#if QT_VERSION >= 0x050000
+  m_dir = QDir (QStandardPaths::writableLocation (QStandardPaths::DocumentsLocation));
+#else
+  //  On Windows the current directory does not have any meaning - it's usually the installation
   //  location.
   m_dir = QDir (QDesktopServices::storageLocation (QDesktopServices::DocumentsLocation));
-# endif
+#endif
 #else
   m_dir = QDir::current ();
 #endif
@@ -62,8 +62,7 @@ FileDialog::~FileDialog ()
   //  .. nothing yet ..
 }
 
-int
-FileDialog::find_selected_filter (const QString &fs, const QString &selected_filter)
+int FileDialog::find_selected_filter (const QString &fs, const QString &selected_filter)
 {
   QStringList filters = fs.split (tl::to_qstring (";;"));
 
@@ -92,22 +91,18 @@ FileDialog::add_default_extension (const std::string &path, const QString &selec
       if (ex.try_read_word (ext)) {
         return path + "." + ext;
       }
-
     }
-
   }
 
   return path;
 }
 
-int
-FileDialog::selected_filter () const
+int FileDialog::selected_filter () const
 {
   return find_selected_filter (m_filters, m_sel_filter);
 }
 
-bool 
-FileDialog::get_open (std::string &fp, const std::string &title) 
+bool FileDialog::get_open (std::string &fp, const std::string &title)
 {
   //  Use the standard (system) dialogs:
 
@@ -132,8 +127,7 @@ FileDialog::get_open (std::string &fp, const std::string &title)
   }
 }
 
-bool 
-FileDialog::get_open (std::vector<std::string> &fp, const std::string &dir, const std::string &title) 
+bool FileDialog::get_open (std::vector<std::string> &fp, const std::string &dir, const std::string &title)
 {
   //  Use the standard (system) dialogs:
 
@@ -157,8 +151,7 @@ FileDialog::get_open (std::vector<std::string> &fp, const std::string &dir, cons
   }
 }
 
-bool 
-FileDialog::get_save (std::string &fp, const std::string &title) 
+bool FileDialog::get_save (std::string &fp, const std::string &title)
 {
   //  Use the standard (system) dialogs:
 

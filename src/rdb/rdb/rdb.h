@@ -45,13 +45,13 @@ class QImage;
 
 namespace tl
 {
-  class Extractor;
+class Extractor;
 }
 
 namespace db
 {
-  class Shape;
-  class Layout;
+class Shape;
+class Layout;
 }
 
 namespace rdb
@@ -69,10 +69,10 @@ class Items;
 /**
  *  @brief A report item's category
  *
- *  An item is member of exactly one category. This can be a check for example. 
+ *  An item is member of exactly one category. This can be a check for example.
  *  A category is described by a name and a description string. An Id is provided
  *  to reference this category from actual report items.
- *  Categories can be organized hierarchically for which a category collection 
+ *  Categories can be organized hierarchically for which a category collection
  *  is provided and member of the individual category.
  *
  *  A category can only be created by the database object, since the
@@ -113,7 +113,7 @@ public:
    *
    *  This method must not be used for items in the database to keep the database consistent.
    */
-  void set_id (id_type id) 
+  void set_id (id_type id)
   {
     m_id = id;
   }
@@ -131,7 +131,7 @@ public:
    *
    *  This method must not be used for items in the database to keep the database consistent.
    */
-  void set_name (const std::string &d) 
+  void set_name (const std::string &d)
   {
     m_name = d;
   }
@@ -156,7 +156,7 @@ public:
   /**
    *  @brief The description string (setter)
    */
-  void set_description (const std::string &d) 
+  void set_description (const std::string &d)
   {
     m_description = d;
   }
@@ -182,7 +182,7 @@ public:
   /**
    *  @brief The parent (owner) of this category (getter)
    */
-  Category *parent () 
+  Category *parent ()
   {
     return mp_parent;
   }
@@ -193,7 +193,7 @@ public:
    *  This method is provided for persistency application only. It should not be used otherwise.
    *  The Category object will take over ownership over the sub categories.
    */
-  void import_sub_categories (Categories *categories); 
+  void import_sub_categories (Categories *categories);
 
   /**
    *  @brief Report the number of items
@@ -243,7 +243,7 @@ private:
    *  @brief Default constructor
    *
    *  Creates a category object with empty name and description.
-   *  This constructor is private to allow only the database to produce a 
+   *  This constructor is private to allow only the database to produce a
    *  category object.
    */
   Category (const std::string &name);
@@ -263,9 +263,9 @@ private:
   {
     m_num_items_visited += d;
   }
-  
+
   /**
-   *  @brief Add an offset to the number of items 
+   *  @brief Add an offset to the number of items
    */
   void add_to_num_items (int d)
   {
@@ -280,7 +280,7 @@ private:
     m_num_items = 0;
     m_num_items_visited = 0;
   }
-  
+
   /**
    *  @brief Set the database reference
    */
@@ -294,10 +294,10 @@ private:
 /**
  *  @brief The collection of categories
  *
- *  A generic collection of categories used for the root node and 
+ *  A generic collection of categories used for the root node and
  *  sub-category nodes.
  */
-class RDB_PUBLIC Categories 
+class RDB_PUBLIC Categories
 {
 public:
   typedef tl::shared_collection<Category>::const_iterator const_iterator;
@@ -328,51 +328,51 @@ public:
   /**
    *  @brief Iterate the categories inside this collection (begin iterator)
    */
-  const_iterator begin () const 
-  { 
-    return m_categories.begin (); 
+  const_iterator begin () const
+  {
+    return m_categories.begin ();
   }
 
   /**
    *  @brief Iterate the categories inside this collection (end iterator)
    */
-  const_iterator end () const 
-  { 
-    return m_categories.end (); 
+  const_iterator end () const
+  {
+    return m_categories.end ();
   }
 
   /**
    *  @brief Iterate the categories inside this collection (begin iterator)
    */
-  iterator begin () 
-  { 
-    return m_categories.begin (); 
+  iterator begin ()
+  {
+    return m_categories.begin ();
   }
 
   /**
    *  @brief Iterate the categories inside this collection (end iterator)
    */
-  iterator end () 
-  { 
-    return m_categories.end (); 
+  iterator end ()
+  {
+    return m_categories.end ();
   }
 
   /**
    *  @brief Find a category by name
    *
-   *  The name is actually a path expression which specifies the category starting from the given 
+   *  The name is actually a path expression which specifies the category starting from the given
    *  node with a '.' separated path notation. I.e. 'a.b' is the sub-category 'b' of category 'a'.
    *  If no such category can be found, 0 is returned.
    */
   const Category *category_by_name (const char *path) const
   {
-    return (const_cast <Categories *> (this)->category_by_name (path));
+    return (const_cast<Categories *> (this)->category_by_name (path));
   }
 
   /**
    *  @brief Find a category by name (non-const version)
    *
-   *  The name is actually a path expression which specifies the category starting from the given 
+   *  The name is actually a path expression which specifies the category starting from the given
    *  node with a '.' separated path notation. I.e. 'a.b' is the sub-category 'b' of category 'a'.
    *  If no such category can be found, 0 is returned.
    */
@@ -389,7 +389,7 @@ public:
    *  This method is provided for persistency application only. It should not be used otherwise.
    *  This will take over ownership over the category.
    */
-  void import_category (Category *category); 
+  void import_category (Category *category);
 
   /**
    *  @brief Gets the database reference
@@ -404,7 +404,7 @@ public:
   friend class Category;
 
   tl::shared_collection<Category> m_categories;
-  std::map <std::string, Category *> m_categories_by_name; 
+  std::map<std::string, Category *> m_categories_by_name;
   tl::weak_ptr<Database> mp_database;
 
   Categories ()
@@ -423,7 +423,7 @@ public:
  *  A value has a value (as the name says) and an optional tag id. Tag id's identify
  *  the value and make the value a named one.
  */
-class RDB_PUBLIC ValueBase 
+class RDB_PUBLIC ValueBase
 {
 public:
   ValueBase ()
@@ -497,14 +497,14 @@ public:
     return m_value;
   }
 
-  C &value () 
+  C &value ()
   {
     return m_value;
   }
 
-  int type_index () const 
-  { 
-    return type_index_of<C> (); 
+  int type_index () const
+  {
+    return type_index_of<C> ();
   }
 
   bool compare (const ValueBase *other) const;
@@ -545,7 +545,7 @@ RDB_PUBLIC_TEMPLATE ValueBase *make_value (const db::object_with_properties<T> &
 /**
  *  @brief A class encapsulating ValueBase pointer
  */
-class RDB_PUBLIC ValueWrapper 
+class RDB_PUBLIC ValueWrapper
 {
 public:
   /**
@@ -602,7 +602,7 @@ public:
   /**
    *  @brief Get the pointer
    */
-  ValueBase *get () 
+  ValueBase *get ()
   {
     return mp_ptr;
   }
@@ -637,19 +637,19 @@ public:
   }
 
   /**
-   *  @brief Convert the values collection to a string 
+   *  @brief Convert the values collection to a string
    */
   std::string to_string (const Database *rdb = 0) const;
 
   /**
    *  @brief Fill the values collection from the string
    */
-  void from_string (Database *rdb, const std::string &s);  
+  void from_string (Database *rdb, const std::string &s);
 
   /**
    *  @brief Fill the values collection from an extractor
    */
-  void from_string (Database *rdb, tl::Extractor &ex);  
+  void from_string (Database *rdb, tl::Extractor &ex);
 
 private:
   ValueBase *mp_ptr;
@@ -682,7 +682,7 @@ public:
   }
 
   /**
-   *  @brief Assignment 
+   *  @brief Assignment
    */
   Values &operator= (const Values &d);
 
@@ -718,7 +718,7 @@ public:
   /**
    *  @brief The non-const iterator (begin)
    */
-  iterator begin () 
+  iterator begin ()
   {
     return m_values.begin ();
   }
@@ -768,24 +768,24 @@ public:
   }
 
   /**
-   *  @brief Convert the values collection to a string 
+   *  @brief Convert the values collection to a string
    */
   std::string to_string (const Database *rdb) const;
 
   /**
    *  @brief Fill the values collection from the string
    */
-  void from_string (Database *rdb, const std::string &s);  
+  void from_string (Database *rdb, const std::string &s);
 
 private:
-  std::list <ValueWrapper> m_values;
+  std::list<ValueWrapper> m_values;
 };
 
 /**
  *  @brief A report item
  *
- *  A report item is one information item in the report. 
- *  The value of a report item is manyfold. Values can be keyed, 
+ *  A report item is one information item in the report.
+ *  The value of a report item is manyfold. Values can be keyed,
  *  i.e. multiple values can be present with different keys.
  *  Each value can be of different types where the type is specified by a type Id.
  */
@@ -799,12 +799,12 @@ public:
   Item (Items *items);
 
   /**
-   *  @brief Copy constructor 
+   *  @brief Copy constructor
    */
   Item (const Item &d);
 
   /**
-   *  @brief Assignment 
+   *  @brief Assignment
    */
   Item &operator= (const Item &d);
 
@@ -826,7 +826,7 @@ public:
    *
    *  This method must not be used for items in the database to keep the database consistent.
    */
-  void set_cell_id (id_type id) 
+  void set_cell_id (id_type id)
   {
     m_cell_id = id;
   }
@@ -856,7 +856,7 @@ public:
    *
    *  This method must not be used for items in the database to keep the database consistent.
    */
-  void set_category_id (id_type id) 
+  void set_category_id (id_type id)
   {
     m_category_id = id;
   }
@@ -1067,7 +1067,7 @@ private:
   size_t m_multiplicity;
   std::string m_comment;
   bool m_visited;
-  std::vector <bool> m_tag_ids;
+  std::vector<bool> m_tag_ids;
   Database *mp_database;
   std::string m_image_str;
 
@@ -1083,9 +1083,9 @@ private:
 };
 
 /**
- *  @brief An item reference 
+ *  @brief An item reference
  *
- *  This is basically a wrapper for a pointer that correctly 
+ *  This is basically a wrapper for a pointer that correctly
  *  maps const * and non-const * values through the operator->
  *  overloads.
  */
@@ -1104,7 +1104,7 @@ public:
   /**
    *  @brief non-const access
    */
-  Item *operator-> ()
+  Item *operator->()
   {
     return mp_item;
   }
@@ -1120,7 +1120,7 @@ public:
   /**
    *  @brief const access
    */
-  const Item *operator-> () const
+  const Item *operator->() const
   {
     return mp_item;
   }
@@ -1151,7 +1151,7 @@ public:
   /**
    *  @brief Construct an item list with a database reference
    */
-  Items (Database *database)  
+  Items (Database *database)
     : mp_database (database)
   {
     // .. nothing yet ..
@@ -1160,33 +1160,33 @@ public:
   /**
    *  @brief Iterate the items inside this collection (begin iterator)
    */
-  const_iterator begin () const 
-  { 
-    return m_items.begin (); 
+  const_iterator begin () const
+  {
+    return m_items.begin ();
   }
 
   /**
    *  @brief Iterate the items inside this collection (end iterator)
    */
-  const_iterator end () const 
-  { 
-    return m_items.end (); 
+  const_iterator end () const
+  {
+    return m_items.end ();
   }
 
   /**
    *  @brief Iterate the items inside this collection (non-const begin iterator)
    */
   iterator begin ()
-  { 
-    return m_items.begin (); 
+  {
+    return m_items.begin ();
   }
 
   /**
    *  @brief Iterate the items inside this collection (non-const end iterator)
    */
   iterator end ()
-  { 
-    return m_items.end (); 
+  {
+    return m_items.end ();
   }
 
   /**
@@ -1205,7 +1205,7 @@ public:
    *
    *  This method is provided for persistency application only. It should not be used otherwise.
    */
-  Item &back () 
+  Item &back ()
   {
     return m_items.back ();
   }
@@ -1213,7 +1213,7 @@ public:
   /**
    *  @brief Get the database reference
    */
-  Database *database () 
+  Database *database ()
   {
     return mp_database;
   }
@@ -1222,7 +1222,7 @@ private:
   friend class Cell;
   friend class Database;
 
-  std::list <Item> m_items;
+  std::list<Item> m_items;
   Database *mp_database;
 
   Items (const Items &d);
@@ -1360,7 +1360,7 @@ private:
 };
 
 /**
- *  @brief A collection of references 
+ *  @brief A collection of references
  */
 class RDB_PUBLIC References
 {
@@ -1403,7 +1403,7 @@ public:
   /**
    *  @brief Begin iterator (non-const)
    */
-  iterator begin () 
+  iterator begin ()
   {
     return m_references.begin ();
   }
@@ -1411,7 +1411,7 @@ public:
   /**
    *  @brief End iterator (non-const)
    */
-  iterator end () 
+  iterator end ()
   {
     return m_references.end ();
   }
@@ -1427,7 +1427,7 @@ public:
   /**
    *  @brief Get the database reference
    */
-  Database *database () 
+  Database *database ()
   {
     return mp_database;
   }
@@ -1510,7 +1510,7 @@ public:
    *
    *  This method must not be used for items in the database to keep the database consistent.
    */
-  void set_id (id_type id) 
+  void set_id (id_type id)
   {
     m_id = id;
   }
@@ -1528,7 +1528,7 @@ public:
    *
    *  This method must not be used for items in the database to keep the database consistent.
    */
-  void set_name (const std::string &d) 
+  void set_name (const std::string &d)
   {
     m_name = d;
   }
@@ -1546,7 +1546,7 @@ public:
    *
    *  This method must not be used for items in the database to keep the database consistent.
    */
-  void set_variant (const std::string &v) 
+  void set_variant (const std::string &v)
   {
     m_variant = v;
   }
@@ -1601,7 +1601,7 @@ public:
   /**
    *  @brief The reference collection (non-const)
    */
-  References &references () 
+  References &references ()
   {
     return m_references;
   }
@@ -1614,10 +1614,10 @@ public:
   void import_references (const References &references);
 
   /**
-   *  @brief Get one example transformation leading from this cell to a given parent cell 
+   *  @brief Get one example transformation leading from this cell to a given parent cell
    *
    *  This method will try to determine one path from the given cell to the given parent
-   *  cell and return the accumulated transformation for this path. 
+   *  cell and return the accumulated transformation for this path.
    *  If no path is found, the first parameter of the returned pair is false, otherwise it's
    *  true.
    */
@@ -1626,7 +1626,7 @@ public:
   /**
    *  @brief Get the database reference
    */
-  Database *database () 
+  Database *database ()
   {
     return mp_database;
   }
@@ -1664,7 +1664,7 @@ private:
   }
 
   /**
-   *  @brief Add an offset to the number of items 
+   *  @brief Add an offset to the number of items
    */
   void add_to_num_items (int d)
   {
@@ -1679,7 +1679,7 @@ private:
     m_num_items = 0;
     m_num_items_visited = 0;
   }
-  
+
   /**
    *  @brief Set the database reference
    */
@@ -1689,11 +1689,11 @@ private:
     m_references.set_database (database);
   }
 
-  std::pair<bool, db::DCplxTrans> path_to (id_type parent_cell_id, const Database *db, std::set <id_type> &visited, const db::DCplxTrans &trans) const;
+  std::pair<bool, db::DCplxTrans> path_to (id_type parent_cell_id, const Database *db, std::set<id_type> &visited, const db::DCplxTrans &trans) const;
 };
 
 /**
- *  @brief A collection of cells 
+ *  @brief A collection of cells
  */
 class RDB_PUBLIC Cells
 {
@@ -1753,7 +1753,7 @@ public:
   /**
    *  @brief Begin iterator (non-const)
    */
-  iterator begin () 
+  iterator begin ()
   {
     return m_cells.begin ();
   }
@@ -1761,7 +1761,7 @@ public:
   /**
    *  @brief End iterator (non-const)
    */
-  iterator end () 
+  iterator end ()
   {
     return m_cells.end ();
   }
@@ -1794,7 +1794,7 @@ public:
   /**
    *  @brief Get the database reference (non-const)
    */
-  Database *database () 
+  Database *database ()
   {
     return mp_database.get ();
   }
@@ -1858,9 +1858,9 @@ public:
 
   /**
    *  @brief Gets a flag indicating whether the tag is a user tag or a system tag
-   *  
+   *
    *  If this flag is false, the tag is a system tag used for tagging "waived" and
-   *  similar conditions. Otherwise it is a user tag which can be used freely to 
+   *  similar conditions. Otherwise it is a user tag which can be used freely to
    *  tag arbitrary conditions.
    */
   bool is_user_tag () const
@@ -1873,7 +1873,7 @@ public:
    *
    *  See \is_user_tag for details.
    */
-  void set_user_tag (bool user) 
+  void set_user_tag (bool user)
   {
     m_is_user_tag = user;
   }
@@ -1891,7 +1891,7 @@ public:
    *
    *  This method must not be used for items in the database to keep the database consistent.
    */
-  void set_id (id_type id) 
+  void set_id (id_type id)
   {
     m_id = id;
   }
@@ -1910,7 +1910,7 @@ public:
    *  The name of the tag must not be changed when the tag is already part of a Tags collection.
    *  Otherwise, the tag collection becomes inconsistent.
    */
-  void set_name (const std::string &name) 
+  void set_name (const std::string &name)
   {
     m_name = name;
   }
@@ -1927,11 +1927,11 @@ private:
 class RDB_PUBLIC Tags
 {
 public:
-  typedef std::vector <rdb::Tag> tag_list_type;
+  typedef std::vector<rdb::Tag> tag_list_type;
   typedef tag_list_type::const_iterator const_iterator;
 
   /**
-   *  @brief Default constructor for the tags list 
+   *  @brief Default constructor for the tags list
    *
    *  This method is provided for persistency application only. It should not be used otherwise.
    */
@@ -1982,7 +1982,7 @@ public:
    *  @brief Import a tag
    *
    *  This method is provided for persistency application only. It should not be used otherwise.
-   *  This will assign a new id to the tag and replace any tag with that 
+   *  This will assign a new id to the tag and replace any tag with that
    *  name.
    */
   void import_tag (const Tag &tag);
@@ -2000,14 +2000,14 @@ public:
 private:
   friend class Database;
 
-  mutable std::map <std::pair<std::string, bool>, id_type> m_ids_for_names;
-  mutable std::vector <Tag> m_tags;
+  mutable std::map<std::pair<std::string, bool>, id_type> m_ids_for_names;
+  mutable std::vector<Tag> m_tags;
 };
 
 /**
  *  @brief The database object
  */
-class RDB_PUBLIC Database 
+class RDB_PUBLIC Database
   : public gsi::ObjectBase,
     public tl::Object
 {
@@ -2117,7 +2117,7 @@ public:
   }
 
   /**
-   *  @brief Set the top cell name 
+   *  @brief Set the top cell name
    */
   void set_top_cell_name (const std::string &topcell)
   {
@@ -2178,17 +2178,17 @@ public:
   void import_categories (Categories *categories);
 
   /**
-   *  @brief Create a category and register it 
+   *  @brief Create a category and register it
    */
   Category *create_category (const std::string &name);
 
   /**
-   *  @brief Create a category as a subcategory and register it 
+   *  @brief Create a category as a subcategory and register it
    */
   Category *create_category (Category *parent, const std::string &name);
 
   /**
-   *  @brief Create a category as a subcategory in the container and register it 
+   *  @brief Create a category as a subcategory in the container and register it
    *
    *  Hint: this method does not set the parent properly and must not be used
    *  under normal circumstances. It is provided as a internal method and
@@ -2267,7 +2267,7 @@ public:
    *  @brief Create a cell variant and register it
    *
    *  A cell with name name/variant combination must not exist already.
-   *  If the variant string is empty, this method behaves the same as the 
+   *  If the variant string is empty, this method behaves the same as the
    *  method without variant.
    *
    *  "layout_name" is the name of the cell in the layout. If empty, the layout
@@ -2280,7 +2280,7 @@ public:
    *
    *  @return a vector of id's corresponding to the given variants or an empty vector if the name is not valid or the cell has no variants
    */
-  const std::vector <id_type> &variants (const std::string &name);
+  const std::vector<id_type> &variants (const std::string &name);
 
   /**
    *  @brief Get the cell pointer for a cell name or name:variant combination (const version)
@@ -2416,7 +2416,7 @@ public:
   /**
    *  @brief Get an iterator pair that delivers the const items (ItemRef) for a given cell
    */
-  std::pair<const_item_ref_iterator, const_item_ref_iterator> items_by_cell (id_type cell_id) const; 
+  std::pair<const_item_ref_iterator, const_item_ref_iterator> items_by_cell (id_type cell_id) const;
 
   /**
    *  @brief Get an iterator pair that delivers the non-const items (ItemRef) for a given cell
@@ -2426,7 +2426,7 @@ public:
   /**
    *  @brief Get an iterator that delivers the const items (ItemRef) for a given category
    */
-  std::pair<const_item_ref_iterator, const_item_ref_iterator> items_by_category (id_type category_id) const; 
+  std::pair<const_item_ref_iterator, const_item_ref_iterator> items_by_category (id_type category_id) const;
 
   /**
    *  @brief Get an iterator that delivers the non-const items (ItemRef) for a given category
@@ -2436,7 +2436,7 @@ public:
   /**
    *  @brief Get an iterator that delivers the const items (ItemRef) for a given cell and category
    */
-  std::pair<const_item_ref_iterator, const_item_ref_iterator> items_by_cell_and_category (id_type cell_id, id_type category_id) const; 
+  std::pair<const_item_ref_iterator, const_item_ref_iterator> items_by_cell_and_category (id_type cell_id, id_type category_id) const;
 
   /**
    *  @brief Get an iterator that delivers the non-const items (ItemRef) for a given cell and category
@@ -2454,7 +2454,7 @@ public:
   /**
    *  @brief Reset the modified file
    */
-  void reset_modified () 
+  void reset_modified ()
   {
     m_modified = false;
   }
@@ -2507,7 +2507,7 @@ public:
    *  @param layers_and_descriptions The layers and (optional) descriptions/names of the layer to scan
    *  @param flat True, to perform a flat scan
    */
-  void scan_layout (const db::Layout &layout, db::cell_index_type cell_index, const std::vector<std::pair<unsigned int, std::string> > &layers_and_descriptions, bool flat);
+  void scan_layout (const db::Layout &layout, db::cell_index_type cell_index, const std::vector<std::pair<unsigned int, std::string>> &layers_and_descriptions, bool flat);
 
 private:
   std::string m_generator;
@@ -2519,15 +2519,15 @@ private:
   id_type m_next_id;
   Categories *mp_categories;
   Tags m_tags;
-  std::map <std::string, Cell *> m_cells_by_qname;
-  std::map <std::string, std::vector <id_type> > m_cell_variants;
-  std::map <id_type, Cell *> m_cells_by_id;
-  std::map <id_type, Category *> m_categories_by_id;
-  std::map <std::pair <id_type, id_type>, std::list<ItemRef> > m_items_by_cell_and_category_id;
-  std::map <std::pair <id_type, id_type>, size_t> m_num_items_by_cell_and_category;
-  std::map <std::pair <id_type, id_type>, size_t> m_num_items_visited_by_cell_and_category;
-  std::map <id_type, std::list<ItemRef> > m_items_by_cell_id;
-  std::map <id_type, std::list<ItemRef> > m_items_by_category_id;
+  std::map<std::string, Cell *> m_cells_by_qname;
+  std::map<std::string, std::vector<id_type>> m_cell_variants;
+  std::map<id_type, Cell *> m_cells_by_id;
+  std::map<id_type, Category *> m_categories_by_id;
+  std::map<std::pair<id_type, id_type>, std::list<ItemRef>> m_items_by_cell_and_category_id;
+  std::map<std::pair<id_type, id_type>, size_t> m_num_items_by_cell_and_category;
+  std::map<std::pair<id_type, id_type>, size_t> m_num_items_visited_by_cell_and_category;
+  std::map<id_type, std::list<ItemRef>> m_items_by_cell_id;
+  std::map<id_type, std::list<ItemRef>> m_items_by_category_id;
   Items *mp_items;
   Cells m_cells;
   size_t m_num_items;
@@ -2536,7 +2536,7 @@ private:
 
   void clear ();
 
-  void set_modified () 
+  void set_modified ()
   {
     m_modified = true;
   }

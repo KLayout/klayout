@@ -61,18 +61,21 @@
 
 class QSpinBox;
 
-namespace rdb {
-  class Database;
+namespace rdb
+{
+class Database;
 }
 
-namespace db {
-  class Layout;
-  class Manager;
-  class SaveLayoutOptions;
-  class LayoutToNetlist;
+namespace db
+{
+class Layout;
+class Manager;
+class SaveLayoutOptions;
+class LayoutToNetlist;
 }
 
-namespace lay {
+namespace lay
+{
 
 class LayoutViewWidget;
 class AbstractMenu;
@@ -98,7 +101,7 @@ class PropertiesDialog;
 class LayoutViewSignalConnector
   : public QObject
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewSignalConnector (QObject *parent, lay::LayoutView *view);
@@ -515,7 +518,7 @@ public:
     LayoutViewBase::stop_redraw ();
   }
 
-  /** 
+  /**
    *  @brief Select last display state
    */
   void prev_display_state ()
@@ -523,7 +526,7 @@ public:
     LayoutViewBase::prev_display_state ();
   }
 
-  /** 
+  /**
    *  @brief Select next display state
    */
   void next_display_state ()
@@ -532,7 +535,7 @@ public:
   }
 
   /**
-   *  @brief Ensure the selection is visible 
+   *  @brief Ensure the selection is visible
    */
   void ensure_selection_visible ()
   {
@@ -724,7 +727,7 @@ private:
 class LAYVIEW_PUBLIC LayoutViewNotificationWidget
   : public QFrame
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   LayoutViewNotificationWidget (LayoutViewWidget *parent, const LayoutViewNotification *notification);
@@ -746,9 +749,10 @@ private:
  *  but only created if a QApplication is present.
  */
 class LAYVIEW_PUBLIC LayoutViewWidget
-  : public QFrame, public gsi::ObjectBase
+  : public QFrame,
+    public gsi::ObjectBase
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -796,7 +800,7 @@ public:
   }
 
   virtual QSize sizeHint () const;
-  virtual bool eventFilter(QObject *obj, QEvent *event);
+  virtual bool eventFilter (QObject *obj, QEvent *event);
   virtual void showEvent (QShowEvent *);
   virtual void hideEvent (QHideEvent *);
 
@@ -901,8 +905,7 @@ private:
 
   void resizeEvent (QResizeEvent *event);
 
-  struct CompareNotificationPointers
-  {
+  struct CompareNotificationPointers {
     bool operator() (const LayoutViewNotification *a, const LayoutViewNotification *b) const
     {
       return *a < *b;

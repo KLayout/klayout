@@ -29,21 +29,19 @@ namespace lay
 // ---------------------------------------------------------------------------------------
 //  layer_op implementation
 
-void 
-AnnotationLayerOp::insert (AnnotationShapes *shapes)
+void AnnotationLayerOp::insert (AnnotationShapes *shapes)
 {
   shapes->insert (m_shapes.begin (), m_shapes.end ());
 }
 
-void 
-AnnotationLayerOp::erase (AnnotationShapes *shapes)
+void AnnotationLayerOp::erase (AnnotationShapes *shapes)
 {
   if (size_t (std::distance (shapes->begin (), shapes->end ())) <= m_shapes.size ()) {
     //  If all shapes are to be removed, just clear the list
     shapes->clear ();
   } else {
 
-    //  look up the shapes to delete and collect them in a sorted list. Then pass this to 
+    //  look up the shapes to delete and collect them in a sorted list. Then pass this to
     //  the erase_positions method of the shapes object
     std::vector<bool> done;
     done.resize (m_shapes.size (), false);
@@ -60,24 +58,23 @@ AnnotationLayerOp::erase (AnnotationShapes *shapes)
     //  of implementing this: search for each element and erase these.
     for (AnnotationShapes::layer_type::iterator lsh = shapes->begin (); lsh != shapes->end (); ++lsh) {
       std::vector<shape_type>::const_iterator s = std::lower_bound (s_begin, s_end, *lsh);
-      while (s != s_end && *s == *lsh && done [std::distance(s_begin, s)]) {
+      while (s != s_end && *s == *lsh && done [std::distance (s_begin, s)]) {
         ++s;
       }
       if (s != s_end && *s == *lsh) {
-        done [std::distance(s_begin, s)] = true;
+        done [std::distance (s_begin, s)] = true;
         to_erase.push_back (lsh);
       }
     }
 
     shapes->erase_positions (to_erase.begin (), to_erase.end ());
-
   }
 }
 
 // ---------------------------------------------------------------------------------------
 //  Shapes implementation
 
-AnnotationShapes::AnnotationShapes (db::Manager *manager) 
+AnnotationShapes::AnnotationShapes (db::Manager *manager)
   : db::LayoutStateModel (true /*busy*/), db::Object (manager)
 {
   // .. nothing yet ..
@@ -126,23 +123,22 @@ AnnotationShapes::operator= (const AnnotationShapes &&d)
   return *this;
 }
 
-void
-AnnotationShapes::clear ()
+void AnnotationShapes::clear ()
 {
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new AnnotationLayerOp (false /*not insert*/, m_layer.begin (), m_layer.end ()));
   }
-  invalidate_state ();  //  HINT: must come before the change is done!
+  invalidate_state (); //  HINT: must come before the change is done!
   m_layer.clear ();
 }
 
-const AnnotationShapes::shape_type & 
+const AnnotationShapes::shape_type &
 AnnotationShapes::insert (const shape_type &sh)
 {
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new AnnotationLayerOp (true /*insert*/, sh));
   }
-  invalidate_state ();  //  HINT: must come before the change is done!
+  invalidate_state (); //  HINT: must come before the change is done!
   return *m_layer.insert (sh);
 }
 
@@ -152,23 +148,21 @@ AnnotationShapes::insert (const shape_type &&sh)
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new AnnotationLayerOp (true /*insert*/, sh));
   }
-  invalidate_state ();  //  HINT: must come before the change is done!
+  invalidate_state (); //  HINT: must come before the change is done!
   return *m_layer.insert (sh);
 }
 
-void
-AnnotationShapes::reserve (size_t n)
+void AnnotationShapes::reserve (size_t n)
 {
   m_layer.reserve (n);
 }
 
-void 
-AnnotationShapes::erase (layer_type::iterator pos)
+void AnnotationShapes::erase (layer_type::iterator pos)
 {
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new AnnotationLayerOp (false /*not insert*/, *pos));
   }
-  invalidate_state ();  //  HINT: must come before the change is done!
+  invalidate_state (); //  HINT: must come before the change is done!
   m_layer.erase (pos);
 }
 
@@ -180,9 +174,9 @@ AnnotationShapes::replace (iterator pos, const shape_type &sh)
       manager ()->queue (this, new AnnotationLayerOp (false /*not insert*/, *pos));
       manager ()->queue (this, new AnnotationLayerOp (true /*insert*/, sh));
     }
-    invalidate_state ();  //  HINT: must come before the change is done!
+    invalidate_state (); //  HINT: must come before the change is done!
     m_layer.replace (pos, sh);
-  } 
+  }
   return *pos;
 }
 
@@ -194,41 +188,36 @@ AnnotationShapes::replace (iterator pos, const shape_type &&sh)
       manager ()->queue (this, new AnnotationLayerOp (false /*not insert*/, *pos));
       manager ()->queue (this, new AnnotationLayerOp (true /*insert*/, sh));
     }
-    invalidate_state ();  //  HINT: must come before the change is done!
+    invalidate_state (); //  HINT: must come before the change is done!
     m_layer.replace (pos, std::move (sh));
   }
   return *pos;
 }
 
-void
-AnnotationShapes::redo (db::Op *op)
+void AnnotationShapes::redo (db::Op *op)
 {
   AnnotationLayerOp *layop = dynamic_cast<AnnotationLayerOp *> (op);
   if (layop) {
     layop->redo (this);
-  } 
+  }
 }
 
-void 
-AnnotationShapes::undo (db::Op *op) 
+void AnnotationShapes::undo (db::Op *op)
 {
   AnnotationLayerOp *layop = dynamic_cast<AnnotationLayerOp *> (op);
   if (layop) {
     layop->undo (this);
-  } 
+  }
 }
 
-void
-AnnotationShapes::mem_stat (db::MemStatistics *stat, db::MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
+void AnnotationShapes::mem_stat (db::MemStatistics *stat, db::MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
 {
   m_layer.mem_stat (stat, purpose, cat, no_self, parent);
 }
 
-void
-AnnotationShapes::do_update ()
+void AnnotationShapes::do_update ()
 {
   m_layer.sort ();
 }
 
 }
-

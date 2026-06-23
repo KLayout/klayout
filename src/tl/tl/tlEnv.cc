@@ -29,12 +29,12 @@
 #include <string.h>
 
 #ifdef _WIN32
-#  include <windows.h>
+#include <windows.h>
 #elif __APPLE__
-#  include <libproc.h>
-#  include <unistd.h>
+#include <libproc.h>
+#include <unistd.h>
 #else
-#  include <unistd.h>
+#include <unistd.h>
 #endif
 
 namespace tl
@@ -138,5 +138,3 @@ bool app_flag (const std::string &name)
 }
 
 } // namespace tl
-
-

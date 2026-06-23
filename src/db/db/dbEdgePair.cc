@@ -26,21 +26,21 @@
 namespace tl
 {
 
-template<> void extractor_impl (tl::Extractor &ex, db::EdgePair &e)
+template <> void extractor_impl (tl::Extractor &ex, db::EdgePair &e)
 {
   if (! test_extractor_impl (ex, e)) {
     ex.error (tl::to_string (tr ("Expected an edge specification")));
   }
 }
 
-template<> void extractor_impl (tl::Extractor &ex, db::DEdgePair &e)
+template <> void extractor_impl (tl::Extractor &ex, db::DEdgePair &e)
 {
   if (! test_extractor_impl (ex, e)) {
     ex.error (tl::to_string (tr ("Expected an edge specification")));
   }
 }
 
-template<class C> bool _test_extractor_impl (tl::Extractor &ex, db::edge_pair<C> &e)
+template <class C> bool _test_extractor_impl (tl::Extractor &ex, db::edge_pair<C> &e)
 {
   typedef db::edge<C> edge_type;
   tl::Extractor ex_saved = ex;
@@ -70,15 +70,14 @@ template<class C> bool _test_extractor_impl (tl::Extractor &ex, db::edge_pair<C>
   }
 }
 
-template<> bool test_extractor_impl (tl::Extractor &ex, db::EdgePair &e)
+template <> bool test_extractor_impl (tl::Extractor &ex, db::EdgePair &e)
 {
   return _test_extractor_impl (ex, e);
 }
 
-template<> bool test_extractor_impl (tl::Extractor &ex, db::DEdgePair &e)
+template <> bool test_extractor_impl (tl::Extractor &ex, db::DEdgePair &e)
 {
   return _test_extractor_impl (ex, e);
 }
 
 } // namespace tl
-

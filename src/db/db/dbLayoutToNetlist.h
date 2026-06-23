@@ -76,7 +76,8 @@ class NetlistBuilder;
  *  @li
  */
 class DB_PUBLIC LayoutToNetlist
-  : public gsi::ObjectBase, public db::NetlistManipulationCallbacks
+  : public gsi::ObjectBase,
+    public db::NetlistManipulationCallbacks
 {
 public:
   typedef std::map<unsigned int, std::string>::const_iterator layer_iterator;
@@ -652,7 +653,7 @@ public:
    *
    *  This method is mainly provided to test purposes.
    */
-  const std::list<std::pair<tl::GlobPattern, tl::GlobPattern> > &joined_net_names_per_cell () const
+  const std::list<std::pair<tl::GlobPattern, tl::GlobPattern>> &joined_net_names_per_cell () const
   {
     return m_joined_net_names_per_cell;
   }
@@ -684,7 +685,7 @@ public:
    *
    *  This method is mainly provided to test purposes.
    */
-  const std::list<std::set<std::string> > &joined_nets () const
+  const std::list<std::set<std::string>> &joined_nets () const
   {
     return m_joined_nets;
   }
@@ -694,7 +695,7 @@ public:
    *
    *  This method is mainly provided to test purposes.
    */
-  const std::list<std::pair<tl::GlobPattern, std::set<std::string> > > &joined_nets_per_cell () const
+  const std::list<std::pair<tl::GlobPattern, std::set<std::string>>> &joined_nets_per_cell () const
   {
     return m_joined_nets_per_cell;
   }
@@ -1098,7 +1099,7 @@ public:
    *  regardless of the diode's area.
    *  In other words: any diode will make the net safe against antenna discharge.
    */
-  db::Region antenna_check (const db::Region &gate, double gate_perimeter_factor, const db::Region &metal, double metal_perimeter_factor, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes = std::vector<std::pair<const db::Region *, double> > (), db::Texts *values = 0)
+  db::Region antenna_check (const db::Region &gate, double gate_perimeter_factor, const db::Region &metal, double metal_perimeter_factor, double ratio, const std::vector<std::pair<const db::Region *, double>> &diodes = std::vector<std::pair<const db::Region *, double>> (), db::Texts *values = 0)
   {
     return antenna_check (gate, 1.0, gate_perimeter_factor, metal, 1.0, metal_perimeter_factor, ratio, diodes, values);
   }
@@ -1107,7 +1108,7 @@ public:
    *  @brief Variant of the antenna check not using the perimeter
    *  This version uses 0 for the perimeter factor hence not taking into account the perimeter at all.
    */
-  db::Region antenna_check (const db::Region &gate, const db::Region &metal, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes = std::vector<std::pair<const db::Region *, double> > (), db::Texts *values = 0)
+  db::Region antenna_check (const db::Region &gate, const db::Region &metal, double ratio, const std::vector<std::pair<const db::Region *, double>> &diodes = std::vector<std::pair<const db::Region *, double>> (), db::Texts *values = 0)
   {
     return antenna_check (gate, 1.0, 0.0, metal, 1.0, 0.0, ratio, diodes, values);
   }
@@ -1124,7 +1125,7 @@ public:
    *
    *  If values is non-null, texts explaining the violations are placed there.
    */
-  db::Region antenna_check (const db::Region &gate, double gate_area_factor, double gate_perimeter_factor, const db::Region &metal, double metal_area_factor, double metal_perimeter_factor, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes = std::vector<std::pair<const db::Region *, double> > (), Texts *values = 0);
+  db::Region antenna_check (const db::Region &gate, double gate_area_factor, double gate_perimeter_factor, const db::Region &metal, double metal_area_factor, double metal_perimeter_factor, double ratio, const std::vector<std::pair<const db::Region *, double>> &diodes = std::vector<std::pair<const db::Region *, double>> (), Texts *values = 0);
 
   /**
    *  @brief Runs a generic net measurement function
@@ -1240,9 +1241,9 @@ private:
   bool m_top_level_mode;
   bool m_make_soft_connection_diodes;
   std::list<tl::GlobPattern> m_joined_net_names;
-  std::list<std::pair<tl::GlobPattern, tl::GlobPattern> > m_joined_net_names_per_cell;
-  std::list<std::set<std::string> > m_joined_nets;
-  std::list<std::pair<tl::GlobPattern, std::set<std::string> > > m_joined_nets_per_cell;
+  std::list<std::pair<tl::GlobPattern, tl::GlobPattern>> m_joined_net_names_per_cell;
+  std::list<std::set<std::string>> m_joined_nets;
+  std::list<std::pair<tl::GlobPattern, std::set<std::string>>> m_joined_nets_per_cell;
 
   void init ();
   void ensure_netlist ();
@@ -1378,8 +1379,7 @@ public:
   static db::properties_id_type make_netname_propid (NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, const db::Net &net, const std::string &net_name_prefix = std::string ());
 
 private:
-  struct CellReuseTableKey
-  {
+  struct CellReuseTableKey {
     CellReuseTableKey (db::cell_index_type _cell_index, db::properties_id_type _netname_propid, size_t _cluster_id)
       : cell_index (_cell_index), netname_propid (_netname_propid), cluster_id (_cluster_id)
     {
@@ -1405,7 +1405,7 @@ private:
     size_t cluster_id;
   };
 
-  typedef std::map<CellReuseTableKey, std::pair<db::cell_index_type, bool> > cell_reuse_table_type;
+  typedef std::map<CellReuseTableKey, std::pair<db::cell_index_type, bool>> cell_reuse_table_type;
 
   tl::weak_ptr<db::Layout> mp_target;
   db::CellMapping m_cmap;

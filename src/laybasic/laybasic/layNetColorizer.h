@@ -34,7 +34,7 @@
 
 namespace db
 {
-  class Net;
+class Net;
 }
 
 namespace lay
@@ -82,4 +82,3 @@ private:
 } // namespace lay
 
 #endif
-

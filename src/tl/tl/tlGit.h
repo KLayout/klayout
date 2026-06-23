@@ -30,8 +30,8 @@
 #include <string>
 #include <vector>
 
-#if !defined(HAVE_GIT2)
-#  error "tlGit.h can only be used with libgit2 enabled"
+#if ! defined(HAVE_GIT2)
+#error "tlGit.h can only be used with libgit2 enabled"
 #endif
 
 namespace tl
@@ -108,4 +108,3 @@ private:
 }
 
 #endif
-

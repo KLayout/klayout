@@ -25,7 +25,7 @@
 #include "tlUnitTest.h"
 
 //  basics
-TEST(1_basics)
+TEST (1_basics)
 {
   tl::equivalence_clusters<int> eq;
 
@@ -56,7 +56,7 @@ TEST(1_basics)
 }
 
 //  joining of clusters
-TEST(2_join)
+TEST (2_join)
 {
   tl::equivalence_clusters<int> eq;
 
@@ -100,7 +100,7 @@ TEST(2_join)
 }
 
 //  size
-TEST(3_size)
+TEST (3_size)
 {
   tl::equivalence_clusters<int> eq;
 
@@ -113,7 +113,7 @@ TEST(3_size)
 }
 
 //  has_attribute
-TEST(4_has_attribute)
+TEST (4_has_attribute)
 {
   tl::equivalence_clusters<int> eq;
 
@@ -143,7 +143,7 @@ std::string eq2string (const tl::equivalence_clusters<int> &eq)
 }
 
 //  iterator
-TEST(5_iterator)
+TEST (5_iterator)
 {
   tl::equivalence_clusters<int> eq;
 
@@ -164,7 +164,7 @@ TEST(5_iterator)
 }
 
 //  apply_other_equivalences
-TEST(6_apply_equivalences)
+TEST (6_apply_equivalences)
 {
   tl::equivalence_clusters<int> eq;
 
@@ -187,7 +187,7 @@ TEST(6_apply_equivalences)
 }
 
 //  merge
-TEST(7_merge)
+TEST (7_merge)
 {
   tl::equivalence_clusters<int> eq;
 
@@ -208,4 +208,3 @@ TEST(7_merge)
   eq.merge (eq2);
   EXPECT_EQ (eq2string (eq), "1;2;3,4,5,6,10;11");
 }
-

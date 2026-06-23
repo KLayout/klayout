@@ -37,7 +37,7 @@ class ClipDialog
   : public lay::Browser,
     private Ui::ClipDialog
 {
-Q_OBJECT 
+  Q_OBJECT
 
 public:
   ClipDialog (lay::Dispatcher *root, lay::LayoutViewBase *view);
@@ -56,10 +56,8 @@ private:
 
   //  implementation of the lay::Plugin interface
   void menu_activated (const std::string &symbol);
-
 };
 
 }
 
 #endif
-

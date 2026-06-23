@@ -29,7 +29,7 @@
 #include "gsiDeclBasic.h"
 #include "pya.h"
 
-#include <QUrl> 
+#include <QUrl>
 #include <QColor>
 #include <QPalette>
 #include <QApplication>
@@ -78,7 +78,7 @@ std::string escape_xml_with_formatting (const std::string &s, bool &in_code)
 {
   std::string r;
   r.reserve (s.size ());
-  for (tl::Extractor sc (s.c_str ()); *sc; ) {
+  for (tl::Extractor sc (s.c_str ()); *sc;) {
     if (*sc == '<') {
       r += "&lt;";
       ++sc;
@@ -146,7 +146,7 @@ std::string escape_xml_with_formatting (const std::string &s, bool &in_code)
   return r;
 }
 
-static std::string 
+static std::string
 full_name (const gsi::MethodBase::MethodSynonym &syn)
 {
   if (syn.is_predicate) {
@@ -160,8 +160,7 @@ full_name (const gsi::MethodBase::MethodSynonym &syn)
   }
 }
 
-struct DocumentationParser 
-{
+struct DocumentationParser {
   DocumentationParser (const gsi::MethodBase *method)
   {
     std::string doc = method->doc ();
@@ -173,7 +172,7 @@ struct DocumentationParser
     parse_doc (cls->doc ());
   }
 
-  void parse_doc (const std::string &formatted_doc) 
+  void parse_doc (const std::string &formatted_doc)
   {
     hidden = false;
     qt_class = false;
@@ -197,7 +196,7 @@ struct DocumentationParser
 
         } else if (ex.test ("@return") || ex.test ("@returns")) {
 
-          ex.read  (ret_val, "\n");
+          ex.read (ret_val, "\n");
 
         } else if (ex.test ("@args")) {
 
@@ -227,7 +226,6 @@ struct DocumentationParser
         doc += *ex;
         ++ex;
       }
-
     }
   }
 
@@ -271,12 +269,12 @@ struct DocumentationParser
   std::string alias;
   std::vector<std::string> args;
   std::string ret_val;
-  std::vector<std::pair <std::string, std::string> > params;
+  std::vector<std::pair<std::string, std::string>> params;
 };
 
 //  A cache for the parsed class documentation
 
-static std::map <const gsi::ClassBase *, DocumentationParser> s_cls_doc;
+static std::map<const gsi::ClassBase *, DocumentationParser> s_cls_doc;
 
 static DocumentationParser &cls_documentation (const gsi::ClassBase *cls)
 {
@@ -284,7 +282,7 @@ static DocumentationParser &cls_documentation (const gsi::ClassBase *cls)
     cls = cls->declaration ();
   }
 
-  std::map <const gsi::ClassBase *, DocumentationParser>::iterator cd = s_cls_doc.find (cls);
+  std::map<const gsi::ClassBase *, DocumentationParser>::iterator cd = s_cls_doc.find (cls);
   if (cd != s_cls_doc.end ()) {
     return cd->second;
   } else {
@@ -313,7 +311,6 @@ static std::string make_qualified_name (const gsi::ClassBase *cls)
     }
 
     p = p->parent ();
-
   }
 
   return qname;
@@ -325,7 +322,8 @@ real_class (const gsi::ClassBase *cls)
   return cls->declaration () ? cls->declaration () : cls;
 }
 
-namespace {
+namespace
+{
 
 class RecursiveClassIterator
 {
@@ -363,13 +361,13 @@ public:
     return *m_cls_iter_stack.back ().first;
   }
 
-  const gsi::ClassBase *operator-> () const
+  const gsi::ClassBase *operator->() const
   {
-    return m_cls_iter_stack.back ().first.operator-> ();
+    return m_cls_iter_stack.back ().first.operator->();
   }
 
 private:
-  std::list<std::pair<gsi::ClassBase::class_iterator, gsi::ClassBase::class_iterator> > m_cls_iter_stack;
+  std::list<std::pair<gsi::ClassBase::class_iterator, gsi::ClassBase::class_iterator>> m_cls_iter_stack;
 };
 
 }
@@ -397,10 +395,10 @@ replace_references (const std::string &t, const gsi::ClassBase *cls_base)
     r += std::string (t, q, p - q);
 
     size_t pp = ++p;
-    while (p < t.size () && (t[p] == '_' || t[p] == ':' || isalnum (t [p]))) {
+    while (p < t.size () && (t [p] == '_' || t [p] == ':' || isalnum (t [p]))) {
       ++p;
     }
-    if (p < t.size () && (t[p] == '?' || t [p] == '=')) {
+    if (p < t.size () && (t [p] == '?' || t [p] == '=')) {
       ++p;
     }
 
@@ -408,12 +406,12 @@ replace_references (const std::string &t, const gsi::ClassBase *cls_base)
 
     std::string mid;
 
-    if (p < t.size () && t[p] == '#') {
+    if (p < t.size () && t [p] == '#') {
       pp = ++p;
-      while (p < t.size () && (t[p] == '_' || isalnum (t [p]))) {
+      while (p < t.size () && (t [p] == '_' || isalnum (t [p]))) {
         ++p;
       }
-      if (p < t.size () && (t[p] == '?' || t [p] == '=')) {
+      if (p < t.size () && (t [p] == '?' || t [p] == '=')) {
         ++p;
       }
       mid = std::string (t, pp, p - pp);
@@ -455,7 +453,6 @@ replace_references (const std::string &t, const gsi::ClassBase *cls_base)
     }
 
     q = p;
-
   }
 
   r += std::string (t, q);
@@ -471,37 +468,35 @@ GSIHelpProvider::GSIHelpProvider ()
   //  .. nothing yet ..
 }
 
-std::string 
+std::string
 GSIHelpProvider::folder (lay::HelpSource * /*src*/) const
 {
   return "code";
 }
 
-std::string 
+std::string
 GSIHelpProvider::title (lay::HelpSource * /*src*/) const
 {
   return tl::to_string (QObject::tr ("API Reference"));
 }
 
-static 
-void produce_toc (const gsi::ClassBase *cls, std::vector <std::string> &toc)
+static void produce_toc (const gsi::ClassBase *cls, std::vector<std::string> &toc)
 {
   DocumentationParser &doc = cls_documentation (cls);
   if (! doc.hidden) {
     toc.push_back (class_doc_url (make_qualified_name (cls)));
   }
   for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
-    produce_toc (cc.operator-> (), toc);
+    produce_toc (cc.operator->(), toc);
   }
 }
 
-void 
-GSIHelpProvider::toc (lay::HelpSource * /*src*/, std::vector<std::string> &t)
+void GSIHelpProvider::toc (lay::HelpSource * /*src*/, std::vector<std::string> &t)
 {
   std::set<std::string> mod_names;
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
     mod_names.insert (c->module ());
-    produce_toc (c.operator-> (), t);
+    produce_toc (c.operator->(), t);
   }
 
   for (std::set<std::string>::const_iterator m = mod_names.begin (); m != mod_names.end (); ++m) {
@@ -537,21 +532,19 @@ GSIHelpProvider::get (lay::HelpSource *src, const std::string &path) const
     //  fallback: provide the original text plus the error message
     std::string fallback_text = std::string ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n") +
                                 "<!DOCTYPE language SYSTEM \"klayout_doc.dtd\">\n" +
-                                "<doc><p>\n" + 
+                                "<doc><p>\n" +
                                 "<b>XML Parser Error: </b>" + escape_xml (tl::to_string (errorMsg)) + ", in line " + tl::to_string (errorLine) + " of " + path + "\n" +
-                                "</p><pre>\n" + 
+                                "</p><pre>\n" +
                                 escape_xml (text) + "\n" +
                                 "</pre></doc>";
 
     doc.setContent (QByteArray (fallback_text.c_str (), int (fallback_text.size ())), true, &errorMsg, &errorLine);
-
   }
-  
+
   return doc;
 }
 
-static
-void collect_class_info (const gsi::ClassBase *cls, const std::string &module, std::vector <std::pair <std::string, std::pair<std::string, std::string> > > &class_names, std::vector <std::pair <std::string, std::pair<std::string, std::string> > > &qt_class_names)
+static void collect_class_info (const gsi::ClassBase *cls, const std::string &module, std::vector<std::pair<std::string, std::pair<std::string, std::string>>> &class_names, std::vector<std::pair<std::string, std::pair<std::string, std::string>>> &qt_class_names)
 {
   DocumentationParser &doc = cls_documentation (cls);
   std::string qname = make_qualified_name (cls);
@@ -567,7 +560,7 @@ void collect_class_info (const gsi::ClassBase *cls, const std::string &module, s
   }
 
   for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
-    collect_class_info (cc.operator-> (), module, class_names, qt_class_names);
+    collect_class_info (cc.operator->(), module, class_names, qt_class_names);
   }
 }
 
@@ -582,21 +575,21 @@ GSIHelpProvider::produce_class_index (lay::HelpSource *src, const char *module_n
      << std::endl;
 
   os << "<doc>";
-  if (!module_name) {
+  if (! module_name) {
     os << "<title>" << tl::to_string (QObject::tr ("Class Index")) << "</title>" << std::endl;
   } else {
     os << "<title>" << tl::to_string (QObject::tr ("Class Index for Module ")) << escape_xml (module_name) << "</title>" << std::endl;
     os << "<keyword name=\"" << escape_xml (module_name) << "\"/>" << std::endl;
   }
 
-  typedef std::vector <std::pair <std::string, std::pair<std::string, std::string> > > class_index_t;
+  typedef std::vector<std::pair<std::string, std::pair<std::string, std::string>>> class_index_t;
 
   class_index_t class_names;
   class_index_t qt_class_names;
 
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
     if (! module_name || c->module () == module_name) {
-      collect_class_info (c.operator-> (), c->module (), class_names, qt_class_names);
+      collect_class_info (c.operator->(), c->module (), class_names, qt_class_names);
     }
   }
 
@@ -641,7 +634,6 @@ GSIHelpProvider::produce_class_index (lay::HelpSource *src, const char *module_n
       os << "<li><a href=\"" << escape_xml (module_doc_url (*m)) << "\">" << tl::to_string (QObject::tr ("Qt Module")) << " " << escape_xml (*m) << "</a></li>";
     }
     os << "</ul>";
-
   }
 
   if (! qt_class_names.empty ()) {
@@ -649,14 +641,14 @@ GSIHelpProvider::produce_class_index (lay::HelpSource *src, const char *module_n
   }
 
   if (! class_names.empty ()) {
-    
+
     std::sort (class_names.begin (), class_names.end ());
 
     os << "<h2>KLayout classes</h2>" << std::endl;
     os << "<table>" << std::endl;
     int n = 0;
     for (class_index_t::const_iterator cc = class_names.begin (); cc != class_names.end (); ++cc, ++n) {
-      os << "<tr class=\"row" << (n % 2)  << "\">" << std::endl;
+      os << "<tr class=\"row" << (n % 2) << "\">" << std::endl;
       os << "<td><a href=\"" << escape_xml (class_doc_url (cc->first)) << "\">" << escape_xml (cc->first) << "</a></td>";
       if (! module_name) {
         os << "<td><a href=\"" << module_doc_url (cc->second.first) << "\">" << escape_xml (cc->second.first) << "</a></td>";
@@ -664,18 +656,17 @@ GSIHelpProvider::produce_class_index (lay::HelpSource *src, const char *module_n
       os << "<td>" << escape_xml (cc->second.second) << "</td></tr>" << std::endl;
     }
     os << "</table>" << std::endl;
-
   }
 
   if (! qt_class_names.empty ()) {
-    
+
     std::sort (qt_class_names.begin (), qt_class_names.end ());
 
     os << "<a name=\"qtclasses\"/><h2>Qt classes</h2>" << std::endl;
     os << "<table>" << std::endl;
     int n = 0;
     for (class_index_t::const_iterator cc = qt_class_names.begin (); cc != qt_class_names.end (); ++cc, ++n) {
-      os << "<tr class=\"row" << (n % 2)  << "\">" << std::endl;
+      os << "<tr class=\"row" << (n % 2) << "\">" << std::endl;
       os << "<td><a href=\"" << escape_xml (class_doc_url (cc->first)) << "\">" << escape_xml (cc->first) << "</a></td>";
       if (! module_name) {
         os << "<td><a href=\"" << module_doc_url (cc->second.first) << "\">" << escape_xml (cc->second.first) << "</a></td>";
@@ -683,13 +674,11 @@ GSIHelpProvider::produce_class_index (lay::HelpSource *src, const char *module_n
       os << "<td>" << escape_xml (cc->second.second) << "</td></tr>" << std::endl;
     }
     os << "</table>" << std::endl;
-
   }
 
   os << "</doc>" << std::endl;
 
   return os.str ();
-
 }
 
 static std::string
@@ -698,47 +687,67 @@ type_to_s (const gsi::ArgType &a, bool linked, bool for_return)
   std::string s;
   switch (a.type ()) {
   case gsi::T_void_ptr:
-    s += "void *"; break;
+    s += "void *";
+    break;
   case gsi::T_void:
-    s += "void"; break;
+    s += "void";
+    break;
   case gsi::T_bool:
-    s += "bool"; break;
+    s += "bool";
+    break;
   case gsi::T_char:
-    s += "char"; break;
+    s += "char";
+    break;
   case gsi::T_schar:
-    s += "signed char"; break;
+    s += "signed char";
+    break;
   case gsi::T_uchar:
-    s += "unsigned char"; break;
+    s += "unsigned char";
+    break;
   case gsi::T_short:
-    s += "short"; break;
+    s += "short";
+    break;
   case gsi::T_ushort:
-    s += "unsigned short"; break;
+    s += "unsigned short";
+    break;
   case gsi::T_int:
-    s += "int"; break;
+    s += "int";
+    break;
 #if defined(HAVE_64BIT_COORD)
   case gsi::T_int128:
-    s += "int128"; break;
+    s += "int128";
+    break;
 #endif
   case gsi::T_uint:
-    s += "unsigned int"; break;
+    s += "unsigned int";
+    break;
   case gsi::T_long:
-    s += "long"; break;
+    s += "long";
+    break;
   case gsi::T_ulong:
-    s += "unsigned long"; break;
+    s += "unsigned long";
+    break;
   case gsi::T_longlong:
-    s += "long long"; break;
+    s += "long long";
+    break;
   case gsi::T_ulonglong:
-    s += "unsigned long long"; break;
+    s += "unsigned long long";
+    break;
   case gsi::T_double:
-    s += "double"; break;
+    s += "double";
+    break;
   case gsi::T_float:
-    s += "float"; break;
+    s += "float";
+    break;
   case gsi::T_string:
-    s += "string"; break;
+    s += "string";
+    break;
   case gsi::T_byte_array:
-    s += "bytes"; break;
+    s += "bytes";
+    break;
   case gsi::T_var:
-    s += "variant"; break;
+    s += "variant";
+    break;
   case gsi::T_object:
     if (a.is_cptr () || (! for_return && a.is_cref ())) {
       s = "const ";
@@ -755,18 +764,18 @@ type_to_s (const gsi::ArgType &a, bool linked, bool for_return)
   case gsi::T_vector:
     if (a.inner ()) {
       s += type_to_s (*a.inner (), linked, false);
-    } 
+    }
     s += "[]";
     break;
   case gsi::T_map:
     s += "map&lt;";
     if (a.inner_k ()) {
       s += type_to_s (*a.inner_k (), linked, false);
-    } 
+    }
     s += ",";
     if (a.inner ()) {
       s += type_to_s (*a.inner (), linked, false);
-    } 
+    }
     s += "&gt;";
     break;
   }
@@ -776,7 +785,7 @@ type_to_s (const gsi::ArgType &a, bool linked, bool for_return)
   return s;
 }
 
-static std::string 
+static std::string
 method_attributes (const gsi::MethodBase *method, DocumentationParser & /*doc*/, bool without_static = false, bool without_prot = true)
 {
   std::string r;
@@ -819,7 +828,7 @@ method_attributes (const gsi::MethodBase *method, DocumentationParser & /*doc*/,
   return r;
 }
 
-static std::string 
+static std::string
 method_return (const gsi::MethodBase *method, DocumentationParser & /*doc*/, bool linked = false)
 {
   return type_to_s (method->ret_type (), linked, true);
@@ -845,7 +854,6 @@ method_arguments (const gsi::MethodBase *method, const gsi::ClassBase *cls_obj, 
       }
 
       r += ")";
-
     }
 
     return r;
@@ -862,7 +870,7 @@ method_arguments (const gsi::MethodBase *method, const gsi::ClassBase *cls_obj, 
       }
       r += type_to_s (*a, linked, false);
       r += " ";
-      if (a->spec () && !a->spec ()->name ().empty()) {
+      if (a->spec () && ! a->spec ()->name ().empty ()) {
         r += escape_xml (a->spec ()->name ());
         if (a->spec ()->has_default ()) {
           r += " = ";
@@ -885,7 +893,6 @@ method_arguments (const gsi::MethodBase *method, const gsi::ClassBase *cls_obj, 
     }
 
     r += ")";
-
   }
 
   return r;
@@ -899,20 +906,18 @@ find_child_with_declaration (const gsi::ClassBase *pc, const gsi::ClassBase *dec
     for (tl::weak_collection<gsi::ClassBase>::const_iterator sc = pc->begin_child_classes (); sc != pc->end_child_classes (); ++sc) {
 
       if (sc->declaration () == decl) {
-        return sc.operator-> ();
+        return sc.operator->();
       }
 
-      const gsi::ClassBase *cc = find_child_with_declaration (sc.operator-> (), decl);
+      const gsi::ClassBase *cc = find_child_with_declaration (sc.operator->(), decl);
       if (cc) {
         return cc;
       }
-
     }
 
-    //  Try the base classes - due to skipping of the hidden classes we might pick a parent 
+    //  Try the base classes - due to skipping of the hidden classes we might pick a parent
     //  class initially.
     pc = pc->base ();
-
   }
 
   return 0;
@@ -949,26 +954,24 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
     const gsi::ClassBase *pc = cls_obj;
 
     cls_obj = 0;
-    while (pc && !cls_obj) {
+    while (pc && ! cls_obj) {
 
       for (tl::weak_collection<gsi::ClassBase>::const_iterator sc = pc->begin_child_classes (); sc != pc->end_child_classes (); ++sc) {
         if (sc->name () == cp.front ()) {
-          cls_obj = sc.operator-> ();
+          cls_obj = sc.operator->();
           cp.erase (cp.begin ());
           break;
         }
       }
 
-      //  Try the base classes too - since we might have skipped some of the classes in the 
+      //  Try the base classes too - since we might have skipped some of the classes in the
       //  inheritance hierarchy, the child may be in a base class.
       pc = pc->base ();
-
     }
 
     if (! cls_obj) {
       return "Unknown class: " + cls;
     }
-
   }
 
   const gsi::ClassBase *tl_alias = 0;
@@ -981,10 +984,9 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
   } else {
 
     //  check if there is a top-level alias class for this one the other way around (A::B from A_B)
-    for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes () && !tl_alias; ++c) {
+    for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes () && ! tl_alias; ++c) {
       tl_alias = find_child_with_declaration (&*c, cls_obj);
     }
-
   }
 
   DocumentationParser &class_doc = cls_documentation (cls_obj);
@@ -1044,11 +1046,9 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
 
       last_cls = base;
       base = base->base ();
-
     }
 
     os << "</p>" << std::endl;
-
   }
 
   if (tl_alias) {
@@ -1066,7 +1066,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
 
     for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = (*c)->begin_child_classes (); cc != (*c)->end_child_classes (); ++cc) {
 
-      DocumentationParser &cdoc = cls_documentation (cc.operator-> ());
+      DocumentationParser &cdoc = cls_documentation (cc.operator->());
 
       if (any) {
         os << ", ";
@@ -1076,16 +1076,14 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
       }
 
       os << "<a href=\""
-         << escape_xml (class_doc_url (make_qualified_name (cc.operator-> ())))
+         << escape_xml (class_doc_url (make_qualified_name (cc.operator->())))
          << "\">"
          << escape_xml (cc->name ());
       if (cdoc.hidden && cdoc.alias.empty ()) {
         os << " " << tl::to_string (QObject::tr ("[internal]"));
       }
       os << "</a>";
-
     }
-
   }
 
   if (any) {
@@ -1098,7 +1096,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
 
   for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = act_cls_obj->begin_subclasses (); cc != act_cls_obj->end_subclasses (); ++cc) {
 
-    DocumentationParser &cdoc = cls_documentation (cc.operator-> ());
+    DocumentationParser &cdoc = cls_documentation (cc.operator->());
 
     if (any) {
       os << ", ";
@@ -1108,14 +1106,13 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
     }
 
     os << "<a href=\""
-       << escape_xml (class_doc_url (make_qualified_name (cc.operator-> ())))
+       << escape_xml (class_doc_url (make_qualified_name (cc.operator->())))
        << "\">"
        << escape_xml (cc->name ());
     if (cdoc.hidden && cdoc.alias.empty ()) {
       os << " " << tl::to_string (QObject::tr ("[internal]"));
     }
     os << "</a>";
-
   }
 
   if (any) {
@@ -1133,12 +1130,11 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
        << tl::to_string (QObject::tr ("Note"))
        << "</b>: "
        << tl::to_string (QObject::tr (
-                           "This class is an internal class provided for technical reasons - i.e. "
-                           "as a placeholder class for argument binding or as an abstract interface. "
-                           "You should not instantiate objects of this class directly. "
-                           "Instead, use the subclasses listed above. "
-                           "Also see there for more documentation and actual incarnations of this class."
-                        ))
+            "This class is an internal class provided for technical reasons - i.e. "
+            "as a placeholder class for argument binding or as an abstract interface. "
+            "You should not instantiate objects of this class directly. "
+            "Instead, use the subclasses listed above. "
+            "Also see there for more documentation and actual incarnations of this class."))
        << "</p>" << std::endl;
   }
 
@@ -1147,16 +1143,16 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
   //  collect the methods of the class and their hidden base classes
   //  (in the reverse order so that derived classes override their super classes methods)
 
-  std::multimap <std::string, std::pair<const gsi::MethodBase *, size_t> > mm;
+  std::multimap<std::string, std::pair<const gsi::MethodBase *, size_t>> mm;
 
-  for (size_t n = classes.size (); n > 0; ) {
+  for (size_t n = classes.size (); n > 0;) {
 
     --n;
 
     //  remove the base classes' definitions if the name matches
     for (gsi::ClassBase::method_iterator m = classes [n]->begin_methods (); m != classes [n]->end_methods (); ++m) {
       for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
-        std::multimap <std::string, std::pair<const gsi::MethodBase *, size_t> >::iterator im;
+        std::multimap<std::string, std::pair<const gsi::MethodBase *, size_t>>::iterator im;
         while ((im = mm.find (full_name (*syn))) != mm.end ()) {
           mm.erase (im);
         }
@@ -1172,7 +1168,6 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
         }
       }
     }
-
   }
 
   if (mm.empty ()) {
@@ -1181,13 +1176,13 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
   }
 
   //  Produce methods brief descriptions
-  
+
   int n = 0;
   int row = 0;
 
   any = false;
 
-  for (std::multimap <std::string, std::pair<const gsi::MethodBase *, size_t> >::const_iterator i = mm.begin (); i != mm.end (); ++i, ++n) {
+  for (std::multimap<std::string, std::pair<const gsi::MethodBase *, size_t>>::const_iterator i = mm.begin (); i != mm.end (); ++i, ++n) {
 
     const gsi::MethodBase::MethodSynonym &syn = i->second.first->begin_synonyms () [i->second.second];
 
@@ -1200,16 +1195,14 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
       }
 
       DocumentationParser method_doc (i->second.first);
-      os << "<tr class=\"row" << (row % 2)  << "\">" << std::endl;
+      os << "<tr class=\"row" << (row % 2) << "\">" << std::endl;
       ++row;
       os << "<td>" << method_return (i->second.first, method_doc) << "</td>";
       os << "<td><b><a href=\"#method" << n << "\">" << escape_xml (i->first) << "</a></b></td>";
       os << "<td>" << method_arguments (i->second.first, cls_obj, method_doc) << "</td>";
       os << "<td>" << replace_references (escape_xml (method_doc.brief_doc), cls_obj) << "</td>";
       os << "</tr>" << std::endl;
-
     }
-
   }
 
   if (any) {
@@ -1220,7 +1213,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
   row = 0;
   any = false;
 
-  for (std::multimap <std::string, std::pair<const gsi::MethodBase *, size_t> >::const_iterator i = mm.begin (); i != mm.end (); ++i, ++n) {
+  for (std::multimap<std::string, std::pair<const gsi::MethodBase *, size_t>>::const_iterator i = mm.begin (); i != mm.end (); ++i, ++n) {
 
     const gsi::MethodBase::MethodSynonym &syn = i->second.first->begin_synonyms () [i->second.second];
 
@@ -1233,7 +1226,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
       }
 
       DocumentationParser method_doc (i->second.first);
-      os << "<tr class=\"row" << (row % 2)  << "\">" << std::endl;
+      os << "<tr class=\"row" << (row % 2) << "\">" << std::endl;
       ++row;
       std::string attr = method_attributes (i->second.first, method_doc, true /*without static*/);
       if (! attr.empty ()) {
@@ -1246,9 +1239,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
       os << "<td>" << method_arguments (i->second.first, cls_obj, method_doc) << "</td>";
       os << "<td>" << replace_references (escape_xml (method_doc.brief_doc), cls_obj) << "</td>";
       os << "</tr>" << std::endl;
-
     }
-
   }
 
   if (any) {
@@ -1262,7 +1253,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
   n = 0;
   row = 0;
 
-  for (std::multimap <std::string, std::pair<const gsi::MethodBase *, size_t> >::const_iterator i = mm.begin (); i != mm.end (); ++i, ++n) {
+  for (std::multimap<std::string, std::pair<const gsi::MethodBase *, size_t>>::const_iterator i = mm.begin (); i != mm.end (); ++i, ++n) {
 
     const gsi::MethodBase::MethodSynonym &syn = i->second.first->begin_synonyms () [i->second.second];
 
@@ -1275,7 +1266,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
       }
 
       DocumentationParser method_doc (i->second.first);
-      os << "<tr class=\"row" << (row % 2)  << "\">" << std::endl;
+      os << "<tr class=\"row" << (row % 2) << "\">" << std::endl;
       ++row;
       std::string attr = method_attributes (i->second.first, method_doc, true /*without static*/);
       if (! attr.empty ()) {
@@ -1288,9 +1279,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
       os << "<td>" << method_arguments (i->second.first, cls_obj, method_doc) << "</td>";
       os << "<td>" << replace_references (escape_xml (method_doc.brief_doc), cls_obj) << "</td>";
       os << "</tr>" << std::endl;
-
     }
-
   }
 
   if (any) {
@@ -1304,7 +1293,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
   n = 0;
   row = 0;
 
-  for (std::multimap <std::string, std::pair<const gsi::MethodBase *, size_t> >::const_iterator i = mm.begin (); i != mm.end (); ++i, ++n) {
+  for (std::multimap<std::string, std::pair<const gsi::MethodBase *, size_t>>::const_iterator i = mm.begin (); i != mm.end (); ++i, ++n) {
 
     const gsi::MethodBase::MethodSynonym &syn = i->second.first->begin_synonyms () [i->second.second];
 
@@ -1317,7 +1306,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
       }
 
       DocumentationParser method_doc (i->second.first);
-      os << "<tr class=\"row" << (row % 2)  << "\">" << std::endl;
+      os << "<tr class=\"row" << (row % 2) << "\">" << std::endl;
       ++row;
       std::string attr = method_attributes (i->second.first, method_doc);
       if (! attr.empty ()) {
@@ -1332,9 +1321,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
       os << "<td>" << replace_references (escape_xml (method_doc.brief_doc), cls_obj) << "</td>";
       os << "</td>";
       os << "</tr>" << std::endl;
-
     }
-
   }
 
   if (any) {
@@ -1348,7 +1335,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
   n = 0;
   row = 0;
 
-  for (std::multimap <std::string, std::pair<const gsi::MethodBase *, size_t> >::const_iterator i = mm.begin (); i != mm.end (); ++i, ++n) {
+  for (std::multimap<std::string, std::pair<const gsi::MethodBase *, size_t>>::const_iterator i = mm.begin (); i != mm.end (); ++i, ++n) {
 
     const gsi::MethodBase::MethodSynonym &syn = i->second.first->begin_synonyms () [i->second.second];
 
@@ -1366,7 +1353,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
       }
 
       DocumentationParser method_doc (i->second.first);
-      os << "<tr class=\"row" << (row % 2)  << "\">" << std::endl;
+      os << "<tr class=\"row" << (row % 2) << "\">" << std::endl;
       ++row;
       std::string attr = method_attributes (i->second.first, method_doc, false, false);
       if (! attr.empty ()) {
@@ -1385,9 +1372,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
       }
       os << "</td>";
       os << "</tr>" << std::endl;
-
     }
-
   }
 
   if (any) {
@@ -1407,7 +1392,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
   int rowindex = -1;
   int sigindex = -1;
 
-  for (std::multimap <std::string, std::pair<const gsi::MethodBase *, size_t> >::const_iterator i = mm.begin (); i != mm.end (); ++i, ++n) {
+  for (std::multimap<std::string, std::pair<const gsi::MethodBase *, size_t>>::const_iterator i = mm.begin (); i != mm.end (); ++i, ++n) {
 
     const gsi::MethodBase::MethodSynonym &syn = i->second.first->begin_synonyms () [i->second.second];
 
@@ -1421,7 +1406,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
 
     if (i->first != prev_title) {
       int rows = 0;
-      for (std::multimap <std::string, std::pair<const gsi::MethodBase *, size_t> >::const_iterator j = i; j != mm.end () && j->first == i->first; ++j) {
+      for (std::multimap<std::string, std::pair<const gsi::MethodBase *, size_t>>::const_iterator j = i; j != mm.end () && j->first == i->first; ++j) {
         ++rows;
       }
       if (rows > 1) {
@@ -1439,7 +1424,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
 
     os << "<a name=\"method" << n << "\"/>"
        << "<a name=\"m_" << escape_xml (i->first) << "\"/>"
-       << "<keyword title=\"" << tl::to_string (QObject::tr ("API reference - Class")) << " " << escape_xml (cls) << ", " << tl::to_string (QObject::tr ("Method")) << " " << escape_xml (i->first) <<  "\" name=\"" << escape_xml (cls) << "#" << escape_xml (i->first) << "\"/>" << std::endl;
+       << "<keyword title=\"" << tl::to_string (QObject::tr ("API reference - Class")) << " " << escape_xml (cls) << ", " << tl::to_string (QObject::tr ("Method")) << " " << escape_xml (i->first) << "\" name=\"" << escape_xml (cls) << "#" << escape_xml (i->first) << "\"/>" << std::endl;
 
     os << "<p><b>";
     if (sigindex >= 0) {
@@ -1458,7 +1443,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
 
     if (! method_doc.params.empty () || ! method_doc.ret_val.empty ()) {
       os << "<table class=\"layout-table\">" << std::endl;
-      for (std::vector<std::pair <std::string, std::string> >::const_iterator p = method_doc.params.begin (); p != method_doc.params.end (); ++p) {
+      for (std::vector<std::pair<std::string, std::string>>::const_iterator p = method_doc.params.begin (); p != method_doc.params.end (); ++p) {
         os << "<tr><td><b>" << escape_xml (p->first) << "</b>:</td><td>" << replace_references (escape_xml (p->second), cls_obj) << "</td></tr>" << std::endl;
       }
       if (! method_doc.ret_val.empty ()) {
@@ -1479,7 +1464,6 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
       } else {
         os << "<p>" << tl::to_string (QObject::tr ("Use of this method is deprecated")) << "</p>" << std::endl;
       }
-
     }
 
     std::string dh = method_doc.doc;
@@ -1494,18 +1478,14 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
     }
 
     os << "</td></tr>";
-
   }
 
   os << "</table>";
 
   os << "</doc>" << std::endl;
   return os.str ();
-
 }
 
 static tl::RegisteredClass<lay::HelpProvider> gsi_help_provider (new GSIHelpProvider (), 1000);
 
 }
-
-

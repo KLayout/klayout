@@ -34,7 +34,8 @@
 
 #include <set>
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief Provides default flat implementations
@@ -315,7 +316,6 @@ protected:
   AsIfFlatRegion (const AsIfFlatRegion &other);
 
 private:
-
   mutable bool m_bbox_valid;
   mutable db::Box m_bbox;
 
@@ -326,4 +326,3 @@ private:
 }
 
 #endif
-

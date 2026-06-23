@@ -35,7 +35,7 @@
 #include "tlVector.h"
 #include "tlUtils.h"
 
-namespace db 
+namespace db
 {
 
 class Shapes;
@@ -56,7 +56,7 @@ class ArrayRepository;
  *  It allows selecting certain kind of shapes. The dereferecing operator
  *  returns a shape proxy object that can be used to access the actual shape.
  *  It can iterator over all shapes and over a region selected.
- *  If the iterator is constructed, it always points to the beginning of the 
+ *  If the iterator is constructed, it always points to the beginning of the
  *  list of shapes in the container or the first shape selected by the region.
  *  The iterator is incremented as usual with the ++ operator. The end of the
  *  sequence is tested with the at_end method.
@@ -102,78 +102,66 @@ public:
   typedef db::Shapes shapes_type;
   typedef std::set<properties_id_type> property_selector;
   typedef shape_type value_type;
-  typedef const shape_type *pointer; 
-  typedef shape_type reference;   //  operator* returns a value
+  typedef const shape_type *pointer;
+  typedef shape_type reference; //  operator* returns a value
   typedef std::forward_iterator_tag iterator_category;
   typedef void difference_type;
 
-  struct NoRegionTag { };
-  struct TouchingRegionTag { };
-  struct OverlappingRegionTag { };
+  struct NoRegionTag {
+  };
+  struct TouchingRegionTag {
+  };
+  struct OverlappingRegionTag {
+  };
 
-  enum region_mode
-  {
+  enum region_mode {
     None,
     Overlapping,
     Touching
   };
 
-  enum object_type 
-  {
-    Polygon                = 0,
-    PolygonRef             = 1,
-    PolygonPtrArray        = 2,
-    SimplePolygon          = 3,
-    SimplePolygonRef       = 4,
-    SimplePolygonPtrArray  = 5,
-    Edge                   = 6,
-    EdgePair               = 7,
-    Path                   = 8,
-    PathRef                = 9,
-    PathPtrArray           = 10,
-    Box                    = 11,
-    BoxArray               = 12,
-    ShortBox               = 13,
-    ShortBoxArray          = 14,
-    Text                   = 15,
-    TextRef                = 16,
-    TextPtrArray           = 17,
-    Point                  = 18,
-    UserObject             = 19,
-    Null                   = 20 //  must be last!
+  enum object_type {
+    Polygon = 0,
+    PolygonRef = 1,
+    PolygonPtrArray = 2,
+    SimplePolygon = 3,
+    SimplePolygonRef = 4,
+    SimplePolygonPtrArray = 5,
+    Edge = 6,
+    EdgePair = 7,
+    Path = 8,
+    PathRef = 9,
+    PathPtrArray = 10,
+    Box = 11,
+    BoxArray = 12,
+    ShortBox = 13,
+    ShortBoxArray = 14,
+    Text = 15,
+    TextRef = 16,
+    TextPtrArray = 17,
+    Point = 18,
+    UserObject = 19,
+    Null = 20 //  must be last!
   };
 
-  enum flags_type 
-  {
+  enum flags_type {
     //  These flags are a combination of all bits representing the
     //  object type (Bit 0 for Polygon and so on)
-    Polygons          = (1 << Polygon) 
-                      | (1 << PolygonRef) 
-                      | (1 << PolygonPtrArray) 
-                      | (1 << SimplePolygon) 
-                      | (1 << SimplePolygonRef) 
-                      | (1 << SimplePolygonPtrArray),
-    Edges             = (1 << Edge),
-    EdgePairs         = (1 << EdgePair),
-    Points            = (1 << Point),
-    Paths             = (1 << Path)
-                      | (1 << PathRef) 
-                      | (1 << PathPtrArray),
-    Boxes             = (1 << Box)
-                      | (1 << BoxArray)
-                      | (1 << ShortBox)
-                      | (1 << ShortBoxArray),
-    Texts             = (1 << Text) 
-                      | (1 << TextRef) 
-                      | (1 << TextPtrArray),
-    Regions           = Polygons | Paths | Boxes,   //  convertible to polygons
-    UserObjects       = (1 << UserObject),
-    Properties        = (1 << Null),
-    All               = (1 << Null) - 1,
+    Polygons = (1 << Polygon) | (1 << PolygonRef) | (1 << PolygonPtrArray) | (1 << SimplePolygon) | (1 << SimplePolygonRef) | (1 << SimplePolygonPtrArray),
+    Edges = (1 << Edge),
+    EdgePairs = (1 << EdgePair),
+    Points = (1 << Point),
+    Paths = (1 << Path) | (1 << PathRef) | (1 << PathPtrArray),
+    Boxes = (1 << Box) | (1 << BoxArray) | (1 << ShortBox) | (1 << ShortBoxArray),
+    Texts = (1 << Text) | (1 << TextRef) | (1 << TextPtrArray),
+    Regions = Polygons | Paths | Boxes, //  convertible to polygons
+    UserObjects = (1 << UserObject),
+    Properties = (1 << Null),
+    All = (1 << Null) - 1,
     AllWithProperties = (1 << (Null + 1)) - 1,
-    Nothing           = 0
+    Nothing = 0
   };
-    
+
   /**
    *  @brief The default constructor of the iterator
    */
@@ -200,8 +188,8 @@ public:
    *  @brief The region iterator
    *
    *  This constructor creates an iterator that iterates over all shapes of
-   *  the selected kind that interact with the given region with their bounding box. 
-   *  The kind of shape is selected by the "flags" argument which is an or-ed sum 
+   *  the selected kind that interact with the given region with their bounding box.
+   *  The kind of shape is selected by the "flags" argument which is an or-ed sum
    *  of flags_type constants. The region_mode argument can be either Overlapping
    *  or Touching. In the former case all shapes whose bounding box overlaps with
    *  the given region are selected. In the latter case all shapes whose bounding
@@ -229,9 +217,9 @@ public:
    */
   ShapeIterator &operator= (const ShapeIterator &d);
 
-  /** 
-   *  @brief Access the object 
-   * 
+  /**
+   *  @brief Access the object
+   *
    *  This method delivers a proxy object that can be copied but still points
    *  to the original objects. This must be taken under consideration if the
    *  container that is iterated over is destroyed: the shape object will then
@@ -244,10 +232,10 @@ public:
     return m_shape;
   }
 
-  /** 
+  /**
    *  @brief Access the object (see operator*)
    */
-  const shape_type *operator-> () const
+  const shape_type *operator->() const
   {
     return &m_shape;
   }
@@ -276,7 +264,7 @@ public:
   /**
    *  @brief Increment the iterator
    */
-  ShapeIterator &operator++ () 
+  ShapeIterator &operator++ ()
   {
     advance (1);
     return *this;
@@ -295,7 +283,7 @@ public:
   /**
    *  @brief Gets the quad ID
    *
-   *  The quad ID is a unique identifier for the current quad. This can be used to 
+   *  The quad ID is a unique identifier for the current quad. This can be used to
    *  detect whether the iterator entered a new quad and optimize the search in that case.
    */
   size_t quad_id () const
@@ -350,78 +338,83 @@ public:
   }
 
 private:
-  //  a helper union for the iter_size union 
+  //  a helper union for the iter_size union
   //  (basically computing the size required for all iterators for a certain shape/array type)
   template <class Shape>
-  class per_shape_iter_size {
+  class per_shape_iter_size
+  {
     union {
       //  stable layer iterators
-      char sz_n   [sizeof (typename db::layer<Shape, db::stable_layer_tag>::flat_iterator)];
-      char sz_np  [sizeof (typename db::layer< db::object_with_properties<Shape>, db::stable_layer_tag >::flat_iterator)];
-      char sz_t   [sizeof (typename db::layer<Shape, db::stable_layer_tag>::touching_iterator)];
-      char sz_tp  [sizeof (typename db::layer< db::object_with_properties<Shape>, db::stable_layer_tag >::touching_iterator)];
-      char sz_o   [sizeof (typename db::layer<Shape, db::stable_layer_tag>::overlapping_iterator)];
-      char sz_op  [sizeof (typename db::layer< db::object_with_properties<Shape>, db::stable_layer_tag >::overlapping_iterator)];
+      char sz_n [sizeof (typename db::layer<Shape, db::stable_layer_tag>::flat_iterator)];
+      char sz_np [sizeof (typename db::layer<db::object_with_properties<Shape>, db::stable_layer_tag>::flat_iterator)];
+      char sz_t [sizeof (typename db::layer<Shape, db::stable_layer_tag>::touching_iterator)];
+      char sz_tp [sizeof (typename db::layer<db::object_with_properties<Shape>, db::stable_layer_tag>::touching_iterator)];
+      char sz_o [sizeof (typename db::layer<Shape, db::stable_layer_tag>::overlapping_iterator)];
+      char sz_op [sizeof (typename db::layer<db::object_with_properties<Shape>, db::stable_layer_tag>::overlapping_iterator)];
       //  unstable layer iterators
-      char sz_nu  [sizeof (typename db::layer<Shape, db::unstable_layer_tag>::iterator)];
-      char sz_npu [sizeof (typename db::layer< db::object_with_properties<Shape>, db::unstable_layer_tag >::iterator)];
-      char sz_tu  [sizeof (typename db::layer<Shape, db::unstable_layer_tag>::touching_iterator)];
-      char sz_tpu [sizeof (typename db::layer< db::object_with_properties<Shape>, db::unstable_layer_tag >::touching_iterator)];
-      char sz_ou  [sizeof (typename db::layer<Shape, db::unstable_layer_tag>::overlapping_iterator)];
-      char sz_opu [sizeof (typename db::layer< db::object_with_properties<Shape>, db::unstable_layer_tag >::overlapping_iterator)];
+      char sz_nu [sizeof (typename db::layer<Shape, db::unstable_layer_tag>::iterator)];
+      char sz_npu [sizeof (typename db::layer<db::object_with_properties<Shape>, db::unstable_layer_tag>::iterator)];
+      char sz_tu [sizeof (typename db::layer<Shape, db::unstable_layer_tag>::touching_iterator)];
+      char sz_tpu [sizeof (typename db::layer<db::object_with_properties<Shape>, db::unstable_layer_tag>::touching_iterator)];
+      char sz_ou [sizeof (typename db::layer<Shape, db::unstable_layer_tag>::overlapping_iterator)];
+      char sz_opu [sizeof (typename db::layer<db::object_with_properties<Shape>, db::unstable_layer_tag>::overlapping_iterator)];
     } all_iterators;
   };
-  
+
   //  this union is simply there to determine the maximum size required for all
   //  possible iterators.
   union iter_size {
-    char sz1  [sizeof (per_shape_iter_size <polygon_type>)];
-    char sz2  [sizeof (per_shape_iter_size <polygon_ref_type>)];
-    char sz3  [sizeof (per_shape_iter_size <polygon_ptr_array_type>)];
-    char sz4  [sizeof (per_shape_iter_size <simple_polygon_type>)];
-    char sz5  [sizeof (per_shape_iter_size <simple_polygon_ref_type>)];
-    char sz6  [sizeof (per_shape_iter_size <simple_polygon_ptr_array_type>)];
-    char sz7  [sizeof (per_shape_iter_size <path_type>)];
-    char sz8  [sizeof (per_shape_iter_size <path_ref_type>)];
-    char sz9  [sizeof (per_shape_iter_size <path_ptr_array_type>)];
-    char sz10 [sizeof (per_shape_iter_size <edge_type>)];
-    char sz11 [sizeof (per_shape_iter_size <edge_pair_type>)];
-    char sz12 [sizeof (per_shape_iter_size <box_type>)];
-    char sz13 [sizeof (per_shape_iter_size <box_array_type>)];
-    char sz14 [sizeof (per_shape_iter_size <short_box_type>)];
-    char sz15 [sizeof (per_shape_iter_size <short_box_array_type>)];
-    char sz16 [sizeof (per_shape_iter_size <text_type>)];
-    char sz17 [sizeof (per_shape_iter_size <text_ref_type>)];
-    char sz18 [sizeof (per_shape_iter_size <text_ptr_array_type>)];
-    char sz19 [sizeof (per_shape_iter_size <user_object_type>)];
-    char sz20 [sizeof (per_shape_iter_size <point_type>)];
+    char sz1 [sizeof (per_shape_iter_size<polygon_type>)];
+    char sz2 [sizeof (per_shape_iter_size<polygon_ref_type>)];
+    char sz3 [sizeof (per_shape_iter_size<polygon_ptr_array_type>)];
+    char sz4 [sizeof (per_shape_iter_size<simple_polygon_type>)];
+    char sz5 [sizeof (per_shape_iter_size<simple_polygon_ref_type>)];
+    char sz6 [sizeof (per_shape_iter_size<simple_polygon_ptr_array_type>)];
+    char sz7 [sizeof (per_shape_iter_size<path_type>)];
+    char sz8 [sizeof (per_shape_iter_size<path_ref_type>)];
+    char sz9 [sizeof (per_shape_iter_size<path_ptr_array_type>)];
+    char sz10 [sizeof (per_shape_iter_size<edge_type>)];
+    char sz11 [sizeof (per_shape_iter_size<edge_pair_type>)];
+    char sz12 [sizeof (per_shape_iter_size<box_type>)];
+    char sz13 [sizeof (per_shape_iter_size<box_array_type>)];
+    char sz14 [sizeof (per_shape_iter_size<short_box_type>)];
+    char sz15 [sizeof (per_shape_iter_size<short_box_array_type>)];
+    char sz16 [sizeof (per_shape_iter_size<text_type>)];
+    char sz17 [sizeof (per_shape_iter_size<text_ref_type>)];
+    char sz18 [sizeof (per_shape_iter_size<text_ptr_array_type>)];
+    char sz19 [sizeof (per_shape_iter_size<user_object_type>)];
+    char sz20 [sizeof (per_shape_iter_size<point_type>)];
   };
 
   //  this union is simply there to determine the maximum size required for all
   //  array iterators.
   union array_iter_size {
-    char ai1  [sizeof (polygon_ptr_array_iterator_type)];
-    char ai2  [sizeof (simple_polygon_ptr_array_iterator_type)];
-    char ai3  [sizeof (path_ptr_array_iterator_type)];
-    char ai4  [sizeof (text_ptr_array_iterator_type)];
-    char ai5  [sizeof (box_array_iterator_type)];
-    char ai6  [sizeof (short_box_array_iterator_type)];
+    char ai1 [sizeof (polygon_ptr_array_iterator_type)];
+    char ai2 [sizeof (simple_polygon_ptr_array_iterator_type)];
+    char ai3 [sizeof (path_ptr_array_iterator_type)];
+    char ai4 [sizeof (text_ptr_array_iterator_type)];
+    char ai5 [sizeof (box_array_iterator_type)];
+    char ai6 [sizeof (short_box_array_iterator_type)];
   };
 
   //  This member must be first to guarantee alignment on 64bit systems:
   //  The strange construction and the local dummy class helps to guarantee alignment of the "iter" space
   union {
-    struct _align_helper { long l; } _ah;
+    struct _align_helper {
+      long l;
+    } _ah;
     char iter [sizeof (iter_size)];
   } m_d;
 
   //  This member must be first to guarantee alignment on 64bit systems:
   //  The strange construction and the local dummy class helps to guarantee alignment of the "iter" space
   union {
-    struct _align_helper { long l; } _ah;
+    struct _align_helper {
+      long l;
+    } _ah;
     char iter [sizeof (array_iter_size)];
   } m_ad;
-  
+
   bool m_valid, m_with_props;
   region_mode m_region_mode;
   object_type m_type;
@@ -468,15 +461,15 @@ private:
 /**
  *  @brief A helper class for shape generalization
  *
- *  This class serves first as a RTTI token for the 
- *  various shape-specific layer implementations and 
+ *  This class serves first as a RTTI token for the
+ *  various shape-specific layer implementations and
  *  provides some common methods though it's interface
  */
 
-class DB_PUBLIC LayerBase 
+class DB_PUBLIC LayerBase
 {
 public:
-  typedef tl::func_delegate_base <db::properties_id_type> pm_delegate_type;
+  typedef tl::func_delegate_base<db::properties_id_type> pm_delegate_type;
   typedef db::Box box_type;
   typedef db::Coord coord_type;
 
@@ -512,10 +505,10 @@ public:
 
 /**
  *  @brief A "shapes" collection
- *  
+ *
  *  A shapes collection is a collection of geometrical objects.
  *  The implementation is based on a set of layers of different
- *  shape types. 
+ *  shape types.
  *  The general idea is that is rarely required to operate with
  *  different shape types at once. Therefore it is practical to
  *  request only a single shape type at once. This is done through
@@ -523,7 +516,7 @@ public:
  *  a certain shape type.
  */
 
-class DB_PUBLIC Shapes 
+class DB_PUBLIC Shapes
   : public db::Object
 {
 public:
@@ -571,8 +564,8 @@ public:
    *  Since such containers are usually used in a layout context, they are created according to the
    *  editable settings of the database by default.
    */
-  Shapes (db::Manager *manager, db::Cell *cell, bool editable) 
-    : db::Object (manager), 
+  Shapes (db::Manager *manager, db::Cell *cell, bool editable)
+    : db::Object (manager),
       mp_cell (cell)
   {
     set_dirty (false);
@@ -582,7 +575,7 @@ public:
   /**
    *  @brief Dtor: clear all ..
    */
-  ~Shapes () 
+  ~Shapes ()
   {
     clear ();
     mp_cell = 0;
@@ -592,16 +585,16 @@ public:
    *  @brief Copy ctor
    *
    *  HINT: This method can duplicate shape containers from one layout to another.
-   *  The current implementation does not translate property Id's. 
+   *  The current implementation does not translate property Id's.
    *  It is mainly intended for 1-to-1 copies of layouts where the whole
    *  property repository is copied.
-   *  
+   *
    *  NOTE: the copy ctor will register the new object under the same
    *  Manager than the source object.
    */
-  Shapes (const Shapes &d) 
-    : db::Object (d), 
-      mp_cell (d.mp_cell)  //  implicitly copies "dirty" and "editable" 
+  Shapes (const Shapes &d)
+    : db::Object (d),
+      mp_cell (d.mp_cell) //  implicitly copies "dirty" and "editable"
   {
     operator= (d);
   }
@@ -610,7 +603,7 @@ public:
    *  @brief Assignment operator
    *
    *  HINT: This method can duplicate shape containers from one layout to another.
-   *  The current implementation does not translate property Id's. 
+   *  The current implementation does not translate property Id's.
    *  It is mainly intended for 1-to-1 copies of layouts where the whole
    *  property repository is copied.
    */
@@ -622,7 +615,7 @@ public:
    *  This method insert all shapes from the given shape container.
    *
    *  HINT: This method can duplicate shape containers from one layout to another.
-   *  The current implementation does not translate property Id's. 
+   *  The current implementation does not translate property Id's.
    *  It is mainly intended for 1-to-1 copies of layouts where the whole
    *  property repository is copied.
    */
@@ -644,7 +637,7 @@ public:
    *  @brief Assignment operator with transformation
    *
    *  HINT: This method can duplicate shape containers from one layout to another.
-   *  The current implementation does not translate property Id's. 
+   *  The current implementation does not translate property Id's.
    *  It is mainly intended for 1-to-1 copies of layouts where the whole
    *  property repository is copied.
    */
@@ -687,7 +680,7 @@ public:
    *  This method insert all shapes from the given shape container using the specified transformation.
    *
    *  HINT: This method can duplicate shape containers from one layout to another.
-   *  The current implementation does not translate property Id's. 
+   *  The current implementation does not translate property Id's.
    *  It is mainly intended for 1-to-1 copies of layouts where the whole
    *  property repository is copied.
    */
@@ -720,7 +713,6 @@ public:
           (*l)->transform_into (this, trans, shape_repository (), array_repository ());
         }
       }
-
     }
   }
 
@@ -748,7 +740,7 @@ public:
 
     } else {
 
-      tl::func_delegate <PropIdMap, db::properties_id_type> pm_delegate (pm);
+      tl::func_delegate<PropIdMap, db::properties_id_type> pm_delegate (pm);
 
       if (layout () == 0) {
         //  deference and transform into this
@@ -761,7 +753,6 @@ public:
           (*l)->transform_into (this, trans, shape_repository (), array_repository (), pm_delegate);
         }
       }
-
     }
   }
 
@@ -789,7 +780,7 @@ public:
 
     } else {
 
-      tl::func_delegate <PropIdMap, db::properties_id_type> pm_delegate (pm);
+      tl::func_delegate<PropIdMap, db::properties_id_type> pm_delegate (pm);
 
       if (layout () == 0) {
         //  deference and transform into this
@@ -802,7 +793,6 @@ public:
           (*l)->translate_into (this, shape_repository (), array_repository (), pm_delegate);
         }
       }
-
     }
   }
 
@@ -821,7 +811,7 @@ public:
    *  state.
    *
    *  @param sh The shape to insert (copy)
-   *  
+   *
    *  @return A reference to the object created
    */
   template <class Sh>
@@ -835,7 +825,7 @@ public:
         db::layer_op<Sh, db::unstable_layer_tag>::queue_or_append (manager (), this, true /*insert*/, sh);
       }
     }
-    invalidate_state ();  //  HINT: must come before the change is done!
+    invalidate_state (); //  HINT: must come before the change is done!
     if (is_editable ()) {
       return shape_type (this, get_layer<Sh, db::stable_layer_tag> ().insert (sh));
     } else {
@@ -875,9 +865,8 @@ public:
         check_is_editable_for_undo_redo ();
         db::layer_op<db::array<Obj, Trans>, db::unstable_layer_tag>::queue_or_append (manager (), this, true /*insert*/, arr);
       }
-      invalidate_state ();  //  HINT: must come before the change is done!
+      invalidate_state (); //  HINT: must come before the change is done!
       return shape_type (this, *get_layer<db::array<Obj, Trans>, db::unstable_layer_tag> ().insert (arr));
-
     }
   }
 
@@ -895,7 +884,7 @@ public:
    *  @return The reference to the object inserted - null in editable mode
    */
   template <class Obj, class Trans>
-  shape_type insert (const db::object_with_properties< db::array<Obj, Trans> > &arr)
+  shape_type insert (const db::object_with_properties<db::array<Obj, Trans>> &arr)
   {
     if (is_editable ()) {
 
@@ -911,11 +900,10 @@ public:
       //  insert the array as a whole in non-editable mode
       if (manager () && manager ()->transacting ()) {
         check_is_editable_for_undo_redo ();
-        db::layer_op< db::object_with_properties< db::array<Obj, Trans> >, db::unstable_layer_tag>::queue_or_append (manager (), this, true /*insert*/, arr);
+        db::layer_op<db::object_with_properties<db::array<Obj, Trans>>, db::unstable_layer_tag>::queue_or_append (manager (), this, true /*insert*/, arr);
       }
-      invalidate_state ();  //  HINT: must come before the change is done!
-      return shape_type (this, *get_layer< db::object_with_properties< db::array<Obj, Trans> >, db::unstable_layer_tag> ().insert (arr));
-
+      invalidate_state (); //  HINT: must come before the change is done!
+      return shape_type (this, *get_layer<db::object_with_properties<db::array<Obj, Trans>>, db::unstable_layer_tag> ().insert (arr));
     }
   }
 
@@ -929,7 +917,7 @@ public:
   template <class Iter>
   void insert (Iter from, Iter to)
   {
-    typedef typename std::iterator_traits <Iter>::value_type value_type;
+    typedef typename std::iterator_traits<Iter>::value_type value_type;
     if (manager () && manager ()->transacting ()) {
       check_is_editable_for_undo_redo ();
       if (is_editable ()) {
@@ -957,8 +945,8 @@ public:
   shape_type insert (const shape_type &shape)
   {
     tl::ident_map<db::properties_id_type> pm;
-    tl::func_delegate <tl::ident_map<db::properties_id_type>, db::properties_id_type> pm_delegate (pm);
-    db::unit_trans <coord_type> trans;
+    tl::func_delegate<tl::ident_map<db::properties_id_type>, db::properties_id_type> pm_delegate (pm);
+    db::unit_trans<coord_type> trans;
     return do_insert (shape, trans, pm_delegate);
   }
 
@@ -974,8 +962,8 @@ public:
   template <class PropIdMap>
   shape_type insert (const shape_type &shape, PropIdMap &pm)
   {
-    tl::func_delegate <PropIdMap, db::properties_id_type> pm_delegate (pm);
-    db::unit_trans <coord_type> trans;
+    tl::func_delegate<PropIdMap, db::properties_id_type> pm_delegate (pm);
+    db::unit_trans<coord_type> trans;
     return do_insert (shape, trans, pm_delegate);
   }
 
@@ -992,7 +980,7 @@ public:
   shape_type insert_transformed (const shape_type &shape, const Trans &trans)
   {
     tl::ident_map<db::properties_id_type> pm;
-    tl::func_delegate <tl::ident_map<db::properties_id_type>, db::properties_id_type> pm_delegate (pm);
+    tl::func_delegate<tl::ident_map<db::properties_id_type>, db::properties_id_type> pm_delegate (pm);
     return do_insert (shape, trans, pm_delegate);
   }
 
@@ -1009,7 +997,7 @@ public:
   template <class Trans, class PropIdMap>
   shape_type insert (const shape_type &shape, const Trans &trans, PropIdMap &pm)
   {
-    tl::func_delegate <PropIdMap, db::properties_id_type> pm_delegate (pm);
+    tl::func_delegate<PropIdMap, db::properties_id_type> pm_delegate (pm);
     return do_insert (shape, trans, pm_delegate);
   }
 
@@ -1019,7 +1007,7 @@ public:
    *  @param tag The shape type's tag (i.e. db::Polygon::tag)
    *  @param n The number of elements to reserve
    */
-  template <class Tag> 
+  template <class Tag>
   void reserve (Tag /*tag*/, size_t n)
   {
     if (is_editable ()) {
@@ -1030,14 +1018,14 @@ public:
   }
 
   /**
-   *  @brief Erase an element 
+   *  @brief Erase an element
    *
    *  Erases a shape at the given position
    *
    *  @param tag The shape type's tag (i.e. db::Polygon::tag)
    *  @param pos The position of the shape to erase
    */
-  template <class Tag, class StableTag> 
+  template <class Tag, class StableTag>
   void erase (Tag /*tag*/, StableTag /*stable_tag*/, typename db::layer<typename Tag::object_type, StableTag>::iterator pos)
   {
     if (! is_editable ()) {
@@ -1047,16 +1035,16 @@ public:
       check_is_editable_for_undo_redo ();
       db::layer_op<typename Tag::object_type, StableTag>::queue_or_append (manager (), this, false /*not insert*/, *pos);
     }
-    invalidate_state ();  //  HINT: must come before the change is done!
+    invalidate_state (); //  HINT: must come before the change is done!
     get_layer<typename Tag::object_type, StableTag> ().erase (pos);
   }
 
   /**
-   *  @brief Check, if the given shape is valid 
+   *  @brief Check, if the given shape is valid
    *
-   *  Returns true, if the given shape is valid. It is not valid, if it has been 
-   *  deleted already. However, it may happen, that the shape memory has been 
-   *  reused already. Therefore this method can safely be used only if nothing 
+   *  Returns true, if the given shape is valid. It is not valid, if it has been
+   *  deleted already. However, it may happen, that the shape memory has been
+   *  reused already. Therefore this method can safely be used only if nothing
    *  has been inserted into this container in between.
    *  This method can only be used in editable mode.
    *
@@ -1091,7 +1079,7 @@ public:
   void erase_shapes (const std::vector<shape_type> &shapes);
 
   /**
-   *  @brief Erase an element 
+   *  @brief Erase an element
    *
    *  Erases a shapes at the given positions [from,to)
    *  This method is only allowed in editable mode.
@@ -1100,9 +1088,9 @@ public:
    *  @param from The first position of the shapes to erase
    *  @param to The past-end position of the shapes to erase
    */
-  template <class Tag, class StableTag> 
+  template <class Tag, class StableTag>
   void erase (Tag /*tag*/, StableTag /*stable_tag*/, typename db::layer<typename Tag::object_type, StableTag>::iterator from,
-                                                     typename db::layer<typename Tag::object_type, StableTag>::iterator to)
+              typename db::layer<typename Tag::object_type, StableTag>::iterator to)
   {
     if (! is_editable ()) {
       throw tl::Exception (tl::to_string (tr ("Function 'erase' is permitted only in editable mode")));
@@ -1111,7 +1099,7 @@ public:
       check_is_editable_for_undo_redo ();
       db::layer_op<typename Tag::object_type, StableTag>::queue_or_append (manager (), this, false /*not insert*/, from, to);
     }
-    invalidate_state ();  //  HINT: must come before the change is done!
+    invalidate_state (); //  HINT: must come before the change is done!
     get_layer<typename Tag::object_type, StableTag> ().erase (from, to);
   }
 
@@ -1138,14 +1126,14 @@ public:
       check_is_editable_for_undo_redo ();
       db::layer_op<typename Tag::object_type, StableTag>::queue_or_append (manager (), this, false /*not insert*/, first, last, true /*dummy*/);
     }
-    invalidate_state ();  //  HINT: must come before the change is done!
+    invalidate_state (); //  HINT: must come before the change is done!
     get_layer<typename Tag::object_type, StableTag> ().erase_positions (first, last);
   }
 
   /**
-   *  @brief Replace the properties Id of a shape 
+   *  @brief Replace the properties Id of a shape
    *
-   *  The properties Id can only be replaced, if the underlying shape is 
+   *  The properties Id can only be replaced, if the underlying shape is
    *  of type object_with_properties<X>.
    *  This method is only allowed in editable mode.
    *
@@ -1171,11 +1159,11 @@ public:
    *  Replaces the shape pointed to by the given shape reference by the given shape.
    *  It is not possible to replace an array member by something else currently.
    *
-   *  If the original shape has a property, just the basic shape is replaced. The property id is 
+   *  If the original shape has a property, just the basic shape is replaced. The property id is
    *  not touched.
    *
    *  @param ref The shape reference which to replace the shape
-   *  @param sh The shape to replace 
+   *  @param sh The shape to replace
    *  @return The reference to the new object
    */
   template <class Sh>
@@ -1186,12 +1174,12 @@ public:
    *
    *  Replaces the shape pointed to by the given shape reference by the given shape with properties.
    *  It is not possible to replace an array member by something else currently.
-   *  If the shape has a property, just the basic shape is replaced. The property id is 
+   *  If the shape has a property, just the basic shape is replaced. The property id is
    *  not touched.
    *  This method is only allowed in editable mode.
    *
    *  @param ref The shape reference which to replace the shape
-   *  @param sh The shape to replace 
+   *  @param sh The shape to replace
    *  @return The reference to the new object
    */
   template <class Sh>
@@ -1208,7 +1196,7 @@ public:
    *  Replaces the shape pointed to by the given shape reference by the one transformed with the
    *  given transformation.
    *  It is not possible to transform an array member by something else currently.
-   *  If the shape has a property, just the basic shape is replaced. The property id is 
+   *  If the shape has a property, just the basic shape is replaced. The property id is
    *  not touched.
    *  This method is only allowed in editable mode.
    *
@@ -1235,7 +1223,7 @@ public:
   void reset_bbox_dirty ();
 
   /**
-   *  @brief Retrieve the bbox 
+   *  @brief Retrieve the bbox
    *
    *  Retrieving the bbox might required an update_bbox
    *  before the bbox is valid. It will assert if the bbox
@@ -1266,7 +1254,7 @@ public:
   /**
    *  @brief Report the type mask of the objects stored herein
    *
-   *  The type mask is composed of the bits that are passed to the 
+   *  The type mask is composed of the bits that are passed to the
    *  ShapeIterator to deliver the respective elements.
    */
   unsigned int type_mask () const
@@ -1321,8 +1309,8 @@ public:
   /**
    *  @brief Report the shape count for a certain type
    */
-  template <class Tag, class StableTag> 
-  size_t size (Tag /*tag*/, StableTag /*stable_tag*/) const 
+  template <class Tag, class StableTag>
+  size_t size (Tag /*tag*/, StableTag /*stable_tag*/) const
   {
     return get_layer<typename Tag::object_type, StableTag> ().size ();
   }
@@ -1331,18 +1319,18 @@ public:
    *  @brief Deliver the flat iterator (see box_tree::flat_iterator for a description)
    *
    *  @param tag The shape type's tag (i.e. db::Polygon::tag)
-   *  
-   *  @return The flat iterator 
+   *
+   *  @return The flat iterator
    */
-  template <class Tag, class StableTag> 
-  typename db::layer<typename Tag::object_type, StableTag>::flat_iterator begin_flat (Tag /*tag*/, StableTag /*stable_tag*/) const 
+  template <class Tag, class StableTag>
+  typename db::layer<typename Tag::object_type, StableTag>::flat_iterator begin_flat (Tag /*tag*/, StableTag /*stable_tag*/) const
   {
-    //  ensure that the box tree is established for stable shape containers in editable mode 
-    //  (in this case, the iterator uses the flat_iterator which accesses the elements through the sorted 
+    //  ensure that the box tree is established for stable shape containers in editable mode
+    //  (in this case, the iterator uses the flat_iterator which accesses the elements through the sorted
     //  elements table which is more stable).
     const db::layer<typename Tag::object_type, StableTag> &l = layer<typename Tag::object_type, StableTag> ();
     if (is_editable ()) {
-      const_cast <db::layer<typename Tag::object_type, StableTag> &> (l).sort ();
+      const_cast<db::layer<typename Tag::object_type, StableTag> &> (l).sort ();
     }
     return l.begin_flat ();
   }
@@ -1351,15 +1339,15 @@ public:
    *  @brief Do a region search for a certain shape type in "touching" mode
    *
    *  @param tag The shape type's tag (i.e. db::Polygon::tag)
-   *  
-   *  @return The region iterator 
+   *
+   *  @return The region iterator
    */
-  template <class Tag, class StableTag> 
-  typename db::layer<typename Tag::object_type, StableTag>::touching_iterator begin_touching (const box_type &b, Tag /*tag*/, StableTag /*stable_tag*/) const 
+  template <class Tag, class StableTag>
+  typename db::layer<typename Tag::object_type, StableTag>::touching_iterator begin_touching (const box_type &b, Tag /*tag*/, StableTag /*stable_tag*/) const
   {
     //  ensure that the box tree is established
     const db::layer<typename Tag::object_type, StableTag> &l = layer<typename Tag::object_type, StableTag> ();
-    const_cast <db::layer<typename Tag::object_type, StableTag> &> (l).sort ();
+    const_cast<db::layer<typename Tag::object_type, StableTag> &> (l).sort ();
     return l.begin_touching (b);
   }
 
@@ -1367,15 +1355,15 @@ public:
    *  @brief Do a region search for a certain shape type in "overlapping" mode
    *
    *  @param tag The shape type's tag (i.e. db::Polygon::tag)
-   *  
-   *  @return The region iterator 
+   *
+   *  @return The region iterator
    */
-  template <class Tag, class StableTag> 
-  typename db::layer<typename Tag::object_type, StableTag>::overlapping_iterator begin_overlapping (const box_type &b, Tag /*tag*/, StableTag /*stable_tag*/) const 
+  template <class Tag, class StableTag>
+  typename db::layer<typename Tag::object_type, StableTag>::overlapping_iterator begin_overlapping (const box_type &b, Tag /*tag*/, StableTag /*stable_tag*/) const
   {
     //  ensure that the box tree is established
     const db::layer<typename Tag::object_type, StableTag> &l = layer<typename Tag::object_type, StableTag> ();
-    const_cast <db::layer<typename Tag::object_type, StableTag> &> (l).sort ();
+    const_cast<db::layer<typename Tag::object_type, StableTag> &> (l).sort ();
     return l.begin_overlapping (b);
   }
 
@@ -1383,10 +1371,10 @@ public:
    *  @brief begin iterator of all elements of a certain shape type
    *
    *  @param tag The shape type's tag (i.e. db::Polygon::tag)
-   *  
+   *
    *  @return The first position of the shapes of the requested type
    */
-  template <class Tag, class StableTag> 
+  template <class Tag, class StableTag>
   typename db::layer<typename Tag::object_type, StableTag>::iterator begin (Tag /*tag*/, StableTag /*stable_tag*/) const
   {
     return get_layer<typename Tag::object_type, StableTag> ().begin ();
@@ -1396,31 +1384,31 @@ public:
    *  @brief end iterator of all elements of a certain shape type
    *
    *  @param tag The shape type's tag (i.e. db::Polygon::tag)
-   *  
+   *
    *  @return The post-end position of the shapes of the requested type
    */
-  template <class Tag, class StableTag> 
+  template <class Tag, class StableTag>
   typename db::layer<typename Tag::object_type, StableTag>::iterator end (Tag /*tag*/, StableTag /*stable_tag*/) const
   {
     return get_layer<typename Tag::object_type, StableTag> ().end ();
   }
 
   /**
-   *  @brief begin iterator of all elements 
+   *  @brief begin iterator of all elements
    *
    *  @param flags The flags of shapes to query (see db::shape documentation)
    *  @param prop_sel A property selector (a set of property set ids)
    *  @param inv_prop_sel true, if prop_sel should select all ids that should not be iterated
-   *  
+   *
    *  @return The generic iterator
    */
   shape_iterator begin (unsigned int flags, const shape_iterator::property_selector *prop_sel = 0, bool inv_prop_sel = false) const
   {
-    //  ensure that the box tree is established for stable shape containers in editable mode 
-    //  (in this case, the iterator uses the flat_iterator which accesses the elements through the sorted 
+    //  ensure that the box tree is established for stable shape containers in editable mode
+    //  (in this case, the iterator uses the flat_iterator which accesses the elements through the sorted
     //  elements table which is more stable).
     if (is_editable ()) {
-      (const_cast <Shapes *> (this))->sort ();
+      (const_cast<Shapes *> (this))->sort ();
     }
     flags &= ((~shape_iterator::All) | type_mask ());
     return shape_iterator (*this, flags, prop_sel, inv_prop_sel);
@@ -1433,13 +1421,13 @@ public:
    *  @param flags The flags of shapes to query (see db::shape documentation)
    *  @param prop_sel A property selector (a set of property set ids)
    *  @param inv_prop_sel true, if prop_sel should select all ids that should not be iterated
-   *  
+   *
    *  @return The generic iterator
    */
   shape_iterator begin_touching (const box_type &box, unsigned int flags, const shape_iterator::property_selector *prop_sel = 0, bool inv_prop_sel = false) const
   {
     //  ensure that the box tree is established
-    (const_cast <Shapes *> (this))->sort ();
+    (const_cast<Shapes *> (this))->sort ();
     flags &= ((~shape_iterator::All) | type_mask ());
     return shape_iterator (*this, box, shape_iterator::Touching, flags, prop_sel, inv_prop_sel);
   }
@@ -1451,13 +1439,13 @@ public:
    *  @param flags The flags of shapes to query (see db::shape documentation)
    *  @param prop_sel A property selector (a set of property set ids)
    *  @param inv_prop_sel true, if prop_sel should select all ids that should not be iterated
-   *  
+   *
    *  @return The generic iterator
    */
   shape_iterator begin_overlapping (const box_type &box, unsigned int flags, const shape_iterator::property_selector *prop_sel = 0, bool inv_prop_sel = false) const
   {
     //  ensure that the box tree is established
-    (const_cast <Shapes *> (this))->sort ();
+    (const_cast<Shapes *> (this))->sort ();
     flags &= ((~shape_iterator::All) | type_mask ());
     return shape_iterator (*this, box, shape_iterator::Overlapping, flags, prop_sel, inv_prop_sel);
   }
@@ -1466,10 +1454,10 @@ public:
    *  @brief find a given shape (exactly)
    *
    *  @param s The shape to find
-   *  
+   *
    *  @return end(Sh::tag) if the shape was not found, the position otherwise
    */
-  template <class Sh, class StableTag> 
+  template <class Sh, class StableTag>
   typename db::layer<Sh, StableTag>::iterator find (const Sh &s) const
   {
     return get_layer<Sh, StableTag> ().find (s);
@@ -1479,7 +1467,7 @@ public:
    *  @brief find a given shape (exactly)
    *
    *  @param s The shape to find (maybe a reference to a shape in a different container)
-   *  
+   *
    *  @return The reference to the shape or a null reference if it is not found
    */
   shape_type find (const shape_type &s) const;
@@ -1505,7 +1493,7 @@ public:
    *
    *  This pointer can be 0 if the shapes container is a standalone container
    */
-  db::Cell *cell () const 
+  db::Cell *cell () const
   {
     return (db::Cell *) (size_t (mp_cell) & ~3);
   }
@@ -1541,7 +1529,7 @@ public:
    */
   void redo (db::Op *op);
 
-  /** 
+  /**
    *  @brief Implementation of the undo method
    */
   void undo (db::Op *op);
@@ -1556,7 +1544,7 @@ private:
   friend class FullLayerOp;
 
   tl::vector<LayerBase *> m_layers;
-  db::Cell *mp_cell;  //  HINT: contains "dirty" in bit 0 and "editable" in bit 1
+  db::Cell *mp_cell; //  HINT: contains "dirty" in bit 0 and "editable" in bit 1
 
   void invalidate_state ();
   void invalidate_prop_ids ();
@@ -1573,51 +1561,51 @@ private:
   db::GenericRepository &shape_repository () const;
 
   //  get the array repository associated with this container
-  db::ArrayRepository &array_repository () const; 
+  db::ArrayRepository &array_repository () const;
 
   //  set dirty flag in mp_cell
-  void set_dirty (bool d) 
+  void set_dirty (bool d)
   {
     mp_cell = (db::Cell *) ((size_t (mp_cell) & ~1) | (d ? 1 : 0));
   }
 
   //  set editable flag in mp_cell
-  void set_editable (bool e) 
+  void set_editable (bool e)
   {
     mp_cell = (db::Cell *) ((size_t (mp_cell) & ~2) | (e ? 2 : 0));
   }
 
-  /** 
+  /**
    *  @brief (Internal) Insert from a generic pointer
    */
   template <class Tag, class PropIdMap>
   shape_type insert_array_by_tag (Tag tag, const shape_type &shape, repository_type &rep, PropIdMap &pm);
 
-  /** 
+  /**
    *  @brief (Internal) Insert from a generic pointer
    */
   template <class Tag, class PropIdMap>
   shape_type insert_by_tag (Tag tag, const shape_type &shape, repository_type &rep, PropIdMap &pm);
 
-  /** 
+  /**
    *  @brief (Internal) Insert from a generic pointer
    */
   template <class Tag, class PropIdMap>
   shape_type insert_by_tag (Tag tag, const shape_type &shape, PropIdMap &pm);
 
-  /** 
+  /**
    *  @brief (Internal) Erase by generic pointer
    */
   template <class Tag>
   bool is_valid_shape_by_tag (Tag tag, const shape_type &shape) const;
 
-  /** 
+  /**
    *  @brief (Internal) Erase by generic pointer
    */
   template <class Tag>
   shape_type find_shape_by_tag (Tag tag, const shape_type &shape) const;
 
-  /** 
+  /**
    *  @brief (Internal) Erase by generic pointer
    */
   template <class Tag>
@@ -1626,7 +1614,7 @@ private:
   template <class Tag, class StableTag>
   void erase_shape_by_tag_ws (Tag tag, StableTag stable_tag, const shape_type &shape);
 
-  /** 
+  /**
    *  @brief (Internal) Erase by generic pointer set
    */
   template <class Tag>
@@ -1637,10 +1625,10 @@ private:
 
   //  The insert delegate
   template <class Trans>
-  shape_type do_insert (const shape_type &shape, const Trans &trans, tl::func_delegate_base <db::properties_id_type> &pm);
+  shape_type do_insert (const shape_type &shape, const Trans &trans, tl::func_delegate_base<db::properties_id_type> &pm);
 
   //  The insert delegate, specialization for unit_trans
-  shape_type do_insert (const shape_type &shape, const unit_trans_type &trans, tl::func_delegate_base <db::properties_id_type> &pm);
+  shape_type do_insert (const shape_type &shape, const unit_trans_type &trans, tl::func_delegate_base<db::properties_id_type> &pm);
 
   template <class Sh>
   void replace_prop_id (const Sh *pos, db::properties_id_type prop_id);
@@ -1656,7 +1644,7 @@ private:
   template <class Sh1, class Sh2>
   shape_type reinsert_member_with_props (typename db::object_tag<Sh1>, const shape_type &ref, const Sh2 &sh);
 
-  //  A helper function to replace a shape given by a generic reference 
+  //  A helper function to replace a shape given by a generic reference
   //  Sh2 must not be a shape with properties
   template <class Sh1, class Sh2>
   shape_type replace_member_with_props (typename db::object_tag<Sh1>, const shape_type &ref, const Sh2 &sh);
@@ -1672,7 +1660,7 @@ private:
     typedef db::object_with_properties<ResType> res_wp_type;
 
     //  expand arrays in editable mode
-    invalidate_state ();  //  HINT: must come before the change is done!
+    invalidate_state (); //  HINT: must come before the change is done!
     db::layer<res_wp_type, db::stable_layer_tag> &l = get_layer<res_wp_type, db::stable_layer_tag> ();
     for (typename Array::iterator a = arr.begin (); ! a.at_end (); ++a) {
       res_wp_type obj_wp (*a * arr.object (), arr.properties_id ());
@@ -1688,7 +1676,7 @@ private:
   void insert_array_typeof (const ResType &, const Array &arr)
   {
     //  expand arrays in editable mode
-    invalidate_state ();  //  HINT: must come before the change is done!
+    invalidate_state (); //  HINT: must come before the change is done!
     db::layer<ResType, db::stable_layer_tag> &l = get_layer<ResType, db::stable_layer_tag> ();
     for (typename Array::iterator a = arr.begin (); ! a.at_end (); ++a) {
       if (manager () && manager ()->transacting ()) {
@@ -1701,7 +1689,7 @@ private:
 };
 
 /**
- *  @brief A base class for layer operations 
+ *  @brief A base class for layer operations
  *
  *  This class is used for the Op classes for the undo/redo queuing mechanism.
  */
@@ -1709,7 +1697,7 @@ class DB_PUBLIC LayerOpBase
   : public db::Op
 {
 public:
-  LayerOpBase () : db::Op () { }
+  LayerOpBase () : db::Op () {}
 
   virtual void undo (Shapes *shapes) = 0;
   virtual void redo (Shapes *shapes) = 0;
@@ -1740,7 +1728,7 @@ public:
     m_shapes.reserve (1);
     m_shapes.push_back (sh);
   }
-  
+
   template <class Iter>
   layer_op (bool insert, Iter from, Iter to)
     : m_insert (insert)
@@ -1778,7 +1766,7 @@ public:
 
   static void queue_or_append (db::Manager *manager, db::Shapes *shapes, bool insert, const Sh &sh)
   {
-    db::layer_op<Sh, StableTag> *old_op = dynamic_cast <db::layer_op<Sh, StableTag> *> (manager->last_queued (shapes));
+    db::layer_op<Sh, StableTag> *old_op = dynamic_cast<db::layer_op<Sh, StableTag> *> (manager->last_queued (shapes));
     if (! old_op || old_op->m_insert != insert) {
       manager->queue (shapes, new db::layer_op<Sh, StableTag> (insert, sh));
     } else {
@@ -1789,7 +1777,7 @@ public:
   template <class Iter>
   static void queue_or_append (db::Manager *manager, db::Shapes *shapes, bool insert, Iter from, Iter to)
   {
-    db::layer_op<Sh, StableTag> *old_op = dynamic_cast <db::layer_op<Sh, StableTag> *> (manager->last_queued (shapes));
+    db::layer_op<Sh, StableTag> *old_op = dynamic_cast<db::layer_op<Sh, StableTag> *> (manager->last_queued (shapes));
     if (! old_op || old_op->m_insert != insert) {
       manager->queue (shapes, new db::layer_op<Sh, StableTag> (insert, from, to));
     } else {
@@ -1800,7 +1788,7 @@ public:
   template <class Iter>
   static void queue_or_append (db::Manager *manager, db::Shapes *shapes, bool insert, Iter from, Iter to, bool dummy)
   {
-    db::layer_op<Sh, StableTag> *old_op = dynamic_cast <db::layer_op<Sh, StableTag> *> (manager->last_queued (shapes));
+    db::layer_op<Sh, StableTag> *old_op = dynamic_cast<db::layer_op<Sh, StableTag> *> (manager->last_queued (shapes));
     if (! old_op || old_op->m_insert != insert) {
       manager->queue (shapes, new db::layer_op<Sh, StableTag> (insert, from, to, dummy));
     } else {
@@ -1863,7 +1851,6 @@ private:
   void erase (Shapes *shapes);
 };
 
-}  // namespace db
-  
-#endif
+} // namespace db
 
+#endif

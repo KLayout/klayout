@@ -69,8 +69,7 @@ DitherPatternSelectionButton::~DitherPatternSelectionButton ()
   // .. nothing yet ..
 }
 
-void 
-DitherPatternSelectionButton::set_view (lay::LayoutViewBase *view)
+void DitherPatternSelectionButton::set_view (lay::LayoutViewBase *view)
 {
   if (view != mp_view) {
     mp_view = view;
@@ -78,8 +77,7 @@ DitherPatternSelectionButton::set_view (lay::LayoutViewBase *view)
   }
 }
 
-void 
-DitherPatternSelectionButton::set_dither_pattern (int dp)
+void DitherPatternSelectionButton::set_dither_pattern (int dp)
 {
   if (dp != m_dither_pattern) {
     m_dither_pattern = dp;
@@ -87,27 +85,23 @@ DitherPatternSelectionButton::set_dither_pattern (int dp)
   }
 }
 
-int 
-DitherPatternSelectionButton::dither_pattern () const
+int DitherPatternSelectionButton::dither_pattern () const
 {
   return m_dither_pattern;
 }
 
-void
-DitherPatternSelectionButton::menu_selected () 
+void DitherPatternSelectionButton::menu_selected ()
 {
-  QAction *action = dynamic_cast <QAction *> (sender ());
+  QAction *action = dynamic_cast<QAction *> (sender ());
   if (action) {
 
     m_dither_pattern = action->data ().toInt ();
     update_pattern ();
     emit (dither_pattern_changed (m_dither_pattern));
-
   }
 }
 
-void 
-DitherPatternSelectionButton::browse_selected ()
+void DitherPatternSelectionButton::browse_selected ()
 {
   if (mp_view) {
 
@@ -119,7 +113,6 @@ DitherPatternSelectionButton::browse_selected ()
       m_dither_pattern = stipples_form.selected ();
       update_pattern ();
       emit (dither_pattern_changed (m_dither_pattern));
-
     }
 
   } else {
@@ -135,15 +128,12 @@ DitherPatternSelectionButton::browse_selected ()
       m_dither_pattern = stipples_form.selected ();
       update_pattern ();
       emit (dither_pattern_changed (m_dither_pattern));
-
     }
-
   }
 }
 
-void 
-DitherPatternSelectionButton::update_pattern ()
-{  
+void DitherPatternSelectionButton::update_pattern ()
+{
   QPushButton::setText (QString::fromUtf8 (" "));
 
   QString text = QString::fromUtf8 ("XXXXXXX");
@@ -180,26 +170,23 @@ DitherPatternSelectionButton::update_pattern ()
 
     const lay::DitherPatternInfo *dp_info;
     if (mp_view) {
-      dp_info = & mp_view->dither_pattern ().pattern ((unsigned int) m_dither_pattern).scaled (dpr);
+      dp_info = &mp_view->dither_pattern ().pattern ((unsigned int) m_dither_pattern).scaled (dpr);
     } else {
       static lay::DitherPattern default_pattern;
-      dp_info = & default_pattern.pattern ((unsigned int) m_dither_pattern).scaled (dpr);
+      dp_info = &default_pattern.pattern ((unsigned int) m_dither_pattern).scaled (dpr);
     }
 
     QPushButton::setIcon (dp_info->get_bitmap (rt.width () * dpr, rt.height () * dpr, dpr));
-
   }
 }
 
-void
-DitherPatternSelectionButton::menu_about_to_show ()
+void DitherPatternSelectionButton::menu_about_to_show ()
 {
   update_menu ();
 }
 
-void 
-DitherPatternSelectionButton::update_menu ()
-{  
+void DitherPatternSelectionButton::update_menu ()
+{
   menu ()->clear ();
   menu ()->addAction (QObject::tr ("None"), this, SLOT (menu_selected ()))->setData (-1);
   menu ()->addAction (QObject::tr ("Choose ..."), this, SLOT (browse_selected ()));
@@ -224,7 +211,7 @@ DitherPatternSelectionButton::update_menu ()
 
       unsigned int n = palette.stipple_by_index (i);
       if (int (n) < std::distance (patterns.begin (), patterns.end ())) {
-      
+
 #if QT_VERSION > 0x050000
         double dpr = devicePixelRatio ();
 #else
@@ -240,11 +227,11 @@ DitherPatternSelectionButton::update_menu ()
         }
 
         menu ()->addAction (QIcon (info.get_bitmap (-1, -1, dpr)), tl::to_qstring (name), this, SLOT (menu_selected ()))->setData (n);
-
       }
     }
 
-  } catch (...) { }
+  } catch (...) {
+  }
 }
 
 // -------------------------------------------------------------
@@ -263,8 +250,7 @@ LineStyleSelectionButton::~LineStyleSelectionButton ()
   // .. nothing yet ..
 }
 
-void
-LineStyleSelectionButton::set_view (lay::LayoutViewBase *view)
+void LineStyleSelectionButton::set_view (lay::LayoutViewBase *view)
 {
   if (view != mp_view) {
     mp_view = view;
@@ -272,8 +258,7 @@ LineStyleSelectionButton::set_view (lay::LayoutViewBase *view)
   }
 }
 
-void
-LineStyleSelectionButton::set_line_style (int ls)
+void LineStyleSelectionButton::set_line_style (int ls)
 {
   if (ls != m_line_style) {
     m_line_style = ls;
@@ -281,27 +266,23 @@ LineStyleSelectionButton::set_line_style (int ls)
   }
 }
 
-int
-LineStyleSelectionButton::line_style () const
+int LineStyleSelectionButton::line_style () const
 {
   return m_line_style;
 }
 
-void
-LineStyleSelectionButton::menu_selected ()
+void LineStyleSelectionButton::menu_selected ()
 {
-  QAction *action = dynamic_cast <QAction *> (sender ());
+  QAction *action = dynamic_cast<QAction *> (sender ());
   if (action) {
 
     m_line_style = action->data ().toInt ();
     update_pattern ();
     emit (line_style_changed (m_line_style));
-
   }
 }
 
-void
-LineStyleSelectionButton::browse_selected ()
+void LineStyleSelectionButton::browse_selected ()
 {
   if (mp_view) {
 
@@ -313,7 +294,6 @@ LineStyleSelectionButton::browse_selected ()
       m_line_style = styles_form.selected ();
       update_pattern ();
       emit (line_style_changed (m_line_style));
-
     }
 
   } else {
@@ -329,14 +309,11 @@ LineStyleSelectionButton::browse_selected ()
       m_line_style = styles_form.selected ();
       update_pattern ();
       emit (line_style_changed (m_line_style));
-
     }
-
   }
 }
 
-void
-LineStyleSelectionButton::update_pattern ()
+void LineStyleSelectionButton::update_pattern ()
 {
   QPushButton::setText (QString::fromUtf8 (" "));
 
@@ -374,25 +351,22 @@ LineStyleSelectionButton::update_pattern ()
 
     const lay::LineStyleInfo *dp_info;
     if (mp_view) {
-      dp_info = & mp_view->line_styles ().style ((unsigned int) m_line_style);
+      dp_info = &mp_view->line_styles ().style ((unsigned int) m_line_style);
     } else {
       static lay::LineStyles default_pattern;
-      dp_info = & default_pattern.style ((unsigned int) m_line_style);
+      dp_info = &default_pattern.style ((unsigned int) m_line_style);
     }
 
     QPushButton::setIcon (dp_info->get_bitmap (rt.width () * dpr, rt.height () * dpr, dpr));
-
   }
 }
 
-void
-LineStyleSelectionButton::menu_about_to_show ()
+void LineStyleSelectionButton::menu_about_to_show ()
 {
   update_menu ();
 }
 
-void
-LineStyleSelectionButton::update_menu ()
+void LineStyleSelectionButton::update_menu ()
 {
   menu ()->clear ();
   menu ()->addAction (QObject::tr ("None"), this, SLOT (menu_selected ()))->setData (-1);
@@ -427,18 +401,17 @@ LineStyleSelectionButton::update_menu ()
         }
 
         menu ()->addAction (QIcon (info.get_bitmap (16, 8)), tl::to_qstring (name), this, SLOT (menu_selected ()))->setData (n);
-
       }
     }
 
-  } catch (...) { }
+  } catch (...) {
+  }
 }
 
 // -------------------------------------------------------------
 //  CellViewSelectionComboBox implementation
 
-struct CellViewSelectionComboBoxPrivateData
-{
+struct CellViewSelectionComboBoxPrivateData {
   const lay::LayoutViewBase *layout_view;
 };
 
@@ -461,8 +434,7 @@ CellViewSelectionComboBox::layout_view () const
   return mp_private->layout_view;
 }
 
-void 
-CellViewSelectionComboBox::set_layout_view (const lay::LayoutViewBase *layout_view)
+void CellViewSelectionComboBox::set_layout_view (const lay::LayoutViewBase *layout_view)
 {
   //  TODO: should register a listener, so it does the update automatically.
   mp_private->layout_view = layout_view;
@@ -472,8 +444,7 @@ CellViewSelectionComboBox::set_layout_view (const lay::LayoutViewBase *layout_vi
   clear ();
   for (unsigned int cv = 0; cv < layout_view->cellviews (); ++cv) {
     if (layout_view->cellview (cv).is_valid ()) {
-      addItem (tl::to_qstring (layout_view->cellview (cv)->name () + ", " + tl::to_string (QObject::tr ("Cell")) + " '" 
-                + layout_view->cellview (cv)->layout ().cell_name (layout_view->cellview (cv).cell_index ()) + "'"));
+      addItem (tl::to_qstring (layout_view->cellview (cv)->name () + ", " + tl::to_string (QObject::tr ("Cell")) + " '" + layout_view->cellview (cv)->layout ().cell_name (layout_view->cellview (cv).cell_index ()) + "'"));
     } else {
       addItem (tl::to_qstring (layout_view->cellview (cv)->name () + ", " + tl::to_string (QObject::tr ("Undefined cell"))));
     }
@@ -486,14 +457,12 @@ CellViewSelectionComboBox::set_layout_view (const lay::LayoutViewBase *layout_vi
   }
 }
 
-void 
-CellViewSelectionComboBox::set_current_cv_index (int cv)
+void CellViewSelectionComboBox::set_current_cv_index (int cv)
 {
   setCurrentIndex (cv);
 }
 
-int 
-CellViewSelectionComboBox::current_cv_index () const
+int CellViewSelectionComboBox::current_cv_index () const
 {
   return currentIndex ();
 }
@@ -501,9 +470,8 @@ CellViewSelectionComboBox::current_cv_index () const
 // -------------------------------------------------------------
 //  LayerSelectionComboBox implementation
 
-struct LayerSelectionComboBoxPrivateData
-{
-  std::vector <std::pair <db::LayerProperties, int> > layers;
+struct LayerSelectionComboBoxPrivateData {
+  std::vector<std::pair<db::LayerProperties, int>> layers;
   bool no_layer_available;
   bool new_layer_enabled;
   bool all_layers;
@@ -533,8 +501,7 @@ LayerSelectionComboBox::~LayerSelectionComboBox ()
   mp_private = 0;
 }
 
-void  
-LayerSelectionComboBox::set_new_layer_enabled (bool f)
+void LayerSelectionComboBox::set_new_layer_enabled (bool f)
 {
   if (mp_private->new_layer_enabled != f) {
     mp_private->new_layer_enabled = f;
@@ -542,14 +509,12 @@ LayerSelectionComboBox::set_new_layer_enabled (bool f)
   }
 }
 
-bool  
-LayerSelectionComboBox::is_new_layer_enabled () const
+bool LayerSelectionComboBox::is_new_layer_enabled () const
 {
   return mp_private->new_layer_enabled;
 }
 
-void  
-LayerSelectionComboBox::set_no_layer_available (bool f)
+void LayerSelectionComboBox::set_no_layer_available (bool f)
 {
   if (mp_private->no_layer_available != f) {
     mp_private->no_layer_available = f;
@@ -557,16 +522,14 @@ LayerSelectionComboBox::set_no_layer_available (bool f)
   }
 }
 
-bool  
-LayerSelectionComboBox::is_no_layer_available () const
+bool LayerSelectionComboBox::is_no_layer_available () const
 {
   return mp_private->no_layer_available;
 }
 
-void 
-LayerSelectionComboBox::item_selected (int index)
+void LayerSelectionComboBox::item_selected (int index)
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (mp_private->view != 0 && index == count () - 1 && mp_private->new_layer_enabled) {
 
@@ -596,7 +559,7 @@ BEGIN_PROTECTED
       }
 
       unsigned int l = cv->layout ().insert_layer (lp);
-      std::vector <unsigned int> nl;
+      std::vector<unsigned int> nl;
       nl.push_back (l);
       mp_private->view->add_new_layers (nl, mp_private->cv_index);
       mp_private->view->update_content ();
@@ -609,19 +572,17 @@ BEGIN_PROTECTED
       set_current_layer (lp);
 
       emit current_layer_changed ();
-
     }
 
   } else {
     emit current_layer_changed ();
   }
 
-END_PROTECTED;
+  END_PROTECTED;
 }
 
-struct LPIPairCompareOp
-{
-  bool operator() (const std::pair <db::LayerProperties, int> &a, const std::pair <db::LayerProperties, int> &b) const
+struct LPIPairCompareOp {
+  bool operator() (const std::pair<db::LayerProperties, int> &a, const std::pair<db::LayerProperties, int> &b) const
   {
     if (! a.first.log_equal (b.first)) {
       return a.first.log_less (b.first);
@@ -630,8 +591,7 @@ struct LPIPairCompareOp
   }
 };
 
-void 
-LayerSelectionComboBox::set_view (lay::LayoutViewBase *view, int cv_index, bool all_layers)
+void LayerSelectionComboBox::set_view (lay::LayoutViewBase *view, int cv_index, bool all_layers)
 {
   if (view == 0 || cv_index < 0) {
     set_layout (0);
@@ -648,16 +608,14 @@ LayerSelectionComboBox::set_view (lay::LayoutViewBase *view, int cv_index, bool 
   update_layer_list ();
 }
 
-void
-LayerSelectionComboBox::on_layer_list_changed (int)
+void LayerSelectionComboBox::on_layer_list_changed (int)
 {
   if (! m_ignore_layer_list_changed) {
     update_layer_list ();
   }
 }
 
-void 
-LayerSelectionComboBox::set_layout (const db::Layout *layout)
+void LayerSelectionComboBox::set_layout (const db::Layout *layout)
 {
   mp_private->layout = layout;
   mp_private->view = 0;
@@ -667,14 +625,12 @@ LayerSelectionComboBox::set_layout (const db::Layout *layout)
   update_layer_list ();
 }
 
-void
-LayerSelectionComboBox::update_layer_list ()
+void LayerSelectionComboBox::update_layer_list ()
 {
   dm_update_layer_list ();
 }
 
-void
-LayerSelectionComboBox::do_update_layer_list ()
+void LayerSelectionComboBox::do_update_layer_list ()
 {
   int i = currentIndex ();
   db::LayerProperties props = mp_private->last_props;
@@ -695,7 +651,7 @@ LayerSelectionComboBox::do_update_layer_list ()
 
     const CellView &cv = mp_private->view->cellview (mp_private->cv_index);
     if (cv.is_valid ()) {
-      layout = & cv->layout ();
+      layout = &cv->layout ();
     }
 
     if (! layout) {
@@ -719,7 +675,7 @@ LayerSelectionComboBox::do_update_layer_list ()
       LayerPropertiesConstIterator lp = mp_private->view->begin_layers ();
       while (! lp.at_end ()) {
         if (lp->cellview_index () == mp_private->cv_index && ! lp->has_children () && (mp_private->all_layers || lp->layer_index () >= 0) && lp->source (true).layer_props () != db::LayerProperties ()) {
-          std::pair <db::LayerProperties, int> k (lp->source (true).layer_props (), lp->layer_index ());
+          std::pair<db::LayerProperties, int> k (lp->source (true).layer_props (), lp->layer_index ());
           name_for_layer.insert (std::make_pair (k, lp->display_string (mp_private->view, true, true /*always show source*/)));
           QIcon icon = QIcon (QPixmap::fromImage (mp_private->view->icon_for_layer (lp, icon_width, icon_height, dpr, 0, true).to_image_copy ()));
           icon_for_layer.insert (std::make_pair (k, icon));
@@ -732,7 +688,7 @@ LayerSelectionComboBox::do_update_layer_list ()
 
       for (unsigned int l = 0; l < layout->layers (); ++l) {
         if (layout->is_valid_layer (l)) {
-          std::pair <db::LayerProperties, int> k (layout->get_properties (l), int (l));
+          std::pair<db::LayerProperties, int> k (layout->get_properties (l), int (l));
           if (name_for_layer.find (k) == name_for_layer.end ()) {
             mp_private->layers.push_back (k);
           }
@@ -741,7 +697,7 @@ LayerSelectionComboBox::do_update_layer_list ()
 
       std::sort (mp_private->layers.begin () + nk, mp_private->layers.end ());
 
-      for (std::vector <std::pair <db::LayerProperties, int> >::iterator ll = mp_private->layers.begin (); ll != mp_private->layers.end (); ++ll) {
+      for (std::vector<std::pair<db::LayerProperties, int>>::iterator ll = mp_private->layers.begin (); ll != mp_private->layers.end (); ++ll) {
         auto ln = name_for_layer.find (*ll);
         QString text;
         if (ln != name_for_layer.end ()) {
@@ -762,7 +718,6 @@ LayerSelectionComboBox::do_update_layer_list ()
       }
 
       set_current_layer (props);
-
     }
 
   } else if (mp_private->layout) {
@@ -777,7 +732,7 @@ LayerSelectionComboBox::do_update_layer_list ()
 
     std::sort (mp_private->layers.begin () + n, mp_private->layers.end ());
 
-    for (std::vector <std::pair <db::LayerProperties, int> >::iterator ll = mp_private->layers.begin (); ll != mp_private->layers.end (); ++ll) {
+    for (std::vector<std::pair<db::LayerProperties, int>>::iterator ll = mp_private->layers.begin (); ll != mp_private->layers.end (); ++ll) {
       addItem (tl::to_qstring (ll->first.to_string ()));
     }
 
@@ -788,12 +743,11 @@ LayerSelectionComboBox::do_update_layer_list ()
   }
 }
 
-void 
-LayerSelectionComboBox::set_current_layer (const db::LayerProperties &props)
+void LayerSelectionComboBox::set_current_layer (const db::LayerProperties &props)
 {
   mp_private->last_props = props;
 
-  for (std::vector <std::pair <db::LayerProperties, int> >::iterator ll = mp_private->layers.begin (); ll != mp_private->layers.end (); ++ll) {
+  for (std::vector<std::pair<db::LayerProperties, int>>::iterator ll = mp_private->layers.begin (); ll != mp_private->layers.end (); ++ll) {
     if (ll->first.log_equal (props)) {
       setCurrentIndex (std::distance (mp_private->layers.begin (), ll));
       return;
@@ -810,7 +764,7 @@ LayerSelectionComboBox::layout () const
   if (! layout && mp_private->view) {
     const CellView &cv = mp_private->view->cellview (mp_private->cv_index);
     if (cv.is_valid ()) {
-      layout = & cv->layout ();
+      layout = &cv->layout ();
     }
   }
   return layout;
@@ -822,8 +776,7 @@ LayerSelectionComboBox::layout ()
   return const_cast<db::Layout *> (((const LayerSelectionComboBox *) this)->layout ());
 }
 
-void 
-LayerSelectionComboBox::set_current_layer (int l)
+void LayerSelectionComboBox::set_current_layer (int l)
 {
   const db::Layout *ly = layout ();
 
@@ -834,7 +787,7 @@ LayerSelectionComboBox::set_current_layer (int l)
   if (l < 0) {
     setCurrentIndex (-1);
   } else {
-    for (std::vector <std::pair <db::LayerProperties, int> >::iterator ll = mp_private->layers.begin (); ll != mp_private->layers.end (); ++ll) {
+    for (std::vector<std::pair<db::LayerProperties, int>>::iterator ll = mp_private->layers.begin (); ll != mp_private->layers.end (); ++ll) {
       if (ll->second == l) {
         setCurrentIndex (std::distance (mp_private->layers.begin (), ll));
       }
@@ -842,20 +795,17 @@ LayerSelectionComboBox::set_current_layer (int l)
   }
 }
 
-bool
-LayerSelectionComboBox::is_no_layer_selected () const
+bool LayerSelectionComboBox::is_no_layer_selected () const
 {
   return currentIndex () < 0;
 }
 
-int
-LayerSelectionComboBox::cv_index () const
+int LayerSelectionComboBox::cv_index () const
 {
   return mp_private->cv_index;
 }
 
-int 
-LayerSelectionComboBox::current_layer () const
+int LayerSelectionComboBox::current_layer () const
 {
   int i = currentIndex ();
   if (i < 0 || i > int (mp_private->layers.size ())) {
@@ -865,8 +815,7 @@ LayerSelectionComboBox::current_layer () const
   }
 }
 
-int
-LayerSelectionComboBox::current_layer_ensure ()
+int LayerSelectionComboBox::current_layer_ensure ()
 {
   int i = currentIndex ();
   if (i < 0 || i > int (mp_private->layers.size ())) {
@@ -894,7 +843,6 @@ LayerSelectionComboBox::current_layer_ensure ()
   } else {
 
     return mp_private->layers [i].second;
-
   }
 }
 
@@ -918,8 +866,7 @@ LibrarySelectionComboBox::LibrarySelectionComboBox (QWidget *parent)
   update_list ();
 }
 
-void
-LibrarySelectionComboBox::set_technology_filter (const std::string &tech, bool enabled)
+void LibrarySelectionComboBox::set_technology_filter (const std::string &tech, bool enabled)
 {
   if (m_tech != tech || m_tech_set != enabled) {
     m_tech = tech;
@@ -928,8 +875,7 @@ LibrarySelectionComboBox::set_technology_filter (const std::string &tech, bool e
   }
 }
 
-void 
-LibrarySelectionComboBox::update_list ()
+void LibrarySelectionComboBox::update_list ()
 {
   bool wasBlocked = blockSignals (true);
 
@@ -941,7 +887,7 @@ LibrarySelectionComboBox::update_list ()
   for (db::LibraryManager::iterator l = db::LibraryManager::instance ().begin (); l != db::LibraryManager::instance ().end (); ++l) {
 
     db::Library *lib = db::LibraryManager::instance ().lib (l->second);
-    if (! m_tech_set || !lib->for_technologies () || lib->is_for_technology (m_tech)) {
+    if (! m_tech_set || ! lib->for_technologies () || lib->is_for_technology (m_tech)) {
 
       std::string item_text = lib->get_name ();
       if (! lib->get_description ().empty ()) {
@@ -954,9 +900,7 @@ LibrarySelectionComboBox::update_list ()
       }
 
       addItem (tl::to_qstring (item_text), QVariant ((unsigned int) lib->get_id ()));
-
     }
-
   }
 
   set_current_library (lib);
@@ -969,8 +913,7 @@ LibrarySelectionComboBox::~LibrarySelectionComboBox ()
   //  .. nothing yet ..
 }
 
-void 
-LibrarySelectionComboBox::set_current_library (db::Library *lib)
+void LibrarySelectionComboBox::set_current_library (db::Library *lib)
 {
   if (lib != current_library ()) {
 
@@ -988,7 +931,6 @@ LibrarySelectionComboBox::set_current_library (db::Library *lib)
 
     //  fallback: not a valid library pointer
     setCurrentIndex (-1);
-
   }
 }
 
@@ -1026,13 +968,13 @@ SimpleColorButton::SimpleColorButton (QPushButton *&to_replace, const char *name
   QLayout *ly = to_replace->parentWidget ()->layout ();
   if (ly) {
 
-    QBoxLayout *bx_ly = dynamic_cast <QBoxLayout *> (ly);
+    QBoxLayout *bx_ly = dynamic_cast<QBoxLayout *> (ly);
     if (bx_ly) {
       int i = ly->indexOf (to_replace);
       bx_ly->insertWidget (i, this);
     }
 
-    QGridLayout *grid_ly = dynamic_cast <QGridLayout *> (ly);
+    QGridLayout *grid_ly = dynamic_cast<QGridLayout *> (ly);
     if (grid_ly) {
       int i = ly->indexOf (to_replace);
       int row = 0, column = 0;
@@ -1040,7 +982,6 @@ SimpleColorButton::SimpleColorButton (QPushButton *&to_replace, const char *name
       grid_ly->getItemPosition (i, &row, &column, &row_span, &column_span);
       grid_ly->addWidget (this, row, column, row_span, column_span);
     }
-
   }
 
   delete to_replace;
@@ -1049,14 +990,12 @@ SimpleColorButton::SimpleColorButton (QPushButton *&to_replace, const char *name
   connect (this, SIGNAL (clicked ()), this, SLOT (selected ()));
 }
 
-void
-SimpleColorButton::set_color (QColor c)
+void SimpleColorButton::set_color (QColor c)
 {
   set_color_internal (c);
 }
 
-void 
-SimpleColorButton::set_color_internal (QColor c)
+void SimpleColorButton::set_color_internal (QColor c)
 {
   m_color = c;
 
@@ -1089,14 +1028,13 @@ SimpleColorButton::set_color_internal (QColor c)
   setIcon (QIcon (pxmp));
 }
 
-QColor 
+QColor
 SimpleColorButton::get_color () const
 {
   return m_color;
 }
 
-void
-SimpleColorButton::selected ()
+void SimpleColorButton::selected ()
 {
   QColor c = QColorDialog::getColor (get_color (), this);
   if (c.isValid ()) {
@@ -1132,13 +1070,13 @@ ColorButton::ColorButton (QPushButton *&to_replace, const char *name)
   QLayout *ly = to_replace->parentWidget ()->layout ();
   if (ly) {
 
-    QBoxLayout *bx_ly = dynamic_cast <QBoxLayout *> (ly);
+    QBoxLayout *bx_ly = dynamic_cast<QBoxLayout *> (ly);
     if (bx_ly) {
       int i = ly->indexOf (to_replace);
       bx_ly->insertWidget (i, this);
     }
 
-    QGridLayout *grid_ly = dynamic_cast <QGridLayout *> (ly);
+    QGridLayout *grid_ly = dynamic_cast<QGridLayout *> (ly);
     if (grid_ly) {
       int i = ly->indexOf (to_replace);
       int row = 0, column = 0;
@@ -1146,14 +1084,13 @@ ColorButton::ColorButton (QPushButton *&to_replace, const char *name)
       grid_ly->getItemPosition (i, &row, &column, &row_span, &column_span);
       grid_ly->addWidget (this, row, column, row_span, column_span);
     }
-
   }
 
   delete to_replace;
   to_replace = 0;
 }
 
-const char *color_icon = 
+const char *color_icon =
   "xxxxxaaxxxxbbxxxxx"
   "xxxxA00AxxB11Bxxxx"
   "xxxa0000ab1111bxxx"
@@ -1205,8 +1142,7 @@ const char *color_icon_2x =
   "xxxxxxxxxE4444ExxxxxxD3333Dxxxxxxxxx"
   "xxxxxxxxxxeeeexxxxxxxxddddxxxxxxxxxx";
 
-void
-ColorButton::build_color_menu (QMenu *menu, QObject *receiver, const char *browse_slot, const char *selected_slot)
+void ColorButton::build_color_menu (QMenu *menu, QObject *receiver, const char *browse_slot, const char *selected_slot)
 {
   tl_assert (selected_slot != 0);
 
@@ -1265,7 +1201,6 @@ ColorButton::build_color_menu (QMenu *menu, QObject *receiver, const char *brows
         }
 
         submenu = menu->addMenu (QPixmap::fromImage (icon), tl::to_qstring (tl::sprintf ("#%d .. %d", i + 1, std::min (i + 6, palette.colors ()))));
-
       }
 
       QColor color = QColor (palette.color_by_index (i));
@@ -1278,26 +1213,23 @@ ColorButton::build_color_menu (QMenu *menu, QObject *receiver, const char *brows
       icon.fill (color);
 
       submenu->addAction (QIcon (icon), tl::to_qstring (name), receiver, selected_slot)->setData (QVariant (color));
-
     }
 
-  } catch (...) { }
+  } catch (...) {
+  }
 }
 
-void 
-ColorButton::build_menu ()
+void ColorButton::build_menu ()
 {
   build_color_menu (menu (), this, SLOT (browse_selected ()), SLOT (menu_selected ()));
 }
 
-void
-ColorButton::set_color (QColor c)
+void ColorButton::set_color (QColor c)
 {
   set_color_internal (c);
 }
 
-void 
-ColorButton::set_color_internal (QColor c)
+void ColorButton::set_color_internal (QColor c)
 {
   m_color = c;
 
@@ -1340,26 +1272,23 @@ ColorButton::set_color_internal (QColor c)
 
     pxpainter.setBrush (QBrush (c));
     pxpainter.drawRect (r);
-
   }
 
   QPushButton::setIcon (QIcon (QPixmap::fromImage (image)));
 }
 
-QColor 
+QColor
 ColorButton::get_color () const
 {
   return m_color;
 }
 
-void
-ColorButton::menu_about_to_show ()
+void ColorButton::menu_about_to_show ()
 {
   build_menu ();
 }
 
-void
-ColorButton::menu_selected ()
+void ColorButton::menu_selected ()
 {
   QAction *action = dynamic_cast<QAction *> (sender ());
   if (action) {
@@ -1368,8 +1297,7 @@ ColorButton::menu_selected ()
   }
 }
 
-void
-ColorButton::browse_selected ()
+void ColorButton::browse_selected ()
 {
   QColor c = QColorDialog::getColor (get_color (), this);
   if (c.isValid ()) {
@@ -1432,8 +1360,7 @@ MarginWidget::get_margin () const
   return m;
 }
 
-void
-MarginWidget::set_margin (const lay::Margin &margin)
+void MarginWidget::set_margin (const lay::Margin &margin)
 {
   m_margin = margin;
 
@@ -1443,8 +1370,7 @@ MarginWidget::set_margin (const lay::Margin &margin)
   mode_selection_changed ();
 }
 
-void
-MarginWidget::mode_selection_changed ()
+void MarginWidget::mode_selection_changed ()
 {
   bool rel_mode = mp_mode_cb->currentIndex () == 1;
   //  NOTE: first hiding and then showing avoids layout flicker ..
@@ -1460,7 +1386,7 @@ MarginWidget::mode_selection_changed ()
 // -------------------------------------------------------------
 //  DecoratedLineEdit implementation
 
-const int le_frame_width = 4; //  TODO: obtain from style?
+const int le_frame_width = 4;      //  TODO: obtain from style?
 const int le_decoration_space = 2; //  additional distance between decoration icons and text
 
 DecoratedLineEdit::DecoratedLineEdit (QWidget *parent)
@@ -1613,9 +1539,7 @@ void DecoratedLineEdit::mouseReleaseEvent (QMouseEvent *event)
       clear ();
       emit clear_pressed (); //  might modify the text
       emit textEdited (text ());
-
     }
-
   }
 
   QLineEdit::mouseReleaseEvent (event);
@@ -1633,9 +1557,7 @@ void DecoratedLineEdit::mousePressEvent (QMouseEvent *event)
       } else {
         emit options_button_clicked ();
       }
-
     }
-
   }
 
   QLineEdit::mousePressEvent (event);
@@ -1680,8 +1602,7 @@ InteractiveListWidget::InteractiveListWidget (QWidget *parent)
   setDragDropMode (QAbstractItemView::InternalMove);
 }
 
-void
-InteractiveListWidget::set_values (const std::vector<std::string> &values)
+void InteractiveListWidget::set_values (const std::vector<std::string> &values)
 {
   clear ();
   add_values (values);
@@ -1698,8 +1619,7 @@ InteractiveListWidget::get_values ()
   return v;
 }
 
-void
-InteractiveListWidget::add_value (const std::string &value)
+void InteractiveListWidget::add_value (const std::string &value)
 {
   addItem (tl::to_qstring (value));
   refresh_flags ();
@@ -1707,8 +1627,7 @@ InteractiveListWidget::add_value (const std::string &value)
   setCurrentItem (item (count () - 1));
 }
 
-void
-InteractiveListWidget::add_values (const std::vector<std::string> &values)
+void InteractiveListWidget::add_values (const std::vector<std::string> &values)
 {
   for (std::vector<std::string>::const_iterator i = values.begin (); i != values.end (); ++i) {
     addItem (tl::to_qstring (*i));
@@ -1717,8 +1636,7 @@ InteractiveListWidget::add_values (const std::vector<std::string> &values)
   clearSelection ();
 }
 
-void
-InteractiveListWidget::delete_selected_items ()
+void InteractiveListWidget::delete_selected_items ()
 {
   QStringList items;
   for (int i = 0; i < count (); ++i) {
@@ -1734,8 +1652,7 @@ InteractiveListWidget::delete_selected_items ()
   refresh_flags ();
 }
 
-void
-InteractiveListWidget::move_selected_items_up ()
+void InteractiveListWidget::move_selected_items_up ()
 {
   std::set<QString> selected;
   for (int i = 0; i < count (); ++i) {
@@ -1770,8 +1687,7 @@ InteractiveListWidget::move_selected_items_up ()
   refresh_flags ();
 }
 
-void
-InteractiveListWidget::move_selected_items_down ()
+void InteractiveListWidget::move_selected_items_down ()
 {
   std::set<QString> selected;
   for (int i = 0; i < count (); ++i) {
@@ -1782,7 +1698,7 @@ InteractiveListWidget::move_selected_items_down ()
 
   QStringList items;
   int j = -1;
-  for (int i = count (); i > 0; ) {
+  for (int i = count (); i > 0;) {
     --i;
     if (item (i)->isSelected ()) {
       items.push_back (item (i)->text ());
@@ -1798,7 +1714,7 @@ InteractiveListWidget::move_selected_items_down ()
   }
 
   clear ();
-  for (QStringList::const_iterator f = items.end (); f != items.begin (); ) {
+  for (QStringList::const_iterator f = items.end (); f != items.begin ();) {
     --f;
     addItem (*f);
     if (selected.find (*f) != selected.end ()) {
@@ -1808,8 +1724,7 @@ InteractiveListWidget::move_selected_items_down ()
   refresh_flags ();
 }
 
-void
-InteractiveListWidget::refresh_flags ()
+void InteractiveListWidget::refresh_flags ()
 {
   for (int i = 0; i < count (); ++i) {
     item (i)->setFlags (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);

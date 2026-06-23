@@ -31,7 +31,7 @@
 
 namespace Ui
 {
-  class RulerOptions;
+class RulerOptions;
 }
 
 namespace ant
@@ -43,7 +43,7 @@ namespace ant
 class RulerOptionsPage
   : public lay::EditorOptionsPageWidget
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   RulerOptionsPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
@@ -63,4 +63,3 @@ private:
 #endif
 
 #endif
-

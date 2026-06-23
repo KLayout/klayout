@@ -31,7 +31,8 @@
 #include "dbGenericShapeIterator.h"
 #include "tlCopyOnWrite.h"
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief An iterator delegate for the flat edge pair set
@@ -106,7 +107,7 @@ public:
     transform_generic (t);
   }
 
-  virtual void flatten () { }
+  virtual void flatten () {}
 
   db::Shapes &raw_edge_pairs () { return *mp_edge_pairs; }
   const db::Shapes &raw_edge_pairs () const { return *mp_edge_pairs; }
@@ -138,4 +139,3 @@ private:
 }
 
 #endif
-

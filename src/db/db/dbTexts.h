@@ -56,8 +56,8 @@ class DB_PUBLIC TextFilterBase
 public:
   typedef db::Text shape_type;
 
-  TextFilterBase () { }
-  virtual ~TextFilterBase () { }
+  TextFilterBase () {}
+  virtual ~TextFilterBase () {}
 
   virtual bool selected (const db::Text &text, db::properties_id_type prop_id) const = 0;
   virtual const TransformationReducer *vars () const = 0;
@@ -92,7 +92,7 @@ public:
    *  This constructor creates an empty text set.
    */
   Texts ();
-  
+
   /**
    *  @brief Destructor
    */
@@ -601,7 +601,7 @@ public:
    *  @brief Converts to polygons
    *
    *  Note: because of the include hierarchy we can't use a direct return value.
-   *  
+   *
    *  The output container is not cleared by this method but polygons are rather
    *  appended.
    *
@@ -614,7 +614,7 @@ public:
    *  @brief Returns individual, dot-like edges
    *
    *  Note: because of the include hierarchy we can't use a direct return value.
-   *  
+   *
    *  The returned edges will be dot-like (identical points) and represent the
    *  position of the text.
    */
@@ -662,16 +662,15 @@ private:
   TextsDelegate *mp_delegate;
 
   void set_delegate (TextsDelegate *delegate);
-  MutableTexts *mutable_texts();
+  MutableTexts *mutable_texts ();
 };
 
 }
 
 namespace tl
 {
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Texts &b);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Texts &b);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Texts &b);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Texts &b);
 }
 
 #endif
-

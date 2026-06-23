@@ -38,8 +38,7 @@ namespace db
  *  @brief A getter for the ID of an object
  */
 template <class T>
-struct id_attribute
-{
+struct id_attribute {
   typedef size_t attr_type;
   size_t operator() (const T *t) const { return t->id (); }
   bool has (const T * /*t*/) const { return true; }
@@ -49,8 +48,7 @@ struct id_attribute
  *  @brief A getter for the cluster ID of an object
  */
 template <class T>
-struct cluster_id_attribute
-{
+struct cluster_id_attribute {
   typedef size_t attr_type;
   attr_type operator() (const T *t) const { return t->cluster_id (); }
   bool has (const T * /*t*/) const { return true; }
@@ -60,8 +58,7 @@ struct cluster_id_attribute
  *  @brief A getter for the cluster ID of an object
  */
 template <class T>
-struct cell_index_attribute
-{
+struct cell_index_attribute {
   typedef db::cell_index_type attr_type;
   attr_type operator() (const T *t) const { return t->cell_index (); }
   bool has (const T * /*t*/) const { return true; }
@@ -71,8 +68,7 @@ struct cell_index_attribute
  *  @brief A getter for the name of an object
  */
 template <class T>
-struct name_attribute
-{
+struct name_attribute {
   typedef std::string attr_type;
   const attr_type &operator() (const T *t) const { return t->name (); }
   bool has (const T *t) const { return ! t->name ().empty (); }
@@ -136,8 +132,8 @@ private:
     ATTR attr;
     m_map.clear ();
     for (I i = (mp_self->*m_bi) (); i != (mp_self->*m_ei) (); ++i) {
-      if (attr.has (i.operator-> ())) {
-        m_map.insert (std::make_pair (attr (i.operator-> ()), i.operator-> ()));
+      if (attr.has (i.operator->())) {
+        m_map.insert (std::make_pair (attr (i.operator->()), i.operator->()));
       }
     }
     m_valid = true;

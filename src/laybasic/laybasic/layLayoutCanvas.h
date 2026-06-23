@@ -61,7 +61,7 @@ class ImageCacheEntry
 public:
   /**
    *  @brief Constructor
-   *  On creation, the entry is in "open" state and will be closed once the data has been 
+   *  On creation, the entry is in "open" state and will be closed once the data has been
    *  committed with "close".
    *  "Precious" entries will be preserved as far as possible.
    */
@@ -127,7 +127,7 @@ private:
   bool m_precious;
   BitmapCanvasData m_data;
 };
-/** 
+/**
  *  @brief A "canvas" object to paint layouts on
  *
  *  The purpose of this object is to provide a canvas QWidget
@@ -158,20 +158,20 @@ public:
   /**
    *  @brief Set the view ops for the layers
    *
-   *  The view_ops vector must correspond to the layers-vector from a separate 
+   *  The view_ops vector must correspond to the layers-vector from a separate
    *  "redraw_new" call.
    *  For performance reasons it is swapped with the existing one.
    */
-  void set_view_ops (std::vector <lay::ViewOp> &view_ops);
+  void set_view_ops (std::vector<lay::ViewOp> &view_ops);
 
   /**
    *  @brief Get the view ops for the layers
    *
    *  This call delivers the view op vector from the layer set_view_ops call.
    */
-  const std::vector <lay::ViewOp> &get_view_ops () const
-  { 
-    return m_view_ops; 
+  const std::vector<lay::ViewOp> &get_view_ops () const
+  {
+    return m_view_ops;
   }
 
   tl::PixelBuffer screenshot ();
@@ -213,7 +213,7 @@ public:
   /**
    *  @brief Free internal resources, in particular pixmaps
    */
-  void free_resources (); 
+  void free_resources ();
 
   /**
    *  @brief Stop the redraw thread
@@ -245,7 +245,7 @@ public:
   /**
    *  @brief Issue a redraw request on selected layers
    *
-   *  The index must correspond to lay::RedrawLayerInfo objects from former redraw_new 
+   *  The index must correspond to lay::RedrawLayerInfo objects from former redraw_new
    *  calls.
    */
   void redraw_selected (const std::vector<int> &layers);
@@ -306,7 +306,7 @@ public:
    *
    *  The vector must correspond to the  lay::RedrawLayerInfo objects from former redraw_new
    */
-  void change_visibility (const std::vector <bool> &visible);
+  void change_visibility (const std::vector<bool> &visible);
 
   /**
    *  @brief Set the dither pattern object
@@ -353,26 +353,26 @@ public:
   }
 
   /**
-   *  @brief Reimplementation of ViewObjectCanvas: Background color 
+   *  @brief Reimplementation of ViewObjectCanvas: Background color
    */
   tl::Color background_color () const
-  { 
+  {
     return tl::Color (m_background);
   }
 
   /**
-   *  @brief Reimplementation of ViewObjectCanvas: Foreground color 
+   *  @brief Reimplementation of ViewObjectCanvas: Foreground color
    */
   tl::Color foreground_color () const
-  { 
+  {
     return tl::Color (m_foreground);
   }
 
   /**
-   *  @brief Reimplementation of ViewObjectCanvas: Active color 
+   *  @brief Reimplementation of ViewObjectCanvas: Active color
    */
   tl::Color active_color () const
-  { 
+  {
     return tl::Color (m_active);
   }
 
@@ -384,12 +384,12 @@ public:
     return mp_image;
   }
 
-  /** 
+  /**
    *  @brief Reimplementation of RedrawThreadCanvas: signal end of drawing
    */
   void signal_end_of_drawing ();
 
-  /** 
+  /**
    *  @brief Reimplementation of RedrawThreadCanvas: signal transfer
    */
   void signal_transfer_done ();
@@ -433,10 +433,10 @@ private:
   tl::color_t m_background;
   tl::color_t m_foreground;
   tl::color_t m_active;
-  std::vector <lay::ViewOp> m_view_ops;
+  std::vector<lay::ViewOp> m_view_ops;
   lay::DitherPattern m_dither_pattern;
   lay::LineStyles m_line_styles;
-  std::map<unsigned int, std::vector <lay::ViewOp> > m_scaled_view_ops;
+  std::map<unsigned int, std::vector<lay::ViewOp>> m_scaled_view_ops;
   unsigned int m_oversampling;
   bool m_hrm;
   bool m_srm;
@@ -486,4 +486,3 @@ private:
 } //  namespace lay
 
 #endif
-

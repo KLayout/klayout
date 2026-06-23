@@ -31,8 +31,7 @@ PasswordDialog::PasswordDialog (QWidget *parent)
   setupUi (this);
 }
 
-bool
-PasswordDialog::user_password (const std::string &url, const std::string &realm, bool proxy, int attempt, std::string &user, std::string &passwd)
+bool PasswordDialog::user_password (const std::string &url, const std::string &realm, bool proxy, int attempt, std::string &user, std::string &passwd)
 {
   realm_label->setText (tr ("<b>Realm:</b> ") + tl::to_qstring (realm));
   if (proxy) {
@@ -55,8 +54,6 @@ PasswordDialog::user_password (const std::string &url, const std::string &realm,
   } else {
     return false;
   }
-
 }
 
 }
-

@@ -54,10 +54,10 @@ std::string var2str (const std::map<db::ICplxTrans, size_t> &vars)
   return res;
 }
 
-std::string vm2str (const db::Layout &ly, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &vm)
+std::string vm2str (const db::Layout &ly, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type>> &vm)
 {
   std::string res;
-  for (std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> >::const_iterator i = vm.begin (); i != vm.end (); ++i) {
+  for (std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type>>::const_iterator i = vm.begin (); i != vm.end (); ++i) {
     if (! res.empty ()) {
       res += ";";
     }
@@ -93,7 +93,7 @@ std::string inst2str (const db::Layout &ly, const db::Cell &cell)
   return res;
 }
 
-TEST(1_Trivial)
+TEST (1_Trivial)
 {
   db::Layout ly;
   db::Cell &a = ly.cell (ly.add_cell ("A"));
@@ -111,13 +111,13 @@ TEST(1_Trivial)
   EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "");
   EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
 
-  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > vm;
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type>> vm;
   vb.separate_variants (&vm);
   EXPECT_EQ (vm.empty (), true);
   EXPECT_EQ (vm2str (ly, vm), "");
 }
 
-TEST(2_TwoVariants)
+TEST (2_TwoVariants)
 {
   db::Layout ly;
   db::Cell &a = ly.cell (ly.add_cell ("A"));
@@ -138,13 +138,13 @@ TEST(2_TwoVariants)
 
   EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B:m0 *1 1,100");
 
-  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > vm;
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type>> vm;
   vb.separate_variants (&vm);
   EXPECT_EQ (vm2str (ly, vm), "B:B[m0 *1 0,0],B$VAR1[r0 *1 0,0]");
   EXPECT_EQ (inst2str (ly, a), "B$VAR1:r0 *1 1,10;B:m0 *1 1,100");
 }
 
-TEST(3_TwoLevels)
+TEST (3_TwoLevels)
 {
   db::Layout ly;
   db::Cell &a = ly.cell (ly.add_cell ("A"));
@@ -168,7 +168,7 @@ TEST(3_TwoLevels)
   EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B:r90 *1 1,100");
   EXPECT_EQ (inst2str (ly, b), "C:r0 *1 2,10;C:m0 *1 2,100");
 
-  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > vm;
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type>> vm;
   vb.separate_variants (&vm);
   EXPECT_EQ (vm2str (ly, vm), "B:B[r0 *1 0,0],B$VAR1[r90 *1 0,0];C:C[m0 *1 0,0],C$VAR1[r0 *1 0,0],C$VAR2[m45 *1 0,0],C$VAR3[r90 *1 0,0]");
 
@@ -177,7 +177,7 @@ TEST(3_TwoLevels)
   EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("B$VAR1").second)), "C$VAR3:r0 *1 2,10;C$VAR2:m0 *1 2,100");
 }
 
-TEST(4_ThreeLevels)
+TEST (4_ThreeLevels)
 {
   db::Layout ly;
   db::Cell &a = ly.cell (ly.add_cell ("A"));
@@ -203,7 +203,7 @@ TEST(4_ThreeLevels)
   EXPECT_EQ (inst2str (ly, b), "C:r0 *1 2,10;C:m0 *1 2,100");
   EXPECT_EQ (inst2str (ly, c), "D:m45 *1 0,0");
 
-  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > vm;
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type>> vm;
   vb.separate_variants (&vm);
   EXPECT_EQ (vm2str (ly, vm), "B:B[r0 *1 0,0],B$VAR1[r90 *1 0,0];C:C[m0 *1 0,0],C$VAR1[r0 *1 0,0],C$VAR2[m45 *1 0,0],C$VAR3[r90 *1 0,0];D:D[r270 *1 0,0],D$VAR1[m90 *1 0,0],D$VAR2[r0 *1 0,0],D$VAR3[m45 *1 0,0]");
 
@@ -216,7 +216,7 @@ TEST(4_ThreeLevels)
   EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("C$VAR3").second)), "D$VAR1:m45 *1 0,0");
 }
 
-TEST(5_ComplexTrans)
+TEST (5_ComplexTrans)
 {
   db::Layout ly;
   db::Cell &a = ly.cell (ly.add_cell ("A"));
@@ -238,7 +238,7 @@ TEST(5_ComplexTrans)
   EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
 }
 
-TEST(6_Arrays)
+TEST (6_Arrays)
 {
   db::Layout ly;
   db::Cell &a = ly.cell (ly.add_cell ("A"));
@@ -260,7 +260,7 @@ TEST(6_Arrays)
   EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
 }
 
-TEST(7_ScalingVariants)
+TEST (7_ScalingVariants)
 {
   db::Layout ly;
   db::Cell &a = ly.cell (ly.add_cell ("A"));
@@ -282,7 +282,7 @@ TEST(7_ScalingVariants)
   EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
 }
 
-TEST(8_GridVariants)
+TEST (8_GridVariants)
 {
   db::Layout ly;
   db::Cell &a = ly.cell (ly.add_cell ("A"));
@@ -315,7 +315,7 @@ TEST(8_GridVariants)
   EXPECT_EQ (inst2str (ly, b), "C:r0 *1 2,3");
   EXPECT_EQ (inst2str (ly, c), "");
 
-  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > vm;
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type>> vm;
   vb.separate_variants (&vm);
   EXPECT_EQ (vm2str (ly, vm), "B:B[r0 *1 1,0],B$VAR1[r0 *1 3,0],B$VAR2[r0 *1 1,1],B$VAR3[r0 *1 3,1];C:C[r0 *1 -5,3],C$VAR1[r0 *1 3,3],C$VAR2[r0 *1 -5,4],C$VAR3[r0 *1 3,4]");
 
@@ -327,7 +327,7 @@ TEST(8_GridVariants)
   EXPECT_EQ (inst2str (ly, c), "");
 }
 
-TEST(9_ComplexGridVariants)
+TEST (9_ComplexGridVariants)
 {
   db::Layout ly;
   db::Cell &a = ly.cell (ly.add_cell ("A"));
@@ -381,7 +381,7 @@ TEST(9_ComplexGridVariants)
   EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
 }
 
-TEST(100_OrientationVariantsWithLayout)
+TEST (100_OrientationVariantsWithLayout)
 {
   db::Layout ly;
   {
@@ -400,11 +400,11 @@ TEST(100_OrientationVariantsWithLayout)
   vb.collect (&ly, top_cell.cell_index ());
   vb.separate_variants ();
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/cell_variants_au1.gds");
 }
 
-TEST(10_TrivialStatistics)
+TEST (10_TrivialStatistics)
 {
   db::Layout ly;
   db::Cell &a = ly.cell (ly.add_cell ("A"));
@@ -423,7 +423,7 @@ TEST(10_TrivialStatistics)
   EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
 }
 
-TEST(11_TwoVariantsStatistics)
+TEST (11_TwoVariantsStatistics)
 {
   db::Layout ly;
   db::Cell &a = ly.cell (ly.add_cell ("A"));
@@ -445,7 +445,7 @@ TEST(11_TwoVariantsStatistics)
   EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B:m0 *1 1,100");
 }
 
-TEST(12_TwoLevelsStatistics)
+TEST (12_TwoLevelsStatistics)
 {
   db::Layout ly;
   db::Cell &a = ly.cell (ly.add_cell ("A"));
@@ -470,7 +470,7 @@ TEST(12_TwoLevelsStatistics)
   EXPECT_EQ (inst2str (ly, b), "C:r0 *1 2,10;C:m0 *1 2,100");
 }
 
-TEST(13_ThreeLevelsStatistics)
+TEST (13_ThreeLevelsStatistics)
 {
   db::Layout ly;
   db::Cell &a = ly.cell (ly.add_cell ("A"));
@@ -497,7 +497,7 @@ TEST(13_ThreeLevelsStatistics)
   EXPECT_EQ (inst2str (ly, c), "D:m45 *1 0,0");
 }
 
-TEST(14_ComplexTransStatistics)
+TEST (14_ComplexTransStatistics)
 {
   db::Layout ly;
   db::Cell &a = ly.cell (ly.add_cell ("A"));
@@ -519,7 +519,7 @@ TEST(14_ComplexTransStatistics)
   EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
 }
 
-TEST(15_ArraysStatistics)
+TEST (15_ArraysStatistics)
 {
 
   db::Layout ly;
@@ -542,7 +542,7 @@ TEST(15_ArraysStatistics)
   EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
 }
 
-TEST(16_ScalingVariantsStatistics)
+TEST (16_ScalingVariantsStatistics)
 {
   db::Layout ly;
   db::Cell &a = ly.cell (ly.add_cell ("A"));
@@ -564,7 +564,7 @@ TEST(16_ScalingVariantsStatistics)
   EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
 }
 
-TEST(17_GridVariantsStatistics)
+TEST (17_GridVariantsStatistics)
 {
   db::Layout ly;
   db::Cell &a = ly.cell (ly.add_cell ("A"));
@@ -598,7 +598,7 @@ TEST(17_GridVariantsStatistics)
   EXPECT_EQ (inst2str (ly, c), "");
 }
 
-TEST(18_ComplexGridVariantsStatistics)
+TEST (18_ComplexGridVariantsStatistics)
 {
   db::Layout ly;
   db::Cell &a = ly.cell (ly.add_cell ("A"));
@@ -652,7 +652,7 @@ TEST(18_ComplexGridVariantsStatistics)
   EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
 }
 
-TEST(101_Propagation)
+TEST (101_Propagation)
 {
   db::Layout ly;
   {
@@ -663,7 +663,7 @@ TEST(101_Propagation)
     reader.read (ly);
   }
 
-  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes>> to_commit;
 
   db::cell_index_type top_cell_index = *ly.begin_top_down ();
   db::Cell &top_cell = ly.cell (top_cell_index);
@@ -685,13 +685,11 @@ TEST(101_Propagation)
         b.enlarge (db::Vector (-100, 0));
         out.insert (b.transformed (v->inverted ()));
       }
-
     }
-
   }
 
   vb.commit_shapes (l2, to_commit);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/cell_variants_au2.gds");
 }

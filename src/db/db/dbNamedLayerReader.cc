@@ -48,14 +48,12 @@ NamedLayerReader::NamedLayerReader ()
   //  .. nothing yet ..
 }
 
-void
-NamedLayerReader::set_create_layers (bool f)
+void NamedLayerReader::set_create_layers (bool f)
 {
   m_create_layers = f;
 }
 
-void
-NamedLayerReader::set_keep_layer_names (bool f)
+void NamedLayerReader::set_keep_layer_names (bool f)
 {
   m_keep_layer_names = f;
 }
@@ -120,26 +118,26 @@ extract_ld (const char *s, int &l, int &d, std::string &n)
   }
 }
 
-std::pair <bool, unsigned int>
+std::pair<bool, unsigned int>
 NamedLayerReader::open_layer (db::Layout &layout, const std::string &n)
 {
   return open_layer (layout, n, keep_layer_names (), create_layers ());
 }
 
-std::pair <bool, unsigned int>
+std::pair<bool, unsigned int>
 NamedLayerReader::open_layer (db::Layout &layout, const std::string &n, bool keep_layer_name, bool create_layer)
 {
-  std::map<std::string, std::pair <bool, unsigned int> >::const_iterator lc = m_layer_cache.find (n);
+  std::map<std::string, std::pair<bool, unsigned int>>::const_iterator lc = m_layer_cache.find (n);
   if (lc != m_layer_cache.end ()) {
     return lc->second;
   } else {
-    std::pair <bool, unsigned int> res = open_layer_uncached (layout, n, keep_layer_name, create_layer);
+    std::pair<bool, unsigned int> res = open_layer_uncached (layout, n, keep_layer_name, create_layer);
     m_layer_cache.insert (std::make_pair (n, res));
     return res;
   }
 }
 
-std::pair <bool, unsigned int>
+std::pair<bool, unsigned int>
 NamedLayerReader::open_layer_uncached (db::Layout &layout, const std::string &n, bool keep_layer_name, bool create_layer)
 {
   int l = -1, d = -1;
@@ -162,9 +160,7 @@ NamedLayerReader::open_layer_uncached (db::Layout &layout, const std::string &n,
       lp.datatype = d;
       lp.name = on;
       li = m_layer_map.logical (lp, layout);
-
     }
-
   }
 
   if (! li.empty ()) {
@@ -186,7 +182,6 @@ NamedLayerReader::open_layer_uncached (db::Layout &layout, const std::string &n,
       }
 
       return std::make_pair (true, mmp->second);
-
     }
 
   } else if (! create_layer) {
@@ -195,7 +190,7 @@ NamedLayerReader::open_layer_uncached (db::Layout &layout, const std::string &n,
 
   } else {
 
-    std::map <std::string, unsigned int>::const_iterator nl = m_new_layers.find (n);
+    std::map<std::string, unsigned int>::const_iterator nl = m_new_layers.find (n);
     if (nl == m_new_layers.end ()) {
 
       unsigned int ll;
@@ -211,19 +206,16 @@ NamedLayerReader::open_layer_uncached (db::Layout &layout, const std::string &n,
     } else {
       return std::pair<bool, unsigned int> (true, nl->second);
     }
-
   }
 }
 
-void
-NamedLayerReader::map_layer (const std::string &name, unsigned int layer)
+void NamedLayerReader::map_layer (const std::string &name, unsigned int layer)
 {
   m_layer_cache [name] = std::make_pair (true, layer);
   m_layer_map_out.map (name, layer);
 }
 
-void
-NamedLayerReader::prepare_layers (db::Layout &layout)
+void NamedLayerReader::prepare_layers (db::Layout &layout)
 {
   m_new_layers.clear ();
   m_next_layer_index = m_layer_map.next_index ();
@@ -235,8 +227,7 @@ NamedLayerReader::prepare_layers (db::Layout &layout)
   m_layer_map.prepare (layout);
 }
 
-void
-NamedLayerReader::finish_layers (db::Layout &layout)
+void NamedLayerReader::finish_layers (db::Layout &layout)
 {
   //  resolve layer multi-mapping
 
@@ -256,23 +247,20 @@ NamedLayerReader::finish_layers (db::Layout &layout)
         } else {
           layout.copy_layer (i->second, *l);
         }
-
       }
-
     }
-
   }
 
   //  assign layer numbers to new layers
   if (! m_new_layers.empty () && ! m_keep_layer_names) {
 
-    std::set<std::pair<int, int> > used_ld;
+    std::set<std::pair<int, int>> used_ld;
     for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
-      used_ld.insert (std::make_pair((*l).second->layer, (*l).second->datatype));
+      used_ld.insert (std::make_pair ((*l).second->layer, (*l).second->datatype));
     }
 
     //  assign fixed layer numbers for all layers whose name is a fixed number unless there is already a layer with that number
-    for (std::map<std::string, unsigned int>::iterator i = m_new_layers.begin (); i != m_new_layers.end (); ) {
+    for (std::map<std::string, unsigned int>::iterator i = m_new_layers.begin (); i != m_new_layers.end ();) {
 
       std::map<std::string, unsigned int>::iterator ii = i;
       ++ii;
@@ -289,15 +277,13 @@ NamedLayerReader::finish_layers (db::Layout &layout)
         m_layer_map.map (lp, i->second);
 
         m_new_layers.erase (i);
-
       }
 
       i = ii;
-
     }
 
     //  assign fixed layer numbers for all layers whose name is a LxDy or Lx notation unless there is already a layer with that layer/datatype
-    for (std::map<std::string, unsigned int>::iterator i = m_new_layers.begin (); i != m_new_layers.end (); ) {
+    for (std::map<std::string, unsigned int>::iterator i = m_new_layers.begin (); i != m_new_layers.end ();) {
 
       std::map<std::string, unsigned int>::iterator ii = i;
       ++ii;
@@ -317,13 +303,10 @@ NamedLayerReader::finish_layers (db::Layout &layout)
         m_layer_map.map (lp, i->second);
 
         m_new_layers.erase (i);
-
       }
 
       i = ii;
-
     }
-
   }
 
   //  insert the remaining ones

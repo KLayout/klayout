@@ -288,7 +288,7 @@ private:
   EdgeSink *mp_chained;
 };
 
-typedef edge_to_edge_set_generator<std::unordered_set<db::Edge> > EdgeToEdgeSetGenerator;
+typedef edge_to_edge_set_generator<std::unordered_set<db::Edge>> EdgeToEdgeSetGenerator;
 
 class DB_PUBLIC PolygonRefToShapesGenerator
   : public PolygonSink
@@ -376,10 +376,10 @@ private:
  */
 template <class TS, class TI>
 DB_PUBLIC_TEMPLATE
-std::map<db::properties_id_type, std::pair<std::vector<const TS *>, std::set<const TI *> > >
-separate_interactions_by_properties (const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, db::PropertyConstraint property_constraint)
+  std::map<db::properties_id_type, std::pair<std::vector<const TS *>, std::set<const TI *>>>
+  separate_interactions_by_properties (const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI>> &interactions, db::PropertyConstraint property_constraint)
 {
-  std::map<db::properties_id_type, std::pair<std::vector<const TS *>, std::set<const TI *> > > by_prop_id;
+  std::map<db::properties_id_type, std::pair<std::vector<const TS *>, std::set<const TI *>>> by_prop_id;
 
   for (auto i = interactions.begin (); i != interactions.end (); ++i) {
 
@@ -387,19 +387,17 @@ separate_interactions_by_properties (const shape_interactions<db::object_with_pr
 
     db::properties_id_type prop_id = subject.properties_id ();
 
-    std::pair<std::vector<const TS *>, std::set<const TI *> > &s2p = by_prop_id [prop_id];
+    std::pair<std::vector<const TS *>, std::set<const TI *>> &s2p = by_prop_id [prop_id];
     s2p.first.push_back (&subject);
 
     for (auto ii = i->second.begin (); ii != i->second.end (); ++ii) {
 
-      const std::pair<unsigned int, db::object_with_properties<TI> > &intruder = interactions.intruder_shape (*ii);
+      const std::pair<unsigned int, db::object_with_properties<TI>> &intruder = interactions.intruder_shape (*ii);
 
       if (pc_match (property_constraint, prop_id, intruder.second.properties_id ())) {
         s2p.second.insert (&intruder.second);
       }
-
     }
-
   }
 
   return by_prop_id;
@@ -414,11 +412,11 @@ separate_interactions_by_properties (const shape_interactions<db::object_with_pr
  */
 template <class TS, class TI>
 DB_PUBLIC_TEMPLATE
-std::map<db::properties_id_type, db::shape_interactions<TS, TI> >
-separate_interactions_to_interactions_by_properties (const shape_interactions<TS, TI> &interactions, db::PropertyConstraint property_constraint)
+  std::map<db::properties_id_type, db::shape_interactions<TS, TI>>
+  separate_interactions_to_interactions_by_properties (const shape_interactions<TS, TI> &interactions, db::PropertyConstraint property_constraint)
 {
-  std::map<db::properties_id_type, db::shape_interactions<TS, TI> > by_prop_id;
-  std::map<db::properties_id_type, std::set<unsigned int> > intruder_ids_by_prop_id;
+  std::map<db::properties_id_type, db::shape_interactions<TS, TI>> by_prop_id;
+  std::map<db::properties_id_type, std::set<unsigned int>> intruder_ids_by_prop_id;
 
   for (auto i = interactions.begin (); i != interactions.end (); ++i) {
 
@@ -437,9 +435,7 @@ separate_interactions_to_interactions_by_properties (const shape_interactions<TS
         s2p.add_interaction (i->first, *ii);
         intruder_ids.insert (*ii);
       }
-
     }
-
   }
 
   for (auto i = intruder_ids_by_prop_id.begin (); i != intruder_ids_by_prop_id.end (); ++i) {
@@ -451,7 +447,6 @@ separate_interactions_to_interactions_by_properties (const shape_interactions<TS
       auto is = interactions.intruder_shape (*ii);
       s2p.add_intruder_shape (*ii, is.first, is.second);
     }
-
   }
 
   return by_prop_id;
@@ -460,4 +455,3 @@ separate_interactions_to_interactions_by_properties (const shape_interactions<TS
 }
 
 #endif
-

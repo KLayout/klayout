@@ -54,8 +54,8 @@ private:
   int m_fw;
   int m_bw;
 
-  void paintEvent (QPaintEvent *event); 
-  void resizeEvent (QResizeEvent *event); 
+  void paintEvent (QPaintEvent *event);
+  void resizeEvent (QResizeEvent *event);
 };
 
 ProgressBarWidget::ProgressBarWidget (QWidget *parent, const char *name)
@@ -67,8 +67,7 @@ ProgressBarWidget::ProgressBarWidget (QWidget *parent, const char *name)
   setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
-void
-ProgressBarWidget::set_value (double v, const std::string &value)
+void ProgressBarWidget::set_value (double v, const std::string &value)
 {
   if (value != m_value_string) {
     update ();
@@ -86,25 +85,22 @@ ProgressBarWidget::set_value (double v, const std::string &value)
   }
 }
 
-QSize
-ProgressBarWidget::sizeHint () const
+QSize ProgressBarWidget::sizeHint () const
 {
   QFontMetrics fm (font ());
 #if QT_VERSION >= 0x60000
-  return QSize (fm.horizontalAdvance (QString::fromUtf8("100%")) * 4, fm.height () + 2);
+  return QSize (fm.horizontalAdvance (QString::fromUtf8 ("100%")) * 4, fm.height () + 2);
 #else
-  return QSize (fm.width (QString::fromUtf8("100%")) * 4, fm.height () + 2);
+  return QSize (fm.width (QString::fromUtf8 ("100%")) * 4, fm.height () + 2);
 #endif
 }
 
-QSize
-ProgressBarWidget::minimumSizeHint () const
+QSize ProgressBarWidget::minimumSizeHint () const
 {
   return QSize (50, 1);
 }
 
-void 
-ProgressBarWidget::paintEvent (QPaintEvent *)
+void ProgressBarWidget::paintEvent (QPaintEvent *)
 {
   QPainter painter (this);
 
@@ -114,7 +110,7 @@ ProgressBarWidget::paintEvent (QPaintEvent *)
   painter.fillRect (QRect (QPoint (m_fw, m_fw), QPoint (m_length + m_fw - 1, bottom - 1 - m_fw)), palette ().brush (QPalette::Highlight));
   painter.fillRect (QRect (QPoint (m_length + m_fw, m_fw), QPoint (right - 1 - m_fw, bottom - 1 - m_fw)), palette ().brush (QPalette::Base));
   painter.setPen (palette ().color (QPalette::Text));
-  
+
   for (int d = 0; d < m_bw; ++d) {
     painter.drawRect (QRect (QPoint (d, d), QPoint (right - 1 - d, bottom - 1 - d)));
   }
@@ -130,8 +126,7 @@ ProgressBarWidget::paintEvent (QPaintEvent *)
   painter.drawText (rect (), Qt::AlignHCenter | Qt::AlignVCenter, tl::to_qstring (m_value_string));
 }
 
-void
-ProgressBarWidget::resizeEvent (QResizeEvent *)
+void ProgressBarWidget::resizeEvent (QResizeEvent *)
 {
   m_width = size ().width ();
   update ();
@@ -204,7 +199,7 @@ ProgressWidget::ProgressWidget (ProgressReporter *pr, QWidget *parent, bool fw)
   m_left_col = col++;
 
   mp_label = new QLabel (bar_frame);
-  layout->setColumnStretch(col, 2);
+  layout->setColumnStretch (col, 2);
   layout->addWidget (mp_label, 0, col++, 1, 1);
 
   layout->addItem (new QSpacerItem (8, 8, QSizePolicy::Fixed, QSizePolicy::Fixed), 0, col++, 1, 1);
@@ -244,8 +239,7 @@ ProgressWidget::ProgressWidget (ProgressReporter *pr, QWidget *parent, bool fw)
   set_full_width (fw);
 }
 
-void
-ProgressWidget::set_log_visible (tl::Progress *progress)
+void ProgressWidget::set_log_visible (tl::Progress *progress)
 {
   if ((progress != 0) != m_log_visible) {
     m_log_visible = (progress != 0);
@@ -254,8 +248,7 @@ ProgressWidget::set_log_visible (tl::Progress *progress)
     set_full_width (m_full_width);
   }
 }
-void
-ProgressWidget::set_full_width (bool fw)
+void ProgressWidget::set_full_width (bool fw)
 {
   m_full_width = fw;
 
@@ -264,8 +257,7 @@ ProgressWidget::set_full_width (bool fw)
   mp_layout->setColumnStretch (m_right_col, f ? 0 : 1);
 }
 
-bool
-ProgressWidget::full_width () const
+bool ProgressWidget::full_width () const
 {
   return m_full_width;
 }
@@ -276,20 +268,18 @@ ProgressWidget::get_widget () const
   return mp_widget;
 }
 
-void
-ProgressWidget::add_widget (QWidget *widget)
+void ProgressWidget::add_widget (QWidget *widget)
 {
   remove_widget ();
 
   if (widget) {
     mp_widget = widget;
-    widget->setParent(this);
+    widget->setParent (this);
     mp_layout->addWidget (widget, 2, 0, 1, m_widget_col);
   }
 }
 
-void
-ProgressWidget::remove_widget ()
+void ProgressWidget::remove_widget ()
 {
   if (mp_widget) {
     delete mp_widget;
@@ -297,10 +287,9 @@ ProgressWidget::remove_widget ()
   }
 }
 
-void
-ProgressWidget::set_progress (tl::Progress *progress)
+void ProgressWidget::set_progress (tl::Progress *progress)
 {
-  lay::ProgressBarWidget *progress_bars[] = { mp_progress_bar1, mp_progress_bar2, mp_progress_bar3 };
+  lay::ProgressBarWidget *progress_bars [] = {mp_progress_bar1, mp_progress_bar2, mp_progress_bar3};
 
   if (! progress || progress->is_abstract ()) {
 
@@ -316,7 +305,6 @@ ProgressWidget::set_progress (tl::Progress *progress)
     mp_label->setText (QString ());
 
     return;
-
   }
 
   bool can_cancel = false;
@@ -330,9 +318,9 @@ ProgressWidget::set_progress (tl::Progress *progress)
   mp_cancel_button->setEnabled (can_cancel);
   mp_label->setText (tl::to_qstring (text));
 
-  for (size_t i = 0; i < sizeof (progress_bars) / sizeof (progress_bars[0]); ++i) {
+  for (size_t i = 0; i < sizeof (progress_bars) / sizeof (progress_bars [0]); ++i) {
 
-    lay::ProgressBarWidget *pb = progress_bars[i];
+    lay::ProgressBarWidget *pb = progress_bars [i];
 
     if (progress) {
 
@@ -351,7 +339,6 @@ ProgressWidget::set_progress (tl::Progress *progress)
     } else {
       pb->hide ();
     }
-
   }
 
   mp_progress_bar_frame->show ();
@@ -360,17 +347,14 @@ ProgressWidget::set_progress (tl::Progress *progress)
   mp_progress_bar1->parentWidget ()->updateGeometry ();
 }
 
-void 
-ProgressWidget::signal_break ()
+void ProgressWidget::signal_break ()
 {
   mp_pr->signal_break ();
 }
 
-QSize  
-ProgressWidget::sizeHint () const
+QSize ProgressWidget::sizeHint () const
 {
   return QSize (400, 50);
 }
 
 }
-

@@ -33,7 +33,7 @@
 namespace
 {
 
-template<class Iter>
+template <class Iter>
 class EdgeRef
 {
 public:
@@ -43,7 +43,8 @@ public:
 
   EdgeRef (Iter i)
     : iter (i), swapped (0), connected (false), delivered (false), seen (false), next (0)
-  { }
+  {
+  }
 
   Iter iter;
   short swapped;
@@ -63,9 +64,8 @@ public:
   }
 };
 
-template<class Iter, bool swapped>
-struct EdgeRefToBox
-{
+template <class Iter, bool swapped>
+struct EdgeRefToBox {
 public:
   typedef typename std::iterator_traits<Iter>::value_type value_type;
   typedef typename value_type::coord_type coord_type;
@@ -74,7 +74,8 @@ public:
 
   EdgeRefToBox (coord_type d)
     : distance (d)
-  { }
+  {
+  }
 
   box_type operator() (EdgeRef<Iter> *er) const
   {
@@ -110,13 +111,13 @@ EdgesToContours::contour (size_t i) const
   }
 }
 
-namespace {
+namespace
+{
 
 template <class C>
 class point_matcher
 {
 public:
-
   point_matcher () : m_vp_min (0.0), m_d_min (0.0), m_any (false)
   {
     //  .. nothing yet ..
@@ -171,8 +172,7 @@ private:
 
 }
 
-template <class Iter, class C> static
-EdgeRef<Iter> *search_follower (const db::point<C> &p, const EdgeRef<Iter> *e, C distance, const db::box_tree<db::box<C>, EdgeRef<Iter> *, EdgeRefToBox<Iter, false> > &t1, const db::box_tree<db::box<C>, EdgeRef<Iter> *, EdgeRefToBox<Iter, true> > &t2)
+template <class Iter, class C> static EdgeRef<Iter> *search_follower (const db::point<C> &p, const EdgeRef<Iter> *e, C distance, const db::box_tree<db::box<C>, EdgeRef<Iter> *, EdgeRefToBox<Iter, false>> &t1, const db::box_tree<db::box<C>, EdgeRef<Iter> *, EdgeRefToBox<Iter, true>> &t2)
 {
   typedef db::box<C> box_type;
 
@@ -182,7 +182,7 @@ EdgeRef<Iter> *search_follower (const db::point<C> &p, const EdgeRef<Iter> *e, C
 
   //  try in forward tree
 
-  typename db::box_tree<box_type, EdgeRef<Iter> *, EdgeRefToBox<Iter, false> >::touching_iterator f = t1.begin_touching (box_type (p, p), EdgeRefToBox <Iter, false> (distance));
+  typename db::box_tree<box_type, EdgeRef<Iter> *, EdgeRefToBox<Iter, false>>::touching_iterator f = t1.begin_touching (box_type (p, p), EdgeRefToBox<Iter, false> (distance));
   while (! f.at_end ()) {
     if (*f != e && ! (*f)->connected && (*f)->swapped != 1 && pm.more (p, *e->iter, *(*f)->iter, false)) {
       cand = *f;
@@ -191,7 +191,7 @@ EdgeRef<Iter> *search_follower (const db::point<C> &p, const EdgeRef<Iter> *e, C
   }
 
   if (! t2.empty ()) {
-    typename db::box_tree<box_type, EdgeRef<Iter> *, EdgeRefToBox<Iter, true> >::touching_iterator f = t2.begin_touching (box_type (p, p), EdgeRefToBox <Iter, true> (distance));
+    typename db::box_tree<box_type, EdgeRef<Iter> *, EdgeRefToBox<Iter, true>>::touching_iterator f = t2.begin_touching (box_type (p, p), EdgeRefToBox<Iter, true> (distance));
     while (! f.at_end ()) {
       if (*f != e && ! (*f)->connected && (*f)->swapped != -1 && pm.more (p, *e->iter, *(*f)->iter, true)) {
         cand = *f;
@@ -210,17 +210,16 @@ EdgeRef<Iter> *search_follower (const db::point<C> &p, const EdgeRef<Iter> *e, C
 }
 
 template <class Iter>
-void
-EdgesToContours::fill (Iter from, Iter to, bool no, typename std::iterator_traits<Iter>::value_type::coord_type distance, tl::RelativeProgress *progress)
+void EdgesToContours::fill (Iter from, Iter to, bool no, typename std::iterator_traits<Iter>::value_type::coord_type distance, tl::RelativeProgress *progress)
 {
   typedef typename std::iterator_traits<Iter>::value_type value_type;
   typedef typename value_type::coord_type coord_type;
   typedef db::box<coord_type> box_type;
   typedef db::point<coord_type> point_type;
-  typedef db::box_tree<box_type, EdgeRef<Iter> *, EdgeRefToBox<Iter, false> > box_tree;
-  typedef db::box_tree<box_type, EdgeRef<Iter> *, EdgeRefToBox<Iter, true> > box_tree_rev;
+  typedef db::box_tree<box_type, EdgeRef<Iter> *, EdgeRefToBox<Iter, false>> box_tree;
+  typedef db::box_tree<box_type, EdgeRef<Iter> *, EdgeRefToBox<Iter, true>> box_tree_rev;
 
-  std::vector<EdgeRef<Iter> > erefs;
+  std::vector<EdgeRef<Iter>> erefs;
   erefs.reserve (to - from);
 
   for (Iter i = from; i < to; ++i) {
@@ -234,25 +233,25 @@ EdgesToContours::fill (Iter from, Iter to, bool no, typename std::iterator_trait
   box_tree_rev btr;
 
   bt.reserve (erefs.size ());
-  for (typename std::vector<EdgeRef<Iter> >::iterator e = erefs.begin (); e != erefs.end (); ++e) {
-    bt.insert (e.operator-> ());
+  for (typename std::vector<EdgeRef<Iter>>::iterator e = erefs.begin (); e != erefs.end (); ++e) {
+    bt.insert (e.operator->());
   }
-  bt.sort (EdgeRefToBox <Iter, false> (distance));
+  bt.sort (EdgeRefToBox<Iter, false> (distance));
 
   if (no) {
     btr.reserve (erefs.size ());
-    for (typename std::vector<EdgeRef<Iter> >::iterator e = erefs.begin (); e != erefs.end (); ++e) {
-      btr.insert (e.operator-> ());
+    for (typename std::vector<EdgeRef<Iter>>::iterator e = erefs.begin (); e != erefs.end (); ++e) {
+      btr.insert (e.operator->());
     }
-    btr.sort (EdgeRefToBox <Iter, true> (distance));
+    btr.sort (EdgeRefToBox<Iter, true> (distance));
   }
 
   //  Build the edge dependency graph (e->next being the following one)
 
-  for (typename std::vector<EdgeRef<Iter> >::iterator e = erefs.begin (); e != erefs.end (); ++e) {
+  for (typename std::vector<EdgeRef<Iter>>::iterator e = erefs.begin (); e != erefs.end (); ++e) {
 
-    EdgeRef<Iter> *ee = e.operator-> ();
-    while (ee && !ee->seen) {
+    EdgeRef<Iter> *ee = e.operator->();
+    while (ee && ! ee->seen) {
 
       if (progress) {
         ++*progress;
@@ -277,9 +276,7 @@ EdgesToContours::fill (Iter from, Iter to, bool no, typename std::iterator_trait
       }
 
       ee = ee->next;
-
     }
-
   }
 
   //  Delivery
@@ -289,7 +286,7 @@ EdgesToContours::fill (Iter from, Iter to, bool no, typename std::iterator_trait
 
   //  Extract the open contours
 
-  for (typename std::vector<EdgeRef<Iter> >::iterator e = erefs.begin (); e != erefs.end (); ++e) {
+  for (typename std::vector<EdgeRef<Iter>>::iterator e = erefs.begin (); e != erefs.end (); ++e) {
 
     if (progress) {
       ++*progress;
@@ -301,21 +298,19 @@ EdgesToContours::fill (Iter from, Iter to, bool no, typename std::iterator_trait
       m_contours_closed.push_back (false);
 
       m_contours.back ().push_back (e->a ());
-      EdgeRef<Iter> *ee = e.operator-> ();
+      EdgeRef<Iter> *ee = e.operator->();
       while (ee) {
         tl_assert (! ee->delivered);
         m_contours.back ().push_back (ee->b ());
         ee->delivered = true;
         ee = ee->next;
       }
-
     }
-
   }
 
   //  Extract the closed contours
 
-  for (typename std::vector<EdgeRef<Iter> >::iterator e = erefs.begin (); e != erefs.end (); ++e) {
+  for (typename std::vector<EdgeRef<Iter>>::iterator e = erefs.begin (); e != erefs.end (); ++e) {
 
     if (progress) {
       ++*progress;
@@ -326,15 +321,13 @@ EdgesToContours::fill (Iter from, Iter to, bool no, typename std::iterator_trait
       m_contours.push_back (std::vector<point_type> ());
       m_contours_closed.push_back (true);
 
-      EdgeRef<Iter> *ee = e.operator-> ();
+      EdgeRef<Iter> *ee = e.operator->();
       while (ee && ! ee->delivered) {
         m_contours.back ().push_back (ee->b ());
         ee->delivered = true;
         ee = ee->next;
       }
-
     }
-
   }
 }
 
@@ -343,4 +336,3 @@ template DB_PUBLIC void EdgesToContours::fill (std::vector<db::Edge>::iterator, 
 template DB_PUBLIC void EdgesToContours::fill (db::Edge *, db::Edge *, bool, db::Coord, tl::RelativeProgress *);
 
 } // namespace db
-

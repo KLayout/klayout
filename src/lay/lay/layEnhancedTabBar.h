@@ -35,7 +35,7 @@ namespace lay
 class EnhancedTabBar
   : public QTabBar
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   EnhancedTabBar (QWidget *parent);
@@ -48,7 +48,7 @@ protected:
   void tabRemoved (int index) override;
 
 private slots:
-  void list_action_group_triggered (QAction* action);
+  void list_action_group_triggered (QAction *action);
   void list_tool_button_menu_about_to_show ();
 
 private:
@@ -61,4 +61,3 @@ private:
 }
 
 #endif
-

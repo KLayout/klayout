@@ -52,19 +52,19 @@ template <class TS, class TI, class TR> class local_processor_contexts;
 inline const db::Shapes *subject_idptr () { return (const db::Shapes *) 0; }
 inline const db::Shapes *foreign_idptr () { return (const db::Shapes *) 1; }
 
-inline unsigned int subject_idlayer() { return std::numeric_limits<unsigned int>::max (); }
-inline unsigned int foreign_idlayer() { return std::numeric_limits<unsigned int>::max () - 1; }
+inline unsigned int subject_idlayer () { return std::numeric_limits<unsigned int>::max (); }
+inline unsigned int foreign_idlayer () { return std::numeric_limits<unsigned int>::max () - 1; }
 
 //  TODO: move this somewhere else?
 template <class TS, class TI>
 class DB_PUBLIC shape_interactions
 {
 public:
-  typedef std::unordered_map<unsigned int, std::vector<unsigned int> > container;
+  typedef std::unordered_map<unsigned int, std::vector<unsigned int>> container;
   typedef container::const_iterator iterator;
   typedef container::value_type::second_type::const_iterator iterator2;
   typedef typename std::unordered_map<unsigned int, TS>::const_iterator subject_iterator;
-  typedef typename std::unordered_map<unsigned int, std::pair<unsigned int, TI> >::const_iterator intruder_iterator;
+  typedef typename std::unordered_map<unsigned int, std::pair<unsigned int, TI>>::const_iterator intruder_iterator;
 
   shape_interactions ();
 
@@ -134,16 +134,15 @@ public:
   }
 
 private:
-  std::unordered_map<unsigned int, std::vector<unsigned int> > m_interactions;
+  std::unordered_map<unsigned int, std::vector<unsigned int>> m_interactions;
   std::unordered_map<unsigned int, TS> m_subject_shapes;
-  std::unordered_map<unsigned int, std::pair<unsigned int, TI> > m_intruder_shapes;
+  std::unordered_map<unsigned int, std::pair<unsigned int, TI>> m_intruder_shapes;
   unsigned int m_id;
 };
 
 //  TODO: should be hidden (private data?)
 template <class TS, class TI, class TR>
-struct DB_PUBLIC local_processor_cell_drop
-{
+struct DB_PUBLIC local_processor_cell_drop {
   local_processor_cell_drop (db::local_processor_cell_context<TS, TI, TR> *_parent_context, db::Cell *_parent, const db::ICplxTrans &_cell_inst)
     : parent_context (_parent_context), parent (_parent), cell_inst (_cell_inst)
   {
@@ -161,7 +160,7 @@ class DB_PUBLIC local_processor_cell_context
 {
 public:
   typedef std::pair<const db::Cell *, db::ICplxTrans> parent_inst_type;
-  typedef typename std::vector<local_processor_cell_drop<TS, TI, TR> >::const_iterator drop_iterator;
+  typedef typename std::vector<local_processor_cell_drop<TS, TI, TR>>::const_iterator drop_iterator;
 
   local_processor_cell_context ();
   local_processor_cell_context (const local_processor_cell_context &other);
@@ -177,7 +176,7 @@ public:
 
   const std::unordered_set<TR> &propagated (unsigned int l) const
   {
-    typename std::map<unsigned int, std::unordered_set<TR> >::const_iterator i = m_propagated.find (l);
+    typename std::map<unsigned int, std::unordered_set<TR>>::const_iterator i = m_propagated.find (l);
     if (i != m_propagated.end ()) {
       return i->second;
     } else {
@@ -209,8 +208,8 @@ public:
   }
 
 private:
-  std::map<unsigned int, std::unordered_set<TR> > m_propagated;
-  std::vector<local_processor_cell_drop<TS, TI, TR> > m_drops;
+  std::map<unsigned int, std::unordered_set<TR>> m_propagated;
+  std::vector<local_processor_cell_drop<TS, TI, TR>> m_drops;
   tl::Mutex m_lock;
 };
 
@@ -218,8 +217,8 @@ template <class TS, class TI, class TR>
 class DB_PUBLIC local_processor_cell_contexts
 {
 public:
-  typedef std::pair<std::set<CellInstArray>, std::map<unsigned int, std::set<TI> > > context_key_type;
-  typedef std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI, TR> > context_map_type;
+  typedef std::pair<std::set<CellInstArray>, std::map<unsigned int, std::set<TI>>> context_key_type;
+  typedef std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI, TR>> context_map_type;
   typedef typename context_map_type::const_iterator iterator;
 
   local_processor_cell_contexts ();
@@ -244,7 +243,7 @@ public:
     return m_contexts.end ();
   }
 
-  const std::vector<std::unordered_set<TR> > &result () const
+  const std::vector<std::unordered_set<TR>> &result () const
   {
     return m_result;
   }
@@ -256,15 +255,15 @@ public:
 
 private:
   const db::Cell *mp_intruder_cell;
-  std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI, TR> > m_contexts;
-  std::vector<std::unordered_set<TR> > m_result;
+  std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI, TR>> m_contexts;
+  std::vector<std::unordered_set<TR>> m_result;
 };
 
 template <class TS, class TI, class TR>
 class DB_PUBLIC local_processor_contexts
 {
 public:
-  typedef std::unordered_map<db::Cell *, local_processor_cell_contexts<TS, TI, TR> > contexts_per_cell_type;
+  typedef std::unordered_map<db::Cell *, local_processor_cell_contexts<TS, TI, TR>> contexts_per_cell_type;
   typedef typename contexts_per_cell_type::iterator iterator;
 
   local_processor_contexts ()
@@ -560,11 +559,11 @@ public:
 
   void run_flat (const db::Shapes *subject_shapes, const db::Shapes *intruders, const local_operation<TS, TI, TR> *op, db::Shapes *result_shapes) const;
   void run_flat (const db::Shapes *subjects, const std::vector<const db::Shapes *> &intruders, const local_operation<TS, TI, TR> *op, const std::vector<db::Shapes *> &result_shapes) const;
-  void run_flat (const generic_shape_iterator<TS> &subjects, const std::vector<generic_shape_iterator<TI> > &intruders, const std::vector<bool> &foreign, const local_operation<TS, TI, TR> *op, const std::vector<db::Shapes *> &result_shapes) const;
+  void run_flat (const generic_shape_iterator<TS> &subjects, const std::vector<generic_shape_iterator<TI>> &intruders, const std::vector<bool> &foreign, const local_operation<TS, TI, TR> *op, const std::vector<db::Shapes *> &result_shapes) const;
 
 private:
-  template<typename, typename, typename> friend class local_processor_cell_contexts;
-  template<typename, typename, typename> friend class local_processor_context_computation_task;
+  template <typename, typename, typename> friend class local_processor_cell_contexts;
+  template <typename, typename, typename> friend class local_processor_context_computation_task;
 
   db::Layout *mp_subject_layout;
   const db::Layout *mp_intruder_layout;
@@ -572,7 +571,7 @@ private:
   const db::Cell *mp_intruder_top;
   const std::set<db::cell_index_type> *mp_subject_breakout_cells;
   const std::set<db::cell_index_type> *mp_intruder_breakout_cells;
-  mutable std::unique_ptr<tl::Job<local_processor_context_computation_worker<TS, TI, TR> > > mp_cc_job;
+  mutable std::unique_ptr<tl::Job<local_processor_context_computation_worker<TS, TI, TR>>> mp_cc_job;
   mutable size_t m_progress;
   mutable tl::Progress *mp_progress;
 
@@ -580,7 +579,7 @@ private:
   size_t get_progress () const;
   void compute_contexts (db::local_processor_contexts<TS, TI, TR> &contexts, db::local_processor_cell_context<TS, TI, TR> *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, db::Coord dist) const;
   void issue_compute_contexts (db::local_processor_contexts<TS, TI, TR> &contexts, db::local_processor_cell_context<TS, TI, TR> *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, db::Coord dist) const;
-  void compute_local_cell (const db::local_processor_contexts<TS, TI, TR> &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const local_operation<TS, TI, TR> *op, const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, std::vector<std::unordered_set<TR> > &result) const;
+  void compute_local_cell (const db::local_processor_contexts<TS, TI, TR> &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const local_operation<TS, TI, TR> *op, const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, std::vector<std::unordered_set<TR>> &result) const;
 
   bool subject_cell_is_breakout (db::cell_index_type ci) const
   {
@@ -596,4 +595,3 @@ private:
 }
 
 #endif
-

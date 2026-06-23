@@ -37,8 +37,7 @@ namespace db
 namespace plc
 {
 
-struct DB_PUBLIC TriangulationParameters
-{
+struct DB_PUBLIC TriangulationParameters {
   TriangulationParameters ()
     : min_b (1.0),
       min_length (0.0),
@@ -48,7 +47,8 @@ struct DB_PUBLIC TriangulationParameters
       base_verbosity (30),
       mark_triangles (false),
       remove_outside_triangles (true)
-  { }
+  {
+  }
 
   /**
    *  @brief Min. readius-to-shortest edge ratio
@@ -163,7 +163,7 @@ public:
    *  This method can be called after "triangulate" to add new points and adjust the triangulation.
    *  Inserting new points will maintain the (constrained) Delaunay condition.
    */
-  Vertex *insert_point (const db::DPoint &point, std::list<tl::weak_ptr<Polygon> > *new_triangles = 0);
+  Vertex *insert_point (const db::DPoint &point, std::list<tl::weak_ptr<Polygon>> *new_triangles = 0);
 
   /**
    *  @brief Finds the edge for two given points
@@ -253,7 +253,7 @@ public:
    *
    *  This method is provided as a partial solution of a triangulation for special cases.
    */
-  void constrain (const std::vector<std::vector<Vertex *> > &contours);
+  void constrain (const std::vector<std::vector<Vertex *>> &contours);
 
   /**
    *  @brief Inserts a contours of a polygon
@@ -266,7 +266,7 @@ public:
    *  This method is used internally by the "triangulate" method to create the basic triangulation.
    *  This method is provided as a partial solution of a triangulation for special cases.
    */
-  template<class Poly, class Trans> void make_contours (const Poly &poly, const Trans &trans, std::vector<std::vector<Vertex *> > &contours);
+  template <class Poly, class Trans> void make_contours (const Poly &poly, const Trans &trans, std::vector<std::vector<Vertex *>> &contours);
 
 protected:
   /**
@@ -286,7 +286,7 @@ protected:
    *  If "new_triangles" is not null, it will receive the list of new triangles created during
    *  the remove step.
    */
-  Vertex *insert_point (db::DCoord x, db::DCoord y, std::list<tl::weak_ptr<Polygon> > *new_triangles = 0);
+  Vertex *insert_point (db::DCoord x, db::DCoord y, std::list<tl::weak_ptr<Polygon>> *new_triangles = 0);
 
   /**
    *  @brief Removes the given vertex
@@ -294,7 +294,7 @@ protected:
    *  If "new_triangles" is not null, it will receive the list of new triangles created during
    *  the remove step.
    */
-  void remove (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles = 0);
+  void remove (Vertex *vertex, std::list<tl::weak_ptr<Polygon>> *new_triangles = 0);
 
   /**
    *  @brief Flips the given edge
@@ -331,20 +331,20 @@ private:
   size_t m_id;
   mutable size_t m_flips, m_hops;
 
-  void remove_outside_vertex (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles = 0);
-  void remove_inside_vertex (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles_out = 0);
+  void remove_outside_vertex (Vertex *vertex, std::list<tl::weak_ptr<Polygon>> *new_triangles = 0);
+  void remove_inside_vertex (Vertex *vertex, std::list<tl::weak_ptr<Polygon>> *new_triangles_out = 0);
   std::vector<Polygon *> fill_concave_corners (const std::vector<Edge *> &edges);
-  void fix_triangles (const std::vector<Polygon *> &tris, const std::vector<Edge *> &fixed_edges, std::list<tl::weak_ptr<Polygon> > *new_triangles);
+  void fix_triangles (const std::vector<Polygon *> &tris, const std::vector<Edge *> &fixed_edges, std::list<tl::weak_ptr<Polygon>> *new_triangles);
   std::vector<Polygon *> find_triangle_for_point (const db::DPoint &point);
   Edge *find_closest_edge (const db::DPoint &p, Vertex *vstart = 0, bool inside_only = false) const;
-  Vertex *insert (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles = 0);
-  void split_triangle (Polygon *t, Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles_out);
-  void split_triangles_on_edge (Vertex *vertex, Edge *split_edge, std::list<tl::weak_ptr<Polygon> > *new_triangles_out);
+  Vertex *insert (Vertex *vertex, std::list<tl::weak_ptr<Polygon>> *new_triangles = 0);
+  void split_triangle (Polygon *t, Vertex *vertex, std::list<tl::weak_ptr<Polygon>> *new_triangles_out);
+  void split_triangles_on_edge (Vertex *vertex, Edge *split_edge, std::list<tl::weak_ptr<Polygon>> *new_triangles_out);
   void add_more_triangles (std::vector<Polygon *> &new_triangles,
-                                 Edge *incoming_edge,
-                                 Vertex *from_vertex, Vertex *to_vertex,
-                                 Edge *conn_edge);
-  void insert_new_vertex(Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles_out);
+                           Edge *incoming_edge,
+                           Vertex *from_vertex, Vertex *to_vertex,
+                           Edge *conn_edge);
+  void insert_new_vertex (Vertex *vertex, std::list<tl::weak_ptr<Polygon>> *new_triangles_out);
   std::vector<Edge *> ensure_edge_inner (Vertex *from, Vertex *to);
   void join_edges (std::vector<Edge *> &edges);
 };
@@ -354,4 +354,3 @@ private:
 } //  namespace db
 
 #endif
-

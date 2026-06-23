@@ -36,97 +36,97 @@ static std::string norm_exp (const std::string &s)
   return tl::replaced (tl::replaced (s, "e+006", "e+06"), "E+006", "E+06");
 }
 
-TEST(1)
+TEST (1)
 {
   EXPECT_EQ (to_string (12.5), "12.5");
   EXPECT_EQ (tl::sprintf ("%.2f", 12.5), "12.50");
   EXPECT_EQ (to_string (int (12)), "12");
   EXPECT_EQ (to_string (long (12)), "12");
-  EXPECT_EQ (to_string ((unsigned int)12), "12");
-  EXPECT_EQ (to_string ((unsigned long)12), "12");
-  EXPECT_EQ (to_string ((char *)" 12"), " 12");
+  EXPECT_EQ (to_string ((unsigned int) 12), "12");
+  EXPECT_EQ (to_string ((unsigned long) 12), "12");
+  EXPECT_EQ (to_string ((char *) " 12"), " 12");
   EXPECT_EQ (to_string (" 12", 2), " 1");
-  EXPECT_EQ (to_string ((unsigned char *)" 12"), " 12");
+  EXPECT_EQ (to_string ((unsigned char *) " 12"), " 12");
   EXPECT_EQ (to_string (std::string (" 12")), " 12");
 
-  EXPECT_EQ (norm_exp (tl::sprintf("%g %e %f",M_PI,M_PI*1e6,M_PI*0.001)), "3.14159 3.141593e+06 0.003142");
-  EXPECT_EQ (norm_exp (tl::sprintf("%G %E %F",M_PI*1e6,M_PI*1e6,M_PI*1e6)), "3.14159E+06 3.141593E+06 3141592.653590");
-  EXPECT_EQ (norm_exp (tl::sprintf("%-15g %015.8e %15.12f %g",M_PI,M_PI*1e6,M_PI*0.001,M_PI)), "3.14159         03.14159265e+06  0.003141592654 3.14159");
-  EXPECT_EQ (norm_exp (tl::sprintf("%-15g %015.8E %15.12f %g",M_PI,M_PI*1e6,M_PI*0.001,M_PI)), "3.14159         03.14159265E+06  0.003141592654 3.14159");
-  EXPECT_EQ (tl::sprintf("%-5s %5s %x %u %d (%s)","a","b",1234,2345,3456), "a         b 4d2 2345 3456 ()");
-  EXPECT_EQ (tl::sprintf("%lu %llu %02x", 1, 2, 167), "1 2 a7");
-  EXPECT_EQ (tl::sprintf("%lu %llu %02X", 1, 2, 761), "1 2 2F9");
-  EXPECT_EQ (tl::sprintf("%c%c", 'a', 'X'), "aX");
+  EXPECT_EQ (norm_exp (tl::sprintf ("%g %e %f", M_PI, M_PI * 1e6, M_PI * 0.001)), "3.14159 3.141593e+06 0.003142");
+  EXPECT_EQ (norm_exp (tl::sprintf ("%G %E %F", M_PI * 1e6, M_PI * 1e6, M_PI * 1e6)), "3.14159E+06 3.141593E+06 3141592.653590");
+  EXPECT_EQ (norm_exp (tl::sprintf ("%-15g %015.8e %15.12f %g", M_PI, M_PI * 1e6, M_PI * 0.001, M_PI)), "3.14159         03.14159265e+06  0.003141592654 3.14159");
+  EXPECT_EQ (norm_exp (tl::sprintf ("%-15g %015.8E %15.12f %g", M_PI, M_PI * 1e6, M_PI * 0.001, M_PI)), "3.14159         03.14159265E+06  0.003141592654 3.14159");
+  EXPECT_EQ (tl::sprintf ("%-5s %5s %x %u %d (%s)", "a", "b", 1234, 2345, 3456), "a         b 4d2 2345 3456 ()");
+  EXPECT_EQ (tl::sprintf ("%lu %llu %02x", 1, 2, 167), "1 2 a7");
+  EXPECT_EQ (tl::sprintf ("%lu %llu %02X", 1, 2, 761), "1 2 2F9");
+  EXPECT_EQ (tl::sprintf ("%c%c", 'a', 'X'), "aX");
 
   //  64bit numbers
-  EXPECT_EQ (tl::sprintf("%x", 0x1000000000ll), "1000000000");
-  EXPECT_EQ (tl::sprintf("%lx", 0x1000000000ll), "1000000000");
-  EXPECT_EQ (tl::sprintf("%llx", 0x1000000000ll), "1000000000");
-  EXPECT_EQ (tl::sprintf("%d", 100000000000ll), "100000000000");
-  EXPECT_EQ (tl::sprintf("%ld", 100000000000ll), "100000000000");
-  EXPECT_EQ (tl::sprintf("%lld", 100000000000ll), "100000000000");
-  EXPECT_EQ (tl::sprintf("%d", -100000000000ll), "-100000000000");
-  EXPECT_EQ (tl::sprintf("%ld", -100000000000ll), "-100000000000");
-  EXPECT_EQ (tl::sprintf("%lld", -100000000000ll), "-100000000000");
-  EXPECT_EQ (tl::sprintf("%u", 100000000000ull), "100000000000");
-  EXPECT_EQ (tl::sprintf("%lu", 100000000000ull), "100000000000");
-  EXPECT_EQ (tl::sprintf("%llu", 100000000000ull), "100000000000");
+  EXPECT_EQ (tl::sprintf ("%x", 0x1000000000ll), "1000000000");
+  EXPECT_EQ (tl::sprintf ("%lx", 0x1000000000ll), "1000000000");
+  EXPECT_EQ (tl::sprintf ("%llx", 0x1000000000ll), "1000000000");
+  EXPECT_EQ (tl::sprintf ("%d", 100000000000ll), "100000000000");
+  EXPECT_EQ (tl::sprintf ("%ld", 100000000000ll), "100000000000");
+  EXPECT_EQ (tl::sprintf ("%lld", 100000000000ll), "100000000000");
+  EXPECT_EQ (tl::sprintf ("%d", -100000000000ll), "-100000000000");
+  EXPECT_EQ (tl::sprintf ("%ld", -100000000000ll), "-100000000000");
+  EXPECT_EQ (tl::sprintf ("%lld", -100000000000ll), "-100000000000");
+  EXPECT_EQ (tl::sprintf ("%u", 100000000000ull), "100000000000");
+  EXPECT_EQ (tl::sprintf ("%lu", 100000000000ull), "100000000000");
+  EXPECT_EQ (tl::sprintf ("%llu", 100000000000ull), "100000000000");
 }
 
-TEST(1a)
+TEST (1a)
 {
   double d;
 
-  from_string("-.10500", d);
-  EXPECT_EQ (to_string(d), "-0.105");
+  from_string ("-.10500", d);
+  EXPECT_EQ (to_string (d), "-0.105");
 
-  from_string("000.105", d);
-  EXPECT_EQ (to_string(d), "0.105");
+  from_string ("000.105", d);
+  EXPECT_EQ (to_string (d), "0.105");
 
-  from_string("10", d);
-  EXPECT_EQ (to_string(d), "10");
+  from_string ("10", d);
+  EXPECT_EQ (to_string (d), "10");
 
-  from_string("-0010", d);
-  EXPECT_EQ (to_string(d), "-10");
+  from_string ("-0010", d);
+  EXPECT_EQ (to_string (d), "-10");
 
-  from_string("-15.", d);
-  EXPECT_EQ (to_string(d), "-15");
+  from_string ("-15.", d);
+  EXPECT_EQ (to_string (d), "-15");
 
-  from_string("-15.000e-1", d);
-  EXPECT_EQ (to_string(d), "-1.5");
+  from_string ("-15.000e-1", d);
+  EXPECT_EQ (to_string (d), "-1.5");
 
-  from_string("-15.000E+1", d);
-  EXPECT_EQ (to_string(d), "-150");
+  from_string ("-15.000E+1", d);
+  EXPECT_EQ (to_string (d), "-150");
 
-  from_string_ext("-15.000E+1", d);
-  EXPECT_EQ (to_string(d), "-150");
+  from_string_ext ("-15.000E+1", d);
+  EXPECT_EQ (to_string (d), "-150");
 
-  from_string_ext("25400/25.4", d);
-  EXPECT_EQ (to_string(d), "1000");
+  from_string_ext ("25400/25.4", d);
+  EXPECT_EQ (to_string (d), "1000");
 
-  from_string_ext("25400/(25+0.4)", d);
-  EXPECT_EQ (to_string(d), "1000");
+  from_string_ext ("25400/(25+0.4)", d);
+  EXPECT_EQ (to_string (d), "1000");
 
-  from_string_ext(" 25400   / (25  + 0.4 )   ", d);
-  EXPECT_EQ (to_string(d), "1000");
+  from_string_ext (" 25400   / (25  + 0.4 )   ", d);
+  EXPECT_EQ (to_string (d), "1000");
 
-  from_string("1E+03", d);
-  EXPECT_EQ (to_string(d), "1000");
+  from_string ("1E+03", d);
+  EXPECT_EQ (to_string (d), "1000");
 
-  from_string("11E3", d);
-  EXPECT_EQ (to_string(d), "11000");
+  from_string ("11E3", d);
+  EXPECT_EQ (to_string (d), "11000");
 
-  from_string("0.0515e+003", d);
-  EXPECT_EQ (to_string(d), "51.5");
+  from_string ("0.0515e+003", d);
+  EXPECT_EQ (to_string (d), "51.5");
 
   tl::Extractor ex ("    -15.000e-1x");
   double x;
   ex.read (x);
-  EXPECT_EQ (to_string(x), "-1.5");
+  EXPECT_EQ (to_string (x), "-1.5");
   ex.expect ("x");
 }
 
-TEST(2)
+TEST (2)
 {
   long l;
   unsigned long ul;
@@ -145,21 +145,37 @@ TEST(2)
   from_string ("   -12.5e2    ", d);
   EXPECT_EQ (d, -12.5e2);
   error = false;
-  try { from_string ("a", d); } catch (...) { error = true; }
+  try {
+    from_string ("a", d);
+  } catch (...) {
+    error = true;
+  }
   EXPECT_EQ (error, true);
   error = false;
-  try { from_string ("12a", d); } catch (...) { error = true; }
+  try {
+    from_string ("12a", d);
+  } catch (...) {
+    error = true;
+  }
   EXPECT_EQ (error, true);
-  
+
   from_string ("   12   ", ul);
   EXPECT_EQ (ul, (unsigned int) 12);
   from_string_ext ("   12   ", ul);
   EXPECT_EQ (ul, (unsigned int) 12);
   error = false;
-  try { from_string ("a", ul); } catch (...) { error = true; }
+  try {
+    from_string ("a", ul);
+  } catch (...) {
+    error = true;
+  }
   EXPECT_EQ (error, true);
   error = false;
-  try { from_string ("-12", ul); } catch (...) { error = true; }
+  try {
+    from_string ("-12", ul);
+  } catch (...) {
+    error = true;
+  }
   EXPECT_EQ (error, true);
 
   from_string ("   12   ", l);
@@ -167,7 +183,11 @@ TEST(2)
   from_string_ext ("   12   ", l);
   EXPECT_EQ (l, 12);
   error = false;
-  try { from_string ("a", l); } catch (...) { error = true; }
+  try {
+    from_string ("a", l);
+  } catch (...) {
+    error = true;
+  }
   EXPECT_EQ (error, true);
 
   from_string ("   12   ", ui);
@@ -175,10 +195,18 @@ TEST(2)
   from_string_ext ("   12   ", ui);
   EXPECT_EQ (ui, (unsigned int) 12);
   error = false;
-  try { from_string ("a", ui); } catch (...) { error = true; }
+  try {
+    from_string ("a", ui);
+  } catch (...) {
+    error = true;
+  }
   EXPECT_EQ (error, true);
   error = false;
-  try { from_string ("-12", ui); } catch (...) { error = true; }
+  try {
+    from_string ("-12", ui);
+  } catch (...) {
+    error = true;
+  }
   EXPECT_EQ (error, true);
 
   from_string ("   12   ", i);
@@ -186,14 +214,18 @@ TEST(2)
   from_string_ext ("   12   ", i);
   EXPECT_EQ (i, 12);
   error = false;
-  try { from_string ("a", i); } catch (...) { error = true; }
+  try {
+    from_string ("a", i);
+  } catch (...) {
+    error = true;
+  }
   EXPECT_EQ (error, true);
 
   from_string ("  12", s);
   EXPECT_EQ (s, "  12");
 }
 
-TEST(3)
+TEST (3)
 {
   EXPECT_EQ (trim ("   12   "), "12");
   EXPECT_EQ (trim ("   1 2   "), "1 2");
@@ -201,7 +233,7 @@ TEST(3)
   EXPECT_EQ (trim ("1 2"), "1 2");
 }
 
-TEST(4)
+TEST (4)
 {
   tl::string s;
   EXPECT_EQ (std::string (s.c_str ()), "");
@@ -253,10 +285,9 @@ TEST(4)
   EXPECT_EQ (s.capacity (), size_t (0));
 
   // ...
-
 }
 
-TEST(5)
+TEST (5)
 {
   Extractor x ("\t5   :  -6 oder-1.5e001");
   Extractor xx ("\t   ");
@@ -281,7 +312,7 @@ TEST(5)
   EXPECT_EQ (d, -15.0);
 }
 
-TEST(6)
+TEST (6)
 {
   Extractor x ("\t5:  -6 oder");
 
@@ -319,7 +350,7 @@ TEST(6)
   EXPECT_EQ (x3.test (":"), true);
 }
 
-TEST(6_double)
+TEST (6_double)
 {
   Extractor x ("  5.5 -2.5 \n+0.125  (no number)");
 
@@ -338,7 +369,7 @@ TEST(6_double)
   x.expect ("(");
 }
 
-TEST(7)
+TEST (7)
 {
   EXPECT_EQ (tl::to_quoted_string ("a_word!"), "'a_word!'");
   EXPECT_EQ (tl::to_quoted_string ("a_word'!"), "'a_word\\'!'");
@@ -346,7 +377,7 @@ TEST(7)
   EXPECT_EQ (tl::to_word_or_quoted_string ("a_word!", "_!"), "a_word!");
 }
 
-TEST(8)
+TEST (8)
 {
   std::string s;
   Extractor x;
@@ -485,7 +516,7 @@ TEST(8)
   EXPECT_EQ (x.test_without_case ("µM"), true);
 }
 
-TEST(9)
+TEST (9)
 {
   EXPECT_EQ (tl::edit_distance ("", ""), 0);
   EXPECT_EQ (tl::edit_distance ("aber", "aber"), 0);
@@ -499,7 +530,7 @@ TEST(9)
   EXPECT_EQ (tl::edit_distance ("matthias", "koefferlein"), 11);
 }
 
-TEST(10)
+TEST (10)
 {
   std::string s;
   s = to_quoted_string ("'a\n\003");
@@ -521,7 +552,7 @@ TEST(10)
   EXPECT_EQ (unescape_string (escape_string ("'a\n\0031")), "'a\n\0031");
 }
 
-TEST(11)
+TEST (11)
 {
   std::string s;
   tl::escape_to_html (s, "x");
@@ -539,7 +570,7 @@ TEST(11)
   EXPECT_EQ (tl::escaped_to_html ("a\nb", false), "a\nb");
 }
 
-TEST(12)
+TEST (12)
 {
   EXPECT_EQ (replaced ("abc", "b", "xy"), "axyc");
   EXPECT_EQ (replaced ("ab", "b", "xy"), "axy");
@@ -556,7 +587,7 @@ TEST(12)
   EXPECT_EQ (replaced ("abbbbbbbc", "bbb", "xy"), "axyxybc");
 }
 
-TEST(13)
+TEST (13)
 {
   EXPECT_EQ (replicate ("abc", 0), "");
   EXPECT_EQ (replicate ("abc", 1), "abc");
@@ -564,7 +595,7 @@ TEST(13)
   EXPECT_EQ (replicate ("", 2), "");
 }
 
-TEST(14)
+TEST (14)
 {
   EXPECT_EQ (pad_string_right (0, "abc"), "abc");
   EXPECT_EQ (pad_string_right (2, "abc"), "abc");
@@ -579,7 +610,7 @@ TEST(14)
 }
 
 //  UTF-8 to wchar_t and local conversion
-TEST(15)
+TEST (15)
 {
   std::string locale = setlocale (LC_ALL, NULL);
   const char *lc = setlocale (LC_ALL, "en_US.UTF-8");
@@ -606,7 +637,7 @@ TEST(15)
 }
 
 //  Special numerical values
-TEST(16)
+TEST (16)
 {
   EXPECT_EQ (tl::to_string (NAN), "nan");
   EXPECT_EQ (tl::to_string (INFINITY), "inf");

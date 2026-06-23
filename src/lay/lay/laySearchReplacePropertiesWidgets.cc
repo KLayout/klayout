@@ -86,7 +86,7 @@ static const char *cfg_suffix_text_size_value = "-text-size-value";
 // ----------------------------------------------------------------------------
 //  Some utilities
 
-static std::string 
+static std::string
 escape_string (const std::string &s, bool process_substring_refs = false, bool *has_substring_refs = 0)
 {
   std::string r = "\"";
@@ -94,7 +94,7 @@ escape_string (const std::string &s, bool process_substring_refs = false, bool *
   for (const char *cp = s.c_str (); *cp; ++cp) {
     if (*cp == '"') {
       r += "\\\"";
-    } else if (*cp == '\\' && isdigit (cp[1]) && process_substring_refs) {
+    } else if (*cp == '\\' && isdigit (cp [1]) && process_substring_refs) {
       //  $1, $2 ... are the substring references
       ++cp;
       r += "\"+$";
@@ -114,8 +114,8 @@ escape_string (const std::string &s, bool process_substring_refs = false, bool *
 
   //  remove neutral components (i.e. ""+$2+"abc" -> $2+"abc")
   std::string rr;
-  for (const char *cp = r.c_str (); *cp; ) {
-    if ((cp[0] == '+' && cp[1] == '"' && cp[2] == '"') || (cp[0] == '"' && cp[1] == '"' && cp[2] == '+')) {
+  for (const char *cp = r.c_str (); *cp;) {
+    if ((cp [0] == '+' && cp [1] == '"' && cp [2] == '"') || (cp [0] == '"' && cp [1] == '"' && cp [2] == '+')) {
       cp += 3;
     } else {
       rr += *cp++;
@@ -125,7 +125,7 @@ escape_string (const std::string &s, bool process_substring_refs = false, bool *
   return rr;
 }
 
-static void 
+static void
 configure_cbx (QComboBox *cbx, const std::string &value)
 {
   cbx->setCurrentIndex (cbx->findText (QString (tl::to_qstring (value))));
@@ -136,7 +136,7 @@ add_layer_clause (std::string &expr, LayerSelectionComboBox *layer)
 {
   db::LayerMap lm;
   //  NOTE: going the way through the LayerMap object to obtain the string
-  //  makes this code compatible with the query parser which uses the 
+  //  makes this code compatible with the query parser which uses the
   //  LayerMap object too.
   lm.map (layer->current_layer_props (), 0);
   std::string v = lm.mapping_str (0);
@@ -159,13 +159,12 @@ add_numerical_condition (std::string &expr, QComboBox *op, QLineEdit *value, con
     tl::Extractor (v.c_str ()).read (vv);
     expr += attribute;
     expr += " ";
-    expr += tl::to_string (op->currentText());
+    expr += tl::to_string (op->currentText ());
     expr += " " + tl::to_string (vv);
     if (unit) {
       expr += " ";
       expr += unit;
     }
-
   }
 }
 
@@ -183,7 +182,6 @@ add_string_condition (std::string &expr, QComboBox *op, QLineEdit *value, const 
     expr += " ";
     expr += tl::to_string (op->currentText ());
     expr += " " + escape_string (v);
-
   }
 }
 
@@ -201,7 +199,6 @@ add_orientation_condition (std::string &expr, QComboBox *op, QComboBox *value, c
     expr += " ";
     expr += tl::to_string (op->currentText ());
     expr += " Trans." + v + ".rot";
-
   }
 }
 
@@ -223,7 +220,6 @@ add_layer_assignment (std::string &expr, LayerSelectionComboBox *value, const ch
     lp.read (ex);
 
     expr += "<" + lp.to_string () + ">";
-
   }
 }
 
@@ -250,7 +246,6 @@ add_cell_index_assignment (std::string &expr, QLineEdit *value, const char *attr
       expr += cstr;
       expr += ">>";
     }
-
   }
 }
 
@@ -274,7 +269,6 @@ add_numerical_assignment (std::string &expr, QLineEdit *value, const char *attri
       expr += " ";
       expr += unit;
     }
-
   }
 }
 
@@ -291,7 +285,6 @@ add_string_assignment (std::string &expr, QLineEdit *value, const char *attribut
     expr += attribute;
     expr += " = ";
     expr += escape_string (v, true /*=process substring refs*/);
-
   }
 }
 
@@ -309,7 +302,6 @@ add_orientation_assignment (std::string &expr, QComboBox *value, const char *att
     expr += " = Trans.";
     expr += v;
     expr += ".rot";
-
   }
 }
 
@@ -1044,7 +1036,7 @@ void fill_replace_pages (QStackedWidget *sw, lay::LayoutViewBase *view, int cv_i
   sw->addWidget (new ReplaceTextProperties (sw, view, cv_index));
 }
 
-static const char *object_ids[] = { "instance", "shape", "box", "polygon", "path", "text" };
+static const char *object_ids [] = {"instance", "shape", "box", "polygon", "path", "text"};
 
 std::string index_to_find_object_id (int index)
 {
@@ -1066,4 +1058,3 @@ int index_from_find_object_id (const std::string &id)
 }
 
 }
-

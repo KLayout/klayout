@@ -118,8 +118,7 @@ StringRepository::create_string_ref ()
   return ref;
 }
 
-void
-StringRepository::unregister_ref (StringRef *ref)
+void StringRepository::unregister_ref (StringRef *ref)
 {
   tl::MutexLocker locker (&s_repository_lock);
   if (! m_string_refs.empty ()) {
@@ -139,15 +138,13 @@ StringRef::~StringRef ()
   }
 }
 
-void
-StringRef::add_ref ()
+void StringRef::add_ref ()
 {
   tl::MutexLocker locker (&s_ref_lock);
   ++m_ref_count;
 }
 
-void
-StringRef::remove_ref ()
+void StringRef::remove_ref ()
 {
   tl::MutexLocker locker (&s_ref_lock);
   --m_ref_count;
@@ -197,14 +194,14 @@ template class text<DCoord>;
 namespace tl
 {
 
-template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Text &p)
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Text &p)
 {
   if (! test_extractor_impl (ex, p)) {
     ex.error (tl::to_string (tr ("Expected a text specification")));
   }
 }
 
-template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DText &p)
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DText &p)
 {
   if (! test_extractor_impl (ex, p)) {
     ex.error (tl::to_string (tr ("Expected a text specification")));
@@ -212,7 +209,7 @@ template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DText &p)
 }
 
 
-template<class C> bool _test_extractor_impl (tl::Extractor &ex, db::text<C> &t)
+template <class C> bool _test_extractor_impl (tl::Extractor &ex, db::text<C> &t)
 {
   if (ex.test ("(")) {
 
@@ -257,15 +254,14 @@ template<class C> bool _test_extractor_impl (tl::Extractor &ex, db::text<C> &t)
   }
 }
 
-template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Text &p)
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Text &p)
 {
   return _test_extractor_impl (ex, p);
 }
 
-template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DText &p)
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DText &p)
 {
   return _test_extractor_impl (ex, p);
 }
 
 }
-

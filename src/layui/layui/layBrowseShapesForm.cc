@@ -58,7 +58,7 @@ class BrowseShapesPluginDeclaration
   : public lay::PluginDeclaration
 {
 public:
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> &options) const
   {
     options.push_back (std::pair<std::string, std::string> (cfg_shb_context_cell, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_shb_context_mode, "any-top"));
@@ -72,7 +72,7 @@ public:
   virtual lay::ConfigPage *config_page (QWidget *parent, std::string &title) const
   {
     title = tl::to_string (QObject::tr ("Browsers|Shape Browser"));
-    return new BrowseShapesConfigPage (parent); 
+    return new BrowseShapesConfigPage (parent);
   }
 
   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
@@ -81,7 +81,7 @@ public:
     menu_entries.push_back (lay::separator ("browser_group", "tools_menu.end"));
     menu_entries.push_back (lay::menu_item ("browse_shapes::show", "browse_shapes", "tools_menu.end", tl::to_string (QObject::tr ("Browse Shapes"))));
   }
- 
+
   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
     if (lay::has_gui ()) {
@@ -101,10 +101,9 @@ static struct {
   BrowseShapesForm::mode_type mode;
   const char *string;
 } context_modes [] = {
-  { BrowseShapesForm::AnyTop,      "any-top"    },
-  { BrowseShapesForm::Local,       "local"      },
-  { BrowseShapesForm::ToCellView,  "given-cell" }
-};
+  {BrowseShapesForm::AnyTop, "any-top"},
+  {BrowseShapesForm::Local, "local"},
+  {BrowseShapesForm::ToCellView, "given-cell"}};
 
 class BrowseShapesContextModeConverter
 {
@@ -121,7 +120,7 @@ public:
     throw tl::Exception (tl::to_string (QObject::tr ("Invalid cell browser context mode: ")) + value);
   }
 
-  std::string 
+  std::string
   to_string (BrowseShapesForm::mode_type mode)
   {
     for (unsigned int i = 0; i < sizeof (context_modes) / sizeof (context_modes [0]); ++i) {
@@ -137,12 +136,11 @@ static struct {
   BrowseShapesForm::window_type mode;
   const char *string;
 } window_modes [] = {
-  { BrowseShapesForm::DontChange,    "dont-change" },
-  { BrowseShapesForm::FitCell,       "fit-cell"    },
-  { BrowseShapesForm::FitMarker,     "fit-marker"  },
-  { BrowseShapesForm::Center,        "center"      },
-  { BrowseShapesForm::CenterSize,    "center-size" }
-};
+  {BrowseShapesForm::DontChange, "dont-change"},
+  {BrowseShapesForm::FitCell, "fit-cell"},
+  {BrowseShapesForm::FitMarker, "fit-marker"},
+  {BrowseShapesForm::Center, "center"},
+  {BrowseShapesForm::CenterSize, "center-size"}};
 
 class BrowseShapesWindowModeConverter
 {
@@ -159,7 +157,7 @@ public:
     throw tl::Exception (tl::to_string (QObject::tr ("Invalid cell browser window mode: ")) + value);
   }
 
-  std::string 
+  std::string
   to_string (BrowseShapesForm::window_type mode)
   {
     for (unsigned int i = 0; i < sizeof (window_modes) / sizeof (window_modes [0]); ++i) {
@@ -182,8 +180,7 @@ BrowseShapesConfigPage::BrowseShapesConfigPage (QWidget *parent)
   connect (cbx_window, SIGNAL (currentIndexChanged (int)), this, SLOT (window_changed (int)));
 }
 
-void 
-BrowseShapesConfigPage::setup (lay::Dispatcher *root)
+void BrowseShapesConfigPage::setup (lay::Dispatcher *root)
 {
   std::string value;
 
@@ -205,7 +202,7 @@ BrowseShapesConfigPage::setup (lay::Dispatcher *root)
   std::string wdim_str;
   root->config_get (cfg_shb_window_dim, wdim_str);
   mrg_window->set_margin (lay::Margin::from_string (wdim_str));
-    
+
   //  max. instance count
   unsigned int max_inst_count = 1000;
   root->config_get (cfg_shb_max_inst_count, max_inst_count);
@@ -221,20 +218,17 @@ BrowseShapesConfigPage::setup (lay::Dispatcher *root)
   window_changed (int (wmode));
 }
 
-void
-BrowseShapesConfigPage::context_changed (int m)
+void BrowseShapesConfigPage::context_changed (int m)
 {
   le_cell_name->setEnabled (m == int (BrowseShapesForm::ToCellView));
 }
 
-void
-BrowseShapesConfigPage::window_changed (int m)
+void BrowseShapesConfigPage::window_changed (int m)
 {
   mrg_window->setEnabled (m == int (BrowseShapesForm::FitMarker) || m == int (BrowseShapesForm::CenterSize));
 }
 
-void 
-BrowseShapesConfigPage::commit (lay::Dispatcher *root)
+void BrowseShapesConfigPage::commit (lay::Dispatcher *root)
 {
   unsigned int max_inst_count = 1000;
   tl::from_string_ext (tl::to_string (le_max_inst->text ()), max_inst_count);
@@ -259,25 +253,25 @@ public:
   BrowseShapesFormLVI (const std::string &text)
     : QTreeWidgetItem (),
       m_value (0.0), m_value_flat (0.0)
-  { 
+  {
     setText (0, tl::to_qstring (text));
-  }  
-     
+  }
+
   virtual bool operator< (const QTreeWidgetItem &i) const
   {
-    const BrowseShapesFormLVI *other = dynamic_cast <const BrowseShapesFormLVI *> (&i);
+    const BrowseShapesFormLVI *other = dynamic_cast<const BrowseShapesFormLVI *> (&i);
     if (other) {
       return m_value < other->m_value;
     }
     return QTreeWidgetItem::operator< (i);
   }
 
-  void set_value (double v) 
+  void set_value (double v)
   {
     m_value = v;
   }
 
-  void set_value_flat (double v) 
+  void set_value_flat (double v)
   {
     m_value_flat = v;
   }
@@ -341,7 +335,7 @@ private:
 class BrowseShapesFormCellInstanceLVI : public QTreeWidgetItem
 {
 public:
-  BrowseShapesFormCellInstanceLVI (const std::string &text, const std::string &path, 
+  BrowseShapesFormCellInstanceLVI (const std::string &text, const std::string &path,
                                    const db::ICplxTrans &trans, lay::CellView::cell_index_type index)
     : QTreeWidgetItem (),
       m_trans (trans), m_index (index)
@@ -370,7 +364,7 @@ private:
 class BrowseShapesFormShapeInstanceLVI : public QTreeWidgetItem
 {
 public:
-  BrowseShapesFormShapeInstanceLVI (const std::string &text, 
+  BrowseShapesFormShapeInstanceLVI (const std::string &text,
                                     const db::ShapeIterator &iter,
                                     const db::ICplxTrans &trans)
     : QTreeWidgetItem (), m_iter (iter), m_trans (trans)
@@ -380,7 +374,7 @@ public:
 
   const db::Shape &shape () const
   {
-    return *(m_iter.operator-> ());
+    return *(m_iter.operator->());
   }
 
   const db::ICplxTrans &trans () const
@@ -396,7 +390,7 @@ private:
 // ------------------------------------------------------------
 
 BrowseShapesForm::BrowseShapesForm (lay::Dispatcher *root, LayoutViewBase *vw)
-  : lay::Browser (root, vw), 
+  : lay::Browser (root, vw),
     Ui::BrowseShapesForm (),
     m_cv_index (-1),
     m_cell_changed_enabled (true),
@@ -407,7 +401,7 @@ BrowseShapesForm::BrowseShapesForm (lay::Dispatcher *root, LayoutViewBase *vw)
     m_mode (AnyTop),
     m_window (FitMarker),
     m_window_dim (),
-    m_max_inst_count (0), 
+    m_max_inst_count (0),
     m_max_shape_count (0)
 {
   Ui::BrowseShapesForm::setupUi (this);
@@ -430,20 +424,19 @@ BrowseShapesForm::BrowseShapesForm (lay::Dispatcher *root, LayoutViewBase *vw)
   update_cell_list ();
 
   // signals and slots connections
-  connect (lv_cell, SIGNAL (currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT (cell_changed(QTreeWidgetItem*, QTreeWidgetItem*)));
-  connect (lv_cell_instance, SIGNAL (currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT (cell_inst_changed(QTreeWidgetItem*, QTreeWidgetItem*)));
-  connect (lv_shape_instance, SIGNAL (itemSelectionChanged()), this, SLOT (shape_inst_changed()));
-  connect (pb_next_cell, SIGNAL (clicked()), this, SLOT (next_cell()));
-  connect (pb_prev_cell, SIGNAL (clicked()), this, SLOT (prev_cell()));
-  connect (pb_next_shape, SIGNAL (clicked()), this, SLOT (next_shape()));
-  connect (pb_prev_shape, SIGNAL (clicked()), this, SLOT (prev_shape()));
-  connect (pb_next_inst, SIGNAL (clicked()), this, SLOT (next_inst()));
-  connect (pb_prev_inst, SIGNAL (clicked()), this, SLOT (prev_inst()));
+  connect (lv_cell, SIGNAL (currentItemChanged (QTreeWidgetItem *, QTreeWidgetItem *)), this, SLOT (cell_changed (QTreeWidgetItem *, QTreeWidgetItem *)));
+  connect (lv_cell_instance, SIGNAL (currentItemChanged (QTreeWidgetItem *, QTreeWidgetItem *)), this, SLOT (cell_inst_changed (QTreeWidgetItem *, QTreeWidgetItem *)));
+  connect (lv_shape_instance, SIGNAL (itemSelectionChanged ()), this, SLOT (shape_inst_changed ()));
+  connect (pb_next_cell, SIGNAL (clicked ()), this, SLOT (next_cell ()));
+  connect (pb_prev_cell, SIGNAL (clicked ()), this, SLOT (prev_cell ()));
+  connect (pb_next_shape, SIGNAL (clicked ()), this, SLOT (next_shape ()));
+  connect (pb_prev_shape, SIGNAL (clicked ()), this, SLOT (prev_shape ()));
+  connect (pb_next_inst, SIGNAL (clicked ()), this, SLOT (next_inst ()));
+  connect (pb_prev_inst, SIGNAL (clicked ()), this, SLOT (prev_inst ()));
   connect (configureButton, SIGNAL (clicked ()), this, SLOT (configure ()));
 }
 
-void 
-BrowseShapesForm::menu_activated (const std::string &symbol)
+void BrowseShapesForm::menu_activated (const std::string &symbol)
 {
   if (symbol == "browse_shapes::show") {
     view ()->deactivate_all_browsers ();
@@ -458,15 +451,13 @@ BrowseShapesForm::~BrowseShapesForm ()
   remove_marker ();
 }
 
-void
-BrowseShapesForm::configure ()
+void BrowseShapesForm::configure ()
 {
   lay::ConfigurationDialog config_dialog (this, root (), "BrowseShapesPlugin");
   config_dialog.exec ();
 }
 
-bool 
-BrowseShapesForm::configure (const std::string &name, const std::string &value)
+bool BrowseShapesForm::configure (const std::string &name, const std::string &value)
 {
   bool need_update = false;
   bool taken = true;
@@ -522,8 +513,7 @@ BrowseShapesForm::configure (const std::string &name, const std::string &value)
   return taken;
 }
 
-void
-BrowseShapesForm::remove_marker ()
+void BrowseShapesForm::remove_marker ()
 {
   for (std::vector<lay::ShapeMarker *>::iterator m = mp_markers.begin (); m != mp_markers.end (); ++m) {
     delete *m;
@@ -531,8 +521,7 @@ BrowseShapesForm::remove_marker ()
   mp_markers.clear ();
 }
 
-void 
-BrowseShapesForm::cell_changed (QTreeWidgetItem *item, QTreeWidgetItem *)
+void BrowseShapesForm::cell_changed (QTreeWidgetItem *item, QTreeWidgetItem *)
 {
   lv_cell_instance->clear ();
   lv_shape_instance->clear ();
@@ -541,7 +530,7 @@ BrowseShapesForm::cell_changed (QTreeWidgetItem *item, QTreeWidgetItem *)
     return;
   }
 
-  BrowseShapesFormCellLVI *it = dynamic_cast <BrowseShapesFormCellLVI *> (item);
+  BrowseShapesFormCellLVI *it = dynamic_cast<BrowseShapesFormCellLVI *> (item);
   if (! it) {
     remove_marker ();
     return;
@@ -550,7 +539,7 @@ BrowseShapesForm::cell_changed (QTreeWidgetItem *item, QTreeWidgetItem *)
   const db::Layout &layout = m_cellview->layout ();
   double dbu = layout.dbu ();
   unsigned int layer = m_lprops [it->lindex ()]->layer_index ();
-  db::ICplxTrans trans = db::VCplxTrans(1.0 / dbu) * m_lprops [it->lindex ()]->trans () [0] * db::CplxTrans(dbu);
+  db::ICplxTrans trans = db::VCplxTrans (1.0 / dbu) * m_lprops [it->lindex ()]->trans () [0] * db::CplxTrans (dbu);
   const std::set<db::properties_id_type> *prop_sel = &m_lprops [it->lindex ()]->prop_sel ();
   bool inv_prop_sel = m_lprops [it->lindex ()]->inverse_prop_sel ();
   const db::Cell &cell = layout.cell (it->index ());
@@ -596,7 +585,7 @@ BrowseShapesForm::cell_changed (QTreeWidgetItem *item, QTreeWidgetItem *)
   //  fill the list of shape instances
   count = 0;
   db::ShapeIterator shape;
-  for (shape = cell.shapes (layer).begin (db::ShapeIterator::All, prop_sel, inv_prop_sel); !shape.at_end () && count++ < m_max_shape_count; ++shape) {
+  for (shape = cell.shapes (layer).begin (db::ShapeIterator::All, prop_sel, inv_prop_sel); ! shape.at_end () && count++ < m_max_shape_count; ++shape) {
 
     db::Box box (shape->bbox ());
 
@@ -615,14 +604,13 @@ BrowseShapesForm::cell_changed (QTreeWidgetItem *item, QTreeWidgetItem *)
       name = tl::to_string (QObject::tr ("non-geometric"));
     }
 
-    items.append (new BrowseShapesFormShapeInstanceLVI ((name + std::string (" at (") + tl::micron_to_string (0.5 * dbu * (box.left () + box.right ())) + 
-                                                                        "," + tl::micron_to_string (0.5 * dbu * (box.bottom () + box.top ())) + ")"),
+    items.append (new BrowseShapesFormShapeInstanceLVI ((name + std::string (" at (") + tl::micron_to_string (0.5 * dbu * (box.left () + box.right ())) +
+                                                         "," + tl::micron_to_string (0.5 * dbu * (box.bottom () + box.top ())) + ")"),
                                                         shape,
                                                         trans));
-
   }
 
-  shortened = !shape.at_end ();
+  shortened = ! shape.at_end ();
 
   //  add an entry to indicate that there are more ..
   if (shortened) {
@@ -640,31 +628,27 @@ BrowseShapesForm::cell_changed (QTreeWidgetItem *item, QTreeWidgetItem *)
   m_shape_inst_changed_enabled = true;
 
   highlight_current ();
-
 }
 
-void 
-BrowseShapesForm::shape_inst_changed ()
+void BrowseShapesForm::shape_inst_changed ()
 {
   if (m_cv_index >= 0 && m_shape_inst_changed_enabled) {
     highlight_current ();
   }
 }
 
-void 
-BrowseShapesForm::cell_inst_changed (QTreeWidgetItem *, QTreeWidgetItem *)
+void BrowseShapesForm::cell_inst_changed (QTreeWidgetItem *, QTreeWidgetItem *)
 {
   if (m_cv_index >= 0 && m_cell_inst_changed_enabled) {
     highlight_current ();
   }
 }
 
-void 
-BrowseShapesForm::activated ()
+void BrowseShapesForm::activated ()
 {
   view ()->save_view (m_display_state);
 
-  std::vector <lay::LayerPropertiesConstIterator> sel_layers = view ()->selected_layers ();
+  std::vector<lay::LayerPropertiesConstIterator> sel_layers = view ()->selected_layers ();
 
   if (sel_layers.empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("No layer selected")));
@@ -675,7 +659,7 @@ BrowseShapesForm::activated ()
 
   m_cv_index = -1;
 
-  for (std::vector <lay::LayerPropertiesConstIterator>::const_iterator l = sel_layers.begin (); l != sel_layers.end (); ++l) {
+  for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = sel_layers.begin (); l != sel_layers.end (); ++l) {
 
     if ((*l)->layer_index () >= 0 && (*l)->cellview_index () >= 0) {
 
@@ -688,13 +672,11 @@ BrowseShapesForm::activated ()
         if (cv_index != m_cv_index) {
           throw tl::Exception (tl::to_string (QObject::tr ("Layers selected for shape browsing must originate from the same cellview")));
         }
-      } else { 
+      } else {
         m_cv_index = cv_index;
         m_cellview = view ()->cellview (m_cv_index);
       }
-
     }
-
   }
 
   update ();
@@ -703,8 +685,7 @@ BrowseShapesForm::activated ()
   m_view_changed = false;
 }
 
-void 
-BrowseShapesForm::update ()
+void BrowseShapesForm::update ()
 {
   if (m_mode == ToCellView) {
     m_cellview.set_cell (m_context_cell);
@@ -721,8 +702,7 @@ BrowseShapesForm::update ()
 //  A helper structure to hold all information relevant to the cells to
 //  show
 
-struct BrowseShapesCellInfo 
-{
+struct BrowseShapesCellInfo {
   BrowseShapesCellInfo (const std::string &n, size_t s, size_t sf, lay::CellView::cell_index_type i)
     : name (n), shapes (s), shapes_flat (sf), cell_index (i)
   {
@@ -733,7 +713,7 @@ struct BrowseShapesCellInfo
   size_t shapes, shapes_flat;
   lay::CellView::cell_index_type cell_index;
 
-  bool operator< (const BrowseShapesCellInfo &d) const 
+  bool operator< (const BrowseShapesCellInfo &d) const
   {
     return name < d.name;
   }
@@ -748,8 +728,7 @@ num_shape_instances (unsigned int layer, const db::Cell &cell)
 }
 
 
-void 
-BrowseShapesForm::update_cell_list ()
+void BrowseShapesForm::update_cell_list ()
 {
   BrowseShapesFormCellLVI *sel_item = 0;
 
@@ -766,21 +745,21 @@ BrowseShapesForm::update_cell_list ()
       lv_cell->addTopLevelItem (layer_root);
 
       const db::Layout &layout = m_cellview->layout ();
-      
+
       m_cell_changed_enabled = false;
 
-      //  obtain all cell names, sort by shape count and fill into the lv_cell  
-      std::vector <BrowseShapesCellInfo> cell_info;
+      //  obtain all cell names, sort by shape count and fill into the lv_cell
+      std::vector<BrowseShapesCellInfo> cell_info;
       cell_info.reserve (layout.cells ());
 
       const std::set<db::properties_id_type> *prop_sel = &m_lprops [lindex]->prop_sel ();
       bool inv_prop_sel = m_lprops [lindex]->inverse_prop_sel ();
 
-      db::CellCounter counter (& layout);
+      db::CellCounter counter (&layout);
 
       for (db::Layout::const_iterator c = layout.begin (); c != layout.end (); ++c) {
         size_t shapes = 0;
-        for (db::ShapeIterator iter = (*c).shapes (m_lprops [lindex]->layer_index ()).begin (db::ShapeIterator::All, prop_sel, inv_prop_sel); !iter.at_end (); ++iter) {
+        for (db::ShapeIterator iter = (*c).shapes (m_lprops [lindex]->layer_index ()).begin (db::ShapeIterator::All, prop_sel, inv_prop_sel); ! iter.at_end (); ++iter) {
           ++shapes;
         }
         if (shapes > 0) {
@@ -791,12 +770,12 @@ BrowseShapesForm::update_cell_list ()
         }
       }
 
-      tl::sort (cell_info.begin (), cell_info.end ()); 
+      tl::sort (cell_info.begin (), cell_info.end ());
 
       //  create the entries.
       QList<QTreeWidgetItem *> items;
       BrowseShapesFormCellLVI *item = 0;
-      for (std::vector<BrowseShapesCellInfo>::const_iterator cn = cell_info.end (); cn != cell_info.begin (); ) {
+      for (std::vector<BrowseShapesCellInfo>::const_iterator cn = cell_info.end (); cn != cell_info.begin ();) {
         --cn;
         item = new BrowseShapesFormCellLVI (cn->name, cn->cell_index, lindex);
         item->setText (1, tl::to_qstring (tl::to_string (cn->shapes)));
@@ -813,9 +792,7 @@ BrowseShapesForm::update_cell_list ()
       layer_root->setText (2, tl::to_qstring (tl::to_string (all_shapes_flat)));
       layer_root->set_value (all_shapes);
       layer_root->set_value_flat (all_shapes);
-
     }
-
   }
 
   if (sel_item) {
@@ -825,12 +802,11 @@ BrowseShapesForm::update_cell_list ()
   }
 }
 
-void
-BrowseShapesForm::deactivated ()
+void BrowseShapesForm::deactivated ()
 {
   root ()->config_set (cfg_shb_window_state, lay::save_dialog_state (this));
 
-  //  remove the cellview reference and clean up everything that could reference 
+  //  remove the cellview reference and clean up everything that could reference
   //  database objects
   lv_cell->clear ();
   lv_cell_instance->clear ();
@@ -844,8 +820,7 @@ BrowseShapesForm::deactivated ()
   remove_marker ();
 }
 
-bool 
-BrowseShapesForm::fill_cell_instances (const db::ICplxTrans &t, const db::Layout &layout, const db::Cell *from, const db::Cell *to, bool to_parent, const std::string &path, QList<QTreeWidgetItem *> &items, unsigned int &count)
+bool BrowseShapesForm::fill_cell_instances (const db::ICplxTrans &t, const db::Layout &layout, const db::Cell *from, const db::Cell *to, bool to_parent, const std::string &path, QList<QTreeWidgetItem *> &items, unsigned int &count)
 {
   if (from == to || (! to_parent && to == 0 && from->is_top ())) {
 
@@ -893,21 +868,17 @@ BrowseShapesForm::fill_cell_instances (const db::ICplxTrans &t, const db::Layout
       }
 
       db::ICplxTrans tt (parent_inst.complex_trans ());
-      const db::Cell *cell = & layout.cell (p->parent_cell_index ());
+      const db::Cell *cell = &layout.cell (p->parent_cell_index ());
       if (fill_cell_instances (tt.inverted () * t, layout, cell, to_parent ? cell : to, false, new_path, items, count)) {
         return true; // list too long - no more entries possible
       }
-
     }
-
   }
 
   return false;
-
 }
 
-void 
-BrowseShapesForm::highlight_current ()
+void BrowseShapesForm::highlight_current ()
 {
   remove_marker ();
 
@@ -918,13 +889,13 @@ BrowseShapesForm::highlight_current ()
   db::ICplxTrans t;
   lay::CellView::cell_index_type cell_index = 0;
 
-  BrowseShapesFormCellLVI *item = dynamic_cast <BrowseShapesFormCellLVI *> (lv_cell->currentItem ());
+  BrowseShapesFormCellLVI *item = dynamic_cast<BrowseShapesFormCellLVI *> (lv_cell->currentItem ());
   if (! item) {
     return;
   }
 
   if (m_mode != Local) {
-    BrowseShapesFormCellInstanceLVI *ci_item = dynamic_cast <BrowseShapesFormCellInstanceLVI *> (lv_cell_instance->currentItem ());
+    BrowseShapesFormCellInstanceLVI *ci_item = dynamic_cast<BrowseShapesFormCellInstanceLVI *> (lv_cell_instance->currentItem ());
     if (! ci_item) {
       return;
     }
@@ -942,17 +913,15 @@ BrowseShapesForm::highlight_current ()
   QList<QTreeWidgetItem *> selected_items = lv_shape_instance->selectedItems ();
   for (QList<QTreeWidgetItem *>::const_iterator s = selected_items.begin (); s != selected_items.end (); ++s) {
 
-    BrowseShapesFormShapeInstanceLVI *shape_item = dynamic_cast <BrowseShapesFormShapeInstanceLVI *> (*s);
+    BrowseShapesFormShapeInstanceLVI *shape_item = dynamic_cast<BrowseShapesFormShapeInstanceLVI *> (*s);
     if (shape_item) {
 
       //  transform the box into the cell view shown in micron space
       mp_markers.push_back (new lay::ShapeMarker (view (), m_cv_index));
       mp_markers.back ()->set (shape_item->shape (), shape_item->trans () * t);
 
-      dbox += (db::CplxTrans(layout.dbu ()) * shape_item->trans () * t) * shape_item->shape ().bbox ();
-
+      dbox += (db::CplxTrans (layout.dbu ()) * shape_item->trans () * t) * shape_item->shape ().bbox ();
     }
-
   }
 
   if (! dbox.empty ()) {
@@ -975,27 +944,24 @@ BrowseShapesForm::highlight_current ()
     }
 
     m_view_changed = true;
-
   }
-
 }
 
-bool
-BrowseShapesForm::adv_cell (bool up)
+bool BrowseShapesForm::adv_cell (bool up)
 {
   QTreeWidgetItem *current = lv_cell->currentItem ();
   m_ef_enabled = false; // prevent recursion
   QKeyEvent ke (QEvent::KeyPress, up ? Qt::Key_Up : Qt::Key_Down, Qt::NoModifier);
-  ((QObject *)lv_cell)->event (&ke);
+  ((QObject *) lv_cell)->event (&ke);
   m_ef_enabled = true;
 
   if (lv_cell->currentItem () != current) {
 
-    BrowseShapesFormLayerLVI *litem = dynamic_cast <BrowseShapesFormLayerLVI *> (lv_cell->currentItem ());
+    BrowseShapesFormLayerLVI *litem = dynamic_cast<BrowseShapesFormLayerLVI *> (lv_cell->currentItem ());
     if (litem) {
       if (! up) {
         while (litem && litem->childCount () == 0) {
-          litem = dynamic_cast <BrowseShapesFormLayerLVI *> (lv_cell->topLevelItem (lv_cell->indexOfTopLevelItem (litem) + 1)); // TODO: slow!
+          litem = dynamic_cast<BrowseShapesFormLayerLVI *> (lv_cell->topLevelItem (lv_cell->indexOfTopLevelItem (litem) + 1)); // TODO: slow!
         }
         if (litem) {
           QTreeWidgetItem *ni = litem->child (0);
@@ -1008,7 +974,7 @@ BrowseShapesForm::adv_cell (bool up)
         do {
           int i = lv_cell->indexOfTopLevelItem (litem);
           if (i > 0) {
-            litem = dynamic_cast <BrowseShapesFormLayerLVI *> (lv_cell->topLevelItem (i - 1)); // TODO: slow!
+            litem = dynamic_cast<BrowseShapesFormLayerLVI *> (lv_cell->topLevelItem (i - 1)); // TODO: slow!
           } else {
             litem = 0;
           }
@@ -1032,21 +998,19 @@ BrowseShapesForm::adv_cell (bool up)
   } else {
     return false;
   }
-
 }
 
-bool
-BrowseShapesForm::adv_shape (bool up)
+bool BrowseShapesForm::adv_shape (bool up)
 {
   QTreeWidgetItem *current = lv_shape_instance->currentItem ();
   m_ef_enabled = false; // prevent recursion
   QKeyEvent ke (QEvent::KeyPress, up ? Qt::Key_Up : Qt::Key_Down, Qt::NoModifier);
-  ((QObject *)lv_shape_instance)->event (&ke);
+  ((QObject *) lv_shape_instance)->event (&ke);
   m_ef_enabled = true;
 
   if (lv_shape_instance->currentItem () == current) {
 
-    //  if we are at the end of the list, pass the event 
+    //  if we are at the end of the list, pass the event
     //  forward to the cell list
     if (adv_cell (up)) {
 
@@ -1069,22 +1033,20 @@ BrowseShapesForm::adv_shape (bool up)
   } else {
     return true;
   }
-
 }
 
-bool
-BrowseShapesForm::adv_cell_inst (bool up)
+bool BrowseShapesForm::adv_cell_inst (bool up)
 {
   QTreeWidgetItem *current = lv_cell_instance->currentItem ();
 
   m_ef_enabled = false; // prevent recursion
   QKeyEvent ke (QEvent::KeyPress, up ? Qt::Key_Up : Qt::Key_Down, Qt::NoModifier);
-  ((QObject *)lv_cell_instance)->event (&ke);
+  ((QObject *) lv_cell_instance)->event (&ke);
   m_ef_enabled = true;
 
   if (lv_cell_instance->currentItem () == current) {
 
-    //  if we are at the end of the list, pass the event 
+    //  if we are at the end of the list, pass the event
     //  forward to the shape instance list
     if (adv_shape (up)) {
 
@@ -1112,12 +1074,11 @@ BrowseShapesForm::adv_cell_inst (bool up)
   }
 }
 
-bool 
-BrowseShapesForm::eventFilter (QObject *watched, QEvent *event)
+bool BrowseShapesForm::eventFilter (QObject *watched, QEvent *event)
 {
   if (m_ef_enabled && event->type () == QEvent::KeyPress) {
 
-    QKeyEvent *ke = dynamic_cast <QKeyEvent *> (event);
+    QKeyEvent *ke = dynamic_cast<QKeyEvent *> (event);
     if (ke && (ke->key () == Qt::Key_Up || ke->key () == Qt::Key_Down)) {
 
       bool up = ke->key () == Qt::Key_Up;
@@ -1131,51 +1092,43 @@ BrowseShapesForm::eventFilter (QObject *watched, QEvent *event)
       }
 
       return true;
-
     }
-
-  } 
+  }
 
   return QDialog::eventFilter (watched, event);
 }
 
-void 
-BrowseShapesForm::next_cell ()
+void BrowseShapesForm::next_cell ()
 {
   lv_cell->setFocus ();
   adv_cell (false);
 }
 
-void 
-BrowseShapesForm::prev_cell ()
+void BrowseShapesForm::prev_cell ()
 {
   lv_cell->setFocus ();
   adv_cell (true);
 }
 
-void 
-BrowseShapesForm::next_shape ()
+void BrowseShapesForm::next_shape ()
 {
   lv_shape_instance->setFocus ();
   adv_shape (false);
 }
 
-void 
-BrowseShapesForm::prev_shape ()
+void BrowseShapesForm::prev_shape ()
 {
   lv_shape_instance->setFocus ();
   adv_shape (true);
 }
 
-void 
-BrowseShapesForm::next_inst ()
+void BrowseShapesForm::next_inst ()
 {
   lv_cell_instance->setFocus ();
   adv_cell_inst (false);
 }
 
-void 
-BrowseShapesForm::prev_inst ()
+void BrowseShapesForm::prev_inst ()
 {
   lv_cell_instance->setFocus ();
   adv_cell_inst (true);
@@ -1184,4 +1137,3 @@ BrowseShapesForm::prev_inst ()
 }
 
 #endif
-

@@ -106,19 +106,21 @@ protected:
   /**
    *  @brief A helper structure defining a port
    */
-  struct PortDefinition
-  {
+  struct PortDefinition {
     PortDefinition ()
       : type (pex::RNode::Internal), port_index (0)
-    { }
+    {
+    }
 
     PortDefinition (pex::RNode::node_type _type, const db::Point &_location, unsigned int _port_index)
       : type (_type), location (_location, _location), port_index (_port_index)
-    { }
+    {
+    }
 
     PortDefinition (pex::RNode::node_type _type, const db::Box &_location, unsigned int _port_index)
       : type (_type), location (_location), port_index (_port_index)
-    { }
+    {
+    }
 
     bool operator< (const PortDefinition &other) const
     {
@@ -141,7 +143,7 @@ protected:
     unsigned int port_index;
   };
 
-  void do_extract (const db::Polygon &db_poly, const std::vector<std::pair<PortDefinition, pex::RNode *> > &ports, pex::RNetwork &rnetwork);
+  void do_extract (const db::Polygon &db_poly, const std::vector<std::pair<PortDefinition, pex::RNode *>> &ports, pex::RNetwork &rnetwork);
 
 private:
   db::plc::ConvexDecompositionParameters m_decomp_param;
@@ -152,4 +154,3 @@ private:
 }
 
 #endif
-

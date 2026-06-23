@@ -49,8 +49,7 @@ class NavigatorService;
 /**
  *  @brief A structure containing all the frozen view information
  */
-struct NavigatorFrozenViewInfo
-{
+struct NavigatorFrozenViewInfo {
   NavigatorFrozenViewInfo (const LayerPropertiesList &lp, std::pair<int, int> hier)
     : layer_properties (lp), hierarchy_levels (hier)
   {
@@ -68,20 +67,20 @@ struct NavigatorFrozenViewInfo
 };
 
 /**
- *  @brief The navigator window 
+ *  @brief The navigator window
  */
-class Navigator 
+class Navigator
   : public QFrame,
     public tl::Object
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   Navigator (MainWindow *main_window);
   ~Navigator ();
 
   void update ();
-  void freeze_clicked (); 
+  void freeze_clicked ();
   void all_hier_levels (bool f);
   void show_images (bool f);
 
@@ -98,9 +97,9 @@ private:
   bool m_show_images;
   bool m_update_layers_needed;
   bool m_update_needed;
-  MainWindow *mp_main_window;  
+  MainWindow *mp_main_window;
   LayoutViewWidget *mp_view;
-  QLabel *mp_placeholder_label;  
+  QLabel *mp_placeholder_label;
   QFrame *mp_menu_bar;
   LayoutView *mp_source_view;
   NavigatorService *mp_service;
@@ -108,7 +107,7 @@ private:
   tl::DeferredMethod<Navigator> m_do_layers_changed;
   tl::DeferredMethod<Navigator> m_do_content_changed;
   tl::DeferredMethod<Navigator> m_do_update_menu_dm;
-  std::map <lay::LayoutView *, NavigatorFrozenViewInfo> m_frozen_list;
+  std::map<lay::LayoutView *, NavigatorFrozenViewInfo> m_frozen_list;
 
   void attach_view (LayoutView *);
   void attach_view ();
@@ -131,4 +130,3 @@ private:
 }
 
 #endif
-

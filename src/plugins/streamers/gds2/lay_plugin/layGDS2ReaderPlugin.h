@@ -30,16 +30,16 @@
 
 namespace Ui
 {
-  class GDS2ReaderOptionPage;
+class GDS2ReaderOptionPage;
 }
 
 namespace lay
 {
 
-class GDS2ReaderOptionPage 
+class GDS2ReaderOptionPage
   : public StreamReaderOptionsPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   GDS2ReaderOptionPage (QWidget *parent);
@@ -55,5 +55,3 @@ private:
 }
 
 #endif
-
-

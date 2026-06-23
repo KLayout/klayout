@@ -27,7 +27,7 @@
 #include <string>
 
 //  basic tests
-TEST(1)
+TEST (1)
 {
   std::set<std::string> names;
 

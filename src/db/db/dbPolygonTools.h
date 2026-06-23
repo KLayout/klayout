@@ -33,7 +33,8 @@
 #include <limits>
 #include <algorithm>
 
-namespace db {
+namespace db
+{
 
 class SimplePolygonSink;
 
@@ -41,13 +42,13 @@ class SimplePolygonSink;
  *  @brief An inside test operator
  *
  *  This class allows an efficient test whether multiple points are inside a given polygon.
- *  Since the test is efficiently implemented when the polygon edges are sorted, the sorting 
- *  and memory allocation step is performed once in the test operator's constructor while 
+ *  Since the test is efficiently implemented when the polygon edges are sorted, the sorting
+ *  and memory allocation step is performed once in the test operator's constructor while
  *  each individual test is performed efficiently.
  */
 
 template <class P>
-class inside_poly_test 
+class inside_poly_test
 {
 public:
   typedef typename P::point_type point_type;
@@ -64,7 +65,7 @@ public:
    *
    *  This function returns 1, if the point is inside (not on)
    *  the polygon. It returns 0, if the point is on the polygon and -1
-   *  if outside. 
+   *  if outside.
    */
   int operator() (const point_type &pt) const;
 
@@ -78,7 +79,7 @@ template <class Polygon>
 class DB_PUBLIC cut_polygon_receiver_base
 {
 public:
-  virtual ~cut_polygon_receiver_base () { }
+  virtual ~cut_polygon_receiver_base () {}
   virtual void put (const Polygon &) = 0;
 };
 
@@ -89,7 +90,8 @@ class cut_polygon_receiver
 public:
   cut_polygon_receiver (const OutputIter &iter)
     : m_iter (iter)
-  { }
+  {
+  }
 
   virtual void put (const Polygon &polygon)
   {
@@ -117,14 +119,14 @@ void cut_polygon (const PolygonType &input, const typename PolygonType::edge_typ
 }
 
 /**
- *  @brief Split a polygon into two or more parts 
+ *  @brief Split a polygon into two or more parts
  *
  *  This function splits a polygon into parts using some heuristics to determine a "suitable" cut line.
  *  The cut line is chosen through a vertex close to a center (either horizontal or vertical). The splitting
  *  is supposed to create smaller parts with less vertices or a better area ratio of polygon to bounding box area.
  *
  *  @param polygon The input polygon
- *  @param output The parts 
+ *  @param output The parts
  */
 template <class PolygonType>
 void DB_PUBLIC split_polygon (const PolygonType &polygon, std::vector<PolygonType> &output);
@@ -150,7 +152,7 @@ bool DB_PUBLIC suggest_split_polygon (const PolygonType &polygon, size_t max_ver
  *  This function determines whether the polygon and the box share at least on common point
  *  and returns true in this case.
  */
-template<class Polygon, class Box>
+template <class Polygon, class Box>
 bool interact_pb (const Polygon &poly, const Box &box)
 {
   if (! poly.box ().touches (box)) {
@@ -205,7 +207,7 @@ bool interact_pp (const Polygon1 &poly1, const Polygon2 &poly2)
   //  in all other cases, in intersection happens if at least one of the edges of poly1 or
   //  poly2 intersect. This is checked with a simple scanline algorithm ...
 
-  std::vector <edge_type> edges1;
+  std::vector<edge_type> edges1;
   edges1.reserve (poly1.vertices ());
   for (edge_iterator1 e = poly1.begin_edge (); ! e.at_end (); ++e) {
     edges1.push_back (*e);
@@ -213,7 +215,7 @@ bool interact_pp (const Polygon1 &poly1, const Polygon2 &poly2)
 
   std::sort (edges1.begin (), edges1.end (), edge_ymin_compare<coord_type> ());
 
-  std::vector <edge_type> edges2;
+  std::vector<edge_type> edges2;
   edges2.reserve (poly2.vertices ());
   for (edge_iterator2 e = poly2.begin_edge (); ! e.at_end (); ++e) {
     edges2.push_back (*e);
@@ -223,11 +225,11 @@ bool interact_pp (const Polygon1 &poly1, const Polygon2 &poly2)
 
   coord_type y = std::min (std::min (edges1.front ().y1 (), edges1.front ().y2 ()),
                            std::min (edges2.front ().y1 (), edges2.front ().y2 ()));
-  
-  typename std::vector <edge_type>::iterator ec1 = edges1.begin (); 
-  typename std::vector <edge_type>::iterator ef1 = edges1.begin (); 
-  typename std::vector <edge_type>::iterator ec2 = edges2.begin (); 
-  typename std::vector <edge_type>::iterator ef2 = edges2.begin (); 
+
+  typename std::vector<edge_type>::iterator ec1 = edges1.begin ();
+  typename std::vector<edge_type>::iterator ef1 = edges1.begin ();
+  typename std::vector<edge_type>::iterator ec2 = edges2.begin ();
+  typename std::vector<edge_type>::iterator ef2 = edges2.begin ();
 
   while (ec1 != edges1.end () && ec2 != edges2.end ()) {
 
@@ -239,7 +241,7 @@ bool interact_pp (const Polygon1 &poly1, const Polygon2 &poly2)
       ++ef2;
     }
 
-    coord_type yy = std::numeric_limits <coord_type>::max ();
+    coord_type yy = std::numeric_limits<coord_type>::max ();
 
     if (ef1 != edges1.end ()) {
       yy = edge_ymin (*ef1);
@@ -255,10 +257,10 @@ bool interact_pp (const Polygon1 &poly1, const Polygon2 &poly2)
     std::sort (ec1, ef1, edge_xmin_at_yinterval_compare<coord_type> (y, yy));
     std::sort (ec2, ef2, edge_xmin_at_yinterval_compare<coord_type> (y, yy));
 
-    typename std::vector <edge_type>::iterator c1 = ec1;
-    typename std::vector <edge_type>::iterator f1 = ec1;
-    typename std::vector <edge_type>::iterator c2 = ec2;
-    typename std::vector <edge_type>::iterator f2 = ec2;
+    typename std::vector<edge_type>::iterator c1 = ec1;
+    typename std::vector<edge_type>::iterator f1 = ec1;
+    typename std::vector<edge_type>::iterator c2 = ec2;
+    typename std::vector<edge_type>::iterator f2 = ec2;
 
     coord_type x1 = edge_xmin_at_yinterval (*ec1, y, yy);
     coord_type x2 = edge_xmin_at_yinterval (*ec2, y, yy);
@@ -274,7 +276,7 @@ bool interact_pp (const Polygon1 &poly1, const Polygon2 &poly2)
         ++f2;
       }
 
-      coord_type xx = std::numeric_limits <coord_type>::max ();
+      coord_type xx = std::numeric_limits<coord_type>::max ();
 
       if (f1 != ef1) {
         xx = edge_xmin_at_yinterval (*f1, y, yy);
@@ -287,8 +289,8 @@ bool interact_pp (const Polygon1 &poly1, const Polygon2 &poly2)
         }
       }
 
-      for (typename std::vector <edge_type>::iterator a = c1; a != f1; ++a) {
-        for (typename std::vector <edge_type>::iterator b = c2; b != f2; ++b) {
+      for (typename std::vector<edge_type>::iterator a = c1; a != f1; ++a) {
+        for (typename std::vector<edge_type>::iterator b = c2; b != f2; ++b) {
           if (a->intersect (*b)) {
             return true;
           }
@@ -297,7 +299,7 @@ bool interact_pp (const Polygon1 &poly1, const Polygon2 &poly2)
 
       x = xx;
 
-      for (typename std::vector <edge_type>::iterator cc = c1; cc != f1; ++cc) {
+      for (typename std::vector<edge_type>::iterator cc = c1; cc != f1; ++cc) {
         if (edge_xmax (*cc) < x || edge_xmax_at_yinterval (*cc, y, yy) < x) {
           if (c1 != cc) {
             std::swap (*cc, *c1);
@@ -306,7 +308,7 @@ bool interact_pp (const Polygon1 &poly1, const Polygon2 &poly2)
         }
       }
 
-      for (typename std::vector <edge_type>::iterator cc = c2; cc != f2; ++cc) {
+      for (typename std::vector<edge_type>::iterator cc = c2; cc != f2; ++cc) {
         if (edge_xmax (*cc) < x || edge_xmax_at_yinterval (*cc, y, yy) < x) {
           if (c2 != cc) {
             std::swap (*cc, *c2);
@@ -314,12 +316,11 @@ bool interact_pp (const Polygon1 &poly1, const Polygon2 &poly2)
           ++c2;
         }
       }
-
     }
 
     y = yy;
 
-    for (typename std::vector <edge_type>::iterator cc = ec1; cc != ef1; ++cc) {
+    for (typename std::vector<edge_type>::iterator cc = ec1; cc != ef1; ++cc) {
       if (edge_ymax (*cc) < y) {
         if (ec1 != cc) {
           std::swap (*cc, *ec1);
@@ -328,7 +329,7 @@ bool interact_pp (const Polygon1 &poly1, const Polygon2 &poly2)
       }
     }
 
-    for (typename std::vector <edge_type>::iterator cc = ec2; cc != ef2; ++cc) {
+    for (typename std::vector<edge_type>::iterator cc = ec2; cc != ef2; ++cc) {
       if (edge_ymax (*cc) < y) {
         if (ec2 != cc) {
           std::swap (*cc, *ec2);
@@ -336,7 +337,6 @@ bool interact_pp (const Polygon1 &poly1, const Polygon2 &poly2)
         ++ec2;
       }
     }
-
   }
 
   return false;
@@ -376,34 +376,34 @@ bool interact_pt (const Polygon &poly, const Text &text)
 }
 
 //  Some specializations that map all combinations to template versions
-inline bool interact (const db::Box &box1,              const db::Box &box2)                { return box1.touches (box2); }
-inline bool interact (const db::DBox &box1,             const db::DBox &box2)               { return box1.touches (box2); }
-inline bool interact (const db::Polygon &poly,          const db::Box &box)                 { return interact_pb (poly, box); }
-inline bool interact (const db::SimplePolygon &poly,    const db::Box &box)                 { return interact_pb (poly, box); }
-inline bool interact (const db::DPolygon &poly,         const db::DBox &box)                { return interact_pb (poly, box); }
-inline bool interact (const db::DSimplePolygon &poly,   const db::DBox &box)                { return interact_pb (poly, box); }
-inline bool interact (const db::Polygon &poly,          const db::Edge &edge)               { return interact_pe (poly, edge); }
-inline bool interact (const db::SimplePolygon &poly,    const db::Edge &edge)               { return interact_pe (poly, edge); }
-inline bool interact (const db::DPolygon &poly,         const db::DEdge &edge)              { return interact_pe (poly, edge); }
-inline bool interact (const db::DSimplePolygon &poly,   const db::DEdge &edge)              { return interact_pe (poly, edge); }
-inline bool interact (const db::Polygon &poly1,         const db::Polygon &poly2)           { return interact_pp (poly1, poly2); }
-inline bool interact (const db::SimplePolygon &poly1,   const db::Polygon &poly2)           { return interact_pp (poly1, poly2); }
-inline bool interact (const db::Polygon &poly1,         const db::SimplePolygon &poly2)     { return interact_pp (poly1, poly2); }
-inline bool interact (const db::SimplePolygon &poly1,   const db::SimplePolygon &poly2)     { return interact_pp (poly1, poly2); }
-inline bool interact (const db::DPolygon &poly1,        const db::DPolygon &poly2)          { return interact_pp (poly1, poly2); }
-inline bool interact (const db::DSimplePolygon &poly1,  const db::DPolygon &poly2)          { return interact_pp (poly1, poly2); }
-inline bool interact (const db::DPolygon &poly1,        const db::DSimplePolygon &poly2)    { return interact_pp (poly1, poly2); }
-inline bool interact (const db::DSimplePolygon &poly1,  const db::DSimplePolygon &poly2)    { return interact_pp (poly1, poly2); }
-inline bool interact (const db::Polygon &poly,          const db::Text &text)               { return interact_pt (poly, text); }
-inline bool interact (const db::SimplePolygon &poly,    const db::Text &text)               { return interact_pt (poly, text); }
-inline bool interact (const db::DPolygon &poly,         const db::DText &text)              { return interact_pt (poly, text); }
-inline bool interact (const db::DSimplePolygon &poly,   const db::DText &text)              { return interact_pt (poly, text); }
+inline bool interact (const db::Box &box1, const db::Box &box2) { return box1.touches (box2); }
+inline bool interact (const db::DBox &box1, const db::DBox &box2) { return box1.touches (box2); }
+inline bool interact (const db::Polygon &poly, const db::Box &box) { return interact_pb (poly, box); }
+inline bool interact (const db::SimplePolygon &poly, const db::Box &box) { return interact_pb (poly, box); }
+inline bool interact (const db::DPolygon &poly, const db::DBox &box) { return interact_pb (poly, box); }
+inline bool interact (const db::DSimplePolygon &poly, const db::DBox &box) { return interact_pb (poly, box); }
+inline bool interact (const db::Polygon &poly, const db::Edge &edge) { return interact_pe (poly, edge); }
+inline bool interact (const db::SimplePolygon &poly, const db::Edge &edge) { return interact_pe (poly, edge); }
+inline bool interact (const db::DPolygon &poly, const db::DEdge &edge) { return interact_pe (poly, edge); }
+inline bool interact (const db::DSimplePolygon &poly, const db::DEdge &edge) { return interact_pe (poly, edge); }
+inline bool interact (const db::Polygon &poly1, const db::Polygon &poly2) { return interact_pp (poly1, poly2); }
+inline bool interact (const db::SimplePolygon &poly1, const db::Polygon &poly2) { return interact_pp (poly1, poly2); }
+inline bool interact (const db::Polygon &poly1, const db::SimplePolygon &poly2) { return interact_pp (poly1, poly2); }
+inline bool interact (const db::SimplePolygon &poly1, const db::SimplePolygon &poly2) { return interact_pp (poly1, poly2); }
+inline bool interact (const db::DPolygon &poly1, const db::DPolygon &poly2) { return interact_pp (poly1, poly2); }
+inline bool interact (const db::DSimplePolygon &poly1, const db::DPolygon &poly2) { return interact_pp (poly1, poly2); }
+inline bool interact (const db::DPolygon &poly1, const db::DSimplePolygon &poly2) { return interact_pp (poly1, poly2); }
+inline bool interact (const db::DSimplePolygon &poly1, const db::DSimplePolygon &poly2) { return interact_pp (poly1, poly2); }
+inline bool interact (const db::Polygon &poly, const db::Text &text) { return interact_pt (poly, text); }
+inline bool interact (const db::SimplePolygon &poly, const db::Text &text) { return interact_pt (poly, text); }
+inline bool interact (const db::DPolygon &poly, const db::DText &text) { return interact_pt (poly, text); }
+inline bool interact (const db::DSimplePolygon &poly, const db::DText &text) { return interact_pt (poly, text); }
 
 /**
  *  @brief Extract a corner radius from a contour
  *
  *  This method will determine the radius of a contour if the contour was formed by rounding another contour.
- *  The corners must be formed by soft bending edges. 
+ *  The corners must be formed by soft bending edges.
  *  It is possible to retrieve the original contour (or an approximation of the latter) by passing a vector
  *  in "new_pts" which will receive the original contour.
  *
@@ -412,15 +412,15 @@ inline bool interact (const db::DSimplePolygon &poly,   const db::DText &text)  
  *  @param router The outer corner radius (in dbu units) extracted (if return value is true)
  *  @param n Receives the number of points per full circle (if return value is true)
  *  @param new_pts If != 0, this vector will receive the contour without the rounded corners (if return value is true)
- *  @param fallback Fallback algorithm (less strict) if true 
+ *  @param fallback Fallback algorithm (less strict) if true
  *  @return True, if the extraction was successful
  */
-bool DB_PUBLIC extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector <db::Point> *new_pts = 0, bool fallback = false);
+bool DB_PUBLIC extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector<db::Point> *new_pts = 0, bool fallback = false);
 
 /**
  *  @brief Extract a corner radius from a contour (version for double coordinates)
  */
-bool DB_PUBLIC extract_rad_from_contour (db::DPolygon::polygon_contour_iterator from, db::DPolygon::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector <db::DPoint> *new_pts = 0, bool fallback = false);
+bool DB_PUBLIC extract_rad_from_contour (db::DPolygon::polygon_contour_iterator from, db::DPolygon::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector<db::DPoint> *new_pts = 0, bool fallback = false);
 
 /**
  *  @brief Extract the radius (better: radii) from a polygon and if requested, compute the new polygon without the rounding
@@ -438,19 +438,19 @@ bool DB_PUBLIC extract_rad (const db::DPolygon &polygon, double &rinner, double 
  *  @brief Compute the rounded version of a polygon contour
  *
  *  Computes the version of a contour with the corners rounded (inner corners with rinner, outer corners with router, n points per full circle=.
- *  
+ *
  *  @param from, to The iterators describing the contour
  *  @param new_pts Receives the new points
  *  @param rinner The inner corner radius (in dbu units)
  *  @param router The outer corner radius (in dbu units)
  *  @param n The number of points per full circle
  */
-void DB_PUBLIC compute_rounded_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, std::vector <db::Point> &new_pts, double rinner, double router, unsigned int n);
+void DB_PUBLIC compute_rounded_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, std::vector<db::Point> &new_pts, double rinner, double router, unsigned int n);
 
 /**
  *  @brief Compute the rounded version of a polygon contour (double coordinate version)
  */
-void DB_PUBLIC compute_rounded_contour (db::DPolygon::polygon_contour_iterator from, db::DPolygon::polygon_contour_iterator to, std::vector <db::DPoint> &new_pts, double rinner, double router, unsigned int n);
+void DB_PUBLIC compute_rounded_contour (db::DPolygon::polygon_contour_iterator from, db::DPolygon::polygon_contour_iterator to, std::vector<db::DPoint> &new_pts, double rinner, double router, unsigned int n);
 
 /**
  *  @brief Compute the rounded version of the polygon
@@ -467,7 +467,7 @@ db::DPolygon DB_PUBLIC compute_rounded (const db::DPolygon &poly, double rinner,
 #define KLAYOUT_SMOOTH_HAS_KEEP_HV 1
 
 /**
- *  @brief Smooth a contour 
+ *  @brief Smooth a contour
  *
  *  Removes vertexes from a contour which deviate from the "average" line by more than "d".
  *
@@ -477,7 +477,7 @@ db::DPolygon DB_PUBLIC compute_rounded (const db::DPolygon &poly, double rinner,
  *  @param d The distance that determines the smoothing "roughness"
  *  @param keep_hv If true, vertical and horizontal edges are maintained
  */
-void DB_PUBLIC smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, std::vector <db::Point> &new_pts, db::Coord d, bool keep_hv);
+void DB_PUBLIC smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, std::vector<db::Point> &new_pts, db::Coord d, bool keep_hv);
 
 /**
  *  @brief Smooth a polygon (apply smoothing to the whole polygon)
@@ -504,8 +504,8 @@ bool DB_PUBLIC is_non_orientable_polygon (const db::Polygon &poly, std::vector<d
 /**
  *  @brief A area collector
  *
- *  This class provides a generic 2d map of area values. 
- *  It is used for example by the rasterize function to collect area values 
+ *  This class provides a generic 2d map of area values.
+ *  It is used for example by the rasterize function to collect area values
  *  on a per-pixel basis.
  */
 template <class C>
@@ -581,7 +581,7 @@ public:
   /**
    *  @brief The number of pixels in x-dimension
    */
-  size_t nx () const 
+  size_t nx () const
   {
     return m_nx;
   }
@@ -663,7 +663,7 @@ typedef area_map<db::DCoord> DAreaMap;
 /**
  *  @brief Rasterize the polygon into the given area map
  *
- *  This will decompose the polygon and produce per-pixel area values for the given 
+ *  This will decompose the polygon and produce per-pixel area values for the given
  *  polygon. The area contributions will be added to the given area map.
  *
  *  Returns a value indicating whether the map will be non-empty.
@@ -701,7 +701,7 @@ db::Polygon DB_PUBLIC minkowski_sum (const db::Polygon &a, const db::Box &b, boo
 db::Polygon DB_PUBLIC minkowski_sum (const db::Polygon &a, const std::vector<db::Point> &c, bool resolve_holes = false);
 
 /**
- *  @brief Resolve holes 
+ *  @brief Resolve holes
  */
 db::Polygon DB_PUBLIC resolve_holes (const db::Polygon &p);
 
@@ -723,8 +723,7 @@ db::SimplePolygon DB_PUBLIC polygon_to_simple_polygon (const db::Polygon &a);
  *  apply horizontal cuts to favor horizontal trapezoids. "PO_vtrapezoids"
  *  will favor vertical trapezoids.
  */
-enum PreferredOrientation
-{
+enum PreferredOrientation {
   PO_any = 0,
   PO_horizontal = 1,
   PO_vertical = 2,
@@ -740,8 +739,7 @@ enum PreferredOrientation
  *  cases. "TD_vtrapezoids" is similar for "TD_htrapezoids" and will produce
  *  vertical trapezoids where the vertical edges are parallel.
  */
-enum TrapezoidDecompositionMode
-{
+enum TrapezoidDecompositionMode {
   TD_simple = 0,
   TD_htrapezoids = 1,
   TD_vtrapezoids = 2
@@ -826,4 +824,3 @@ DB_PUBLIC db::Vector scaled_and_snapped_vector (const db::Vector &v, db::Coord g
 }
 
 #endif
-

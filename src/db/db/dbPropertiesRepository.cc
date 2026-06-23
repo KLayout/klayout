@@ -41,7 +41,7 @@ const tl::Variant &property_name (db::property_names_id_type id)
     static tl::Variant nil;
     return nil;
   } else {
-    return *(reinterpret_cast <const tl::Variant *> (id));
+    return *(reinterpret_cast<const tl::Variant *> (id));
   }
 }
 
@@ -56,7 +56,7 @@ const tl::Variant &property_value (db::property_values_id_type id)
     static tl::Variant nil;
     return nil;
   } else {
-    return *(reinterpret_cast <const tl::Variant *> (id));
+    return *(reinterpret_cast<const tl::Variant *> (id));
   }
 }
 
@@ -71,7 +71,7 @@ const PropertiesSet &properties (db::properties_id_type id)
     static db::PropertiesSet empty;
     return empty;
   } else {
-    return *(reinterpret_cast <const PropertiesSet *> (id));
+    return *(reinterpret_cast<const PropertiesSet *> (id));
   }
 }
 
@@ -153,27 +153,23 @@ PropertiesSet::operator= (const PropertiesSet &&other)
   return *this;
 }
 
-bool
-PropertiesSet::operator== (const PropertiesSet &other) const
+bool PropertiesSet::operator== (const PropertiesSet &other) const
 {
   return m_map == other.m_map;
 }
 
-bool
-PropertiesSet::operator< (const PropertiesSet &other) const
+bool PropertiesSet::operator< (const PropertiesSet &other) const
 {
   return m_map < other.m_map;
 }
 
-bool
-PropertiesSet::has_value (const tl::Variant &name) const
+bool PropertiesSet::has_value (const tl::Variant &name) const
 {
   db::property_names_id_type nid = db::property_names_id (name);
   return m_map.find (nid) != m_map.end ();
 }
 
-bool
-PropertiesSet::has_value (db::property_names_id_type nid) const
+bool PropertiesSet::has_value (db::property_names_id_type nid) const
 {
   return m_map.find (nid) != m_map.end ();
 }
@@ -203,14 +199,12 @@ PropertiesSet::value (db::property_names_id_type nid) const
   }
 }
 
-void
-PropertiesSet::clear ()
+void PropertiesSet::clear ()
 {
   m_map.clear ();
 }
 
-void
-PropertiesSet::erase (const tl::Variant &name)
+void PropertiesSet::erase (const tl::Variant &name)
 {
   db::property_names_id_type nid = db::property_names_id (name);
   auto i = m_map.find (nid);
@@ -223,8 +217,7 @@ PropertiesSet::erase (const tl::Variant &name)
   }
 }
 
-void
-PropertiesSet::erase (db::property_names_id_type nid)
+void PropertiesSet::erase (db::property_names_id_type nid)
 {
   auto i = m_map.find (nid);
   auto ii = i;
@@ -236,32 +229,27 @@ PropertiesSet::erase (db::property_names_id_type nid)
   }
 }
 
-void
-PropertiesSet::insert (const tl::Variant &name, const tl::Variant &value)
+void PropertiesSet::insert (const tl::Variant &name, const tl::Variant &value)
 {
   m_map.insert (std::make_pair (db::property_names_id (name), db::property_values_id (value)));
 }
 
-void
-PropertiesSet::insert (db::property_names_id_type nid, const tl::Variant &value)
+void PropertiesSet::insert (db::property_names_id_type nid, const tl::Variant &value)
 {
   m_map.insert (std::make_pair (nid, db::property_values_id (value)));
 }
 
-void
-PropertiesSet::insert_by_id (db::property_names_id_type nid, db::property_values_id_type vid)
+void PropertiesSet::insert_by_id (db::property_names_id_type nid, db::property_values_id_type vid)
 {
   m_map.insert (std::make_pair (nid, vid));
 }
 
-void
-PropertiesSet::merge (const db::PropertiesSet &other)
+void PropertiesSet::merge (const db::PropertiesSet &other)
 {
   m_map.insert (other.m_map.begin (), other.m_map.end ());
 }
 
-void
-PropertiesSet::join_max (const db::PropertiesSet &other)
+void PropertiesSet::join_max (const db::PropertiesSet &other)
 {
   if (other.empty ()) {
 
@@ -282,7 +270,6 @@ PropertiesSet::join_max (const db::PropertiesSet &other)
         insert_by_id (i->first, i->second);
       }
     }
-
   }
 }
 
@@ -340,7 +327,6 @@ PropertiesSet::hash () const
         m_hash = size_t (1);
       }
     }
-
   }
 
   return m_hash;
@@ -366,8 +352,7 @@ PropertiesRepository::instance ()
   }
 }
 
-void
-PropertiesRepository::replace_instance_temporarily (db::PropertiesRepository *temp)
+void PropertiesRepository::replace_instance_temporarily (db::PropertiesRepository *temp)
 {
   sp_temp_instance = temp;
 }
@@ -448,7 +433,7 @@ PropertiesRepository::properties_id (const PropertiesSet &props)
   {
     tl::MutexLocker locker (&m_lock);
 
-    std::set <const PropertiesSet *>::const_iterator pi = m_properties.find (&props);
+    std::set<const PropertiesSet *>::const_iterator pi = m_properties.find (&props);
     if (pi == m_properties.end ()) {
 
       m_properties_heap.push_back (props);
@@ -469,8 +454,7 @@ PropertiesRepository::properties_id (const PropertiesSet &props)
   return pid;
 }
 
-bool
-PropertiesRepository::is_valid_properties_id (properties_id_type id) const
+bool PropertiesRepository::is_valid_properties_id (properties_id_type id) const
 {
   if (id == 0) {
     return true;
@@ -485,8 +469,7 @@ PropertiesRepository::is_valid_properties_id (properties_id_type id) const
   return false;
 }
 
-bool
-PropertiesRepository::is_valid_property_names_id (property_names_id_type id) const
+bool PropertiesRepository::is_valid_property_names_id (property_names_id_type id) const
 {
   tl::MutexLocker locker (&m_lock);
   for (auto i = m_propnames.begin (); i != m_propnames.end (); ++i) {
@@ -497,8 +480,7 @@ PropertiesRepository::is_valid_property_names_id (property_names_id_type id) con
   return false;
 }
 
-bool
-PropertiesRepository::is_valid_property_values_id (property_values_id_type id) const
+bool PropertiesRepository::is_valid_property_values_id (property_values_id_type id) const
 {
   tl::MutexLocker locker (&m_lock);
   for (auto i = m_propvalues.begin (); i != m_propvalues.end (); ++i) {
@@ -567,9 +549,7 @@ PropertiesRepository::properties_ids_by_name_value (db::property_names_id_type n
           break;
         }
       }
-
     }
-
   }
 
   return result;
@@ -621,7 +601,6 @@ PropertiesTranslator::operator* (const PropertiesTranslator &other) const
     }
 
     return PropertiesTranslator (new_map);
-
   }
 }
 
@@ -661,7 +640,6 @@ PropertiesTranslator::make_filter (const std::set<tl::Variant> &keys, db::Proper
 
     db::PropertiesRepository::properties_id_set ids_with_name = repo.properties_ids_by_name (nid);
     ids.insert (ids_with_name.begin (), ids_with_name.end ());
-
   }
 
   std::map<db::properties_id_type, db::properties_id_type> map;
@@ -680,7 +658,6 @@ PropertiesTranslator::make_filter (const std::set<tl::Variant> &keys, db::Proper
     if (! new_props.empty ()) {
       map.insert (std::make_pair (*i, new_props == props ? *i : repo.properties_id (new_props)));
     }
-
   }
 
   return PropertiesTranslator (map);
@@ -699,7 +676,6 @@ PropertiesTranslator::make_key_mapper (const std::map<tl::Variant, tl::Variant> 
 
     db::PropertiesRepository::properties_id_set ids_with_name = repo.properties_ids_by_name (nid);
     ids.insert (ids_with_name.begin (), ids_with_name.end ());
-
   }
 
   std::map<db::properties_id_type, db::properties_id_type> map;
@@ -719,11 +695,9 @@ PropertiesTranslator::make_key_mapper (const std::map<tl::Variant, tl::Variant> 
     if (! new_props.empty ()) {
       map.insert (std::make_pair (*i, new_props == props ? *i : repo.properties_id (new_props)));
     }
-
   }
 
   return PropertiesTranslator (map);
 }
 
 } // namespace db
-

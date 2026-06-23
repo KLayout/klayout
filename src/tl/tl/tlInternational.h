@@ -29,9 +29,9 @@
 #include <string>
 
 #if defined(HAVE_QT)
-# include <QString>
+#include <QString>
 //  provides QObject for tr
-# include <QObject>
+#include <QObject>
 #endif
 
 /**
@@ -50,7 +50,7 @@ inline QString tr (const char *s)
 #define __KLAYOUT_TL_HAVE_TR_FALLBACK
 namespace tl
 {
-  std::string TL_PUBLIC tr_fallback (const char *s);
+std::string TL_PUBLIC tr_fallback (const char *s);
 }
 
 inline std::string tr (const char *s)
@@ -103,4 +103,3 @@ TL_PUBLIC void initialize_codecs ();
 }
 
 #endif
-

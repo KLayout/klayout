@@ -41,11 +41,9 @@ const tl::XMLElementList *CellPath::xml_format ()
   static tl::XMLElementList format (
     tl::make_member<std::string, string_v::const_iterator, CellPath> (&CellPath::begin_path, &CellPath::end_path, &CellPath::push_back_path, "cellname") +
     tl::make_element<SpecificInst, specific_inst_v::const_iterator, CellPath> (&CellPath::begin_context_path, &CellPath::end_context_path, &CellPath::push_back_context_path, "cellinst",
-      tl::make_member (&SpecificInst::cell_name, "cellname") +
-      tl::make_member (&SpecificInst::trans_str, &SpecificInst::set_trans_str, "trans") +
-      tl::make_member (&SpecificInst::array_trans_str, &SpecificInst::set_array_trans_str, "array_trans") 
-    )
-  );
+                                                                               tl::make_member (&SpecificInst::cell_name, "cellname") +
+                                                                                 tl::make_member (&SpecificInst::trans_str, &SpecificInst::set_trans_str, "trans") +
+                                                                                 tl::make_member (&SpecificInst::array_trans_str, &SpecificInst::set_array_trans_str, "array_trans")));
 
   return &format;
 }
@@ -65,13 +63,13 @@ SpecificInst::SpecificInst (const db::InstElement &el, const db::Layout &layout)
   array_trans = *el.array_inst;
 }
 
-std::pair<bool, db::InstElement> 
+std::pair<bool, db::InstElement>
 SpecificInst::to_inst_element (const db::Layout &layout, const db::Cell &parent_cell) const
 {
   //  first, we must find the cell by name
   std::pair<bool, db::cell_index_type> ci = layout.cell_by_name (cell_name.c_str ());
   if (! ci.first) {
-    return std::make_pair(false, db::InstElement ());
+    return std::make_pair (false, db::InstElement ());
   }
 
   db::cell_index_type cell_index = ci.second;
@@ -92,39 +90,34 @@ SpecificInst::to_inst_element (const db::Layout &layout, const db::Cell &parent_
           el.inst_ptr = *inst;
           el.array_inst = ainst;
           return std::make_pair (true, el);
-
         }
       }
-
     }
-
   }
 
   //  nothing found.
-  return std::make_pair(false, db::InstElement ());
+  return std::make_pair (false, db::InstElement ());
 }
 
-std::string 
+std::string
 SpecificInst::trans_str () const
 {
   return trans.to_string ();
 }
 
-void 
-SpecificInst::set_trans_str (const std::string &s)
+void SpecificInst::set_trans_str (const std::string &s)
 {
   tl::Extractor ex (s.c_str ());
   ex.read (trans);
 }
 
-std::string 
+std::string
 SpecificInst::array_trans_str () const
 {
   return array_trans.to_string ();
 }
 
-void 
-SpecificInst::set_array_trans_str (const std::string &s)
+void SpecificInst::set_array_trans_str (const std::string &s)
 {
   tl::Extractor ex (s.c_str ());
   ex.read (array_trans);
@@ -164,7 +157,7 @@ DisplayState::DisplayState (const db::DBox &b, int min_hier, int max_hier, const
   }
 }
 
-lay::CellView 
+lay::CellView
 DisplayState::cellview (unsigned int index, lay::LayoutHandle *layout_h) const
 {
   //  try to restore the cell path
@@ -236,9 +229,7 @@ DisplayState::cellview (unsigned int index, lay::LayoutHandle *layout_h) const
           return cv;
         }
       }
-
     }
-
   }
 
   //  if everything fails, return an empty cellview
@@ -248,19 +239,16 @@ DisplayState::cellview (unsigned int index, lay::LayoutHandle *layout_h) const
 const tl::XMLElementList *DisplayState::xml_format ()
 {
   static tl::XMLElementList format (
-    tl::make_member<double, DisplayState> (&DisplayState::xleft, &DisplayState::set_xleft, "x-left") + 
-    tl::make_member<double, DisplayState> (&DisplayState::xright, &DisplayState::set_xright, "x-right") + 
-    tl::make_member<double, DisplayState> (&DisplayState::ybottom, &DisplayState::set_ybottom, "y-bottom") + 
-    tl::make_member<double, DisplayState> (&DisplayState::ytop, &DisplayState::set_ytop, "y-top") + 
-    tl::make_member<int, DisplayState> (&DisplayState::min_hier, &DisplayState::set_min_hier, "min-hier") + 
-    tl::make_member<int, DisplayState> (&DisplayState::max_hier, &DisplayState::set_max_hier, "max-hier") + 
-    tl::make_element<cell_path_v, DisplayState> (&DisplayState::paths, &DisplayState::set_paths, "cellpaths", 
-      tl::make_element<CellPath, cell_path_v::const_iterator, cell_path_v> (&cell_path_v::begin, &cell_path_v::end, &cell_path_v::push_back, "cellpath", CellPath::xml_format ())
-    )
-  );
+    tl::make_member<double, DisplayState> (&DisplayState::xleft, &DisplayState::set_xleft, "x-left") +
+    tl::make_member<double, DisplayState> (&DisplayState::xright, &DisplayState::set_xright, "x-right") +
+    tl::make_member<double, DisplayState> (&DisplayState::ybottom, &DisplayState::set_ybottom, "y-bottom") +
+    tl::make_member<double, DisplayState> (&DisplayState::ytop, &DisplayState::set_ytop, "y-top") +
+    tl::make_member<int, DisplayState> (&DisplayState::min_hier, &DisplayState::set_min_hier, "min-hier") +
+    tl::make_member<int, DisplayState> (&DisplayState::max_hier, &DisplayState::set_max_hier, "max-hier") +
+    tl::make_element<cell_path_v, DisplayState> (&DisplayState::paths, &DisplayState::set_paths, "cellpaths",
+                                                 tl::make_element<CellPath, cell_path_v::const_iterator, cell_path_v> (&cell_path_v::begin, &cell_path_v::end, &cell_path_v::push_back, "cellpath", CellPath::xml_format ())));
 
   return &format;
 }
 
 }
-

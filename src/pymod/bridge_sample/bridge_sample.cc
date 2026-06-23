@@ -72,7 +72,7 @@ bridge_a2p (PyObject * /*self*/, PyObject *args)
       return NULL;
     }
 
-    double c[2] = { 0.0, 0.0 };
+    double c [2] = {0.0, 0.0};
 
     //  Gets the x and y value
     for (int i = 0; i < 2; ++i) {
@@ -81,16 +81,15 @@ bridge_a2p (PyObject * /*self*/, PyObject *args)
         return NULL;
       }
       if (pya::test_type<double> (xy_item.get ())) {
-        c[i] = pya::python2c<double> (xy_item.get ());
+        c [i] = pya::python2c<double> (xy_item.get ());
       }
     }
 
-    points.push_back (db::DPoint (c[0], c[1]));
-
+    points.push_back (db::DPoint (c [0], c [1]));
   }
 
   //  Handle iteration errors
-  if (PyErr_Occurred()) {
+  if (PyErr_Occurred ()) {
     return NULL;
   }
 
@@ -134,16 +133,12 @@ bridge_p2a (PyObject * /*self*/, PyObject *args)
   return array;
 }
 
-static PyMethodDef BridgeMethods[] = {
-  {
-    "p2a", bridge_p2a, METH_VARARGS,
-    "Converts a DSimplePolygon to an array."
-  },
-  {
-    "a2p", bridge_a2p, METH_VARARGS,
-    "Converts an array to a DSimplePolygon."
-  },
-  { NULL, NULL, 0, NULL }  //  terminal
+static PyMethodDef BridgeMethods [] = {
+  {"p2a", bridge_p2a, METH_VARARGS,
+   "Converts a DSimplePolygon to an array."},
+  {"a2p", bridge_a2p, METH_VARARGS,
+   "Converts an array to a DSimplePolygon."},
+  {NULL, NULL, 0, NULL} //  terminal
 };
 
 #if PY_MAJOR_VERSION < 3
@@ -165,15 +160,13 @@ initbridge_mod ()
 
 #else
 
-static
-struct PyModuleDef bridge_module =
-{
-  PyModuleDef_HEAD_INIT,
-  "bridge_mod",
-  NULL,
-  -1,
-  BridgeMethods
-};
+static struct PyModuleDef bridge_module =
+  {
+    PyModuleDef_HEAD_INIT,
+    "bridge_mod",
+    NULL,
+    -1,
+    BridgeMethods};
 
 PyMODINIT_FUNC
 PyInit_bridge_mod ()

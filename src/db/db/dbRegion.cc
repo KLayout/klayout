@@ -132,15 +132,13 @@ Region::Region (DeepShapeStore &dss)
   mp_delegate = new db::DeepRegion (db::DeepLayer (&dss, layout_index, dss.layout (layout_index).insert_layer ()));
 }
 
-void
-Region::convert_to_deep (const db::DeepLayer &layer)
+void Region::convert_to_deep (const db::DeepLayer &layer)
 {
   tl_assert (mp_delegate->deep () == 0);
   set_delegate (copy_data_id (new db::DeepRegion (layer)));
 }
 
-void
-Region::write (const std::string &fn) const
+void Region::write (const std::string &fn) const
 {
   //  method provided for debugging purposes
 
@@ -163,8 +161,7 @@ Region::iter () const
   return *(i ? i : &def_iter);
 }
 
-void
-Region::set_delegate (RegionDelegate *delegate, bool keep_attributes)
+void Region::set_delegate (RegionDelegate *delegate, bool keep_attributes)
 {
   if (delegate != mp_delegate) {
     if (keep_attributes && delegate && mp_delegate) {
@@ -176,14 +173,12 @@ Region::set_delegate (RegionDelegate *delegate, bool keep_attributes)
   }
 }
 
-void
-Region::clear ()
+void Region::clear ()
 {
   set_delegate (new EmptyRegion ());
 }
 
-void
-Region::reserve (size_t n)
+void Region::reserve (size_t n)
 {
   mutable_region ()->reserve (n);
 }
@@ -242,13 +237,12 @@ Region::mutable_region ()
     region = flat_region;
 
     if (mp_delegate) {
-      flat_region->RegionDelegate::operator= (*mp_delegate);   //  copy basic flags
+      flat_region->RegionDelegate::operator= (*mp_delegate); //  copy basic flags
       flat_region->insert_seq (begin ());
       flat_region->set_is_merged (mp_delegate->is_merged ());
     }
 
     set_delegate (flat_region);
-
   }
 
   return region;
@@ -268,8 +262,7 @@ Region::cop_to_region (db::CompoundRegionOperationNode &node, db::PropertyConstr
   return Region (mp_delegate->cop_to_region (node, prop_constraint));
 }
 
-Edges
-Region::cop_to_edges (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
+Edges Region::cop_to_edges (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   tl_assert (node.result_type () == db::CompoundRegionOperationNode::Edges);
   return Edges (mp_delegate->cop_to_edges (node, prop_constraint));
@@ -341,8 +334,7 @@ Region::sized_inside (const db::Region &inside, bool outside, coord_type dx, coo
   return Region (mp_delegate->sized_inside (inside, outside, dx, dy, steps, mode));
 }
 
-void
-Region::round_corners (double rinner, double router, unsigned int n)
+void Region::round_corners (double rinner, double router, unsigned int n)
 {
   process (RoundedCornersProcessor (rinner, router, n));
 }
@@ -353,8 +345,7 @@ Region::rounded_corners (double rinner, double router, unsigned int n) const
   return processed (RoundedCornersProcessor (rinner, router, n));
 }
 
-void
-Region::smooth (coord_type d, bool keep_hv)
+void Region::smooth (coord_type d, bool keep_hv)
 {
   process (SmoothingProcessor (d, keep_hv));
 }
@@ -372,8 +363,7 @@ Region::flatten ()
   return *this;
 }
 
-void
-Region::snap (db::Coord gx, db::Coord gy)
+void Region::snap (db::Coord gx, db::Coord gy)
 {
   set_delegate (mp_delegate->snapped_in_place (gx, gy));
 }
@@ -384,8 +374,7 @@ Region::snapped (db::Coord gx, db::Coord gy) const
   return Region (mp_delegate->snapped (gx, gy));
 }
 
-void
-Region::scale_and_snap (db::Coord gx, db::Coord mx, db::Coord dx, db::Coord gy, db::Coord my, db::Coord dy)
+void Region::scale_and_snap (db::Coord gx, db::Coord mx, db::Coord dx, db::Coord gy, db::Coord my, db::Coord dy)
 {
   set_delegate (mp_delegate->scaled_and_snapped_in_place (gx, mx, dx, gy, my, dy));
 }
@@ -418,8 +407,7 @@ namespace
 {
 
 template <class Container>
-struct dot_delivery
-{
+struct dot_delivery {
   typedef Container container_type;
 
   dot_delivery ()
@@ -434,8 +422,7 @@ struct dot_delivery
 };
 
 template <class Container>
-struct box_delivery
-{
+struct box_delivery {
   typedef Container container_type;
 
   box_delivery (db::Coord enl)
@@ -501,14 +488,12 @@ static void fill_texts (const Iter &iter, const std::string &pat, bool pattern, 
           is_text = true;
         }
       }
-
     }
 
     if (is_text &&
-        (all || (pattern && glob_pat.match (text_string)) || (!pattern && text_string == pat))) {
+        (all || (pattern && glob_pat.match (text_string)) || (! pattern && text_string == pat))) {
       delivery.insert (si.trans () * (trans * si->bbox ().center ()), container);
     }
-
   }
 }
 
@@ -521,7 +506,7 @@ public:
     : m_delivery (delivery), m_glob_pat (), m_all (false), m_pattern (pattern), m_pat (pat), m_text_annot_name_id (false, 0), mp_layout (0)
   {
     if (org_deep) {
-      mp_layout = & org_deep->deep_layer ().layout ();
+      mp_layout = &org_deep->deep_layer ().layout ();
       const db::DeepShapeStore *store = org_deep->deep_layer ().store ();
       if (! store->text_property_name ().is_nil ()) {
         m_text_annot_name_id = db::PropertiesRepository::instance ().get_id_of_name (store->text_property_name ());
@@ -559,11 +544,10 @@ public:
           is_text = true;
         }
       }
-
     }
 
     if (is_text &&
-        (m_all || (m_pattern && m_glob_pat.match (text_string)) || (!m_pattern && text_string == m_pat))) {
+        (m_all || (m_pattern && m_glob_pat.match (text_string)) || (! m_pattern && text_string == m_pat))) {
 
       db::Point pt = shape.bbox ().center ();
 
@@ -576,12 +560,11 @@ public:
           m_delivery.insert (pt.transformed (trans), target);
         }
       }
-
     }
   }
 
-  virtual void push (const db::Box &, db::properties_id_type, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
-  virtual void push (const db::Polygon &, db::properties_id_type, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
+  virtual void push (const db::Box &, db::properties_id_type, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) {}
+  virtual void push (const db::Polygon &, db::properties_id_type, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) {}
 
 private:
   Delivery m_delivery;
@@ -595,8 +578,7 @@ private:
 
 }
 
-Edges
-Region::texts_as_dots (const std::string &pat, bool pattern) const
+Edges Region::texts_as_dots (const std::string &pat, bool pattern) const
 {
   const db::DeepRegion *dr = dynamic_cast<const db::DeepRegion *> (delegate ());
   if (dr) {
@@ -617,8 +599,7 @@ Region::texts_as_dots (const std::string &pat, bool pattern) const
   return Edges (res.release ());
 }
 
-Edges
-Region::texts_as_dots (const std::string &pat, bool pattern, db::DeepShapeStore &store) const
+Edges Region::texts_as_dots (const std::string &pat, bool pattern, db::DeepShapeStore &store) const
 {
   const db::DeepRegion *dr = dynamic_cast<const db::DeepRegion *> (delegate ());
 
@@ -639,12 +620,11 @@ Region::texts_as_dots (const std::string &pat, bool pattern, db::DeepShapeStore 
     Edges edges (res.release ());
     edges.set_merged_semantics (false);
     return edges;
-
   }
 
   db::Edges edges;
 
-  text_shape_receiver<dot_delivery<db::Shapes> > pipe = text_shape_receiver<dot_delivery<db::Shapes> > (dot_delivery<db::Shapes> (), pat, pattern, dr);
+  text_shape_receiver<dot_delivery<db::Shapes>> pipe = text_shape_receiver<dot_delivery<db::Shapes>> (dot_delivery<db::Shapes> (), pat, pattern, dr);
   if (dr && dr->deep_layer ().store () == &store) {
     edges = Edges (new db::DeepEdges (store.create_copy (dr->deep_layer (), &pipe)));
   } else {
@@ -697,10 +677,9 @@ Region::texts_as_boxes (const std::string &pat, bool pattern, db::Coord enl, db:
     fill_texts (si.first, pat, pattern, box_delivery<db::FlatRegion> (enl), res.get (), si.second, dr);
 
     return Region (res.release ());
-
   }
 
-  text_shape_receiver<box_delivery<db::Shapes> > pipe = text_shape_receiver<box_delivery<db::Shapes> > (box_delivery<db::Shapes> (enl), pat, pattern, dr);
+  text_shape_receiver<box_delivery<db::Shapes>> pipe = text_shape_receiver<box_delivery<db::Shapes>> (box_delivery<db::Shapes> (enl), pat, pattern, dr);
   if (dr && dr->deep_layer ().store () == &store) {
     return Region (new db::DeepRegion (store.create_copy (dr->deep_layer (), &pipe)));
   } else {
@@ -712,31 +691,30 @@ Region::texts_as_boxes (const std::string &pat, bool pattern, db::Coord enl, db:
 
 namespace tl
 {
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Region &b)
-  {
-    db::Polygon p;
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Region &b)
+{
+  db::Polygon p;
 
-    if (ex.at_end ()) {
-      return true;
-    }
-    if (! ex.try_read (p)) {
-      return false;
-    }
-    b.insert (p);
-
-    while (ex.test (";")) {
-      ex.read (p);
-      b.insert (p);
-    } 
-
+  if (ex.at_end ()) {
     return true;
   }
-
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Region &b)
-  {
-    if (! test_extractor_impl (ex, b)) {
-      ex.error (tl::to_string (tr ("Expected a region specification")));
-    }
+  if (! ex.try_read (p)) {
+    return false;
   }
+  b.insert (p);
+
+  while (ex.test (";")) {
+    ex.read (p);
+    b.insert (p);
+  }
+
+  return true;
 }
 
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Region &b)
+{
+  if (! test_extractor_impl (ex, b)) {
+    ex.error (tl::to_string (tr ("Expected a region specification")));
+  }
+}
+}

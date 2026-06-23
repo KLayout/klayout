@@ -57,7 +57,7 @@ namespace db
  */
 template <class P>
 DB_PUBLIC std::list<P>
-spline_interpolation (const std::vector<std::pair<P, double> > &control_points, int degree, const std::vector<double> &knots, double relative_accuracy, double absolute_accuracy);
+spline_interpolation (const std::vector<std::pair<P, double>> &control_points, int degree, const std::vector<double> &knots, double relative_accuracy, double absolute_accuracy);
 
 /**
  *  @brief A convenience version of the previous function
@@ -80,5 +80,3 @@ spline_interpolation (const std::vector<P> &control_points, int degree, const st
 }
 
 #endif
-
-

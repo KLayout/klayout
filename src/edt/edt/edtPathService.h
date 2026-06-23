@@ -38,7 +38,7 @@ class PathService
 public:
   PathService (db::Manager *manager, lay::LayoutViewBase *view);
   ~PathService ();
-  
+
 #if defined(HAVE_QT)
   virtual std::vector<lay::PropertiesPage *> properties_pages (db::Manager *manager, QWidget *parent);
 #endif
@@ -59,13 +59,12 @@ protected:
   void config_finalize ();
 
 private:
-  struct PathSegment
-  {
-    PathSegment () : cv_index (0), transaction_id (0) { }
+  struct PathSegment {
+    PathSegment () : cv_index (0), transaction_id (0) {}
 
     db::LayerProperties layer;
     int cv_index;
-    std::list<std::pair<std::string, std::string> > config;
+    std::list<std::pair<std::string, std::string>> config;
     std::vector<db::DPoint> points;
     db::DPoint last_point;
     db::Shape path_shape;
@@ -76,7 +75,10 @@ private:
 
   std::vector<db::DPoint> m_points;
   double m_width, m_bgnext, m_endext;
-  enum { Flush = 0, Square, Variable, Round } m_type;
+  enum { Flush = 0,
+         Square,
+         Variable,
+         Round } m_type;
   bool m_needs_update;
   db::DPoint m_last;
   std::list<PathSegment> m_previous_segments;
@@ -98,4 +100,3 @@ private:
 }
 
 #endif
-

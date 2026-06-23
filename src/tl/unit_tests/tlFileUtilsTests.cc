@@ -30,9 +30,9 @@
 
 #if defined(HAVE_QT)
 //  A few things we cross-check against Qt
-#  include <QDir>
-#  include <QFileInfo>
-#  include <QFile>
+#include <QDir>
+#include <QFileInfo>
+#include <QFile>
 #endif
 
 #if defined(HAVE_QT)
@@ -121,8 +121,6 @@ TEST (2)
   EXPECT_EQ (b1dir.exists (), false);
   EXPECT_EQ (b2dir.exists (), false);
   EXPECT_EQ (QFileInfo (b2dir.absoluteFilePath (QString::fromUtf8 ("x"))).exists (), false);
-
-
 }
 #endif
 
@@ -618,7 +616,7 @@ TEST (12)
 }
 
 //  mkpath
-TEST(13)
+TEST (13)
 {
   std::string tp = tl::absolute_file_path (tmp_file ());
   std::string tt = tl::combine_path (tp, "mkpathtest");
@@ -656,7 +654,7 @@ TEST(13)
 
 #if defined(HAVE_QT)
 //  absolute_path vs. Qt
-TEST(14)
+TEST (14)
 {
   std::string xpath_qt = tl::to_string (QDir::current ().absoluteFilePath ("doesnotexist"));
   std::string xpath = tl::absolute_file_path ("doesnotexist");
@@ -672,7 +670,7 @@ TEST(14)
 #endif
 
 //  relative_path and absolute_file_path
-TEST(15)
+TEST (15)
 {
   std::string xpath = tl::absolute_file_path ("doesnotexist");
   std::string xpath2 = tl::absolute_path ("./doesnotexist");
@@ -683,7 +681,7 @@ TEST(15)
 }
 
 //  dir_entries
-TEST(16)
+TEST (16)
 {
   std::string tp = tl::absolute_file_path (tmp_file ());
   std::string tt = tl::combine_path (tp, "detest");
@@ -764,7 +762,7 @@ TEST(16)
   std::sort (ee.begin (), ee.end ());
   EXPECT_EQ (tl::join (ee, "+"), ".w+v");
 
-  EXPECT_EQ (tl::rm_dir (tt), false);  //  not empty
+  EXPECT_EQ (tl::rm_dir (tt), false); //  not empty
 }
 
 //  is_same_file
@@ -1085,4 +1083,3 @@ TEST (25)
   std::sort (au.begin (), au.end ());
   EXPECT_EQ (tl::join (res, "\n"), tl::join (au, "\n"));
 }
-

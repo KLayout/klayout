@@ -56,7 +56,8 @@ class DB_PLUGIN_PUBLIC OASISReaderException
 public:
   OASISReaderException (const std::string &msg, size_t p, const std::string &cell, const std::string &source)
     : ReaderException (tl::sprintf (tl::to_string (tr ("%s (position=%ld, cell=%s), in file: %s")), msg, p, cell, source))
-  { }
+  {
+  }
 };
 
 /**
@@ -66,7 +67,7 @@ class DB_PLUGIN_PUBLIC OASISReader
   : public CommonReader,
     public OASISDiagnostics
 {
-public: 
+public:
   typedef std::vector<tl::Variant> property_value_list;
 
   /**
@@ -76,7 +77,7 @@ public:
    */
   OASISReader (tl::InputStream &s);
 
-  /**  
+  /**
    *  @brief Destructor
    */
   ~OASISReader ();
@@ -109,8 +110,7 @@ protected:
 private:
   typedef db::coord_traits<db::Coord>::distance_type distance_type;
 
-  enum TableMode
-  {
+  enum TableMode {
     NotInTable,
     InCELLNAME,
     InPROPNAME,
@@ -152,24 +152,24 @@ private:
   modal_variable<db::Coord> mm_geometry_y;
   modal_variable<distance_type> mm_geometry_w;
   modal_variable<distance_type> mm_geometry_h;
-  modal_variable< std::vector<db::Point> > mm_polygon_point_list;
+  modal_variable<std::vector<db::Point>> mm_polygon_point_list;
   modal_variable<distance_type> mm_path_halfwidth;
   modal_variable<db::Coord> mm_path_start_extension;
   modal_variable<db::Coord> mm_path_end_extension;
-  modal_variable< std::vector<db::Point> > mm_path_point_list;
+  modal_variable<std::vector<db::Point>> mm_path_point_list;
   modal_variable<uint32_t> mm_ctrapezoid_type;
   modal_variable<distance_type> mm_circle_radius;
   modal_variable<db::property_names_id_type> mm_last_property_name;
   modal_variable<bool> mm_last_property_is_sprop;
   modal_variable<property_value_list> mm_last_value_list;
 
-  std::map <uint64_t, db::properties_id_type> m_cellname_properties;
-  std::map <uint64_t, std::string> m_textstrings;
-  std::map <uint64_t, const db::StringRef *> m_text_forward_references;
-  std::map <uint64_t, std::string> m_propstrings;
-  std::map <uint64_t, std::string> m_propnames;
+  std::map<uint64_t, db::properties_id_type> m_cellname_properties;
+  std::map<uint64_t, std::string> m_textstrings;
+  std::map<uint64_t, const db::StringRef *> m_text_forward_references;
+  std::map<uint64_t, std::string> m_propstrings;
+  std::map<uint64_t, std::string> m_propnames;
 
-  std::map <db::cell_index_type, std::vector<tl::Variant> > m_context_strings_per_cell;
+  std::map<db::cell_index_type, std::vector<tl::Variant>> m_context_strings_per_cell;
 
   tl::vector<db::CellInstArray> m_instances;
   tl::vector<db::CellInstArrayWithProperties> m_instances_with_props;
@@ -178,11 +178,11 @@ private:
   bool m_read_properties;
   bool m_read_all_properties;
 
-  std::map <uint64_t, db::property_names_id_type> m_propname_forward_references;
-  std::map <uint64_t, std::string> m_propvalue_forward_references;
-  std::map <db::properties_id_type, std::set<db::Shapes *> > m_forward_properties_for_shapes;
-  std::map <db::properties_id_type, std::set<db::Instances *> > m_forward_properties_for_instances;
-  std::map <db::cell_index_type, db::PropertiesSet> m_future_cell_properties;
+  std::map<uint64_t, db::property_names_id_type> m_propname_forward_references;
+  std::map<uint64_t, std::string> m_propvalue_forward_references;
+  std::map<db::properties_id_type, std::set<db::Shapes *>> m_forward_properties_for_shapes;
+  std::map<db::properties_id_type, std::set<db::Instances *>> m_forward_properties_for_instances;
+  std::map<db::cell_index_type, db::PropertiesSet> m_future_cell_properties;
   std::list<db::PropertiesSet> m_fwd_properties;
   db::property_names_id_type m_s_gds_property_name_id;
   db::property_names_id_type m_klayout_context_property_name_id;
@@ -191,17 +191,17 @@ private:
 
   void do_read_placement (unsigned char r,
                           bool xy_absolute,
-                          db::Layout &layout, 
+                          db::Layout &layout,
                           tl::vector<db::CellInstArray> &instances,
                           tl::vector<db::CellInstArrayWithProperties> &instances_with_props);
 
-  void do_read_text (bool xy_absolute,db::cell_index_type cell_index, db::Layout &layout);
-  void do_read_rectangle (bool xy_absolute,db::cell_index_type cell_index, db::Layout &layout);
-  void do_read_polygon (bool xy_absolute,db::cell_index_type cell_index, db::Layout &layout);
-  void do_read_path (bool xy_absolute,db::cell_index_type cell_index, db::Layout &layout);
-  void do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index_type cell_index, db::Layout &layout);
-  void do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index, db::Layout &layout);
-  void do_read_circle (bool xy_absolute,db::cell_index_type cell_index, db::Layout &layout);
+  void do_read_text (bool xy_absolute, db::cell_index_type cell_index, db::Layout &layout);
+  void do_read_rectangle (bool xy_absolute, db::cell_index_type cell_index, db::Layout &layout);
+  void do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, db::Layout &layout);
+  void do_read_path (bool xy_absolute, db::cell_index_type cell_index, db::Layout &layout);
+  void do_read_trapezoid (unsigned char r, bool xy_absolute, db::cell_index_type cell_index, db::Layout &layout);
+  void do_read_ctrapezoid (bool xy_absolute, db::cell_index_type cell_index, db::Layout &layout);
+  void do_read_circle (bool xy_absolute, db::cell_index_type cell_index, db::Layout &layout);
 
   void reset_modal_variables ();
 
@@ -209,10 +209,10 @@ private:
 
   void read_offset_table ();
   bool read_repetition ();
-  void read_pointlist (modal_variable <std::vector <db::Point> > &pointlist, bool for_polygon);
+  void read_pointlist (modal_variable<std::vector<db::Point>> &pointlist, bool for_polygon);
   void read_properties ();
   void store_last_properties (db::PropertiesSet &properties, bool ignore_special, bool with_context_props = false);
-  std::pair <bool, db::properties_id_type> read_element_properties (bool ignore_special);
+  std::pair<bool, db::properties_id_type> read_element_properties (bool ignore_special);
   void replace_forward_references_in_variant (tl::Variant &v);
   void extract_context_strings (db::PropertiesSet &properties, std::vector<tl::Variant> &context_strings);
   bool has_forward_refs (const db::PropertiesSet &properties);
@@ -284,4 +284,3 @@ private:
 }
 
 #endif
-

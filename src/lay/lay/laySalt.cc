@@ -30,7 +30,7 @@
 #include "tlWebDAV.h"
 #include "tlEnv.h"
 #if defined(HAVE_GIT2)
-#  include "tlGit.h"
+#include "tlGit.h"
 #endif
 
 #include "lymMacro.h"
@@ -70,8 +70,7 @@ Salt::root ()
   return m_root;
 }
 
-bool
-Salt::download_package_information () const
+bool Salt::download_package_information () const
 {
   //  $KLAYOUT_ALWAYS_DOWNLOAD_PACKAGE_INFO
   return tl::app_flag ("always-download-package-info") || m_root.sparse ();
@@ -103,12 +102,11 @@ Salt::grain_by_name (const std::string &name)
   }
 }
 
-void
-Salt::add_location (const std::string &path)
+void Salt::add_location (const std::string &path)
 {
   tl_assert (! path.empty ());
 
-  if (path[0] != ':') {
+  if (path [0] != ':') {
     //  do nothing if the collection is already there
     QFileInfo fi (tl::to_qstring (path));
     for (lay::SaltGrains::collection_iterator g = m_root.begin_collections (); g != m_root.end_collections (); ++g) {
@@ -124,8 +122,7 @@ Salt::add_location (const std::string &path)
   invalidate ();
 }
 
-void
-Salt::remove_location (const std::string &path)
+void Salt::remove_location (const std::string &path)
 {
   QFileInfo fi (tl::to_qstring (path));
   for (lay::SaltGrains::collection_iterator g = m_root.begin_collections (); g != m_root.end_collections (); ++g) {
@@ -138,8 +135,7 @@ Salt::remove_location (const std::string &path)
   }
 }
 
-void
-Salt::refresh ()
+void Salt::refresh ()
 {
   lay::SaltGrains new_root;
   for (lay::SaltGrains::collection_iterator g = m_root.begin_collections (); g != m_root.end_collections (); ++g) {
@@ -152,30 +148,29 @@ Salt::refresh ()
   }
 }
 
-void
-Salt::add_collection_to_flat (SaltGrains &gg)
+void Salt::add_collection_to_flat (SaltGrains &gg)
 {
   for (lay::SaltGrains::grain_iterator g = gg.begin_grains (); g != gg.end_grains (); ++g) {
     //  TODO: get rid of the const cast - would require a non-const grain iterator
-    mp_flat_grains.push_back (const_cast <SaltGrain *> (g.operator-> ()));
+    mp_flat_grains.push_back (const_cast<SaltGrain *> (g.operator->()));
   }
   for (lay::SaltGrains::collection_iterator g = gg.begin_collections (); g != gg.end_collections (); ++g) {
     //  TODO: get rid of the const cast - would require a non-const grain collection iterator
-    add_collection_to_flat (const_cast <SaltGrains &> (*g));
+    add_collection_to_flat (const_cast<SaltGrains &> (*g));
   }
 }
 
-namespace {
-
-struct NameAndTopoIndexCompare
+namespace
 {
+
+struct NameAndTopoIndexCompare {
   NameAndTopoIndexCompare (const std::map<std::string, int> &topo_index)
     : mp_topo_index (&topo_index)
   {
     //  .. nothing yet ..
   }
 
-  bool operator () (lay::SaltGrain *a, lay::SaltGrain *b) const
+  bool operator() (lay::SaltGrain *a, lay::SaltGrain *b) const
   {
     std::map<std::string, int>::const_iterator ti_a = mp_topo_index->find (a->name ());
     std::map<std::string, int>::const_iterator ti_b = mp_topo_index->find (b->name ());
@@ -202,8 +197,7 @@ private:
 
 }
 
-void
-Salt::validate ()
+void Salt::validate ()
 {
   if (mp_flat_grains.empty ()) {
 
@@ -243,32 +237,27 @@ Salt::validate ()
       if (! any_updated) {
         break;
       }
-
     }
 
     //  NOTE: we intentionally sort after the name list has been built - this way
     //  the first entry will win in the name to grain map.
     std::sort (mp_flat_grains.begin (), mp_flat_grains.end (), NameAndTopoIndexCompare (topological_index));
-
   }
 }
 
-void
-Salt::invalidate ()
+void Salt::invalidate ()
 {
   mp_flat_grains.clear ();
   emit collections_changed ();
 }
 
-void
-Salt::consolidate ()
+void Salt::consolidate ()
 {
   m_root.consolidate ();
   invalidate ();
 }
 
-static
-bool remove_from_collection (SaltGrains &collection, const std::string &name)
+static bool remove_from_collection (SaltGrains &collection, const std::string &name)
 {
   bool res = false;
 
@@ -281,7 +270,7 @@ bool remove_from_collection (SaltGrains &collection, const std::string &name)
 
   for (SaltGrains::collection_iterator gg = collection.begin_collections (); gg != collection.end_collections (); ++gg) {
     //  TODO: remove this const_cast
-    if (remove_from_collection (const_cast <SaltGrains &> (*gg), name)) {
+    if (remove_from_collection (const_cast<SaltGrains &> (*gg), name)) {
       res = true;
     }
   }
@@ -289,8 +278,7 @@ bool remove_from_collection (SaltGrains &collection, const std::string &name)
   return res;
 }
 
-bool
-Salt::remove_grain (const SaltGrain &grain)
+bool Salt::remove_grain (const SaltGrain &grain)
 {
   emit collections_about_to_change ();
 
@@ -371,9 +359,9 @@ public:
 #else
           if (child_res.isCompressed ()) {
 #endif
-            data = qUncompress ((const unsigned char *)child_res.data (), (int)child_res.size ());
+            data = qUncompress ((const unsigned char *) child_res.data (), (int) child_res.size ());
           } else {
-            data = QByteArray ((const char *)child_res.data (), (int)child_res.size ());
+            data = QByteArray ((const char *) child_res.data (), (int) child_res.size ());
           }
 
           file.write (data);
@@ -396,11 +384,8 @@ public:
           if (! child_res.copy_to (QDir (target.absoluteFilePath (*t)))) {
             return false;
           }
-
         }
-
       }
-
     }
 
     return true;
@@ -409,12 +394,11 @@ public:
 
 }
 
-bool
-Salt::create_grain (const SaltGrain &templ, SaltGrain &target, double timeout, tl::InputHttpStreamCallback *callback)
+bool Salt::create_grain (const SaltGrain &templ, SaltGrain &target, double timeout, tl::InputHttpStreamCallback *callback)
 {
   tl_assert (m_root.begin_collections () != m_root.end_collections ());
 
-  const SaltGrains *coll = m_root.begin_collections ().operator-> ();
+  const SaltGrains *coll = m_root.begin_collections ().operator->();
 
   if (target.name ().empty ()) {
     target.set_name (templ.name ());
@@ -432,7 +416,7 @@ Salt::create_grain (const SaltGrain &templ, SaltGrain &target, double timeout, t
     coll = 0;
     for (SaltGrains::collection_iterator gg = m_root.begin_collections (); gg != m_root.end_collections (); ++gg) {
       if (tl::is_parent_path (gg->path (), path)) {
-        coll = gg.operator-> ();
+        coll = gg.operator->();
         break;
       }
     }
@@ -464,7 +448,6 @@ Salt::create_grain (const SaltGrain &templ, SaltGrain &target, double timeout, t
           throw tl::Exception (tl::to_string (tr ("Unable to change to target directory '%1' for installing package").arg (subdir.path ())));
         }
       }
-
     }
 
   } catch (tl::Exception &ex) {
@@ -481,7 +464,7 @@ Salt::create_grain (const SaltGrain &templ, SaltGrain &target, double timeout, t
 
   if (! templ.path ().empty ()) {
 
-    if (templ.path ()[0] != ':') {
+    if (templ.path () [0] != ':') {
 
       //  if the template represents an actual folder, use the files from there
       tl::info << QObject::tr ("Copying package from '%1' to '%2' ..").arg (tl::to_qstring (templ.path ())).arg (tl::to_qstring (target.path ()));
@@ -492,7 +475,6 @@ Salt::create_grain (const SaltGrain &templ, SaltGrain &target, double timeout, t
       //  if the template represents a resource path, use the files from there
       tl::info << QObject::tr ("Installing package from resource '%1' to '%2' ..").arg (tl::to_qstring (templ.path ())).arg (tl::to_qstring (target.path ()));
       res = ResourceDir (tl::to_qstring (templ.path ())).copy_to (QDir (tl::to_qstring (target.path ())));
-
     }
 
   } else if (! templ.url ().empty ()) {
@@ -516,7 +498,6 @@ Salt::create_grain (const SaltGrain &templ, SaltGrain &target, double timeout, t
 
         tl::info << QObject::tr ("Downloading package from '%1' to '%2' using SVN/WebDAV protocol ..").arg (tl::to_qstring (purl.url ())).arg (tl::to_qstring (target.path ()));
         res = tl::WebDAVObject::download (purl.url (), target.path (), timeout, callback);
-
       }
 
     } else {
@@ -530,11 +511,9 @@ Salt::create_grain (const SaltGrain &templ, SaltGrain &target, double timeout, t
 
       tl::info << QObject::tr ("Copying package from '%1' to '%2' ..").arg (tl::to_qstring (src)).arg (tl::to_qstring (target.path ()));
       res = tl::cp_dir_recursive (src, target.path ());
-
     }
 
     target.set_url (templ.url ());
-
   }
 
   if (res) {
@@ -567,7 +546,6 @@ Salt::create_grain (const SaltGrain &templ, SaltGrain &target, double timeout, t
     if (! tl::rm_dir_recursive (target.path ())) {
       tl::warn << QObject::tr ("Failed to remove files").arg (tl::to_qstring (target.name ()));
     }
-
   }
 
   return res;

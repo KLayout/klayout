@@ -45,7 +45,7 @@ class QModelIndex;
 
 namespace Ui
 {
-  class PropertiesDialog;
+class PropertiesDialog;
 }
 
 namespace lay
@@ -65,9 +65,10 @@ class PropertiesTreeModel;
  */
 
 class LAYUI_PUBLIC PropertiesDialog
-  : public QDialog, public lay::PropertiesPageSet
+  : public QDialog,
+    public lay::PropertiesPageSet
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -95,7 +96,7 @@ private:
   db::Manager *mp_manager;
   lay::Editables *mp_editables;
   int m_index, m_prev_index;
-  std::vector<std::vector<size_t> > m_object_indexes;
+  std::vector<std::vector<size_t>> m_object_indexes;
   QStackedLayout *mp_stack;
   QLabel *mp_none;
   lay::MainWindow *mp_mw;
@@ -137,4 +138,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

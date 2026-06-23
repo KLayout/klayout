@@ -130,53 +130,49 @@ namespace db
 
 namespace lvs_std_format
 {
-  struct DB_PUBLIC ShortKeys
-  {
-    static std::string lvs_magic_string;
+struct DB_PUBLIC ShortKeys {
+  static std::string lvs_magic_string;
 
-    static std::string reference_key;
-    static std::string layout_key;
-    static std::string xref_key;
-    static std::string log_key;
-    static std::string log_entry_key;
+  static std::string reference_key;
+  static std::string layout_key;
+  static std::string xref_key;
+  static std::string log_key;
+  static std::string log_entry_key;
 
-    static std::string mismatch_key;
-    static std::string match_key;
-    static std::string nomatch_key;
-    static std::string warning_key;
-    static std::string skipped_key;
-  };
+  static std::string mismatch_key;
+  static std::string match_key;
+  static std::string nomatch_key;
+  static std::string warning_key;
+  static std::string skipped_key;
+};
 
-  struct DB_PUBLIC LongKeys
-  {
-    static std::string lvs_magic_string;
+struct DB_PUBLIC LongKeys {
+  static std::string lvs_magic_string;
 
-    static std::string reference_key;
-    static std::string layout_key;
-    static std::string xref_key;
-    static std::string log_key;
-    static std::string log_entry_key;
+  static std::string reference_key;
+  static std::string layout_key;
+  static std::string xref_key;
+  static std::string log_key;
+  static std::string log_entry_key;
 
-    static std::string mismatch_key;
-    static std::string match_key;
-    static std::string nomatch_key;
-    static std::string warning_key;
-    static std::string skipped_key;
-  };
+  static std::string mismatch_key;
+  static std::string match_key;
+  static std::string nomatch_key;
+  static std::string warning_key;
+  static std::string skipped_key;
+};
 
-  template <bool Short> struct DB_PUBLIC keys;
+template <bool Short> struct DB_PUBLIC keys;
 
-  template <> struct DB_PUBLIC keys<true> : public l2n_std_format::keys<true>, public ShortKeys
-  {
-    typedef l2n_std_format::keys<true> l2n_keys;
-    inline static bool is_short () { return true; }
-  };
+template <> struct DB_PUBLIC keys<true> : public l2n_std_format::keys<true>, public ShortKeys {
+  typedef l2n_std_format::keys<true> l2n_keys;
+  inline static bool is_short () { return true; }
+};
 
-  template <> struct DB_PUBLIC keys<false> : public l2n_std_format::keys<false>, public LongKeys
-  {
-    typedef l2n_std_format::keys<false> l2n_keys;
-    inline static bool is_short () { return false; }
-  };
+template <> struct DB_PUBLIC keys<false> : public l2n_std_format::keys<false>, public LongKeys {
+  typedef l2n_std_format::keys<false> l2n_keys;
+  inline static bool is_short () { return false; }
+};
 }
 
 }

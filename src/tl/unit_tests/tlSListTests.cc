@@ -29,11 +29,14 @@ namespace
 
 static size_t obj_count = 0;
 
-struct MyClass1
-{
+struct MyClass1 {
   MyClass1 (int _n) : n (_n) { ++obj_count; }
   MyClass1 (const MyClass1 &other) : n (other.n) { ++obj_count; }
-  MyClass1 &operator= (const MyClass1 &other) { n = other.n; return *this; }
+  MyClass1 &operator= (const MyClass1 &other)
+  {
+    n = other.n;
+    return *this;
+  }
   ~MyClass1 () { --obj_count; }
   int n;
   bool operator== (const MyClass1 &other) const { return n == other.n; }
@@ -47,7 +50,7 @@ static std::string l2s (const tl::slist<C> &l)
 {
   std::string x;
   for (typename tl::slist<C>::const_iterator i = l.begin (); i != l.end (); ++i) {
-    if (!x.empty ()) {
+    if (! x.empty ()) {
       x += ",";
     }
     x += tl::to_string (i->n);
@@ -60,7 +63,7 @@ static std::string l2s_nc (tl::slist<C> &l)
 {
   std::string x;
   for (typename tl::slist<C>::iterator i = l.begin (); i != l.end (); ++i) {
-    if (!x.empty ()) {
+    if (! x.empty ()) {
       x += ",";
     }
     x += tl::to_string (i->n);
@@ -68,7 +71,7 @@ static std::string l2s_nc (tl::slist<C> &l)
   return x;
 }
 
-TEST(1_Basic)
+TEST (1_Basic)
 {
   obj_count = 0;
 
@@ -109,7 +112,7 @@ TEST(1_Basic)
     EXPECT_EQ (l2s (l2), "11,42");
     l2.erase_after (l2.begin ());
     EXPECT_EQ (l2s (l2), "11");
-    l2.erase_after (l2.begin ());  //  ignored
+    l2.erase_after (l2.begin ()); //  ignored
     EXPECT_EQ (l2s (l2), "11");
     l2.pop_front ();
     EXPECT_EQ (l2s (l2), "");
@@ -160,7 +163,7 @@ TEST(1_Basic)
   EXPECT_EQ (obj_count, size_t (0));
 }
 
-TEST(2_SpliceAndMove)
+TEST (2_SpliceAndMove)
 {
   obj_count = 0;
 

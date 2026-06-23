@@ -50,8 +50,7 @@ BasicText::BasicText ()
   //  .. nothing yet ..
 }
 
-bool 
-BasicText::can_create_from_shape (const db::Layout & /*layout*/, const db::Shape &shape, unsigned int /*layer*/) const
+bool BasicText::can_create_from_shape (const db::Layout & /*layout*/, const db::Shape &shape, unsigned int /*layer*/) const
 {
   return shape.is_text ();
 }
@@ -80,7 +79,7 @@ BasicText::parameters_from_shape (const db::Layout &layout, const db::Shape &sha
   return map_parameters (nm);
 }
 
-std::vector<db::PCellLayerDeclaration> 
+std::vector<db::PCellLayerDeclaration>
 BasicText::get_layer_declarations (const db::pcell_parameters_type &parameters) const
 {
   std::vector<db::PCellLayerDeclaration> layers;
@@ -93,8 +92,7 @@ BasicText::get_layer_declarations (const db::pcell_parameters_type &parameters) 
   return layers;
 }
 
-int
-BasicText::get_font_index (const db::pcell_parameters_type &parameters) const
+int BasicText::get_font_index (const db::pcell_parameters_type &parameters) const
 {
   int f = -1;
   if (parameters.size () > p_font) {
@@ -118,8 +116,7 @@ BasicText::get_font_index (const db::pcell_parameters_type &parameters) const
   return f;
 }
 
-void 
-BasicText::coerce_parameters (const db::Layout &layout, db::pcell_parameters_type &parameters) const
+void BasicText::coerce_parameters (const db::Layout &layout, db::pcell_parameters_type &parameters) const
 {
   //  Compute the read-only parameters
 
@@ -130,7 +127,7 @@ BasicText::coerce_parameters (const db::Layout &layout, db::pcell_parameters_typ
   std::string t = parameters [p_text].to_string ();
 
   int f = get_font_index (parameters);
-  const db::TextGenerator &font = db::TextGenerator::generators ()[f];
+  const db::TextGenerator &font = db::TextGenerator::generators () [f];
 
   parameters [p_font_name] = font.name ();
   parameters [p_font] = f;
@@ -143,15 +140,14 @@ BasicText::coerce_parameters (const db::Layout &layout, db::pcell_parameters_typ
   parameters [p_eff_design_raster] = font.design_grid () * layout.dbu () * m;
 }
 
-void 
-BasicText::produce (const db::Layout &layout, const std::vector<unsigned int> &layer_ids, const db::pcell_parameters_type &parameters, db::Cell &cell) const
+void BasicText::produce (const db::Layout &layout, const std::vector<unsigned int> &layer_ids, const db::pcell_parameters_type &parameters, db::Cell &cell) const
 {
   if (parameters.size () < 6 || layer_ids.size () < 1 || db::TextGenerator::generators ().empty ()) {
     return;
   }
 
   int f = get_font_index (parameters);
-  const db::TextGenerator &font = db::TextGenerator::generators ()[f];
+  const db::TextGenerator &font = db::TextGenerator::generators () [f];
 
   double m = parameters [p_magnification].to_double ();
   double b = parameters [p_bias].to_double ();
@@ -170,7 +166,7 @@ BasicText::produce (const db::Layout &layout, const std::vector<unsigned int> &l
   }
 }
 
-std::string 
+std::string
 BasicText::get_display_name (const db::pcell_parameters_type &parameters) const
 {
   std::string t;
@@ -178,15 +174,15 @@ BasicText::get_display_name (const db::pcell_parameters_type &parameters) const
     t = parameters [p_text].to_string ();
   }
   return "TEXT(l=" + std::string (parameters [p_layer].to_string ()) +
-              ",'" + t + "')";
+         ",'" + t + "')";
 }
 
-std::vector<db::PCellParameterDeclaration> 
+std::vector<db::PCellParameterDeclaration>
 BasicText::get_parameter_declarations () const
 {
   std::vector<db::PCellParameterDeclaration> parameters;
 
-  //  parameter: text 
+  //  parameter: text
   tl_assert (parameters.size () == p_text);
   parameters.push_back (db::PCellParameterDeclaration ("text"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_string);
@@ -222,14 +218,14 @@ BasicText::get_parameter_declarations () const
   parameters.back ().set_description (tl::to_string (tr ("Magnification")));
   parameters.back ().set_default (1.0);
 
-  //  parameter: inverse 
+  //  parameter: inverse
   tl_assert (parameters.size () == p_inverse);
   parameters.push_back (db::PCellParameterDeclaration ("inverse"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_boolean);
   parameters.back ().set_description (tl::to_string (tr ("Inverse")));
   parameters.back ().set_default (false);
 
-  //  parameter: bias 
+  //  parameter: bias
   tl_assert (parameters.size () == p_bias);
   parameters.push_back (db::PCellParameterDeclaration ("bias"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
@@ -237,7 +233,7 @@ BasicText::get_parameter_declarations () const
   parameters.back ().set_default (0.0);
   parameters.back ().set_unit (tl::to_string (tr ("micron")));
 
-  //  parameter: character spacing 
+  //  parameter: character spacing
   tl_assert (parameters.size () == p_char_spacing);
   parameters.push_back (db::PCellParameterDeclaration ("cspacing"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
@@ -245,7 +241,7 @@ BasicText::get_parameter_declarations () const
   parameters.back ().set_default (0.0);
   parameters.back ().set_unit (tl::to_string (tr ("micron")));
 
-  //  parameter: line spacing 
+  //  parameter: line spacing
   tl_assert (parameters.size () == p_line_spacing);
   parameters.push_back (db::PCellParameterDeclaration ("lspacing"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
@@ -303,5 +299,3 @@ BasicText::get_parameter_declarations () const
 }
 
 }
-
-

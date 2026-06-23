@@ -53,9 +53,10 @@ class EditorOptionsModalPages;
  *  @brief The object properties tab widget
  */
 class LAYVIEW_PUBLIC EditorOptionsPages
-  : public QFrame, public lay::EditorOptionsPageCollection
+  : public QFrame,
+    public lay::EditorOptionsPageCollection
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   EditorOptionsPages (QWidget *parent, lay::LayoutViewBase *view, const std::vector<lay::EditorOptionsPage *> &pages);
@@ -79,7 +80,7 @@ public slots:
   void setup ();
 
 private:
-  tl::weak_collection <lay::EditorOptionsPage> m_pages;
+  tl::weak_collection<lay::EditorOptionsPage> m_pages;
   lay::LayoutViewBase *mp_view;
   QTabWidget *mp_pages;
   EditorOptionsModalPages *mp_modal_pages;
@@ -95,7 +96,7 @@ private:
 class LAYVIEW_PUBLIC EditorOptionsModalPages
   : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   EditorOptionsModalPages (EditorOptionsPages *parent);
@@ -128,4 +129,3 @@ private:
 #endif
 
 #endif
-

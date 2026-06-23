@@ -23,11 +23,13 @@
 #include "dbShapes.h"
 #include "dbPolygonTools.h"
 
-namespace db {
+namespace db
+{
 
 NetShape::NetShape ()
   : m_ptr (0), m_dx (0), m_dy (0)
-{ }
+{
+}
 
 NetShape::NetShape (const db::PolygonRef &pr)
 {
@@ -143,7 +145,6 @@ bool NetShape::interacts_with (const db::NetShape &other) const
       db::PolygonRef pr = polygon_ref ();
       db::Point pt = db::Point (other.m_dx, other.m_dy) - pr.trans ().disp ();
       return db::inside_poly (pr.obj ().begin_edge (), pt) >= 0;
-
     }
 
   } else {
@@ -159,9 +160,7 @@ bool NetShape::interacts_with (const db::NetShape &other) const
       db::PolygonRef pr_other = other.polygon_ref ();
       db::Point pt = db::Point (m_dx, m_dy) - pr_other.trans ().disp ();
       return db::inside_poly (pr_other.obj ().begin_edge (), pt) >= 0;
-
     }
-
   }
 }
 
@@ -188,7 +187,6 @@ bool NetShape::interacts_with_transformed (const db::NetShape &other, const Tr &
       db::PolygonRef pr = polygon_ref ();
       db::Point pt = trans * db::Point (other.m_dx, other.m_dy) - pr.trans ().disp ();
       return db::inside_poly (pr.obj ().begin_edge (), pt) >= 0;
-
     }
 
   } else {
@@ -205,9 +203,7 @@ bool NetShape::interacts_with_transformed (const db::NetShape &other, const Tr &
       db::PolygonRef pr_other = other.polygon_ref ();
       db::Point pt = trans.inverted () * db::Point (m_dx, m_dy) - pr_other.trans ().disp ();
       return db::inside_poly (pr_other.obj ().begin_edge (), pt) >= 0;
-
     }
-
   }
 }
 

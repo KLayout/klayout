@@ -44,7 +44,7 @@ namespace rdb
 std::string cfg_rdb_context_mode ("rdb-context-mode");
 std::string cfg_rdb_show_all ("rdb-show-all");
 std::string cfg_rdb_list_shapes ("rdb-list-shapes");
-std::string cfg_rdb_window_state ("rdb-window-state-v2");  // v2: 0.24++
+std::string cfg_rdb_window_state ("rdb-window-state-v2"); // v2: 0.24++
 std::string cfg_rdb_window_mode ("rdb-window-mode");
 std::string cfg_rdb_tree_state ("rdb-tree-state");
 std::string cfg_rdb_window_dim ("rdb-window-dim");
@@ -61,15 +61,14 @@ static struct {
   rdb::context_mode_type mode;
   const char *string;
 } context_modes [] = {
-  { rdb::AnyCell,       "any-cell"     },
-  { rdb::DatabaseTop,   "database-top" },
-  { rdb::Current,       "current-cell" },
-  { rdb::CurrentOrAny,  "current-or-any-cell" },
-  { rdb::Local,         "local-cell"   },
+  {rdb::AnyCell, "any-cell"},
+  {rdb::DatabaseTop, "database-top"},
+  {rdb::Current, "current-cell"},
+  {rdb::CurrentOrAny, "current-or-any-cell"},
+  {rdb::Local, "local-cell"},
 };
 
-void
-MarkerBrowserContextModeConverter::from_string (const std::string &value, rdb::context_mode_type &mode)
+void MarkerBrowserContextModeConverter::from_string (const std::string &value, rdb::context_mode_type &mode)
 {
   for (unsigned int i = 0; i < sizeof (context_modes) / sizeof (context_modes [0]); ++i) {
     if (value == context_modes [i].string) {
@@ -80,7 +79,7 @@ MarkerBrowserContextModeConverter::from_string (const std::string &value, rdb::c
   throw tl::Exception (tl::to_string (QObject::tr ("Invalid marker database browser context mode: ")) + value);
 }
 
-std::string 
+std::string
 MarkerBrowserContextModeConverter::to_string (rdb::context_mode_type mode)
 {
   for (unsigned int i = 0; i < sizeof (context_modes) / sizeof (context_modes [0]); ++i) {
@@ -98,15 +97,13 @@ static struct {
   rdb::window_type mode;
   const char *string;
 } window_modes [] = {
-  { rdb::DontChange,    "dont-change" },
-  { rdb::FitCell,       "fit-cell"    },
-  { rdb::FitMarker,     "fit-marker"  },
-  { rdb::Center,        "center"      },
-  { rdb::CenterSize,    "center-size" }
-};
+  {rdb::DontChange, "dont-change"},
+  {rdb::FitCell, "fit-cell"},
+  {rdb::FitMarker, "fit-marker"},
+  {rdb::Center, "center"},
+  {rdb::CenterSize, "center-size"}};
 
-void
-MarkerBrowserWindowModeConverter::from_string (const std::string &value, rdb::window_type &mode)
+void MarkerBrowserWindowModeConverter::from_string (const std::string &value, rdb::window_type &mode)
 {
   for (unsigned int i = 0; i < sizeof (window_modes) / sizeof (window_modes [0]); ++i) {
     if (value == window_modes [i].string) {
@@ -117,7 +114,7 @@ MarkerBrowserWindowModeConverter::from_string (const std::string &value, rdb::wi
   throw tl::Exception (tl::to_string (QObject::tr ("Invalid marker database browser window mode: ")) + value);
 }
 
-std::string 
+std::string
 MarkerBrowserWindowModeConverter::to_string (rdb::window_type mode)
 {
   for (unsigned int i = 0; i < sizeof (window_modes) / sizeof (window_modes [0]); ++i) {
@@ -147,8 +144,7 @@ MarkerBrowserConfigPage::~MarkerBrowserConfigPage ()
   mp_ui = 0;
 }
 
-void 
-MarkerBrowserConfigPage::setup (lay::Dispatcher *root)
+void MarkerBrowserConfigPage::setup (lay::Dispatcher *root)
 {
   //  context mode
   rdb::context_mode_type cmode = rdb::DatabaseTop;
@@ -166,7 +162,7 @@ MarkerBrowserConfigPage::setup (lay::Dispatcher *root)
   root->config_get (cfg_rdb_window_dim, wdim_str);
   wdim = lay::Margin::from_string (wdim_str);
   mp_ui->mgn_window->set_margin (wdim);
-    
+
   //  max. marker count
   unsigned int max_marker_count = 1000;
   root->config_get (cfg_rdb_max_marker_count, max_marker_count);
@@ -176,14 +172,12 @@ MarkerBrowserConfigPage::setup (lay::Dispatcher *root)
   window_changed (int (wmode));
 }
 
-void
-MarkerBrowserConfigPage::window_changed (int m)
+void MarkerBrowserConfigPage::window_changed (int m)
 {
   mp_ui->mgn_window->setEnabled (m == int (rdb::FitMarker) || m == int (rdb::CenterSize));
 }
 
-void 
-MarkerBrowserConfigPage::commit (lay::Dispatcher *root)
+void MarkerBrowserConfigPage::commit (lay::Dispatcher *root)
 {
   unsigned int max_markers_count = 1000;
   tl::from_string_ext (tl::to_string (mp_ui->le_max_markers->text ()), max_markers_count);
@@ -210,8 +204,7 @@ MarkerBrowserConfigPage2::~MarkerBrowserConfigPage2 ()
   mp_ui = 0;
 }
 
-void
-MarkerBrowserConfigPage2::setup (lay::Dispatcher *root)
+void MarkerBrowserConfigPage2::setup (lay::Dispatcher *root)
 {
   //  marker color
   QColor color;
@@ -247,8 +240,7 @@ MarkerBrowserConfigPage2::setup (lay::Dispatcher *root)
   mp_ui->halo_cb->setCheckState (halo < 0 ? Qt::PartiallyChecked : (halo ? Qt::Checked : Qt::Unchecked));
 }
 
-void 
-MarkerBrowserConfigPage2::commit (lay::Dispatcher *root)
+void MarkerBrowserConfigPage2::commit (lay::Dispatcher *root)
 {
   QColor color (mp_ui->color_pb->get_color ());
   root->config_set (cfg_rdb_marker_color, color, lay::ColorConverter ());
@@ -260,7 +252,8 @@ MarkerBrowserConfigPage2::commit (lay::Dispatcher *root)
       int s;
       tl::from_string_ext (tl::to_string (mp_ui->lw_le->text ()), s);
       root->config_set (cfg_rdb_marker_line_width, s);
-    } catch (...) { }
+    } catch (...) {
+    }
   }
 
   if (mp_ui->vs_le->text ().isEmpty ()) {
@@ -270,7 +263,8 @@ MarkerBrowserConfigPage2::commit (lay::Dispatcher *root)
       int s;
       tl::from_string_ext (tl::to_string (mp_ui->vs_le->text ()), s);
       root->config_set (cfg_rdb_marker_vertex_size, s);
-    } catch (...) { }
+    } catch (...) {
+    }
   }
 
   root->config_set (cfg_rdb_marker_dither_pattern, mp_ui->stipple_pb->dither_pattern ());
@@ -285,13 +279,13 @@ MarkerBrowserConfigPage2::commit (lay::Dispatcher *root)
 }
 
 // ------------------------------------------------------------
-//  Declaration and implementation of the browser plugin declaration object 
+//  Declaration and implementation of the browser plugin declaration object
 
 class MarkerBrowserPluginDeclaration
   : public lay::PluginDeclaration
 {
 public:
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> &options) const
   {
     options.push_back (std::pair<std::string, std::string> (cfg_rdb_context_mode, "database-top"));
     options.push_back (std::pair<std::string, std::string> (cfg_rdb_window_mode, "fit-marker"));
@@ -306,9 +300,9 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_rdb_marker_dither_pattern, "-1"));
   }
 
-  virtual std::vector<std::pair <std::string, lay::ConfigPage *> > config_pages (QWidget *parent) const 
+  virtual std::vector<std::pair<std::string, lay::ConfigPage *>> config_pages (QWidget *parent) const
   {
-    std::vector<std::pair <std::string, lay::ConfigPage *> > pages;
+    std::vector<std::pair<std::string, lay::ConfigPage *>> pages;
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Marker Database Browser|Setup")), new MarkerBrowserConfigPage (parent)));
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Marker Database Browser|Marker Appearance")), new MarkerBrowserConfigPage2 (parent)));
     return pages;

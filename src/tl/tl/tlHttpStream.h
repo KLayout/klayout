@@ -40,8 +40,8 @@ class TL_PUBLIC HttpCredentialProvider
   : public tl::Object
 {
 public:
-  HttpCredentialProvider () { }
-  virtual ~HttpCredentialProvider () { }
+  HttpCredentialProvider () {}
+  virtual ~HttpCredentialProvider () {}
 
   /**
    *  @brief Gets the user name and password for the given URL and authentication realm
@@ -58,7 +58,8 @@ class TL_PUBLIC HttpErrorException
 public:
   HttpErrorException (const std::string &f, int ec, const std::string &url, const std::string &body = std::string ())
     : tl::Exception (format_error (f, ec, url, body))
-  { }
+  {
+  }
 
   static std::string format_error (const std::string &em, int ec, const std::string &url, const std::string &body);
 };
@@ -69,10 +70,10 @@ public:
 class TL_PUBLIC InputHttpStreamCallback
 {
 public:
-  InputHttpStreamCallback () { }
-  virtual ~InputHttpStreamCallback () { }
+  InputHttpStreamCallback () {}
+  virtual ~InputHttpStreamCallback () {}
 
-  virtual void wait_for_input () { }
+  virtual void wait_for_input () {}
 };
 
 class InputHttpStreamPrivateData;
@@ -225,10 +226,10 @@ public:
    */
   InflatingInputHttpStream (const std::string &url)
     : inflating_input_stream<InputHttpStream> (new InputHttpStream (url))
-  { }
+  {
+  }
 };
 
 }
 
 #endif
-

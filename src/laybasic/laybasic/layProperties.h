@@ -33,7 +33,7 @@
 
 namespace db
 {
-  class Manager;
+class Manager;
 }
 
 namespace lay
@@ -47,21 +47,21 @@ class Editable;
 class LAYBASIC_PUBLIC PropertiesPageSet
 {
 public:
-  virtual ~PropertiesPageSet () { }
+  virtual ~PropertiesPageSet () {}
   virtual const std::vector<lay::PropertiesPage *> &properties_pages () const = 0;
 };
 
 /**
  *  @brief The properties page object
  *
- *  The properties page object forms the interface between the 
+ *  The properties page object forms the interface between the
  *  properties dialog and the selected object.
  */
 
 class LAYBASIC_PUBLIC PropertiesPage
   : public QFrame
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -143,30 +143,30 @@ public:
    *  This method is called by the dialog to transfer data from the
    *  selected element into the display (QFrame and children).
    */
-  virtual void update () { }
+  virtual void update () {}
 
-  /** 
+  /**
    *  @brief Leave the properties page
    *
    *  This method is called when the properties page becomes hidden (unused)
-   *  in the stack of properties pages. The main use is to notify the 
+   *  in the stack of properties pages. The main use is to notify the
    *  owner to remove highlights.
    */
-  virtual void leave () { }
+  virtual void leave () {}
 
-  /** 
+  /**
    *  @brief Report if the object can be changed
    *
    *  This method is supposed to return true if the current object
    *  cannot be changed. In this case, the "Apply" button is disabled.
    */
-  virtual bool readonly () 
+  virtual bool readonly ()
   {
     //  default implementation is "readonly"
     return true;
   }
 
-  /** 
+  /**
    *  @brief Apply any changes to the current object
    *
    *  Apply any changes to the current objects. If nothing was
@@ -188,10 +188,10 @@ public:
     return false;
   }
 
-  /** 
+  /**
    *  @brief Apply current changes to all objects of the current kind
    *
-   *  Apply any changes to the current object plus all other objects of the same kind. 
+   *  Apply any changes to the current object plus all other objects of the same kind.
    *  If nothing was changed, the objects may be left untouched.
    *  The dialog will start a transaction on the manager object.
    *
@@ -207,7 +207,7 @@ public:
    *  @brief Return the Editable object that this properties page
    *  object was issued from.
    */
-  lay::Editable *editable () 
+  lay::Editable *editable ()
   {
     return mp_editable.get ();
   }
@@ -253,4 +253,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

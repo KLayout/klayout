@@ -30,7 +30,7 @@
 #include <stdlib.h>
 
 // Test the writer's capabilities to write polygon's with holes
-TEST(1)
+TEST (1)
 {
   db::ShapeProcessor sp;
 
@@ -77,9 +77,9 @@ TEST(1)
       for (unsigned int j = 0; j < layout_read.layers (); ++j) {
         if (layout_read.is_valid_layer (j) && layout_read.get_properties (j) == lp_org) {
           EXPECT_EQ (top_org.shapes (i).size () > 0, true);
-          sp.boolean (layout_org, top_org, i, 
-                      layout_read, top_read, j, 
-                      top_org.shapes (xor_layer), db::BooleanOp::Xor, true, false); 
+          sp.boolean (layout_org, top_org, i,
+                      layout_read, top_read, j,
+                      top_org.shapes (xor_layer), db::BooleanOp::Xor, true, false);
           sp.size (layout_org, top_org, xor_layer, top_org.shapes (xor_layer), db::Coord (-1), db::Coord (-1));
           EXPECT_EQ (top_org.shapes (xor_layer).size () == 0, true);
         }
@@ -87,4 +87,3 @@ TEST(1)
     }
   }
 }
-

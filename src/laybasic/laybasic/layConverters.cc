@@ -32,7 +32,7 @@ namespace lay
 //  ColorConverter implementation
 
 #if defined(HAVE_QT)
-std::string 
+std::string
 ColorConverter::to_string (const QColor &c) const
 {
   if (! c.isValid ()) {
@@ -54,20 +54,18 @@ ColorConverter::to_string (const tl::Color &c) const
 }
 
 #if defined(HAVE_QT)
-void
-ColorConverter::from_string (const std::string &s, QColor &c) const
+void ColorConverter::from_string (const std::string &s, QColor &c) const
 {
   std::string t (tl::trim (s));
   if (t == "auto") {
     c = QColor ();
   } else {
     c = QColor (t.c_str ());
-  } 
+  }
 }
 #endif
 
-void
-ColorConverter::from_string (const std::string &s, tl::Color &c) const
+void ColorConverter::from_string (const std::string &s, tl::Color &c) const
 {
   std::string t (tl::trim (s));
   if (t == "auto") {
@@ -102,8 +100,7 @@ ACConverter::to_string (const lay::angle_constraint_type &m)
   }
 }
 
-void
-ACConverter::from_string (const std::string &tt, lay::angle_constraint_type &m)
+void ACConverter::from_string (const std::string &tt, lay::angle_constraint_type &m)
 {
   std::string t (tl::trim (tt));
   if (t == "any") {
@@ -142,8 +139,7 @@ HAlignConverter::to_string (db::HAlign a)
   }
 }
 
-void
-HAlignConverter::from_string (const std::string &tt, db::HAlign &a)
+void HAlignConverter::from_string (const std::string &tt, db::HAlign &a)
 {
   std::string t (tl::trim (tt));
   if (t == "center") {
@@ -174,8 +170,7 @@ VAlignConverter::to_string (db::VAlign a)
   }
 }
 
-void
-VAlignConverter::from_string (const std::string &tt, db::VAlign &a)
+void VAlignConverter::from_string (const std::string &tt, db::VAlign &a)
 {
   std::string t (tl::trim (tt));
   if (t == "center") {
@@ -206,8 +201,7 @@ EditGridConverter::to_string (const db::DVector &eg)
   }
 }
 
-void
-EditGridConverter::from_string (const std::string &s, db::DVector &eg)
+void EditGridConverter::from_string (const std::string &s, db::DVector &eg)
 {
   tl::Extractor ex (s.c_str ());
 
@@ -225,8 +219,7 @@ EditGridConverter::from_string (const std::string &s, db::DVector &eg)
   }
 }
 
-void
-EditGridConverter::from_string_picky (const std::string &s, db::DVector &eg)
+void EditGridConverter::from_string_picky (const std::string &s, db::DVector &eg)
 {
   tl::Extractor ex (s.c_str ());
 
@@ -251,4 +244,3 @@ EditGridConverter::from_string_picky (const std::string &s, db::DVector &eg)
 }
 
 }
-

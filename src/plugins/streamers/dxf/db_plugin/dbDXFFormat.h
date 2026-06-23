@@ -59,7 +59,7 @@ public:
   }
 
   /**
-   *  @brief Specify the database unit to produce 
+   *  @brief Specify the database unit to produce
    *
    *  Specify the database unit which the resulting layout will receive.
    */
@@ -75,9 +75,9 @@ public:
   /**
    *  @brief Text scaling factor
    *
-   *  This value specifies text scaling in percent. A value of 100 roughly means that the letter 
+   *  This value specifies text scaling in percent. A value of 100 roughly means that the letter
    *  pitch of the font will be 92% of the specified text height. That value applies for ROMANS fonts.
-   *  When generating GDS texts, a value of 100 generates TEXT objects with 
+   *  When generating GDS texts, a value of 100 generates TEXT objects with
    *  the specified size. Smaller values generate smaller sizes.
    */
   double text_scaling;
@@ -130,7 +130,7 @@ public:
 
   /**
    *  @brief If set to true, converts texts to polygons on read
-   * 
+   *
    *  Converting texts avoids problems with UTF-8 character sets.
    */
   bool render_texts_as_polygons;
@@ -217,7 +217,7 @@ public:
    */
   int polygon_mode;
 
-  /** 
+  /**
    *  @brief Implementation of FormatSpecificWriterOptions
    */
   virtual FormatSpecificWriterOptions *clone () const
@@ -238,4 +238,3 @@ public:
 } // namespace db
 
 #endif
-

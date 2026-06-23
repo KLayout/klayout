@@ -56,13 +56,12 @@ MAGWriter::MAGWriter ()
   m_timestamp = 0;
 }
 
-void 
-MAGWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options)
+void MAGWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options)
 {
-  std::vector <std::pair <unsigned int, db::LayerProperties> > layers;
+  std::vector<std::pair<unsigned int, db::LayerProperties>> layers;
   options.get_valid_layers (layout, layers, db::SaveLayoutOptions::LP_AssignNameWithPriority);
 
-  std::set <db::cell_index_type> cell_set;
+  std::set<db::cell_index_type> cell_set;
   options.get_cells (layout, cell_set, layers);
 
   tl::URI src (stream.path ());
@@ -123,8 +122,7 @@ MAGWriter::filename_for_cell (db::cell_index_type ci, db::Layout &layout)
   return uri.to_string ();
 }
 
-void
-MAGWriter::write_dummy_top (const std::set<db::cell_index_type> &cell_set, const db::Layout &layout, tl::OutputStream &os)
+void MAGWriter::write_dummy_top (const std::set<db::cell_index_type> &cell_set, const db::Layout &layout, tl::OutputStream &os)
 {
   m_cellname = "<TOP>";
 
@@ -169,8 +167,7 @@ MAGWriter::write_dummy_top (const std::set<db::cell_index_type> &cell_set, const
   os << "<< end >>\n";
 }
 
-void
-MAGWriter::write_cell (db::cell_index_type ci, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers, db::Layout &layout, tl::OutputStream &os)
+void MAGWriter::write_cell (db::cell_index_type ci, const std::vector<std::pair<unsigned int, db::LayerProperties>> &layers, db::Layout &layout, tl::OutputStream &os)
 {
   m_cellname = layout.cell_name (ci);
   try {
@@ -180,8 +177,7 @@ MAGWriter::write_cell (db::cell_index_type ci, const std::vector <std::pair <uns
   }
 }
 
-void
-MAGWriter::do_write_cell (db::cell_index_type ci, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers, db::Layout &layout, tl::OutputStream &os)
+void MAGWriter::do_write_cell (db::cell_index_type ci, const std::vector<std::pair<unsigned int, db::LayerProperties>> &layers, db::Layout &layout, tl::OutputStream &os)
 {
   os.set_as_text (true);
   os << "magic\n";
@@ -203,7 +199,7 @@ MAGWriter::do_write_cell (db::cell_index_type ci, const std::vector <std::pair <
 
   bool any;
 
-  for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator ll = layers.begin (); ll != layers.end (); ++ll) {
+  for (std::vector<std::pair<unsigned int, db::LayerProperties>>::const_iterator ll = layers.begin (); ll != layers.end (); ++ll) {
     any = false;
     for (db::Shapes::shape_iterator s = cell.shapes (ll->first).begin (db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Paths); ! s.at_end (); ++s) {
       if (! any) {
@@ -217,7 +213,7 @@ MAGWriter::do_write_cell (db::cell_index_type ci, const std::vector <std::pair <
   }
 
   any = false;
-  for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator ll = layers.begin (); ll != layers.end (); ++ll) {
+  for (std::vector<std::pair<unsigned int, db::LayerProperties>>::const_iterator ll = layers.begin (); ll != layers.end (); ++ll) {
     for (db::Shapes::shape_iterator s = cell.shapes (ll->first).begin (db::ShapeIterator::Texts); ! s.at_end (); ++s) {
       if (! any) {
         os << "<< labels >>\n";
@@ -237,68 +233,69 @@ MAGWriter::do_write_cell (db::cell_index_type ci, const std::vector <std::pair <
   os << "<< end >>\n";
 }
 
-namespace {
+namespace
+{
 
-  /**
-   *  @brief A simple polygon receiver that writes triangles and rectangles from trapezoids
-   */
-  class TrapezoidWriter
-    : public SimplePolygonSink
+/**
+ *  @brief A simple polygon receiver that writes triangles and rectangles from trapezoids
+ */
+class TrapezoidWriter
+  : public SimplePolygonSink
+{
+public:
+  TrapezoidWriter (tl::OutputStream &os)
+    : mp_os (&os)
   {
-  public:
-    TrapezoidWriter (tl::OutputStream &os)
-      : mp_os (&os)
-    { }
+  }
 
-    virtual void put (const db::SimplePolygon &polygon)
-    {
-      db::Box b = polygon.box ();
-      if (b.empty () || b.height () == 0 || b.width () == 0) {
-        //  safe fallback for degenerated polygons
-        return;
-      }
+  virtual void put (const db::SimplePolygon &polygon)
+  {
+    db::Box b = polygon.box ();
+    if (b.empty () || b.height () == 0 || b.width () == 0) {
+      //  safe fallback for degenerated polygons
+      return;
+    }
 
-      //  Determine the border triangles left and right
+    //  Determine the border triangles left and right
 
-      //  tl, tr describe the two triangles: tl left and tr right one.
-      //  If sl/sr indicate south half of the rectangle.
-      db::Box tl, tr;
-      bool sl = false, sr = false;
+    //  tl, tr describe the two triangles: tl left and tr right one.
+    //  If sl/sr indicate south half of the rectangle.
+    db::Box tl, tr;
+    bool sl = false, sr = false;
 
-      for (db::SimplePolygon::polygon_edge_iterator ie = polygon.begin_edge (); ! ie.at_end (); ++ie) {
-        db::Edge e = *ie;
-        if (e.dy () > 0 /*left side*/) {
-          tl = e.bbox ();
-          sl = e.dx () > 0;
-        } else if (e.dy () < 0 /*right side*/) {
-          tr = e.bbox ();
-          sr = e.dx () > 0;
-        }
-      }
-
-      //  outputs the parts
-
-      if (tl.width () > 0) {
-        (*mp_os) << "tri " << tl.left () << " " << tl.bottom () << " " << tl.right () << " " << tl.top () << " " << (sl ? "s" : "") << "e\n";
-      }
-
-      db::Box ib (tl.right (), tl.bottom (), tr.left (), tr.top ());
-      if (ib.width () > 0) {
-        (*mp_os) << "rect " << ib.left () << " " << ib.bottom () << " " << ib.right () << " " << ib.top () << "\n";
-      }
-
-      if (tr.width () > 0) {
-        (*mp_os) << "tri " << tr.left () << " " << tr.bottom () << " " << tr.right () << " " << tr.top () << " " << (sr ? "s" : "") << "\n";
+    for (db::SimplePolygon::polygon_edge_iterator ie = polygon.begin_edge (); ! ie.at_end (); ++ie) {
+      db::Edge e = *ie;
+      if (e.dy () > 0 /*left side*/) {
+        tl = e.bbox ();
+        sl = e.dx () > 0;
+      } else if (e.dy () < 0 /*right side*/) {
+        tr = e.bbox ();
+        sr = e.dx () > 0;
       }
     }
 
-  private:
-    tl::OutputStream *mp_os;
-  };
+    //  outputs the parts
+
+    if (tl.width () > 0) {
+      (*mp_os) << "tri " << tl.left () << " " << tl.bottom () << " " << tl.right () << " " << tl.top () << " " << (sl ? "s" : "") << "e\n";
+    }
+
+    db::Box ib (tl.right (), tl.bottom (), tr.left (), tr.top ());
+    if (ib.width () > 0) {
+      (*mp_os) << "rect " << ib.left () << " " << ib.bottom () << " " << ib.right () << " " << ib.top () << "\n";
+    }
+
+    if (tr.width () > 0) {
+      (*mp_os) << "tri " << tr.left () << " " << tr.bottom () << " " << tr.right () << " " << tr.top () << " " << (sr ? "s" : "") << "\n";
+    }
+  }
+
+private:
+  tl::OutputStream *mp_os;
+};
 }
 
-void
-MAGWriter::write_polygon (const db::Polygon &poly, const db::Layout & /*layout*/, tl::OutputStream &os)
+void MAGWriter::write_polygon (const db::Polygon &poly, const db::Layout & /*layout*/, tl::OutputStream &os)
 {
   TrapezoidWriter writer (os);
 
@@ -315,8 +312,7 @@ MAGWriter::write_polygon (const db::Polygon &poly, const db::Layout & /*layout*/
   }
 }
 
-void
-MAGWriter::write_label (const std::string &layer, const db::Text &text, const db::Layout & /*layout*/, tl::OutputStream &os)
+void MAGWriter::write_label (const std::string &layer, const db::Text &text, const db::Layout & /*layout*/, tl::OutputStream &os)
 {
   db::Vector v = scaled (text.trans ().disp ());
 
@@ -328,12 +324,11 @@ MAGWriter::write_label (const std::string &layer, const db::Text &text, const db
   os << "rlabel " << make_string (layer) << " " << v.x () << " " << v.y () << " " << v.x () << " " << v.y () << " 0 " << s << "\n";
 }
 
-void
-MAGWriter::write_instance (const db::CellInstArray &inst, const db::Layout &layout, tl::OutputStream &os)
+void MAGWriter::write_instance (const db::CellInstArray &inst, const db::Layout &layout, tl::OutputStream &os)
 {
   db::Vector a, b;
   unsigned long na = 0, nb = 0;
-  if (inst.is_regular_array (a, b, na, nb) && ((a.x () == 0 && b.y () == 0) || (a.y () == 0 && b.x () == 0)) && !needs_rounding (a) && !needs_rounding (b)) {
+  if (inst.is_regular_array (a, b, na, nb) && ((a.x () == 0 && b.y () == 0) || (a.y () == 0 && b.x () == 0)) && ! needs_rounding (a) && ! needs_rounding (b)) {
 
     db::ICplxTrans tr = inst.complex_trans ();
     write_single_instance (inst.object ().cell_index (), tr, a, b, na, nb, layout, os);
@@ -344,12 +339,10 @@ MAGWriter::write_instance (const db::CellInstArray &inst, const db::Layout &layo
       db::ICplxTrans tr = inst.complex_trans (*ia);
       write_single_instance (inst.object ().cell_index (), tr, db::Vector (), db::Vector (), 1, 1, layout, os);
     }
-
   }
 }
 
-void
-MAGWriter::write_single_instance (db::cell_index_type ci, db::ICplxTrans trans, db::Vector a, db::Vector b, unsigned long na, unsigned long nb, const db::Layout &layout, tl::OutputStream &os)
+void MAGWriter::write_single_instance (db::cell_index_type ci, db::ICplxTrans trans, db::Vector a, db::Vector b, unsigned long na, unsigned long nb, const db::Layout &layout, tl::OutputStream &os)
 {
   if (trans.is_mag ()) {
     throw tl::Exception (tl::to_string (tr ("Cannot write magnified instance to MAG files: ")) + trans.to_string () + tl::to_string (tr (" of cell ")) + layout.cell_name (ci));
@@ -377,7 +370,6 @@ MAGWriter::write_single_instance (db::cell_index_type ci, db::ICplxTrans trans, 
     db::Vector db = scaled (b);
 
     os << "array " << 0 << " " << (na - 1) << " " << da.x () << " " << 0 << " " << (nb - 1) << " " << db.y () << "\n";
-
   }
 
   os << "timestamp " << m_timestamp << "\n";
@@ -391,15 +383,16 @@ MAGWriter::write_single_instance (db::cell_index_type ci, db::ICplxTrans trans, 
   os << "box " << bx.left () << " " << bx.bottom () << " " << bx.right () << " " << bx.top () << "\n";
 }
 
-namespace {
+namespace
+{
 
-  struct ScalingOp
-  {
-    ScalingOp (MAGWriter *wr) : mp_wr (wr) { }
-    db::Point operator() (const db::Point &pt) const { return mp_wr->scaled (pt); }
-  private:
-    MAGWriter *mp_wr;
-  };
+struct ScalingOp {
+  ScalingOp (MAGWriter *wr) : mp_wr (wr) {}
+  db::Point operator() (const db::Point &pt) const { return mp_wr->scaled (pt); }
+
+private:
+  MAGWriter *mp_wr;
+};
 
 }
 
@@ -440,8 +433,7 @@ MAGWriter::scaled (const db::Point &p) const
   return res;
 }
 
-bool
-MAGWriter::needs_rounding (const db::Vector &v) const
+bool MAGWriter::needs_rounding (const db::Vector &v) const
 {
   db::Vector res (db::DVector (v) * m_sf);
   return ! db::DVector (res).equal (db::DVector (v) * m_sf);
@@ -459,7 +451,7 @@ std::string
 MAGWriter::make_string (const std::string &s)
 {
   std::string res;
-  for (const char *cp = s.c_str (); *cp; ) {
+  for (const char *cp = s.c_str (); *cp;) {
     uint32_t c32 = tl::utf32_from_utf8 (cp);
     if (! is_valid_char (c32)) {
       res += tl::sprintf ("x%x", c32);

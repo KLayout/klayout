@@ -36,7 +36,8 @@
 #include <map>
 #include <vector>
 
-namespace db {
+namespace db
+{
 
 class PolygonSink;
 
@@ -60,7 +61,7 @@ public:
   {
     return run_check (db::WidthRelation, 0, d, options);
   }
-    
+
   virtual EdgePairsDelegate *space_check (db::Coord d, const db::EdgesCheckOptions &options) const
   {
     return run_check (db::SpaceRelation, 0, d, options);
@@ -202,10 +203,9 @@ private:
   virtual db::Box compute_bbox () const;
   EdgesDelegate *boolean (const Edges *other, EdgeBoolOp op) const;
   std::pair<EdgesDelegate *, EdgesDelegate *> boolean_andnot (const Edges *other) const;
-  std::pair<EdgesDelegate *, EdgesDelegate *> edge_region_op(const Region &other, db::EdgePolygonOp::mode_t mode, bool include_borders) const;
+  std::pair<EdgesDelegate *, EdgesDelegate *> edge_region_op (const Region &other, db::EdgePolygonOp::mode_t mode, bool include_borders) const;
 };
 
 }
 
 #endif
-

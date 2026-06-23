@@ -48,22 +48,19 @@ static lay::LayoutView *get_view (lay::CellViewRef *cv)
 
 static ClassExt<lay::CellViewRef> extdecl_CellView (
   method ("active", &get_active_cellview_ref,
-    "@brief Gets the active CellView\n"
-    "The active CellView is the one that is selected in the current layout view. This method is "
-    "equivalent to\n"
-    "@code\n"
-    "RBA::LayoutView::current.active_cellview\n"
-    "@/code\n"
-    "If no CellView is active, this method returns nil.\n"
-    "\n"
-    "This method has been introduced in version 0.23."
-  ) +
+          "@brief Gets the active CellView\n"
+          "The active CellView is the one that is selected in the current layout view. This method is "
+          "equivalent to\n"
+          "@code\n"
+          "RBA::LayoutView::current.active_cellview\n"
+          "@/code\n"
+          "If no CellView is active, this method returns nil.\n"
+          "\n"
+          "This method has been introduced in version 0.23.") +
   method_ext ("view", &get_view,
-    "@brief Gets the view the cellview resides in\n"
-    "This reference will be nil if the cellview is not a valid one.\n"
-    "This method has been added in version 0.25.\n"
-  )
-);
+              "@brief Gets the view the cellview resides in\n"
+              "This reference will be nil if the cellview is not a valid one.\n"
+              "This method has been added in version 0.25.\n"));
 
 static lay::LayoutView *get_view_from_lp (lay::LayerPropertiesNode *node)
 {
@@ -72,10 +69,8 @@ static lay::LayoutView *get_view_from_lp (lay::LayerPropertiesNode *node)
 
 static ClassExt<lay::LayerPropertiesNode> extdecl_LayerPropertiesNode (
   method_ext ("view", &get_view_from_lp,
-    "@brief Gets the view this node lives in\n"
-    "\n"
-    "This reference can be nil if the node is a orphan node that lives outside a view."
-  )
-);
+              "@brief Gets the view this node lives in\n"
+              "\n"
+              "This reference can be nil if the node is a orphan node that lives outside a view."));
 
 }

@@ -45,8 +45,7 @@ BasicRoundPolygon::BasicRoundPolygon ()
   //  .. nothing yet ..
 }
 
-bool 
-BasicRoundPolygon::can_create_from_shape (const db::Layout & /*layout*/, const db::Shape &shape, unsigned int /*layer*/) const
+bool BasicRoundPolygon::can_create_from_shape (const db::Layout & /*layout*/, const db::Shape &shape, unsigned int /*layer*/) const
 {
   return (shape.is_polygon () || shape.is_box () || shape.is_path ());
 }
@@ -66,7 +65,7 @@ BasicRoundPolygon::parameters_from_shape (const db::Layout &layout, const db::Sh
   return map_parameters (nm);
 }
 
-std::vector<db::PCellLayerDeclaration> 
+std::vector<db::PCellLayerDeclaration>
 BasicRoundPolygon::get_layer_declarations (const db::pcell_parameters_type &parameters) const
 {
   std::vector<db::PCellLayerDeclaration> layers;
@@ -79,8 +78,7 @@ BasicRoundPolygon::get_layer_declarations (const db::pcell_parameters_type &para
   return layers;
 }
 
-void 
-BasicRoundPolygon::produce (const db::Layout &layout, const std::vector<unsigned int> &layer_ids, const db::pcell_parameters_type &parameters, db::Cell &cell) const
+void BasicRoundPolygon::produce (const db::Layout &layout, const std::vector<unsigned int> &layer_ids, const db::pcell_parameters_type &parameters, db::Cell &cell) const
 {
   if (parameters.size () < p_total || layer_ids.size () < 1) {
     return;
@@ -109,27 +107,27 @@ BasicRoundPolygon::produce (const db::Layout &layout, const std::vector<unsigned
   }
 }
 
-std::string 
+std::string
 BasicRoundPolygon::get_display_name (const db::pcell_parameters_type &parameters) const
 {
   return "ROUND_POLYGON(l=" + std::string (parameters [p_layer].to_string ()) +
-                      ",r=" + tl::to_string (parameters [p_radius].to_double ()) +
-                      ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
-                        ")";
+         ",r=" + tl::to_string (parameters [p_radius].to_double ()) +
+         ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
+         ")";
 }
 
-std::vector<db::PCellParameterDeclaration> 
+std::vector<db::PCellParameterDeclaration>
 BasicRoundPolygon::get_parameter_declarations () const
 {
   std::vector<db::PCellParameterDeclaration> parameters;
 
-  //  parameter #0: layer 
+  //  parameter #0: layer
   tl_assert (parameters.size () == p_layer);
   parameters.push_back (db::PCellParameterDeclaration ("layer"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_layer);
   parameters.back ().set_description (tl::to_string (tr ("Layer")));
 
-  //  parameter #1: radius 
+  //  parameter #1: radius
   tl_assert (parameters.size () == p_radius);
   parameters.push_back (db::PCellParameterDeclaration ("radius"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
@@ -137,16 +135,16 @@ BasicRoundPolygon::get_parameter_declarations () const
   parameters.back ().set_default (0.1);
   parameters.back ().set_unit (tl::to_string (tr ("micron")));
 
-  //  parameter #2: handle 
+  //  parameter #2: handle
   tl_assert (parameters.size () == p_polygon);
   parameters.push_back (db::PCellParameterDeclaration ("polygon"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
   db::DPolygon p;
-  db::DPoint pts[] = { db::DPoint(-0.2, -0.2), db::DPoint(0.2, -0.2), db::DPoint (0.2, 0.2), db::DPoint (-0.2, 0.2) };
-  p.assign_hull (pts, pts + sizeof (pts) / sizeof (pts[0]));
+  db::DPoint pts [] = {db::DPoint (-0.2, -0.2), db::DPoint (0.2, -0.2), db::DPoint (0.2, 0.2), db::DPoint (-0.2, 0.2)};
+  p.assign_hull (pts, pts + sizeof (pts) / sizeof (pts [0]));
   parameters.back ().set_default (p);
 
-  //  parameter #3: number of points 
+  //  parameter #3: number of points
   tl_assert (parameters.size () == p_npoints);
   parameters.push_back (db::PCellParameterDeclaration ("npoints"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_int);
@@ -157,6 +155,3 @@ BasicRoundPolygon::get_parameter_declarations () const
 }
 
 }
-
-
-

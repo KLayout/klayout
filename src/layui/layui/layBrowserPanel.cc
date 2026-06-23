@@ -33,7 +33,7 @@
 
 #include <cstdio>
 #if QT_VERSION >= 0x050000
-#  include <QUrlQuery>
+#include <QUrlQuery>
 #endif
 
 #include <QTreeWidgetItem>
@@ -47,7 +47,7 @@ namespace lay
 
 // -------------------------------------------------------------
 
-QVariant 
+QVariant
 BrowserTextWidget::loadResource (int type, const QUrl &url)
 {
   if (mp_panel && url.scheme () == QString::fromUtf8 ("int")) {
@@ -59,8 +59,7 @@ BrowserTextWidget::loadResource (int type, const QUrl &url)
 
 // -------------------------------------------------------------
 
-void
-BookmarkItem::read (tl::Extractor &ex)
+void BookmarkItem::read (tl::Extractor &ex)
 {
   while (! ex.at_end () && ! ex.test (";")) {
 
@@ -77,7 +76,6 @@ BookmarkItem::read (tl::Extractor &ex)
     } else if (k == "position") {
       tl::from_string (v, position);
     }
-
   }
 }
 
@@ -102,8 +100,7 @@ BrowserPanel::BrowserPanel (QWidget *parent)
   init ();
 }
 
-void 
-BrowserPanel::init ()
+void BrowserPanel::init ()
 {
   m_enable_load = false;
   m_enable_reject = false;
@@ -182,8 +179,7 @@ BrowserPanel::~BrowserPanel ()
   mp_ui = 0;
 }
 
-void
-BrowserPanel::set_dispatcher (lay::Dispatcher *dispatcher, const std::string &cfg_bookmarks)
+void BrowserPanel::set_dispatcher (lay::Dispatcher *dispatcher, const std::string &cfg_bookmarks)
 {
   mp_dispatcher = dispatcher;
   m_cfg_bookmarks = cfg_bookmarks;
@@ -203,7 +199,6 @@ BrowserPanel::set_dispatcher (lay::Dispatcher *dispatcher, const std::string &cf
         m_bookmarks.push_back (BookmarkItem ());
         m_bookmarks.back ().read (ex);
       }
-
     }
 
   } catch (...) {
@@ -225,8 +220,7 @@ BrowserPanel::url () const
   return tl::to_string (mp_ui->browser->source ().toString ());
 }
 
-void
-BrowserPanel::bookmark ()
+void BrowserPanel::bookmark ()
 {
   BookmarkItem bm;
   bm.url = tl::to_string (mp_ui->browser->historyUrl (0).toString ());
@@ -239,8 +233,7 @@ BrowserPanel::bookmark ()
   store_bookmarks ();
 }
 
-void
-BrowserPanel::store_bookmarks ()
+void BrowserPanel::store_bookmarks ()
 {
   if (mp_dispatcher) {
 
@@ -250,12 +243,10 @@ BrowserPanel::store_bookmarks ()
     }
 
     mp_dispatcher->config_set (m_cfg_bookmarks, s);
-
   }
 }
 
-void
-BrowserPanel::bookmark_item_selected (QTreeWidgetItem *item)
+void BrowserPanel::bookmark_item_selected (QTreeWidgetItem *item)
 {
   int index = mp_ui->browser_bookmark_view->indexOfTopLevelItem (item);
   if (index < 0 || index >= int (m_bookmarks.size ())) {
@@ -263,7 +254,7 @@ BrowserPanel::bookmark_item_selected (QTreeWidgetItem *item)
   }
 
   std::list<BookmarkItem>::iterator i = m_bookmarks.begin ();
-  for ( ; i != m_bookmarks.end () && index > 0; --index, ++i)
+  for (; i != m_bookmarks.end () && index > 0; --index, ++i)
     ;
 
   if (i == m_bookmarks.end ()) {
@@ -282,16 +273,14 @@ BrowserPanel::bookmark_item_selected (QTreeWidgetItem *item)
   mp_ui->browser_bookmark_view->topLevelItem (0)->setSelected (true);
 }
 
-void
-BrowserPanel::clear_bookmarks ()
+void BrowserPanel::clear_bookmarks ()
 {
   m_bookmarks.clear ();
 }
 
-void
-BrowserPanel::add_bookmark (const BookmarkItem &item)
+void BrowserPanel::add_bookmark (const BookmarkItem &item)
 {
-  for (std::list<BookmarkItem>::iterator i = m_bookmarks.begin (); i != m_bookmarks.end (); ) {
+  for (std::list<BookmarkItem>::iterator i = m_bookmarks.begin (); i != m_bookmarks.end ();) {
     std::list<BookmarkItem>::iterator ii = i;
     ++ii;
     if (*i == item) {
@@ -302,8 +291,7 @@ BrowserPanel::add_bookmark (const BookmarkItem &item)
   m_bookmarks.push_front (item);
 }
 
-void
-BrowserPanel::delete_bookmark ()
+void BrowserPanel::delete_bookmark ()
 {
   QTreeWidgetItem *item = mp_ui->browser_bookmark_view->currentItem ();
   if (! item) {
@@ -312,7 +300,7 @@ BrowserPanel::delete_bookmark ()
 
   int index = mp_ui->browser_bookmark_view->indexOfTopLevelItem (item);
   std::list<BookmarkItem>::iterator i = m_bookmarks.begin ();
-  for ( ; i != m_bookmarks.end () && index > 0; --index, ++i)
+  for (; i != m_bookmarks.end () && index > 0; --index, ++i)
     ;
 
   if (i != m_bookmarks.end ()) {
@@ -322,8 +310,7 @@ BrowserPanel::delete_bookmark ()
   }
 }
 
-void
-BrowserPanel::refresh_bookmark_list ()
+void BrowserPanel::refresh_bookmark_list ()
 {
   mp_ui->browser_bookmark_view->setVisible (! m_bookmarks.empty ());
 
@@ -338,15 +325,13 @@ BrowserPanel::refresh_bookmark_list ()
   update_navigation_panel ();
 }
 
-void
-BrowserPanel::find ()
+void BrowserPanel::find ()
 {
   mp_ui->search_frame->show ();
-  mp_ui->on_page_search_edit->setFocus();
+  mp_ui->on_page_search_edit->setFocus ();
 }
 
-void
-BrowserPanel::page_search_edited ()
+void BrowserPanel::page_search_edited ()
 {
   m_search_selection.clear ();
   m_search_index = -1;
@@ -378,9 +363,7 @@ BrowserPanel::page_search_edited ()
       m_search_selection.push_back (extra_selection);
 
       from = index + search_text.size ();
-
     }
-
   }
 
   if (! m_search_selection.empty ()) {
@@ -390,8 +373,7 @@ BrowserPanel::page_search_edited ()
   }
 }
 
-void
-BrowserPanel::page_search_next ()
+void BrowserPanel::page_search_next ()
 {
   if (m_search_index >= 0) {
 
@@ -401,12 +383,10 @@ BrowserPanel::page_search_next ()
     }
 
     mp_ui->browser->setTextCursor (m_search_selection [m_search_index].cursor);
-
   }
 }
 
-void
-BrowserPanel::search_text_changed (const QString &text)
+void BrowserPanel::search_text_changed (const QString &text)
 {
   QList<QString> strings;
   if (! text.isEmpty () && mp_source.get ()) {
@@ -419,21 +399,18 @@ BrowserPanel::search_text_changed (const QString &text)
   mp_completer_model->setStringList (strings);
 }
 
-void
-BrowserPanel::source_changed ()
+void BrowserPanel::source_changed ()
 {
   m_new_url_dm ();
 }
 
-void
-BrowserPanel::anchor_clicked (const QUrl &url)
+void BrowserPanel::anchor_clicked (const QUrl &url)
 {
   mp_ui->browser->setSource (url);
   source_changed ();
 }
 
-void
-BrowserPanel::new_url ()
+void BrowserPanel::new_url ()
 {
   QString title = mp_ui->browser->document ()->metaInformation (QTextDocument::DocumentTitle);
   m_current_title = title;
@@ -443,8 +420,7 @@ BrowserPanel::new_url ()
   page_search_edited ();
 }
 
-void
-BrowserPanel::outline_item_clicked (QTreeWidgetItem *item)
+void BrowserPanel::outline_item_clicked (QTreeWidgetItem *item)
 {
   QString url = item->data (0, Qt::UserRole).toString ();
   if (! url.isEmpty ()) {
@@ -452,14 +428,12 @@ BrowserPanel::outline_item_clicked (QTreeWidgetItem *item)
   }
 }
 
-void 
-BrowserPanel::load (const std::string &s)
+void BrowserPanel::load (const std::string &s)
 {
   mp_ui->browser->setSource (QUrl (tl::to_qstring (s)));
 }
 
-void 
-BrowserPanel::set_source (BrowserSource *source)
+void BrowserPanel::set_source (BrowserSource *source)
 {
   m_enable_reject = false;
   m_enable_load = false;
@@ -483,12 +457,10 @@ BrowserPanel::set_source (BrowserSource *source)
     mp_ui->browser->clearHistory ();
     reload ();
     m_enable_reject = true;
-
   }
 }
 
-void 
-BrowserPanel::set_home (const std::string &url)
+void BrowserPanel::set_home (const std::string &url)
 {
   m_home = url;
   home ();
@@ -499,14 +471,13 @@ BrowserPanel::set_home (const std::string &url)
   QList<int> sizes = mp_ui->splitter->sizes ();
   if (sizes.size () >= 2) {
     int size_outline = 150;
-    sizes[1] += std::max (width () - 10 - size_outline, 10);
-    sizes[0] = size_outline;
+    sizes [1] += std::max (width () - 10 - size_outline, 10);
+    sizes [0] = size_outline;
   }
   mp_ui->splitter->setSizes (sizes);
 }
 
-void 
-BrowserPanel::reload ()
+void BrowserPanel::reload ()
 {
   //  clear caches to force a reload
   m_cached_url = "";
@@ -519,34 +490,29 @@ BrowserPanel::reload ()
   }
 }
 
-void
-BrowserPanel::prev ()
+void BrowserPanel::prev ()
 {
   mp_ui->browser->setSource (QUrl (tl::to_qstring (m_cached_prev_url)));
   reload ();
 }
 
-void
-BrowserPanel::next ()
+void BrowserPanel::next ()
 {
   mp_ui->browser->setSource (QUrl (tl::to_qstring (m_cached_next_url)));
   reload ();
 }
 
-void 
-BrowserPanel::back ()
+void BrowserPanel::back ()
 {
   mp_ui->browser->backward ();
 }
 
-void 
-BrowserPanel::forward ()
+void BrowserPanel::forward ()
 {
   mp_ui->browser->forward ();
 }
 
-void 
-BrowserPanel::home ()
+void BrowserPanel::home ()
 {
   bool needs_reload = (m_home == m_cached_url);
   mp_ui->browser->setSource (QUrl (tl::to_qstring (m_home)));
@@ -555,14 +521,12 @@ BrowserPanel::home ()
   }
 }
 
-QSize  
-BrowserPanel::sizeHint () const
+QSize BrowserPanel::sizeHint () const
 {
   return QSize (800, 600);
 }
 
-void
-BrowserPanel::search (const std::string &s)
+void BrowserPanel::search (const std::string &s)
 {
   if (! s.empty ()) {
     QUrl url (tl::to_qstring (m_search_url));
@@ -571,7 +535,7 @@ BrowserPanel::search (const std::string &s)
     qi.addQueryItem (tl::to_qstring (m_search_query_item), tl::to_qstring (s));
     url.setQuery (qi);
 #else
-    QList<QPair<QString, QString> > qi;
+    QList<QPair<QString, QString>> qi;
     qi.push_back (QPair<QString, QString> (tl::to_qstring (m_search_query_item), tl::to_qstring (s)));
     url.setQueryItems (qi);
 #endif
@@ -579,8 +543,7 @@ BrowserPanel::search (const std::string &s)
   }
 }
 
-void
-BrowserPanel::search_edited ()
+void BrowserPanel::search_edited ()
 {
   if (mp_ui->search_edit->text ().size () > 0) {
     QUrl url (tl::to_qstring (m_search_url));
@@ -589,7 +552,7 @@ BrowserPanel::search_edited ()
     qi.addQueryItem (tl::to_qstring (m_search_query_item), mp_ui->search_edit->text ());
     url.setQuery (qi);
 #else
-    QList<QPair<QString, QString> > qi;
+    QList<QPair<QString, QString>> qi;
     qi.push_back (QPair<QString, QString> (tl::to_qstring (m_search_query_item), mp_ui->search_edit->text ()));
     url.setQueryItems (qi);
 #endif
@@ -597,16 +560,14 @@ BrowserPanel::search_edited ()
   }
 }
 
-void 
-BrowserPanel::set_search_url (const std::string &url, const std::string &query_item)
+void BrowserPanel::set_search_url (const std::string &url, const std::string &query_item)
 {
   m_search_url = url;
   m_search_query_item = query_item;
   mp_ui->search_edit->setVisible (! url.empty ());
 }
 
-void 
-BrowserPanel::set_label (const std::string &text)
+void BrowserPanel::set_label (const std::string &text)
 {
   mp_ui->label->setText (tl::to_qstring (text));
   mp_ui->label->setVisible (! text.empty ());
@@ -632,15 +593,13 @@ update_item_with_outline (const BrowserOutline &ol, QTreeWidgetItem *item)
   }
 }
 
-void
-BrowserPanel::update_navigation_panel ()
+void BrowserPanel::update_navigation_panel ()
 {
   bool navigation_visible = mp_ui->outline_tree->topLevelItemCount () > 0 || mp_ui->browser_bookmark_view->topLevelItemCount () > 0;
   mp_ui->navigation_frame->setVisible (navigation_visible);
 }
 
-void
-BrowserPanel::set_outline (const BrowserOutline &ol)
+void BrowserPanel::set_outline (const BrowserOutline &ol)
 {
   if (ol.begin () == ol.end ()) {
 
@@ -663,13 +622,12 @@ BrowserPanel::set_outline (const BrowserOutline &ol)
     }
 
     mp_ui->outline_tree->expandAll ();
-
   }
 
   update_navigation_panel ();
 }
 
-QVariant 
+QVariant
 BrowserPanel::loadResource (int type, const QUrl &url)
 {
   if (type == QTextDocument::ImageResource) {
@@ -703,7 +661,7 @@ BrowserPanel::loadResource (int type, const QUrl &url)
     QVariant ret;
 
     //  recursion sentinel: avoid recursion by any action within mp_source->get that causes a "loadResource"
-    if (! m_enable_load || !mp_source.get ()) {
+    if (! m_enable_load || ! mp_source.get ()) {
       //  return any dummy in this case - otherwise the QTestBrowser complains about not having anything.
       return QVariant (QString::fromUtf8 (" "));
     }
@@ -734,7 +692,7 @@ BrowserPanel::loadResource (int type, const QUrl &url)
       }
       if (s.empty ()) {
         s = " "; // QTextBrowser needs at least something
-        //  The only way (as far as I know in Qt <4.2) to suppress navigation to 
+        //  The only way (as far as I know in Qt <4.2) to suppress navigation to
         //  the Url is to schedule a delayed "back" signal. In Qt >= 4.2 we could register
         //  an external handler for "int" schemes that would do nothing ..
         if (m_enable_reject) {
@@ -773,7 +731,6 @@ BrowserPanel::loadResource (int type, const QUrl &url)
 
     m_enable_load = true;
     return ret;
-
   }
 }
 
@@ -800,13 +757,13 @@ BrowserSource::~BrowserSource ()
 }
 
 std::string
-BrowserSource::get_css (const std::string & /*url*/) 
+BrowserSource::get_css (const std::string & /*url*/)
 {
   return std::string ();
 }
 
 QImage
-BrowserSource::get_image (const std::string & /*url*/) 
+BrowserSource::get_image (const std::string & /*url*/)
 {
   return QImage ();
 }
@@ -817,26 +774,23 @@ BrowserSource::get_outline (const std::string & /*url*/)
   return BrowserOutline ();
 }
 
-void
-BrowserSource::search_completers (const std::string & /*search_string*/, std::list<std::string> & /*completers*/)
+void BrowserSource::search_completers (const std::string & /*search_string*/, std::list<std::string> & /*completers*/)
 {
   //  .. nothing here ..
 }
 
-std::string 
-BrowserSource::get (const std::string & /*url*/) 
+std::string
+BrowserSource::get (const std::string & /*url*/)
 {
   return m_default_html;
 }
 
-void 
-BrowserSource::detach (lay::BrowserPanel *d)
+void BrowserSource::detach (lay::BrowserPanel *d)
 {
   mp_owners.erase (d);
 }
 
-void 
-BrowserSource::attach (lay::BrowserPanel *d)
+void BrowserSource::attach (lay::BrowserPanel *d)
 {
   mp_owners.insert (d);
 }
@@ -844,4 +798,3 @@ BrowserSource::attach (lay::BrowserPanel *d)
 }
 
 #endif
-

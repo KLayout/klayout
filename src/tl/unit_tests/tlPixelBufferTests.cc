@@ -27,8 +27,8 @@
 
 #if defined(HAVE_QT)
 
-#  include <QImage>
-#  include <QPainter>
+#include <QImage>
+#include <QPainter>
 
 static bool compare_images (const QImage &qimg, const std::string &au)
 {
@@ -38,7 +38,7 @@ static bool compare_images (const QImage &qimg, const std::string &au)
   if (qimg2.width () == (int) qimg.width () && qimg2.height () == (int) qimg.height ()) {
     for (int j = 0; j < qimg.height (); ++j) {
       for (int i = 0; i < qimg.width (); ++i) {
-        if (((const tl::color_t *) qimg.scanLine (j))[i] != ((const tl::color_t *) qimg2.scanLine (j))[i]) {
+        if (((const tl::color_t *) qimg.scanLine (j)) [i] != ((const tl::color_t *) qimg2.scanLine (j)) [i]) {
           return false;
         }
       }
@@ -59,7 +59,7 @@ static bool compare_images_mono (const QImage &qimg, const std::string &au)
     //  NOTE: slooooow ...
     for (int j = 0; j < qimg.height (); ++j) {
       for (int i = 0; i < qimg.width (); ++i) {
-        if ((qimg.scanLine (j)[i / 8] & (0x01 << (i % 8))) != (qimg2.scanLine (j)[i / 8] & (0x01 << (i % 8)))) {
+        if ((qimg.scanLine (j) [i / 8] & (0x01 << (i % 8))) != (qimg2.scanLine (j) [i / 8] & (0x01 << (i % 8)))) {
           return false;
         }
       }
@@ -82,7 +82,7 @@ static bool compare_images (const tl::BitmapBuffer &img, const tl::BitmapBuffer 
   return img == img2;
 }
 
-TEST(1)
+TEST (1)
 {
   tl::PixelBuffer img (15, 25);
   EXPECT_EQ (img.width (), 15u);
@@ -94,7 +94,7 @@ TEST(1)
   EXPECT_EQ (img.transparent (), true);
 
   img.fill (0x112233);
-  EXPECT_EQ (img.scan_line (5)[10], 0x112233u);
+  EXPECT_EQ (img.scan_line (5) [10], 0x112233u);
 
   tl::PixelBuffer img2;
   EXPECT_EQ (img2.transparent (), false);
@@ -103,23 +103,23 @@ TEST(1)
   EXPECT_EQ (img2.width (), 15u);
   EXPECT_EQ (img2.height (), 25u);
 
-  EXPECT_EQ (img.scan_line (5)[10], 0x112233u);
-  EXPECT_EQ (img2.scan_line (5)[10], 0x112233u);
+  EXPECT_EQ (img.scan_line (5) [10], 0x112233u);
+  EXPECT_EQ (img2.scan_line (5) [10], 0x112233u);
 
   img2.fill (0x332211);
-  EXPECT_EQ (img.scan_line (5)[10], 0x112233u);
-  EXPECT_EQ (img2.scan_line (5)[10], 0x332211u);
+  EXPECT_EQ (img.scan_line (5) [10], 0x112233u);
+  EXPECT_EQ (img2.scan_line (5) [10], 0x332211u);
 
   img.set_transparent (false);
   img2.swap (img);
   EXPECT_EQ (img2.transparent (), false);
-  EXPECT_EQ (img2.scan_line (5)[10], 0x112233u);
-  EXPECT_EQ (img.scan_line (5)[10], 0x332211u);
+  EXPECT_EQ (img2.scan_line (5) [10], 0x112233u);
+  EXPECT_EQ (img.scan_line (5) [10], 0x332211u);
 
   img2 = img;
   EXPECT_EQ (compare_images (img, img2), true);
-  EXPECT_EQ (img.scan_line (5)[10], 0x332211u);
-  EXPECT_EQ (img2.scan_line (5)[10], 0x332211u);
+  EXPECT_EQ (img.scan_line (5) [10], 0x332211u);
+  EXPECT_EQ (img2.scan_line (5) [10], 0x332211u);
 
   img2 = tl::PixelBuffer (10, 16);
   EXPECT_EQ (img.width (), 15u);
@@ -129,47 +129,47 @@ TEST(1)
   img2.fill (0x010203);
   EXPECT_EQ (compare_images (img, img2), false);
 
-  EXPECT_EQ (img.scan_line (5)[10], 0x332211u);
-  EXPECT_EQ (img2.scan_line (5)[8], 0xff010203u);
+  EXPECT_EQ (img.scan_line (5) [10], 0x332211u);
+  EXPECT_EQ (img2.scan_line (5) [8], 0xff010203u);
 
   img = std::move (img2);
   EXPECT_EQ (compare_images (img, img2), false);
   EXPECT_EQ (img.width (), 10u);
   EXPECT_EQ (img.height (), 16u);
-  EXPECT_EQ (img.scan_line (5)[8], 0xff010203u);
+  EXPECT_EQ (img.scan_line (5) [8], 0xff010203u);
 
   tl::PixelBuffer img3 (img);
   EXPECT_EQ (compare_images (img, img3), true);
   EXPECT_EQ (img3.width (), 10u);
   EXPECT_EQ (img3.height (), 16u);
-  EXPECT_EQ (img3.scan_line (5)[8], 0xff010203u);
+  EXPECT_EQ (img3.scan_line (5) [8], 0xff010203u);
 
   img.fill (0x102030);
   EXPECT_EQ (compare_images (img, img3), false);
   EXPECT_EQ (img3.width (), 10u);
   EXPECT_EQ (img3.height (), 16u);
-  EXPECT_EQ (img3.scan_line (5)[8], 0xff010203u);
+  EXPECT_EQ (img3.scan_line (5) [8], 0xff010203u);
   EXPECT_EQ (img.width (), 10u);
   EXPECT_EQ (img.height (), 16u);
-  EXPECT_EQ (img.scan_line (5)[8], 0xff102030u);
+  EXPECT_EQ (img.scan_line (5) [8], 0xff102030u);
 
   tl::PixelBuffer img4 (std::move (img));
   EXPECT_EQ (img4.width (), 10u);
   EXPECT_EQ (img4.height (), 16u);
-  EXPECT_EQ (img4.scan_line (5)[8], 0xff102030u);
+  EXPECT_EQ (img4.scan_line (5) [8], 0xff102030u);
 
   //  other constructors
   EXPECT_EQ (compare_images (tl::PixelBuffer (img4.width (), img4.height (), (const tl::color_t *) img4.data ()), img4), true);
   EXPECT_EQ (compare_images (tl::PixelBuffer (img4.width (), img4.height (), (const tl::color_t *) img4.data (), img4.stride ()), img4), true);
 
-  tl::color_t *dnew = new tl::color_t [ img4.width () * img4.height () * sizeof (tl::color_t) ];
+  tl::color_t *dnew = new tl::color_t [img4.width () * img4.height () * sizeof (tl::color_t)];
   memcpy (dnew, (const tl::color_t *) img4.data (), img4.width () * img4.height () * sizeof (tl::color_t));
   EXPECT_EQ (compare_images (tl::PixelBuffer (img4.width (), img4.height (), dnew), img4), true);
 }
 
 #if defined(HAVE_QT)
 
-TEST(2)
+TEST (2)
 {
   tl::PixelBuffer img (227, 231);
 
@@ -235,11 +235,11 @@ TEST(2)
 #if defined(HAVE_PNG)
 
 //  libpng support
-TEST(3)
+TEST (3)
 {
   tl::PixelBuffer img;
 
-  std::string in = tl::testsrc () + "/testdata/lay/png1.png";  //  ARGB32
+  std::string in = tl::testsrc () + "/testdata/lay/png1.png"; //  ARGB32
   tl::info << "PNG file read (libpng) from " << in;
 
   {
@@ -270,18 +270,18 @@ TEST(3)
 
   EXPECT_EQ (compare_images (img, img2), true);
 
-#if defined (HAVE_QT)
+#if defined(HAVE_QT)
   //  Qt cross-check
   std::string au = tl::testsrc () + "/testdata/lay/au.png";
   EXPECT_EQ (compare_images (img2.to_image (), au), true);
 #endif
 }
 
-TEST(4)
+TEST (4)
 {
   tl::PixelBuffer img;
 
-  std::string in = tl::testsrc () + "/testdata/lay/png2.png";  //  RGB32
+  std::string in = tl::testsrc () + "/testdata/lay/png2.png"; //  RGB32
   tl::info << "PNG file read (libpng) from " << in;
 
   {
@@ -312,18 +312,18 @@ TEST(4)
 
   EXPECT_EQ (compare_images (img, img2), true);
 
-#if defined (HAVE_QT)
+#if defined(HAVE_QT)
   //  Qt cross-check
   std::string au = tl::testsrc () + "/testdata/lay/au.png";
   EXPECT_EQ (compare_images (img2.to_image (), au), true);
 #endif
 }
 
-TEST(5)
+TEST (5)
 {
   tl::PixelBuffer img;
 
-  std::string in = tl::testsrc () + "/testdata/lay/png3.png";  //  GA
+  std::string in = tl::testsrc () + "/testdata/lay/png3.png"; //  GA
   tl::info << "PNG file read (libpng) from " << in;
 
   {
@@ -354,18 +354,18 @@ TEST(5)
 
   EXPECT_EQ (compare_images (img, img2), true);
 
-#if defined (HAVE_QT)
+#if defined(HAVE_QT)
   //  Qt cross-check
   std::string au = tl::testsrc () + "/testdata/lay/au_gs.png";
   EXPECT_EQ (compare_images (img2.to_image (), au), true);
 #endif
 }
 
-TEST(6)
+TEST (6)
 {
   tl::PixelBuffer img;
 
-  std::string in = tl::testsrc () + "/testdata/lay/png4.png";  //  G
+  std::string in = tl::testsrc () + "/testdata/lay/png4.png"; //  G
   tl::info << "PNG file read (libpng) from " << in;
 
   {
@@ -396,7 +396,7 @@ TEST(6)
 
   EXPECT_EQ (compare_images (img, img2), true);
 
-#if defined (HAVE_QT)
+#if defined(HAVE_QT)
   //  Qt cross-check
   std::string au = tl::testsrc () + "/testdata/lay/au_gs.png";
   EXPECT_EQ (compare_images (img2.to_image (), au), true);
@@ -405,7 +405,7 @@ TEST(6)
 
 #endif
 
-TEST(7)
+TEST (7)
 {
   {
     tl::SelfTimer timer ("Run time - tl::Image copy, no write (should be very fast)");
@@ -492,7 +492,7 @@ TEST(7)
 
 //  Monochrome version
 
-TEST(11)
+TEST (11)
 {
   tl::BitmapBuffer img (15, 25);
   EXPECT_EQ (img.width (), 15u);
@@ -500,28 +500,28 @@ TEST(11)
   EXPECT_EQ (img.stride (), 4u);
 
   img.fill (true);
-  EXPECT_EQ (img.scan_line (5)[1], 0xff);
+  EXPECT_EQ (img.scan_line (5) [1], 0xff);
 
   tl::BitmapBuffer img2;
   img2 = img;
   EXPECT_EQ (img2.width (), 15u);
   EXPECT_EQ (img2.height (), 25u);
 
-  EXPECT_EQ (img.scan_line (5)[1], 0xff);
-  EXPECT_EQ (img2.scan_line (5)[1], 0xff);
+  EXPECT_EQ (img.scan_line (5) [1], 0xff);
+  EXPECT_EQ (img2.scan_line (5) [1], 0xff);
 
   img2.fill (false);
-  EXPECT_EQ (img.scan_line (5)[1], 0xff);
-  EXPECT_EQ (img2.scan_line (5)[1], 0);
+  EXPECT_EQ (img.scan_line (5) [1], 0xff);
+  EXPECT_EQ (img2.scan_line (5) [1], 0);
 
   img2.swap (img);
-  EXPECT_EQ (img2.scan_line (5)[1], 0xff);
-  EXPECT_EQ (img.scan_line (5)[1], 0);
+  EXPECT_EQ (img2.scan_line (5) [1], 0xff);
+  EXPECT_EQ (img.scan_line (5) [1], 0);
 
   img2 = img;
   EXPECT_EQ (compare_images (img, img2), true);
-  EXPECT_EQ (img.scan_line (5)[1], 0);
-  EXPECT_EQ (img2.scan_line (5)[1], 0);
+  EXPECT_EQ (img.scan_line (5) [1], 0);
+  EXPECT_EQ (img2.scan_line (5) [1], 0);
 
   img2 = tl::BitmapBuffer (10, 16);
   EXPECT_EQ (img.width (), 15u);
@@ -531,47 +531,47 @@ TEST(11)
   img2.fill (true);
   EXPECT_EQ (compare_images (img, img2), false);
 
-  EXPECT_EQ (img.scan_line (5)[1], 0);
-  EXPECT_EQ (img2.scan_line (5)[0], 0xff);
+  EXPECT_EQ (img.scan_line (5) [1], 0);
+  EXPECT_EQ (img2.scan_line (5) [0], 0xff);
 
   img = std::move (img2);
   EXPECT_EQ (compare_images (img, img2), false);
   EXPECT_EQ (img.width (), 10u);
   EXPECT_EQ (img.height (), 16u);
-  EXPECT_EQ (img.scan_line (5)[0], 0xff);
+  EXPECT_EQ (img.scan_line (5) [0], 0xff);
 
   tl::BitmapBuffer img3 (img);
   EXPECT_EQ (compare_images (img, img3), true);
   EXPECT_EQ (img3.width (), 10u);
   EXPECT_EQ (img3.height (), 16u);
-  EXPECT_EQ (img3.scan_line (5)[1], 0xff);
+  EXPECT_EQ (img3.scan_line (5) [1], 0xff);
 
   img.fill (false);
   EXPECT_EQ (compare_images (img, img3), false);
   EXPECT_EQ (img3.width (), 10u);
   EXPECT_EQ (img3.height (), 16u);
-  EXPECT_EQ (img3.scan_line (5)[1], 0xff);
+  EXPECT_EQ (img3.scan_line (5) [1], 0xff);
   EXPECT_EQ (img.width (), 10u);
   EXPECT_EQ (img.height (), 16u);
-  EXPECT_EQ (img.scan_line (5)[1], 0);
+  EXPECT_EQ (img.scan_line (5) [1], 0);
 
   tl::BitmapBuffer img4 (std::move (img));
   EXPECT_EQ (img4.width (), 10u);
   EXPECT_EQ (img4.height (), 16u);
-  EXPECT_EQ (img4.scan_line (5)[1], 0);
+  EXPECT_EQ (img4.scan_line (5) [1], 0);
 
   //  other constructors
   EXPECT_EQ (compare_images (tl::BitmapBuffer (img4.width (), img4.height (), (const uint8_t *) img4.data ()), img4), true);
   EXPECT_EQ (compare_images (tl::BitmapBuffer (img4.width (), img4.height (), (const uint8_t *) img4.data (), img4.stride ()), img4), true);
 
-  uint8_t *dnew = new uint8_t [ img4.width () * img4.height () * sizeof (uint8_t) ];
+  uint8_t *dnew = new uint8_t [img4.width () * img4.height () * sizeof (uint8_t)];
   memcpy (dnew, (const uint8_t *) img4.data (), img4.stride () * img4.height ());
   EXPECT_EQ (compare_images (tl::BitmapBuffer (img4.width (), img4.height (), dnew), img4), true);
 }
 
 #if defined(HAVE_QT)
 
-TEST(12)
+TEST (12)
 {
   tl::BitmapBuffer img (227, 231);
 
@@ -611,7 +611,7 @@ TEST(12)
 #if defined(HAVE_PNG)
 
 //  libpng support
-TEST(13)
+TEST (13)
 {
   tl::BitmapBuffer img;
 
@@ -646,7 +646,7 @@ TEST(13)
 
   EXPECT_EQ (compare_images (img, img2), true);
 
-#if defined (HAVE_QT)
+#if defined(HAVE_QT)
   //  Qt cross-check
   std::string au = tl::testsrc () + "/testdata/lay/au_mono.png";
   EXPECT_EQ (compare_images_mono (img2.to_image (), au), true);

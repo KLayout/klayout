@@ -71,93 +71,92 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
   db::compare_layouts (_this, layout_read, fn_au, db::WriteOAS);
 }
 
-TEST(basic)
+TEST (basic)
 {
   run_test (_this, tl::testdata (), "basic.lstr", "basic_au.oas");
 }
 
-TEST(boxes)
+TEST (boxes)
 {
   run_test (_this, tl::testdata (), "boxes.lstr", "boxes_au.oas");
 }
 
-TEST(cells)
+TEST (cells)
 {
   run_test (_this, tl::testdata (), "cells.lstr", "cells_au.oas");
 }
 
-TEST(cells_with_instances)
+TEST (cells_with_instances)
 {
   run_test (_this, tl::testdata (), "cells_with_instances.lstr", "cells_with_instances_au.oas");
 }
 
-TEST(edge_pairs)
+TEST (edge_pairs)
 {
   run_test (_this, tl::testdata (), "edge_pairs.lstr", "edge_pairs_au.oas");
 }
 
-TEST(edges)
+TEST (edges)
 {
   run_test (_this, tl::testdata (), "edges.lstr", "edges_au.oas");
 }
 
-TEST(ghost_cells)
+TEST (ghost_cells)
 {
   run_test (_this, tl::testdata (), "ghost_cells.lstr", "ghost_cells_au.oas");
 }
 
-TEST(meta_data)
+TEST (meta_data)
 {
   run_test (_this, tl::testdata (), "meta_data.lstr", "meta_data_au.oas");
 }
 
-TEST(paths)
+TEST (paths)
 {
   run_test (_this, tl::testdata (), "paths.lstr", "paths_au.oas");
 }
 
-TEST(pcells)
+TEST (pcells)
 {
   run_test (_this, tl::testdata (), "pcells.lstr", "pcells_au.oas");
 }
 
-TEST(points)
+TEST (points)
 {
   run_test (_this, tl::testdata (), "points.lstr", "points_au.oas");
 }
 
-TEST(polygons)
+TEST (polygons)
 {
   run_test (_this, tl::testdata (), "polygons.lstr", "polygons_au.oas");
 }
 
-TEST(properties)
+TEST (properties)
 {
   run_test (_this, tl::testdata (), "properties.lstr", "properties_au.oas");
 }
 
-TEST(simple_polygons)
+TEST (simple_polygons)
 {
   run_test (_this, tl::testdata (), "simple_polygons.lstr", "simple_polygons_au.oas");
 }
 
-TEST(texts)
+TEST (texts)
 {
   run_test (_this, tl::testdata (), "texts.lstr", "texts_au.oas");
 }
 
-TEST(variants)
+TEST (variants)
 {
   run_test (_this, tl::testdata (), "variants.lstr", "variants_au.oas");
 }
 
-TEST(sample1)
+TEST (sample1)
 {
   run_test (_this, tl::testdata (), "sample1.lstr", "sample1_au.oas");
 }
 
-TEST(sample2)
+TEST (sample2)
 {
   run_test (_this, tl::testdata (), "sample2.lstr", "sample2_au.oas");
 }
-

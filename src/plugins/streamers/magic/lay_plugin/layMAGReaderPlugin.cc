@@ -55,12 +55,11 @@ MAGReaderOptionPage::~MAGReaderOptionPage ()
   mp_ui = 0;
 }
 
-void 
-MAGReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
+void MAGReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
 {
   static const db::MAGReaderOptions default_options;
   const db::MAGReaderOptions *options = dynamic_cast<const db::MAGReaderOptions *> (o);
-  if (!options) {
+  if (! options) {
     options = &default_options;
   }
 
@@ -74,8 +73,7 @@ MAGReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::
   mp_ui->lib_path->set_values (options->lib_paths);
 }
 
-void 
-MAGReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
+void MAGReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
 {
   db::MAGReaderOptions *options = dynamic_cast<db::MAGReaderOptions *> (o);
   if (options) {
@@ -96,18 +94,15 @@ MAGReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Techn
     options->merge = mp_ui->merge_cbx->isChecked ();
 
     options->lib_paths = mp_ui->lib_path->get_values ();
-
   }
 }
 
-void
-MAGReaderOptionPage::add_lib_path_clicked ()
+void MAGReaderOptionPage::add_lib_path_clicked ()
 {
   mp_ui->lib_path->add_value (tl::to_string (tr ("Enter your path here ...")));
 }
 
-void
-MAGReaderOptionPage::add_lib_path_clicked_with_choose ()
+void MAGReaderOptionPage::add_lib_path_clicked_with_choose ()
 {
   QString dir = QFileDialog::getExistingDirectory (this, QObject::tr ("Add library path"));
   if (! dir.isNull ()) {
@@ -142,4 +137,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> plugin_decl (new lay::MAGReaderPluginDeclaration (), 10000, "MAGReader");
 
 }
-

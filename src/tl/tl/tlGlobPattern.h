@@ -34,8 +34,8 @@ namespace tl
 
 class GlobPatternOp;
 
-/** 
- *  @brief A class representing a glob pattern 
+/**
+ *  @brief A class representing a glob pattern
  */
 
 class TL_PUBLIC GlobPattern
@@ -146,9 +146,9 @@ public:
   bool is_const () const;
 
   /**
-   *  @brief Match the given string 
+   *  @brief Match the given string
    *
-   *  Returns true, if the given subject string matches the glob pattern 
+   *  Returns true, if the given subject string matches the glob pattern
    */
   bool match (const std::string &s) const;
 
@@ -158,9 +158,9 @@ public:
   bool match (const std::string &s, std::vector<std::string> &e) const;
 
   /**
-   *  @brief Match the given string 
+   *  @brief Match the given string
    *
-   *  Returns true, if the given subject string matches the glob pattern 
+   *  Returns true, if the given subject string matches the glob pattern
    */
   bool match (const char *s) const;
 
@@ -185,4 +185,3 @@ private:
 } // namespace tl
 
 #endif
-

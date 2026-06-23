@@ -37,7 +37,7 @@ std::string s2string (tl::OutputMemoryStream &osm)
   return res;
 }
 
-TEST(BinaryStreams1)
+TEST (BinaryStreams1)
 {
   tl::OutputMemoryStream osm;
   tl::BinaryOutputStream os (osm);
@@ -57,7 +57,7 @@ TEST(BinaryStreams1)
   EXPECT_EQ (tl::to_string (x), "0.17");
 }
 
-TEST(BinaryStreams2)
+TEST (BinaryStreams2)
 {
   tl::OutputMemoryStream osm;
   tl::BinaryOutputStream os (osm);
@@ -77,7 +77,7 @@ TEST(BinaryStreams2)
   EXPECT_EQ (tl::to_string (x), "0.17");
 }
 
-TEST(BinaryStreams3)
+TEST (BinaryStreams3)
 {
   tl::OutputMemoryStream osm;
   tl::BinaryOutputStream os (osm);
@@ -97,7 +97,7 @@ TEST(BinaryStreams3)
   EXPECT_EQ (x, "ABC");
 }
 
-TEST(BinaryStreams4)
+TEST (BinaryStreams4)
 {
   tl::OutputMemoryStream osm;
   tl::BinaryOutputStream os (osm);
@@ -117,7 +117,7 @@ TEST(BinaryStreams4)
   EXPECT_EQ (x, "ABC");
 }
 
-TEST(BinaryStreams5)
+TEST (BinaryStreams5)
 {
   tl::OutputMemoryStream osm;
   tl::BinaryOutputStream os (osm);
@@ -137,7 +137,7 @@ TEST(BinaryStreams5)
   EXPECT_EQ (x, 17);
 }
 
-TEST(BinaryStreams6)
+TEST (BinaryStreams6)
 {
   tl::OutputMemoryStream osm;
   tl::BinaryOutputStream os (osm);
@@ -157,7 +157,7 @@ TEST(BinaryStreams6)
   EXPECT_EQ (x, 17);
 }
 
-TEST(BinaryStreams7)
+TEST (BinaryStreams7)
 {
   tl::OutputMemoryStream osm;
   tl::BinaryOutputStream os (osm);
@@ -177,7 +177,7 @@ TEST(BinaryStreams7)
   EXPECT_EQ (x, 1742);
 }
 
-TEST(BinaryStreams8)
+TEST (BinaryStreams8)
 {
   tl::OutputMemoryStream osm;
   tl::BinaryOutputStream os (osm);
@@ -197,7 +197,7 @@ TEST(BinaryStreams8)
   EXPECT_EQ (x, 1742);
 }
 
-TEST(BinaryStreams9)
+TEST (BinaryStreams9)
 {
   tl::OutputMemoryStream osm;
   tl::BinaryOutputStream os (osm);
@@ -217,7 +217,7 @@ TEST(BinaryStreams9)
   EXPECT_EQ (x, 17420000u);
 }
 
-TEST(BinaryStreams10)
+TEST (BinaryStreams10)
 {
   tl::OutputMemoryStream osm;
   tl::BinaryOutputStream os (osm);
@@ -237,7 +237,7 @@ TEST(BinaryStreams10)
   EXPECT_EQ (x, 17420000);
 }
 
-TEST(BinaryStreams11)
+TEST (BinaryStreams11)
 {
   tl::OutputMemoryStream osm;
   tl::BinaryOutputStream os (osm);
@@ -257,7 +257,7 @@ TEST(BinaryStreams11)
   EXPECT_EQ (x, 174200000000lu);
 }
 
-TEST(BinaryStreams12)
+TEST (BinaryStreams12)
 {
   tl::OutputMemoryStream osm;
   tl::BinaryOutputStream os (osm);
@@ -277,7 +277,7 @@ TEST(BinaryStreams12)
   EXPECT_EQ (x, 174200000000l);
 }
 
-TEST(BinaryStreams13)
+TEST (BinaryStreams13)
 {
   tl::OutputMemoryStream osm;
   tl::BinaryOutputStream os (osm);
@@ -299,7 +299,7 @@ TEST(BinaryStreams13)
   EXPECT_EQ (y, false);
 }
 
-TEST(BinaryStreamsCombined)
+TEST (BinaryStreamsCombined)
 {
   tl::OutputMemoryStream osm;
   tl::BinaryOutputStream os (osm);
@@ -324,12 +324,12 @@ TEST(BinaryStreamsCombined)
   EXPECT_EQ (d, 42);
 }
 
-TEST(BinaryStreamsVariants)
+TEST (BinaryStreamsVariants)
 {
   tl::OutputMemoryStream osm;
   tl::BinaryOutputStream os (osm);
 
-  std::vector<char> bytes = { 'X', 'U', 'V' };
+  std::vector<char> bytes = {'X', 'U', 'V'};
 
   os << tl::Variant ("ABC")
      << tl::Variant ()
@@ -379,12 +379,12 @@ TEST(BinaryStreamsVariants)
   EXPECT_EQ (v17.to_parsable_string (), "[id202]");
 }
 
-TEST(BinaryStreamsVariantList)
+TEST (BinaryStreamsVariantList)
 {
   tl::OutputMemoryStream osm;
   tl::BinaryOutputStream os (osm);
 
-  std::vector<tl::Variant> list = { 5.5, -17, "ABC" };
+  std::vector<tl::Variant> list = {5.5, -17, "ABC"};
 
   os << tl::Variant (list);
 
@@ -401,12 +401,12 @@ TEST(BinaryStreamsVariantList)
   EXPECT_EQ (v1.to_parsable_string (), "(##5.5,#-17,'ABC')");
 }
 
-TEST(BinaryStreamsVariantArray)
+TEST (BinaryStreamsVariantArray)
 {
   tl::OutputMemoryStream osm;
   tl::BinaryOutputStream os (osm);
 
-  std::vector<std::pair<tl::Variant, tl::Variant> > a = { { 1, 5.5 }, { 2, -17 }, { "id", "ABC" } };
+  std::vector<std::pair<tl::Variant, tl::Variant>> a = {{1, 5.5}, {2, -17}, {"id", "ABC"}};
 
   std::map<tl::Variant, tl::Variant> array (a.begin (), a.end ());
   os << tl::Variant (array);

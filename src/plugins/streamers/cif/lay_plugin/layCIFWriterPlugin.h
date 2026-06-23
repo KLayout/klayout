@@ -29,16 +29,16 @@
 
 namespace Ui
 {
-  class CIFWriterOptionPage;
+class CIFWriterOptionPage;
 }
 
 namespace lay
 {
 
-class CIFWriterOptionPage 
+class CIFWriterOptionPage
   : public StreamWriterOptionsPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   CIFWriterOptionPage (QWidget *parent);
@@ -54,5 +54,3 @@ private:
 }
 
 #endif
-
-

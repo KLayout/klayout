@@ -45,7 +45,7 @@ class ChangeApplicator;
 class ShapePropertiesPage
   : public lay::PropertiesPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   ShapePropertiesPage (const std::string &description, edt::Service *service, db::Manager *manager, QWidget *parent);
@@ -107,7 +107,7 @@ class PolygonPropertiesPage
   : public ShapePropertiesPage,
     public Ui::PolygonPropertiesPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   PolygonPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
@@ -134,7 +134,7 @@ class BoxPropertiesPage
   : public ShapePropertiesPage,
     public Ui::BoxPropertiesPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   BoxPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
@@ -167,7 +167,7 @@ class PointPropertiesPage
   : public ShapePropertiesPage,
     public Ui::PointPropertiesPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   PointPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
@@ -197,7 +197,7 @@ class TextPropertiesPage
   : public ShapePropertiesPage,
     public Ui::TextPropertiesPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   TextPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
@@ -218,7 +218,7 @@ class PathPropertiesPage
   : public ShapePropertiesPage,
     public Ui::PathPropertiesPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   PathPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
@@ -242,7 +242,7 @@ class EditablePathPropertiesPage
   : public ShapePropertiesPage,
     public Ui::EditablePathPropertiesPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   EditablePathPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
@@ -259,7 +259,7 @@ protected:
   virtual QLabel *cell_label () const { return cell_lbl; }
 
 public slots:
-  void type_selected (int); 
+  void type_selected (int);
   void text_changed ();
 
 private:

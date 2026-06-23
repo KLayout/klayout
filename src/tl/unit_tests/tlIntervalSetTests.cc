@@ -34,8 +34,8 @@ std::string to_string (const is_t &is)
   bool f = true;
   std::string s;
   for (is_t::const_iterator i = is.begin (); i != is.end (); ++i) {
-    if (!f) { 
-      s += ","; 
+    if (! f) {
+      s += ",";
     }
     f = 0;
     s += tl::to_string (i->first) + ".." + tl::to_string (i->second);
@@ -43,7 +43,7 @@ std::string to_string (const is_t &is)
   return s;
 }
 
-TEST(1) 
+TEST (1)
 {
   is_t is;
 
@@ -70,11 +70,10 @@ TEST(1)
   EXPECT_EQ (is.check (), true);
   is.erase (2, 99);
   EXPECT_EQ (to_string (is), "0..2,99..100");
-
 }
 
 
-TEST(2) 
+TEST (2)
 {
   is_t is;
 
@@ -91,6 +90,4 @@ TEST(2)
   EXPECT_EQ (is.mapped (7), true);
   EXPECT_EQ (is.mapped (8), false);
   EXPECT_EQ (is.mapped (9), false);
-
 }
-

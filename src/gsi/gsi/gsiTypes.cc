@@ -39,67 +39,88 @@ ArgType::to_string () const
   }
   switch (m_type) {
   case T_void:
-    s += "void"; break;
+    s += "void";
+    break;
   case T_void_ptr:
-    s += "void *"; break;
+    s += "void *";
+    break;
   case T_bool:
-    s += "bool"; break;
+    s += "bool";
+    break;
   case T_char:
-    s += "char"; break;
+    s += "char";
+    break;
   case T_schar:
-    s += "signed char"; break;
+    s += "signed char";
+    break;
   case T_uchar:
-    s += "unsigned char"; break;
+    s += "unsigned char";
+    break;
   case T_short:
-    s += "short"; break;
+    s += "short";
+    break;
   case T_ushort:
-    s += "unsigned short"; break;
+    s += "unsigned short";
+    break;
   case T_int:
-    s += "int"; break;
+    s += "int";
+    break;
   case T_uint:
-    s += "unsigned int"; break;
+    s += "unsigned int";
+    break;
   case T_long:
-    s += "long"; break;
+    s += "long";
+    break;
   case T_ulong:
-    s += "unsigned long"; break;
+    s += "unsigned long";
+    break;
   case T_longlong:
-    s += "long long"; break;
+    s += "long long";
+    break;
   case T_ulonglong:
-    s += "unsigned long long"; break;
+    s += "unsigned long long";
+    break;
 #if defined(HAVE_64BIT_COORD)
   case T_int128:
-    s += "int128"; break;
+    s += "int128";
+    break;
 #endif
   case T_double:
-    s += "double"; break;
+    s += "double";
+    break;
   case T_float:
-    s += "float"; break;
+    s += "float";
+    break;
   case T_string:
-    s += "string"; break;
+    s += "string";
+    break;
   case T_byte_array:
-    s += "byte array"; break;
+    s += "byte array";
+    break;
   case T_var:
-    s += "variant"; break;
+    s += "variant";
+    break;
   case T_object:
     if (m_pass_obj) {
       s += "new ";
     }
-    s += mp_cls->name (); break;
+    s += mp_cls->name ();
+    break;
   case T_map:
     s += "map<";
     if (mp_inner_k) {
       s += mp_inner_k->to_string ();
-    } 
+    }
     s += ",";
     if (mp_inner) {
       s += mp_inner->to_string ();
-    } 
+    }
     s += ">";
     break;
   case T_vector:
     if (mp_inner) {
       s += mp_inner->to_string ();
-    } 
+    }
     s += "[]";
     break;
   }
@@ -113,10 +134,11 @@ ArgType::to_string () const
 
 ArgType::ArgType ()
   : m_type (T_void), mp_spec (0), mp_inner (0), mp_inner_k (0),
-    m_is_ref (false), m_is_ptr (false), m_is_cref (false), m_is_cptr (false), m_is_iter (false), 
+    m_is_ref (false), m_is_ptr (false), m_is_cref (false), m_is_cptr (false), m_is_iter (false),
     m_owns_spec (false), m_pass_obj (false), m_prefer_copy (false),
     mp_cls (0), m_size (0)
-{ }
+{
+}
 
 ArgType::~ArgType ()
 {
@@ -133,7 +155,7 @@ ArgType::~ArgType ()
 
 ArgType::ArgType (const ArgType &other)
   : m_type (T_void), mp_spec (0), mp_inner (0), mp_inner_k (0),
-    m_is_ref (false), m_is_ptr (false), m_is_cref (false), m_is_cptr (false), m_is_iter (false), 
+    m_is_ref (false), m_is_ptr (false), m_is_cref (false), m_is_cptr (false), m_is_iter (false),
     m_owns_spec (false), m_pass_obj (false), m_prefer_copy (false),
     mp_cls (0), m_size (0)
 {
@@ -184,14 +206,12 @@ ArgType::operator= (const ArgType &other)
     if (other.mp_inner_k) {
       mp_inner_k = new ArgType (*other.mp_inner_k);
     }
-
   }
 
   return *this;
 }
 
-bool 
-ArgType::operator== (const ArgType &b) const
+bool ArgType::operator== (const ArgType &b) const
 {
   if ((mp_inner == 0) != (b.mp_inner == 0)) {
     return false;
@@ -205,13 +225,12 @@ ArgType::operator== (const ArgType &b) const
   if (mp_inner_k && *mp_inner_k != *b.mp_inner_k) {
     return false;
   }
-  return m_type == b.m_type && m_is_iter == b.m_is_iter && 
-         m_is_ref == b.m_is_ref && m_is_cref == b.m_is_cref && m_is_ptr == b.m_is_ptr && m_is_cptr == b.m_is_cptr && 
+  return m_type == b.m_type && m_is_iter == b.m_is_iter &&
+         m_is_ref == b.m_is_ref && m_is_cref == b.m_is_cref && m_is_ptr == b.m_is_ptr && m_is_cptr == b.m_is_cptr &&
          mp_cls == b.mp_cls && m_pass_obj == b.m_pass_obj && m_prefer_copy == b.m_prefer_copy;
 }
 
-void 
-ArgType::release_spec ()
+void ArgType::release_spec ()
 {
   if (mp_spec && m_owns_spec) {
     delete mp_spec;
@@ -221,4 +240,3 @@ ArgType::release_spec ()
 }
 
 }
-

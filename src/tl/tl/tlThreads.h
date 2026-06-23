@@ -27,13 +27,13 @@
 
 #include <limits>
 
-#if defined(HAVE_QT) && !defined(HAVE_PTHREADS)
-#  include <QMutex>
-#  include <QWaitCondition>
-#  include <QThread>
-#  include <QThreadStorage>
+#if defined(HAVE_QT) && ! defined(HAVE_PTHREADS)
+#include <QMutex>
+#include <QWaitCondition>
+#include <QThread>
+#include <QThreadStorage>
 #else
-#  include <atomic>
+#include <atomic>
 #endif
 
 namespace tl
@@ -45,13 +45,13 @@ namespace tl
  *  available.
  */
 
-#if defined(HAVE_QT) && !defined(HAVE_PTHREADS)
+#if defined(HAVE_QT) && ! defined(HAVE_PTHREADS)
 
 class TL_PUBLIC Mutex
   : public QMutex
 {
 public:
-  Mutex () : QMutex () { }
+  Mutex () : QMutex () {}
 };
 
 #else
@@ -59,7 +59,7 @@ public:
 class TL_PUBLIC Mutex
 {
 public:
-  Mutex () { }
+  Mutex () {}
 
   void lock ()
   {
@@ -84,13 +84,13 @@ private:
  *  available.
  */
 
-#if defined(HAVE_QT) && !defined(HAVE_PTHREADS) && !defined(HAVE_CPP20)
+#if defined(HAVE_QT) && ! defined(HAVE_PTHREADS) && ! defined(HAVE_CPP20)
 
 class TL_PUBLIC WaitCondition
   : public QWaitCondition
 {
 public:
-  WaitCondition () : QWaitCondition () { }
+  WaitCondition () : QWaitCondition () {}
 
   bool wait (Mutex *mutex, unsigned long time = std::numeric_limits<unsigned long>::max ()) { return QWaitCondition::wait (mutex, time); }
 };
@@ -141,7 +141,7 @@ private:
  *  available.
  */
 
-#if defined(HAVE_QT) && !defined(HAVE_PTHREADS)
+#if defined(HAVE_QT) && ! defined(HAVE_PTHREADS)
 
 class TL_PUBLIC Thread
   : public QThread
@@ -149,7 +149,8 @@ class TL_PUBLIC Thread
 public:
   Thread ()
     : QThread ()
-  { }
+  {
+  }
 };
 
 #else
@@ -171,7 +172,7 @@ public:
   bool wait (unsigned long /*time*/ = std::numeric_limits<unsigned long>::max ());
 
 protected:
-  virtual void run () { }
+  virtual void run () {}
 
 private:
   friend void *start_thread (void *);
@@ -187,14 +188,14 @@ private:
  *  available.
  */
 
-#if defined(HAVE_QT) && !defined(HAVE_PTHREADS)
+#if defined(HAVE_QT) && ! defined(HAVE_PTHREADS)
 
 template <class T>
 class ThreadStorage
   : public QThreadStorage<T>
 {
 public:
-  ThreadStorage () : QThreadStorage<T> () { }
+  ThreadStorage () : QThreadStorage<T> () {}
 };
 
 #else
@@ -202,8 +203,8 @@ public:
 class TL_PUBLIC ThreadStorageHolderBase
 {
 public:
-  ThreadStorageHolderBase (void *obj) : mp_obj (obj) { }
-  virtual ~ThreadStorageHolderBase () { }
+  ThreadStorageHolderBase (void *obj) : mp_obj (obj) {}
+  virtual ~ThreadStorageHolderBase () {}
 
 protected:
   void *obj () { return mp_obj; }
@@ -215,7 +216,7 @@ class ThreadStorageHolder
   : public ThreadStorageHolderBase
 {
 public:
-  ThreadStorageHolder (T *t) : ThreadStorageHolderBase ((void *) t) { }
+  ThreadStorageHolder (T *t) : ThreadStorageHolderBase ((void *) t) {}
   ~ThreadStorageHolder () { delete data (); }
   T *data () { return (T *) obj (); }
 };
@@ -240,7 +241,7 @@ class ThreadStorage
   : public ThreadStorageBase
 {
 public:
-  ThreadStorage () : ThreadStorageBase () { }
+  ThreadStorage () : ThreadStorageBase () {}
 
   bool hasLocalData () const
   {

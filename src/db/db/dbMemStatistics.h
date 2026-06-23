@@ -41,9 +41,9 @@
 
 namespace tl
 {
-  template <class> class vector;
-  template <class, bool> class reuse_vector;
-  class Variant;
+template <class> class vector;
+template <class, bool> class reuse_vector;
+class Variant;
 }
 
 namespace db
@@ -53,13 +53,12 @@ namespace db
  *  @brief A collector for memory statistics
  *  This interface implements the collector for memory statistics.
  */
-class DB_PUBLIC MemStatistics 
+class DB_PUBLIC MemStatistics
 {
 public:
   MemStatistics ();
 
-  enum purpose_t
-  {
+  enum purpose_t {
     None,
     LayoutInfo,
     CellInfo,
@@ -81,7 +80,7 @@ public:
    *  can indicate that the chunk is a part of another object.
    *  "purpose" and "cat can be inherited by the parent.
    */
-  virtual void add (const std::type_info & /*ti*/, void * /*ptr*/, size_t /*size*/, size_t /*used*/, void * /*parent*/, purpose_t /*purpose*/ = None, int /*cat*/ = 0) { }
+  virtual void add (const std::type_info & /*ti*/, void * /*ptr*/, size_t /*size*/, size_t /*used*/, void * /*parent*/, purpose_t /*purpose*/ = None, int /*cat*/ = 0) {}
 };
 
 /**
@@ -103,9 +102,9 @@ public:
 
 private:
   bool m_detailed;
-  std::map<const std::type_info *, std::pair<size_t, size_t> > m_per_type;
-  std::map<std::pair<purpose_t, int>, std::pair<size_t, size_t> > m_per_cat;
-  std::map<purpose_t, std::pair<size_t, size_t> > m_per_purpose;
+  std::map<const std::type_info *, std::pair<size_t, size_t>> m_per_type;
+  std::map<std::pair<purpose_t, int>, std::pair<size_t, size_t>> m_per_cat;
+  std::map<purpose_t, std::pair<size_t, size_t>> m_per_purpose;
 };
 
 /**
@@ -118,7 +117,8 @@ class DB_PUBLIC MemStatisticsSimple
 public:
   MemStatisticsSimple ()
     : m_size (0), m_used (0)
-  { }
+  {
+  }
 
   size_t size () const
   {
@@ -167,7 +167,7 @@ void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, c
     stat->add (typeid (v), (void *) &v, sizeof (v), sizeof (v), parent, purpose, cat);
   }
   if (! v.empty ()) {
-    stat->add (typeid (X[]), (void *) v.begin ().operator-> (), sizeof (X) * v.capacity (), sizeof (X) * v.size (), (void *) &v, purpose, cat);
+    stat->add (typeid (X []), (void *) v.begin ().operator->(), sizeof (X) * v.capacity (), sizeof (X) * v.size (), (void *) &v, purpose, cat);
   }
   if (v.reuse_data ()) {
     stat->add (typeid (tl::ReuseData), (void *) v.reuse_data (), v.reuse_data ()->mem_reqd (), v.reuse_data ()->mem_used (), (void *) &v, purpose, cat);
@@ -184,10 +184,10 @@ void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, c
     stat->add (typeid (v), (void *) &v, sizeof (v), sizeof (v), parent, purpose, cat);
   }
   if (! v.empty ()) {
-    stat->add (typeid (X[]), (void *) &v.front (), sizeof (X) * v.capacity (), sizeof (X) * v.size (), (void *) &v, purpose, cat);
+    stat->add (typeid (X []), (void *) &v.front (), sizeof (X) * v.capacity (), sizeof (X) * v.size (), (void *) &v, purpose, cat);
   }
   for (size_t i = 0; i < v.size (); ++i) {
-    mem_stat (stat, purpose, cat, v[i], true, (void *) &v);
+    mem_stat (stat, purpose, cat, v [i], true, (void *) &v);
   }
 }
 
@@ -198,10 +198,10 @@ void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, c
     stat->add (typeid (v), (void *) &v, sizeof (v), sizeof (v), parent, purpose, cat);
   }
   if (! v.empty ()) {
-    stat->add (typeid (X[]), (void *) &v.front (), sizeof (X) * v.capacity (), sizeof (X) * v.size (), (void *) &v, purpose, cat);
+    stat->add (typeid (X []), (void *) &v.front (), sizeof (X) * v.capacity (), sizeof (X) * v.size (), (void *) &v, purpose, cat);
   }
   for (size_t i = 0; i < v.size (); ++i) {
-    mem_stat (stat, purpose, cat, v[i], true, (void *) &v);
+    mem_stat (stat, purpose, cat, v [i], true, (void *) &v);
   }
 }
 
@@ -245,7 +245,7 @@ void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, c
     mem_stat (stat, purpose, cat, *i, false, (void *) &v);
 #ifdef __GLIBCXX__
     //  NOTE: the pointer is only an approximation
-    stat->add (typeid (std::_Rb_tree_node_base), (void *) i.operator-> (), sizeof (std::_Rb_tree_node_base), sizeof (std::_Rb_tree_node_base), (void *) &v, purpose, cat);
+    stat->add (typeid (std::_Rb_tree_node_base), (void *) i.operator->(), sizeof (std::_Rb_tree_node_base), sizeof (std::_Rb_tree_node_base), (void *) &v, purpose, cat);
 #endif
   }
 }
@@ -272,7 +272,7 @@ void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, c
     mem_stat (stat, purpose, cat, *i, false, (void *) &v);
 #ifdef __GLIBCXX__
     //  NOTE: the pointer is only an approximation
-    stat->add (typeid (std::__detail::_List_node_base), (void *) i.operator-> (), sizeof (std::__detail::_List_node_base), sizeof (std::__detail::_List_node_base), (void *) &v, purpose, cat);
+    stat->add (typeid (std::__detail::_List_node_base), (void *) i.operator->(), sizeof (std::__detail::_List_node_base), sizeof (std::__detail::_List_node_base), (void *) &v, purpose, cat);
 #endif
   }
 }
@@ -301,7 +301,7 @@ void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, c
 }
 
 template <class X>
-void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const tl::weak_collection <X> &v, bool no_self = false, void *parent = 0)
+void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const tl::weak_collection<X> &v, bool no_self = false, void *parent = 0)
 {
   if (! no_self) {
     stat->add (typeid (v), (void *) &v, sizeof (v), sizeof (v), parent, purpose, cat);
@@ -313,4 +313,3 @@ void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, c
 }
 
 #endif
-

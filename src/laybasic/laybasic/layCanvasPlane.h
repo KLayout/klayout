@@ -35,7 +35,8 @@
 
 #include <vector>
 
-namespace lay {
+namespace lay
+{
 
 const double render_epsilon = 1e-6;
 
@@ -45,7 +46,7 @@ const double render_epsilon = 1e-6;
  *  This is the base class for lay::Bitmap for example.
  *  It is used by the renderer to identify the rendering target.
  */
-class LAYBASIC_PUBLIC CanvasPlane 
+class LAYBASIC_PUBLIC CanvasPlane
 {
 public:
   /**
@@ -59,7 +60,7 @@ public:
   virtual void clear () = 0;
 
   /**
-   *  @brief Fill method 
+   *  @brief Fill method
    *
    *  This method is supposed to draw a small rectangle of 1 pixel
    *
@@ -71,5 +72,3 @@ public:
 } // namespace lay
 
 #endif
-
-

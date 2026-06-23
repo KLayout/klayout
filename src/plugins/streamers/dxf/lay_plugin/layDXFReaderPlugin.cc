@@ -47,12 +47,11 @@ DXFReaderOptionPage::~DXFReaderOptionPage ()
   mp_ui = 0;
 }
 
-void 
-DXFReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
+void DXFReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
 {
   static const db::DXFReaderOptions default_options;
   const db::DXFReaderOptions *options = dynamic_cast<const db::DXFReaderOptions *> (o);
-  if (!options) {
+  if (! options) {
     options = &default_options;
   }
 
@@ -70,8 +69,7 @@ DXFReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::
   mp_ui->keep_names_cbx->setChecked (options->keep_layer_names);
 }
 
-void 
-DXFReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
+void DXFReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
 {
   db::DXFReaderOptions *options = dynamic_cast<db::DXFReaderOptions *> (o);
   if (options) {
@@ -87,12 +85,12 @@ DXFReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Techn
     if (options->text_scaling > 10000 || options->text_scaling < 1) {
       throw tl::Exception (tl::to_string (QObject::tr ("Invalid value for the text scaling")));
     }
-    tl::from_string_ext (tl::to_string(mp_ui->circle_points_le->text ()), options->circle_points);
+    tl::from_string_ext (tl::to_string (mp_ui->circle_points_le->text ()), options->circle_points);
     if (options->circle_points < 4 || options->circle_points > 1000000) {
       throw tl::Exception (tl::to_string (QObject::tr ("Invalid value for the number of points for arc interpolation")));
     }
-    tl::from_string_ext (tl::to_string(mp_ui->circle_accuracy_le->text ()), options->circle_accuracy);
-    tl::from_string_ext (tl::to_string(mp_ui->contour_accuracy_le->text ()), options->contour_accuracy);
+    tl::from_string_ext (tl::to_string (mp_ui->circle_accuracy_le->text ()), options->circle_accuracy);
+    tl::from_string_ext (tl::to_string (mp_ui->contour_accuracy_le->text ()), options->contour_accuracy);
     options->polyline_mode = mp_ui->polyline2poly_cbx->currentIndex ();
     options->render_texts_as_polygons = mp_ui->render_texts_as_polygons_cbx->isChecked ();
     options->keep_other_cells = mp_ui->keep_other_cells_cbx->isChecked ();
@@ -109,7 +107,7 @@ class DXFReaderPluginDeclaration
   : public StreamReaderPluginDeclaration
 {
 public:
-  DXFReaderPluginDeclaration () 
+  DXFReaderPluginDeclaration ()
     : StreamReaderPluginDeclaration (db::DXFReaderOptions ().format_name ())
   {
     // .. nothing yet ..
@@ -129,8 +127,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> plugin_decl (new lay::DXFReaderPluginDeclaration (), 10000, "DXFReader");
 
 }
-
-
-
-
-

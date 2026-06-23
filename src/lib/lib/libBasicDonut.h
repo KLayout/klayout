@@ -34,7 +34,7 @@ namespace lib
 /**
  *  @brief Implements the "DONUT" PCell of the basic library
  */
-class BasicDonut 
+class BasicDonut
   : public db::PCellDeclaration
 {
 public:
@@ -87,4 +87,3 @@ public:
 }
 
 #endif
-

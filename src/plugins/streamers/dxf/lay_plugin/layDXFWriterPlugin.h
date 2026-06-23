@@ -30,16 +30,16 @@
 
 namespace Ui
 {
-  class DXFWriterOptionPage;
+class DXFWriterOptionPage;
 }
 
 namespace lay
 {
 
-class DXFWriterOptionPage 
+class DXFWriterOptionPage
   : public StreamWriterOptionsPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   DXFWriterOptionPage (QWidget *parent);
@@ -55,5 +55,3 @@ private:
 }
 
 #endif
-
-

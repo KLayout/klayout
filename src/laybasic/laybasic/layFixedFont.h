@@ -24,7 +24,7 @@ public:
 
   /**
    *  @brief Factory
-   * 
+   *
    *  This renders a FixedFont object for the given resolution.
    */
   static const FixedFont &get_font (double resolution);
@@ -40,7 +40,7 @@ public:
   static const char *font_size_name (int sz);
 
   /**
-   *  @brief Set the default font size 
+   *  @brief Set the default font size
    *
    *  Allowed values are 0 (small), 1 (medium) or 2 (large) etc.
    */
@@ -49,7 +49,7 @@ public:
   /**
    *  @brief Gets the default font size
    */
-  static int default_font_size () 
+  static int default_font_size ()
   {
     return ms_default_font_size;
   }
@@ -122,4 +122,3 @@ private:
 }
 
 #endif
-

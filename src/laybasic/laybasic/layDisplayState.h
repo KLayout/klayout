@@ -33,7 +33,7 @@
 
 namespace tl
 {
-  class XMLElementList;
+class XMLElementList;
 }
 
 namespace lay
@@ -42,11 +42,10 @@ namespace lay
 /**
  *  @brief A structure encapsulating an specific instance
  *
- *  This is a normalized representation of a db::InstElement object suitable to being stored in a XML 
+ *  This is a normalized representation of a db::InstElement object suitable to being stored in a XML
  *  document or disconnected from a layout object.
  */
-struct LAYBASIC_PUBLIC SpecificInst
-{
+struct LAYBASIC_PUBLIC SpecificInst {
   std::string cell_name;
   db::ICplxTrans trans;
   db::Trans array_trans;
@@ -57,7 +56,7 @@ struct LAYBASIC_PUBLIC SpecificInst
   /**
    *  @brief Convert the specific instance to a db::InstElement object with the given parent cell
    *
-   *  This method returns false in the first member of the returned pair, if the 
+   *  This method returns false in the first member of the returned pair, if the
    *  specific instance cannot be converted back.
    */
   std::pair<bool, db::InstElement> to_inst_element (const db::Layout &layout, const db::Cell &parent_cell) const;
@@ -71,20 +70,19 @@ struct LAYBASIC_PUBLIC SpecificInst
 /**
  *  @brief A structure encapsulating a cell path and a context path
  *
- *  Basically this structure is just needed to provide a nice adaptor for the XML reader/writer 
+ *  Basically this structure is just needed to provide a nice adaptor for the XML reader/writer
  *  in the BookmarkList
  */
-struct LAYBASIC_PUBLIC CellPath 
-{
+struct LAYBASIC_PUBLIC CellPath {
   std::vector<std::string> path;
   std::vector<SpecificInst> context_path;
 
-  std::vector<std::string>::const_iterator begin_path () const 
+  std::vector<std::string>::const_iterator begin_path () const
   {
     return path.begin ();
   }
 
-  std::vector<std::string>::const_iterator end_path () const 
+  std::vector<std::string>::const_iterator end_path () const
   {
     return path.end ();
   }
@@ -94,12 +92,12 @@ struct LAYBASIC_PUBLIC CellPath
     path.push_back (name);
   }
 
-  std::vector<SpecificInst>::const_iterator begin_context_path () const 
+  std::vector<SpecificInst>::const_iterator begin_context_path () const
   {
     return context_path.begin ();
   }
 
-  std::vector<SpecificInst>::const_iterator end_context_path () const 
+  std::vector<SpecificInst>::const_iterator end_context_path () const
   {
     return context_path.end ();
   }
@@ -118,8 +116,7 @@ struct LAYBASIC_PUBLIC CellPath
  *  A display state is comprised of a box and a cell path for all views.
  *  It can be used to transfer a display state from one layout to another.
  */
-struct LAYBASIC_PUBLIC DisplayState
-{
+struct LAYBASIC_PUBLIC DisplayState {
   /**
    *  @brief Default ctor
    */
@@ -131,15 +128,15 @@ struct LAYBASIC_PUBLIC DisplayState
   DisplayState (const db::DBox &b, int min_hier, int max_hier, const std::list<CellView> &cvs);
 
   /**
-   *  @brief Create a display state from a given set of cell name paths 
+   *  @brief Create a display state from a given set of cell name paths
    */
   DisplayState (const db::DBox &b, int min_hier, int max_hier, const std::list<CellPath> &cns);
 
   /**
-   *  @brief Transform a partial display state back into a cellview 
+   *  @brief Transform a partial display state back into a cellview
    *
    *  This method provides some safety: if the display state cannot be
-   *  transferred into the layout, some reasonable assumption is made 
+   *  transferred into the layout, some reasonable assumption is made
    *  and an artifical state is created.
    *
    *  @param index The index of the cellview to obtain
@@ -159,7 +156,7 @@ struct LAYBASIC_PUBLIC DisplayState
   /**
    *  @brief Set minimum drawn hierarchy level
    */
-  void set_min_hier (int l) 
+  void set_min_hier (int l)
   {
     m_min_hier = l;
   }
@@ -175,7 +172,7 @@ struct LAYBASIC_PUBLIC DisplayState
   /**
    *  @brief Set maximum drawn hierarchy level
    */
-  void set_max_hier (int l) 
+  void set_max_hier (int l)
   {
     m_max_hier = l;
   }
@@ -256,4 +253,3 @@ private:
 }
 
 #endif
-

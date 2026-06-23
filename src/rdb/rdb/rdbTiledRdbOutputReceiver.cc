@@ -64,5 +64,3 @@ void TiledRdbOutputReceiver::put (size_t /*ix*/, size_t /*iy*/, const db::Box &t
 }
 
 }
-
-

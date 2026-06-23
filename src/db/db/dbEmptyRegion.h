@@ -29,7 +29,8 @@
 #include "dbEmptyEdges.h"
 #include "dbEmptyTexts.h"
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief An empty Region
@@ -134,11 +135,11 @@ public:
   virtual RegionDelegate *selected_overlapping (const Region &, size_t, size_t) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_not_overlapping (const Region &, size_t, size_t) const { return new EmptyRegion (); }
   virtual std::pair<RegionDelegate *, RegionDelegate *> selected_overlapping_pair (const Region &, size_t, size_t) const { return std::make_pair (new EmptyRegion (), new EmptyRegion ()); }
-  virtual RegionDelegate *pull_inside (const Region &) const  { return new EmptyRegion (); }
-  virtual RegionDelegate *pull_interacting (const Region &) const  { return new EmptyRegion (); }
-  virtual EdgesDelegate *pull_interacting (const Edges &) const  { return new EmptyEdges (); }
-  virtual TextsDelegate *pull_interacting (const Texts &) const  { return new EmptyTexts (); }
-  virtual RegionDelegate *pull_overlapping (const Region &) const  { return new EmptyRegion (); }
+  virtual RegionDelegate *pull_inside (const Region &) const { return new EmptyRegion (); }
+  virtual RegionDelegate *pull_interacting (const Region &) const { return new EmptyRegion (); }
+  virtual EdgesDelegate *pull_interacting (const Edges &) const { return new EmptyEdges (); }
+  virtual TextsDelegate *pull_interacting (const Texts &) const { return new EmptyTexts (); }
+  virtual RegionDelegate *pull_overlapping (const Region &) const { return new EmptyRegion (); }
   virtual RegionDelegate *in (const Region &, bool) const { return new EmptyRegion (); }
   virtual std::pair<RegionDelegate *, RegionDelegate *> in_and_out (const Region &) const { return std::make_pair (new EmptyRegion (), new EmptyRegion ()); }
 
@@ -148,12 +149,12 @@ public:
   virtual db::properties_id_type nth_prop_id (size_t) const { tl_assert (false); }
 
   virtual const db::RecursiveShapeIterator *iter () const { return 0; }
-  virtual void apply_property_translator (const db::PropertiesTranslator &) { }
+  virtual void apply_property_translator (const db::PropertiesTranslator &) {}
 
   virtual bool equals (const Region &other) const;
   virtual bool less (const Region &other) const;
 
-  virtual void insert_into (Layout *, db::cell_index_type, unsigned int) const { }
+  virtual void insert_into (Layout *, db::cell_index_type, unsigned int) const {}
 
   virtual RegionDelegate *nets (LayoutToNetlist *, NetPropertyMode, const tl::Variant &, const std::vector<const db::Net *> *) const { return new EmptyRegion (); }
 
@@ -161,7 +162,6 @@ private:
   EmptyRegion &operator= (const EmptyRegion &other);
 };
 
-}  // namespace db
+} // namespace db
 
 #endif
-

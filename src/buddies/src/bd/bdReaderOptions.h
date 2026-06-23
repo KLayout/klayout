@@ -31,13 +31,13 @@
 
 namespace tl
 {
-  class CommandLineOptions;
+class CommandLineOptions;
 }
 
 namespace db
 {
-  class LoadLayoutOptions;
-  class Layout;
+class LoadLayoutOptions;
+class Layout;
 }
 
 namespace bd

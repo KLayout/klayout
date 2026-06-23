@@ -30,7 +30,7 @@ static std::string plc2string (const edt::distributed_placer<Box, Value> &plc)
   std::string s;
   for (typename edt::distributed_placer<Box, Value>::iterator i = plc.begin (); i != plc.end (); ++i) {
     if (! s.empty ()) {
-       s += ",";
+      s += ",";
     }
     s += tl::to_string (i->first);
     s += "[";
@@ -40,7 +40,7 @@ static std::string plc2string (const edt::distributed_placer<Box, Value> &plc)
   return s;
 }
 
-TEST(1) 
+TEST (1)
 {
   edt::distributed_placer<db::Box, size_t> placer;
 
@@ -94,7 +94,7 @@ TEST(1)
 }
 
 
-TEST(2)
+TEST (2)
 {
   edt::distributed_placer<db::Box, size_t> placer;
 
@@ -111,7 +111,7 @@ TEST(2)
   EXPECT_EQ (plc2string (p), "(-5,0;95,100)[0],(-5,100;95,200)[1],(95,100;195,200)[2],(95,0;195,100)[3]");
 }
 
-TEST(3)
+TEST (3)
 {
   edt::distributed_placer<db::Box, size_t> placer;
 
@@ -129,7 +129,7 @@ TEST(3)
   EXPECT_EQ (plc2string (p), "(0,17;1,20)[0],(1,5;6,16)[1],(6,0;12,5)[2],(13,0;19,5)[3],(12,16;13,17)[4]");
 }
 
-TEST(4)
+TEST (4)
 {
   edt::distributed_placer<db::Box, size_t> placer;
 
@@ -156,4 +156,3 @@ TEST(4)
 
   EXPECT_EQ (plc2string (p), "(-9,16;-8,20)[0],(-7,9;-2,20)[1],(-1,3;11,8)[2],(12,3;19,8)[3],(-11,19;-10,20)[4]");
 }
-

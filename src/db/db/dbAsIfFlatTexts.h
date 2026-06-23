@@ -28,7 +28,8 @@
 
 #include "dbTextsDelegate.h"
 
-namespace db {
+namespace db
+{
 
 class Region;
 
@@ -92,7 +93,6 @@ protected:
   AsIfFlatTexts &operator= (const AsIfFlatTexts &other);
 
 private:
-
   mutable bool m_bbox_valid;
   mutable db::Box m_bbox;
 
@@ -104,4 +104,3 @@ private:
 }
 
 #endif
-

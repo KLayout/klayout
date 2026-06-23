@@ -34,8 +34,7 @@ namespace db
 /**
  *  @brief Specifies a property constraint for some operations
  */
-enum PropertyConstraint
-{
+enum PropertyConstraint {
   /**
    *  @brief Ignore properties
    *
@@ -128,4 +127,3 @@ db::properties_id_type inline pc_norm (PropertyConstraint pc, db::properties_id_
 }
 
 #endif
-

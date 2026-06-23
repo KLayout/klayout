@@ -70,8 +70,7 @@ GerberImportDialogFileColumnEditorWidget::GerberImportDialogFileColumnEditorWidg
   setFocusProxy (mp_filename_edit);
 }
 
-void 
-GerberImportDialogFileColumnEditorWidget::set_filename (const std::string &s)
+void GerberImportDialogFileColumnEditorWidget::set_filename (const std::string &s)
 {
   QDir base_dir (tl::to_qstring (mp_data->base_dir));
   QString text (base_dir.relativeFilePath (tl::to_qstring (s)));
@@ -80,21 +79,20 @@ GerberImportDialogFileColumnEditorWidget::set_filename (const std::string &s)
   }
 }
 
-std::string 
+std::string
 GerberImportDialogFileColumnEditorWidget::get_filename () const
 {
   return tl::to_string (mp_filename_edit->text ());
 }
 
-void
-GerberImportDialogFileColumnEditorWidget::browse_clicked ()
+void GerberImportDialogFileColumnEditorWidget::browse_clicked ()
 {
   QFileInfo file (tl::to_qstring (get_filename ()));
   if (get_filename ().empty ()) {
     file = QFileInfo (tl::to_qstring (mp_data->base_dir));
   } else if (! QFileInfo (tl::to_qstring (get_filename ())).isAbsolute ()) {
     file = QFileInfo (QDir (tl::to_qstring (mp_data->base_dir)), tl::to_qstring (get_filename ()));
-  } 
+  }
 
   std::string new_file (tl::to_string (file.absoluteFilePath ()));
   lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Load PCB data file")), tl::to_string (QObject::tr ("All files (*)")));
@@ -114,22 +112,20 @@ GerberImportDialogMetalLayerColumnEditorWidget::GerberImportDialogMetalLayerColu
   }
 }
 
-void 
-GerberImportDialogMetalLayerColumnEditorWidget::set_layer (int layer)
+void GerberImportDialogMetalLayerColumnEditorWidget::set_layer (int layer)
 {
   setCurrentIndex (layer);
 }
 
-int 
-GerberImportDialogMetalLayerColumnEditorWidget::get_layer () const
+int GerberImportDialogMetalLayerColumnEditorWidget::get_layer () const
 {
   return currentIndex ();
 }
 
 // -----------------------------------------------------------------------------------------
-//  GerberImportDialogNoEditDelegate 
+//  GerberImportDialogNoEditDelegate
 
-class GerberImportDialogNoEditDelegate 
+class GerberImportDialogNoEditDelegate
   : public QItemDelegate
 {
 public:
@@ -139,7 +135,7 @@ public:
     //  .. nothing yet ..
   }
 
-  QWidget *createEditor (QWidget * /*parent*/, const QStyleOptionViewItem & /*option*/, const QModelIndex & /*index*/) const 
+  QWidget *createEditor (QWidget * /*parent*/, const QStyleOptionViewItem & /*option*/, const QModelIndex & /*index*/) const
   {
     return 0;
   }
@@ -158,14 +154,14 @@ public:
     //  .. nothing yet ..
   }
 
-  QWidget *createEditor (QWidget *parent, const QStyleOptionViewItem & /*option*/, const QModelIndex & /*index*/) const 
+  QWidget *createEditor (QWidget *parent, const QStyleOptionViewItem & /*option*/, const QModelIndex & /*index*/) const
   {
     return new GerberImportDialogMetalLayerColumnEditorWidget (parent, mp_data);
   }
 
-  void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex & /*index*/) const
+  void updateEditorGeometry (QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex & /*index*/) const
   {
-    editor->setGeometry(option.rect);
+    editor->setGeometry (option.rect);
   }
 
   void setEditorData (QWidget *widget, const QModelIndex &index) const
@@ -192,7 +188,7 @@ public:
     }
   }
 
-  QSize sizeHint (const QStyleOptionViewItem &option, const QModelIndex &index) const 
+  QSize sizeHint (const QStyleOptionViewItem &option, const QModelIndex &index) const
   {
     QWidget *editor = createEditor (0, option, index);
     QSize size = editor->sizeHint ();
@@ -217,14 +213,14 @@ public:
     //  .. nothing yet ..
   }
 
-  QWidget *createEditor (QWidget *parent, const QStyleOptionViewItem & /*option*/, const QModelIndex & /*index*/) const 
+  QWidget *createEditor (QWidget *parent, const QStyleOptionViewItem & /*option*/, const QModelIndex & /*index*/) const
   {
     return new GerberImportDialogFileColumnEditorWidget (parent, mp_data);
   }
 
-  void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex & /*index*/) const
+  void updateEditorGeometry (QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex & /*index*/) const
   {
-    editor->setGeometry(option.rect);
+    editor->setGeometry (option.rect);
   }
 
   void setEditorData (QWidget *widget, const QModelIndex &index) const
@@ -264,13 +260,11 @@ public:
         model->setData (index, QVariant (QObject::tr ("Click here to enter file name")), Qt::DisplayRole);
         model->setData (index, widget->palette ().color (QPalette::Disabled, QPalette::Text), Qt::ForegroundRole);
         model->setData (index, widget->palette ().color (QPalette::Disabled, QPalette::Base), Qt::BackgroundRole);
-
       }
-
     }
   }
 
-  QSize sizeHint (const QStyleOptionViewItem &option, const QModelIndex &index) const 
+  QSize sizeHint (const QStyleOptionViewItem &option, const QModelIndex &index) const
   {
     QWidget *editor = createEditor (0, option, index);
     QSize size = editor->sizeHint ();
@@ -347,8 +341,7 @@ GerberImportDialog::~GerberImportDialog ()
   mp_ui = 0;
 }
 
-void
-GerberImportDialog::reset_clicked ()
+void GerberImportDialog::reset_clicked ()
 {
   //  Commit everything that is not loaded
   try {
@@ -362,10 +355,9 @@ GerberImportDialog::reset_clicked ()
   update ();
 }
 
-void
-GerberImportDialog::saveas_clicked ()
+void GerberImportDialog::saveas_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   commit_page ();
 
@@ -376,11 +368,10 @@ BEGIN_PROTECTED
     mp_data->save (fn);
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-GerberImportDialog::open_clicked ()
+void GerberImportDialog::open_clicked ()
 {
   //  Commit everything that is not loaded
   try {
@@ -400,7 +391,6 @@ GerberImportDialog::open_clicked ()
     QFileInfo fi (tl::to_qstring (fn));
     mp_data->base_dir = tl::to_string (fi.absoluteDir ().path ());
     mp_data->load (fn);
-    
   }
 
   END_PROTECTED
@@ -408,8 +398,7 @@ GerberImportDialog::open_clicked ()
   update ();
 }
 
-void  
-GerberImportDialog::browse_layer_properties_file ()
+void GerberImportDialog::browse_layer_properties_file ()
 {
   std::string file = tl::to_string (mp_ui->layer_properties_file_le->text ());
   lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Load Layer Properties File")), tl::to_string (QObject::tr ("Layer properties files (*.lyp);;All files (*)")));
@@ -419,8 +408,7 @@ GerberImportDialog::browse_layer_properties_file ()
   }
 }
 
-void  
-GerberImportDialog::browse_base_dir ()
+void GerberImportDialog::browse_base_dir ()
 {
   QString base_dir = mp_ui->base_dir_le->text ();
   base_dir = QFileDialog::getExistingDirectory (this, QObject::tr ("Get Base Directory"), base_dir);
@@ -429,8 +417,7 @@ GerberImportDialog::browse_base_dir ()
   }
 }
 
-void 
-GerberImportDialog::reject ()
+void GerberImportDialog::reject ()
 {
   try {
     commit_page ();
@@ -441,8 +428,7 @@ GerberImportDialog::reject ()
   QDialog::reject ();
 }
 
-void 
-GerberImportDialog::accept ()
+void GerberImportDialog::accept ()
 {
   BEGIN_PROTECTED
 
@@ -452,8 +438,7 @@ GerberImportDialog::accept ()
   END_PROTECTED
 }
 
-int 
-GerberImportDialog::exec ()
+int GerberImportDialog::exec ()
 {
   mp_ui->central_stack->setCurrentIndex (0);
   update ();
@@ -461,7 +446,7 @@ GerberImportDialog::exec ()
   return QDialog::exec ();
 }
 
-/* 
+/*
  * 0 - General
  * 1 - Layers (stacked)
  * 2 - Stack (stacked)
@@ -472,54 +457,52 @@ GerberImportDialog::exec ()
  * 7 - Reference points
  * 8 - Options
  */
-static int next_pages_stacked[] = {  1, 2, 3, 4, 8, 8, 8, 8, 9, -1 };
-static int next_pages_free[]    = {  5, 5, 5, 5, 5, 6, 7, 8, 9, -1 };
-static int prev_pages_stacked[] = { -1, 0, 1, 2, 3, 4, 4, 4, 4, 8  };
-static int prev_pages_free[]    = { -1, 0, 0, 0, 0, 0, 5, 6, 7, 8  };
+static int next_pages_stacked [] = {1, 2, 3, 4, 8, 8, 8, 8, 9, -1};
+static int next_pages_free [] = {5, 5, 5, 5, 5, 6, 7, 8, 9, -1};
+static int prev_pages_stacked [] = {-1, 0, 1, 2, 3, 4, 4, 4, 4, 8};
+static int prev_pages_free [] = {-1, 0, 0, 0, 0, 0, 5, 6, 7, 8};
 
-void
-GerberImportDialog::next_page ()
+void GerberImportDialog::next_page ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
   commit_page ();
 
   int index = mp_ui->central_stack->currentIndex ();
-  if (index >= 0 && index < int (sizeof (next_pages_stacked) / sizeof (next_pages_stacked[0]))) {
+  if (index >= 0 && index < int (sizeof (next_pages_stacked) / sizeof (next_pages_stacked [0]))) {
     index = mp_data->free_layer_mapping ? next_pages_free [index] : next_pages_stacked [index];
     if (index >= 0) {
       mp_ui->central_stack->setCurrentIndex (index);
       enter_page ();
     }
-  } 
+  }
 
   update ();
   END_PROTECTED
 }
 
-void 
-GerberImportDialog::last_page ()
+void GerberImportDialog::last_page ()
 {
   // "safe" commit
   try {
     commit_page ();
-  } catch (...) { }
+  } catch (...) {
+  }
 
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   int index = mp_ui->central_stack->currentIndex ();
-  if (index >= 0 && index < int (sizeof (next_pages_stacked) / sizeof (next_pages_stacked[0]))) {
+  if (index >= 0 && index < int (sizeof (next_pages_stacked) / sizeof (next_pages_stacked [0]))) {
     index = mp_data->free_layer_mapping ? prev_pages_free [index] : prev_pages_stacked [index];
     if (index >= 0) {
       mp_ui->central_stack->setCurrentIndex (index);
     }
-  } 
+  }
 
   update ();
   END_PROTECTED
 }
 
-void  
-GerberImportDialog::add_target_layer ()
+void GerberImportDialog::add_target_layer ()
 {
   QTreeWidget *tree = mp_data->free_layer_mapping ? mp_ui->free_layout_layers_tree : mp_ui->layout_layers_tree;
 
@@ -542,14 +525,13 @@ GerberImportDialog::add_target_layer ()
   }
 }
 
-void  
-GerberImportDialog::delete_target_layer ()
+void GerberImportDialog::delete_target_layer ()
 {
   QTreeWidget *tree = mp_data->free_layer_mapping ? mp_ui->free_layout_layers_tree : mp_ui->layout_layers_tree;
 
   QList<QTreeWidgetItem *> selected = tree->selectedItems ();
 
-  std::set <int> selected_indices;
+  std::set<int> selected_indices;
   for (QList<QTreeWidgetItem *>::const_iterator s = selected.begin (); s != selected.end (); ++s) {
     int n = (*s)->data (0, Qt::UserRole).toInt ();
     if (n >= 0 && n < int (mp_data->layout_layers.size ())) {
@@ -557,8 +539,8 @@ GerberImportDialog::delete_target_layer ()
     }
   }
 
-  std::vector <db::LayerProperties>::iterator lw = mp_data->layout_layers.begin ();
-  for (std::vector <db::LayerProperties>::iterator l = mp_data->layout_layers.begin (); l != mp_data->layout_layers.end (); ++l) {
+  std::vector<db::LayerProperties>::iterator lw = mp_data->layout_layers.begin ();
+  for (std::vector<db::LayerProperties>::iterator l = mp_data->layout_layers.begin (); l != mp_data->layout_layers.end (); ++l) {
     if (selected_indices.find (int (std::distance (mp_data->layout_layers.begin (), l))) == selected_indices.end ()) {
       *lw++ = *l;
     }
@@ -568,14 +550,13 @@ GerberImportDialog::delete_target_layer ()
   update ();
 }
 
-void  
-GerberImportDialog::move_target_layer_up ()
+void GerberImportDialog::move_target_layer_up ()
 {
   QTreeWidget *tree = mp_data->free_layer_mapping ? mp_ui->free_layout_layers_tree : mp_ui->layout_layers_tree;
 
   QList<QTreeWidgetItem *> selected = tree->selectedItems ();
 
-  std::set <int> selected_indices;
+  std::set<int> selected_indices;
   for (QList<QTreeWidgetItem *>::const_iterator s = selected.begin (); s != selected.end (); ++s) {
     int n = (*s)->data (0, Qt::UserRole).toInt ();
     if (n >= 0 && n < int (mp_data->layout_layers.size ())) {
@@ -586,7 +567,7 @@ GerberImportDialog::move_target_layer_up ()
   QTreeWidgetItem *current = tree->currentItem ();
   int n_current = current ? current->data (0, Qt::UserRole).toInt () : -1;
 
-  for (std::vector <db::LayerProperties>::iterator l = mp_data->layout_layers.begin (); l != mp_data->layout_layers.end (); ++l) {
+  for (std::vector<db::LayerProperties>::iterator l = mp_data->layout_layers.begin (); l != mp_data->layout_layers.end (); ++l) {
     int n = int (std::distance (mp_data->layout_layers.begin (), l));
     if (selected_indices.find (n + 1) != selected_indices.end () && selected_indices.find (n) == selected_indices.end ()) {
       std::swap (mp_data->layout_layers [n + 1], mp_data->layout_layers [n]);
@@ -601,7 +582,7 @@ GerberImportDialog::move_target_layer_up ()
   update ();
 
   // select the new items
-  for (std::set <int>::const_iterator s = selected_indices.begin (); s != selected_indices.end (); ++s) {
+  for (std::set<int>::const_iterator s = selected_indices.begin (); s != selected_indices.end (); ++s) {
     tree->selectionModel ()->select (tree->model ()->index (*s, 0), QItemSelectionModel::Select | QItemSelectionModel::Rows);
   }
 
@@ -610,14 +591,13 @@ GerberImportDialog::move_target_layer_up ()
   }
 }
 
-void  
-GerberImportDialog::move_target_layer_down ()
+void GerberImportDialog::move_target_layer_down ()
 {
   QTreeWidget *tree = mp_data->free_layer_mapping ? mp_ui->free_layout_layers_tree : mp_ui->layout_layers_tree;
 
   QList<QTreeWidgetItem *> selected = tree->selectedItems ();
 
-  std::set <int> selected_indices;
+  std::set<int> selected_indices;
   for (QList<QTreeWidgetItem *>::const_iterator s = selected.begin (); s != selected.end (); ++s) {
     int n = (*s)->data (0, Qt::UserRole).toInt ();
     if (n >= 0 && n < int (mp_data->layout_layers.size ())) {
@@ -628,7 +608,7 @@ GerberImportDialog::move_target_layer_down ()
   QTreeWidgetItem *current = tree->currentItem ();
   int n_current = current ? current->data (0, Qt::UserRole).toInt () : -1;
 
-  for (std::vector <db::LayerProperties>::iterator l = mp_data->layout_layers.end (); l != mp_data->layout_layers.begin (); ) {
+  for (std::vector<db::LayerProperties>::iterator l = mp_data->layout_layers.end (); l != mp_data->layout_layers.begin ();) {
     --l;
     int n = int (std::distance (mp_data->layout_layers.begin (), l));
     if (selected_indices.find (n - 1) != selected_indices.end () && selected_indices.find (n) == selected_indices.end ()) {
@@ -644,7 +624,7 @@ GerberImportDialog::move_target_layer_down ()
   update ();
 
   // select the new items
-  for (std::set <int>::const_iterator s = selected_indices.begin (); s != selected_indices.end (); ++s) {
+  for (std::set<int>::const_iterator s = selected_indices.begin (); s != selected_indices.end (); ++s) {
     tree->selectionModel ()->select (tree->model ()->index (*s, 0), QItemSelectionModel::Select | QItemSelectionModel::Rows);
   }
 
@@ -653,17 +633,17 @@ GerberImportDialog::move_target_layer_down ()
   }
 }
 
-void    
-GerberImportDialog::add_free_file ()
+void GerberImportDialog::add_free_file ()
 {
   // "safe" commit
   try {
     commit_page ();
-  } catch (...) { }
+  } catch (...) {
+  }
 
   QTreeWidget *tree = mp_ui->free_files_tree;
 
-  std::vector <std::string> new_files;
+  std::vector<std::string> new_files;
 
   lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Load PCB data file")), tl::to_string (QObject::tr ("All files (*)")));
   if (open_dialog.get_open (new_files, mp_data->base_dir)) {
@@ -672,25 +652,23 @@ GerberImportDialog::add_free_file ()
 
     QDir base_dir (tl::to_qstring (mp_data->base_dir));
 
-    for (std::vector <std::string>::const_iterator f = new_files.begin (); f != new_files.end (); ++f) {
+    for (std::vector<std::string>::const_iterator f = new_files.begin (); f != new_files.end (); ++f) {
       mp_data->free_files.push_back (db::GerberFreeFileDescriptor ());
       mp_data->free_files.back ().filename = tl::to_string (base_dir.relativeFilePath (tl::to_qstring (*f)));
     }
 
     update ();
     tree->setCurrentItem (tree->topLevelItem (int (mp_data->free_files.size () - 1)));
-
   }
 }
 
-void    
-GerberImportDialog::delete_free_file ()
+void GerberImportDialog::delete_free_file ()
 {
   QTreeWidget *tree = mp_ui->free_files_tree;
 
   QList<QTreeWidgetItem *> selected = tree->selectedItems ();
 
-  std::set <int> selected_indices;
+  std::set<int> selected_indices;
   for (QList<QTreeWidgetItem *>::const_iterator s = selected.begin (); s != selected.end (); ++s) {
     int n = (*s)->data (0, Qt::UserRole + 1).toInt ();
     if (n >= 0 && n < int (mp_data->free_files.size ())) {
@@ -701,10 +679,11 @@ GerberImportDialog::delete_free_file ()
   // "safe" commit
   try {
     commit_page ();
-  } catch (...) { }
+  } catch (...) {
+  }
 
-  std::vector <db::GerberFreeFileDescriptor>::iterator lw = mp_data->free_files.begin ();
-  for (std::vector <db::GerberFreeFileDescriptor>::iterator l = mp_data->free_files.begin (); l != mp_data->free_files.end (); ++l) {
+  std::vector<db::GerberFreeFileDescriptor>::iterator lw = mp_data->free_files.begin ();
+  for (std::vector<db::GerberFreeFileDescriptor>::iterator l = mp_data->free_files.begin (); l != mp_data->free_files.end (); ++l) {
     if (selected_indices.find (int (std::distance (mp_data->free_files.begin (), l))) == selected_indices.end ()) {
       *lw++ = *l;
     }
@@ -714,14 +693,13 @@ GerberImportDialog::delete_free_file ()
   update ();
 }
 
-void    
-GerberImportDialog::move_free_file_up ()
+void GerberImportDialog::move_free_file_up ()
 {
   QTreeWidget *tree = mp_ui->free_files_tree;
 
   QList<QTreeWidgetItem *> selected = tree->selectedItems ();
 
-  std::set <int> selected_indices;
+  std::set<int> selected_indices;
   for (QList<QTreeWidgetItem *>::const_iterator s = selected.begin (); s != selected.end (); ++s) {
     int n = (*s)->data (0, Qt::UserRole + 1).toInt ();
     if (n >= 0 && n < int (mp_data->free_files.size ())) {
@@ -735,9 +713,10 @@ GerberImportDialog::move_free_file_up ()
   // "safe" commit
   try {
     commit_page ();
-  } catch (...) { }
+  } catch (...) {
+  }
 
-  for (std::vector <db::GerberFreeFileDescriptor>::iterator l = mp_data->free_files.begin (); l != mp_data->free_files.end (); ++l) {
+  for (std::vector<db::GerberFreeFileDescriptor>::iterator l = mp_data->free_files.begin (); l != mp_data->free_files.end (); ++l) {
     int n = int (std::distance (mp_data->free_files.begin (), l));
     if (selected_indices.find (n + 1) != selected_indices.end () && selected_indices.find (n) == selected_indices.end ()) {
       std::swap (mp_data->free_files [n + 1], mp_data->free_files [n]);
@@ -752,7 +731,7 @@ GerberImportDialog::move_free_file_up ()
   update ();
 
   // select the new items
-  for (std::set <int>::const_iterator s = selected_indices.begin (); s != selected_indices.end (); ++s) {
+  for (std::set<int>::const_iterator s = selected_indices.begin (); s != selected_indices.end (); ++s) {
     tree->selectionModel ()->select (tree->model ()->index (*s, 0), QItemSelectionModel::Select | QItemSelectionModel::Rows);
   }
 
@@ -761,14 +740,13 @@ GerberImportDialog::move_free_file_up ()
   }
 }
 
-void    
-GerberImportDialog::move_free_file_down ()
+void GerberImportDialog::move_free_file_down ()
 {
   QTreeWidget *tree = mp_ui->free_files_tree;
 
   QList<QTreeWidgetItem *> selected = tree->selectedItems ();
 
-  std::set <int> selected_indices;
+  std::set<int> selected_indices;
   for (QList<QTreeWidgetItem *>::const_iterator s = selected.begin (); s != selected.end (); ++s) {
     int n = (*s)->data (0, Qt::UserRole + 1).toInt ();
     if (n >= 0 && n < int (mp_data->free_files.size ())) {
@@ -782,9 +760,10 @@ GerberImportDialog::move_free_file_down ()
   // "safe" commit
   try {
     commit_page ();
-  } catch (...) { }
+  } catch (...) {
+  }
 
-  for (std::vector <db::GerberFreeFileDescriptor>::iterator l = mp_data->free_files.end (); l != mp_data->free_files.begin (); ) {
+  for (std::vector<db::GerberFreeFileDescriptor>::iterator l = mp_data->free_files.end (); l != mp_data->free_files.begin ();) {
     --l;
     int n = int (std::distance (mp_data->free_files.begin (), l));
     if (selected_indices.find (n - 1) != selected_indices.end () && selected_indices.find (n) == selected_indices.end ()) {
@@ -800,7 +779,7 @@ GerberImportDialog::move_free_file_down ()
   update ();
 
   // select the new items
-  for (std::set <int>::const_iterator s = selected_indices.begin (); s != selected_indices.end (); ++s) {
+  for (std::set<int>::const_iterator s = selected_indices.begin (); s != selected_indices.end (); ++s) {
     tree->selectionModel ()->select (tree->model ()->index (*s, 0), QItemSelectionModel::Select | QItemSelectionModel::Rows);
   }
 
@@ -809,8 +788,7 @@ GerberImportDialog::move_free_file_down ()
   }
 }
 
-void 
-GerberImportDialog::free_layer_mapping_item_clicked (QTreeWidgetItem *item, int column)
+void GerberImportDialog::free_layer_mapping_item_clicked (QTreeWidgetItem *item, int column)
 {
   if (column > 0) {
     bool value = ! item->data (column, Qt::UserRole).toBool ();
@@ -819,8 +797,7 @@ GerberImportDialog::free_layer_mapping_item_clicked (QTreeWidgetItem *item, int 
   }
 }
 
-void
-GerberImportDialog::reset_free_mapping ()
+void GerberImportDialog::reset_free_mapping ()
 {
   QTreeWidget *tree = mp_ui->free_layer_mapping_tree;
   QList<QTreeWidgetItem *> selected = tree->selectedItems ();
@@ -833,8 +810,7 @@ GerberImportDialog::reset_free_mapping ()
   }
 }
 
-void   
-GerberImportDialog::layout_layer_double_clicked (QTreeWidgetItem *, int)
+void GerberImportDialog::layout_layer_double_clicked (QTreeWidgetItem *, int)
 {
   QTreeWidget *tree = mp_data->free_layer_mapping ? mp_ui->free_layout_layers_tree : mp_ui->layout_layers_tree;
 
@@ -850,14 +826,11 @@ GerberImportDialog::layout_layer_double_clicked (QTreeWidgetItem *, int)
         mp_data->layout_layers [n] = props;
         update ();
       }
-
     }
-
   }
 }
 
-struct FilePositionCompare
-{
+struct FilePositionCompare {
   bool operator() (const std::pair<db::GerberMetaData, std::string> &a, const std::pair<db::GerberMetaData, std::string> &b)
   {
     if ((a.first.cu_layer_number == 0) != (b.first.cu_layer_number == 0)) {
@@ -876,8 +849,7 @@ struct FilePositionCompare
   }
 };
 
-void
-GerberImportDialog::enter_page ()
+void GerberImportDialog::enter_page ()
 {
   int page = mp_ui->central_stack->currentIndex ();
 
@@ -896,7 +868,7 @@ GerberImportDialog::enter_page ()
         filters << tl::to_qstring ("*.gbr");
         filters << tl::to_qstring ("*.GBR");
 
-        std::vector<std::pair<db::GerberMetaData, std::string> > files;
+        std::vector<std::pair<db::GerberMetaData, std::string>> files;
 
         QStringList entries = dir.entryList (filters);
         for (QStringList::const_iterator e = entries.begin (); e != entries.end (); ++e) {
@@ -916,7 +888,7 @@ GerberImportDialog::enter_page ()
         mp_data->layout_layers.clear ();
 
         int min_layer = 0, max_layer = 0;
-        for (std::vector<std::pair<db::GerberMetaData, std::string> >::const_iterator f = files.begin (); f != files.end (); ++f) {
+        for (std::vector<std::pair<db::GerberMetaData, std::string>>::const_iterator f = files.begin (); f != files.end (); ++f) {
           if (f->first.cu_layer_number > 0) {
             if (min_layer == 0 || min_layer > f->first.cu_layer_number) {
               min_layer = f->first.cu_layer_number;
@@ -944,7 +916,7 @@ GerberImportDialog::enter_page ()
         int next_layer = max_layer * 2;
         int hole_num = 0, profile_num = 0, legend_num = 0, solder_num = 0;
 
-        for (std::vector<std::pair<db::GerberMetaData, std::string> >::const_iterator f = files.begin (); f != files.end (); ++f) {
+        for (std::vector<std::pair<db::GerberMetaData, std::string>>::const_iterator f = files.begin (); f != files.end (); ++f) {
 
           mp_data->free_files.push_back (db::GerberFreeFileDescriptor ());
           mp_data->free_files.back ().filename = tl::to_string (f->second);
@@ -976,18 +948,13 @@ GerberImportDialog::enter_page ()
           }
 
           mp_data->free_files.back ().layout_layers = layers;
-
         }
-
       }
-
     }
-
   }
 }
 
-void 
-GerberImportDialog::commit_page ()
+void GerberImportDialog::commit_page ()
 {
   int page = mp_ui->central_stack->currentIndex ();
 
@@ -1008,7 +975,7 @@ GerberImportDialog::commit_page ()
 
     //  --- Layout Layers page
     //  Nothing to commit here. It's done instantaneous.
-    
+
     if ((mp_data->layout_layers.size () % 2) == 0) {
       throw tl::Exception (tl::to_string (QObject::tr ("The layout layer list must start and end with a metal layer")));
     }
@@ -1056,12 +1023,12 @@ GerberImportDialog::commit_page ()
   } else if (page == 3) {
 
     //  --- Artwork Files page
-    
+
     //  Since we set the edit triggers to "currentChanged", this will commit the data:
     mp_ui->artwork_files_tree->setCurrentIndex (QModelIndex ());
 
     int n = 0;
-    for (std::vector <db::GerberArtworkFileDescriptor>::iterator l = mp_data->artwork_files.begin (); l != mp_data->artwork_files.end (); ++l, ++n) {
+    for (std::vector<db::GerberArtworkFileDescriptor>::iterator l = mp_data->artwork_files.begin (); l != mp_data->artwork_files.end (); ++l, ++n) {
       QTreeWidgetItem *item = mp_ui->artwork_files_tree->topLevelItem (n);
       if (item) {
         l->filename = tl::to_string (item->data (1, Qt::UserRole).toString ());
@@ -1086,7 +1053,7 @@ GerberImportDialog::commit_page ()
     mp_ui->drill_files_tree->setCurrentIndex (QModelIndex ());
 
     int n = 0;
-    for (std::vector <db::GerberDrillFileDescriptor>::iterator l = mp_data->drill_files.begin (); l != mp_data->drill_files.end (); ++l, ++n) {
+    for (std::vector<db::GerberDrillFileDescriptor>::iterator l = mp_data->drill_files.begin (); l != mp_data->drill_files.end (); ++l, ++n) {
       QTreeWidgetItem *item = mp_ui->drill_files_tree->topLevelItem (n);
       if (item) {
         l->start = item->data (1, Qt::UserRole).toInt ();
@@ -1100,7 +1067,7 @@ GerberImportDialog::commit_page ()
       }
     }
 
-    for (std::vector <db::GerberDrillFileDescriptor>::const_iterator l = mp_data->drill_files.begin (); l != mp_data->drill_files.end (); ++l) {
+    for (std::vector<db::GerberDrillFileDescriptor>::const_iterator l = mp_data->drill_files.begin (); l != mp_data->drill_files.end (); ++l) {
       /*  it might be a useful feature ...
       if (l->filename.empty ()) {
         throw tl::Exception (tl::to_string (QObject::tr ("Some file names are missing")));
@@ -1121,7 +1088,7 @@ GerberImportDialog::commit_page ()
     mp_ui->free_files_tree->setCurrentIndex (QModelIndex ());
 
     int n = 0;
-    for (std::vector <db::GerberFreeFileDescriptor>::iterator l = mp_data->free_files.begin (); l != mp_data->free_files.end (); ++l, ++n) {
+    for (std::vector<db::GerberFreeFileDescriptor>::iterator l = mp_data->free_files.begin (); l != mp_data->free_files.end (); ++l, ++n) {
       QTreeWidgetItem *item = mp_ui->free_files_tree->topLevelItem (n);
       if (item) {
         l->filename = tl::to_string (item->data (0, Qt::UserRole).toString ());
@@ -1141,32 +1108,30 @@ GerberImportDialog::commit_page ()
     //  add layers for all free files if no layer is defined yet. Add additional layers. Try to find some useful numbering scheme.
 
     int max_layer = 0;
-    for (std::vector <db::LayerProperties>::const_iterator l = mp_data->layout_layers.begin (); l != mp_data->layout_layers.end (); ++l) {
+    for (std::vector<db::LayerProperties>::const_iterator l = mp_data->layout_layers.begin (); l != mp_data->layout_layers.end (); ++l) {
       max_layer = std::max (max_layer, l->layer);
     }
 
     for (size_t i = 0; i < mp_data->free_files.size (); ++i) {
 
       std::vector<int> valid_layers;
-      for (std::vector<int>::const_iterator l = mp_data->free_files[i].layout_layers.begin (); l != mp_data->free_files[i].layout_layers.end (); ++l) {
+      for (std::vector<int>::const_iterator l = mp_data->free_files [i].layout_layers.begin (); l != mp_data->free_files [i].layout_layers.end (); ++l) {
         if (*l >= 0 && *l < int (mp_data->layout_layers.size ())) {
           valid_layers.push_back (*l);
         }
       }
 
-      mp_data->free_files[i].layout_layers = valid_layers;
+      mp_data->free_files [i].layout_layers = valid_layers;
 
       //  Add a stupid 1:1 mapping if no layers are mapped for the next file.
       if (valid_layers.empty ()) {
 
-        mp_data->free_files[i].layout_layers.push_back (int (mp_data->layout_layers.size ()));
+        mp_data->free_files [i].layout_layers.push_back (int (mp_data->layout_layers.size ()));
 
         mp_data->layout_layers.push_back (db::LayerProperties ());
         mp_data->layout_layers.back ().layer = ++max_layer;
         mp_data->layout_layers.back ().datatype = 0;
-
       }
-
     }
 
   } else if (page == 6) {
@@ -1175,9 +1140,9 @@ GerberImportDialog::commit_page ()
     //  no commit needed - done immediately
 
     //  reset any layers not present any longer
-    for (std::vector <db::GerberFreeFileDescriptor>::iterator l = mp_data->free_files.begin (); l != mp_data->free_files.end (); ++l) {
-      std::vector <int> indices;
-      for (std::vector <int>::const_iterator i = l->layout_layers.begin (); i != l->layout_layers.end (); ++i) {
+    for (std::vector<db::GerberFreeFileDescriptor>::iterator l = mp_data->free_files.begin (); l != mp_data->free_files.end (); ++l) {
+      std::vector<int> indices;
+      for (std::vector<int>::const_iterator i = l->layout_layers.begin (); i != l->layout_layers.end (); ++i) {
         if (*i < int (mp_data->layout_layers.size ())) {
           indices.push_back (*i);
         }
@@ -1192,13 +1157,13 @@ GerberImportDialog::commit_page ()
     mp_ui->free_layer_mapping_tree->setCurrentIndex (QModelIndex ());
 
     int n = 0;
-    for (std::vector <db::GerberFreeFileDescriptor>::iterator l = mp_data->free_files.begin (); l != mp_data->free_files.end (); ++l, ++n) {
+    for (std::vector<db::GerberFreeFileDescriptor>::iterator l = mp_data->free_files.begin (); l != mp_data->free_files.end (); ++l, ++n) {
       QTreeWidgetItem *item = mp_ui->free_layer_mapping_tree->topLevelItem (n);
       if (item) {
 
         l->filename = tl::to_string (item->data (0, Qt::UserRole).toString ());
 
-        std::vector <int> indices;
+        std::vector<int> indices;
         for (int i = 0; i < int (mp_data->layout_layers.size ()); ++i) {
           if (item->data (i + 1, Qt::UserRole).toBool ()) {
             indices.push_back (i);
@@ -1222,11 +1187,10 @@ GerberImportDialog::commit_page ()
   } else if (page == 8) {
 
     //  --- Coordinate Mapping page
-    QLineEdit *(coord_editors[][4]) = {
-      { mp_ui->pcb_x1_le, mp_ui->pcb_y1_le, mp_ui->layout_x1_le, mp_ui->layout_y1_le },
-      { mp_ui->pcb_x2_le, mp_ui->pcb_y2_le, mp_ui->layout_x2_le, mp_ui->layout_y2_le },
-      { mp_ui->pcb_x3_le, mp_ui->pcb_y3_le, mp_ui->layout_x3_le, mp_ui->layout_y3_le }
-    };
+    QLineEdit *(coord_editors [][4]) = {
+      {mp_ui->pcb_x1_le, mp_ui->pcb_y1_le, mp_ui->layout_x1_le, mp_ui->layout_y1_le},
+      {mp_ui->pcb_x2_le, mp_ui->pcb_y2_le, mp_ui->layout_x2_le, mp_ui->layout_y2_le},
+      {mp_ui->pcb_x3_le, mp_ui->pcb_y3_le, mp_ui->layout_x3_le, mp_ui->layout_y3_le}};
 
     mp_data->reference_points.clear ();
     for (unsigned int i = 0; i < sizeof (coord_editors) / sizeof (coord_editors [0]); ++i) {
@@ -1266,7 +1230,6 @@ GerberImportDialog::commit_page ()
         db::DPoint layout (x, y);
 
         mp_data->reference_points.push_back (std::make_pair (pcb, layout));
-
       }
     }
 
@@ -1308,18 +1271,15 @@ GerberImportDialog::commit_page ()
       }
 
       mp_data->topcell_name = tl::to_string (mp_ui->topcell_le->text ());
-
     }
-
-  } 
+  }
 }
 
-void 
-GerberImportDialog::update ()
+void GerberImportDialog::update ()
 {
   int n, nn;
 
-  std::string section_headers[] = {
+  std::string section_headers [] = {
     tl::to_string (QObject::tr ("General")),
     tl::to_string (QObject::tr ("Layout Layers")),
     tl::to_string (QObject::tr ("Layer Stack")),
@@ -1329,8 +1289,7 @@ GerberImportDialog::update ()
     tl::to_string (QObject::tr ("Layout Layers")),
     tl::to_string (QObject::tr ("Layer Mapping")),
     tl::to_string (QObject::tr ("Coordinate Mapping")),
-    tl::to_string (QObject::tr ("Options"))
-  };
+    tl::to_string (QObject::tr ("Options"))};
 
   int page = mp_ui->central_stack->currentIndex ();
   if (page < 0 || page >= int (sizeof (section_headers) / sizeof (section_headers [0]))) {
@@ -1352,7 +1311,7 @@ GerberImportDialog::update ()
   mp_ui->layout_layers_tree->clear ();
   n = 0;
   nn = mp_ui->layout_layers_tree->topLevelItemCount ();
-  for (std::vector <db::LayerProperties>::const_iterator l = mp_data->layout_layers.begin (); l != mp_data->layout_layers.end (); ++l, ++n) {
+  for (std::vector<db::LayerProperties>::const_iterator l = mp_data->layout_layers.begin (); l != mp_data->layout_layers.end (); ++l, ++n) {
 
     QTreeWidgetItem *item;
     if (n < nn) {
@@ -1373,7 +1332,6 @@ GerberImportDialog::update ()
     item->setData (0, Qt::UserRole, QVariant (n));
 
     item->setData (1, Qt::DisplayRole, QVariant (tl::to_qstring (l->to_string ())));
-
   }
 
   while (mp_ui->layout_layers_tree->topLevelItemCount () > n) {
@@ -1390,7 +1348,7 @@ GerberImportDialog::update ()
   //  --- Artwork Files page (stacked)
   mp_ui->artwork_files_tree->clear ();
   n = 0;
-  for (std::vector <db::GerberArtworkFileDescriptor>::const_iterator l = mp_data->artwork_files.begin (); l != mp_data->artwork_files.end (); ++l, ++n) {
+  for (std::vector<db::GerberArtworkFileDescriptor>::const_iterator l = mp_data->artwork_files.begin (); l != mp_data->artwork_files.end (); ++l, ++n) {
 
     QTreeWidgetItem *item = new QTreeWidgetItem (mp_ui->artwork_files_tree);
     item->setFlags (item->flags () | Qt::ItemIsEditable);
@@ -1432,13 +1390,12 @@ GerberImportDialog::update ()
     item->setData (1, Qt::UserRole, QVariant (tl::to_qstring (l->filename)));
 
     mp_ui->artwork_files_tree->addTopLevelItem (item);
-
   }
 
   //  --- Drill Types And Files page (stacked)
   mp_ui->drill_files_tree->clear ();
   n = 0;
-  for (std::vector <db::GerberDrillFileDescriptor>::const_iterator l = mp_data->drill_files.begin (); l != mp_data->drill_files.end (); ++l, ++n) {
+  for (std::vector<db::GerberDrillFileDescriptor>::const_iterator l = mp_data->drill_files.begin (); l != mp_data->drill_files.end (); ++l, ++n) {
 
     QTreeWidgetItem *item = new QTreeWidgetItem (mp_ui->drill_files_tree);
     item->setFlags (item->flags () | Qt::ItemIsEditable);
@@ -1495,13 +1452,12 @@ GerberImportDialog::update ()
     item->setData (3, Qt::UserRole, QVariant (tl::to_qstring (l->filename)));
 
     mp_ui->drill_files_tree->addTopLevelItem (item);
-
   }
 
   //  --- Files page (free)
   mp_ui->free_files_tree->clear ();
   n = 0;
-  for (std::vector <db::GerberFreeFileDescriptor>::const_iterator l = mp_data->free_files.begin (); l != mp_data->free_files.end (); ++l, ++n) {
+  for (std::vector<db::GerberFreeFileDescriptor>::const_iterator l = mp_data->free_files.begin (); l != mp_data->free_files.end (); ++l, ++n) {
 
     QTreeWidgetItem *item = new QTreeWidgetItem (mp_ui->free_files_tree);
     item->setFlags (item->flags () | Qt::ItemIsEditable);
@@ -1534,14 +1490,13 @@ GerberImportDialog::update ()
     item->setData (0, Qt::UserRole, QVariant (tl::to_qstring (l->filename)));
 
     mp_ui->free_files_tree->addTopLevelItem (item);
-
   }
 
   //  --- Layout Layers page (free)
   mp_ui->free_layout_layers_tree->clear (); // TODO: check whether this is a good solution and simplify the scheme below
   n = 0;
   nn = mp_ui->free_layout_layers_tree->topLevelItemCount ();
-  for (std::vector <db::LayerProperties>::const_iterator l = mp_data->layout_layers.begin (); l != mp_data->layout_layers.end (); ++l, ++n) {
+  for (std::vector<db::LayerProperties>::const_iterator l = mp_data->layout_layers.begin (); l != mp_data->layout_layers.end (); ++l, ++n) {
 
     QTreeWidgetItem *item;
     if (n < nn) {
@@ -1553,7 +1508,6 @@ GerberImportDialog::update ()
 
     item->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (l->to_string ())));
     item->setData (0, Qt::UserRole, QVariant (n));
-
   }
 
   while (mp_ui->free_layout_layers_tree->topLevelItemCount () > n) {
@@ -1565,7 +1519,7 @@ GerberImportDialog::update ()
   //  --- Files And Layer Mapping page (free)
   mp_ui->free_layer_mapping_tree->clear ();
   n = 0;
-  for (std::vector <db::GerberFreeFileDescriptor>::const_iterator l = mp_data->free_files.begin (); l != mp_data->free_files.end (); ++l, ++n) {
+  for (std::vector<db::GerberFreeFileDescriptor>::const_iterator l = mp_data->free_files.begin (); l != mp_data->free_files.end (); ++l, ++n) {
 
     QTreeWidgetItem *item = new QTreeWidgetItem (mp_ui->free_layer_mapping_tree);
     item->setFlags (item->flags () | Qt::ItemIsEditable);
@@ -1598,27 +1552,25 @@ GerberImportDialog::update ()
 
     item->setData (0, Qt::UserRole, QVariant (tl::to_qstring (l->filename)));
 
-    for (std::vector <db::LayerProperties>::iterator ll = mp_data->layout_layers.begin (); ll != mp_data->layout_layers.end (); ++ll) {
+    for (std::vector<db::LayerProperties>::iterator ll = mp_data->layout_layers.begin (); ll != mp_data->layout_layers.end (); ++ll) {
 
-      bool is_present = false; 
+      bool is_present = false;
       int layer = int (std::distance (mp_data->layout_layers.begin (), ll));
-      for (std::vector <int>::const_iterator i = l->layout_layers.begin (); i != l->layout_layers.end () && ! is_present; ++i) {
+      for (std::vector<int>::const_iterator i = l->layout_layers.begin (); i != l->layout_layers.end () && ! is_present; ++i) {
         is_present = (*i == layer);
       }
 
       item->setData (layer + 1, Qt::UserRole, QVariant (is_present));
       item->setData (layer + 1, Qt::DecorationRole, QVariant (QIcon (QString::fromUtf8 (is_present ? ":checked_16px.png" : ":unchecked_16px.png"))));
-
     }
 
     mp_ui->free_layer_mapping_tree->addTopLevelItem (item);
-
   }
 
   mp_ui->free_layer_mapping_tree->setColumnCount (int (mp_data->layout_layers.size () + 1));
   n = 0;
   mp_ui->free_layer_mapping_tree->headerItem ()->setData (0, Qt::DisplayRole, QVariant (QObject::tr ("File")));
-  for (std::vector <db::LayerProperties>::const_iterator l = mp_data->layout_layers.begin (); l != mp_data->layout_layers.end (); ++l, ++n) {
+  for (std::vector<db::LayerProperties>::const_iterator l = mp_data->layout_layers.begin (); l != mp_data->layout_layers.end (); ++l, ++n) {
 
     QString hdr_label;
 
@@ -1632,7 +1584,7 @@ GerberImportDialog::update ()
     } else {
       hdr_label += tl::to_qstring (l->name);
     }
-      
+
     mp_ui->free_layer_mapping_tree->headerItem ()->setData (n + 1, Qt::DisplayRole, QVariant (hdr_label));
     mp_ui->free_layer_mapping_tree->headerItem ()->setData (n + 1, Qt::ToolTipRole, QVariant (tl::to_qstring (l->to_string ())));
 
@@ -1645,25 +1597,23 @@ GerberImportDialog::update ()
 #else
     mp_ui->free_layer_mapping_tree->header ()->setResizeMode (n + 1, QHeaderView::ResizeToContents);
 #endif
-
   }
-  
+
   //  --- Coordinate Mapping page
-  QLineEdit *(coord_editors[][4]) = {
-    { mp_ui->pcb_x1_le, mp_ui->pcb_y1_le, mp_ui->layout_x1_le, mp_ui->layout_y1_le },
-    { mp_ui->pcb_x2_le, mp_ui->pcb_y2_le, mp_ui->layout_x2_le, mp_ui->layout_y2_le },
-    { mp_ui->pcb_x3_le, mp_ui->pcb_y3_le, mp_ui->layout_x3_le, mp_ui->layout_y3_le }
-  };
+  QLineEdit *(coord_editors [][4]) = {
+    {mp_ui->pcb_x1_le, mp_ui->pcb_y1_le, mp_ui->layout_x1_le, mp_ui->layout_y1_le},
+    {mp_ui->pcb_x2_le, mp_ui->pcb_y2_le, mp_ui->layout_x2_le, mp_ui->layout_y2_le},
+    {mp_ui->pcb_x3_le, mp_ui->pcb_y3_le, mp_ui->layout_x3_le, mp_ui->layout_y3_le}};
 
   for (unsigned int i = 0; i < sizeof (coord_editors) / sizeof (coord_editors [0]); ++i) {
     if (mp_data->reference_points.size () > i) {
-      coord_editors[i][0]->setText (tl::to_qstring (tl::to_string (mp_data->reference_points [i].first.x ())));
-      coord_editors[i][1]->setText (tl::to_qstring (tl::to_string (mp_data->reference_points [i].first.y ())));
-      coord_editors[i][2]->setText (tl::to_qstring (tl::to_string (mp_data->reference_points [i].second.x ())));
-      coord_editors[i][3]->setText (tl::to_qstring (tl::to_string (mp_data->reference_points [i].second.y ())));
+      coord_editors [i][0]->setText (tl::to_qstring (tl::to_string (mp_data->reference_points [i].first.x ())));
+      coord_editors [i][1]->setText (tl::to_qstring (tl::to_string (mp_data->reference_points [i].first.y ())));
+      coord_editors [i][2]->setText (tl::to_qstring (tl::to_string (mp_data->reference_points [i].second.x ())));
+      coord_editors [i][3]->setText (tl::to_qstring (tl::to_string (mp_data->reference_points [i].second.y ())));
     } else {
       for (unsigned int j = 0; j < 4; ++j) {
-        coord_editors[i][j]->setText (QString ());
+        coord_editors [i][j]->setText (QString ());
       }
     }
   }
@@ -1705,4 +1655,3 @@ GerberImportDialog::update ()
 }
 
 }
-

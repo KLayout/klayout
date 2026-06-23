@@ -29,7 +29,7 @@
 #include "tlUnitTest.h"
 #include "tlStream.h"
 
-TEST(1)
+TEST (1)
 {
   db::DeepShapeStore store;
   db::Layout layout;
@@ -57,11 +57,11 @@ TEST(1)
   db::DeepLayer dl4 = store.create_polygon_layer (db::RecursiveShapeIterator (layout, layout.cell (c1), l1, db::Box (0, 1, 2, 3)));
   db::DeepLayer dl5 = store.create_polygon_layer (db::RecursiveShapeIterator (layout, layout.cell (c1), l2, db::Box (0, 1, 2, 3)));
   EXPECT_EQ (dl4.layer (), l1);
-  EXPECT_EQ (dl5.layer (), l1);  //  not l2, because it's a new layout
+  EXPECT_EQ (dl5.layer (), l1); //  not l2, because it's a new layout
   EXPECT_EQ (store.layouts (), (unsigned int) 4);
 
   db::DeepLayer dl6 = store.create_polygon_layer (db::RecursiveShapeIterator (layout, layout.cell (c1), l1, db::Box (0, 1, 2, 3)));
-  EXPECT_EQ (dl6.layer (), l2);  //  a new layer (a copy)
+  EXPECT_EQ (dl6.layer (), l2); //  a new layer (a copy)
   EXPECT_EQ (&dl6.layout (), &dl4.layout ());
   EXPECT_EQ (store.layouts (), (unsigned int) 4);
 }
@@ -72,7 +72,7 @@ static size_t shapes_in_top (const db::Layout &layout, unsigned int layer)
   return top.shapes (layer).size ();
 }
 
-TEST(2_RefCounting)
+TEST (2_RefCounting)
 {
   db::DeepShapeStore store;
   store.set_keep_layouts (false);
@@ -155,7 +155,7 @@ TEST(2_RefCounting)
   EXPECT_EQ (store.is_valid_layout_index (lyi1), false);
 }
 
-TEST(3_TextTreatment)
+TEST (3_TextTreatment)
 {
   db::DeepShapeStore store;
   db::Layout layout;
@@ -184,7 +184,7 @@ TEST(3_TextTreatment)
   EXPECT_EQ (dl1.initial_cell ().shapes (dl1.layer ()).begin (db::ShapeIterator::All)->to_string (), "polygon (999,1999;999,2001;1001,2001;1001,1999) props={text=>TEXT}");
 }
 
-TEST(4_FlatAndEmptyInput)
+TEST (4_FlatAndEmptyInput)
 {
   db::DeepShapeStore dss ("TOP", 0.01);
   EXPECT_EQ (dss.layout ().dbu (), 0.01);
@@ -205,7 +205,7 @@ TEST(4_FlatAndEmptyInput)
   EXPECT_EQ ((dr1 - dr3).to_string (), "(0,0;0,1000;1000,1000;1000,0)");
 }
 
-TEST(5_State)
+TEST (5_State)
 {
   db::DeepShapeStore store ("TOP", 0.01);
   EXPECT_EQ (store.layout ().dbu (), 0.01);
@@ -263,7 +263,7 @@ TEST(5_State)
   EXPECT_EQ (store.breakout_cells (0)->find (3) != store.breakout_cells (0)->end (), true);
 }
 
-TEST(6_RestoreWithCellSelection)
+TEST (6_RestoreWithCellSelection)
 {
   db::Layout ly;
 
@@ -295,7 +295,7 @@ TEST(6_RestoreWithCellSelection)
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/dss_bug_au.gds");
 }
 
-TEST(7_RestoreWithCellSelection2)
+TEST (7_RestoreWithCellSelection2)
 {
   db::Layout ly;
 
@@ -335,7 +335,7 @@ TEST(7_RestoreWithCellSelection2)
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/dss_bug2_au.gds");
 }
 
-TEST(8_RestoreWithCellSelection3)
+TEST (8_RestoreWithCellSelection3)
 {
   db::Layout ly;
 
@@ -376,7 +376,7 @@ TEST(8_RestoreWithCellSelection3)
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/dss_bug3_au.gds");
 }
 
-TEST(9_sparse_array_limit)
+TEST (9_sparse_array_limit)
 {
   db::Layout ly;
 
@@ -483,4 +483,3 @@ TEST(9_sparse_array_limit)
     db::compare_layouts (_this, ly, tl::testdata () + "/algo/dss_sparse_array_au1.gds");
   }
 }
-

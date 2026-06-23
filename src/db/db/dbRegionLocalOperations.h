@@ -50,8 +50,7 @@ namespace db
  *
  *  The bitmaps are choosen such that they can be or-combined.
  */
-enum RectFilter
-{
+enum RectFilter {
   /**
    *  @brief No filter
    */
@@ -91,8 +90,7 @@ enum RectFilter
 /**
  *  @brief Specifies an error filter for opposite errors
  */
-enum OppositeFilter
-{
+enum OppositeFilter {
   /**
    *  @brief No filter
    */
@@ -113,8 +111,7 @@ enum OppositeFilter
  *  @brief A structure holding the options for the region checks (space, width, ...)
  */
 struct DB_PUBLIC RegionCheckOptions
-  : public EdgesCheckOptions
-{
+  : public EdgesCheckOptions {
   typedef db::coord_traits<db::Coord>::distance_type distance_type;
 
   /**
@@ -137,7 +134,8 @@ struct DB_PUBLIC RegionCheckOptions
       rect_filter (_rect_filter),
       negative (_negative),
       prop_constraint (_prop_constraint)
-  { }
+  {
+  }
 
   /**
    *  @brief Specifies shielding
@@ -171,12 +169,7 @@ struct DB_PUBLIC RegionCheckOptions
    */
   bool needs_merged () const
   {
-    return negative
-             || rect_filter != NoRectFilter
-             || opposite_filter != NoOppositeFilter
-             || max_projection != std::numeric_limits<distance_type>::max ()
-             || min_projection != 0
-             || whole_edges;
+    return negative || rect_filter != NoRectFilter || opposite_filter != NoOppositeFilter || max_projection != std::numeric_limits<distance_type>::max () || min_projection != 0 || whole_edges;
   }
 };
 
@@ -201,7 +194,8 @@ protected:
 
 template <class TS, class TI>
 class check_local_operation
-  : public local_operation<TS, TI, db::EdgePair>, public check_local_operation_base<TS, TI>
+  : public local_operation<TS, TI, db::EdgePair>,
+    public check_local_operation_base<TS, TI>
 {
 public:
   check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool is_merged, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options);
@@ -211,8 +205,8 @@ public:
   virtual bool requests_single_subjects () const { return true; }
   virtual std::string description () const;
 
-  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, const db::LocalProcessorBase * /*proc*/) const;
-  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties> > &results, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair>> &results, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties>> &results, const db::LocalProcessorBase * /*proc*/) const;
 
   virtual const db::TransformationReducer *vars () const { return &m_vars; }
 
@@ -222,7 +216,8 @@ private:
 
 template <class TS, class TI>
 class check_local_operation_with_properties
-  : public local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::EdgePairWithProperties>, public check_local_operation_base<TS, TI>
+  : public local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::EdgePairWithProperties>,
+    public check_local_operation_base<TS, TI>
 {
 public:
   check_local_operation_with_properties (const EdgeRelationFilter &check, bool different_polygons, bool is_merged, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options);
@@ -232,7 +227,7 @@ public:
   virtual bool requests_single_subjects () const { return true; }
   virtual std::string description () const;
 
-  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties> > &results, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI>> &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties>> &results, const db::LocalProcessorBase * /*proc*/) const;
 
   virtual const db::TransformationReducer *vars () const { return &m_vars; }
 
@@ -243,7 +238,10 @@ private:
 typedef check_local_operation<db::PolygonRef, db::PolygonRef> CheckLocalOperation;
 
 enum InteractingOutputMode {
-  None = 0, Positive = 1, Negative = 2, PositiveAndNegative = 3
+  None = 0,
+  Positive = 1,
+  Negative = 2,
+  PositiveAndNegative = 3
 };
 
 template <class TS, class TI, class TR>
@@ -254,7 +252,7 @@ public:
   interacting_local_operation (int mode, bool touching, InteractingOutputMode output_mode, size_t min_count, size_t max_count, bool other_is_merged);
 
   virtual db::Coord dist () const;
-  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase * /*proc*/) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -276,7 +274,7 @@ public:
   pull_local_operation (int mode, bool touching);
 
   virtual db::Coord dist () const;
-  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase * /*proc*/) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -295,7 +293,7 @@ public:
   interacting_with_edge_local_operation (InteractingOutputMode output_mode, size_t min_count, size_t max_count, bool other_is_merged);
 
   virtual db::Coord dist () const;
-  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase * /*proc*/) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -315,7 +313,7 @@ public:
   pull_with_edge_local_operation ();
 
   virtual db::Coord dist () const;
-  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase * /*proc*/) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 };
@@ -330,7 +328,7 @@ public:
   interacting_with_text_local_operation (InteractingOutputMode output_mode, size_t min_count, size_t max_count);
 
   virtual db::Coord dist () const;
-  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase * /*proc*/) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -349,7 +347,7 @@ public:
   pull_with_text_local_operation ();
 
   virtual db::Coord dist () const;
-  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase * /*proc*/) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 };
@@ -364,7 +362,7 @@ public:
   contained_local_operation (InteractingOutputMode output_mode);
 
   virtual db::Coord dist () const;
-  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const LocalProcessorBase * /*proc*/) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -387,7 +385,7 @@ class DB_PUBLIC bool_and_or_not_local_operation
 public:
   bool_and_or_not_local_operation (bool is_and);
 
-  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &result, const db::LocalProcessorBase *proc) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &result, const db::LocalProcessorBase *proc) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -402,12 +400,12 @@ typedef bool_and_or_not_local_operation<db::PolygonRef, db::PolygonRef, db::Poly
  */
 template <class TS, class TI, class TR>
 class DB_PUBLIC bool_and_or_not_local_operation_with_properties
-  : public local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::object_with_properties<TR> >
+  : public local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::object_with_properties<TR>>
 {
 public:
   bool_and_or_not_local_operation_with_properties (bool is_and, db::PropertyConstraint property_constraint);
 
-  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &result, const db::LocalProcessorBase *proc) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI>> &interactions, std::vector<std::unordered_set<db::object_with_properties<TR>>> &result, const db::LocalProcessorBase *proc) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -432,7 +430,7 @@ class DB_PUBLIC two_bool_and_not_local_operation
 public:
   two_bool_and_not_local_operation ();
 
-  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &result, const db::LocalProcessorBase *proc) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &result, const db::LocalProcessorBase *proc) const;
   virtual std::string description () const;
 };
 
@@ -446,12 +444,12 @@ typedef two_bool_and_not_local_operation<db::PolygonRef, db::PolygonRef, db::Pol
  */
 template <class TS, class TI, class TR>
 class DB_PUBLIC two_bool_and_not_local_operation_with_properties
-  : public local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::object_with_properties<TR> >
+  : public local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::object_with_properties<TR>>
 {
 public:
   two_bool_and_not_local_operation_with_properties (db::PropertyConstraint property_constraint);
 
-  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &result, const db::LocalProcessorBase *proc) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI>> &interactions, std::vector<std::unordered_set<db::object_with_properties<TR>>> &result, const db::LocalProcessorBase *proc) const;
   virtual std::string description () const;
 
 private:
@@ -474,7 +472,7 @@ public:
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
-  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR>> &results, const db::LocalProcessorBase * /*proc*/) const;
 
   virtual const db::TransformationReducer *vars () const
   {
@@ -503,7 +501,7 @@ class DB_PUBLIC SelfOverlapMergeLocalOperation
 public:
   SelfOverlapMergeLocalOperation (unsigned int wrap_count);
 
-  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &result, const db::LocalProcessorBase *proc) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef>> &result, const db::LocalProcessorBase *proc) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -524,10 +522,9 @@ public:
   virtual bool requests_single_subjects () const { return true; }
   virtual std::string description () const;
 
-  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::EdgeWithProperties> > &results, const db::LocalProcessorBase *proc) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::EdgeWithProperties>> &results, const db::LocalProcessorBase *proc) const;
 };
 
 } // namespace db
 
 #endif
-

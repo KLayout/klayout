@@ -32,9 +32,8 @@
 
 namespace ant
 {
-  ANT_PUBLIC int _force_link_f ();
-  static int _force_link_target = _force_link_f ();
+ANT_PUBLIC int _force_link_f ();
+static int _force_link_target = _force_link_f ();
 }
 
 #endif
-

@@ -84,7 +84,8 @@ public:
  *  device extraction. See the virtual methods below.
  */
 class DB_PUBLIC NetlistDeviceExtractor
-  : public gsi::ObjectBase, public tl::Object
+  : public gsi::ObjectBase,
+    public tl::Object
 {
 public:
   typedef std::list<db::LogEntryData> log_entry_list;
@@ -433,9 +434,8 @@ public:
   void initialize (db::Netlist *nl);
 
 private:
-  struct DeviceCellKey
-  {
-    DeviceCellKey () { }
+  struct DeviceCellKey {
+    DeviceCellKey () {}
 
     bool operator== (const DeviceCellKey &other) const
     {
@@ -459,11 +459,11 @@ private:
       return false;
     }
 
-    std::map<size_t, std::map<unsigned int, std::set<db::NetShape> > > geometry;
+    std::map<size_t, std::map<unsigned int, std::set<db::NetShape>>> geometry;
     std::map<size_t, double> parameters;
   };
 
-  typedef std::map<unsigned int, std::vector<db::NetShape> > geometry_per_layer_type;
+  typedef std::map<unsigned int, std::vector<db::NetShape>> geometry_per_layer_type;
   typedef std::map<size_t, geometry_per_layer_type> geometry_per_terminal_type;
 
   tl::weak_ptr<db::Netlist> m_netlist;
@@ -479,8 +479,8 @@ private:
   layer_definitions m_layer_definitions;
   std::vector<unsigned int> m_layers;
   log_entry_list m_log_entries;
-  std::map<size_t, std::pair<db::Device *, geometry_per_terminal_type> > m_new_devices;
-  std::map<DeviceCellKey, std::pair<db::cell_index_type, db::DeviceAbstract *> > m_device_cells;
+  std::map<size_t, std::pair<db::Device *, geometry_per_terminal_type>> m_new_devices;
+  std::map<DeviceCellKey, std::pair<db::cell_index_type, db::DeviceAbstract *>> m_device_cells;
 
   //  no copying
   NetlistDeviceExtractor (const NetlistDeviceExtractor &);

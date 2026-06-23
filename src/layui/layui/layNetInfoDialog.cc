@@ -191,7 +191,7 @@ void NetInfoDialog::update_info_text ()
       size_t n;
 
       info.start_element ("td");
-      n = count_shapes (mp_l2ndb.get (), net.operator-> ());
+      n = count_shapes (mp_l2ndb.get (), net.operator->());
       shapes += n;
       info.cdata (tl::to_string (n));
       info.end_element ("td");
@@ -215,7 +215,6 @@ void NetInfoDialog::update_info_text ()
       info.end_element ("td");
 
       info.end_element ("tr");
-
     }
 
     if (mp_nets.size () > 1) {
@@ -243,7 +242,6 @@ void NetInfoDialog::update_info_text ()
       info.end_element ("td");
 
       info.end_element ("tr");
-
     }
 
     info.end_element ("table");
@@ -264,10 +262,10 @@ void NetInfoDialog::update_info_text ()
       info.start_element ("hr");
       info.end_element ("hr");
 
-      std::map<std::string, std::set<std::string> > shapes;
+      std::map<std::string, std::set<std::string>> shapes;
 
       //  map as (layernumber, group of shapes by layer):
-      std::map<unsigned int, std::vector<db::Polygon> > shapes_by_layer;
+      std::map<unsigned int, std::vector<db::Polygon>> shapes_by_layer;
       std::map<unsigned int, std::string> layer_names;
       std::map<unsigned int, db::coord_traits<db::Coord>::area_type> statinfo_area;
       std::map<unsigned int, db::coord_traits<db::Coord>::perimeter_type> statinfo_perimeter;
@@ -293,7 +291,7 @@ void NetInfoDialog::update_info_text ()
 
           //  Check if layer is already detected, otherwise create vector-of-Shape object to hold shapes
           //  plus initialize the perimeter and area sums
-          std::map<unsigned int, std::vector<db::Polygon> >::iterator s = shapes_by_layer.find (*layer);
+          std::map<unsigned int, std::vector<db::Polygon>>::iterator s = shapes_by_layer.find (*layer);
           if (s == shapes_by_layer.end ()) {
             s = shapes_by_layer.insert (std::make_pair (*layer, std::vector<db::Polygon> ())).first;
             layer_names.insert (std::make_pair (*layer, l));
@@ -316,26 +314,24 @@ void NetInfoDialog::update_info_text ()
           }
 
           shapes.insert (std::make_pair (c, std::set<std::string> ())).first->second.insert (t);
-
         }
-
       }
 
       //  Try to merge all shaped to polygons, use Map of (layernumber, group of polygons by layer)
-      std::map<unsigned int, std::vector<db::Polygon> > polygons_by_layer;
-      for (std::map<unsigned int, std::vector<db::Polygon> >::iterator i = shapes_by_layer.begin(); i != shapes_by_layer.end (); ++i) {
+      std::map<unsigned int, std::vector<db::Polygon>> polygons_by_layer;
+      for (std::map<unsigned int, std::vector<db::Polygon>>::iterator i = shapes_by_layer.begin (); i != shapes_by_layer.end (); ++i) {
 
         unsigned int l = i->first;
 
         db::EdgeProcessor ep;
-        std::vector <db::Polygon> &merged = polygons_by_layer.insert (std::make_pair (l, std::vector <db::Polygon> ())).first->second;
-        ep.merge(i->second, merged, 0, true, true);
+        std::vector<db::Polygon> &merged = polygons_by_layer.insert (std::make_pair (l, std::vector<db::Polygon> ())).first->second;
+        ep.merge (i->second, merged, 0, true, true);
 
         db::coord_traits<db::Coord>::area_type area = 0;
         db::coord_traits<db::Coord>::perimeter_type perimeter = 0;
 
         //  Despite merging, a multitude of separate non-touching polygons can exist.
-        for (std::vector <db::Polygon>::iterator j = merged.begin (); j != merged.end (); ++j) {
+        for (std::vector<db::Polygon>::iterator j = merged.begin (); j != merged.end (); ++j) {
           //  Sum area
           area += j->area ();
           //  Sum perimeter for the merged polygon
@@ -344,7 +340,6 @@ void NetInfoDialog::update_info_text ()
 
         statinfo_area [l] += area;
         statinfo_perimeter [l] += perimeter;
-
       }
 
       if (! shapes.empty ()) {
@@ -392,7 +387,7 @@ void NetInfoDialog::update_info_text ()
           info.end_element ("td");
           info.end_element ("tr");
 
-          for (std::map<unsigned int, db::coord_traits<db::Coord>::area_type>::iterator i = statinfo_area.begin (); i != statinfo_area.end(); ++i) {
+          for (std::map<unsigned int, db::coord_traits<db::Coord>::area_type>::iterator i = statinfo_area.begin (); i != statinfo_area.end (); ++i) {
 
             unsigned int l = i->first;
             size_t n;
@@ -413,12 +408,11 @@ void NetInfoDialog::update_info_text ()
             info.cdata (tl::micron_to_string (v * dbu_unidir));
             info.end_element ("td");
             info.start_element ("td");
-            v = statinfo_area[l];
+            v = statinfo_area [l];
             total_area += v;
             info.cdata (tl::to_string (v * dbu_unidir * dbu_unidir));
             info.end_element ("td");
             info.end_element ("tr");
-
           }
 
           //  Only if more than one layer is involved, print summed values
@@ -438,18 +432,16 @@ void NetInfoDialog::update_info_text ()
             info.cdata (tl::to_string (total_area * dbu_unidir * dbu_unidir));
             info.end_element ("td");
             info.end_element ("tr");
-
           }
 
           info.end_element ("table");
-
         }
 
         info.start_element ("h3");
         info.cdata (tl::to_string (QObject::tr ("Shapes:")));
         info.end_element ("h3");
 
-        for (std::map<std::string, std::set<std::string> >::const_iterator s = shapes.begin (); s != shapes.end (); ++s) {
+        for (std::map<std::string, std::set<std::string>>::const_iterator s = shapes.begin (); s != shapes.end (); ++s) {
 
           info.start_element ("p");
 
@@ -459,14 +451,13 @@ void NetInfoDialog::update_info_text ()
           info.cdata (":");
           info.end_element ("b");
 
-          for (std::set <std::string>::const_iterator l = s->second.begin (); l != s->second.end (); ++l) {
+          for (std::set<std::string>::const_iterator l = s->second.begin (); l != s->second.end (); ++l) {
             info.start_element ("br");
             info.end_element ("br");
             info.cdata (*l);
           }
 
           info.end_element ("p");
-
         }
 
         if (incomplete) {
@@ -474,11 +465,8 @@ void NetInfoDialog::update_info_text ()
           info.cdata ("...");
           info.end_element ("p");
         }
-
       }
-
     }
-
   }
 
   info.end_element ("body");

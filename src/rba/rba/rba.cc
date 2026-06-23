@@ -52,13 +52,13 @@
 #include <cctype>
 #include <algorithm>
 
-#if !defined(HAVE_RUBY_VERSION_CODE)
-#  define HAVE_RUBY_VERSION_CODE 10901
+#if ! defined(HAVE_RUBY_VERSION_CODE)
+#define HAVE_RUBY_VERSION_CODE 10901
 #endif
 
 //  For the installation path
 #ifdef _WIN32
-#  include <windows.h>
+#include <windows.h>
 #endif
 
 // -------------------------------------------------------------------
@@ -70,7 +70,7 @@
 #include <signal.h>
 
 #if HAVE_RUBY_VERSION_CODE >= 20300
-#  include <ruby/debug.h>
+#include <ruby/debug.h>
 #endif
 
 namespace rba
@@ -81,7 +81,8 @@ namespace rba
 
 RubyStackTraceProvider::RubyStackTraceProvider (const std::string &scope)
   : m_scope (scope)
-{ }
+{
+}
 
 std::vector<tl::BacktraceElement>
 RubyStackTraceProvider::stack_trace () const
@@ -119,7 +120,7 @@ RubyStackTraceProvider::scope_index (const std::vector<tl::BacktraceElement> &bt
     }
 
     for (size_t i = 0; i < bt.size (); ++i) {
-      if (bt[i].file == scope) {
+      if (bt [i].file == scope) {
         return i;
       }
     }
@@ -127,8 +128,7 @@ RubyStackTraceProvider::scope_index (const std::vector<tl::BacktraceElement> &bt
   return 0;
 }
 
-int
-RubyStackTraceProvider::stack_depth () const
+int RubyStackTraceProvider::stack_depth () const
 {
   //  NOTE: this implementation will provide an "internal stack depth".
   //  It's not exactly the same than the length of the stack_trace vector length.
@@ -138,7 +138,7 @@ RubyStackTraceProvider::stack_depth () const
   static ID id_caller = rb_intern ("caller");
   VALUE backtrace = rb_funcall (rb_mKernel, id_caller, 0);
   if (TYPE (backtrace) == T_ARRAY) {
-    d += RARRAY_LEN(backtrace);
+    d += RARRAY_LEN (backtrace);
   }
   return d;
 }
@@ -194,7 +194,7 @@ static std::set<std::string>
 invalid_kwnames (const gsi::MethodBase *meth, VALUE kwargs)
 {
   std::set<std::string> invalid_names;
-  rb_hash_foreach (kwargs, (int (*)(...)) &get_kwargs_keys, (VALUE) &invalid_names);
+  rb_hash_foreach (kwargs, (int (*) (...)) &get_kwargs_keys, (VALUE) &invalid_names);
 
   for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments (); ++a) {
     invalid_names.erase (a->spec ()->name ());
@@ -217,14 +217,13 @@ class MethodTableEntry
 public:
   typedef std::vector<const gsi::MethodBase *>::const_iterator method_iterator;
 
-  struct MethodVariantKey
-  {
+  struct MethodVariantKey {
     MethodVariantKey (int argc, VALUE *argv, bool block_given, bool is_ctor, bool is_static, bool is_const)
       : m_block_given (block_given), m_is_ctor (is_ctor), m_is_static (is_static), m_is_const (is_const)
     {
       m_argtypes.reserve (size_t (argc));
       for (int i = 0; i < argc; ++i) {
-        m_argtypes.push_back (CLASS_OF (argv[i]));
+        m_argtypes.push_back (CLASS_OF (argv [i]));
       }
     }
 
@@ -267,7 +266,8 @@ public:
 
   MethodTableEntry (const std::string &name, bool ctor, bool st, bool prot, bool signal)
     : m_name (name), m_is_ctor (ctor), m_is_static (st), m_is_protected (prot), m_is_signal (signal)
-  { }
+  {
+  }
 
   const std::string &name () const
   {
@@ -303,7 +303,7 @@ public:
   {
     //  remove duplicate entries in the method list
     std::vector<const gsi::MethodBase *> m = m_methods;
-    std::sort(m.begin (), m.end ());
+    std::sort (m.begin (), m.end ());
     m_methods.assign (m.begin (), std::unique (m.begin (), m.end ()));
   }
 
@@ -324,7 +324,7 @@ public:
     bool nocache = (kwargs != Qnil);
 
     for (int i = 0; i < argc && ! nocache; ++i) {
-      int t = TYPE (argv[i]);
+      int t = TYPE (argv [i]);
       nocache = (t == T_ARRAY || t == T_HASH);
     }
 
@@ -341,12 +341,11 @@ public:
     }
 
     const gsi::MethodBase *meth = find_variant (argc, argv, kwargs, block_given, is_ctor, is_static, is_const);
-    m_variants[key] = meth;
+    m_variants [key] = meth;
     return meth;
   }
 
 private:
-
   static bool
   compatible_with_args (const gsi::MethodBase *m, int argc, VALUE kwargs, std::string *why_not = 0)
   {
@@ -423,7 +422,6 @@ private:
       }
 
       return true;
-
     }
   }
 
@@ -478,7 +476,7 @@ private:
           throw tl::Exception (tl::to_string (tr ("An event needs a block")));
         }
 
-      } else if ((*m)->is_callback()) {
+      } else if ((*m)->is_callback ()) {
 
         //  ignore callbacks
 
@@ -486,9 +484,7 @@ private:
 
         ++candidates;
         meth = *m;
-
       }
-
     }
 
     //  no method found, but the ctor was requested - implement that method as replacement for the default "initialize"
@@ -515,7 +511,6 @@ private:
       }
 
       throw tl::Exception (tl::to_string (tr ("Can't match arguments. Variants are:\n")) + describe_overloads (argc, kwargs));
-
     }
 
     //  more than one candidate -> refine by checking the arguments
@@ -535,7 +530,7 @@ private:
           int sc = 0;
           int i = 0;
           for (gsi::MethodBase::argument_iterator a = (*m)->begin_arguments (); is_valid && a != (*m)->end_arguments (); ++a, ++i) {
-            VALUE arg = i >= argc ? get_kwarg (*a, kwargs) : argv[i];
+            VALUE arg = i >= argc ? get_kwarg (*a, kwargs) : argv [i];
             if (arg == Qundef) {
               is_valid = a->spec ()->has_default ();
             } else if (test_arg (*a, arg, false /*strict*/, false /*with object substitution*/)) {
@@ -562,7 +557,6 @@ private:
               const_matching = true;
               candidates = 0;
             }
-
           }
 
           if (is_valid) {
@@ -582,13 +576,9 @@ private:
               meth = *m;
               score = sc;
             }
-
           }
-
         }
-
       }
-
     }
 
     if (! meth) {
@@ -642,19 +632,19 @@ public:
   }
 
   /**
-   *  @brief Adds a method to the table 
+   *  @brief Adds a method to the table
    *  The ctor flag indicates that instance method to static call translation needs to
    *  be performed in order to implement "initialize" which basically is a method called
    *  on the already constructed object.
    */
-  void add_method_generic (const std::string &name, const gsi::MethodBase *mb, bool ctor) 
+  void add_method_generic (const std::string &name, const gsi::MethodBase *mb, bool ctor)
   {
     bool st = mb->is_static ();
 
     std::map<std::pair<bool, std::string>, size_t>::iterator n = m_name_map.find (std::make_pair (st, name));
     if (n == m_name_map.end ()) {
 
-      m_name_map.insert (std::make_pair (std::make_pair(st, name), m_table.size ()));
+      m_name_map.insert (std::make_pair (std::make_pair (st, name), m_table.size ()));
       m_table.push_back (MethodTableEntry (name, ctor, mb->is_static (), mb->is_protected (), mb->is_signal ()));
       m_table.back ().add (mb);
 
@@ -674,14 +664,13 @@ public:
       }
 
       m_table [n->second].add (mb);
-
     }
   }
 
   /**
    *  @brief Convenience wrapper
    */
-  void add_ctor_method (const std::string &name, const gsi::MethodBase *mb) 
+  void add_ctor_method (const std::string &name, const gsi::MethodBase *mb)
   {
     add_method_generic (name, mb, true);
   }
@@ -689,7 +678,7 @@ public:
   /**
    *  @brief Convenience wrapper
    */
-  void add_method (const std::string &name, const gsi::MethodBase *mb) 
+  void add_method (const std::string &name, const gsi::MethodBase *mb)
   {
     add_method_generic (name, mb, false);
   }
@@ -739,7 +728,7 @@ public:
    */
   const MethodTableEntry &entry (size_t mid) const
   {
-    return m_table[mid - m_method_offset];
+    return m_table [mid - m_method_offset];
   }
 
   /**
@@ -747,7 +736,7 @@ public:
    *  This method must be called after the add_method calls have been used
    *  to fill the table. It will remove duplicate entries and clean up memory.
    */
-  void finish () 
+  void finish ()
   {
     for (std::vector<MethodTableEntry>::iterator m = m_table.begin (); m != m_table.end (); ++m) {
       m->finish ();
@@ -760,7 +749,7 @@ public:
    */
   static MethodTable *method_table_by_class (const gsi::ClassBase *cls_decl, bool force_init = false)
   {
-    MethodTable *mt = dynamic_cast<MethodTable *>(cls_decl->data (gsi::ClientIndex::Ruby));
+    MethodTable *mt = dynamic_cast<MethodTable *> (cls_decl->data (gsi::ClientIndex::Ruby));
     if (! mt || force_init) {
       MethodTable *mtnc = new MethodTable (cls_decl);
       mt = mtnc;
@@ -778,12 +767,12 @@ private:
   /**
    *  @brief Constructor
    *  This constructor will create a method table for the given class and register
-   *  this table under this class. 
+   *  this table under this class.
    *  It is used by method_table_by_class only, hence it's private.
    */
   MethodTable (const gsi::ClassBase *cls_decl)
     : m_method_offset (0), mp_cls_decl (cls_decl)
-  { 
+  {
     if (cls_decl->base ()) {
       const MethodTable *base_mt = method_table_by_class (cls_decl->base ());
       tl_assert (base_mt);
@@ -795,8 +784,7 @@ private:
 // -------------------------------------------------------------------
 //  Ruby interpreter private data
 
-struct RubyInterpreterPrivateData
-{
+struct RubyInterpreterPrivateData {
   RubyInterpreterPrivateData ()
   {
     saved_stderr = Qnil;
@@ -831,7 +819,7 @@ struct RubyInterpreterPrivateData
 };
 
 // -------------------------------------------------------------------
-//  Ruby API 
+//  Ruby API
 
 static void
 handle_exception (VALUE exc, bool first_chance)
@@ -847,10 +835,10 @@ handle_exception (VALUE exc, bool first_chance)
 static void
 handle_exception (const std::string &where, std::exception &ex)
 {
-  VALUE error_msg = rb_str_new2 ((std::string(ex.what ()) + tl::to_string (tr (" in ")) + where).c_str ());
+  VALUE error_msg = rb_str_new2 ((std::string (ex.what ()) + tl::to_string (tr (" in ")) + where).c_str ());
   VALUE args [1];
   args [0] = error_msg;
-  VALUE exc = rb_class_new_instance(1, args, rb_eRuntimeError);
+  VALUE exc = rb_class_new_instance (1, args, rb_eRuntimeError);
   handle_exception (exc, true);
 }
 
@@ -880,39 +868,51 @@ handle_exception (rba::RubyContinueException &ex)
 static void
 handle_exception (const std::string &where, tl::Exception &ex)
 {
-  VALUE error_msg = rb_str_new2 ((ex.msg () + tl::to_string (tr (" in ")) + where).c_str ()); \
+  VALUE error_msg = rb_str_new2 ((ex.msg () + tl::to_string (tr (" in ")) + where).c_str ());
   VALUE args [1];
   args [0] = error_msg;
-  VALUE exc = rb_class_new_instance(1, args, rb_eRuntimeError);
+  VALUE exc = rb_class_new_instance (1, args, rb_eRuntimeError);
   handle_exception (exc, ex.first_chance ());
 }
 
 static void
 handle_exception (const std::string &where)
 {
-  VALUE error_msg = rb_str_new2 ((tl::to_string (tr ("Unspecific exception in ")) + where).c_str ()); \
+  VALUE error_msg = rb_str_new2 ((tl::to_string (tr ("Unspecific exception in ")) + where).c_str ());
   VALUE args [1];
   args [0] = error_msg;
-  VALUE exc = rb_class_new_instance(1, args, rb_eRuntimeError);
+  VALUE exc = rb_class_new_instance (1, args, rb_eRuntimeError);
   handle_exception (exc, true);
 }
 
 #define RBA_TRY \
   try {
 
-#define RBA_CATCH(where) \
-  } catch (std::exception &ex) { \
-    handle_exception ((where), ex); \
-  } catch (tl::ExitException &ex) { \
-    handle_exception ((where), ex); \
-  } catch (rba::RubyContinueException &ex) { \
-    handle_exception (ex); \
-  } catch (rba::RubyError &ex) { \
-    handle_exception ((where), ex); \
-  } catch (tl::Exception &ex) { \
-    handle_exception ((where), ex); \
-  } catch (...) { \
-    handle_exception ((where)); \
+#define RBA_CATCH(where)                  \
+  }                                       \
+  catch (std::exception & ex)             \
+  {                                       \
+    handle_exception ((where), ex);       \
+  }                                       \
+  catch (tl::ExitException & ex)          \
+  {                                       \
+    handle_exception ((where), ex);       \
+  }                                       \
+  catch (rba::RubyContinueException & ex) \
+  {                                       \
+    handle_exception (ex);                \
+  }                                       \
+  catch (rba::RubyError & ex)             \
+  {                                       \
+    handle_exception ((where), ex);       \
+  }                                       \
+  catch (tl::Exception & ex)              \
+  {                                       \
+    handle_exception ((where), ex);       \
+  }                                       \
+  catch (...)                             \
+  {                                       \
+    handle_exception ((where));           \
   }
 
 static void free_proxy (void *p)
@@ -1030,7 +1030,7 @@ assign (VALUE self, VALUE src)
 
   if (cls_decl_src != cls_decl_self) {
     throw tl::Exception (tl::to_string (tr ("Type is not identical on copy")));
-  } 
+  }
   if (! cls_decl_self->can_copy ()) {
     throw tl::Exception (tl::to_string (tr ("No assignment provided for class '%s'")), cls_decl_self->name ());
   }
@@ -1046,35 +1046,35 @@ special_method_impl (const gsi::MethodBase *meth, int argc, VALUE *argv, VALUE s
 
   if (smt == gsi::MethodBase::DefaultCtor) {
 
-    //  Must be called in the ctor context and does nothing since the object is 
+    //  Must be called in the ctor context and does nothing since the object is
     //  automatically default-created
     //  It is mapped to the non-static(!) initialize method.
     tl_assert (ctor);
     return Qnil;
 
   } else if (smt == gsi::MethodBase::Destroy) {
-    tl_assert (!ctor);
+    tl_assert (! ctor);
     return destroy (self);
   } else if (smt == gsi::MethodBase::Keep) {
-    tl_assert (!ctor);
+    tl_assert (! ctor);
     return keep (self);
   } else if (smt == gsi::MethodBase::Release) {
-    tl_assert (!ctor);
+    tl_assert (! ctor);
     return release (self);
   } else if (smt == gsi::MethodBase::Create) {
-    tl_assert (!ctor);
+    tl_assert (! ctor);
     return create (self);
   } else if (smt == gsi::MethodBase::IsConst) {
-    tl_assert (!ctor);
+    tl_assert (! ctor);
     return is_const (self);
   } else if (smt == gsi::MethodBase::ToConst) {
-    tl_assert (!ctor);
+    tl_assert (! ctor);
     return to_const (self);
   } else if (smt == gsi::MethodBase::ConstCast) {
-    tl_assert (!ctor);
+    tl_assert (! ctor);
     return const_cast_ (self);
   } else if (smt == gsi::MethodBase::Destroyed) {
-    tl_assert (!ctor);
+    tl_assert (! ctor);
     return destroyed (self);
   } else if (smt == gsi::MethodBase::Assign) {
 
@@ -1085,7 +1085,7 @@ special_method_impl (const gsi::MethodBase *meth, int argc, VALUE *argv, VALUE s
   } else if (smt == gsi::MethodBase::Dup) {
 
     //  dup is disguised as assign in ctor context
-    tl_assert (false); 
+    tl_assert (false);
 
   } else {
     return Qnil;
@@ -1106,7 +1106,7 @@ static VALUE alloc_proxy (VALUE klass)
 /**
  *  @brief Gets the method name from a method id
  */
-std::string 
+std::string
 method_name_from_id (int mid, VALUE self)
 {
   const gsi::ClassBase *cls_decl;
@@ -1131,7 +1131,6 @@ method_name_from_id (int mid, VALUE self)
     cls_decl = cls_decl->base ();
     mt = MethodTable::method_table_by_class (cls_decl);
     tl_assert (mt);
-
   }
 
   return cls_decl->name () + "::" + mt->name (mid);
@@ -1146,8 +1145,7 @@ static gsi::ArgType create_void_type ()
 
 static gsi::ArgType s_void_type = create_void_type ();
 
-void
-push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, int argc, VALUE kwargs, tl::Heap &heap)
+void push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, int argc, VALUE kwargs, tl::Heap &heap)
 {
   int iarg = 0;
   int kwargs_taken = 0;
@@ -1157,7 +1155,7 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, i
 
     for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments (); ++a, ++iarg) {
 
-      VALUE arg = iarg >= argc ? get_kwarg (*a, kwargs) : argv[iarg];
+      VALUE arg = iarg >= argc ? get_kwarg (*a, kwargs) : argv [iarg];
       if (arg == Qundef) {
         if (a->spec ()->has_default ()) {
           if (kwargs_taken == nkwargs) {
@@ -1177,7 +1175,6 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, i
         }
         push_arg (*a, arglist, arg, heap);
       }
-
     }
 
     if (kwargs_taken != nkwargs) {
@@ -1185,7 +1182,7 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, i
       //  check if there are any left-over keyword parameters with unknown names
 
       std::set<std::string> invalid_names;
-      rb_hash_foreach (kwargs, (int (*)(...)) &get_kwargs_keys, (VALUE) &invalid_names);
+      rb_hash_foreach (kwargs, (int (*) (...)) &get_kwargs_keys, (VALUE) &invalid_names);
 
       for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments (); ++a) {
         invalid_names.erase (a->spec ()->name ());
@@ -1197,7 +1194,6 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, i
       } else if (invalid_names.size () == 1) {
         throw tl::Exception (tl::to_string (tr ("Unknown keyword parameter: ")) + *invalid_names.begin ());
       }
-
     }
 
   } catch (tl::Exception &ex) {
@@ -1236,7 +1232,6 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, i
     }
 
     throw;
-
   }
 }
 
@@ -1247,144 +1242,142 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
   RBA_TRY
 
-    tl::Heap heap;
+  tl::Heap heap;
 
-    const gsi::ClassBase *cls_decl;
-    Proxy *p = 0;
+  const gsi::ClassBase *cls_decl;
+  Proxy *p = 0;
 
-    //  this prevents side effects of callbacks raised from within the called functions -
-    //  if these trigger the GC, self is protected from destruction herein.
-    GCLocker gc_locker (self);
+  //  this prevents side effects of callbacks raised from within the called functions -
+  //  if these trigger the GC, self is protected from destruction herein.
+  GCLocker gc_locker (self);
 
-    if (TYPE (self) == T_CLASS) {
-      //  we have a static method
-      cls_decl = find_cclass (self);
-    } else {
-      //  we have an instance method
-      Data_Get_Struct (self, Proxy, p);
-      cls_decl = p->cls_decl ();
-    }
+  if (TYPE (self) == T_CLASS) {
+    //  we have a static method
+    cls_decl = find_cclass (self);
+  } else {
+    //  we have an instance method
+    Data_Get_Struct (self, Proxy, p);
+    cls_decl = p->cls_decl ();
+  }
 
-    const MethodTable *mt = MethodTable::method_table_by_class (cls_decl);
+  const MethodTable *mt = MethodTable::method_table_by_class (cls_decl);
+  tl_assert (mt);
+
+  //  locate the method in the base classes method table if necessary
+  while (mid < int (mt->bottom_mid ())) {
+
+    tl_assert (cls_decl->base ());
+    cls_decl = cls_decl->base ();
+    mt = MethodTable::method_table_by_class (cls_decl);
     tl_assert (mt);
+  }
 
-    //  locate the method in the base classes method table if necessary
-    while (mid < int (mt->bottom_mid ())) {
+  //  Check for keyword arguments ..
 
-      tl_assert (cls_decl->base ());
-      cls_decl = cls_decl->base ();
-      mt = MethodTable::method_table_by_class (cls_decl);
-      tl_assert (mt);
-
-    }
-
-    //  Check for keyword arguments ..
-
-    VALUE kwargs = Qnil;
-    bool check_last = true;
-#if HAVE_RUBY_VERSION_CODE>=20700
-    check_last = rb_keyword_given_p ();
+  VALUE kwargs = Qnil;
+  bool check_last = true;
+#if HAVE_RUBY_VERSION_CODE >= 20700
+  check_last = rb_keyword_given_p ();
 #endif
 
-    //  This is a heuristics to distinguish methods that are potential candidates for
-    //  accepting a keyword argument. Problem is that Ruby confuses function calls with
-    //  keyword arguments with arguments that take a single hash argument.
-    //  We accept only methods here as candidates that do not have a last argument which
-    //  is a map.
-    //  For compatibility we do this check also for Ruby >=2.7 which supports rb_keyword_given_p.
-    if (check_last) {
-      const MethodTableEntry &e = mt->entry (mid);
-      for (auto m = e.begin (); m != e.end () && check_last; ++m) {
-        auto a = (*m)->end_arguments ();
-        if (a != (*m)->begin_arguments () && (--a)->type () == gsi::T_map) {
-          check_last = false;
-        }
+  //  This is a heuristics to distinguish methods that are potential candidates for
+  //  accepting a keyword argument. Problem is that Ruby confuses function calls with
+  //  keyword arguments with arguments that take a single hash argument.
+  //  We accept only methods here as candidates that do not have a last argument which
+  //  is a map.
+  //  For compatibility we do this check also for Ruby >=2.7 which supports rb_keyword_given_p.
+  if (check_last) {
+    const MethodTableEntry &e = mt->entry (mid);
+    for (auto m = e.begin (); m != e.end () && check_last; ++m) {
+      auto a = (*m)->end_arguments ();
+      if (a != (*m)->begin_arguments () && (--a)->type () == gsi::T_map) {
+        check_last = false;
+      }
+    }
+  }
+
+  if (check_last && argc > 0 && RB_TYPE_P (argv [argc - 1], T_HASH)) {
+    kwargs = argv [--argc];
+  }
+
+  //  Identify the matching variant
+
+  const gsi::MethodBase *meth = mt->entry (mid).get_variant (argc, argv, kwargs, rb_block_given_p (), ctor, p == 0, p != 0 && p->const_ref ());
+
+  if (! meth) {
+
+    //  no method found, but the ctor was requested - implement that method as replacement for the default "initialize"
+
+  } else if (meth->smt () != gsi::MethodBase::None) {
+
+    if (kwargs != Qnil && RHASH_SIZE (kwargs) > 0) {
+      throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted")));
+    }
+
+    ret = special_method_impl (meth, argc, argv, self, ctor);
+
+  } else if (meth->is_signal ()) {
+
+    if (kwargs != Qnil && RHASH_SIZE (kwargs) > 0) {
+      throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted on events")));
+    }
+
+    if (p) {
+
+      static ID id_set = rb_intern ("set");
+
+      VALUE signal_handler = p->signal_handler (meth);
+
+      if (rb_block_given_p ()) {
+
+        VALUE proc = rb_block_proc ();
+        RB_GC_GUARD (proc);
+        ret = rba_funcall2_checked (signal_handler, id_set, 1, &proc);
+
+      } else if (argc > 0) {
+        ret = rba_funcall2_checked (signal_handler, id_set, argc, argv);
+      } else {
+        ret = signal_handler;
       }
     }
 
-    if (check_last && argc > 0 && RB_TYPE_P (argv[argc - 1], T_HASH)) {
-      kwargs = argv[--argc];
+  } else if (ctor && meth->ret_type ().type () == gsi::T_object && meth->ret_type ().pass_obj ()) {
+
+    tl_assert (p != 0);
+
+    //  This is a non-static constructor ("new" renamed to "initialize"): it does not create a
+    //  new Ruby object but just a new C++ object which replaces the old one.
+
+    gsi::SerialArgs retlist (meth->retsize ());
+
+    {
+      gsi::SerialArgs arglist (meth->argsize ());
+      push_args (arglist, meth, argv, argc, kwargs, heap);
+      meth->call (0, arglist, retlist);
     }
 
-    //  Identify the matching variant
+    void *obj = retlist.read<void *> (heap);
+    if (obj == 0) {
+      p->reset ();
+    } else {
+      p->set (obj, true, false, true, self);
+    }
 
-    const gsi::MethodBase *meth = mt->entry (mid).get_variant (argc, argv, kwargs, rb_block_given_p (), ctor, p == 0, p != 0 && p->const_ref ());
+  } else if (meth->ret_type ().is_iter () && ! rb_block_given_p ()) {
 
-    if (! meth) {
+    //  calling an iterator method without block -> deliver an enumerator using "to_enum"
 
-      //  no method found, but the ctor was requested - implement that method as replacement for the default "initialize"
+    if (kwargs != Qnil && RHASH_SIZE (kwargs) > 0) {
+      throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted on enumerators")));
+    }
 
-    } else if (meth->smt () != gsi::MethodBase::None) {
+    static ID id_to_enum = rb_intern ("to_enum");
 
-      if (kwargs != Qnil && RHASH_SIZE (kwargs) > 0) {
-        throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted")));
-      }
+    VALUE method_sym = ID2SYM (rb_intern (meth->primary_name ().c_str ()));
 
-      ret = special_method_impl (meth, argc, argv, self, ctor);
-
-    } else if (meth->is_signal ()) {
-
-      if (kwargs != Qnil && RHASH_SIZE (kwargs) > 0) {
-        throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted on events")));
-      }
-
-      if (p) {
-
-        static ID id_set = rb_intern ("set");
-
-        VALUE signal_handler = p->signal_handler (meth);
-
-        if (rb_block_given_p ()) {
-
-          VALUE proc = rb_block_proc ();
-          RB_GC_GUARD (proc);
-          ret = rba_funcall2_checked (signal_handler, id_set, 1, &proc);
-
-        } else if (argc > 0) {
-          ret = rba_funcall2_checked (signal_handler, id_set, argc, argv);
-        } else {
-          ret = signal_handler;
-        }
-
-      }
-
-    } else if (ctor && meth->ret_type ().type () == gsi::T_object && meth->ret_type ().pass_obj ()) {
-
-      tl_assert (p != 0);
-
-      //  This is a non-static constructor ("new" renamed to "initialize"): it does not create a 
-      //  new Ruby object but just a new C++ object which replaces the old one.
-
-      gsi::SerialArgs retlist (meth->retsize ());
-
-      {
-        gsi::SerialArgs arglist (meth->argsize ());
-        push_args (arglist, meth, argv, argc, kwargs, heap);
-        meth->call (0, arglist, retlist);
-      }
-
-      void *obj = retlist.read<void *> (heap);
-      if (obj == 0) {
-        p->reset ();
-      } else {
-        p->set (obj, true, false, true, self);
-      }
-
-    } else if (meth->ret_type ().is_iter () && ! rb_block_given_p ()) {
-
-      //  calling an iterator method without block -> deliver an enumerator using "to_enum"
-
-      if (kwargs != Qnil && RHASH_SIZE (kwargs) > 0) {
-        throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted on enumerators")));
-      }
-
-      static ID id_to_enum = rb_intern ("to_enum");
-
-      VALUE method_sym = ID2SYM (rb_intern (meth->primary_name ().c_str ()));
-
-      if (argc == 0) {
-        ret = rba_funcall2_checked (self, id_to_enum, 1, &method_sym);
-      } else {
+    if (argc == 0) {
+      ret = rba_funcall2_checked (self, id_to_enum, 1, &method_sym);
+    } else {
 #if 0
 	//  this solution does not work on MSVC2017 for unknown reasons and 
 	//  makes the application segfault even without being called
@@ -1394,69 +1387,65 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
         new_args.insert (new_args.end (), argv, argv + argc);
         ret = rba_funcall2_checked (self, id_to_enum, argc + 1, new_args.begin ().operator-> ());
 #else
-	VALUE new_args[16];
-	tl_assert (argc + 1 <= int (sizeof(new_args) / sizeof(new_args[0])));
-	VALUE *a = &new_args[0];
-	*a++ = method_sym;
-	for (int i = 0; i < argc; ++i) {
-	  *a++ = argv[i];
-	}
-        ret = rba_funcall2_checked (self, id_to_enum, argc + 1, &new_args[0]);
-#endif
+      VALUE new_args [16];
+      tl_assert (argc + 1 <= int (sizeof (new_args) / sizeof (new_args [0])));
+      VALUE *a = &new_args [0];
+      *a++ = method_sym;
+      for (int i = 0; i < argc; ++i) {
+        *a++ = argv [i];
       }
+      ret = rba_funcall2_checked (self, id_to_enum, argc + 1, &new_args [0]);
+#endif
+    }
+
+  } else {
+
+    void *obj = 0;
+    if (p) {
+      //  Hint: this potentially instantiates the object
+      obj = p->obj ();
+    }
+
+    gsi::SerialArgs retlist (meth->retsize ());
+
+    {
+      gsi::SerialArgs arglist (meth->argsize ());
+      push_args (arglist, meth, argv, argc, kwargs, heap);
+      meth->call (obj, arglist, retlist);
+    }
+
+    if (meth->ret_type ().is_iter ()) {
+
+      ret = Qnil;
+
+      std::unique_ptr<gsi::IterAdaptorAbstractBase> iter ((gsi::IterAdaptorAbstractBase *) retlist.read<void *> (heap));
+      if (iter.get ()) {
+
+        gsi::SerialArgs rr (iter->serial_size ());
+        while (! iter->at_end ()) {
+
+          rr.reset ();
+          iter->get (rr);
+
+          VALUE value = pull_arg (meth->ret_type (), p, rr, heap);
+          rba_yield_checked (value);
+
+          iter->inc ();
+        }
+      }
+
+    } else if (meth->ret_type () == s_void_type) {
+
+      //  simple, yet magical :)
+      return self;
 
     } else {
 
-      void *obj = 0;
-      if (p) {
-        //  Hint: this potentially instantiates the object
-        obj = p->obj ();
-      }
-
-      gsi::SerialArgs retlist (meth->retsize ());
-
-      {
-        gsi::SerialArgs arglist (meth->argsize ());
-        push_args (arglist, meth, argv, argc, kwargs, heap);
-        meth->call (obj, arglist, retlist);
-      }
-
-      if (meth->ret_type ().is_iter ()) {
-
-        ret = Qnil;
-
-        std::unique_ptr<gsi::IterAdaptorAbstractBase> iter ((gsi::IterAdaptorAbstractBase *) retlist.read<void *> (heap));
-        if (iter.get ()) {
-
-          gsi::SerialArgs rr (iter->serial_size ());
-          while (! iter->at_end ()) {
-
-            rr.reset ();
-            iter->get (rr);
-
-            VALUE value = pull_arg (meth->ret_type (), p, rr, heap);
-            rba_yield_checked (value);
-
-            iter->inc ();
-
-          }
-
-        }
-
-      } else if (meth->ret_type () == s_void_type) {
-
-        //  simple, yet magical :)
-        return self;
-
-      } else {
-
-        ret = pull_arg (meth->ret_type (), p, retlist, heap);
-
-      }
-
+      ret = pull_arg (meth->ret_type (), p, retlist, heap);
     }
+  }
 
-  RBA_CATCH(method_name_from_id (mid, self))
+  RBA_CATCH (method_name_from_id (mid, self))
 
   return ret;
 }
@@ -1466,282 +1455,2074 @@ VALUE method_adaptor_n (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
   return method_adaptor (mid, argc, argv, self, ctor);
 }
 
-template <int N> 
+template <int N>
 VALUE method_adaptor (int argc, VALUE *argv, VALUE self)
 {
   return method_adaptor_n (N, argc, argv, self, false);
 }
 
 VALUE (*(method_adaptors [])) (int, VALUE *, VALUE) =
-{
-  &method_adaptor<0x000>, &method_adaptor<0x001>, &method_adaptor<0x002>, &method_adaptor<0x003>, &method_adaptor<0x004>, &method_adaptor<0x005>, &method_adaptor<0x006>, &method_adaptor<0x007>,
-  &method_adaptor<0x008>, &method_adaptor<0x009>, &method_adaptor<0x00a>, &method_adaptor<0x00b>, &method_adaptor<0x00c>, &method_adaptor<0x00d>, &method_adaptor<0x00e>, &method_adaptor<0x00f>,
-  &method_adaptor<0x010>, &method_adaptor<0x011>, &method_adaptor<0x012>, &method_adaptor<0x013>, &method_adaptor<0x014>, &method_adaptor<0x015>, &method_adaptor<0x016>, &method_adaptor<0x017>,
-  &method_adaptor<0x018>, &method_adaptor<0x019>, &method_adaptor<0x01a>, &method_adaptor<0x01b>, &method_adaptor<0x01c>, &method_adaptor<0x01d>, &method_adaptor<0x01e>, &method_adaptor<0x01f>,
-  &method_adaptor<0x020>, &method_adaptor<0x021>, &method_adaptor<0x022>, &method_adaptor<0x023>, &method_adaptor<0x024>, &method_adaptor<0x025>, &method_adaptor<0x026>, &method_adaptor<0x027>,
-  &method_adaptor<0x028>, &method_adaptor<0x029>, &method_adaptor<0x02a>, &method_adaptor<0x02b>, &method_adaptor<0x02c>, &method_adaptor<0x02d>, &method_adaptor<0x02e>, &method_adaptor<0x02f>,
-  &method_adaptor<0x030>, &method_adaptor<0x031>, &method_adaptor<0x032>, &method_adaptor<0x033>, &method_adaptor<0x034>, &method_adaptor<0x035>, &method_adaptor<0x036>, &method_adaptor<0x037>,
-  &method_adaptor<0x038>, &method_adaptor<0x039>, &method_adaptor<0x03a>, &method_adaptor<0x03b>, &method_adaptor<0x03c>, &method_adaptor<0x03d>, &method_adaptor<0x03e>, &method_adaptor<0x03f>,
-  &method_adaptor<0x040>, &method_adaptor<0x041>, &method_adaptor<0x042>, &method_adaptor<0x043>, &method_adaptor<0x044>, &method_adaptor<0x045>, &method_adaptor<0x046>, &method_adaptor<0x047>,
-  &method_adaptor<0x048>, &method_adaptor<0x049>, &method_adaptor<0x04a>, &method_adaptor<0x04b>, &method_adaptor<0x04c>, &method_adaptor<0x04d>, &method_adaptor<0x04e>, &method_adaptor<0x04f>,
-  &method_adaptor<0x050>, &method_adaptor<0x051>, &method_adaptor<0x052>, &method_adaptor<0x053>, &method_adaptor<0x054>, &method_adaptor<0x055>, &method_adaptor<0x056>, &method_adaptor<0x057>,
-  &method_adaptor<0x058>, &method_adaptor<0x059>, &method_adaptor<0x05a>, &method_adaptor<0x05b>, &method_adaptor<0x05c>, &method_adaptor<0x05d>, &method_adaptor<0x05e>, &method_adaptor<0x05f>,
-  &method_adaptor<0x060>, &method_adaptor<0x061>, &method_adaptor<0x062>, &method_adaptor<0x063>, &method_adaptor<0x064>, &method_adaptor<0x065>, &method_adaptor<0x066>, &method_adaptor<0x067>,
-  &method_adaptor<0x068>, &method_adaptor<0x069>, &method_adaptor<0x06a>, &method_adaptor<0x06b>, &method_adaptor<0x06c>, &method_adaptor<0x06d>, &method_adaptor<0x06e>, &method_adaptor<0x06f>,
-  &method_adaptor<0x070>, &method_adaptor<0x071>, &method_adaptor<0x072>, &method_adaptor<0x073>, &method_adaptor<0x074>, &method_adaptor<0x075>, &method_adaptor<0x076>, &method_adaptor<0x077>,
-  &method_adaptor<0x078>, &method_adaptor<0x079>, &method_adaptor<0x07a>, &method_adaptor<0x07b>, &method_adaptor<0x07c>, &method_adaptor<0x07d>, &method_adaptor<0x07e>, &method_adaptor<0x07f>,
-  &method_adaptor<0x080>, &method_adaptor<0x081>, &method_adaptor<0x082>, &method_adaptor<0x083>, &method_adaptor<0x084>, &method_adaptor<0x085>, &method_adaptor<0x086>, &method_adaptor<0x087>,
-  &method_adaptor<0x088>, &method_adaptor<0x089>, &method_adaptor<0x08a>, &method_adaptor<0x08b>, &method_adaptor<0x08c>, &method_adaptor<0x08d>, &method_adaptor<0x08e>, &method_adaptor<0x08f>,
-  &method_adaptor<0x090>, &method_adaptor<0x091>, &method_adaptor<0x092>, &method_adaptor<0x093>, &method_adaptor<0x094>, &method_adaptor<0x095>, &method_adaptor<0x096>, &method_adaptor<0x097>,
-  &method_adaptor<0x098>, &method_adaptor<0x099>, &method_adaptor<0x09a>, &method_adaptor<0x09b>, &method_adaptor<0x09c>, &method_adaptor<0x09d>, &method_adaptor<0x09e>, &method_adaptor<0x09f>,
-  &method_adaptor<0x0a0>, &method_adaptor<0x0a1>, &method_adaptor<0x0a2>, &method_adaptor<0x0a3>, &method_adaptor<0x0a4>, &method_adaptor<0x0a5>, &method_adaptor<0x0a6>, &method_adaptor<0x0a7>,
-  &method_adaptor<0x0a8>, &method_adaptor<0x0a9>, &method_adaptor<0x0aa>, &method_adaptor<0x0ab>, &method_adaptor<0x0ac>, &method_adaptor<0x0ad>, &method_adaptor<0x0ae>, &method_adaptor<0x0af>,
-  &method_adaptor<0x0b0>, &method_adaptor<0x0b1>, &method_adaptor<0x0b2>, &method_adaptor<0x0b3>, &method_adaptor<0x0b4>, &method_adaptor<0x0b5>, &method_adaptor<0x0b6>, &method_adaptor<0x0b7>,
-  &method_adaptor<0x0b8>, &method_adaptor<0x0b9>, &method_adaptor<0x0ba>, &method_adaptor<0x0bb>, &method_adaptor<0x0bc>, &method_adaptor<0x0bd>, &method_adaptor<0x0be>, &method_adaptor<0x0bf>,
-  &method_adaptor<0x0c0>, &method_adaptor<0x0c1>, &method_adaptor<0x0c2>, &method_adaptor<0x0c3>, &method_adaptor<0x0c4>, &method_adaptor<0x0c5>, &method_adaptor<0x0c6>, &method_adaptor<0x0c7>,
-  &method_adaptor<0x0c8>, &method_adaptor<0x0c9>, &method_adaptor<0x0ca>, &method_adaptor<0x0cb>, &method_adaptor<0x0cc>, &method_adaptor<0x0cd>, &method_adaptor<0x0ce>, &method_adaptor<0x0cf>,
-  &method_adaptor<0x0d0>, &method_adaptor<0x0d1>, &method_adaptor<0x0d2>, &method_adaptor<0x0d3>, &method_adaptor<0x0d4>, &method_adaptor<0x0d5>, &method_adaptor<0x0d6>, &method_adaptor<0x0d7>,
-  &method_adaptor<0x0d8>, &method_adaptor<0x0d9>, &method_adaptor<0x0da>, &method_adaptor<0x0db>, &method_adaptor<0x0dc>, &method_adaptor<0x0dd>, &method_adaptor<0x0de>, &method_adaptor<0x0df>,
-  &method_adaptor<0x0e0>, &method_adaptor<0x0e1>, &method_adaptor<0x0e2>, &method_adaptor<0x0e3>, &method_adaptor<0x0e4>, &method_adaptor<0x0e5>, &method_adaptor<0x0e6>, &method_adaptor<0x0e7>,
-  &method_adaptor<0x0e8>, &method_adaptor<0x0e9>, &method_adaptor<0x0ea>, &method_adaptor<0x0eb>, &method_adaptor<0x0ec>, &method_adaptor<0x0ed>, &method_adaptor<0x0ee>, &method_adaptor<0x0ef>,
-  &method_adaptor<0x0f0>, &method_adaptor<0x0f1>, &method_adaptor<0x0f2>, &method_adaptor<0x0f3>, &method_adaptor<0x0f4>, &method_adaptor<0x0f5>, &method_adaptor<0x0f6>, &method_adaptor<0x0f7>,
-  &method_adaptor<0x0f8>, &method_adaptor<0x0f9>, &method_adaptor<0x0fa>, &method_adaptor<0x0fb>, &method_adaptor<0x0fc>, &method_adaptor<0x0fd>, &method_adaptor<0x0fe>, &method_adaptor<0x0ff>,
-  &method_adaptor<0x100>, &method_adaptor<0x101>, &method_adaptor<0x102>, &method_adaptor<0x103>, &method_adaptor<0x104>, &method_adaptor<0x105>, &method_adaptor<0x106>, &method_adaptor<0x107>,
-  &method_adaptor<0x108>, &method_adaptor<0x109>, &method_adaptor<0x10a>, &method_adaptor<0x10b>, &method_adaptor<0x10c>, &method_adaptor<0x10d>, &method_adaptor<0x10e>, &method_adaptor<0x10f>,
-  &method_adaptor<0x110>, &method_adaptor<0x111>, &method_adaptor<0x112>, &method_adaptor<0x113>, &method_adaptor<0x114>, &method_adaptor<0x115>, &method_adaptor<0x116>, &method_adaptor<0x117>,
-  &method_adaptor<0x118>, &method_adaptor<0x119>, &method_adaptor<0x11a>, &method_adaptor<0x11b>, &method_adaptor<0x11c>, &method_adaptor<0x11d>, &method_adaptor<0x11e>, &method_adaptor<0x11f>,
-  &method_adaptor<0x120>, &method_adaptor<0x121>, &method_adaptor<0x122>, &method_adaptor<0x123>, &method_adaptor<0x124>, &method_adaptor<0x125>, &method_adaptor<0x126>, &method_adaptor<0x127>,
-  &method_adaptor<0x128>, &method_adaptor<0x129>, &method_adaptor<0x12a>, &method_adaptor<0x12b>, &method_adaptor<0x12c>, &method_adaptor<0x12d>, &method_adaptor<0x12e>, &method_adaptor<0x12f>,
-  &method_adaptor<0x130>, &method_adaptor<0x131>, &method_adaptor<0x132>, &method_adaptor<0x133>, &method_adaptor<0x134>, &method_adaptor<0x135>, &method_adaptor<0x136>, &method_adaptor<0x137>,
-  &method_adaptor<0x138>, &method_adaptor<0x139>, &method_adaptor<0x13a>, &method_adaptor<0x13b>, &method_adaptor<0x13c>, &method_adaptor<0x13d>, &method_adaptor<0x13e>, &method_adaptor<0x13f>,
-  &method_adaptor<0x140>, &method_adaptor<0x141>, &method_adaptor<0x142>, &method_adaptor<0x143>, &method_adaptor<0x144>, &method_adaptor<0x145>, &method_adaptor<0x146>, &method_adaptor<0x147>,
-  &method_adaptor<0x148>, &method_adaptor<0x149>, &method_adaptor<0x14a>, &method_adaptor<0x14b>, &method_adaptor<0x14c>, &method_adaptor<0x14d>, &method_adaptor<0x14e>, &method_adaptor<0x14f>,
-  &method_adaptor<0x150>, &method_adaptor<0x151>, &method_adaptor<0x152>, &method_adaptor<0x153>, &method_adaptor<0x154>, &method_adaptor<0x155>, &method_adaptor<0x156>, &method_adaptor<0x157>,
-  &method_adaptor<0x158>, &method_adaptor<0x159>, &method_adaptor<0x15a>, &method_adaptor<0x15b>, &method_adaptor<0x15c>, &method_adaptor<0x15d>, &method_adaptor<0x15e>, &method_adaptor<0x15f>,
-  &method_adaptor<0x160>, &method_adaptor<0x161>, &method_adaptor<0x162>, &method_adaptor<0x163>, &method_adaptor<0x164>, &method_adaptor<0x165>, &method_adaptor<0x166>, &method_adaptor<0x167>,
-  &method_adaptor<0x168>, &method_adaptor<0x169>, &method_adaptor<0x16a>, &method_adaptor<0x16b>, &method_adaptor<0x16c>, &method_adaptor<0x16d>, &method_adaptor<0x16e>, &method_adaptor<0x16f>,
-  &method_adaptor<0x170>, &method_adaptor<0x171>, &method_adaptor<0x172>, &method_adaptor<0x173>, &method_adaptor<0x174>, &method_adaptor<0x175>, &method_adaptor<0x176>, &method_adaptor<0x177>,
-  &method_adaptor<0x178>, &method_adaptor<0x179>, &method_adaptor<0x17a>, &method_adaptor<0x17b>, &method_adaptor<0x17c>, &method_adaptor<0x17d>, &method_adaptor<0x17e>, &method_adaptor<0x17f>,
-  &method_adaptor<0x180>, &method_adaptor<0x181>, &method_adaptor<0x182>, &method_adaptor<0x183>, &method_adaptor<0x184>, &method_adaptor<0x185>, &method_adaptor<0x186>, &method_adaptor<0x187>,
-  &method_adaptor<0x188>, &method_adaptor<0x189>, &method_adaptor<0x18a>, &method_adaptor<0x18b>, &method_adaptor<0x18c>, &method_adaptor<0x18d>, &method_adaptor<0x18e>, &method_adaptor<0x18f>,
-  &method_adaptor<0x190>, &method_adaptor<0x191>, &method_adaptor<0x192>, &method_adaptor<0x193>, &method_adaptor<0x194>, &method_adaptor<0x195>, &method_adaptor<0x196>, &method_adaptor<0x197>,
-  &method_adaptor<0x198>, &method_adaptor<0x199>, &method_adaptor<0x19a>, &method_adaptor<0x19b>, &method_adaptor<0x19c>, &method_adaptor<0x19d>, &method_adaptor<0x19e>, &method_adaptor<0x19f>,
-  &method_adaptor<0x1a0>, &method_adaptor<0x1a1>, &method_adaptor<0x1a2>, &method_adaptor<0x1a3>, &method_adaptor<0x1a4>, &method_adaptor<0x1a5>, &method_adaptor<0x1a6>, &method_adaptor<0x1a7>,
-  &method_adaptor<0x1a8>, &method_adaptor<0x1a9>, &method_adaptor<0x1aa>, &method_adaptor<0x1ab>, &method_adaptor<0x1ac>, &method_adaptor<0x1ad>, &method_adaptor<0x1ae>, &method_adaptor<0x1af>,
-  &method_adaptor<0x1b0>, &method_adaptor<0x1b1>, &method_adaptor<0x1b2>, &method_adaptor<0x1b3>, &method_adaptor<0x1b4>, &method_adaptor<0x1b5>, &method_adaptor<0x1b6>, &method_adaptor<0x1b7>,
-  &method_adaptor<0x1b8>, &method_adaptor<0x1b9>, &method_adaptor<0x1ba>, &method_adaptor<0x1bb>, &method_adaptor<0x1bc>, &method_adaptor<0x1bd>, &method_adaptor<0x1be>, &method_adaptor<0x1bf>,
-  &method_adaptor<0x1c0>, &method_adaptor<0x1c1>, &method_adaptor<0x1c2>, &method_adaptor<0x1c3>, &method_adaptor<0x1c4>, &method_adaptor<0x1c5>, &method_adaptor<0x1c6>, &method_adaptor<0x1c7>,
-  &method_adaptor<0x1c8>, &method_adaptor<0x1c9>, &method_adaptor<0x1ca>, &method_adaptor<0x1cb>, &method_adaptor<0x1cc>, &method_adaptor<0x1cd>, &method_adaptor<0x1ce>, &method_adaptor<0x1cf>,
-  &method_adaptor<0x1d0>, &method_adaptor<0x1d1>, &method_adaptor<0x1d2>, &method_adaptor<0x1d3>, &method_adaptor<0x1d4>, &method_adaptor<0x1d5>, &method_adaptor<0x1d6>, &method_adaptor<0x1d7>,
-  &method_adaptor<0x1d8>, &method_adaptor<0x1d9>, &method_adaptor<0x1da>, &method_adaptor<0x1db>, &method_adaptor<0x1dc>, &method_adaptor<0x1dd>, &method_adaptor<0x1de>, &method_adaptor<0x1df>,
-  &method_adaptor<0x1e0>, &method_adaptor<0x1e1>, &method_adaptor<0x1e2>, &method_adaptor<0x1e3>, &method_adaptor<0x1e4>, &method_adaptor<0x1e5>, &method_adaptor<0x1e6>, &method_adaptor<0x1e7>,
-  &method_adaptor<0x1e8>, &method_adaptor<0x1e9>, &method_adaptor<0x1ea>, &method_adaptor<0x1eb>, &method_adaptor<0x1ec>, &method_adaptor<0x1ed>, &method_adaptor<0x1ee>, &method_adaptor<0x1ef>,
-  &method_adaptor<0x1f0>, &method_adaptor<0x1f1>, &method_adaptor<0x1f2>, &method_adaptor<0x1f3>, &method_adaptor<0x1f4>, &method_adaptor<0x1f5>, &method_adaptor<0x1f6>, &method_adaptor<0x1f7>,
-  &method_adaptor<0x1f8>, &method_adaptor<0x1f9>, &method_adaptor<0x1fa>, &method_adaptor<0x1fb>, &method_adaptor<0x1fc>, &method_adaptor<0x1fd>, &method_adaptor<0x1fe>, &method_adaptor<0x1ff>,
-  &method_adaptor<0x200>, &method_adaptor<0x201>, &method_adaptor<0x202>, &method_adaptor<0x203>, &method_adaptor<0x204>, &method_adaptor<0x205>, &method_adaptor<0x206>, &method_adaptor<0x207>,
-  &method_adaptor<0x208>, &method_adaptor<0x209>, &method_adaptor<0x20a>, &method_adaptor<0x20b>, &method_adaptor<0x20c>, &method_adaptor<0x20d>, &method_adaptor<0x20e>, &method_adaptor<0x20f>,
-  &method_adaptor<0x210>, &method_adaptor<0x211>, &method_adaptor<0x212>, &method_adaptor<0x213>, &method_adaptor<0x214>, &method_adaptor<0x215>, &method_adaptor<0x216>, &method_adaptor<0x217>,
-  &method_adaptor<0x218>, &method_adaptor<0x219>, &method_adaptor<0x21a>, &method_adaptor<0x21b>, &method_adaptor<0x21c>, &method_adaptor<0x21d>, &method_adaptor<0x21e>, &method_adaptor<0x21f>,
-  &method_adaptor<0x220>, &method_adaptor<0x221>, &method_adaptor<0x222>, &method_adaptor<0x223>, &method_adaptor<0x224>, &method_adaptor<0x225>, &method_adaptor<0x226>, &method_adaptor<0x227>,
-  &method_adaptor<0x228>, &method_adaptor<0x229>, &method_adaptor<0x22a>, &method_adaptor<0x22b>, &method_adaptor<0x22c>, &method_adaptor<0x22d>, &method_adaptor<0x22e>, &method_adaptor<0x22f>,
-  &method_adaptor<0x230>, &method_adaptor<0x231>, &method_adaptor<0x232>, &method_adaptor<0x233>, &method_adaptor<0x234>, &method_adaptor<0x235>, &method_adaptor<0x236>, &method_adaptor<0x237>,
-  &method_adaptor<0x238>, &method_adaptor<0x239>, &method_adaptor<0x23a>, &method_adaptor<0x23b>, &method_adaptor<0x23c>, &method_adaptor<0x23d>, &method_adaptor<0x23e>, &method_adaptor<0x23f>,
-  &method_adaptor<0x240>, &method_adaptor<0x241>, &method_adaptor<0x242>, &method_adaptor<0x243>, &method_adaptor<0x244>, &method_adaptor<0x245>, &method_adaptor<0x246>, &method_adaptor<0x247>,
-  &method_adaptor<0x248>, &method_adaptor<0x249>, &method_adaptor<0x24a>, &method_adaptor<0x24b>, &method_adaptor<0x24c>, &method_adaptor<0x24d>, &method_adaptor<0x24e>, &method_adaptor<0x24f>,
-  &method_adaptor<0x250>, &method_adaptor<0x251>, &method_adaptor<0x252>, &method_adaptor<0x253>, &method_adaptor<0x254>, &method_adaptor<0x255>, &method_adaptor<0x256>, &method_adaptor<0x257>,
-  &method_adaptor<0x258>, &method_adaptor<0x259>, &method_adaptor<0x25a>, &method_adaptor<0x25b>, &method_adaptor<0x25c>, &method_adaptor<0x25d>, &method_adaptor<0x25e>, &method_adaptor<0x25f>,
-  &method_adaptor<0x260>, &method_adaptor<0x261>, &method_adaptor<0x262>, &method_adaptor<0x263>, &method_adaptor<0x264>, &method_adaptor<0x265>, &method_adaptor<0x266>, &method_adaptor<0x267>,
-  &method_adaptor<0x268>, &method_adaptor<0x269>, &method_adaptor<0x26a>, &method_adaptor<0x26b>, &method_adaptor<0x26c>, &method_adaptor<0x26d>, &method_adaptor<0x26e>, &method_adaptor<0x26f>,
-  &method_adaptor<0x270>, &method_adaptor<0x271>, &method_adaptor<0x272>, &method_adaptor<0x273>, &method_adaptor<0x274>, &method_adaptor<0x275>, &method_adaptor<0x276>, &method_adaptor<0x277>,
-  &method_adaptor<0x278>, &method_adaptor<0x279>, &method_adaptor<0x27a>, &method_adaptor<0x27b>, &method_adaptor<0x27c>, &method_adaptor<0x27d>, &method_adaptor<0x27e>, &method_adaptor<0x27f>,
-  &method_adaptor<0x280>, &method_adaptor<0x281>, &method_adaptor<0x282>, &method_adaptor<0x283>, &method_adaptor<0x284>, &method_adaptor<0x285>, &method_adaptor<0x286>, &method_adaptor<0x287>,
-  &method_adaptor<0x288>, &method_adaptor<0x289>, &method_adaptor<0x28a>, &method_adaptor<0x28b>, &method_adaptor<0x28c>, &method_adaptor<0x28d>, &method_adaptor<0x28e>, &method_adaptor<0x28f>,
-  &method_adaptor<0x290>, &method_adaptor<0x291>, &method_adaptor<0x292>, &method_adaptor<0x293>, &method_adaptor<0x294>, &method_adaptor<0x295>, &method_adaptor<0x296>, &method_adaptor<0x297>,
-  &method_adaptor<0x298>, &method_adaptor<0x299>, &method_adaptor<0x29a>, &method_adaptor<0x29b>, &method_adaptor<0x29c>, &method_adaptor<0x29d>, &method_adaptor<0x29e>, &method_adaptor<0x29f>,
-  &method_adaptor<0x2a0>, &method_adaptor<0x2a1>, &method_adaptor<0x2a2>, &method_adaptor<0x2a3>, &method_adaptor<0x2a4>, &method_adaptor<0x2a5>, &method_adaptor<0x2a6>, &method_adaptor<0x2a7>,
-  &method_adaptor<0x2a8>, &method_adaptor<0x2a9>, &method_adaptor<0x2aa>, &method_adaptor<0x2ab>, &method_adaptor<0x2ac>, &method_adaptor<0x2ad>, &method_adaptor<0x2ae>, &method_adaptor<0x2af>,
-  &method_adaptor<0x2b0>, &method_adaptor<0x2b1>, &method_adaptor<0x2b2>, &method_adaptor<0x2b3>, &method_adaptor<0x2b4>, &method_adaptor<0x2b5>, &method_adaptor<0x2b6>, &method_adaptor<0x2b7>,
-  &method_adaptor<0x2b8>, &method_adaptor<0x2b9>, &method_adaptor<0x2ba>, &method_adaptor<0x2bb>, &method_adaptor<0x2bc>, &method_adaptor<0x2bd>, &method_adaptor<0x2be>, &method_adaptor<0x2bf>,
-  &method_adaptor<0x2c0>, &method_adaptor<0x2c1>, &method_adaptor<0x2c2>, &method_adaptor<0x2c3>, &method_adaptor<0x2c4>, &method_adaptor<0x2c5>, &method_adaptor<0x2c6>, &method_adaptor<0x2c7>,
-  &method_adaptor<0x2c8>, &method_adaptor<0x2c9>, &method_adaptor<0x2ca>, &method_adaptor<0x2cb>, &method_adaptor<0x2cc>, &method_adaptor<0x2cd>, &method_adaptor<0x2ce>, &method_adaptor<0x2cf>,
-  &method_adaptor<0x2d0>, &method_adaptor<0x2d1>, &method_adaptor<0x2d2>, &method_adaptor<0x2d3>, &method_adaptor<0x2d4>, &method_adaptor<0x2d5>, &method_adaptor<0x2d6>, &method_adaptor<0x2d7>,
-  &method_adaptor<0x2d8>, &method_adaptor<0x2d9>, &method_adaptor<0x2da>, &method_adaptor<0x2db>, &method_adaptor<0x2dc>, &method_adaptor<0x2dd>, &method_adaptor<0x2de>, &method_adaptor<0x2df>,
-  &method_adaptor<0x2e0>, &method_adaptor<0x2e1>, &method_adaptor<0x2e2>, &method_adaptor<0x2e3>, &method_adaptor<0x2e4>, &method_adaptor<0x2e5>, &method_adaptor<0x2e6>, &method_adaptor<0x2e7>,
-  &method_adaptor<0x2e8>, &method_adaptor<0x2e9>, &method_adaptor<0x2ea>, &method_adaptor<0x2eb>, &method_adaptor<0x2ec>, &method_adaptor<0x2ed>, &method_adaptor<0x2ee>, &method_adaptor<0x2ef>,
-  &method_adaptor<0x2f0>, &method_adaptor<0x2f1>, &method_adaptor<0x2f2>, &method_adaptor<0x2f3>, &method_adaptor<0x2f4>, &method_adaptor<0x2f5>, &method_adaptor<0x2f6>, &method_adaptor<0x2f7>,
-  &method_adaptor<0x2f8>, &method_adaptor<0x2f9>, &method_adaptor<0x2fa>, &method_adaptor<0x2fb>, &method_adaptor<0x2fc>, &method_adaptor<0x2fd>, &method_adaptor<0x2fe>, &method_adaptor<0x2ff>,
-  &method_adaptor<0x300>, &method_adaptor<0x301>, &method_adaptor<0x302>, &method_adaptor<0x303>, &method_adaptor<0x304>, &method_adaptor<0x305>, &method_adaptor<0x306>, &method_adaptor<0x307>,
-  &method_adaptor<0x308>, &method_adaptor<0x309>, &method_adaptor<0x30a>, &method_adaptor<0x30b>, &method_adaptor<0x30c>, &method_adaptor<0x30d>, &method_adaptor<0x30e>, &method_adaptor<0x30f>,
-  &method_adaptor<0x310>, &method_adaptor<0x311>, &method_adaptor<0x312>, &method_adaptor<0x313>, &method_adaptor<0x314>, &method_adaptor<0x315>, &method_adaptor<0x316>, &method_adaptor<0x317>,
-  &method_adaptor<0x318>, &method_adaptor<0x319>, &method_adaptor<0x31a>, &method_adaptor<0x31b>, &method_adaptor<0x31c>, &method_adaptor<0x31d>, &method_adaptor<0x31e>, &method_adaptor<0x31f>,
-  &method_adaptor<0x320>, &method_adaptor<0x321>, &method_adaptor<0x322>, &method_adaptor<0x323>, &method_adaptor<0x324>, &method_adaptor<0x325>, &method_adaptor<0x326>, &method_adaptor<0x327>,
-  &method_adaptor<0x328>, &method_adaptor<0x329>, &method_adaptor<0x32a>, &method_adaptor<0x32b>, &method_adaptor<0x32c>, &method_adaptor<0x32d>, &method_adaptor<0x32e>, &method_adaptor<0x32f>,
-  &method_adaptor<0x330>, &method_adaptor<0x331>, &method_adaptor<0x332>, &method_adaptor<0x333>, &method_adaptor<0x334>, &method_adaptor<0x335>, &method_adaptor<0x336>, &method_adaptor<0x337>,
-  &method_adaptor<0x338>, &method_adaptor<0x339>, &method_adaptor<0x33a>, &method_adaptor<0x33b>, &method_adaptor<0x33c>, &method_adaptor<0x33d>, &method_adaptor<0x33e>, &method_adaptor<0x33f>,
-  &method_adaptor<0x340>, &method_adaptor<0x341>, &method_adaptor<0x342>, &method_adaptor<0x343>, &method_adaptor<0x344>, &method_adaptor<0x345>, &method_adaptor<0x346>, &method_adaptor<0x347>,
-  &method_adaptor<0x348>, &method_adaptor<0x349>, &method_adaptor<0x34a>, &method_adaptor<0x34b>, &method_adaptor<0x34c>, &method_adaptor<0x34d>, &method_adaptor<0x34e>, &method_adaptor<0x34f>,
-  &method_adaptor<0x350>, &method_adaptor<0x351>, &method_adaptor<0x352>, &method_adaptor<0x353>, &method_adaptor<0x354>, &method_adaptor<0x355>, &method_adaptor<0x356>, &method_adaptor<0x357>,
-  &method_adaptor<0x358>, &method_adaptor<0x359>, &method_adaptor<0x35a>, &method_adaptor<0x35b>, &method_adaptor<0x35c>, &method_adaptor<0x35d>, &method_adaptor<0x35e>, &method_adaptor<0x35f>,
-  &method_adaptor<0x360>, &method_adaptor<0x361>, &method_adaptor<0x362>, &method_adaptor<0x363>, &method_adaptor<0x364>, &method_adaptor<0x365>, &method_adaptor<0x366>, &method_adaptor<0x367>,
-  &method_adaptor<0x368>, &method_adaptor<0x369>, &method_adaptor<0x36a>, &method_adaptor<0x36b>, &method_adaptor<0x36c>, &method_adaptor<0x36d>, &method_adaptor<0x36e>, &method_adaptor<0x36f>,
-  &method_adaptor<0x370>, &method_adaptor<0x371>, &method_adaptor<0x372>, &method_adaptor<0x373>, &method_adaptor<0x374>, &method_adaptor<0x375>, &method_adaptor<0x376>, &method_adaptor<0x377>,
-  &method_adaptor<0x378>, &method_adaptor<0x379>, &method_adaptor<0x37a>, &method_adaptor<0x37b>, &method_adaptor<0x37c>, &method_adaptor<0x37d>, &method_adaptor<0x37e>, &method_adaptor<0x37f>,
-  &method_adaptor<0x380>, &method_adaptor<0x381>, &method_adaptor<0x382>, &method_adaptor<0x383>, &method_adaptor<0x384>, &method_adaptor<0x385>, &method_adaptor<0x386>, &method_adaptor<0x387>,
-  &method_adaptor<0x388>, &method_adaptor<0x389>, &method_adaptor<0x38a>, &method_adaptor<0x38b>, &method_adaptor<0x38c>, &method_adaptor<0x38d>, &method_adaptor<0x38e>, &method_adaptor<0x38f>,
-  &method_adaptor<0x390>, &method_adaptor<0x391>, &method_adaptor<0x392>, &method_adaptor<0x393>, &method_adaptor<0x394>, &method_adaptor<0x395>, &method_adaptor<0x396>, &method_adaptor<0x397>,
-  &method_adaptor<0x398>, &method_adaptor<0x399>, &method_adaptor<0x39a>, &method_adaptor<0x39b>, &method_adaptor<0x39c>, &method_adaptor<0x39d>, &method_adaptor<0x39e>, &method_adaptor<0x39f>,
-  &method_adaptor<0x3a0>, &method_adaptor<0x3a1>, &method_adaptor<0x3a2>, &method_adaptor<0x3a3>, &method_adaptor<0x3a4>, &method_adaptor<0x3a5>, &method_adaptor<0x3a6>, &method_adaptor<0x3a7>,
-  &method_adaptor<0x3a8>, &method_adaptor<0x3a9>, &method_adaptor<0x3aa>, &method_adaptor<0x3ab>, &method_adaptor<0x3ac>, &method_adaptor<0x3ad>, &method_adaptor<0x3ae>, &method_adaptor<0x3af>,
-  &method_adaptor<0x3b0>, &method_adaptor<0x3b1>, &method_adaptor<0x3b2>, &method_adaptor<0x3b3>, &method_adaptor<0x3b4>, &method_adaptor<0x3b5>, &method_adaptor<0x3b6>, &method_adaptor<0x3b7>,
-  &method_adaptor<0x3b8>, &method_adaptor<0x3b9>, &method_adaptor<0x3ba>, &method_adaptor<0x3bb>, &method_adaptor<0x3bc>, &method_adaptor<0x3bd>, &method_adaptor<0x3be>, &method_adaptor<0x3bf>,
-  &method_adaptor<0x3c0>, &method_adaptor<0x3c1>, &method_adaptor<0x3c2>, &method_adaptor<0x3c3>, &method_adaptor<0x3c4>, &method_adaptor<0x3c5>, &method_adaptor<0x3c6>, &method_adaptor<0x3c7>,
-  &method_adaptor<0x3c8>, &method_adaptor<0x3c9>, &method_adaptor<0x3ca>, &method_adaptor<0x3cb>, &method_adaptor<0x3cc>, &method_adaptor<0x3cd>, &method_adaptor<0x3ce>, &method_adaptor<0x3cf>,
-  &method_adaptor<0x3d0>, &method_adaptor<0x3d1>, &method_adaptor<0x3d2>, &method_adaptor<0x3d3>, &method_adaptor<0x3d4>, &method_adaptor<0x3d5>, &method_adaptor<0x3d6>, &method_adaptor<0x3d7>,
-  &method_adaptor<0x3d8>, &method_adaptor<0x3d9>, &method_adaptor<0x3da>, &method_adaptor<0x3db>, &method_adaptor<0x3dc>, &method_adaptor<0x3dd>, &method_adaptor<0x3de>, &method_adaptor<0x3df>,
-  &method_adaptor<0x3e0>, &method_adaptor<0x3e1>, &method_adaptor<0x3e2>, &method_adaptor<0x3e3>, &method_adaptor<0x3e4>, &method_adaptor<0x3e5>, &method_adaptor<0x3e6>, &method_adaptor<0x3e7>,
-  &method_adaptor<0x3e8>, &method_adaptor<0x3e9>, &method_adaptor<0x3ea>, &method_adaptor<0x3eb>, &method_adaptor<0x3ec>, &method_adaptor<0x3ed>, &method_adaptor<0x3ee>, &method_adaptor<0x3ef>,
-  &method_adaptor<0x3f0>, &method_adaptor<0x3f1>, &method_adaptor<0x3f2>, &method_adaptor<0x3f3>, &method_adaptor<0x3f4>, &method_adaptor<0x3f5>, &method_adaptor<0x3f6>, &method_adaptor<0x3f7>,
-  &method_adaptor<0x3f8>, &method_adaptor<0x3f9>, &method_adaptor<0x3fa>, &method_adaptor<0x3fb>, &method_adaptor<0x3fc>, &method_adaptor<0x3fd>, &method_adaptor<0x3fe>, &method_adaptor<0x3ff>,
+  {
+    &method_adaptor<0x000>,
+    &method_adaptor<0x001>,
+    &method_adaptor<0x002>,
+    &method_adaptor<0x003>,
+    &method_adaptor<0x004>,
+    &method_adaptor<0x005>,
+    &method_adaptor<0x006>,
+    &method_adaptor<0x007>,
+    &method_adaptor<0x008>,
+    &method_adaptor<0x009>,
+    &method_adaptor<0x00a>,
+    &method_adaptor<0x00b>,
+    &method_adaptor<0x00c>,
+    &method_adaptor<0x00d>,
+    &method_adaptor<0x00e>,
+    &method_adaptor<0x00f>,
+    &method_adaptor<0x010>,
+    &method_adaptor<0x011>,
+    &method_adaptor<0x012>,
+    &method_adaptor<0x013>,
+    &method_adaptor<0x014>,
+    &method_adaptor<0x015>,
+    &method_adaptor<0x016>,
+    &method_adaptor<0x017>,
+    &method_adaptor<0x018>,
+    &method_adaptor<0x019>,
+    &method_adaptor<0x01a>,
+    &method_adaptor<0x01b>,
+    &method_adaptor<0x01c>,
+    &method_adaptor<0x01d>,
+    &method_adaptor<0x01e>,
+    &method_adaptor<0x01f>,
+    &method_adaptor<0x020>,
+    &method_adaptor<0x021>,
+    &method_adaptor<0x022>,
+    &method_adaptor<0x023>,
+    &method_adaptor<0x024>,
+    &method_adaptor<0x025>,
+    &method_adaptor<0x026>,
+    &method_adaptor<0x027>,
+    &method_adaptor<0x028>,
+    &method_adaptor<0x029>,
+    &method_adaptor<0x02a>,
+    &method_adaptor<0x02b>,
+    &method_adaptor<0x02c>,
+    &method_adaptor<0x02d>,
+    &method_adaptor<0x02e>,
+    &method_adaptor<0x02f>,
+    &method_adaptor<0x030>,
+    &method_adaptor<0x031>,
+    &method_adaptor<0x032>,
+    &method_adaptor<0x033>,
+    &method_adaptor<0x034>,
+    &method_adaptor<0x035>,
+    &method_adaptor<0x036>,
+    &method_adaptor<0x037>,
+    &method_adaptor<0x038>,
+    &method_adaptor<0x039>,
+    &method_adaptor<0x03a>,
+    &method_adaptor<0x03b>,
+    &method_adaptor<0x03c>,
+    &method_adaptor<0x03d>,
+    &method_adaptor<0x03e>,
+    &method_adaptor<0x03f>,
+    &method_adaptor<0x040>,
+    &method_adaptor<0x041>,
+    &method_adaptor<0x042>,
+    &method_adaptor<0x043>,
+    &method_adaptor<0x044>,
+    &method_adaptor<0x045>,
+    &method_adaptor<0x046>,
+    &method_adaptor<0x047>,
+    &method_adaptor<0x048>,
+    &method_adaptor<0x049>,
+    &method_adaptor<0x04a>,
+    &method_adaptor<0x04b>,
+    &method_adaptor<0x04c>,
+    &method_adaptor<0x04d>,
+    &method_adaptor<0x04e>,
+    &method_adaptor<0x04f>,
+    &method_adaptor<0x050>,
+    &method_adaptor<0x051>,
+    &method_adaptor<0x052>,
+    &method_adaptor<0x053>,
+    &method_adaptor<0x054>,
+    &method_adaptor<0x055>,
+    &method_adaptor<0x056>,
+    &method_adaptor<0x057>,
+    &method_adaptor<0x058>,
+    &method_adaptor<0x059>,
+    &method_adaptor<0x05a>,
+    &method_adaptor<0x05b>,
+    &method_adaptor<0x05c>,
+    &method_adaptor<0x05d>,
+    &method_adaptor<0x05e>,
+    &method_adaptor<0x05f>,
+    &method_adaptor<0x060>,
+    &method_adaptor<0x061>,
+    &method_adaptor<0x062>,
+    &method_adaptor<0x063>,
+    &method_adaptor<0x064>,
+    &method_adaptor<0x065>,
+    &method_adaptor<0x066>,
+    &method_adaptor<0x067>,
+    &method_adaptor<0x068>,
+    &method_adaptor<0x069>,
+    &method_adaptor<0x06a>,
+    &method_adaptor<0x06b>,
+    &method_adaptor<0x06c>,
+    &method_adaptor<0x06d>,
+    &method_adaptor<0x06e>,
+    &method_adaptor<0x06f>,
+    &method_adaptor<0x070>,
+    &method_adaptor<0x071>,
+    &method_adaptor<0x072>,
+    &method_adaptor<0x073>,
+    &method_adaptor<0x074>,
+    &method_adaptor<0x075>,
+    &method_adaptor<0x076>,
+    &method_adaptor<0x077>,
+    &method_adaptor<0x078>,
+    &method_adaptor<0x079>,
+    &method_adaptor<0x07a>,
+    &method_adaptor<0x07b>,
+    &method_adaptor<0x07c>,
+    &method_adaptor<0x07d>,
+    &method_adaptor<0x07e>,
+    &method_adaptor<0x07f>,
+    &method_adaptor<0x080>,
+    &method_adaptor<0x081>,
+    &method_adaptor<0x082>,
+    &method_adaptor<0x083>,
+    &method_adaptor<0x084>,
+    &method_adaptor<0x085>,
+    &method_adaptor<0x086>,
+    &method_adaptor<0x087>,
+    &method_adaptor<0x088>,
+    &method_adaptor<0x089>,
+    &method_adaptor<0x08a>,
+    &method_adaptor<0x08b>,
+    &method_adaptor<0x08c>,
+    &method_adaptor<0x08d>,
+    &method_adaptor<0x08e>,
+    &method_adaptor<0x08f>,
+    &method_adaptor<0x090>,
+    &method_adaptor<0x091>,
+    &method_adaptor<0x092>,
+    &method_adaptor<0x093>,
+    &method_adaptor<0x094>,
+    &method_adaptor<0x095>,
+    &method_adaptor<0x096>,
+    &method_adaptor<0x097>,
+    &method_adaptor<0x098>,
+    &method_adaptor<0x099>,
+    &method_adaptor<0x09a>,
+    &method_adaptor<0x09b>,
+    &method_adaptor<0x09c>,
+    &method_adaptor<0x09d>,
+    &method_adaptor<0x09e>,
+    &method_adaptor<0x09f>,
+    &method_adaptor<0x0a0>,
+    &method_adaptor<0x0a1>,
+    &method_adaptor<0x0a2>,
+    &method_adaptor<0x0a3>,
+    &method_adaptor<0x0a4>,
+    &method_adaptor<0x0a5>,
+    &method_adaptor<0x0a6>,
+    &method_adaptor<0x0a7>,
+    &method_adaptor<0x0a8>,
+    &method_adaptor<0x0a9>,
+    &method_adaptor<0x0aa>,
+    &method_adaptor<0x0ab>,
+    &method_adaptor<0x0ac>,
+    &method_adaptor<0x0ad>,
+    &method_adaptor<0x0ae>,
+    &method_adaptor<0x0af>,
+    &method_adaptor<0x0b0>,
+    &method_adaptor<0x0b1>,
+    &method_adaptor<0x0b2>,
+    &method_adaptor<0x0b3>,
+    &method_adaptor<0x0b4>,
+    &method_adaptor<0x0b5>,
+    &method_adaptor<0x0b6>,
+    &method_adaptor<0x0b7>,
+    &method_adaptor<0x0b8>,
+    &method_adaptor<0x0b9>,
+    &method_adaptor<0x0ba>,
+    &method_adaptor<0x0bb>,
+    &method_adaptor<0x0bc>,
+    &method_adaptor<0x0bd>,
+    &method_adaptor<0x0be>,
+    &method_adaptor<0x0bf>,
+    &method_adaptor<0x0c0>,
+    &method_adaptor<0x0c1>,
+    &method_adaptor<0x0c2>,
+    &method_adaptor<0x0c3>,
+    &method_adaptor<0x0c4>,
+    &method_adaptor<0x0c5>,
+    &method_adaptor<0x0c6>,
+    &method_adaptor<0x0c7>,
+    &method_adaptor<0x0c8>,
+    &method_adaptor<0x0c9>,
+    &method_adaptor<0x0ca>,
+    &method_adaptor<0x0cb>,
+    &method_adaptor<0x0cc>,
+    &method_adaptor<0x0cd>,
+    &method_adaptor<0x0ce>,
+    &method_adaptor<0x0cf>,
+    &method_adaptor<0x0d0>,
+    &method_adaptor<0x0d1>,
+    &method_adaptor<0x0d2>,
+    &method_adaptor<0x0d3>,
+    &method_adaptor<0x0d4>,
+    &method_adaptor<0x0d5>,
+    &method_adaptor<0x0d6>,
+    &method_adaptor<0x0d7>,
+    &method_adaptor<0x0d8>,
+    &method_adaptor<0x0d9>,
+    &method_adaptor<0x0da>,
+    &method_adaptor<0x0db>,
+    &method_adaptor<0x0dc>,
+    &method_adaptor<0x0dd>,
+    &method_adaptor<0x0de>,
+    &method_adaptor<0x0df>,
+    &method_adaptor<0x0e0>,
+    &method_adaptor<0x0e1>,
+    &method_adaptor<0x0e2>,
+    &method_adaptor<0x0e3>,
+    &method_adaptor<0x0e4>,
+    &method_adaptor<0x0e5>,
+    &method_adaptor<0x0e6>,
+    &method_adaptor<0x0e7>,
+    &method_adaptor<0x0e8>,
+    &method_adaptor<0x0e9>,
+    &method_adaptor<0x0ea>,
+    &method_adaptor<0x0eb>,
+    &method_adaptor<0x0ec>,
+    &method_adaptor<0x0ed>,
+    &method_adaptor<0x0ee>,
+    &method_adaptor<0x0ef>,
+    &method_adaptor<0x0f0>,
+    &method_adaptor<0x0f1>,
+    &method_adaptor<0x0f2>,
+    &method_adaptor<0x0f3>,
+    &method_adaptor<0x0f4>,
+    &method_adaptor<0x0f5>,
+    &method_adaptor<0x0f6>,
+    &method_adaptor<0x0f7>,
+    &method_adaptor<0x0f8>,
+    &method_adaptor<0x0f9>,
+    &method_adaptor<0x0fa>,
+    &method_adaptor<0x0fb>,
+    &method_adaptor<0x0fc>,
+    &method_adaptor<0x0fd>,
+    &method_adaptor<0x0fe>,
+    &method_adaptor<0x0ff>,
+    &method_adaptor<0x100>,
+    &method_adaptor<0x101>,
+    &method_adaptor<0x102>,
+    &method_adaptor<0x103>,
+    &method_adaptor<0x104>,
+    &method_adaptor<0x105>,
+    &method_adaptor<0x106>,
+    &method_adaptor<0x107>,
+    &method_adaptor<0x108>,
+    &method_adaptor<0x109>,
+    &method_adaptor<0x10a>,
+    &method_adaptor<0x10b>,
+    &method_adaptor<0x10c>,
+    &method_adaptor<0x10d>,
+    &method_adaptor<0x10e>,
+    &method_adaptor<0x10f>,
+    &method_adaptor<0x110>,
+    &method_adaptor<0x111>,
+    &method_adaptor<0x112>,
+    &method_adaptor<0x113>,
+    &method_adaptor<0x114>,
+    &method_adaptor<0x115>,
+    &method_adaptor<0x116>,
+    &method_adaptor<0x117>,
+    &method_adaptor<0x118>,
+    &method_adaptor<0x119>,
+    &method_adaptor<0x11a>,
+    &method_adaptor<0x11b>,
+    &method_adaptor<0x11c>,
+    &method_adaptor<0x11d>,
+    &method_adaptor<0x11e>,
+    &method_adaptor<0x11f>,
+    &method_adaptor<0x120>,
+    &method_adaptor<0x121>,
+    &method_adaptor<0x122>,
+    &method_adaptor<0x123>,
+    &method_adaptor<0x124>,
+    &method_adaptor<0x125>,
+    &method_adaptor<0x126>,
+    &method_adaptor<0x127>,
+    &method_adaptor<0x128>,
+    &method_adaptor<0x129>,
+    &method_adaptor<0x12a>,
+    &method_adaptor<0x12b>,
+    &method_adaptor<0x12c>,
+    &method_adaptor<0x12d>,
+    &method_adaptor<0x12e>,
+    &method_adaptor<0x12f>,
+    &method_adaptor<0x130>,
+    &method_adaptor<0x131>,
+    &method_adaptor<0x132>,
+    &method_adaptor<0x133>,
+    &method_adaptor<0x134>,
+    &method_adaptor<0x135>,
+    &method_adaptor<0x136>,
+    &method_adaptor<0x137>,
+    &method_adaptor<0x138>,
+    &method_adaptor<0x139>,
+    &method_adaptor<0x13a>,
+    &method_adaptor<0x13b>,
+    &method_adaptor<0x13c>,
+    &method_adaptor<0x13d>,
+    &method_adaptor<0x13e>,
+    &method_adaptor<0x13f>,
+    &method_adaptor<0x140>,
+    &method_adaptor<0x141>,
+    &method_adaptor<0x142>,
+    &method_adaptor<0x143>,
+    &method_adaptor<0x144>,
+    &method_adaptor<0x145>,
+    &method_adaptor<0x146>,
+    &method_adaptor<0x147>,
+    &method_adaptor<0x148>,
+    &method_adaptor<0x149>,
+    &method_adaptor<0x14a>,
+    &method_adaptor<0x14b>,
+    &method_adaptor<0x14c>,
+    &method_adaptor<0x14d>,
+    &method_adaptor<0x14e>,
+    &method_adaptor<0x14f>,
+    &method_adaptor<0x150>,
+    &method_adaptor<0x151>,
+    &method_adaptor<0x152>,
+    &method_adaptor<0x153>,
+    &method_adaptor<0x154>,
+    &method_adaptor<0x155>,
+    &method_adaptor<0x156>,
+    &method_adaptor<0x157>,
+    &method_adaptor<0x158>,
+    &method_adaptor<0x159>,
+    &method_adaptor<0x15a>,
+    &method_adaptor<0x15b>,
+    &method_adaptor<0x15c>,
+    &method_adaptor<0x15d>,
+    &method_adaptor<0x15e>,
+    &method_adaptor<0x15f>,
+    &method_adaptor<0x160>,
+    &method_adaptor<0x161>,
+    &method_adaptor<0x162>,
+    &method_adaptor<0x163>,
+    &method_adaptor<0x164>,
+    &method_adaptor<0x165>,
+    &method_adaptor<0x166>,
+    &method_adaptor<0x167>,
+    &method_adaptor<0x168>,
+    &method_adaptor<0x169>,
+    &method_adaptor<0x16a>,
+    &method_adaptor<0x16b>,
+    &method_adaptor<0x16c>,
+    &method_adaptor<0x16d>,
+    &method_adaptor<0x16e>,
+    &method_adaptor<0x16f>,
+    &method_adaptor<0x170>,
+    &method_adaptor<0x171>,
+    &method_adaptor<0x172>,
+    &method_adaptor<0x173>,
+    &method_adaptor<0x174>,
+    &method_adaptor<0x175>,
+    &method_adaptor<0x176>,
+    &method_adaptor<0x177>,
+    &method_adaptor<0x178>,
+    &method_adaptor<0x179>,
+    &method_adaptor<0x17a>,
+    &method_adaptor<0x17b>,
+    &method_adaptor<0x17c>,
+    &method_adaptor<0x17d>,
+    &method_adaptor<0x17e>,
+    &method_adaptor<0x17f>,
+    &method_adaptor<0x180>,
+    &method_adaptor<0x181>,
+    &method_adaptor<0x182>,
+    &method_adaptor<0x183>,
+    &method_adaptor<0x184>,
+    &method_adaptor<0x185>,
+    &method_adaptor<0x186>,
+    &method_adaptor<0x187>,
+    &method_adaptor<0x188>,
+    &method_adaptor<0x189>,
+    &method_adaptor<0x18a>,
+    &method_adaptor<0x18b>,
+    &method_adaptor<0x18c>,
+    &method_adaptor<0x18d>,
+    &method_adaptor<0x18e>,
+    &method_adaptor<0x18f>,
+    &method_adaptor<0x190>,
+    &method_adaptor<0x191>,
+    &method_adaptor<0x192>,
+    &method_adaptor<0x193>,
+    &method_adaptor<0x194>,
+    &method_adaptor<0x195>,
+    &method_adaptor<0x196>,
+    &method_adaptor<0x197>,
+    &method_adaptor<0x198>,
+    &method_adaptor<0x199>,
+    &method_adaptor<0x19a>,
+    &method_adaptor<0x19b>,
+    &method_adaptor<0x19c>,
+    &method_adaptor<0x19d>,
+    &method_adaptor<0x19e>,
+    &method_adaptor<0x19f>,
+    &method_adaptor<0x1a0>,
+    &method_adaptor<0x1a1>,
+    &method_adaptor<0x1a2>,
+    &method_adaptor<0x1a3>,
+    &method_adaptor<0x1a4>,
+    &method_adaptor<0x1a5>,
+    &method_adaptor<0x1a6>,
+    &method_adaptor<0x1a7>,
+    &method_adaptor<0x1a8>,
+    &method_adaptor<0x1a9>,
+    &method_adaptor<0x1aa>,
+    &method_adaptor<0x1ab>,
+    &method_adaptor<0x1ac>,
+    &method_adaptor<0x1ad>,
+    &method_adaptor<0x1ae>,
+    &method_adaptor<0x1af>,
+    &method_adaptor<0x1b0>,
+    &method_adaptor<0x1b1>,
+    &method_adaptor<0x1b2>,
+    &method_adaptor<0x1b3>,
+    &method_adaptor<0x1b4>,
+    &method_adaptor<0x1b5>,
+    &method_adaptor<0x1b6>,
+    &method_adaptor<0x1b7>,
+    &method_adaptor<0x1b8>,
+    &method_adaptor<0x1b9>,
+    &method_adaptor<0x1ba>,
+    &method_adaptor<0x1bb>,
+    &method_adaptor<0x1bc>,
+    &method_adaptor<0x1bd>,
+    &method_adaptor<0x1be>,
+    &method_adaptor<0x1bf>,
+    &method_adaptor<0x1c0>,
+    &method_adaptor<0x1c1>,
+    &method_adaptor<0x1c2>,
+    &method_adaptor<0x1c3>,
+    &method_adaptor<0x1c4>,
+    &method_adaptor<0x1c5>,
+    &method_adaptor<0x1c6>,
+    &method_adaptor<0x1c7>,
+    &method_adaptor<0x1c8>,
+    &method_adaptor<0x1c9>,
+    &method_adaptor<0x1ca>,
+    &method_adaptor<0x1cb>,
+    &method_adaptor<0x1cc>,
+    &method_adaptor<0x1cd>,
+    &method_adaptor<0x1ce>,
+    &method_adaptor<0x1cf>,
+    &method_adaptor<0x1d0>,
+    &method_adaptor<0x1d1>,
+    &method_adaptor<0x1d2>,
+    &method_adaptor<0x1d3>,
+    &method_adaptor<0x1d4>,
+    &method_adaptor<0x1d5>,
+    &method_adaptor<0x1d6>,
+    &method_adaptor<0x1d7>,
+    &method_adaptor<0x1d8>,
+    &method_adaptor<0x1d9>,
+    &method_adaptor<0x1da>,
+    &method_adaptor<0x1db>,
+    &method_adaptor<0x1dc>,
+    &method_adaptor<0x1dd>,
+    &method_adaptor<0x1de>,
+    &method_adaptor<0x1df>,
+    &method_adaptor<0x1e0>,
+    &method_adaptor<0x1e1>,
+    &method_adaptor<0x1e2>,
+    &method_adaptor<0x1e3>,
+    &method_adaptor<0x1e4>,
+    &method_adaptor<0x1e5>,
+    &method_adaptor<0x1e6>,
+    &method_adaptor<0x1e7>,
+    &method_adaptor<0x1e8>,
+    &method_adaptor<0x1e9>,
+    &method_adaptor<0x1ea>,
+    &method_adaptor<0x1eb>,
+    &method_adaptor<0x1ec>,
+    &method_adaptor<0x1ed>,
+    &method_adaptor<0x1ee>,
+    &method_adaptor<0x1ef>,
+    &method_adaptor<0x1f0>,
+    &method_adaptor<0x1f1>,
+    &method_adaptor<0x1f2>,
+    &method_adaptor<0x1f3>,
+    &method_adaptor<0x1f4>,
+    &method_adaptor<0x1f5>,
+    &method_adaptor<0x1f6>,
+    &method_adaptor<0x1f7>,
+    &method_adaptor<0x1f8>,
+    &method_adaptor<0x1f9>,
+    &method_adaptor<0x1fa>,
+    &method_adaptor<0x1fb>,
+    &method_adaptor<0x1fc>,
+    &method_adaptor<0x1fd>,
+    &method_adaptor<0x1fe>,
+    &method_adaptor<0x1ff>,
+    &method_adaptor<0x200>,
+    &method_adaptor<0x201>,
+    &method_adaptor<0x202>,
+    &method_adaptor<0x203>,
+    &method_adaptor<0x204>,
+    &method_adaptor<0x205>,
+    &method_adaptor<0x206>,
+    &method_adaptor<0x207>,
+    &method_adaptor<0x208>,
+    &method_adaptor<0x209>,
+    &method_adaptor<0x20a>,
+    &method_adaptor<0x20b>,
+    &method_adaptor<0x20c>,
+    &method_adaptor<0x20d>,
+    &method_adaptor<0x20e>,
+    &method_adaptor<0x20f>,
+    &method_adaptor<0x210>,
+    &method_adaptor<0x211>,
+    &method_adaptor<0x212>,
+    &method_adaptor<0x213>,
+    &method_adaptor<0x214>,
+    &method_adaptor<0x215>,
+    &method_adaptor<0x216>,
+    &method_adaptor<0x217>,
+    &method_adaptor<0x218>,
+    &method_adaptor<0x219>,
+    &method_adaptor<0x21a>,
+    &method_adaptor<0x21b>,
+    &method_adaptor<0x21c>,
+    &method_adaptor<0x21d>,
+    &method_adaptor<0x21e>,
+    &method_adaptor<0x21f>,
+    &method_adaptor<0x220>,
+    &method_adaptor<0x221>,
+    &method_adaptor<0x222>,
+    &method_adaptor<0x223>,
+    &method_adaptor<0x224>,
+    &method_adaptor<0x225>,
+    &method_adaptor<0x226>,
+    &method_adaptor<0x227>,
+    &method_adaptor<0x228>,
+    &method_adaptor<0x229>,
+    &method_adaptor<0x22a>,
+    &method_adaptor<0x22b>,
+    &method_adaptor<0x22c>,
+    &method_adaptor<0x22d>,
+    &method_adaptor<0x22e>,
+    &method_adaptor<0x22f>,
+    &method_adaptor<0x230>,
+    &method_adaptor<0x231>,
+    &method_adaptor<0x232>,
+    &method_adaptor<0x233>,
+    &method_adaptor<0x234>,
+    &method_adaptor<0x235>,
+    &method_adaptor<0x236>,
+    &method_adaptor<0x237>,
+    &method_adaptor<0x238>,
+    &method_adaptor<0x239>,
+    &method_adaptor<0x23a>,
+    &method_adaptor<0x23b>,
+    &method_adaptor<0x23c>,
+    &method_adaptor<0x23d>,
+    &method_adaptor<0x23e>,
+    &method_adaptor<0x23f>,
+    &method_adaptor<0x240>,
+    &method_adaptor<0x241>,
+    &method_adaptor<0x242>,
+    &method_adaptor<0x243>,
+    &method_adaptor<0x244>,
+    &method_adaptor<0x245>,
+    &method_adaptor<0x246>,
+    &method_adaptor<0x247>,
+    &method_adaptor<0x248>,
+    &method_adaptor<0x249>,
+    &method_adaptor<0x24a>,
+    &method_adaptor<0x24b>,
+    &method_adaptor<0x24c>,
+    &method_adaptor<0x24d>,
+    &method_adaptor<0x24e>,
+    &method_adaptor<0x24f>,
+    &method_adaptor<0x250>,
+    &method_adaptor<0x251>,
+    &method_adaptor<0x252>,
+    &method_adaptor<0x253>,
+    &method_adaptor<0x254>,
+    &method_adaptor<0x255>,
+    &method_adaptor<0x256>,
+    &method_adaptor<0x257>,
+    &method_adaptor<0x258>,
+    &method_adaptor<0x259>,
+    &method_adaptor<0x25a>,
+    &method_adaptor<0x25b>,
+    &method_adaptor<0x25c>,
+    &method_adaptor<0x25d>,
+    &method_adaptor<0x25e>,
+    &method_adaptor<0x25f>,
+    &method_adaptor<0x260>,
+    &method_adaptor<0x261>,
+    &method_adaptor<0x262>,
+    &method_adaptor<0x263>,
+    &method_adaptor<0x264>,
+    &method_adaptor<0x265>,
+    &method_adaptor<0x266>,
+    &method_adaptor<0x267>,
+    &method_adaptor<0x268>,
+    &method_adaptor<0x269>,
+    &method_adaptor<0x26a>,
+    &method_adaptor<0x26b>,
+    &method_adaptor<0x26c>,
+    &method_adaptor<0x26d>,
+    &method_adaptor<0x26e>,
+    &method_adaptor<0x26f>,
+    &method_adaptor<0x270>,
+    &method_adaptor<0x271>,
+    &method_adaptor<0x272>,
+    &method_adaptor<0x273>,
+    &method_adaptor<0x274>,
+    &method_adaptor<0x275>,
+    &method_adaptor<0x276>,
+    &method_adaptor<0x277>,
+    &method_adaptor<0x278>,
+    &method_adaptor<0x279>,
+    &method_adaptor<0x27a>,
+    &method_adaptor<0x27b>,
+    &method_adaptor<0x27c>,
+    &method_adaptor<0x27d>,
+    &method_adaptor<0x27e>,
+    &method_adaptor<0x27f>,
+    &method_adaptor<0x280>,
+    &method_adaptor<0x281>,
+    &method_adaptor<0x282>,
+    &method_adaptor<0x283>,
+    &method_adaptor<0x284>,
+    &method_adaptor<0x285>,
+    &method_adaptor<0x286>,
+    &method_adaptor<0x287>,
+    &method_adaptor<0x288>,
+    &method_adaptor<0x289>,
+    &method_adaptor<0x28a>,
+    &method_adaptor<0x28b>,
+    &method_adaptor<0x28c>,
+    &method_adaptor<0x28d>,
+    &method_adaptor<0x28e>,
+    &method_adaptor<0x28f>,
+    &method_adaptor<0x290>,
+    &method_adaptor<0x291>,
+    &method_adaptor<0x292>,
+    &method_adaptor<0x293>,
+    &method_adaptor<0x294>,
+    &method_adaptor<0x295>,
+    &method_adaptor<0x296>,
+    &method_adaptor<0x297>,
+    &method_adaptor<0x298>,
+    &method_adaptor<0x299>,
+    &method_adaptor<0x29a>,
+    &method_adaptor<0x29b>,
+    &method_adaptor<0x29c>,
+    &method_adaptor<0x29d>,
+    &method_adaptor<0x29e>,
+    &method_adaptor<0x29f>,
+    &method_adaptor<0x2a0>,
+    &method_adaptor<0x2a1>,
+    &method_adaptor<0x2a2>,
+    &method_adaptor<0x2a3>,
+    &method_adaptor<0x2a4>,
+    &method_adaptor<0x2a5>,
+    &method_adaptor<0x2a6>,
+    &method_adaptor<0x2a7>,
+    &method_adaptor<0x2a8>,
+    &method_adaptor<0x2a9>,
+    &method_adaptor<0x2aa>,
+    &method_adaptor<0x2ab>,
+    &method_adaptor<0x2ac>,
+    &method_adaptor<0x2ad>,
+    &method_adaptor<0x2ae>,
+    &method_adaptor<0x2af>,
+    &method_adaptor<0x2b0>,
+    &method_adaptor<0x2b1>,
+    &method_adaptor<0x2b2>,
+    &method_adaptor<0x2b3>,
+    &method_adaptor<0x2b4>,
+    &method_adaptor<0x2b5>,
+    &method_adaptor<0x2b6>,
+    &method_adaptor<0x2b7>,
+    &method_adaptor<0x2b8>,
+    &method_adaptor<0x2b9>,
+    &method_adaptor<0x2ba>,
+    &method_adaptor<0x2bb>,
+    &method_adaptor<0x2bc>,
+    &method_adaptor<0x2bd>,
+    &method_adaptor<0x2be>,
+    &method_adaptor<0x2bf>,
+    &method_adaptor<0x2c0>,
+    &method_adaptor<0x2c1>,
+    &method_adaptor<0x2c2>,
+    &method_adaptor<0x2c3>,
+    &method_adaptor<0x2c4>,
+    &method_adaptor<0x2c5>,
+    &method_adaptor<0x2c6>,
+    &method_adaptor<0x2c7>,
+    &method_adaptor<0x2c8>,
+    &method_adaptor<0x2c9>,
+    &method_adaptor<0x2ca>,
+    &method_adaptor<0x2cb>,
+    &method_adaptor<0x2cc>,
+    &method_adaptor<0x2cd>,
+    &method_adaptor<0x2ce>,
+    &method_adaptor<0x2cf>,
+    &method_adaptor<0x2d0>,
+    &method_adaptor<0x2d1>,
+    &method_adaptor<0x2d2>,
+    &method_adaptor<0x2d3>,
+    &method_adaptor<0x2d4>,
+    &method_adaptor<0x2d5>,
+    &method_adaptor<0x2d6>,
+    &method_adaptor<0x2d7>,
+    &method_adaptor<0x2d8>,
+    &method_adaptor<0x2d9>,
+    &method_adaptor<0x2da>,
+    &method_adaptor<0x2db>,
+    &method_adaptor<0x2dc>,
+    &method_adaptor<0x2dd>,
+    &method_adaptor<0x2de>,
+    &method_adaptor<0x2df>,
+    &method_adaptor<0x2e0>,
+    &method_adaptor<0x2e1>,
+    &method_adaptor<0x2e2>,
+    &method_adaptor<0x2e3>,
+    &method_adaptor<0x2e4>,
+    &method_adaptor<0x2e5>,
+    &method_adaptor<0x2e6>,
+    &method_adaptor<0x2e7>,
+    &method_adaptor<0x2e8>,
+    &method_adaptor<0x2e9>,
+    &method_adaptor<0x2ea>,
+    &method_adaptor<0x2eb>,
+    &method_adaptor<0x2ec>,
+    &method_adaptor<0x2ed>,
+    &method_adaptor<0x2ee>,
+    &method_adaptor<0x2ef>,
+    &method_adaptor<0x2f0>,
+    &method_adaptor<0x2f1>,
+    &method_adaptor<0x2f2>,
+    &method_adaptor<0x2f3>,
+    &method_adaptor<0x2f4>,
+    &method_adaptor<0x2f5>,
+    &method_adaptor<0x2f6>,
+    &method_adaptor<0x2f7>,
+    &method_adaptor<0x2f8>,
+    &method_adaptor<0x2f9>,
+    &method_adaptor<0x2fa>,
+    &method_adaptor<0x2fb>,
+    &method_adaptor<0x2fc>,
+    &method_adaptor<0x2fd>,
+    &method_adaptor<0x2fe>,
+    &method_adaptor<0x2ff>,
+    &method_adaptor<0x300>,
+    &method_adaptor<0x301>,
+    &method_adaptor<0x302>,
+    &method_adaptor<0x303>,
+    &method_adaptor<0x304>,
+    &method_adaptor<0x305>,
+    &method_adaptor<0x306>,
+    &method_adaptor<0x307>,
+    &method_adaptor<0x308>,
+    &method_adaptor<0x309>,
+    &method_adaptor<0x30a>,
+    &method_adaptor<0x30b>,
+    &method_adaptor<0x30c>,
+    &method_adaptor<0x30d>,
+    &method_adaptor<0x30e>,
+    &method_adaptor<0x30f>,
+    &method_adaptor<0x310>,
+    &method_adaptor<0x311>,
+    &method_adaptor<0x312>,
+    &method_adaptor<0x313>,
+    &method_adaptor<0x314>,
+    &method_adaptor<0x315>,
+    &method_adaptor<0x316>,
+    &method_adaptor<0x317>,
+    &method_adaptor<0x318>,
+    &method_adaptor<0x319>,
+    &method_adaptor<0x31a>,
+    &method_adaptor<0x31b>,
+    &method_adaptor<0x31c>,
+    &method_adaptor<0x31d>,
+    &method_adaptor<0x31e>,
+    &method_adaptor<0x31f>,
+    &method_adaptor<0x320>,
+    &method_adaptor<0x321>,
+    &method_adaptor<0x322>,
+    &method_adaptor<0x323>,
+    &method_adaptor<0x324>,
+    &method_adaptor<0x325>,
+    &method_adaptor<0x326>,
+    &method_adaptor<0x327>,
+    &method_adaptor<0x328>,
+    &method_adaptor<0x329>,
+    &method_adaptor<0x32a>,
+    &method_adaptor<0x32b>,
+    &method_adaptor<0x32c>,
+    &method_adaptor<0x32d>,
+    &method_adaptor<0x32e>,
+    &method_adaptor<0x32f>,
+    &method_adaptor<0x330>,
+    &method_adaptor<0x331>,
+    &method_adaptor<0x332>,
+    &method_adaptor<0x333>,
+    &method_adaptor<0x334>,
+    &method_adaptor<0x335>,
+    &method_adaptor<0x336>,
+    &method_adaptor<0x337>,
+    &method_adaptor<0x338>,
+    &method_adaptor<0x339>,
+    &method_adaptor<0x33a>,
+    &method_adaptor<0x33b>,
+    &method_adaptor<0x33c>,
+    &method_adaptor<0x33d>,
+    &method_adaptor<0x33e>,
+    &method_adaptor<0x33f>,
+    &method_adaptor<0x340>,
+    &method_adaptor<0x341>,
+    &method_adaptor<0x342>,
+    &method_adaptor<0x343>,
+    &method_adaptor<0x344>,
+    &method_adaptor<0x345>,
+    &method_adaptor<0x346>,
+    &method_adaptor<0x347>,
+    &method_adaptor<0x348>,
+    &method_adaptor<0x349>,
+    &method_adaptor<0x34a>,
+    &method_adaptor<0x34b>,
+    &method_adaptor<0x34c>,
+    &method_adaptor<0x34d>,
+    &method_adaptor<0x34e>,
+    &method_adaptor<0x34f>,
+    &method_adaptor<0x350>,
+    &method_adaptor<0x351>,
+    &method_adaptor<0x352>,
+    &method_adaptor<0x353>,
+    &method_adaptor<0x354>,
+    &method_adaptor<0x355>,
+    &method_adaptor<0x356>,
+    &method_adaptor<0x357>,
+    &method_adaptor<0x358>,
+    &method_adaptor<0x359>,
+    &method_adaptor<0x35a>,
+    &method_adaptor<0x35b>,
+    &method_adaptor<0x35c>,
+    &method_adaptor<0x35d>,
+    &method_adaptor<0x35e>,
+    &method_adaptor<0x35f>,
+    &method_adaptor<0x360>,
+    &method_adaptor<0x361>,
+    &method_adaptor<0x362>,
+    &method_adaptor<0x363>,
+    &method_adaptor<0x364>,
+    &method_adaptor<0x365>,
+    &method_adaptor<0x366>,
+    &method_adaptor<0x367>,
+    &method_adaptor<0x368>,
+    &method_adaptor<0x369>,
+    &method_adaptor<0x36a>,
+    &method_adaptor<0x36b>,
+    &method_adaptor<0x36c>,
+    &method_adaptor<0x36d>,
+    &method_adaptor<0x36e>,
+    &method_adaptor<0x36f>,
+    &method_adaptor<0x370>,
+    &method_adaptor<0x371>,
+    &method_adaptor<0x372>,
+    &method_adaptor<0x373>,
+    &method_adaptor<0x374>,
+    &method_adaptor<0x375>,
+    &method_adaptor<0x376>,
+    &method_adaptor<0x377>,
+    &method_adaptor<0x378>,
+    &method_adaptor<0x379>,
+    &method_adaptor<0x37a>,
+    &method_adaptor<0x37b>,
+    &method_adaptor<0x37c>,
+    &method_adaptor<0x37d>,
+    &method_adaptor<0x37e>,
+    &method_adaptor<0x37f>,
+    &method_adaptor<0x380>,
+    &method_adaptor<0x381>,
+    &method_adaptor<0x382>,
+    &method_adaptor<0x383>,
+    &method_adaptor<0x384>,
+    &method_adaptor<0x385>,
+    &method_adaptor<0x386>,
+    &method_adaptor<0x387>,
+    &method_adaptor<0x388>,
+    &method_adaptor<0x389>,
+    &method_adaptor<0x38a>,
+    &method_adaptor<0x38b>,
+    &method_adaptor<0x38c>,
+    &method_adaptor<0x38d>,
+    &method_adaptor<0x38e>,
+    &method_adaptor<0x38f>,
+    &method_adaptor<0x390>,
+    &method_adaptor<0x391>,
+    &method_adaptor<0x392>,
+    &method_adaptor<0x393>,
+    &method_adaptor<0x394>,
+    &method_adaptor<0x395>,
+    &method_adaptor<0x396>,
+    &method_adaptor<0x397>,
+    &method_adaptor<0x398>,
+    &method_adaptor<0x399>,
+    &method_adaptor<0x39a>,
+    &method_adaptor<0x39b>,
+    &method_adaptor<0x39c>,
+    &method_adaptor<0x39d>,
+    &method_adaptor<0x39e>,
+    &method_adaptor<0x39f>,
+    &method_adaptor<0x3a0>,
+    &method_adaptor<0x3a1>,
+    &method_adaptor<0x3a2>,
+    &method_adaptor<0x3a3>,
+    &method_adaptor<0x3a4>,
+    &method_adaptor<0x3a5>,
+    &method_adaptor<0x3a6>,
+    &method_adaptor<0x3a7>,
+    &method_adaptor<0x3a8>,
+    &method_adaptor<0x3a9>,
+    &method_adaptor<0x3aa>,
+    &method_adaptor<0x3ab>,
+    &method_adaptor<0x3ac>,
+    &method_adaptor<0x3ad>,
+    &method_adaptor<0x3ae>,
+    &method_adaptor<0x3af>,
+    &method_adaptor<0x3b0>,
+    &method_adaptor<0x3b1>,
+    &method_adaptor<0x3b2>,
+    &method_adaptor<0x3b3>,
+    &method_adaptor<0x3b4>,
+    &method_adaptor<0x3b5>,
+    &method_adaptor<0x3b6>,
+    &method_adaptor<0x3b7>,
+    &method_adaptor<0x3b8>,
+    &method_adaptor<0x3b9>,
+    &method_adaptor<0x3ba>,
+    &method_adaptor<0x3bb>,
+    &method_adaptor<0x3bc>,
+    &method_adaptor<0x3bd>,
+    &method_adaptor<0x3be>,
+    &method_adaptor<0x3bf>,
+    &method_adaptor<0x3c0>,
+    &method_adaptor<0x3c1>,
+    &method_adaptor<0x3c2>,
+    &method_adaptor<0x3c3>,
+    &method_adaptor<0x3c4>,
+    &method_adaptor<0x3c5>,
+    &method_adaptor<0x3c6>,
+    &method_adaptor<0x3c7>,
+    &method_adaptor<0x3c8>,
+    &method_adaptor<0x3c9>,
+    &method_adaptor<0x3ca>,
+    &method_adaptor<0x3cb>,
+    &method_adaptor<0x3cc>,
+    &method_adaptor<0x3cd>,
+    &method_adaptor<0x3ce>,
+    &method_adaptor<0x3cf>,
+    &method_adaptor<0x3d0>,
+    &method_adaptor<0x3d1>,
+    &method_adaptor<0x3d2>,
+    &method_adaptor<0x3d3>,
+    &method_adaptor<0x3d4>,
+    &method_adaptor<0x3d5>,
+    &method_adaptor<0x3d6>,
+    &method_adaptor<0x3d7>,
+    &method_adaptor<0x3d8>,
+    &method_adaptor<0x3d9>,
+    &method_adaptor<0x3da>,
+    &method_adaptor<0x3db>,
+    &method_adaptor<0x3dc>,
+    &method_adaptor<0x3dd>,
+    &method_adaptor<0x3de>,
+    &method_adaptor<0x3df>,
+    &method_adaptor<0x3e0>,
+    &method_adaptor<0x3e1>,
+    &method_adaptor<0x3e2>,
+    &method_adaptor<0x3e3>,
+    &method_adaptor<0x3e4>,
+    &method_adaptor<0x3e5>,
+    &method_adaptor<0x3e6>,
+    &method_adaptor<0x3e7>,
+    &method_adaptor<0x3e8>,
+    &method_adaptor<0x3e9>,
+    &method_adaptor<0x3ea>,
+    &method_adaptor<0x3eb>,
+    &method_adaptor<0x3ec>,
+    &method_adaptor<0x3ed>,
+    &method_adaptor<0x3ee>,
+    &method_adaptor<0x3ef>,
+    &method_adaptor<0x3f0>,
+    &method_adaptor<0x3f1>,
+    &method_adaptor<0x3f2>,
+    &method_adaptor<0x3f3>,
+    &method_adaptor<0x3f4>,
+    &method_adaptor<0x3f5>,
+    &method_adaptor<0x3f6>,
+    &method_adaptor<0x3f7>,
+    &method_adaptor<0x3f8>,
+    &method_adaptor<0x3f9>,
+    &method_adaptor<0x3fa>,
+    &method_adaptor<0x3fb>,
+    &method_adaptor<0x3fc>,
+    &method_adaptor<0x3fd>,
+    &method_adaptor<0x3fe>,
+    &method_adaptor<0x3ff>,
 };
 
 //  zero-arguments method adaptors
 
-template <int N> 
+template <int N>
 VALUE method_adaptor_ctor (int argc, VALUE *argv, VALUE self)
 {
   return method_adaptor_n (N, argc, argv, self, true);
 }
 
 VALUE (*(method_adaptors_ctor [])) (int, VALUE *, VALUE) =
-{
-  &method_adaptor_ctor<0x000>, &method_adaptor_ctor<0x001>, &method_adaptor_ctor<0x002>, &method_adaptor_ctor<0x003>, &method_adaptor_ctor<0x004>, &method_adaptor_ctor<0x005>, &method_adaptor_ctor<0x006>, &method_adaptor_ctor<0x007>,
-  &method_adaptor_ctor<0x008>, &method_adaptor_ctor<0x009>, &method_adaptor_ctor<0x00a>, &method_adaptor_ctor<0x00b>, &method_adaptor_ctor<0x00c>, &method_adaptor_ctor<0x00d>, &method_adaptor_ctor<0x00e>, &method_adaptor_ctor<0x00f>,
-  &method_adaptor_ctor<0x010>, &method_adaptor_ctor<0x011>, &method_adaptor_ctor<0x012>, &method_adaptor_ctor<0x013>, &method_adaptor_ctor<0x014>, &method_adaptor_ctor<0x015>, &method_adaptor_ctor<0x016>, &method_adaptor_ctor<0x017>,
-  &method_adaptor_ctor<0x018>, &method_adaptor_ctor<0x019>, &method_adaptor_ctor<0x01a>, &method_adaptor_ctor<0x01b>, &method_adaptor_ctor<0x01c>, &method_adaptor_ctor<0x01d>, &method_adaptor_ctor<0x01e>, &method_adaptor_ctor<0x01f>,
-  &method_adaptor_ctor<0x020>, &method_adaptor_ctor<0x021>, &method_adaptor_ctor<0x022>, &method_adaptor_ctor<0x023>, &method_adaptor_ctor<0x024>, &method_adaptor_ctor<0x025>, &method_adaptor_ctor<0x026>, &method_adaptor_ctor<0x027>,
-  &method_adaptor_ctor<0x028>, &method_adaptor_ctor<0x029>, &method_adaptor_ctor<0x02a>, &method_adaptor_ctor<0x02b>, &method_adaptor_ctor<0x02c>, &method_adaptor_ctor<0x02d>, &method_adaptor_ctor<0x02e>, &method_adaptor_ctor<0x02f>,
-  &method_adaptor_ctor<0x030>, &method_adaptor_ctor<0x031>, &method_adaptor_ctor<0x032>, &method_adaptor_ctor<0x033>, &method_adaptor_ctor<0x034>, &method_adaptor_ctor<0x035>, &method_adaptor_ctor<0x036>, &method_adaptor_ctor<0x037>,
-  &method_adaptor_ctor<0x038>, &method_adaptor_ctor<0x039>, &method_adaptor_ctor<0x03a>, &method_adaptor_ctor<0x03b>, &method_adaptor_ctor<0x03c>, &method_adaptor_ctor<0x03d>, &method_adaptor_ctor<0x03e>, &method_adaptor_ctor<0x03f>,
-  &method_adaptor_ctor<0x040>, &method_adaptor_ctor<0x041>, &method_adaptor_ctor<0x042>, &method_adaptor_ctor<0x043>, &method_adaptor_ctor<0x044>, &method_adaptor_ctor<0x045>, &method_adaptor_ctor<0x046>, &method_adaptor_ctor<0x047>,
-  &method_adaptor_ctor<0x048>, &method_adaptor_ctor<0x049>, &method_adaptor_ctor<0x04a>, &method_adaptor_ctor<0x04b>, &method_adaptor_ctor<0x04c>, &method_adaptor_ctor<0x04d>, &method_adaptor_ctor<0x04e>, &method_adaptor_ctor<0x04f>,
-  &method_adaptor_ctor<0x050>, &method_adaptor_ctor<0x051>, &method_adaptor_ctor<0x052>, &method_adaptor_ctor<0x053>, &method_adaptor_ctor<0x054>, &method_adaptor_ctor<0x055>, &method_adaptor_ctor<0x056>, &method_adaptor_ctor<0x057>,
-  &method_adaptor_ctor<0x058>, &method_adaptor_ctor<0x059>, &method_adaptor_ctor<0x05a>, &method_adaptor_ctor<0x05b>, &method_adaptor_ctor<0x05c>, &method_adaptor_ctor<0x05d>, &method_adaptor_ctor<0x05e>, &method_adaptor_ctor<0x05f>,
-  &method_adaptor_ctor<0x060>, &method_adaptor_ctor<0x061>, &method_adaptor_ctor<0x062>, &method_adaptor_ctor<0x063>, &method_adaptor_ctor<0x064>, &method_adaptor_ctor<0x065>, &method_adaptor_ctor<0x066>, &method_adaptor_ctor<0x067>,
-  &method_adaptor_ctor<0x068>, &method_adaptor_ctor<0x069>, &method_adaptor_ctor<0x06a>, &method_adaptor_ctor<0x06b>, &method_adaptor_ctor<0x06c>, &method_adaptor_ctor<0x06d>, &method_adaptor_ctor<0x06e>, &method_adaptor_ctor<0x06f>,
-  &method_adaptor_ctor<0x070>, &method_adaptor_ctor<0x071>, &method_adaptor_ctor<0x072>, &method_adaptor_ctor<0x073>, &method_adaptor_ctor<0x074>, &method_adaptor_ctor<0x075>, &method_adaptor_ctor<0x076>, &method_adaptor_ctor<0x077>,
-  &method_adaptor_ctor<0x078>, &method_adaptor_ctor<0x079>, &method_adaptor_ctor<0x07a>, &method_adaptor_ctor<0x07b>, &method_adaptor_ctor<0x07c>, &method_adaptor_ctor<0x07d>, &method_adaptor_ctor<0x07e>, &method_adaptor_ctor<0x07f>,
-  &method_adaptor_ctor<0x080>, &method_adaptor_ctor<0x081>, &method_adaptor_ctor<0x082>, &method_adaptor_ctor<0x083>, &method_adaptor_ctor<0x084>, &method_adaptor_ctor<0x085>, &method_adaptor_ctor<0x086>, &method_adaptor_ctor<0x087>,
-  &method_adaptor_ctor<0x088>, &method_adaptor_ctor<0x089>, &method_adaptor_ctor<0x08a>, &method_adaptor_ctor<0x08b>, &method_adaptor_ctor<0x08c>, &method_adaptor_ctor<0x08d>, &method_adaptor_ctor<0x08e>, &method_adaptor_ctor<0x08f>,
-  &method_adaptor_ctor<0x090>, &method_adaptor_ctor<0x091>, &method_adaptor_ctor<0x092>, &method_adaptor_ctor<0x093>, &method_adaptor_ctor<0x094>, &method_adaptor_ctor<0x095>, &method_adaptor_ctor<0x096>, &method_adaptor_ctor<0x097>,
-  &method_adaptor_ctor<0x098>, &method_adaptor_ctor<0x099>, &method_adaptor_ctor<0x09a>, &method_adaptor_ctor<0x09b>, &method_adaptor_ctor<0x09c>, &method_adaptor_ctor<0x09d>, &method_adaptor_ctor<0x09e>, &method_adaptor_ctor<0x09f>,
-  &method_adaptor_ctor<0x0a0>, &method_adaptor_ctor<0x0a1>, &method_adaptor_ctor<0x0a2>, &method_adaptor_ctor<0x0a3>, &method_adaptor_ctor<0x0a4>, &method_adaptor_ctor<0x0a5>, &method_adaptor_ctor<0x0a6>, &method_adaptor_ctor<0x0a7>,
-  &method_adaptor_ctor<0x0a8>, &method_adaptor_ctor<0x0a9>, &method_adaptor_ctor<0x0aa>, &method_adaptor_ctor<0x0ab>, &method_adaptor_ctor<0x0ac>, &method_adaptor_ctor<0x0ad>, &method_adaptor_ctor<0x0ae>, &method_adaptor_ctor<0x0af>,
-  &method_adaptor_ctor<0x0b0>, &method_adaptor_ctor<0x0b1>, &method_adaptor_ctor<0x0b2>, &method_adaptor_ctor<0x0b3>, &method_adaptor_ctor<0x0b4>, &method_adaptor_ctor<0x0b5>, &method_adaptor_ctor<0x0b6>, &method_adaptor_ctor<0x0b7>,
-  &method_adaptor_ctor<0x0b8>, &method_adaptor_ctor<0x0b9>, &method_adaptor_ctor<0x0ba>, &method_adaptor_ctor<0x0bb>, &method_adaptor_ctor<0x0bc>, &method_adaptor_ctor<0x0bd>, &method_adaptor_ctor<0x0be>, &method_adaptor_ctor<0x0bf>,
-  &method_adaptor_ctor<0x0c0>, &method_adaptor_ctor<0x0c1>, &method_adaptor_ctor<0x0c2>, &method_adaptor_ctor<0x0c3>, &method_adaptor_ctor<0x0c4>, &method_adaptor_ctor<0x0c5>, &method_adaptor_ctor<0x0c6>, &method_adaptor_ctor<0x0c7>,
-  &method_adaptor_ctor<0x0c8>, &method_adaptor_ctor<0x0c9>, &method_adaptor_ctor<0x0ca>, &method_adaptor_ctor<0x0cb>, &method_adaptor_ctor<0x0cc>, &method_adaptor_ctor<0x0cd>, &method_adaptor_ctor<0x0ce>, &method_adaptor_ctor<0x0cf>,
-  &method_adaptor_ctor<0x0d0>, &method_adaptor_ctor<0x0d1>, &method_adaptor_ctor<0x0d2>, &method_adaptor_ctor<0x0d3>, &method_adaptor_ctor<0x0d4>, &method_adaptor_ctor<0x0d5>, &method_adaptor_ctor<0x0d6>, &method_adaptor_ctor<0x0d7>,
-  &method_adaptor_ctor<0x0d8>, &method_adaptor_ctor<0x0d9>, &method_adaptor_ctor<0x0da>, &method_adaptor_ctor<0x0db>, &method_adaptor_ctor<0x0dc>, &method_adaptor_ctor<0x0dd>, &method_adaptor_ctor<0x0de>, &method_adaptor_ctor<0x0df>,
-  &method_adaptor_ctor<0x0e0>, &method_adaptor_ctor<0x0e1>, &method_adaptor_ctor<0x0e2>, &method_adaptor_ctor<0x0e3>, &method_adaptor_ctor<0x0e4>, &method_adaptor_ctor<0x0e5>, &method_adaptor_ctor<0x0e6>, &method_adaptor_ctor<0x0e7>,
-  &method_adaptor_ctor<0x0e8>, &method_adaptor_ctor<0x0e9>, &method_adaptor_ctor<0x0ea>, &method_adaptor_ctor<0x0eb>, &method_adaptor_ctor<0x0ec>, &method_adaptor_ctor<0x0ed>, &method_adaptor_ctor<0x0ee>, &method_adaptor_ctor<0x0ef>,
-  &method_adaptor_ctor<0x0f0>, &method_adaptor_ctor<0x0f1>, &method_adaptor_ctor<0x0f2>, &method_adaptor_ctor<0x0f3>, &method_adaptor_ctor<0x0f4>, &method_adaptor_ctor<0x0f5>, &method_adaptor_ctor<0x0f6>, &method_adaptor_ctor<0x0f7>,
-  &method_adaptor_ctor<0x0f8>, &method_adaptor_ctor<0x0f9>, &method_adaptor_ctor<0x0fa>, &method_adaptor_ctor<0x0fb>, &method_adaptor_ctor<0x0fc>, &method_adaptor_ctor<0x0fd>, &method_adaptor_ctor<0x0fe>, &method_adaptor_ctor<0x0ff>,
-  &method_adaptor_ctor<0x100>, &method_adaptor_ctor<0x101>, &method_adaptor_ctor<0x102>, &method_adaptor_ctor<0x103>, &method_adaptor_ctor<0x104>, &method_adaptor_ctor<0x105>, &method_adaptor_ctor<0x106>, &method_adaptor_ctor<0x107>,
-  &method_adaptor_ctor<0x108>, &method_adaptor_ctor<0x109>, &method_adaptor_ctor<0x10a>, &method_adaptor_ctor<0x10b>, &method_adaptor_ctor<0x10c>, &method_adaptor_ctor<0x10d>, &method_adaptor_ctor<0x10e>, &method_adaptor_ctor<0x10f>,
-  &method_adaptor_ctor<0x110>, &method_adaptor_ctor<0x111>, &method_adaptor_ctor<0x112>, &method_adaptor_ctor<0x113>, &method_adaptor_ctor<0x114>, &method_adaptor_ctor<0x115>, &method_adaptor_ctor<0x116>, &method_adaptor_ctor<0x117>,
-  &method_adaptor_ctor<0x118>, &method_adaptor_ctor<0x119>, &method_adaptor_ctor<0x11a>, &method_adaptor_ctor<0x11b>, &method_adaptor_ctor<0x11c>, &method_adaptor_ctor<0x11d>, &method_adaptor_ctor<0x11e>, &method_adaptor_ctor<0x11f>,
-  &method_adaptor_ctor<0x120>, &method_adaptor_ctor<0x121>, &method_adaptor_ctor<0x122>, &method_adaptor_ctor<0x123>, &method_adaptor_ctor<0x124>, &method_adaptor_ctor<0x125>, &method_adaptor_ctor<0x126>, &method_adaptor_ctor<0x127>,
-  &method_adaptor_ctor<0x128>, &method_adaptor_ctor<0x129>, &method_adaptor_ctor<0x12a>, &method_adaptor_ctor<0x12b>, &method_adaptor_ctor<0x12c>, &method_adaptor_ctor<0x12d>, &method_adaptor_ctor<0x12e>, &method_adaptor_ctor<0x12f>,
-  &method_adaptor_ctor<0x130>, &method_adaptor_ctor<0x131>, &method_adaptor_ctor<0x132>, &method_adaptor_ctor<0x133>, &method_adaptor_ctor<0x134>, &method_adaptor_ctor<0x135>, &method_adaptor_ctor<0x136>, &method_adaptor_ctor<0x137>,
-  &method_adaptor_ctor<0x138>, &method_adaptor_ctor<0x139>, &method_adaptor_ctor<0x13a>, &method_adaptor_ctor<0x13b>, &method_adaptor_ctor<0x13c>, &method_adaptor_ctor<0x13d>, &method_adaptor_ctor<0x13e>, &method_adaptor_ctor<0x13f>,
-  &method_adaptor_ctor<0x140>, &method_adaptor_ctor<0x141>, &method_adaptor_ctor<0x142>, &method_adaptor_ctor<0x143>, &method_adaptor_ctor<0x144>, &method_adaptor_ctor<0x145>, &method_adaptor_ctor<0x146>, &method_adaptor_ctor<0x147>,
-  &method_adaptor_ctor<0x148>, &method_adaptor_ctor<0x149>, &method_adaptor_ctor<0x14a>, &method_adaptor_ctor<0x14b>, &method_adaptor_ctor<0x14c>, &method_adaptor_ctor<0x14d>, &method_adaptor_ctor<0x14e>, &method_adaptor_ctor<0x14f>,
-  &method_adaptor_ctor<0x150>, &method_adaptor_ctor<0x151>, &method_adaptor_ctor<0x152>, &method_adaptor_ctor<0x153>, &method_adaptor_ctor<0x154>, &method_adaptor_ctor<0x155>, &method_adaptor_ctor<0x156>, &method_adaptor_ctor<0x157>,
-  &method_adaptor_ctor<0x158>, &method_adaptor_ctor<0x159>, &method_adaptor_ctor<0x15a>, &method_adaptor_ctor<0x15b>, &method_adaptor_ctor<0x15c>, &method_adaptor_ctor<0x15d>, &method_adaptor_ctor<0x15e>, &method_adaptor_ctor<0x15f>,
-  &method_adaptor_ctor<0x160>, &method_adaptor_ctor<0x161>, &method_adaptor_ctor<0x162>, &method_adaptor_ctor<0x163>, &method_adaptor_ctor<0x164>, &method_adaptor_ctor<0x165>, &method_adaptor_ctor<0x166>, &method_adaptor_ctor<0x167>,
-  &method_adaptor_ctor<0x168>, &method_adaptor_ctor<0x169>, &method_adaptor_ctor<0x16a>, &method_adaptor_ctor<0x16b>, &method_adaptor_ctor<0x16c>, &method_adaptor_ctor<0x16d>, &method_adaptor_ctor<0x16e>, &method_adaptor_ctor<0x16f>,
-  &method_adaptor_ctor<0x170>, &method_adaptor_ctor<0x171>, &method_adaptor_ctor<0x172>, &method_adaptor_ctor<0x173>, &method_adaptor_ctor<0x174>, &method_adaptor_ctor<0x175>, &method_adaptor_ctor<0x176>, &method_adaptor_ctor<0x177>,
-  &method_adaptor_ctor<0x178>, &method_adaptor_ctor<0x179>, &method_adaptor_ctor<0x17a>, &method_adaptor_ctor<0x17b>, &method_adaptor_ctor<0x17c>, &method_adaptor_ctor<0x17d>, &method_adaptor_ctor<0x17e>, &method_adaptor_ctor<0x17f>,
-  &method_adaptor_ctor<0x180>, &method_adaptor_ctor<0x181>, &method_adaptor_ctor<0x182>, &method_adaptor_ctor<0x183>, &method_adaptor_ctor<0x184>, &method_adaptor_ctor<0x185>, &method_adaptor_ctor<0x186>, &method_adaptor_ctor<0x187>,
-  &method_adaptor_ctor<0x188>, &method_adaptor_ctor<0x189>, &method_adaptor_ctor<0x18a>, &method_adaptor_ctor<0x18b>, &method_adaptor_ctor<0x18c>, &method_adaptor_ctor<0x18d>, &method_adaptor_ctor<0x18e>, &method_adaptor_ctor<0x18f>,
-  &method_adaptor_ctor<0x190>, &method_adaptor_ctor<0x191>, &method_adaptor_ctor<0x192>, &method_adaptor_ctor<0x193>, &method_adaptor_ctor<0x194>, &method_adaptor_ctor<0x195>, &method_adaptor_ctor<0x196>, &method_adaptor_ctor<0x197>,
-  &method_adaptor_ctor<0x198>, &method_adaptor_ctor<0x199>, &method_adaptor_ctor<0x19a>, &method_adaptor_ctor<0x19b>, &method_adaptor_ctor<0x19c>, &method_adaptor_ctor<0x19d>, &method_adaptor_ctor<0x19e>, &method_adaptor_ctor<0x19f>,
-  &method_adaptor_ctor<0x1a0>, &method_adaptor_ctor<0x1a1>, &method_adaptor_ctor<0x1a2>, &method_adaptor_ctor<0x1a3>, &method_adaptor_ctor<0x1a4>, &method_adaptor_ctor<0x1a5>, &method_adaptor_ctor<0x1a6>, &method_adaptor_ctor<0x1a7>,
-  &method_adaptor_ctor<0x1a8>, &method_adaptor_ctor<0x1a9>, &method_adaptor_ctor<0x1aa>, &method_adaptor_ctor<0x1ab>, &method_adaptor_ctor<0x1ac>, &method_adaptor_ctor<0x1ad>, &method_adaptor_ctor<0x1ae>, &method_adaptor_ctor<0x1af>,
-  &method_adaptor_ctor<0x1b0>, &method_adaptor_ctor<0x1b1>, &method_adaptor_ctor<0x1b2>, &method_adaptor_ctor<0x1b3>, &method_adaptor_ctor<0x1b4>, &method_adaptor_ctor<0x1b5>, &method_adaptor_ctor<0x1b6>, &method_adaptor_ctor<0x1b7>,
-  &method_adaptor_ctor<0x1b8>, &method_adaptor_ctor<0x1b9>, &method_adaptor_ctor<0x1ba>, &method_adaptor_ctor<0x1bb>, &method_adaptor_ctor<0x1bc>, &method_adaptor_ctor<0x1bd>, &method_adaptor_ctor<0x1be>, &method_adaptor_ctor<0x1bf>,
-  &method_adaptor_ctor<0x1c0>, &method_adaptor_ctor<0x1c1>, &method_adaptor_ctor<0x1c2>, &method_adaptor_ctor<0x1c3>, &method_adaptor_ctor<0x1c4>, &method_adaptor_ctor<0x1c5>, &method_adaptor_ctor<0x1c6>, &method_adaptor_ctor<0x1c7>,
-  &method_adaptor_ctor<0x1c8>, &method_adaptor_ctor<0x1c9>, &method_adaptor_ctor<0x1ca>, &method_adaptor_ctor<0x1cb>, &method_adaptor_ctor<0x1cc>, &method_adaptor_ctor<0x1cd>, &method_adaptor_ctor<0x1ce>, &method_adaptor_ctor<0x1cf>,
-  &method_adaptor_ctor<0x1d0>, &method_adaptor_ctor<0x1d1>, &method_adaptor_ctor<0x1d2>, &method_adaptor_ctor<0x1d3>, &method_adaptor_ctor<0x1d4>, &method_adaptor_ctor<0x1d5>, &method_adaptor_ctor<0x1d6>, &method_adaptor_ctor<0x1d7>,
-  &method_adaptor_ctor<0x1d8>, &method_adaptor_ctor<0x1d9>, &method_adaptor_ctor<0x1da>, &method_adaptor_ctor<0x1db>, &method_adaptor_ctor<0x1dc>, &method_adaptor_ctor<0x1dd>, &method_adaptor_ctor<0x1de>, &method_adaptor_ctor<0x1df>,
-  &method_adaptor_ctor<0x1e0>, &method_adaptor_ctor<0x1e1>, &method_adaptor_ctor<0x1e2>, &method_adaptor_ctor<0x1e3>, &method_adaptor_ctor<0x1e4>, &method_adaptor_ctor<0x1e5>, &method_adaptor_ctor<0x1e6>, &method_adaptor_ctor<0x1e7>,
-  &method_adaptor_ctor<0x1e8>, &method_adaptor_ctor<0x1e9>, &method_adaptor_ctor<0x1ea>, &method_adaptor_ctor<0x1eb>, &method_adaptor_ctor<0x1ec>, &method_adaptor_ctor<0x1ed>, &method_adaptor_ctor<0x1ee>, &method_adaptor_ctor<0x1ef>,
-  &method_adaptor_ctor<0x1f0>, &method_adaptor_ctor<0x1f1>, &method_adaptor_ctor<0x1f2>, &method_adaptor_ctor<0x1f3>, &method_adaptor_ctor<0x1f4>, &method_adaptor_ctor<0x1f5>, &method_adaptor_ctor<0x1f6>, &method_adaptor_ctor<0x1f7>,
-  &method_adaptor_ctor<0x1f8>, &method_adaptor_ctor<0x1f9>, &method_adaptor_ctor<0x1fa>, &method_adaptor_ctor<0x1fb>, &method_adaptor_ctor<0x1fc>, &method_adaptor_ctor<0x1fd>, &method_adaptor_ctor<0x1fe>, &method_adaptor_ctor<0x1ff>,
-  &method_adaptor_ctor<0x200>, &method_adaptor_ctor<0x201>, &method_adaptor_ctor<0x202>, &method_adaptor_ctor<0x203>, &method_adaptor_ctor<0x204>, &method_adaptor_ctor<0x205>, &method_adaptor_ctor<0x206>, &method_adaptor_ctor<0x207>,
-  &method_adaptor_ctor<0x208>, &method_adaptor_ctor<0x209>, &method_adaptor_ctor<0x20a>, &method_adaptor_ctor<0x20b>, &method_adaptor_ctor<0x20c>, &method_adaptor_ctor<0x20d>, &method_adaptor_ctor<0x20e>, &method_adaptor_ctor<0x20f>,
-  &method_adaptor_ctor<0x210>, &method_adaptor_ctor<0x211>, &method_adaptor_ctor<0x212>, &method_adaptor_ctor<0x213>, &method_adaptor_ctor<0x214>, &method_adaptor_ctor<0x215>, &method_adaptor_ctor<0x216>, &method_adaptor_ctor<0x217>,
-  &method_adaptor_ctor<0x218>, &method_adaptor_ctor<0x219>, &method_adaptor_ctor<0x21a>, &method_adaptor_ctor<0x21b>, &method_adaptor_ctor<0x21c>, &method_adaptor_ctor<0x21d>, &method_adaptor_ctor<0x21e>, &method_adaptor_ctor<0x21f>,
-  &method_adaptor_ctor<0x220>, &method_adaptor_ctor<0x221>, &method_adaptor_ctor<0x222>, &method_adaptor_ctor<0x223>, &method_adaptor_ctor<0x224>, &method_adaptor_ctor<0x225>, &method_adaptor_ctor<0x226>, &method_adaptor_ctor<0x227>,
-  &method_adaptor_ctor<0x228>, &method_adaptor_ctor<0x229>, &method_adaptor_ctor<0x22a>, &method_adaptor_ctor<0x22b>, &method_adaptor_ctor<0x22c>, &method_adaptor_ctor<0x22d>, &method_adaptor_ctor<0x22e>, &method_adaptor_ctor<0x22f>,
-  &method_adaptor_ctor<0x230>, &method_adaptor_ctor<0x231>, &method_adaptor_ctor<0x232>, &method_adaptor_ctor<0x233>, &method_adaptor_ctor<0x234>, &method_adaptor_ctor<0x235>, &method_adaptor_ctor<0x236>, &method_adaptor_ctor<0x237>,
-  &method_adaptor_ctor<0x238>, &method_adaptor_ctor<0x239>, &method_adaptor_ctor<0x23a>, &method_adaptor_ctor<0x23b>, &method_adaptor_ctor<0x23c>, &method_adaptor_ctor<0x23d>, &method_adaptor_ctor<0x23e>, &method_adaptor_ctor<0x23f>,
-  &method_adaptor_ctor<0x240>, &method_adaptor_ctor<0x241>, &method_adaptor_ctor<0x242>, &method_adaptor_ctor<0x243>, &method_adaptor_ctor<0x244>, &method_adaptor_ctor<0x245>, &method_adaptor_ctor<0x246>, &method_adaptor_ctor<0x247>,
-  &method_adaptor_ctor<0x248>, &method_adaptor_ctor<0x249>, &method_adaptor_ctor<0x24a>, &method_adaptor_ctor<0x24b>, &method_adaptor_ctor<0x24c>, &method_adaptor_ctor<0x24d>, &method_adaptor_ctor<0x24e>, &method_adaptor_ctor<0x24f>,
-  &method_adaptor_ctor<0x250>, &method_adaptor_ctor<0x251>, &method_adaptor_ctor<0x252>, &method_adaptor_ctor<0x253>, &method_adaptor_ctor<0x254>, &method_adaptor_ctor<0x255>, &method_adaptor_ctor<0x256>, &method_adaptor_ctor<0x257>,
-  &method_adaptor_ctor<0x258>, &method_adaptor_ctor<0x259>, &method_adaptor_ctor<0x25a>, &method_adaptor_ctor<0x25b>, &method_adaptor_ctor<0x25c>, &method_adaptor_ctor<0x25d>, &method_adaptor_ctor<0x25e>, &method_adaptor_ctor<0x25f>,
-  &method_adaptor_ctor<0x260>, &method_adaptor_ctor<0x261>, &method_adaptor_ctor<0x262>, &method_adaptor_ctor<0x263>, &method_adaptor_ctor<0x264>, &method_adaptor_ctor<0x265>, &method_adaptor_ctor<0x266>, &method_adaptor_ctor<0x267>,
-  &method_adaptor_ctor<0x268>, &method_adaptor_ctor<0x269>, &method_adaptor_ctor<0x26a>, &method_adaptor_ctor<0x26b>, &method_adaptor_ctor<0x26c>, &method_adaptor_ctor<0x26d>, &method_adaptor_ctor<0x26e>, &method_adaptor_ctor<0x26f>,
-  &method_adaptor_ctor<0x270>, &method_adaptor_ctor<0x271>, &method_adaptor_ctor<0x272>, &method_adaptor_ctor<0x273>, &method_adaptor_ctor<0x274>, &method_adaptor_ctor<0x275>, &method_adaptor_ctor<0x276>, &method_adaptor_ctor<0x277>,
-  &method_adaptor_ctor<0x278>, &method_adaptor_ctor<0x279>, &method_adaptor_ctor<0x27a>, &method_adaptor_ctor<0x27b>, &method_adaptor_ctor<0x27c>, &method_adaptor_ctor<0x27d>, &method_adaptor_ctor<0x27e>, &method_adaptor_ctor<0x27f>,
-  &method_adaptor_ctor<0x280>, &method_adaptor_ctor<0x281>, &method_adaptor_ctor<0x282>, &method_adaptor_ctor<0x283>, &method_adaptor_ctor<0x284>, &method_adaptor_ctor<0x285>, &method_adaptor_ctor<0x286>, &method_adaptor_ctor<0x287>,
-  &method_adaptor_ctor<0x288>, &method_adaptor_ctor<0x289>, &method_adaptor_ctor<0x28a>, &method_adaptor_ctor<0x28b>, &method_adaptor_ctor<0x28c>, &method_adaptor_ctor<0x28d>, &method_adaptor_ctor<0x28e>, &method_adaptor_ctor<0x28f>,
-  &method_adaptor_ctor<0x290>, &method_adaptor_ctor<0x291>, &method_adaptor_ctor<0x292>, &method_adaptor_ctor<0x293>, &method_adaptor_ctor<0x294>, &method_adaptor_ctor<0x295>, &method_adaptor_ctor<0x296>, &method_adaptor_ctor<0x297>,
-  &method_adaptor_ctor<0x298>, &method_adaptor_ctor<0x299>, &method_adaptor_ctor<0x29a>, &method_adaptor_ctor<0x29b>, &method_adaptor_ctor<0x29c>, &method_adaptor_ctor<0x29d>, &method_adaptor_ctor<0x29e>, &method_adaptor_ctor<0x29f>,
-  &method_adaptor_ctor<0x2a0>, &method_adaptor_ctor<0x2a1>, &method_adaptor_ctor<0x2a2>, &method_adaptor_ctor<0x2a3>, &method_adaptor_ctor<0x2a4>, &method_adaptor_ctor<0x2a5>, &method_adaptor_ctor<0x2a6>, &method_adaptor_ctor<0x2a7>,
-  &method_adaptor_ctor<0x2a8>, &method_adaptor_ctor<0x2a9>, &method_adaptor_ctor<0x2aa>, &method_adaptor_ctor<0x2ab>, &method_adaptor_ctor<0x2ac>, &method_adaptor_ctor<0x2ad>, &method_adaptor_ctor<0x2ae>, &method_adaptor_ctor<0x2af>,
-  &method_adaptor_ctor<0x2b0>, &method_adaptor_ctor<0x2b1>, &method_adaptor_ctor<0x2b2>, &method_adaptor_ctor<0x2b3>, &method_adaptor_ctor<0x2b4>, &method_adaptor_ctor<0x2b5>, &method_adaptor_ctor<0x2b6>, &method_adaptor_ctor<0x2b7>,
-  &method_adaptor_ctor<0x2b8>, &method_adaptor_ctor<0x2b9>, &method_adaptor_ctor<0x2ba>, &method_adaptor_ctor<0x2bb>, &method_adaptor_ctor<0x2bc>, &method_adaptor_ctor<0x2bd>, &method_adaptor_ctor<0x2be>, &method_adaptor_ctor<0x2bf>,
-  &method_adaptor_ctor<0x2c0>, &method_adaptor_ctor<0x2c1>, &method_adaptor_ctor<0x2c2>, &method_adaptor_ctor<0x2c3>, &method_adaptor_ctor<0x2c4>, &method_adaptor_ctor<0x2c5>, &method_adaptor_ctor<0x2c6>, &method_adaptor_ctor<0x2c7>,
-  &method_adaptor_ctor<0x2c8>, &method_adaptor_ctor<0x2c9>, &method_adaptor_ctor<0x2ca>, &method_adaptor_ctor<0x2cb>, &method_adaptor_ctor<0x2cc>, &method_adaptor_ctor<0x2cd>, &method_adaptor_ctor<0x2ce>, &method_adaptor_ctor<0x2cf>,
-  &method_adaptor_ctor<0x2d0>, &method_adaptor_ctor<0x2d1>, &method_adaptor_ctor<0x2d2>, &method_adaptor_ctor<0x2d3>, &method_adaptor_ctor<0x2d4>, &method_adaptor_ctor<0x2d5>, &method_adaptor_ctor<0x2d6>, &method_adaptor_ctor<0x2d7>,
-  &method_adaptor_ctor<0x2d8>, &method_adaptor_ctor<0x2d9>, &method_adaptor_ctor<0x2da>, &method_adaptor_ctor<0x2db>, &method_adaptor_ctor<0x2dc>, &method_adaptor_ctor<0x2dd>, &method_adaptor_ctor<0x2de>, &method_adaptor_ctor<0x2df>,
-  &method_adaptor_ctor<0x2e0>, &method_adaptor_ctor<0x2e1>, &method_adaptor_ctor<0x2e2>, &method_adaptor_ctor<0x2e3>, &method_adaptor_ctor<0x2e4>, &method_adaptor_ctor<0x2e5>, &method_adaptor_ctor<0x2e6>, &method_adaptor_ctor<0x2e7>,
-  &method_adaptor_ctor<0x2e8>, &method_adaptor_ctor<0x2e9>, &method_adaptor_ctor<0x2ea>, &method_adaptor_ctor<0x2eb>, &method_adaptor_ctor<0x2ec>, &method_adaptor_ctor<0x2ed>, &method_adaptor_ctor<0x2ee>, &method_adaptor_ctor<0x2ef>,
-  &method_adaptor_ctor<0x2f0>, &method_adaptor_ctor<0x2f1>, &method_adaptor_ctor<0x2f2>, &method_adaptor_ctor<0x2f3>, &method_adaptor_ctor<0x2f4>, &method_adaptor_ctor<0x2f5>, &method_adaptor_ctor<0x2f6>, &method_adaptor_ctor<0x2f7>,
-  &method_adaptor_ctor<0x2f8>, &method_adaptor_ctor<0x2f9>, &method_adaptor_ctor<0x2fa>, &method_adaptor_ctor<0x2fb>, &method_adaptor_ctor<0x2fc>, &method_adaptor_ctor<0x2fd>, &method_adaptor_ctor<0x2fe>, &method_adaptor_ctor<0x2ff>,
-  &method_adaptor_ctor<0x300>, &method_adaptor_ctor<0x301>, &method_adaptor_ctor<0x302>, &method_adaptor_ctor<0x303>, &method_adaptor_ctor<0x304>, &method_adaptor_ctor<0x305>, &method_adaptor_ctor<0x306>, &method_adaptor_ctor<0x307>,
-  &method_adaptor_ctor<0x308>, &method_adaptor_ctor<0x309>, &method_adaptor_ctor<0x30a>, &method_adaptor_ctor<0x30b>, &method_adaptor_ctor<0x30c>, &method_adaptor_ctor<0x30d>, &method_adaptor_ctor<0x30e>, &method_adaptor_ctor<0x30f>,
-  &method_adaptor_ctor<0x310>, &method_adaptor_ctor<0x311>, &method_adaptor_ctor<0x312>, &method_adaptor_ctor<0x313>, &method_adaptor_ctor<0x314>, &method_adaptor_ctor<0x315>, &method_adaptor_ctor<0x316>, &method_adaptor_ctor<0x317>,
-  &method_adaptor_ctor<0x318>, &method_adaptor_ctor<0x319>, &method_adaptor_ctor<0x31a>, &method_adaptor_ctor<0x31b>, &method_adaptor_ctor<0x31c>, &method_adaptor_ctor<0x31d>, &method_adaptor_ctor<0x31e>, &method_adaptor_ctor<0x31f>,
-  &method_adaptor_ctor<0x320>, &method_adaptor_ctor<0x321>, &method_adaptor_ctor<0x322>, &method_adaptor_ctor<0x323>, &method_adaptor_ctor<0x324>, &method_adaptor_ctor<0x325>, &method_adaptor_ctor<0x326>, &method_adaptor_ctor<0x327>,
-  &method_adaptor_ctor<0x328>, &method_adaptor_ctor<0x329>, &method_adaptor_ctor<0x32a>, &method_adaptor_ctor<0x32b>, &method_adaptor_ctor<0x32c>, &method_adaptor_ctor<0x32d>, &method_adaptor_ctor<0x32e>, &method_adaptor_ctor<0x32f>,
-  &method_adaptor_ctor<0x330>, &method_adaptor_ctor<0x331>, &method_adaptor_ctor<0x332>, &method_adaptor_ctor<0x333>, &method_adaptor_ctor<0x334>, &method_adaptor_ctor<0x335>, &method_adaptor_ctor<0x336>, &method_adaptor_ctor<0x337>,
-  &method_adaptor_ctor<0x338>, &method_adaptor_ctor<0x339>, &method_adaptor_ctor<0x33a>, &method_adaptor_ctor<0x33b>, &method_adaptor_ctor<0x33c>, &method_adaptor_ctor<0x33d>, &method_adaptor_ctor<0x33e>, &method_adaptor_ctor<0x33f>,
-  &method_adaptor_ctor<0x340>, &method_adaptor_ctor<0x341>, &method_adaptor_ctor<0x342>, &method_adaptor_ctor<0x343>, &method_adaptor_ctor<0x344>, &method_adaptor_ctor<0x345>, &method_adaptor_ctor<0x346>, &method_adaptor_ctor<0x347>,
-  &method_adaptor_ctor<0x348>, &method_adaptor_ctor<0x349>, &method_adaptor_ctor<0x34a>, &method_adaptor_ctor<0x34b>, &method_adaptor_ctor<0x34c>, &method_adaptor_ctor<0x34d>, &method_adaptor_ctor<0x34e>, &method_adaptor_ctor<0x34f>,
-  &method_adaptor_ctor<0x350>, &method_adaptor_ctor<0x351>, &method_adaptor_ctor<0x352>, &method_adaptor_ctor<0x353>, &method_adaptor_ctor<0x354>, &method_adaptor_ctor<0x355>, &method_adaptor_ctor<0x356>, &method_adaptor_ctor<0x357>,
-  &method_adaptor_ctor<0x358>, &method_adaptor_ctor<0x359>, &method_adaptor_ctor<0x35a>, &method_adaptor_ctor<0x35b>, &method_adaptor_ctor<0x35c>, &method_adaptor_ctor<0x35d>, &method_adaptor_ctor<0x35e>, &method_adaptor_ctor<0x35f>,
-  &method_adaptor_ctor<0x360>, &method_adaptor_ctor<0x361>, &method_adaptor_ctor<0x362>, &method_adaptor_ctor<0x363>, &method_adaptor_ctor<0x364>, &method_adaptor_ctor<0x365>, &method_adaptor_ctor<0x366>, &method_adaptor_ctor<0x367>,
-  &method_adaptor_ctor<0x368>, &method_adaptor_ctor<0x369>, &method_adaptor_ctor<0x36a>, &method_adaptor_ctor<0x36b>, &method_adaptor_ctor<0x36c>, &method_adaptor_ctor<0x36d>, &method_adaptor_ctor<0x36e>, &method_adaptor_ctor<0x36f>,
-  &method_adaptor_ctor<0x370>, &method_adaptor_ctor<0x371>, &method_adaptor_ctor<0x372>, &method_adaptor_ctor<0x373>, &method_adaptor_ctor<0x374>, &method_adaptor_ctor<0x375>, &method_adaptor_ctor<0x376>, &method_adaptor_ctor<0x377>,
-  &method_adaptor_ctor<0x378>, &method_adaptor_ctor<0x379>, &method_adaptor_ctor<0x37a>, &method_adaptor_ctor<0x37b>, &method_adaptor_ctor<0x37c>, &method_adaptor_ctor<0x37d>, &method_adaptor_ctor<0x37e>, &method_adaptor_ctor<0x37f>,
-  &method_adaptor_ctor<0x380>, &method_adaptor_ctor<0x381>, &method_adaptor_ctor<0x382>, &method_adaptor_ctor<0x383>, &method_adaptor_ctor<0x384>, &method_adaptor_ctor<0x385>, &method_adaptor_ctor<0x386>, &method_adaptor_ctor<0x387>,
-  &method_adaptor_ctor<0x388>, &method_adaptor_ctor<0x389>, &method_adaptor_ctor<0x38a>, &method_adaptor_ctor<0x38b>, &method_adaptor_ctor<0x38c>, &method_adaptor_ctor<0x38d>, &method_adaptor_ctor<0x38e>, &method_adaptor_ctor<0x38f>,
-  &method_adaptor_ctor<0x390>, &method_adaptor_ctor<0x391>, &method_adaptor_ctor<0x392>, &method_adaptor_ctor<0x393>, &method_adaptor_ctor<0x394>, &method_adaptor_ctor<0x395>, &method_adaptor_ctor<0x396>, &method_adaptor_ctor<0x397>,
-  &method_adaptor_ctor<0x398>, &method_adaptor_ctor<0x399>, &method_adaptor_ctor<0x39a>, &method_adaptor_ctor<0x39b>, &method_adaptor_ctor<0x39c>, &method_adaptor_ctor<0x39d>, &method_adaptor_ctor<0x39e>, &method_adaptor_ctor<0x39f>,
-  &method_adaptor_ctor<0x3a0>, &method_adaptor_ctor<0x3a1>, &method_adaptor_ctor<0x3a2>, &method_adaptor_ctor<0x3a3>, &method_adaptor_ctor<0x3a4>, &method_adaptor_ctor<0x3a5>, &method_adaptor_ctor<0x3a6>, &method_adaptor_ctor<0x3a7>,
-  &method_adaptor_ctor<0x3a8>, &method_adaptor_ctor<0x3a9>, &method_adaptor_ctor<0x3aa>, &method_adaptor_ctor<0x3ab>, &method_adaptor_ctor<0x3ac>, &method_adaptor_ctor<0x3ad>, &method_adaptor_ctor<0x3ae>, &method_adaptor_ctor<0x3af>,
-  &method_adaptor_ctor<0x3b0>, &method_adaptor_ctor<0x3b1>, &method_adaptor_ctor<0x3b2>, &method_adaptor_ctor<0x3b3>, &method_adaptor_ctor<0x3b4>, &method_adaptor_ctor<0x3b5>, &method_adaptor_ctor<0x3b6>, &method_adaptor_ctor<0x3b7>,
-  &method_adaptor_ctor<0x3b8>, &method_adaptor_ctor<0x3b9>, &method_adaptor_ctor<0x3ba>, &method_adaptor_ctor<0x3bb>, &method_adaptor_ctor<0x3bc>, &method_adaptor_ctor<0x3bd>, &method_adaptor_ctor<0x3be>, &method_adaptor_ctor<0x3bf>,
-  &method_adaptor_ctor<0x3c0>, &method_adaptor_ctor<0x3c1>, &method_adaptor_ctor<0x3c2>, &method_adaptor_ctor<0x3c3>, &method_adaptor_ctor<0x3c4>, &method_adaptor_ctor<0x3c5>, &method_adaptor_ctor<0x3c6>, &method_adaptor_ctor<0x3c7>,
-  &method_adaptor_ctor<0x3c8>, &method_adaptor_ctor<0x3c9>, &method_adaptor_ctor<0x3ca>, &method_adaptor_ctor<0x3cb>, &method_adaptor_ctor<0x3cc>, &method_adaptor_ctor<0x3cd>, &method_adaptor_ctor<0x3ce>, &method_adaptor_ctor<0x3cf>,
-  &method_adaptor_ctor<0x3d0>, &method_adaptor_ctor<0x3d1>, &method_adaptor_ctor<0x3d2>, &method_adaptor_ctor<0x3d3>, &method_adaptor_ctor<0x3d4>, &method_adaptor_ctor<0x3d5>, &method_adaptor_ctor<0x3d6>, &method_adaptor_ctor<0x3d7>,
-  &method_adaptor_ctor<0x3d8>, &method_adaptor_ctor<0x3d9>, &method_adaptor_ctor<0x3da>, &method_adaptor_ctor<0x3db>, &method_adaptor_ctor<0x3dc>, &method_adaptor_ctor<0x3dd>, &method_adaptor_ctor<0x3de>, &method_adaptor_ctor<0x3df>,
-  &method_adaptor_ctor<0x3e0>, &method_adaptor_ctor<0x3e1>, &method_adaptor_ctor<0x3e2>, &method_adaptor_ctor<0x3e3>, &method_adaptor_ctor<0x3e4>, &method_adaptor_ctor<0x3e5>, &method_adaptor_ctor<0x3e6>, &method_adaptor_ctor<0x3e7>,
-  &method_adaptor_ctor<0x3e8>, &method_adaptor_ctor<0x3e9>, &method_adaptor_ctor<0x3ea>, &method_adaptor_ctor<0x3eb>, &method_adaptor_ctor<0x3ec>, &method_adaptor_ctor<0x3ed>, &method_adaptor_ctor<0x3ee>, &method_adaptor_ctor<0x3ef>,
-  &method_adaptor_ctor<0x3f0>, &method_adaptor_ctor<0x3f1>, &method_adaptor_ctor<0x3f2>, &method_adaptor_ctor<0x3f3>, &method_adaptor_ctor<0x3f4>, &method_adaptor_ctor<0x3f5>, &method_adaptor_ctor<0x3f6>, &method_adaptor_ctor<0x3f7>,
-  &method_adaptor_ctor<0x3f8>, &method_adaptor_ctor<0x3f9>, &method_adaptor_ctor<0x3fa>, &method_adaptor_ctor<0x3fb>, &method_adaptor_ctor<0x3fc>, &method_adaptor_ctor<0x3fd>, &method_adaptor_ctor<0x3fe>, &method_adaptor_ctor<0x3ff>,
+  {
+    &method_adaptor_ctor<0x000>,
+    &method_adaptor_ctor<0x001>,
+    &method_adaptor_ctor<0x002>,
+    &method_adaptor_ctor<0x003>,
+    &method_adaptor_ctor<0x004>,
+    &method_adaptor_ctor<0x005>,
+    &method_adaptor_ctor<0x006>,
+    &method_adaptor_ctor<0x007>,
+    &method_adaptor_ctor<0x008>,
+    &method_adaptor_ctor<0x009>,
+    &method_adaptor_ctor<0x00a>,
+    &method_adaptor_ctor<0x00b>,
+    &method_adaptor_ctor<0x00c>,
+    &method_adaptor_ctor<0x00d>,
+    &method_adaptor_ctor<0x00e>,
+    &method_adaptor_ctor<0x00f>,
+    &method_adaptor_ctor<0x010>,
+    &method_adaptor_ctor<0x011>,
+    &method_adaptor_ctor<0x012>,
+    &method_adaptor_ctor<0x013>,
+    &method_adaptor_ctor<0x014>,
+    &method_adaptor_ctor<0x015>,
+    &method_adaptor_ctor<0x016>,
+    &method_adaptor_ctor<0x017>,
+    &method_adaptor_ctor<0x018>,
+    &method_adaptor_ctor<0x019>,
+    &method_adaptor_ctor<0x01a>,
+    &method_adaptor_ctor<0x01b>,
+    &method_adaptor_ctor<0x01c>,
+    &method_adaptor_ctor<0x01d>,
+    &method_adaptor_ctor<0x01e>,
+    &method_adaptor_ctor<0x01f>,
+    &method_adaptor_ctor<0x020>,
+    &method_adaptor_ctor<0x021>,
+    &method_adaptor_ctor<0x022>,
+    &method_adaptor_ctor<0x023>,
+    &method_adaptor_ctor<0x024>,
+    &method_adaptor_ctor<0x025>,
+    &method_adaptor_ctor<0x026>,
+    &method_adaptor_ctor<0x027>,
+    &method_adaptor_ctor<0x028>,
+    &method_adaptor_ctor<0x029>,
+    &method_adaptor_ctor<0x02a>,
+    &method_adaptor_ctor<0x02b>,
+    &method_adaptor_ctor<0x02c>,
+    &method_adaptor_ctor<0x02d>,
+    &method_adaptor_ctor<0x02e>,
+    &method_adaptor_ctor<0x02f>,
+    &method_adaptor_ctor<0x030>,
+    &method_adaptor_ctor<0x031>,
+    &method_adaptor_ctor<0x032>,
+    &method_adaptor_ctor<0x033>,
+    &method_adaptor_ctor<0x034>,
+    &method_adaptor_ctor<0x035>,
+    &method_adaptor_ctor<0x036>,
+    &method_adaptor_ctor<0x037>,
+    &method_adaptor_ctor<0x038>,
+    &method_adaptor_ctor<0x039>,
+    &method_adaptor_ctor<0x03a>,
+    &method_adaptor_ctor<0x03b>,
+    &method_adaptor_ctor<0x03c>,
+    &method_adaptor_ctor<0x03d>,
+    &method_adaptor_ctor<0x03e>,
+    &method_adaptor_ctor<0x03f>,
+    &method_adaptor_ctor<0x040>,
+    &method_adaptor_ctor<0x041>,
+    &method_adaptor_ctor<0x042>,
+    &method_adaptor_ctor<0x043>,
+    &method_adaptor_ctor<0x044>,
+    &method_adaptor_ctor<0x045>,
+    &method_adaptor_ctor<0x046>,
+    &method_adaptor_ctor<0x047>,
+    &method_adaptor_ctor<0x048>,
+    &method_adaptor_ctor<0x049>,
+    &method_adaptor_ctor<0x04a>,
+    &method_adaptor_ctor<0x04b>,
+    &method_adaptor_ctor<0x04c>,
+    &method_adaptor_ctor<0x04d>,
+    &method_adaptor_ctor<0x04e>,
+    &method_adaptor_ctor<0x04f>,
+    &method_adaptor_ctor<0x050>,
+    &method_adaptor_ctor<0x051>,
+    &method_adaptor_ctor<0x052>,
+    &method_adaptor_ctor<0x053>,
+    &method_adaptor_ctor<0x054>,
+    &method_adaptor_ctor<0x055>,
+    &method_adaptor_ctor<0x056>,
+    &method_adaptor_ctor<0x057>,
+    &method_adaptor_ctor<0x058>,
+    &method_adaptor_ctor<0x059>,
+    &method_adaptor_ctor<0x05a>,
+    &method_adaptor_ctor<0x05b>,
+    &method_adaptor_ctor<0x05c>,
+    &method_adaptor_ctor<0x05d>,
+    &method_adaptor_ctor<0x05e>,
+    &method_adaptor_ctor<0x05f>,
+    &method_adaptor_ctor<0x060>,
+    &method_adaptor_ctor<0x061>,
+    &method_adaptor_ctor<0x062>,
+    &method_adaptor_ctor<0x063>,
+    &method_adaptor_ctor<0x064>,
+    &method_adaptor_ctor<0x065>,
+    &method_adaptor_ctor<0x066>,
+    &method_adaptor_ctor<0x067>,
+    &method_adaptor_ctor<0x068>,
+    &method_adaptor_ctor<0x069>,
+    &method_adaptor_ctor<0x06a>,
+    &method_adaptor_ctor<0x06b>,
+    &method_adaptor_ctor<0x06c>,
+    &method_adaptor_ctor<0x06d>,
+    &method_adaptor_ctor<0x06e>,
+    &method_adaptor_ctor<0x06f>,
+    &method_adaptor_ctor<0x070>,
+    &method_adaptor_ctor<0x071>,
+    &method_adaptor_ctor<0x072>,
+    &method_adaptor_ctor<0x073>,
+    &method_adaptor_ctor<0x074>,
+    &method_adaptor_ctor<0x075>,
+    &method_adaptor_ctor<0x076>,
+    &method_adaptor_ctor<0x077>,
+    &method_adaptor_ctor<0x078>,
+    &method_adaptor_ctor<0x079>,
+    &method_adaptor_ctor<0x07a>,
+    &method_adaptor_ctor<0x07b>,
+    &method_adaptor_ctor<0x07c>,
+    &method_adaptor_ctor<0x07d>,
+    &method_adaptor_ctor<0x07e>,
+    &method_adaptor_ctor<0x07f>,
+    &method_adaptor_ctor<0x080>,
+    &method_adaptor_ctor<0x081>,
+    &method_adaptor_ctor<0x082>,
+    &method_adaptor_ctor<0x083>,
+    &method_adaptor_ctor<0x084>,
+    &method_adaptor_ctor<0x085>,
+    &method_adaptor_ctor<0x086>,
+    &method_adaptor_ctor<0x087>,
+    &method_adaptor_ctor<0x088>,
+    &method_adaptor_ctor<0x089>,
+    &method_adaptor_ctor<0x08a>,
+    &method_adaptor_ctor<0x08b>,
+    &method_adaptor_ctor<0x08c>,
+    &method_adaptor_ctor<0x08d>,
+    &method_adaptor_ctor<0x08e>,
+    &method_adaptor_ctor<0x08f>,
+    &method_adaptor_ctor<0x090>,
+    &method_adaptor_ctor<0x091>,
+    &method_adaptor_ctor<0x092>,
+    &method_adaptor_ctor<0x093>,
+    &method_adaptor_ctor<0x094>,
+    &method_adaptor_ctor<0x095>,
+    &method_adaptor_ctor<0x096>,
+    &method_adaptor_ctor<0x097>,
+    &method_adaptor_ctor<0x098>,
+    &method_adaptor_ctor<0x099>,
+    &method_adaptor_ctor<0x09a>,
+    &method_adaptor_ctor<0x09b>,
+    &method_adaptor_ctor<0x09c>,
+    &method_adaptor_ctor<0x09d>,
+    &method_adaptor_ctor<0x09e>,
+    &method_adaptor_ctor<0x09f>,
+    &method_adaptor_ctor<0x0a0>,
+    &method_adaptor_ctor<0x0a1>,
+    &method_adaptor_ctor<0x0a2>,
+    &method_adaptor_ctor<0x0a3>,
+    &method_adaptor_ctor<0x0a4>,
+    &method_adaptor_ctor<0x0a5>,
+    &method_adaptor_ctor<0x0a6>,
+    &method_adaptor_ctor<0x0a7>,
+    &method_adaptor_ctor<0x0a8>,
+    &method_adaptor_ctor<0x0a9>,
+    &method_adaptor_ctor<0x0aa>,
+    &method_adaptor_ctor<0x0ab>,
+    &method_adaptor_ctor<0x0ac>,
+    &method_adaptor_ctor<0x0ad>,
+    &method_adaptor_ctor<0x0ae>,
+    &method_adaptor_ctor<0x0af>,
+    &method_adaptor_ctor<0x0b0>,
+    &method_adaptor_ctor<0x0b1>,
+    &method_adaptor_ctor<0x0b2>,
+    &method_adaptor_ctor<0x0b3>,
+    &method_adaptor_ctor<0x0b4>,
+    &method_adaptor_ctor<0x0b5>,
+    &method_adaptor_ctor<0x0b6>,
+    &method_adaptor_ctor<0x0b7>,
+    &method_adaptor_ctor<0x0b8>,
+    &method_adaptor_ctor<0x0b9>,
+    &method_adaptor_ctor<0x0ba>,
+    &method_adaptor_ctor<0x0bb>,
+    &method_adaptor_ctor<0x0bc>,
+    &method_adaptor_ctor<0x0bd>,
+    &method_adaptor_ctor<0x0be>,
+    &method_adaptor_ctor<0x0bf>,
+    &method_adaptor_ctor<0x0c0>,
+    &method_adaptor_ctor<0x0c1>,
+    &method_adaptor_ctor<0x0c2>,
+    &method_adaptor_ctor<0x0c3>,
+    &method_adaptor_ctor<0x0c4>,
+    &method_adaptor_ctor<0x0c5>,
+    &method_adaptor_ctor<0x0c6>,
+    &method_adaptor_ctor<0x0c7>,
+    &method_adaptor_ctor<0x0c8>,
+    &method_adaptor_ctor<0x0c9>,
+    &method_adaptor_ctor<0x0ca>,
+    &method_adaptor_ctor<0x0cb>,
+    &method_adaptor_ctor<0x0cc>,
+    &method_adaptor_ctor<0x0cd>,
+    &method_adaptor_ctor<0x0ce>,
+    &method_adaptor_ctor<0x0cf>,
+    &method_adaptor_ctor<0x0d0>,
+    &method_adaptor_ctor<0x0d1>,
+    &method_adaptor_ctor<0x0d2>,
+    &method_adaptor_ctor<0x0d3>,
+    &method_adaptor_ctor<0x0d4>,
+    &method_adaptor_ctor<0x0d5>,
+    &method_adaptor_ctor<0x0d6>,
+    &method_adaptor_ctor<0x0d7>,
+    &method_adaptor_ctor<0x0d8>,
+    &method_adaptor_ctor<0x0d9>,
+    &method_adaptor_ctor<0x0da>,
+    &method_adaptor_ctor<0x0db>,
+    &method_adaptor_ctor<0x0dc>,
+    &method_adaptor_ctor<0x0dd>,
+    &method_adaptor_ctor<0x0de>,
+    &method_adaptor_ctor<0x0df>,
+    &method_adaptor_ctor<0x0e0>,
+    &method_adaptor_ctor<0x0e1>,
+    &method_adaptor_ctor<0x0e2>,
+    &method_adaptor_ctor<0x0e3>,
+    &method_adaptor_ctor<0x0e4>,
+    &method_adaptor_ctor<0x0e5>,
+    &method_adaptor_ctor<0x0e6>,
+    &method_adaptor_ctor<0x0e7>,
+    &method_adaptor_ctor<0x0e8>,
+    &method_adaptor_ctor<0x0e9>,
+    &method_adaptor_ctor<0x0ea>,
+    &method_adaptor_ctor<0x0eb>,
+    &method_adaptor_ctor<0x0ec>,
+    &method_adaptor_ctor<0x0ed>,
+    &method_adaptor_ctor<0x0ee>,
+    &method_adaptor_ctor<0x0ef>,
+    &method_adaptor_ctor<0x0f0>,
+    &method_adaptor_ctor<0x0f1>,
+    &method_adaptor_ctor<0x0f2>,
+    &method_adaptor_ctor<0x0f3>,
+    &method_adaptor_ctor<0x0f4>,
+    &method_adaptor_ctor<0x0f5>,
+    &method_adaptor_ctor<0x0f6>,
+    &method_adaptor_ctor<0x0f7>,
+    &method_adaptor_ctor<0x0f8>,
+    &method_adaptor_ctor<0x0f9>,
+    &method_adaptor_ctor<0x0fa>,
+    &method_adaptor_ctor<0x0fb>,
+    &method_adaptor_ctor<0x0fc>,
+    &method_adaptor_ctor<0x0fd>,
+    &method_adaptor_ctor<0x0fe>,
+    &method_adaptor_ctor<0x0ff>,
+    &method_adaptor_ctor<0x100>,
+    &method_adaptor_ctor<0x101>,
+    &method_adaptor_ctor<0x102>,
+    &method_adaptor_ctor<0x103>,
+    &method_adaptor_ctor<0x104>,
+    &method_adaptor_ctor<0x105>,
+    &method_adaptor_ctor<0x106>,
+    &method_adaptor_ctor<0x107>,
+    &method_adaptor_ctor<0x108>,
+    &method_adaptor_ctor<0x109>,
+    &method_adaptor_ctor<0x10a>,
+    &method_adaptor_ctor<0x10b>,
+    &method_adaptor_ctor<0x10c>,
+    &method_adaptor_ctor<0x10d>,
+    &method_adaptor_ctor<0x10e>,
+    &method_adaptor_ctor<0x10f>,
+    &method_adaptor_ctor<0x110>,
+    &method_adaptor_ctor<0x111>,
+    &method_adaptor_ctor<0x112>,
+    &method_adaptor_ctor<0x113>,
+    &method_adaptor_ctor<0x114>,
+    &method_adaptor_ctor<0x115>,
+    &method_adaptor_ctor<0x116>,
+    &method_adaptor_ctor<0x117>,
+    &method_adaptor_ctor<0x118>,
+    &method_adaptor_ctor<0x119>,
+    &method_adaptor_ctor<0x11a>,
+    &method_adaptor_ctor<0x11b>,
+    &method_adaptor_ctor<0x11c>,
+    &method_adaptor_ctor<0x11d>,
+    &method_adaptor_ctor<0x11e>,
+    &method_adaptor_ctor<0x11f>,
+    &method_adaptor_ctor<0x120>,
+    &method_adaptor_ctor<0x121>,
+    &method_adaptor_ctor<0x122>,
+    &method_adaptor_ctor<0x123>,
+    &method_adaptor_ctor<0x124>,
+    &method_adaptor_ctor<0x125>,
+    &method_adaptor_ctor<0x126>,
+    &method_adaptor_ctor<0x127>,
+    &method_adaptor_ctor<0x128>,
+    &method_adaptor_ctor<0x129>,
+    &method_adaptor_ctor<0x12a>,
+    &method_adaptor_ctor<0x12b>,
+    &method_adaptor_ctor<0x12c>,
+    &method_adaptor_ctor<0x12d>,
+    &method_adaptor_ctor<0x12e>,
+    &method_adaptor_ctor<0x12f>,
+    &method_adaptor_ctor<0x130>,
+    &method_adaptor_ctor<0x131>,
+    &method_adaptor_ctor<0x132>,
+    &method_adaptor_ctor<0x133>,
+    &method_adaptor_ctor<0x134>,
+    &method_adaptor_ctor<0x135>,
+    &method_adaptor_ctor<0x136>,
+    &method_adaptor_ctor<0x137>,
+    &method_adaptor_ctor<0x138>,
+    &method_adaptor_ctor<0x139>,
+    &method_adaptor_ctor<0x13a>,
+    &method_adaptor_ctor<0x13b>,
+    &method_adaptor_ctor<0x13c>,
+    &method_adaptor_ctor<0x13d>,
+    &method_adaptor_ctor<0x13e>,
+    &method_adaptor_ctor<0x13f>,
+    &method_adaptor_ctor<0x140>,
+    &method_adaptor_ctor<0x141>,
+    &method_adaptor_ctor<0x142>,
+    &method_adaptor_ctor<0x143>,
+    &method_adaptor_ctor<0x144>,
+    &method_adaptor_ctor<0x145>,
+    &method_adaptor_ctor<0x146>,
+    &method_adaptor_ctor<0x147>,
+    &method_adaptor_ctor<0x148>,
+    &method_adaptor_ctor<0x149>,
+    &method_adaptor_ctor<0x14a>,
+    &method_adaptor_ctor<0x14b>,
+    &method_adaptor_ctor<0x14c>,
+    &method_adaptor_ctor<0x14d>,
+    &method_adaptor_ctor<0x14e>,
+    &method_adaptor_ctor<0x14f>,
+    &method_adaptor_ctor<0x150>,
+    &method_adaptor_ctor<0x151>,
+    &method_adaptor_ctor<0x152>,
+    &method_adaptor_ctor<0x153>,
+    &method_adaptor_ctor<0x154>,
+    &method_adaptor_ctor<0x155>,
+    &method_adaptor_ctor<0x156>,
+    &method_adaptor_ctor<0x157>,
+    &method_adaptor_ctor<0x158>,
+    &method_adaptor_ctor<0x159>,
+    &method_adaptor_ctor<0x15a>,
+    &method_adaptor_ctor<0x15b>,
+    &method_adaptor_ctor<0x15c>,
+    &method_adaptor_ctor<0x15d>,
+    &method_adaptor_ctor<0x15e>,
+    &method_adaptor_ctor<0x15f>,
+    &method_adaptor_ctor<0x160>,
+    &method_adaptor_ctor<0x161>,
+    &method_adaptor_ctor<0x162>,
+    &method_adaptor_ctor<0x163>,
+    &method_adaptor_ctor<0x164>,
+    &method_adaptor_ctor<0x165>,
+    &method_adaptor_ctor<0x166>,
+    &method_adaptor_ctor<0x167>,
+    &method_adaptor_ctor<0x168>,
+    &method_adaptor_ctor<0x169>,
+    &method_adaptor_ctor<0x16a>,
+    &method_adaptor_ctor<0x16b>,
+    &method_adaptor_ctor<0x16c>,
+    &method_adaptor_ctor<0x16d>,
+    &method_adaptor_ctor<0x16e>,
+    &method_adaptor_ctor<0x16f>,
+    &method_adaptor_ctor<0x170>,
+    &method_adaptor_ctor<0x171>,
+    &method_adaptor_ctor<0x172>,
+    &method_adaptor_ctor<0x173>,
+    &method_adaptor_ctor<0x174>,
+    &method_adaptor_ctor<0x175>,
+    &method_adaptor_ctor<0x176>,
+    &method_adaptor_ctor<0x177>,
+    &method_adaptor_ctor<0x178>,
+    &method_adaptor_ctor<0x179>,
+    &method_adaptor_ctor<0x17a>,
+    &method_adaptor_ctor<0x17b>,
+    &method_adaptor_ctor<0x17c>,
+    &method_adaptor_ctor<0x17d>,
+    &method_adaptor_ctor<0x17e>,
+    &method_adaptor_ctor<0x17f>,
+    &method_adaptor_ctor<0x180>,
+    &method_adaptor_ctor<0x181>,
+    &method_adaptor_ctor<0x182>,
+    &method_adaptor_ctor<0x183>,
+    &method_adaptor_ctor<0x184>,
+    &method_adaptor_ctor<0x185>,
+    &method_adaptor_ctor<0x186>,
+    &method_adaptor_ctor<0x187>,
+    &method_adaptor_ctor<0x188>,
+    &method_adaptor_ctor<0x189>,
+    &method_adaptor_ctor<0x18a>,
+    &method_adaptor_ctor<0x18b>,
+    &method_adaptor_ctor<0x18c>,
+    &method_adaptor_ctor<0x18d>,
+    &method_adaptor_ctor<0x18e>,
+    &method_adaptor_ctor<0x18f>,
+    &method_adaptor_ctor<0x190>,
+    &method_adaptor_ctor<0x191>,
+    &method_adaptor_ctor<0x192>,
+    &method_adaptor_ctor<0x193>,
+    &method_adaptor_ctor<0x194>,
+    &method_adaptor_ctor<0x195>,
+    &method_adaptor_ctor<0x196>,
+    &method_adaptor_ctor<0x197>,
+    &method_adaptor_ctor<0x198>,
+    &method_adaptor_ctor<0x199>,
+    &method_adaptor_ctor<0x19a>,
+    &method_adaptor_ctor<0x19b>,
+    &method_adaptor_ctor<0x19c>,
+    &method_adaptor_ctor<0x19d>,
+    &method_adaptor_ctor<0x19e>,
+    &method_adaptor_ctor<0x19f>,
+    &method_adaptor_ctor<0x1a0>,
+    &method_adaptor_ctor<0x1a1>,
+    &method_adaptor_ctor<0x1a2>,
+    &method_adaptor_ctor<0x1a3>,
+    &method_adaptor_ctor<0x1a4>,
+    &method_adaptor_ctor<0x1a5>,
+    &method_adaptor_ctor<0x1a6>,
+    &method_adaptor_ctor<0x1a7>,
+    &method_adaptor_ctor<0x1a8>,
+    &method_adaptor_ctor<0x1a9>,
+    &method_adaptor_ctor<0x1aa>,
+    &method_adaptor_ctor<0x1ab>,
+    &method_adaptor_ctor<0x1ac>,
+    &method_adaptor_ctor<0x1ad>,
+    &method_adaptor_ctor<0x1ae>,
+    &method_adaptor_ctor<0x1af>,
+    &method_adaptor_ctor<0x1b0>,
+    &method_adaptor_ctor<0x1b1>,
+    &method_adaptor_ctor<0x1b2>,
+    &method_adaptor_ctor<0x1b3>,
+    &method_adaptor_ctor<0x1b4>,
+    &method_adaptor_ctor<0x1b5>,
+    &method_adaptor_ctor<0x1b6>,
+    &method_adaptor_ctor<0x1b7>,
+    &method_adaptor_ctor<0x1b8>,
+    &method_adaptor_ctor<0x1b9>,
+    &method_adaptor_ctor<0x1ba>,
+    &method_adaptor_ctor<0x1bb>,
+    &method_adaptor_ctor<0x1bc>,
+    &method_adaptor_ctor<0x1bd>,
+    &method_adaptor_ctor<0x1be>,
+    &method_adaptor_ctor<0x1bf>,
+    &method_adaptor_ctor<0x1c0>,
+    &method_adaptor_ctor<0x1c1>,
+    &method_adaptor_ctor<0x1c2>,
+    &method_adaptor_ctor<0x1c3>,
+    &method_adaptor_ctor<0x1c4>,
+    &method_adaptor_ctor<0x1c5>,
+    &method_adaptor_ctor<0x1c6>,
+    &method_adaptor_ctor<0x1c7>,
+    &method_adaptor_ctor<0x1c8>,
+    &method_adaptor_ctor<0x1c9>,
+    &method_adaptor_ctor<0x1ca>,
+    &method_adaptor_ctor<0x1cb>,
+    &method_adaptor_ctor<0x1cc>,
+    &method_adaptor_ctor<0x1cd>,
+    &method_adaptor_ctor<0x1ce>,
+    &method_adaptor_ctor<0x1cf>,
+    &method_adaptor_ctor<0x1d0>,
+    &method_adaptor_ctor<0x1d1>,
+    &method_adaptor_ctor<0x1d2>,
+    &method_adaptor_ctor<0x1d3>,
+    &method_adaptor_ctor<0x1d4>,
+    &method_adaptor_ctor<0x1d5>,
+    &method_adaptor_ctor<0x1d6>,
+    &method_adaptor_ctor<0x1d7>,
+    &method_adaptor_ctor<0x1d8>,
+    &method_adaptor_ctor<0x1d9>,
+    &method_adaptor_ctor<0x1da>,
+    &method_adaptor_ctor<0x1db>,
+    &method_adaptor_ctor<0x1dc>,
+    &method_adaptor_ctor<0x1dd>,
+    &method_adaptor_ctor<0x1de>,
+    &method_adaptor_ctor<0x1df>,
+    &method_adaptor_ctor<0x1e0>,
+    &method_adaptor_ctor<0x1e1>,
+    &method_adaptor_ctor<0x1e2>,
+    &method_adaptor_ctor<0x1e3>,
+    &method_adaptor_ctor<0x1e4>,
+    &method_adaptor_ctor<0x1e5>,
+    &method_adaptor_ctor<0x1e6>,
+    &method_adaptor_ctor<0x1e7>,
+    &method_adaptor_ctor<0x1e8>,
+    &method_adaptor_ctor<0x1e9>,
+    &method_adaptor_ctor<0x1ea>,
+    &method_adaptor_ctor<0x1eb>,
+    &method_adaptor_ctor<0x1ec>,
+    &method_adaptor_ctor<0x1ed>,
+    &method_adaptor_ctor<0x1ee>,
+    &method_adaptor_ctor<0x1ef>,
+    &method_adaptor_ctor<0x1f0>,
+    &method_adaptor_ctor<0x1f1>,
+    &method_adaptor_ctor<0x1f2>,
+    &method_adaptor_ctor<0x1f3>,
+    &method_adaptor_ctor<0x1f4>,
+    &method_adaptor_ctor<0x1f5>,
+    &method_adaptor_ctor<0x1f6>,
+    &method_adaptor_ctor<0x1f7>,
+    &method_adaptor_ctor<0x1f8>,
+    &method_adaptor_ctor<0x1f9>,
+    &method_adaptor_ctor<0x1fa>,
+    &method_adaptor_ctor<0x1fb>,
+    &method_adaptor_ctor<0x1fc>,
+    &method_adaptor_ctor<0x1fd>,
+    &method_adaptor_ctor<0x1fe>,
+    &method_adaptor_ctor<0x1ff>,
+    &method_adaptor_ctor<0x200>,
+    &method_adaptor_ctor<0x201>,
+    &method_adaptor_ctor<0x202>,
+    &method_adaptor_ctor<0x203>,
+    &method_adaptor_ctor<0x204>,
+    &method_adaptor_ctor<0x205>,
+    &method_adaptor_ctor<0x206>,
+    &method_adaptor_ctor<0x207>,
+    &method_adaptor_ctor<0x208>,
+    &method_adaptor_ctor<0x209>,
+    &method_adaptor_ctor<0x20a>,
+    &method_adaptor_ctor<0x20b>,
+    &method_adaptor_ctor<0x20c>,
+    &method_adaptor_ctor<0x20d>,
+    &method_adaptor_ctor<0x20e>,
+    &method_adaptor_ctor<0x20f>,
+    &method_adaptor_ctor<0x210>,
+    &method_adaptor_ctor<0x211>,
+    &method_adaptor_ctor<0x212>,
+    &method_adaptor_ctor<0x213>,
+    &method_adaptor_ctor<0x214>,
+    &method_adaptor_ctor<0x215>,
+    &method_adaptor_ctor<0x216>,
+    &method_adaptor_ctor<0x217>,
+    &method_adaptor_ctor<0x218>,
+    &method_adaptor_ctor<0x219>,
+    &method_adaptor_ctor<0x21a>,
+    &method_adaptor_ctor<0x21b>,
+    &method_adaptor_ctor<0x21c>,
+    &method_adaptor_ctor<0x21d>,
+    &method_adaptor_ctor<0x21e>,
+    &method_adaptor_ctor<0x21f>,
+    &method_adaptor_ctor<0x220>,
+    &method_adaptor_ctor<0x221>,
+    &method_adaptor_ctor<0x222>,
+    &method_adaptor_ctor<0x223>,
+    &method_adaptor_ctor<0x224>,
+    &method_adaptor_ctor<0x225>,
+    &method_adaptor_ctor<0x226>,
+    &method_adaptor_ctor<0x227>,
+    &method_adaptor_ctor<0x228>,
+    &method_adaptor_ctor<0x229>,
+    &method_adaptor_ctor<0x22a>,
+    &method_adaptor_ctor<0x22b>,
+    &method_adaptor_ctor<0x22c>,
+    &method_adaptor_ctor<0x22d>,
+    &method_adaptor_ctor<0x22e>,
+    &method_adaptor_ctor<0x22f>,
+    &method_adaptor_ctor<0x230>,
+    &method_adaptor_ctor<0x231>,
+    &method_adaptor_ctor<0x232>,
+    &method_adaptor_ctor<0x233>,
+    &method_adaptor_ctor<0x234>,
+    &method_adaptor_ctor<0x235>,
+    &method_adaptor_ctor<0x236>,
+    &method_adaptor_ctor<0x237>,
+    &method_adaptor_ctor<0x238>,
+    &method_adaptor_ctor<0x239>,
+    &method_adaptor_ctor<0x23a>,
+    &method_adaptor_ctor<0x23b>,
+    &method_adaptor_ctor<0x23c>,
+    &method_adaptor_ctor<0x23d>,
+    &method_adaptor_ctor<0x23e>,
+    &method_adaptor_ctor<0x23f>,
+    &method_adaptor_ctor<0x240>,
+    &method_adaptor_ctor<0x241>,
+    &method_adaptor_ctor<0x242>,
+    &method_adaptor_ctor<0x243>,
+    &method_adaptor_ctor<0x244>,
+    &method_adaptor_ctor<0x245>,
+    &method_adaptor_ctor<0x246>,
+    &method_adaptor_ctor<0x247>,
+    &method_adaptor_ctor<0x248>,
+    &method_adaptor_ctor<0x249>,
+    &method_adaptor_ctor<0x24a>,
+    &method_adaptor_ctor<0x24b>,
+    &method_adaptor_ctor<0x24c>,
+    &method_adaptor_ctor<0x24d>,
+    &method_adaptor_ctor<0x24e>,
+    &method_adaptor_ctor<0x24f>,
+    &method_adaptor_ctor<0x250>,
+    &method_adaptor_ctor<0x251>,
+    &method_adaptor_ctor<0x252>,
+    &method_adaptor_ctor<0x253>,
+    &method_adaptor_ctor<0x254>,
+    &method_adaptor_ctor<0x255>,
+    &method_adaptor_ctor<0x256>,
+    &method_adaptor_ctor<0x257>,
+    &method_adaptor_ctor<0x258>,
+    &method_adaptor_ctor<0x259>,
+    &method_adaptor_ctor<0x25a>,
+    &method_adaptor_ctor<0x25b>,
+    &method_adaptor_ctor<0x25c>,
+    &method_adaptor_ctor<0x25d>,
+    &method_adaptor_ctor<0x25e>,
+    &method_adaptor_ctor<0x25f>,
+    &method_adaptor_ctor<0x260>,
+    &method_adaptor_ctor<0x261>,
+    &method_adaptor_ctor<0x262>,
+    &method_adaptor_ctor<0x263>,
+    &method_adaptor_ctor<0x264>,
+    &method_adaptor_ctor<0x265>,
+    &method_adaptor_ctor<0x266>,
+    &method_adaptor_ctor<0x267>,
+    &method_adaptor_ctor<0x268>,
+    &method_adaptor_ctor<0x269>,
+    &method_adaptor_ctor<0x26a>,
+    &method_adaptor_ctor<0x26b>,
+    &method_adaptor_ctor<0x26c>,
+    &method_adaptor_ctor<0x26d>,
+    &method_adaptor_ctor<0x26e>,
+    &method_adaptor_ctor<0x26f>,
+    &method_adaptor_ctor<0x270>,
+    &method_adaptor_ctor<0x271>,
+    &method_adaptor_ctor<0x272>,
+    &method_adaptor_ctor<0x273>,
+    &method_adaptor_ctor<0x274>,
+    &method_adaptor_ctor<0x275>,
+    &method_adaptor_ctor<0x276>,
+    &method_adaptor_ctor<0x277>,
+    &method_adaptor_ctor<0x278>,
+    &method_adaptor_ctor<0x279>,
+    &method_adaptor_ctor<0x27a>,
+    &method_adaptor_ctor<0x27b>,
+    &method_adaptor_ctor<0x27c>,
+    &method_adaptor_ctor<0x27d>,
+    &method_adaptor_ctor<0x27e>,
+    &method_adaptor_ctor<0x27f>,
+    &method_adaptor_ctor<0x280>,
+    &method_adaptor_ctor<0x281>,
+    &method_adaptor_ctor<0x282>,
+    &method_adaptor_ctor<0x283>,
+    &method_adaptor_ctor<0x284>,
+    &method_adaptor_ctor<0x285>,
+    &method_adaptor_ctor<0x286>,
+    &method_adaptor_ctor<0x287>,
+    &method_adaptor_ctor<0x288>,
+    &method_adaptor_ctor<0x289>,
+    &method_adaptor_ctor<0x28a>,
+    &method_adaptor_ctor<0x28b>,
+    &method_adaptor_ctor<0x28c>,
+    &method_adaptor_ctor<0x28d>,
+    &method_adaptor_ctor<0x28e>,
+    &method_adaptor_ctor<0x28f>,
+    &method_adaptor_ctor<0x290>,
+    &method_adaptor_ctor<0x291>,
+    &method_adaptor_ctor<0x292>,
+    &method_adaptor_ctor<0x293>,
+    &method_adaptor_ctor<0x294>,
+    &method_adaptor_ctor<0x295>,
+    &method_adaptor_ctor<0x296>,
+    &method_adaptor_ctor<0x297>,
+    &method_adaptor_ctor<0x298>,
+    &method_adaptor_ctor<0x299>,
+    &method_adaptor_ctor<0x29a>,
+    &method_adaptor_ctor<0x29b>,
+    &method_adaptor_ctor<0x29c>,
+    &method_adaptor_ctor<0x29d>,
+    &method_adaptor_ctor<0x29e>,
+    &method_adaptor_ctor<0x29f>,
+    &method_adaptor_ctor<0x2a0>,
+    &method_adaptor_ctor<0x2a1>,
+    &method_adaptor_ctor<0x2a2>,
+    &method_adaptor_ctor<0x2a3>,
+    &method_adaptor_ctor<0x2a4>,
+    &method_adaptor_ctor<0x2a5>,
+    &method_adaptor_ctor<0x2a6>,
+    &method_adaptor_ctor<0x2a7>,
+    &method_adaptor_ctor<0x2a8>,
+    &method_adaptor_ctor<0x2a9>,
+    &method_adaptor_ctor<0x2aa>,
+    &method_adaptor_ctor<0x2ab>,
+    &method_adaptor_ctor<0x2ac>,
+    &method_adaptor_ctor<0x2ad>,
+    &method_adaptor_ctor<0x2ae>,
+    &method_adaptor_ctor<0x2af>,
+    &method_adaptor_ctor<0x2b0>,
+    &method_adaptor_ctor<0x2b1>,
+    &method_adaptor_ctor<0x2b2>,
+    &method_adaptor_ctor<0x2b3>,
+    &method_adaptor_ctor<0x2b4>,
+    &method_adaptor_ctor<0x2b5>,
+    &method_adaptor_ctor<0x2b6>,
+    &method_adaptor_ctor<0x2b7>,
+    &method_adaptor_ctor<0x2b8>,
+    &method_adaptor_ctor<0x2b9>,
+    &method_adaptor_ctor<0x2ba>,
+    &method_adaptor_ctor<0x2bb>,
+    &method_adaptor_ctor<0x2bc>,
+    &method_adaptor_ctor<0x2bd>,
+    &method_adaptor_ctor<0x2be>,
+    &method_adaptor_ctor<0x2bf>,
+    &method_adaptor_ctor<0x2c0>,
+    &method_adaptor_ctor<0x2c1>,
+    &method_adaptor_ctor<0x2c2>,
+    &method_adaptor_ctor<0x2c3>,
+    &method_adaptor_ctor<0x2c4>,
+    &method_adaptor_ctor<0x2c5>,
+    &method_adaptor_ctor<0x2c6>,
+    &method_adaptor_ctor<0x2c7>,
+    &method_adaptor_ctor<0x2c8>,
+    &method_adaptor_ctor<0x2c9>,
+    &method_adaptor_ctor<0x2ca>,
+    &method_adaptor_ctor<0x2cb>,
+    &method_adaptor_ctor<0x2cc>,
+    &method_adaptor_ctor<0x2cd>,
+    &method_adaptor_ctor<0x2ce>,
+    &method_adaptor_ctor<0x2cf>,
+    &method_adaptor_ctor<0x2d0>,
+    &method_adaptor_ctor<0x2d1>,
+    &method_adaptor_ctor<0x2d2>,
+    &method_adaptor_ctor<0x2d3>,
+    &method_adaptor_ctor<0x2d4>,
+    &method_adaptor_ctor<0x2d5>,
+    &method_adaptor_ctor<0x2d6>,
+    &method_adaptor_ctor<0x2d7>,
+    &method_adaptor_ctor<0x2d8>,
+    &method_adaptor_ctor<0x2d9>,
+    &method_adaptor_ctor<0x2da>,
+    &method_adaptor_ctor<0x2db>,
+    &method_adaptor_ctor<0x2dc>,
+    &method_adaptor_ctor<0x2dd>,
+    &method_adaptor_ctor<0x2de>,
+    &method_adaptor_ctor<0x2df>,
+    &method_adaptor_ctor<0x2e0>,
+    &method_adaptor_ctor<0x2e1>,
+    &method_adaptor_ctor<0x2e2>,
+    &method_adaptor_ctor<0x2e3>,
+    &method_adaptor_ctor<0x2e4>,
+    &method_adaptor_ctor<0x2e5>,
+    &method_adaptor_ctor<0x2e6>,
+    &method_adaptor_ctor<0x2e7>,
+    &method_adaptor_ctor<0x2e8>,
+    &method_adaptor_ctor<0x2e9>,
+    &method_adaptor_ctor<0x2ea>,
+    &method_adaptor_ctor<0x2eb>,
+    &method_adaptor_ctor<0x2ec>,
+    &method_adaptor_ctor<0x2ed>,
+    &method_adaptor_ctor<0x2ee>,
+    &method_adaptor_ctor<0x2ef>,
+    &method_adaptor_ctor<0x2f0>,
+    &method_adaptor_ctor<0x2f1>,
+    &method_adaptor_ctor<0x2f2>,
+    &method_adaptor_ctor<0x2f3>,
+    &method_adaptor_ctor<0x2f4>,
+    &method_adaptor_ctor<0x2f5>,
+    &method_adaptor_ctor<0x2f6>,
+    &method_adaptor_ctor<0x2f7>,
+    &method_adaptor_ctor<0x2f8>,
+    &method_adaptor_ctor<0x2f9>,
+    &method_adaptor_ctor<0x2fa>,
+    &method_adaptor_ctor<0x2fb>,
+    &method_adaptor_ctor<0x2fc>,
+    &method_adaptor_ctor<0x2fd>,
+    &method_adaptor_ctor<0x2fe>,
+    &method_adaptor_ctor<0x2ff>,
+    &method_adaptor_ctor<0x300>,
+    &method_adaptor_ctor<0x301>,
+    &method_adaptor_ctor<0x302>,
+    &method_adaptor_ctor<0x303>,
+    &method_adaptor_ctor<0x304>,
+    &method_adaptor_ctor<0x305>,
+    &method_adaptor_ctor<0x306>,
+    &method_adaptor_ctor<0x307>,
+    &method_adaptor_ctor<0x308>,
+    &method_adaptor_ctor<0x309>,
+    &method_adaptor_ctor<0x30a>,
+    &method_adaptor_ctor<0x30b>,
+    &method_adaptor_ctor<0x30c>,
+    &method_adaptor_ctor<0x30d>,
+    &method_adaptor_ctor<0x30e>,
+    &method_adaptor_ctor<0x30f>,
+    &method_adaptor_ctor<0x310>,
+    &method_adaptor_ctor<0x311>,
+    &method_adaptor_ctor<0x312>,
+    &method_adaptor_ctor<0x313>,
+    &method_adaptor_ctor<0x314>,
+    &method_adaptor_ctor<0x315>,
+    &method_adaptor_ctor<0x316>,
+    &method_adaptor_ctor<0x317>,
+    &method_adaptor_ctor<0x318>,
+    &method_adaptor_ctor<0x319>,
+    &method_adaptor_ctor<0x31a>,
+    &method_adaptor_ctor<0x31b>,
+    &method_adaptor_ctor<0x31c>,
+    &method_adaptor_ctor<0x31d>,
+    &method_adaptor_ctor<0x31e>,
+    &method_adaptor_ctor<0x31f>,
+    &method_adaptor_ctor<0x320>,
+    &method_adaptor_ctor<0x321>,
+    &method_adaptor_ctor<0x322>,
+    &method_adaptor_ctor<0x323>,
+    &method_adaptor_ctor<0x324>,
+    &method_adaptor_ctor<0x325>,
+    &method_adaptor_ctor<0x326>,
+    &method_adaptor_ctor<0x327>,
+    &method_adaptor_ctor<0x328>,
+    &method_adaptor_ctor<0x329>,
+    &method_adaptor_ctor<0x32a>,
+    &method_adaptor_ctor<0x32b>,
+    &method_adaptor_ctor<0x32c>,
+    &method_adaptor_ctor<0x32d>,
+    &method_adaptor_ctor<0x32e>,
+    &method_adaptor_ctor<0x32f>,
+    &method_adaptor_ctor<0x330>,
+    &method_adaptor_ctor<0x331>,
+    &method_adaptor_ctor<0x332>,
+    &method_adaptor_ctor<0x333>,
+    &method_adaptor_ctor<0x334>,
+    &method_adaptor_ctor<0x335>,
+    &method_adaptor_ctor<0x336>,
+    &method_adaptor_ctor<0x337>,
+    &method_adaptor_ctor<0x338>,
+    &method_adaptor_ctor<0x339>,
+    &method_adaptor_ctor<0x33a>,
+    &method_adaptor_ctor<0x33b>,
+    &method_adaptor_ctor<0x33c>,
+    &method_adaptor_ctor<0x33d>,
+    &method_adaptor_ctor<0x33e>,
+    &method_adaptor_ctor<0x33f>,
+    &method_adaptor_ctor<0x340>,
+    &method_adaptor_ctor<0x341>,
+    &method_adaptor_ctor<0x342>,
+    &method_adaptor_ctor<0x343>,
+    &method_adaptor_ctor<0x344>,
+    &method_adaptor_ctor<0x345>,
+    &method_adaptor_ctor<0x346>,
+    &method_adaptor_ctor<0x347>,
+    &method_adaptor_ctor<0x348>,
+    &method_adaptor_ctor<0x349>,
+    &method_adaptor_ctor<0x34a>,
+    &method_adaptor_ctor<0x34b>,
+    &method_adaptor_ctor<0x34c>,
+    &method_adaptor_ctor<0x34d>,
+    &method_adaptor_ctor<0x34e>,
+    &method_adaptor_ctor<0x34f>,
+    &method_adaptor_ctor<0x350>,
+    &method_adaptor_ctor<0x351>,
+    &method_adaptor_ctor<0x352>,
+    &method_adaptor_ctor<0x353>,
+    &method_adaptor_ctor<0x354>,
+    &method_adaptor_ctor<0x355>,
+    &method_adaptor_ctor<0x356>,
+    &method_adaptor_ctor<0x357>,
+    &method_adaptor_ctor<0x358>,
+    &method_adaptor_ctor<0x359>,
+    &method_adaptor_ctor<0x35a>,
+    &method_adaptor_ctor<0x35b>,
+    &method_adaptor_ctor<0x35c>,
+    &method_adaptor_ctor<0x35d>,
+    &method_adaptor_ctor<0x35e>,
+    &method_adaptor_ctor<0x35f>,
+    &method_adaptor_ctor<0x360>,
+    &method_adaptor_ctor<0x361>,
+    &method_adaptor_ctor<0x362>,
+    &method_adaptor_ctor<0x363>,
+    &method_adaptor_ctor<0x364>,
+    &method_adaptor_ctor<0x365>,
+    &method_adaptor_ctor<0x366>,
+    &method_adaptor_ctor<0x367>,
+    &method_adaptor_ctor<0x368>,
+    &method_adaptor_ctor<0x369>,
+    &method_adaptor_ctor<0x36a>,
+    &method_adaptor_ctor<0x36b>,
+    &method_adaptor_ctor<0x36c>,
+    &method_adaptor_ctor<0x36d>,
+    &method_adaptor_ctor<0x36e>,
+    &method_adaptor_ctor<0x36f>,
+    &method_adaptor_ctor<0x370>,
+    &method_adaptor_ctor<0x371>,
+    &method_adaptor_ctor<0x372>,
+    &method_adaptor_ctor<0x373>,
+    &method_adaptor_ctor<0x374>,
+    &method_adaptor_ctor<0x375>,
+    &method_adaptor_ctor<0x376>,
+    &method_adaptor_ctor<0x377>,
+    &method_adaptor_ctor<0x378>,
+    &method_adaptor_ctor<0x379>,
+    &method_adaptor_ctor<0x37a>,
+    &method_adaptor_ctor<0x37b>,
+    &method_adaptor_ctor<0x37c>,
+    &method_adaptor_ctor<0x37d>,
+    &method_adaptor_ctor<0x37e>,
+    &method_adaptor_ctor<0x37f>,
+    &method_adaptor_ctor<0x380>,
+    &method_adaptor_ctor<0x381>,
+    &method_adaptor_ctor<0x382>,
+    &method_adaptor_ctor<0x383>,
+    &method_adaptor_ctor<0x384>,
+    &method_adaptor_ctor<0x385>,
+    &method_adaptor_ctor<0x386>,
+    &method_adaptor_ctor<0x387>,
+    &method_adaptor_ctor<0x388>,
+    &method_adaptor_ctor<0x389>,
+    &method_adaptor_ctor<0x38a>,
+    &method_adaptor_ctor<0x38b>,
+    &method_adaptor_ctor<0x38c>,
+    &method_adaptor_ctor<0x38d>,
+    &method_adaptor_ctor<0x38e>,
+    &method_adaptor_ctor<0x38f>,
+    &method_adaptor_ctor<0x390>,
+    &method_adaptor_ctor<0x391>,
+    &method_adaptor_ctor<0x392>,
+    &method_adaptor_ctor<0x393>,
+    &method_adaptor_ctor<0x394>,
+    &method_adaptor_ctor<0x395>,
+    &method_adaptor_ctor<0x396>,
+    &method_adaptor_ctor<0x397>,
+    &method_adaptor_ctor<0x398>,
+    &method_adaptor_ctor<0x399>,
+    &method_adaptor_ctor<0x39a>,
+    &method_adaptor_ctor<0x39b>,
+    &method_adaptor_ctor<0x39c>,
+    &method_adaptor_ctor<0x39d>,
+    &method_adaptor_ctor<0x39e>,
+    &method_adaptor_ctor<0x39f>,
+    &method_adaptor_ctor<0x3a0>,
+    &method_adaptor_ctor<0x3a1>,
+    &method_adaptor_ctor<0x3a2>,
+    &method_adaptor_ctor<0x3a3>,
+    &method_adaptor_ctor<0x3a4>,
+    &method_adaptor_ctor<0x3a5>,
+    &method_adaptor_ctor<0x3a6>,
+    &method_adaptor_ctor<0x3a7>,
+    &method_adaptor_ctor<0x3a8>,
+    &method_adaptor_ctor<0x3a9>,
+    &method_adaptor_ctor<0x3aa>,
+    &method_adaptor_ctor<0x3ab>,
+    &method_adaptor_ctor<0x3ac>,
+    &method_adaptor_ctor<0x3ad>,
+    &method_adaptor_ctor<0x3ae>,
+    &method_adaptor_ctor<0x3af>,
+    &method_adaptor_ctor<0x3b0>,
+    &method_adaptor_ctor<0x3b1>,
+    &method_adaptor_ctor<0x3b2>,
+    &method_adaptor_ctor<0x3b3>,
+    &method_adaptor_ctor<0x3b4>,
+    &method_adaptor_ctor<0x3b5>,
+    &method_adaptor_ctor<0x3b6>,
+    &method_adaptor_ctor<0x3b7>,
+    &method_adaptor_ctor<0x3b8>,
+    &method_adaptor_ctor<0x3b9>,
+    &method_adaptor_ctor<0x3ba>,
+    &method_adaptor_ctor<0x3bb>,
+    &method_adaptor_ctor<0x3bc>,
+    &method_adaptor_ctor<0x3bd>,
+    &method_adaptor_ctor<0x3be>,
+    &method_adaptor_ctor<0x3bf>,
+    &method_adaptor_ctor<0x3c0>,
+    &method_adaptor_ctor<0x3c1>,
+    &method_adaptor_ctor<0x3c2>,
+    &method_adaptor_ctor<0x3c3>,
+    &method_adaptor_ctor<0x3c4>,
+    &method_adaptor_ctor<0x3c5>,
+    &method_adaptor_ctor<0x3c6>,
+    &method_adaptor_ctor<0x3c7>,
+    &method_adaptor_ctor<0x3c8>,
+    &method_adaptor_ctor<0x3c9>,
+    &method_adaptor_ctor<0x3ca>,
+    &method_adaptor_ctor<0x3cb>,
+    &method_adaptor_ctor<0x3cc>,
+    &method_adaptor_ctor<0x3cd>,
+    &method_adaptor_ctor<0x3ce>,
+    &method_adaptor_ctor<0x3cf>,
+    &method_adaptor_ctor<0x3d0>,
+    &method_adaptor_ctor<0x3d1>,
+    &method_adaptor_ctor<0x3d2>,
+    &method_adaptor_ctor<0x3d3>,
+    &method_adaptor_ctor<0x3d4>,
+    &method_adaptor_ctor<0x3d5>,
+    &method_adaptor_ctor<0x3d6>,
+    &method_adaptor_ctor<0x3d7>,
+    &method_adaptor_ctor<0x3d8>,
+    &method_adaptor_ctor<0x3d9>,
+    &method_adaptor_ctor<0x3da>,
+    &method_adaptor_ctor<0x3db>,
+    &method_adaptor_ctor<0x3dc>,
+    &method_adaptor_ctor<0x3dd>,
+    &method_adaptor_ctor<0x3de>,
+    &method_adaptor_ctor<0x3df>,
+    &method_adaptor_ctor<0x3e0>,
+    &method_adaptor_ctor<0x3e1>,
+    &method_adaptor_ctor<0x3e2>,
+    &method_adaptor_ctor<0x3e3>,
+    &method_adaptor_ctor<0x3e4>,
+    &method_adaptor_ctor<0x3e5>,
+    &method_adaptor_ctor<0x3e6>,
+    &method_adaptor_ctor<0x3e7>,
+    &method_adaptor_ctor<0x3e8>,
+    &method_adaptor_ctor<0x3e9>,
+    &method_adaptor_ctor<0x3ea>,
+    &method_adaptor_ctor<0x3eb>,
+    &method_adaptor_ctor<0x3ec>,
+    &method_adaptor_ctor<0x3ed>,
+    &method_adaptor_ctor<0x3ee>,
+    &method_adaptor_ctor<0x3ef>,
+    &method_adaptor_ctor<0x3f0>,
+    &method_adaptor_ctor<0x3f1>,
+    &method_adaptor_ctor<0x3f2>,
+    &method_adaptor_ctor<0x3f3>,
+    &method_adaptor_ctor<0x3f4>,
+    &method_adaptor_ctor<0x3f5>,
+    &method_adaptor_ctor<0x3f6>,
+    &method_adaptor_ctor<0x3f7>,
+    &method_adaptor_ctor<0x3f8>,
+    &method_adaptor_ctor<0x3f9>,
+    &method_adaptor_ctor<0x3fa>,
+    &method_adaptor_ctor<0x3fb>,
+    &method_adaptor_ctor<0x3fc>,
+    &method_adaptor_ctor<0x3fd>,
+    &method_adaptor_ctor<0x3fe>,
+    &method_adaptor_ctor<0x3ff>,
 };
 
 // -------------------------------------------------------------------
@@ -1759,7 +3540,7 @@ stdout_write (VALUE /*self*/, VALUE a)
   return Qnil;
 }
 
-static VALUE 
+static VALUE
 stdout_flush (VALUE /*self*/)
 {
   if (RubyInterpreter::instance ()->current_console ()) {
@@ -1803,7 +3584,7 @@ stderr_write (VALUE /*self*/, VALUE a)
   return Qnil;
 }
 
-static VALUE 
+static VALUE
 stderr_flush (VALUE /*self*/)
 {
   if (RubyInterpreter::instance ()->current_console ()) {
@@ -1829,14 +3610,13 @@ stderr_winsize (VALUE self)
 
 static RubyInterpreter *sp_rba_interpreter = 0;
 
-struct RubyConstDescriptor
-{
+struct RubyConstDescriptor {
   VALUE klass;
   const gsi::MethodBase *meth;
   std::string name;
 };
 
-extern "C" void ruby_prog_init();
+extern "C" void ruby_prog_init ();
 
 static void
 rba_add_path (const std::string &path, bool prepend)
@@ -1924,7 +3704,6 @@ public:
       }
 
       rb_define_alloc_func (klass, alloc_proxy);
-
     }
 
     register_class (klass, cls, as_static);
@@ -1981,7 +3760,6 @@ public:
                 mt->add_method (ruby_name (syn->name), *m);
               }
             }
-
           }
 
         } else {
@@ -2016,14 +3794,10 @@ public:
             } else {
 
               mt->add_method (ruby_name (syn->name), *m);
-
             }
           }
-
         }
-
       }
-
     }
 
     //  clean up the method table
@@ -2051,10 +3825,8 @@ public:
           }
           */
 
-          rb_define_module_function (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors[mid], -1);
-
+          rb_define_module_function (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors [mid], -1);
         }
-
       }
 
       for (size_t mid = mt->bottom_mid (); mid < mt->top_mid (); ++mid) {
@@ -2064,11 +3836,11 @@ public:
           tl_assert (mid < size_t (sizeof (method_adaptors_ctor) / sizeof (method_adaptors_ctor [0])));
 
           if (! mt->is_protected (mid)) {
-            rb_define_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors_ctor[mid], -1);
+            rb_define_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors_ctor [mid], -1);
           } else {
             //  a protected constructor needs to be provided in both protected and non-protected mode
-            rb_define_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors_ctor[mid], -1);
-            rb_define_protected_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors_ctor[mid], -1);
+            rb_define_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors_ctor [mid], -1);
+            rb_define_protected_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors_ctor [mid], -1);
           }
 
         } else if (! mt->is_static (mid)) {
@@ -2076,11 +3848,10 @@ public:
           tl_assert (mid < size_t (sizeof (method_adaptors) / sizeof (method_adaptors [0])));
 
           if (! mt->is_protected (mid)) {
-            rb_define_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors[mid], -1);
+            rb_define_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors [mid], -1);
           } else {
-            rb_define_protected_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors[mid], -1);
+            rb_define_protected_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors [mid], -1);
           }
-
         }
 
         if (mt->is_signal (mid)) {
@@ -2092,20 +3863,17 @@ public:
           //    x.signal(proc)
           //  which will make proc the only receiver for the signal
           rb_define_alias (klass, (mt->name (mid) + "=").c_str (), mt->name (mid).c_str ());
-
         }
 
         if (mt->name (mid) == "to_s") {
-    #if HAVE_RUBY_VERSION_CODE>=20000 && defined(GSI_ALIAS_INSPECT)
-        //  Ruby 2.x does no longer alias "inspect" to "to_s" automatically, so we have to do this:
+#if HAVE_RUBY_VERSION_CODE >= 20000 && defined(GSI_ALIAS_INSPECT)
+          //  Ruby 2.x does no longer alias "inspect" to "to_s" automatically, so we have to do this:
           rb_define_alias (klass, "inspect", "to_s");
-    #endif
+#endif
         } else if (mt->name (mid) == "==") {
           rb_define_alias (klass, "eql?", "==");
         }
-
       }
-
     }
 
     return klass;
@@ -2127,14 +3895,13 @@ public:
       } catch (tl::Exception &ex) {
         tl::warn << "Got exception '" << ex.msg () << "' while defining constant " << c->name;
       }
-
     }
   }
 
 private:
   VALUE m_module;
-  std::vector <RubyConstDescriptor> m_constants;
-  std::map<const gsi::ClassBase *, std::vector<const gsi::ClassBase *> > m_extensions_for;
+  std::vector<RubyConstDescriptor> m_constants;
+  std::map<const gsi::ClassBase *, std::vector<const gsi::ClassBase *>> m_extensions_for;
   std::set<const gsi::ClassBase *> m_extensions;
 };
 
@@ -2150,7 +3917,7 @@ rba_init (RubyInterpreterPrivateData *d)
 
   //  save all constants for later (we cannot declare them while we are still producing classes
   //  because of the enum representative classes and enum constants are important)
-  std::vector <RubyConstDescriptor> constants;
+  std::vector<RubyConstDescriptor> constants;
 
   std::list<const gsi::ClassBase *> sorted_classes = gsi::ClassBase::classes_in_definition_order ();
 
@@ -2190,11 +3957,11 @@ rba_init (RubyInterpreterPrivateData *d)
   rb_define_method (d->stderr_klass, "winsize", (ruby_func) &stderr_winsize, 0);
 
   //  register the saved stdout/stderr objects with the garbage collector
-  rb_global_variable (& d->saved_stdout);
-  rb_global_variable (& d->saved_stderr);
+  rb_global_variable (&d->saved_stdout);
+  rb_global_variable (&d->saved_stderr);
 
   //  create the handler objects
-  VALUE empty_args [] = { INT2NUM (0) };
+  VALUE empty_args [] = {INT2NUM (0)};
   d->saved_stderr = rba_class_new_instance_checked (1, empty_args, d->stderr_klass);
   d->saved_stdout = rba_class_new_instance_checked (1, empty_args, d->stdout_klass);
 }
@@ -2211,7 +3978,7 @@ RubyInterpreter::RubyInterpreter ()
   rb_init_top_self ();
 }
 
-RubyInterpreter::~RubyInterpreter () 
+RubyInterpreter::~RubyInterpreter ()
 {
   delete d;
   d = 0;
@@ -2255,21 +4022,20 @@ static VALUE run_app_func (VALUE)
   return Qnil;
 }
 
-int
-RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) (int &, char **))
+int RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) (int &, char **))
 {
-  static char argv1[] = "-e";
-  static char argv2[] = "__run_app__";
+  static char argv1 [] = "-e";
+  static char argv2 [] = "__run_app__";
 
   int argc = 3;
-  char *argvv[3];
-  argvv[0] = main_argv[0];
+  char *argvv [3];
+  argvv [0] = main_argv [0];
   // Hint: to keep ruby_options from reading stdin, we simulate a "-e" option with an empty script
-  argvv[1] = argv1;
-  argvv[2] = argv2;
+  argvv [1] = argv1;
+  argvv [2] = argv2;
   char **argv = argvv;
 
-#if HAVE_RUBY_VERSION_CODE>=10900
+#if HAVE_RUBY_VERSION_CODE >= 10900
   //  Make sure we call ruby_sysinit on Windows because otherwise the program will crash (this
   //  has been observed on Windows under MSVC 2017 with Ruby 2.5.1 for example)
   //  ruby_sysinit will restore the argc/argv to their originals, so we use copies here.
@@ -2300,13 +4066,13 @@ RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) 
 
 #if defined(_WIN32)
 
-      //  On Windows we derive additional path components from a file called ".ruby-paths.txt" 
+      //  On Windows we derive additional path components from a file called ".ruby-paths.txt"
       //  inside the installation directory. This way, the installer can copy the deployment-time
       //  installation easier.
 
       try {
 
-        wchar_t buffer[MAX_PATH];
+        wchar_t buffer [MAX_PATH];
         int len;
         if ((len = GetModuleFileName (NULL, buffer, MAX_PATH)) > 0) {
 
@@ -2330,9 +4096,7 @@ RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) 
                 rba_add_path (i->to_string (), false);
               }
             }
-
           }
-
         }
 
       } catch (tl::Exception &ex) {
@@ -2343,7 +4107,7 @@ RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) 
 
 #endif
 
-      rb_define_global_function("__run_app__", (VALUE (*)(...)) run_app_func, 0);
+      rb_define_global_function ("__run_app__", (VALUE (*) (...)) run_app_func, 0);
 
       s_argc = &main_argc;
       s_argv = main_argv;
@@ -2353,8 +4117,8 @@ RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) 
       //  __app_run__ function. This was necessary to make the unit test framework work
       //  with Ruby 2.3.0. Without this scheme, rb_load_protect was giving a segmentation
       //  fault on exception.
-     
-#if HAVE_RUBY_VERSION_CODE<10900
+
+#if HAVE_RUBY_VERSION_CODE < 10900
 
       //  Remove setters for $0 and $PROGRAM_NAME (still both are linked) because
       //  the setter does strange things with the process and the argv, specifically argv[0] above.
@@ -2362,12 +4126,12 @@ RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) 
       //  with this code, so it got moved into the 1.8.x branch.
       static VALUE argv0 = Qnil;
       argv0 = c2ruby<const char *> (main_argv [0]);
-      rb_define_hooked_variable("$0", &argv0, 0, 0);
-      rb_define_hooked_variable("$PROGRAM_NAME", &argv0, 0, 0);
+      rb_define_hooked_variable ("$0", &argv0, 0, 0);
+      rb_define_hooked_variable ("$PROGRAM_NAME", &argv0, 0, 0);
 
       //  1.8.x does not have ruby_run_node
-      ruby_options(argc, argv);
-      ruby_run();
+      ruby_options (argc, argv);
+      ruby_run ();
       int res = 0;
 
 #else
@@ -2376,19 +4140,16 @@ RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) 
 
       s_argc = 0;
       return res;
-
     }
   }
 }
 
-void 
-RubyInterpreter::set_debugger_scope (const std::string &filename)
+void RubyInterpreter::set_debugger_scope (const std::string &filename)
 {
   d->debugger_scope = filename;
 }
 
-void 
-RubyInterpreter::remove_debugger_scope ()
+void RubyInterpreter::remove_debugger_scope ()
 {
   d->debugger_scope.clear ();
 }
@@ -2399,16 +4160,14 @@ RubyInterpreter::debugger_scope () const
   return d->debugger_scope;
 }
 
-void
-RubyInterpreter::ignore_next_exception ()
+void RubyInterpreter::ignore_next_exception ()
 {
   if (d->current_exec_handler) {
     d->ignore_next_exception = true;
   }
 }
 
-void
-RubyInterpreter::add_package_location (const std::string &package_path)
+void RubyInterpreter::add_package_location (const std::string &package_path)
 {
   std::string path = tl::combine_path (tl::absolute_file_path (package_path), "ruby");
   if (tl::file_exists (path) && d->package_paths.find (path) == d->package_paths.end ()) {
@@ -2417,20 +4176,17 @@ RubyInterpreter::add_package_location (const std::string &package_path)
   }
 }
 
-void
-RubyInterpreter::remove_package_location (const std::string & /*package_path*/)
+void RubyInterpreter::remove_package_location (const std::string & /*package_path*/)
 {
   //  Currently, we do not really remove the location. Ruby might get screwed up this way.
 }
 
-void
-RubyInterpreter::add_path (const std::string &path, bool prepend)
+void RubyInterpreter::add_path (const std::string &path, bool prepend)
 {
   rba_add_path (path, prepend);
 }
 
-void
-RubyInterpreter::require (const std::string &filename_utf8)
+void RubyInterpreter::require (const std::string &filename_utf8)
 {
   std::string fl (rb_cstring_from_utf8 (filename_utf8));
 
@@ -2439,7 +4195,7 @@ RubyInterpreter::require (const std::string &filename_utf8)
   rb_protect_init (); // see above
 
   RUBY_BEGIN_EXEC
-    rb_protect ((VALUE (*)(VALUE))rb_require, (VALUE)fl.c_str (), &error);
+  rb_protect ((VALUE (*) (VALUE)) rb_require, (VALUE) fl.c_str (), &error);
   RUBY_END_EXEC
 
   if (error) {
@@ -2447,8 +4203,7 @@ RubyInterpreter::require (const std::string &filename_utf8)
   }
 }
 
-void
-RubyInterpreter::load_file (const std::string &filename_utf8)
+void RubyInterpreter::load_file (const std::string &filename_utf8)
 {
   std::string fl (rb_cstring_from_utf8 (filename_utf8));
 
@@ -2456,11 +4211,11 @@ RubyInterpreter::load_file (const std::string &filename_utf8)
 
   rb_set_errinfo (Qnil);
   int error = 0;
-  int wrap = 0; // TODO: make variable?
+  int wrap = 0;       // TODO: make variable?
   rb_protect_init (); // see above
 
   RUBY_BEGIN_EXEC
-    rb_load_protect (rb_str_new (fl.c_str (), long (fl.size ())), wrap, &error);
+  rb_load_protect (rb_str_new (fl.c_str (), long (fl.size ())), wrap, &error);
   RUBY_END_EXEC
 
   if (error) {
@@ -2468,8 +4223,7 @@ RubyInterpreter::load_file (const std::string &filename_utf8)
   }
 }
 
-void
-RubyInterpreter::eval_string (const char *expr, const char *file, int line, int context)
+void RubyInterpreter::eval_string (const char *expr, const char *file, int line, int context)
 {
   d->file_id_map.clear ();
   rba_eval_string_in_context (expr, file, line, context);
@@ -2487,8 +4241,7 @@ RubyInterpreter::eval_expr (const char *expr, const char *file, int line, int co
   }
 }
 
-void
-RubyInterpreter::eval_string_and_print (const char *expr, const char *file, int line, int context)
+void RubyInterpreter::eval_string_and_print (const char *expr, const char *file, int line, int context)
 {
   d->file_id_map.clear ();
   VALUE res = rba_eval_string_in_context (expr, file, line, context);
@@ -2499,8 +4252,7 @@ RubyInterpreter::eval_string_and_print (const char *expr, const char *file, int 
   }
 }
 
-void
-RubyInterpreter::define_variable (const std::string &name, const tl::Variant &value)
+void RubyInterpreter::define_variable (const std::string &name, const tl::Variant &value)
 {
   rb_gv_set (name.c_str (), c2ruby (value));
 }
@@ -2511,8 +4263,7 @@ RubyInterpreter::inspector (int context)
   return create_inspector (context);
 }
 
-bool
-RubyInterpreter::available () const
+bool RubyInterpreter::available () const
 {
   return true;
 }
@@ -2522,8 +4273,7 @@ gsi::Console *RubyInterpreter::current_console ()
   return d->current_console;
 }
 
-void 
-RubyInterpreter::push_console (gsi::Console *console)
+void RubyInterpreter::push_console (gsi::Console *console)
 {
   if (! d->current_console) {
     std::swap (d->saved_stderr, rb_stderr);
@@ -2535,8 +4285,7 @@ RubyInterpreter::push_console (gsi::Console *console)
   d->current_console = console;
 }
 
-void 
-RubyInterpreter::remove_console (gsi::Console *console)
+void RubyInterpreter::remove_console (gsi::Console *console)
 {
   if (d->current_console == console) {
 
@@ -2557,18 +4306,15 @@ RubyInterpreter::remove_console (gsi::Console *console)
         break;
       }
     }
-
   }
 }
 
-void
-RubyInterpreter::block_exceptions (bool f)
+void RubyInterpreter::block_exceptions (bool f)
 {
   d->block_exceptions = f;
 }
 
-bool
-RubyInterpreter::exceptions_blocked ()
+bool RubyInterpreter::exceptions_blocked ()
 {
   return d->block_exceptions;
 }
@@ -2582,7 +4328,7 @@ prepare_trace (RubyInterpreter *interp, const char *fn)
   std::map<const char *, size_t>::const_iterator f = d->file_id_map.find (fn);
   if (f == d->file_id_map.end ()) {
     f = d->file_id_map.insert (std::make_pair (fn, d->current_exec_handler->id_for_path (interp, fn))).first;
-  } 
+  }
 
   return f->second;
 }
@@ -2595,23 +4341,23 @@ finish_trace (RubyInterpreter *interp)
 }
 
 static void
-#if HAVE_RUBY_VERSION_CODE<10900
+#if HAVE_RUBY_VERSION_CODE < 10900
 trace_callback (rb_event_t event, NODE *, VALUE /*self*/, ID /*id*/, VALUE /*klass*/)
-#elif HAVE_RUBY_VERSION_CODE<20300
+#elif HAVE_RUBY_VERSION_CODE < 20300
 trace_callback (rb_event_flag_t event, VALUE /*data*/, VALUE /*self*/, ID /*id*/, VALUE /*klass*/)
 #else
 //  raw trace func
 trace_callback (VALUE /*data*/, rb_trace_arg_t *trace_arg)
 #endif
 {
-#if HAVE_RUBY_VERSION_CODE>=20300
+#if HAVE_RUBY_VERSION_CODE >= 20300
   rb_event_flag_t event = rb_tracearg_event_flag (trace_arg);
 #endif
 
   //  TODO: should not access private data
   RubyInterpreterPrivateData *d = RubyInterpreter::instance ()->d;
 
-  if (d->current_exec_handler && !d->in_trace) {
+  if (d->current_exec_handler && ! d->in_trace) {
 
     if ((event & RUBY_EVENT_LINE) != 0) {
 
@@ -2620,26 +4366,26 @@ trace_callback (VALUE /*data*/, rb_trace_arg_t *trace_arg)
 
       RBA_TRY
 
-        if (d->exit_on_next) {
-          throw tl::ExitException (0);
-        }
+      if (d->exit_on_next) {
+        throw tl::ExitException (0);
+      }
 
-        try {
+      try {
 
-          int line = rb_sourceline ();
-          size_t file_id = prepare_trace (RubyInterpreter::instance (), rb_sourcefile ());
+        int line = rb_sourceline ();
+        size_t file_id = prepare_trace (RubyInterpreter::instance (), rb_sourcefile ());
 
-          RubyStackTraceProvider st_provider (d->debugger_scope);
-          d->current_exec_handler->trace (RubyInterpreter::instance (), file_id, line, &st_provider);
+        RubyStackTraceProvider st_provider (d->debugger_scope);
+        d->current_exec_handler->trace (RubyInterpreter::instance (), file_id, line, &st_provider);
 
-          finish_trace (RubyInterpreter::instance ());
+        finish_trace (RubyInterpreter::instance ());
 
-        } catch (...) {
-          finish_trace (RubyInterpreter::instance ());
-          throw;
-        }
+      } catch (...) {
+        finish_trace (RubyInterpreter::instance ());
+        throw;
+      }
 
-      RBA_CATCH("trace callback")
+      RBA_CATCH ("trace callback")
 
     } else if ((event & RUBY_EVENT_CALL) != 0) {
       d->current_exec_handler->push_call_stack (RubyInterpreter::instance ());
@@ -2647,7 +4393,7 @@ trace_callback (VALUE /*data*/, rb_trace_arg_t *trace_arg)
       d->current_exec_handler->pop_call_stack (RubyInterpreter::instance ());
     } else if ((event & RUBY_EVENT_RAISE) != 0 && ! d->block_exceptions) {
 
-#if HAVE_RUBY_VERSION_CODE>=20300
+#if HAVE_RUBY_VERSION_CODE >= 20300
       VALUE lasterr = rb_tracearg_raised_exception (trace_arg);
 #else
       VALUE lasterr = rb_errinfo ();
@@ -2671,9 +4417,9 @@ trace_callback (VALUE /*data*/, rb_trace_arg_t *trace_arg)
             std::string emsg = "<unknown>";
 
             VALUE klass = rb_class_path (CLASS_OF (lasterr));
-            eclass = std::string (RSTRING_PTR(klass), RSTRING_LEN(klass));
-            VALUE message = rb_obj_as_string(lasterr);
-            emsg = std::string (RSTRING_PTR(message), RSTRING_LEN(message));
+            eclass = std::string (RSTRING_PTR (klass), RSTRING_LEN (klass));
+            VALUE message = rb_obj_as_string (lasterr);
+            emsg = std::string (RSTRING_PTR (message), RSTRING_LEN (message));
 
             RubyStackTraceProvider st_provider (d->debugger_scope);
             d->current_exec_handler->exception_thrown (RubyInterpreter::instance (), file_id, line, eclass, emsg, &st_provider);
@@ -2688,24 +4434,18 @@ trace_callback (VALUE /*data*/, rb_trace_arg_t *trace_arg)
             //  because this causes a fatal error (exception reentered)
             finish_trace (RubyInterpreter::instance ());
           }
-
         }
 
-        //  Ruby tends to call this callback twice - once from rb_f_raise and then 
-        //  from rb_exc_raise. We use the s_block_exceptions flag to suppress the 
+        //  Ruby tends to call this callback twice - once from rb_f_raise and then
+        //  from rb_exc_raise. We use the s_block_exceptions flag to suppress the
         //  second one
         d->block_exceptions = true;
-
       }
-
     }
-
   }
-
 }
 
-void 
-RubyInterpreter::push_exec_handler (gsi::ExecutionHandler *h)
+void RubyInterpreter::push_exec_handler (gsi::ExecutionHandler *h)
 {
   if (d->current_exec_handler) {
 
@@ -2713,35 +4453,33 @@ RubyInterpreter::push_exec_handler (gsi::ExecutionHandler *h)
 
   } else {
 
-#if HAVE_RUBY_VERSION_CODE<10900
-    rb_remove_event_hook(trace_callback);
-    rb_add_event_hook(trace_callback, RUBY_EVENT_ALL);
-#elif HAVE_RUBY_VERSION_CODE<20300
-    rb_remove_event_hook(trace_callback);
-    rb_add_event_hook(trace_callback, RUBY_EVENT_ALL, Qnil);
+#if HAVE_RUBY_VERSION_CODE < 10900
+    rb_remove_event_hook (trace_callback);
+    rb_add_event_hook (trace_callback, RUBY_EVENT_ALL);
+#elif HAVE_RUBY_VERSION_CODE < 20300
+    rb_remove_event_hook (trace_callback);
+    rb_add_event_hook (trace_callback, RUBY_EVENT_ALL, Qnil);
 #else
-    rb_remove_event_hook((rb_event_hook_func_t)trace_callback);
-    rb_add_event_hook2((rb_event_hook_func_t)trace_callback, RUBY_EVENT_ALL, Qnil, RUBY_EVENT_HOOK_FLAG_RAW_ARG);
+    rb_remove_event_hook ((rb_event_hook_func_t) trace_callback);
+    rb_add_event_hook2 ((rb_event_hook_func_t) trace_callback, RUBY_EVENT_ALL, Qnil, RUBY_EVENT_HOOK_FLAG_RAW_ARG);
 #endif
-
   }
 
   d->current_exec_handler = h;
   d->file_id_map.clear ();
 
-  //  if we happen to push the exec handler inside the execution, 
+  //  if we happen to push the exec handler inside the execution,
   //  signal start of execution
   if (d->current_exec_level > 0) {
     d->current_exec_handler->start_exec (this);
   }
 }
 
-void 
-RubyInterpreter::remove_exec_handler (gsi::ExecutionHandler *exec_handler)
+void RubyInterpreter::remove_exec_handler (gsi::ExecutionHandler *exec_handler)
 {
   if (d->current_exec_handler == exec_handler) {
 
-    //  if we happen to remove the exec handler inside the execution, 
+    //  if we happen to remove the exec handler inside the execution,
     //  signal end of execution
     if (d->current_exec_level > 0) {
       d->current_exec_handler->end_exec (this);
@@ -2749,10 +4487,10 @@ RubyInterpreter::remove_exec_handler (gsi::ExecutionHandler *exec_handler)
 
     if (d->exec_handlers.empty ()) {
       d->current_exec_handler = 0;
-#if HAVE_RUBY_VERSION_CODE<20300
-      rb_remove_event_hook(trace_callback);
+#if HAVE_RUBY_VERSION_CODE < 20300
+      rb_remove_event_hook (trace_callback);
 #else
-    rb_remove_event_hook((rb_event_hook_func_t)trace_callback);
+      rb_remove_event_hook ((rb_event_hook_func_t) trace_callback);
 #endif
     } else {
       d->current_exec_handler = d->exec_handlers.back ();
@@ -2767,13 +4505,10 @@ RubyInterpreter::remove_exec_handler (gsi::ExecutionHandler *exec_handler)
         break;
       }
     }
-
   }
-
 }
 
-void
-RubyInterpreter::begin_exec ()
+void RubyInterpreter::begin_exec ()
 {
   d->exit_on_next = false;
   d->block_exceptions = false;
@@ -2785,8 +4520,7 @@ RubyInterpreter::begin_exec ()
   }
 }
 
-void
-RubyInterpreter::end_exec ()
+void RubyInterpreter::end_exec ()
 {
   if (d->current_exec_level > 0 && --d->current_exec_level == 0 && d->current_exec_handler) {
     d->current_exec_handler->end_exec (this);
@@ -2809,36 +4543,32 @@ static void fail (const char *file, int line)
   throw tl::ScriptError (tl::to_string (tr ("Ruby support not compiled in")).c_str (), file, line, "missing_feature", std::vector<tl::BacktraceElement> ());
 }
 
-RubyInterpreter::RubyInterpreter () 
-{ 
-  // .. nothing ..
-}
-
-RubyInterpreter::~RubyInterpreter () 
+RubyInterpreter::RubyInterpreter ()
 {
   // .. nothing ..
 }
 
-void 
-RubyInterpreter::add_path (const std::string &)
+RubyInterpreter::~RubyInterpreter ()
 {
   // .. nothing ..
 }
 
-void
-RubyInterpreter::require (const std::string &)
+void RubyInterpreter::add_path (const std::string &)
 {
   // .. nothing ..
 }
 
-void 
-RubyInterpreter::set_debugger_scope (const std::string &)
+void RubyInterpreter::require (const std::string &)
 {
   // .. nothing ..
 }
 
-void 
-RubyInterpreter::remove_debugger_scope ()
+void RubyInterpreter::set_debugger_scope (const std::string &)
+{
+  // .. nothing ..
+}
+
+void RubyInterpreter::remove_debugger_scope ()
 {
   // .. nothing ..
 }
@@ -2850,32 +4580,27 @@ RubyInterpreter::debugger_scope () const
   return empty;
 }
 
-void
-RubyInterpreter::ignore_next_exception ()
+void RubyInterpreter::ignore_next_exception ()
 {
   // .. nothing ..
 }
 
-void
-RubyInterpreter::load_file (const std::string &)
+void RubyInterpreter::load_file (const std::string &)
 {
   // .. nothing ..
 }
 
-void
-RubyInterpreter::eval_string (const char *, const char *file, int line, int)
+void RubyInterpreter::eval_string (const char *, const char *file, int line, int)
 {
   fail (file, line);
 }
 
-void
-RubyInterpreter::eval_string_and_print (const char *, const char *file, int line, int)
+void RubyInterpreter::eval_string_and_print (const char *, const char *file, int line, int)
 {
   fail (file, line);
 }
 
-void
-RubyInterpreter::define_variable (const std::string &, const std::string &)
+void RubyInterpreter::define_variable (const std::string &, const std::string &)
 {
   // .. nothing ..
 }
@@ -2885,38 +4610,32 @@ gsi::Inspector *RubyInterpreter::inspector (int)
   return 0;
 }
 
-bool
-RubyInterpreter::available () const
+bool RubyInterpreter::available () const
 {
   return false;
 }
 
-int
-RubyInterpreter::initialize (int argc, char **argv, int (*main_func) (int, char **))
+int RubyInterpreter::initialize (int argc, char **argv, int (*main_func) (int, char **))
 {
   return (*main_func) (argc, argv);
 }
 
-void 
-RubyInterpreter::push_exec_handler (gsi::ExecutionHandler *)
+void RubyInterpreter::push_exec_handler (gsi::ExecutionHandler *)
 {
   // .. nothing ..
 }
 
-void
-RubyInterpreter::remove_exec_handler (gsi::ExecutionHandler *)
+void RubyInterpreter::remove_exec_handler (gsi::ExecutionHandler *)
 {
   // .. nothing ..
 }
 
-void 
-RubyInterpreter::push_console (gsi::Console *)
+void RubyInterpreter::push_console (gsi::Console *)
 {
   // .. nothing ..
 }
 
-void 
-RubyInterpreter::remove_console (gsi::Console *)
+void RubyInterpreter::remove_console (gsi::Console *)
 {
   // .. nothing ..
 }
@@ -2949,4 +4668,3 @@ RubyInterpreter::instance ()
 }
 
 #endif
-

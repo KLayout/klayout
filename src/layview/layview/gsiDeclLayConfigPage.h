@@ -20,7 +20,7 @@
 
 */
 
-#if !defined(_HDR_gsiDeclLayConfigPage)
+#if ! defined(_HDR_gsiDeclLayConfigPage)
 #define _HDR_gsiDeclLayConfigPage
 
 #if defined(HAVE_QTBINDINGS)
@@ -35,7 +35,8 @@ namespace gsi
 {
 
 class ConfigPageImpl
-  : public lay::ConfigPage, public gsi::ObjectBase
+  : public lay::ConfigPage,
+    public gsi::ObjectBase
 {
 public:
   ConfigPageImpl (const std::string &title);

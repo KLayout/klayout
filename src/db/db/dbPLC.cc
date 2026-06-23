@@ -94,13 +94,11 @@ Vertex &Vertex::operator= (const Vertex &v)
     if (v.mp_ids) {
       mp_ids = new std::set<unsigned int> (*v.mp_ids);
     }
-
   }
   return *this;
 }
 
-bool
-Vertex::is_outside () const
+bool Vertex::is_outside () const
 {
   for (auto e = mp_edges.begin (); e != mp_edges.end (); ++e) {
     if ((*e)->is_outside ()) {
@@ -110,8 +108,7 @@ Vertex::is_outside () const
   return false;
 }
 
-bool
-Vertex::is_on_outline () const
+bool Vertex::is_on_outline () const
 {
   for (auto e = mp_edges.begin (); e != mp_edges.end (); ++e) {
     if ((*e)->is_segment ()) {
@@ -121,8 +118,7 @@ Vertex::is_on_outline () const
   return false;
 }
 
-void
-Vertex::set_is_precious (bool f, unsigned int id)
+void Vertex::set_is_precious (bool f, unsigned int id)
 {
   if (f) {
     if (! mp_ids) {
@@ -137,8 +133,7 @@ Vertex::set_is_precious (bool f, unsigned int id)
   }
 }
 
-bool
-Vertex::is_precious () const
+bool Vertex::is_precious () const
 {
   return mp_ids != 0;
 }
@@ -161,16 +156,15 @@ Vertex::polygons () const
   std::vector<Polygon *> res;
   for (auto e = mp_edges.begin (); e != mp_edges.end (); ++e) {
     for (auto t = (*e)->begin_polygons (); t != (*e)->end_polygons (); ++t) {
-      if (seen.insert (t.operator-> ()).second) {
-        res.push_back (t.operator-> ());
+      if (seen.insert (t.operator->()).second) {
+        res.push_back (t.operator->());
       }
     }
   }
   return res;
 }
 
-bool
-Vertex::has_edge (const Edge *edge) const
+bool Vertex::has_edge (const Edge *edge) const
 {
   for (auto e = mp_edges.begin (); e != mp_edges.end (); ++e) {
     if (*e == edge) {
@@ -198,15 +192,14 @@ Vertex::num_edges (int max_count) const
 std::string
 Vertex::to_string (bool with_id) const
 {
-  std::string res = tl::sprintf ("(%.12g, %.12g)", x (), y());
+  std::string res = tl::sprintf ("(%.12g, %.12g)", x (), y ());
   if (with_id) {
-    res += tl::sprintf ("[%x]", (size_t)this);
+    res += tl::sprintf ("[%x]", (size_t) this);
   }
   return res;
 }
 
-int
-Vertex::in_circle (const DPoint &point, const DPoint &center, double radius)
+int Vertex::in_circle (const DPoint &point, const DPoint &center, double radius)
 {
   double dx = point.x () - center.x ();
   double dy = point.y () - center.y ();
@@ -242,20 +235,17 @@ Edge::~Edge ()
   //  .. nothing yet ..
 }
 
-void
-Edge::set_left  (Polygon *t)
+void Edge::set_left (Polygon *t)
 {
   mp_left = t;
 }
 
-void
-Edge::set_right (Polygon *t)
+void Edge::set_right (Polygon *t)
 {
   mp_right = t;
 }
 
-void
-Edge::link ()
+void Edge::link ()
 {
   mp_v1->mp_edges.push_back (this);
   m_ec_v1 = --mp_v1->mp_edges.end ();
@@ -264,8 +254,7 @@ Edge::link ()
   m_ec_v2 = --mp_v2->mp_edges.end ();
 }
 
-void
-Edge::unlink ()
+void Edge::unlink ()
 {
   if (mp_v1) {
     mp_v1->remove_edge (m_ec_v1);
@@ -302,8 +291,7 @@ Edge::other (const Vertex *t) const
   return 0;
 }
 
-bool
-Edge::has_vertex (const Vertex *v) const
+bool Edge::has_vertex (const Vertex *v) const
 {
   return mp_v1 == v || mp_v2 == v;
 }
@@ -325,7 +313,7 @@ Edge::to_string (bool with_id) const
 {
   std::string res = std::string ("(") + mp_v1->to_string (with_id) + ", " + mp_v2->to_string (with_id) + ")";
   if (with_id) {
-    res += tl::sprintf ("[%x]", (size_t)this);
+    res += tl::sprintf ("[%x]", (size_t) this);
   }
   return res;
 }
@@ -345,15 +333,13 @@ Edge::distance (const db::DEdge &e, const db::DPoint &p)
   return (p - pp).length ();
 }
 
-bool
-Edge::crosses (const db::DEdge &e, const db::DEdge &other)
+bool Edge::crosses (const db::DEdge &e, const db::DEdge &other)
 {
   return e.side_of (other.p1 ()) * e.side_of (other.p2 ()) < 0 &&
          other.side_of (e.p1 ()) * other.side_of (e.p2 ()) < 0;
 }
 
-bool
-Edge::crosses_including (const db::DEdge &e, const db::DEdge &other)
+bool Edge::crosses_including (const db::DEdge &e, const db::DEdge &other)
 {
   int sa = e.side_of (other.p1 ());
   int sb = e.side_of (other.p2 ());
@@ -371,18 +357,16 @@ Edge::intersection_point (const db::DEdge &e, const db::DEdge &other)
   return e.intersect_point (other).second;
 }
 
-bool
-Edge::point_on (const db::DEdge &edge, const db::DPoint &point)
+bool Edge::point_on (const db::DEdge &edge, const db::DPoint &point)
 {
   if (edge.side_of (point) != 0) {
     return false;
   } else {
-    return db::sprod_sign (point - edge.p1 (), edge.d ()) * db::sprod_sign(point - edge.p2 (), edge.d ()) < 0;
+    return db::sprod_sign (point - edge.p1 (), edge.d ()) * db::sprod_sign (point - edge.p2 (), edge.d ()) < 0;
   }
 }
 
-bool
-Edge::can_flip () const
+bool Edge::can_flip () const
 {
   if (! left () || ! right ()) {
     return false;
@@ -393,8 +377,7 @@ Edge::can_flip () const
   return crosses (db::DEdge (*v1, *v2));
 }
 
-bool
-Edge::can_join_via (const Vertex *vertex) const
+bool Edge::can_join_via (const Vertex *vertex) const
 {
   if (! left () || ! right ()) {
     return false;
@@ -406,20 +389,17 @@ Edge::can_join_via (const Vertex *vertex) const
   return db::DEdge (*v1, *v2).side_of (*vertex) == 0;
 }
 
-bool
-Edge::is_outside () const
+bool Edge::is_outside () const
 {
   return left () == 0 || right () == 0;
 }
 
-bool
-Edge::is_for_outside_triangles () const
+bool Edge::is_for_outside_triangles () const
 {
   return (left () && left ()->is_outside ()) || (right () && right ()->is_outside ());
 }
 
-bool
-Edge::has_polygon (const Polygon *t) const
+bool Edge::has_polygon (const Polygon *t) const
 {
   return t != 0 && (left () == t || right () == t);
 }
@@ -433,8 +413,7 @@ Polygon::Polygon (Graph *graph)
   //  .. nothing yet ..
 }
 
-void
-Polygon::init ()
+void Polygon::init ()
 {
   m_id = 0;
   m_is_outside = false;
@@ -483,7 +462,6 @@ Polygon::init ()
       }
       ++i;
     }
-
   }
 
   //  establish clockwise order of the vertexes
@@ -505,8 +483,8 @@ Polygon::init ()
   //  link the polygon to the edges
 
   for (size_t i = 0; i < size (); ++i) {
-    Vertex *v = mp_v[i];
-    Edge *e = mp_e[i];
+    Vertex *v = mp_v [i];
+    Edge *e = mp_e [i];
     if (e->v1 () == v) {
       e->set_right (this);
     } else {
@@ -521,23 +499,23 @@ Polygon::Polygon (Graph *graph, Edge *e1, Edge *e2, Edge *e3)
   mp_e.resize (3, 0);
   mp_v.resize (3, 0);
 
-  mp_e[0] = e1;
-  mp_v[0] = e1->v1 ();
-  mp_v[1] = e1->v2 ();
+  mp_e [0] = e1;
+  mp_v [0] = e1->v1 ();
+  mp_v [1] = e1->v2 ();
 
-  if (e2->has_vertex (mp_v[1])) {
-    mp_e[1] = e2;
-    mp_e[2] = e3;
+  if (e2->has_vertex (mp_v [1])) {
+    mp_e [1] = e2;
+    mp_e [2] = e3;
   } else {
-    mp_e[1] = e3;
-    mp_e[2] = e2;
+    mp_e [1] = e3;
+    mp_e [2] = e2;
   }
-  mp_v[2] = mp_e[1]->other (mp_v[1]);
+  mp_v [2] = mp_e [1]->other (mp_v [1]);
 
   //  enforce clockwise orientation
-  int s = db::vprod_sign (*mp_v[2] - *mp_v[0], *mp_v[1] - *mp_v[0]);
+  int s = db::vprod_sign (*mp_v [2] - *mp_v [0], *mp_v [1] - *mp_v [0]);
   if (s < 0) {
-    std::swap (mp_v[2], mp_v[1]);
+    std::swap (mp_v [2], mp_v [1]);
   } else if (s == 0) {
     //  Triangle is not orientable
     tl_assert (false);
@@ -546,13 +524,13 @@ Polygon::Polygon (Graph *graph, Edge *e1, Edge *e2, Edge *e3)
   //  establish link to edges
   for (int i = 0; i < 3; ++i) {
 
-    Edge *e = mp_e[i];
+    Edge *e = mp_e [i];
 
     unsigned int i1 = 0;
-    for ( ; e->v1 () != mp_v[i1] && i1 < 3; ++i1)
+    for (; e->v1 () != mp_v [i1] && i1 < 3; ++i1)
       ;
     unsigned int i2 = 0;
-    for ( ; e->v2 () != mp_v[i2] && i2 < 3; ++i2)
+    for (; e->v2 () != mp_v [i2] && i2 < 3; ++i2)
       ;
 
     if ((i1 + 1) % 3 == i2) {
@@ -560,7 +538,6 @@ Polygon::Polygon (Graph *graph, Edge *e1, Edge *e2, Edge *e3)
     } else {
       e->set_left (this);
     }
-
   }
 }
 
@@ -569,8 +546,7 @@ Polygon::~Polygon ()
   unlink ();
 }
 
-void
-Polygon::unlink ()
+void Polygon::unlink ()
 {
   for (auto e = mp_e.begin (); e != mp_e.end (); ++e) {
     if ((*e)->left () == this) {
@@ -603,7 +579,7 @@ Polygon::to_string (bool with_id) const
 double
 Polygon::area () const
 {
-  return fabs (db::vprod (mp_e[0]->d (), mp_e[1]->d ())) * 0.5;
+  return fabs (db::vprod (mp_e [0]->d (), mp_e [1]->d ())) * 0.5;
 }
 
 db::DBox
@@ -641,17 +617,17 @@ Polygon::circumcircle (bool *ok) const
     *ok = true;
   }
 
-  db::DVector b = *mp_v[1] - *mp_v[0];
-  db::DVector c = *mp_v[2] - *mp_v[0];
+  db::DVector b = *mp_v [1] - *mp_v [0];
+  db::DVector c = *mp_v [2] - *mp_v [0];
 
   double b2 = b.sq_length ();
   double c2 = c.sq_length ();
 
   double sx = 0.5 * (b2 * c.y () - c2 * b.y ());
-  double sy = 0.5 * (b.x () * c2 - c.x() * b2);
+  double sy = 0.5 * (b.x () * c2 - c.x () * b2);
 
-  double a1 = b.x() * c.y();
-  double a2 = c.x() * b.y();
+  double a1 = b.x () * c.y ();
+  double a2 = c.x () * b.y ();
   double a = a1 - a2;
   double a_abs = std::abs (a);
 
@@ -665,7 +641,7 @@ Polygon::circumcircle (bool *ok) const
   }
 
   double radius = sqrt (sx * sx + sy * sy) / a_abs;
-  db::DPoint center = *mp_v[0] + db::DVector (sx / a, sy / a);
+  db::DPoint center = *mp_v [0] + db::DVector (sx / a, sy / a);
 
   return std::make_pair (center, radius);
 }
@@ -676,7 +652,7 @@ Polygon::opposite (const Edge *edge) const
   tl_assert (mp_v.size () == 3);
 
   for (int i = 0; i < 3; ++i) {
-    Vertex *v = mp_v[i];
+    Vertex *v = mp_v [i];
     if (! edge->has_vertex (v)) {
       return v;
     }
@@ -690,7 +666,7 @@ Polygon::opposite (const Vertex *vertex) const
   tl_assert (mp_v.size () == 3);
 
   for (int i = 0; i < 3; ++i) {
-    Edge *e = mp_e[i];
+    Edge *e = mp_e [i];
     if (! e->has_vertex (vertex)) {
       return e;
     }
@@ -720,24 +696,23 @@ Polygon::common_edge (const Polygon *other) const
   return 0;
 }
 
-int
-Polygon::contains (const db::DPoint &point) const
+int Polygon::contains (const db::DPoint &point) const
 {
   tl_assert (mp_v.size () == 3);
 
-  auto c = *mp_v[2] - *mp_v[0];
-  auto b = *mp_v[1] - *mp_v[0];
+  auto c = *mp_v [2] - *mp_v [0];
+  auto b = *mp_v [1] - *mp_v [0];
 
   int vps = db::vprod_sign (c, b);
   if (vps == 0) {
-    return db::vprod_sign (point - *mp_v[0], b) == 0 && db::vprod_sign (point - *mp_v[0], c) == 0 ? 0 : -1;
+    return db::vprod_sign (point - *mp_v [0], b) == 0 && db::vprod_sign (point - *mp_v [0], c) == 0 ? 0 : -1;
   }
 
   int res = 1;
 
-  const Vertex *vl = mp_v[2];
+  const Vertex *vl = mp_v [2];
   for (int i = 0; i < 3; ++i) {
-    const Vertex *v = mp_v[i];
+    const Vertex *v = mp_v [i];
     int n = db::vprod_sign (point - *vl, *v - *vl) * vps;
     if (n < 0) {
       return -1;
@@ -764,7 +739,7 @@ Polygon::next_edge (const Edge *edge, const Vertex *vertex) const
 double
 Polygon::min_edge_length () const
 {
-  double lmin = mp_e[0]->d ().length ();
+  double lmin = mp_e [0]->d ().length ();
   for (auto e = mp_e.begin (); e != mp_e.end (); ++e) {
     lmin = std::min (lmin, (*e)->d ().length ());
   }
@@ -780,8 +755,7 @@ Polygon::b () const
   return ok ? lmin / cr.second : 0.0;
 }
 
-bool
-Polygon::has_segment () const
+bool Polygon::has_segment () const
 {
   for (auto e = mp_e.begin (); e != mp_e.end (); ++e) {
     if ((*e)->is_segment ()) {
@@ -859,8 +833,7 @@ Graph::create_triangle (Edge *e1, Edge *e2, Edge *e3)
   return res;
 }
 
-void
-Graph::remove_polygon (Polygon *poly)
+void Graph::remove_polygon (Polygon *poly)
 {
   std::vector<Edge *> edges;
   edges.resize (poly->size (), 0);
@@ -949,8 +922,7 @@ Graph::to_layout (bool decompose_by_id) const
   return layout;
 }
 
-void
-Graph::dump (const std::string &path, bool decompose_by_id) const
+void Graph::dump (const std::string &path, bool decompose_by_id) const
 {
   std::unique_ptr<db::Layout> ly (to_layout (decompose_by_id));
 
@@ -963,8 +935,7 @@ Graph::dump (const std::string &path, bool decompose_by_id) const
   tl::info << "Graph written to " << path;
 }
 
-void
-Graph::clear ()
+void Graph::clear ()
 {
   mp_polygons.clear ();
   m_edges_heap.clear ();
@@ -973,6 +944,6 @@ Graph::clear ()
   m_id = 0;
 }
 
-}  // namespace plc
+} // namespace plc
 
-}  // namespace db
+} // namespace db

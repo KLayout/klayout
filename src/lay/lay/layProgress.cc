@@ -71,8 +71,7 @@ ProgressReporter::~ProgressReporter ()
   mp_pb = 0;
 }
 
-void
-ProgressReporter::set_progress_bar (lay::ProgressBar *pb)
+void ProgressReporter::set_progress_bar (lay::ProgressBar *pb)
 {
   if (pb == mp_pb) {
     return;
@@ -86,8 +85,7 @@ ProgressReporter::set_progress_bar (lay::ProgressBar *pb)
   }
 }
 
-void 
-ProgressReporter::register_object (tl::Progress *progress)
+void ProgressReporter::register_object (tl::Progress *progress)
 {
   if (begin () == end ()) {
     //  to avoid recursions of any kind, disallow any user interaction except
@@ -115,8 +113,7 @@ ProgressReporter::register_object (tl::Progress *progress)
   }
 }
 
-void 
-ProgressReporter::unregister_object (tl::Progress *progress)
+void ProgressReporter::unregister_object (tl::Progress *progress)
 {
   tl::ProgressAdaptor::unregister_object (progress);
 
@@ -146,12 +143,10 @@ ProgressReporter::unregister_object (tl::Progress *progress)
       m_active.erase (a);
       update_and_yield ();
     }
-
   }
 }
 
-void 
-ProgressReporter::trigger (tl::Progress *progress)
+void ProgressReporter::trigger (tl::Progress *progress)
 {
   std::map<tl::Progress *, tl::Clock>::iterator q = m_queued.find (progress);
   if (q != m_queued.end () && (tl::Clock::current () - q->second).seconds () > visibility_delay) {
@@ -167,8 +162,7 @@ ProgressReporter::trigger (tl::Progress *progress)
   }
 }
 
-void 
-ProgressReporter::yield (tl::Progress *progress)
+void ProgressReporter::yield (tl::Progress *progress)
 {
   std::map<tl::Progress *, tl::Clock>::iterator q = m_queued.find (progress);
   if (q != m_queued.end () && (tl::Clock::current () - q->second).seconds () > visibility_delay) {
@@ -185,8 +179,7 @@ ProgressReporter::yield (tl::Progress *progress)
   }
 }
 
-void
-ProgressReporter::update_and_yield ()
+void ProgressReporter::update_and_yield ()
 {
   if (! m_pw_visible) {
     return;
@@ -200,7 +193,7 @@ ProgressReporter::update_and_yield ()
         first ()->render_progress (w);
       }
     } else if (begin () != end ()) {
-      mp_pb->update_progress (begin ().operator-> ());
+      mp_pb->update_progress (begin ().operator->());
     } else {
       mp_pb->update_progress (0);
     }
@@ -209,16 +202,14 @@ ProgressReporter::update_and_yield ()
   process_events (); // Qt4 seems to need this
 }
 
-void
-ProgressReporter::process_events ()
+void ProgressReporter::process_events ()
 {
   if (m_pw_visible && lay::MainWindow::instance () && lay::ApplicationBase::instance ()) {
     lay::ApplicationBase::instance ()->process_events (QEventLoop::AllEvents, true /* no deferred methods */);
   }
 }
 
-void
-ProgressReporter::set_visible (bool vis)
+void ProgressReporter::set_visible (bool vis)
 {
   if (mp_pb) {
     mp_pb->show_progress_bar (vis);
@@ -228,10 +219,10 @@ ProgressReporter::set_visible (bool vis)
 
     //  prevent deferred method execution inside progress events - this might interfere with the
     //  actual operation
-    tl::DeferredMethodScheduler::enable (!vis);
+    tl::DeferredMethodScheduler::enable (! vis);
 
     if (mp_pb) {
-      if (!vis) {
+      if (! vis) {
         mp_pb->progress_remove_widget ();
       } else if (mp_pb->progress_wants_widget () && first ()) {
         mp_pb->progress_add_widget (first ()->progress_widget ());
@@ -239,15 +230,13 @@ ProgressReporter::set_visible (bool vis)
     }
 
     m_pw_visible = vis;
-
   }
 }
 
-bool
-ProgressReporter::eventFilter (QObject *obj, QEvent *event)
+bool ProgressReporter::eventFilter (QObject *obj, QEvent *event)
 {
   //  do not handle events that are not targeted towards widgets
-  if (! dynamic_cast <QWidget *> (obj)) {
+  if (! dynamic_cast<QWidget *> (obj)) {
     return false;
   }
 
@@ -256,7 +245,7 @@ ProgressReporter::eventFilter (QObject *obj, QEvent *event)
     return false;
   }
 
-  if (dynamic_cast <QInputEvent *> (event)) {
+  if (dynamic_cast<QInputEvent *> (event)) {
 
     QObject *o = obj;
     while (o) {
@@ -277,4 +266,3 @@ ProgressReporter::eventFilter (QObject *obj, QEvent *event)
 }
 
 } // namespace lay
-

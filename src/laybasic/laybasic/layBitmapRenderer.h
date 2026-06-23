@@ -36,17 +36,17 @@ namespace lay
  *
  *  The renderer is supposed to render a set of edges to
  *  one or more bitmaps. One bitmap holds the contour
- *  information, one the fill. A third one holds the 
+ *  information, one the fill. A third one holds the
  *  vertex information (dots).
- *  
+ *
  *  The intended use model is first to reserve a number of
  *  points if necessary, the fill the renderer with the
  *  edges and then render the content to the bitmaps.
  *
  *  The coordinate system of the bitmaps is 0,0..w-1,h-1
- *  with 0,0 being the lower left corner. 
+ *  with 0,0 being the lower left corner.
  */
-class LAYBASIC_PUBLIC BitmapRenderer 
+class LAYBASIC_PUBLIC BitmapRenderer
   : public Renderer
 {
 public:
@@ -56,7 +56,7 @@ public:
   BitmapRenderer (unsigned int width, unsigned int height, double resolution, double font_resolution);
 
   /**
-   *  @brief Reserve space for n edges 
+   *  @brief Reserve space for n edges
    *
    *  It is strongly recommended to use this method to
    *  reserve space in advance before any insert operation for edges or boxes.
@@ -64,14 +64,14 @@ public:
   virtual void reserve_edges (size_t n);
 
   /**
-   *  @brief Reserve space for n texts 
+   *  @brief Reserve space for n texts
    *
    *  It is strongly recommended to use this method to
    *  reserve space in advance before any insert operation for texts.
    */
   virtual void reserve_texts (size_t n);
 
-  /** 
+  /**
    *  @brief Clear the content
    */
   virtual void clear ();
@@ -86,7 +86,7 @@ public:
    *  @param f The function to apply before inserting the edge. It must
    *         provide a db::DEdge operator(Iter::value_type).
    */
-  template <class Iter, class Func> 
+  template <class Iter, class Func>
   void insert_edges (Iter from, Iter to, Func f)
   {
     for (Iter e = from; e != to; ++e) {
@@ -94,23 +94,23 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Insert a box with a transformation (because it may not be orthogonal)
    */
   void insert (const db::Box &b, const db::CplxTrans &t);
 
-  /** 
+  /**
    *  @brief Insert a box with a transformation (because it may not be orthogonal)
    */
   void insert (const db::DBox &b, const db::DCplxTrans &t);
 
-  /** 
-   *  @brief Insert a box 
+  /**
+   *  @brief Insert a box
    */
   void insert (const db::DBox &b);
 
-  /** 
-   *  @brief Insert an edge 
+  /**
+   *  @brief Insert an edge
    *
    *  The edges must be a db::DEdge type.
    */
@@ -129,17 +129,17 @@ public:
   void insert (const db::DBox &box, const std::string &text, db::Font font, db::HAlign halign, db::VAlign valign, db::DFTrans trans);
 
   /**
-   *  @brief Render the interior of the object to the bitmap 
+   *  @brief Render the interior of the object to the bitmap
    */
   void render_fill (lay::CanvasPlane &bitmap);
 
   /**
-   *  @brief Render the contour of the object to the bitmap 
+   *  @brief Render the contour of the object to the bitmap
    */
   void render_contour (lay::CanvasPlane &bitmap);
 
   /**
-   *  @brief Render the vertices of the object to the bitmap 
+   *  @brief Render the vertices of the object to the bitmap
    *
    *  Mode is
    *  0 for "all vertices" (2 per edge)
@@ -181,13 +181,13 @@ public:
   virtual void draw (const db::Polygon &poly, const db::CplxTrans &trans,
                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts);
 
-  /** 
+  /**
    *  @brief Same for double coordinates
    */
   virtual void draw (const db::DPolygon &poly,
                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts);
 
-  /** 
+  /**
    *  @brief Same for double coordinates and transformation
    */
   virtual void draw (const db::DPolygon &poly, const db::DCplxTrans &trans,
@@ -206,19 +206,19 @@ public:
   virtual void draw (const db::Box &box, const db::CplxTrans &trans,
                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts);
 
-  /** 
+  /**
    *  @brief Same for short representation
    */
   virtual void draw (const db::ShortBox &box, const db::CplxTrans &trans,
                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts);
 
-  /** 
+  /**
    *  @brief Same for double coordinates
    */
-  virtual void draw (const db::DBox &box, 
+  virtual void draw (const db::DBox &box,
                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts);
 
-  /** 
+  /**
    *  @brief Same for double coordinates and transformation
    */
   virtual void draw (const db::DBox &box, const db::DCplxTrans &trans,
@@ -237,13 +237,13 @@ public:
   virtual void draw (const db::Path &path, const db::CplxTrans &trans,
                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts);
 
-  /** 
+  /**
    *  @brief Same for double coordinates
    */
   virtual void draw (const db::DPath &path,
                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts);
 
-  /** 
+  /**
    *  @brief Same for double coordinates and transformation
    */
   virtual void draw (const db::DPath &path, const db::DCplxTrans &trans,
@@ -262,13 +262,13 @@ public:
   virtual void draw (const db::Text &text, const db::CplxTrans &trans,
                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts);
 
-  /** 
+  /**
    *  @brief Same for double coordinates
    */
-  virtual void draw (const db::DText &text, 
+  virtual void draw (const db::DText &text,
                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts);
 
-  /** 
+  /**
    *  @brief Same for double coordinates and transformation
    */
   virtual void draw (const db::DText &text, const db::DCplxTrans &trans,
@@ -304,13 +304,13 @@ public:
   virtual void draw (const db::Edge &edge, const db::CplxTrans &trans,
                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts);
 
-  /** 
-   *  @brief Same for double coordinates 
+  /**
+   *  @brief Same for double coordinates
    */
-  virtual void draw (const db::DEdge &edge, 
+  virtual void draw (const db::DEdge &edge,
                      lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertices, lay::CanvasPlane *texts);
 
-  /** 
+  /**
    *  @brief Same for double coordinates and transformation
    */
   virtual void draw (const db::DEdge &edge, const db::DCplxTrans &trans,
@@ -331,4 +331,3 @@ private:
 }
 
 #endif
-

@@ -41,10 +41,10 @@ static void remove_stipple (lay::LayoutViewBase *view, unsigned int index)
 {
   lay::DitherPattern pattern (view->dither_pattern ());
 
-  if (index >= (unsigned int) std::distance (pattern.begin (), pattern.begin_custom ()) && 
+  if (index >= (unsigned int) std::distance (pattern.begin (), pattern.begin_custom ()) &&
       index < (unsigned int) std::distance (pattern.begin (), pattern.end ())) {
     lay::DitherPatternInfo p;
-    pattern.replace_pattern (index, p); 
+    pattern.replace_pattern (index, p);
     pattern.renumber ();
     view->set_dither_pattern (pattern);
   }
@@ -300,7 +300,7 @@ static unsigned int show_layout2 (lay::LayoutViewBase *view, db::Layout *layout,
 
 static unsigned int show_layout_handle (lay::LayoutViewBase *view, lay::LayoutHandleRef &handle, bool add_cellview, bool initialize_layers)
 {
-  return view->add_layout (handle.operator-> (), add_cellview, initialize_layers);
+  return view->add_layout (handle.operator->(), add_cellview, initialize_layers);
 }
 
 static void delete_layers2 (lay::LayoutViewBase *view, unsigned int index, const std::vector<lay::LayerPropertiesConstIterator> &iters)
@@ -400,49 +400,50 @@ send_wheel_event (lay::LayoutViewBase *view, int delta, bool horizontal, const d
   view->canvas ()->send_wheel_event (delta, horizontal, pt, buttons);
 }
 
-namespace {
+namespace
+{
 
-  /**
-   *  @brief A wrapper class around LayerPropertiesConstIterator that adapts this iterator to GSI requirements
-   *
-   *  These requirements are basically a proper declaration of the value type.
-   *  TODO: once the LayerPropertiesConstIterator is modified to return
-   */
-  class LayerPropertiesConstIteratorWrapper
+/**
+ *  @brief A wrapper class around LayerPropertiesConstIterator that adapts this iterator to GSI requirements
+ *
+ *  These requirements are basically a proper declaration of the value type.
+ *  TODO: once the LayerPropertiesConstIterator is modified to return
+ */
+class LayerPropertiesConstIteratorWrapper
+{
+public:
+  typedef lay::LayerPropertiesNodeRef value_type;
+  typedef lay::LayerPropertiesNodeRef reference;
+  //  Dummy declarations required for std::iterator_traits
+  typedef std::forward_iterator_tag iterator_category;
+  typedef void difference_type;
+  typedef void pointer;
+
+  LayerPropertiesConstIteratorWrapper (const lay::LayerPropertiesConstIterator &iter)
+    : m_iter (iter)
   {
-  public:
-    typedef lay::LayerPropertiesNodeRef value_type;
-    typedef lay::LayerPropertiesNodeRef reference;
-    //  Dummy declarations required for std::iterator_traits
-    typedef std::forward_iterator_tag iterator_category;
-    typedef void difference_type;
-    typedef void pointer;
+    //  .. nothing yet ..
+  }
 
-    LayerPropertiesConstIteratorWrapper (const lay::LayerPropertiesConstIterator &iter)
-      : m_iter (iter)
-    {
-      //  .. nothing yet ..
-    }
+  reference operator* () const
+  {
+    return lay::LayerPropertiesNodeRef (m_iter);
+  }
 
-    reference operator* () const
-    {
-      return lay::LayerPropertiesNodeRef (m_iter);
-    }
+  bool at_end () const
+  {
+    return m_iter.at_end ();
+  }
 
-    bool at_end () const
-    {
-      return m_iter.at_end ();
-    }
+  LayerPropertiesConstIteratorWrapper &operator++ ()
+  {
+    ++m_iter;
+    return *this;
+  }
 
-    LayerPropertiesConstIteratorWrapper &operator++()
-    {
-      ++m_iter;
-      return *this;
-    }
-
-  private:
-    lay::LayerPropertiesConstIterator m_iter;
-  };
+private:
+  lay::LayerPropertiesConstIterator m_iter;
+};
 
 }
 
@@ -486,1586 +487,1382 @@ static bool view_is_dirty (lay::LayoutViewBase *view)
 extern Class<lay::Dispatcher> decl_Dispatcher;
 
 LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (decl_Dispatcher, "lay", "LayoutViewBase",
-  gsi::constant ("LV_NoLayers", (unsigned int) lay::LayoutViewBase::LV_NoLayers,
-    "@brief With this option, no layers view will be provided (see \\layer_control_frame)\n"
-    "Use this value with the constructor's 'options' argument.\n"
-    "\n"
-    "This constant has been introduced in version 0.27.\n"
-  ) +
-  gsi::constant ("LV_NoHierarchyPanel", (unsigned int) lay::LayoutViewBase::LV_NoHierarchyPanel,
-    "@brief With this option, no cell hierarchy view will be provided (see \\hierarchy_control_frame)\n"
-    "Use this value with the constructor's 'options' argument.\n"
-    "\n"
-    "This constant has been introduced in version 0.27.\n"
-  ) +
-  gsi::constant ("LV_NoLibrariesView", (unsigned int) lay::LayoutViewBase::LV_NoLibrariesView,
-    "@brief With this option, no library view will be provided (see \\libraries_frame)\n"
-    "Use this value with the constructor's 'options' argument.\n"
-    "\n"
-    "This constant has been introduced in version 0.27.\n"
-  ) +
-  gsi::constant ("LV_NoEditorOptionsPanel", (unsigned int) lay::LayoutViewBase::LV_NoEditorOptionsPanel,
-    "@brief With this option, no editor options panel will be provided (see \\editor_options_frame)\n"
-    "Use this value with the constructor's 'options' argument.\n"
-    "\n"
-    "This constant has been introduced in version 0.27.\n"
-  ) +
-  gsi::constant ("LV_NoBookmarksView", (unsigned int) lay::LayoutViewBase::LV_NoBookmarksView,
-    "@brief With this option, no bookmarks view will be provided (see \\bookmarks_frame)\n"
-    "Use this value with the constructor's 'options' argument.\n"
-    "\n"
-    "This constant has been introduced in version 0.27.\n"
-  ) +
-  gsi::constant ("LV_Naked", (unsigned int) lay::LayoutViewBase::LV_Naked,
-    "@brief With this option, no separate views will be provided\n"
-    "Use this value with the constructor's 'options' argument.\n"
-    "This option is basically equivalent to using \\LV_NoLayers+\\LV_NoHierarchyPanel+\\LV_NoLibrariesView+\\LV_NoBookmarksView\n"
-    "\n"
-    "This constant has been introduced in version 0.27.\n"
-  ) +
-  gsi::constant ("LV_NoZoom", (unsigned int) lay::LayoutViewBase::LV_NoZoom,
-    "@brief With this option, zooming is disabled\n"
-    "Use this value with the constructor's 'options' argument.\n"
-    "\n"
-    "This constant has been introduced in version 0.27.\n"
-  ) +
-  gsi::constant ("LV_NoGrid", (unsigned int) lay::LayoutViewBase::LV_NoGrid,
-    "@brief With this option, the grid background is not shown\n"
-    "Use this value with the constructor's 'options' argument.\n"
-    "\n"
-    "This constant has been introduced in version 0.27.\n"
-  ) +
-  gsi::constant ("LV_NoMove", (unsigned int) lay::LayoutViewBase::LV_NoMove,
-    "@brief With this option, move operations are not supported\n"
-    "Use this value with the constructor's 'options' argument.\n"
-    "\n"
-    "This constant has been introduced in version 0.27.\n"
-  ) +
-  gsi::constant ("LV_NoTracker", (unsigned int) lay::LayoutViewBase::LV_NoTracker,
-    "@brief With this option, mouse position tracking is not supported\n"
-    "Use this value with the constructor's 'options' argument.\n"
-    "This option is not useful currently as no mouse tracking support is provided.\n"
-    "\n"
-    "This constant has been introduced in version 0.27.\n"
-  ) +
-  gsi::constant ("LV_NoSelection", (unsigned int) lay::LayoutViewBase::LV_NoSelection,
-    "@brief With this option, objects cannot be selected\n"
-    "Use this value with the constructor's 'options' argument.\n"
-    "\n"
-    "This constant has been introduced in version 0.27.\n"
-  ) +
-  gsi::constant ("LV_NoPlugins", (unsigned int) lay::LayoutViewBase::LV_NoPlugins,
-    "@brief With this option, all plugins are disabled\n"
-    "Use this value with the constructor's 'options' argument.\n"
-    "\n"
-    "This constant has been introduced in version 0.27.\n"
-  ) +
-  gsi::constant ("LV_NoPropertiesPopup", (unsigned int) lay::LayoutViewBase::LV_NoPropertiesPopup,
-    "@brief This option disables the properties popup on double click\n"
-    "Use this value with the constructor's 'options' argument.\n"
-    "\n"
-    "This constant has been introduced in version 0.28.\n"
-  ) +
-  gsi::constant ("LV_NoServices", (unsigned int) lay::LayoutViewBase::LV_NoServices,
-    "@brief This option disables all services except the ones for pure viewing\n"
-    "Use this value with the constructor's 'options' argument.\n"
-    "With this option, all manipulation features are disabled, except zooming.\n"
-    "It is equivalent to \\LV_NoMove + \\LV_NoTracker + \\LV_NoSelection + \\LV_NoPlugins.\n"
-    "\n"
-    "This constant has been introduced in version 0.27.\n"
-  ) +
-  gsi::method ("stop_redraw", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::stop_redraw),
-    "@brief Stops the redraw thread\n"
-    "\n"
-    "It is very important to stop the redraw thread before applying changes to the "
-    "layout or the cell views and the LayoutView configuration. This is usually done automatically. "
-    "For rare cases, where this is not the case, this method is provided.\n"
-  ) +
-  gsi::method ("title=|#set_title", static_cast<void (lay::LayoutViewBase::*) (const std::string &)> (&lay::LayoutViewBase::set_title), gsi::arg ("title"),
-    "@brief Sets the title of the view\n"
-    "\n"
-    "@param title The title string to use\n"
-    "\n"
-    "Override the standard title of the view indicating the file names loaded by "
-    "the specified title string. The title string can be reset with \\reset_title to "
-    "the standard title again."
-  ) +
-  gsi::method ("reset_title", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::reset_title),
-    "@brief Resets the title to the standard title\n"
-    "\n"
-    "See \\set_title and \\title for a description about how titles are handled."
-  ) +
-  gsi::method ("title", static_cast<const std::string &(lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::title),
-    "@brief Returns the view's title string\n"
-    "\n"
-    "@return The title string\n"
-    "\n"
-    "The title string is either a string composed of the file names loaded (in some "
-    "\"readable\" manner) or a customized title string set by \\set_title."
-  ) +
-  gsi::method ("save_layer_props", static_cast<void (lay::LayoutViewBase::*) (const std::string &)> (&lay::LayoutViewBase::save_layer_props), gsi::arg ("fn"),
-    "@brief Saves the layer properties\n"
-    "\n"
-    "Save the layer properties to the file given in \"fn\""
-  ) +
-  gsi::method ("load_layer_props", static_cast <void (lay::LayoutViewBase::*)(const std::string &)> (&lay::LayoutViewBase::load_layer_props), gsi::arg ("fn"),
-    "@brief Loads the layer properties\n"
-    "\n"
-    "@param fn The file name of the .lyp file to load\n"
-    "\n"
-    "Load the layer properties from the file given in \"fn\""
-  ) +
-  gsi::method ("load_layer_props", static_cast <void (lay::LayoutViewBase::*)(const std::string &, bool)> (&lay::LayoutViewBase::load_layer_props), gsi::arg ("fn"), gsi::arg ("add_default"),
-    "@brief Loads the layer properties with options\n"
-    "\n"
-    "@param fn The file name of the .lyp file to load\n"
-    "@param add_default If true, default layers will be added for each other layer in the layout\n"
-    "\n"
-    "Load the layer properties from the file given in \"fn\".\n"
-    "This version allows one to specify whether defaults should be used for all other layers by "
-    "setting \"add_default\" to true.\n"
-    "\n"
-    "This variant has been added on version 0.21."
-  ) +
-  gsi::method ("load_layer_props", static_cast <void (lay::LayoutViewBase::*)(const std::string &, int, bool)> (&lay::LayoutViewBase::load_layer_props), gsi::arg ("fn"), gsi::arg ("cv_index"), gsi::arg ("add_default"),
-    "@brief Loads the layer properties with options\n"
-    "\n"
-    "@param fn The file name of the .lyp file to load\n"
-    "@param cv_index See description text\n"
-    "@param add_default If true, default layers will be added for each other layer in the layout\n"
-    "\n"
-    "Load the layer properties from the file given in \"fn\".\n"
-    "This version allows one to specify whether defaults should be used for all other layers by "
-    "setting \"add_default\" to true. It can be used to load the layer properties for a specific "
-    "cellview by setting \"cv_index\" to the index for which the layer properties file should be applied. "
-    "All present definitions for this layout will be removed before the properties file is loaded. \"cv_index\" can "
-    "be set to -1. In that case, the layer properties file is applied to each of the layouts individually.\n"
-    "\n"
-    "Note that this version will override all cellview index definitions in the layer properties file.\n"
-    "\n"
-    "This variant has been added on version 0.21."
-  ) +
-  gsi::method ("min_hier_levels=", static_cast<void (lay::LayoutViewBase::*) (int)> (&lay::LayoutViewBase::set_min_hier_levels), gsi::arg ("level"),
-    "@brief Sets the minimum hierarchy level at which to display geometries\n"
-    "\n"
-    "@param level The minimum level above which to display something\n"
-    "\n"
-    "This methods allows setting the minimum hierarchy level above which to display geometries."
-    "This method may cause a redraw if required."
-  ) +
-  gsi::method ("min_hier_levels", static_cast<int (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::get_min_hier_levels),
-    "@brief Returns the minimum hierarchy level at which to display geometries\n"
-    "\n"
-    "@return The minimum level at which to display geometries"
-  ) +
-  gsi::method ("max_hier_levels=", static_cast<void (lay::LayoutViewBase::*) (int)> (&lay::LayoutViewBase::set_max_hier_levels), gsi::arg ("level"),
-    "@brief Sets the maximum hierarchy level up to which to display geometries\n"
-    "\n"
-    "@param level The maximum level below which to display something\n"
-    "\n"
-    "This methods allows setting the maximum hierarchy below which to display geometries."
-    "This method may cause a redraw if required."
-  ) +
-  gsi::method ("max_hier_levels", static_cast<int (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::get_max_hier_levels),
-    "@brief Returns the maximum hierarchy level up to which to display geometries\n"
-    "\n"
-    "@return The maximum level up to which to display geometries"
-  ) +
-  gsi::method ("enable_edits", static_cast<void (lay::LayoutViewBase::*) (bool)> (&lay::LayoutViewBase::enable_edits), gsi::arg ("enable"),
-    "@brief Enables or disables edits\n"
-    "\n"
-    "@param enable Enable edits if set to true\n"
-    "\n"
-    "This method allows putting the view into read-only mode by disabling all edit "
-    "functions. For doing so, this method has to be called with a 'false' argument. Calling it "
-    "with a 'true' parameter enables all edits again. This method must not be confused with the "
-    "edit/viewer mode. The LayoutView's enable_edits method is intended to temporarily disable "
-    "all menu entries and functions which could allow the user to alter the database."
-    "\n"
-    "In 0.25, this method has been moved from MainWindow to LayoutView.\n"
-  ) +
-  gsi::method_ext ("add_marker", &add_marker, gsi::arg ("marker"),
-    "@brief Adds a persistent marker to the view (transferring ownership)\n"
-    "\n"
-    "This method allows creating markers and transferring ownership to the view, hence making them persistent. "
-    "This means, when the variable with the marker object goes out of scope, the marker will still exist in the view.\n"
-    "\n"
-    "To create a persistent marker, use the following code:\n"
-    "\n"
-    "@code\n"
-    "marker = RBA::Marker::new\n"
-    "# ... configure marker ...\n"
-    "view.add_marker(marker)\n"
-    "@/code\n"
-    "\n"
-    "To remove all persistent markers owned by the view, use \\clear_markers.\n"
-    "\n"
-    "Persistent markers have been introduced in version 0.29.3\n"
-  ) +
-  gsi::method_ext ("clear_markers", &clear_markers,
-    "@brief Clears all persistent markers from the view\n"
-    "See \\add_marker for details about persistent markers.\n"
-    "\n"
-    "Persistent markers have been introduced in version 0.29.3\n"
-  ) +
-  gsi::method ("is_editable?", static_cast<bool (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::is_editable),
-    "@brief Returns true if the view is in editable mode\n"
-    "\n"
-    "This read-only attribute has been added in version 0.27.5.\n"
-  ) +
-  gsi::method ("reload_layout", static_cast<void (lay::LayoutViewBase::*) (unsigned int)> (&lay::LayoutViewBase::reload_layout), gsi::arg ("cv"),
-    "@brief Reloads the given cellview\n"
-    "\n"
-    "@param cv The index of the cellview to reload"
-  ) + 
-  gsi::method ("create_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (bool)> (&lay::LayoutViewBase::create_layout), gsi::arg ("add_cellview"),
-    "@brief Creates a new, empty layout\n"
-    "\n"
-    "The add_cellview parameter controls whether to create a new cellview (true)\n"
-    "or clear all cellviews before (false).\n"
-    "\n"
-    "This version will associate the new layout with the default technology.\n"
-    "\n"
-    "@return The index of the cellview created.\n"
-  ) +
-  gsi::method ("create_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, bool)> (&lay::LayoutViewBase::create_layout), gsi::arg ("tech"), gsi::arg ("add_cellview"),
-    "@brief Create a new, empty layout and associate it with the given technology\n"
-    "\n"
-    "The add_cellview parameter controls whether to create a new cellview (true)\n"
-    "or clear all cellviews before (false).\n"
-    "\n"
-    "@return The index of the cellview created.\n"
-    "\n"
-    "This variant has been introduced in version 0.22.\n"
-  ) +
-  gsi::method ("create_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, bool, bool)> (&lay::LayoutViewBase::create_layout), gsi::arg ("tech"), gsi::arg ("add_cellview"), gsi::arg ("init_layers"),
-    "@brief Create a new, empty layout and associate it with the given technology\n"
-    "\n"
-    "The add_cellview parameter controls whether to create a new cellview (true)\n"
-    "or clear all cellviews before (false). This variant also allows one to control whether the layer properties are\n"
-    "initialized (init_layers = true) or not (init_layers = false).\n"
-    "\n"
-    "@return The index of the cellview created.\n"
-    "\n"
-    "This variant has been introduced in version 0.22.\n"
-  ) +
-  gsi::method_ext ("show_layout", &show_layout1, gsi::arg ("layout"), gsi::arg ("add_cellview"),
-    "@brief Shows an existing layout in the view\n"
-    "\n"
-    "Shows the given layout in the view. If add_cellview is true, the new layout is added to the list of "
-    "cellviews in the view.\n"
-    "\n"
-    "Note: once a layout is passed to the view with show_layout, it is owned by the view and must not be "
-    "destroyed with the 'destroy' method.\n"
-    "\n"
-    "@return The index of the cellview created.\n"
-    "\n"
-    "This method has been introduced in version 0.22.\n"
-  ) +
-  gsi::method_ext ("show_layout", &show_layout2, gsi::arg ("layout"), gsi::arg ("tech"), gsi::arg ("add_cellview"), gsi::arg ("init_layers", true),
-    "@brief Shows an existing layout in the view\n"
-    "\n"
-    "Shows the given layout in the view. If add_cellview is true, the new layout is added to the list of "
-    "cellviews in the view.\n"
-    "The technology to use for that layout can be specified as well with the 'tech' parameter. Depending "
-    "on the definition of the technology, layer properties may be loaded for example.\n"
-    "The technology string can be empty for the default technology.\n"
-    "This variant also allows one to control whether the layer properties are\n"
-    "initialized (init_layers = true) or not (init_layers = false).\n"
-    "\n"
-    "Note: once a layout is passed to the view with show_layout, it is owned by the view and must not be "
-    "destroyed with the 'destroy' method.\n"
-    "\n"
-    "@return The index of the cellview created.\n"
-    "\n"
-    "This method has been introduced in version 0.22.\n"
-  ) +
-  gsi::method_ext ("show_layout", &show_layout_handle, gsi::arg ("layout_handle"), gsi::arg ("add_cellview"), gsi::arg ("init_layers", true),
-    "@brief Shows an existing layout (from a handle) in the view\n"
-    "\n"
-    "This variant of \\show_layout takes a layout handle instead of the layout. Layout handles are reference-counted pointers\n"
-    "and can be used to hold a reference to a layout object. This way, ownership over the layout can be shared between different\n"
-    "objects.\n"
-    "\n"
-    "@return The index of the cellview created.\n"
-    "\n"
-    "This method has been introduced in version 0.30.7.\n"
-  ) +
-  gsi::method ("erase_cellview", static_cast<void (lay::LayoutViewBase::*) (unsigned int)> (&lay::LayoutViewBase::erase_cellview), gsi::arg ("index"),
-    "@brief Erases the cellview with the given index\n"
-    "\n"
-    "This closes the given cellview and unloads the layout associated with it, unless referred to by another cellview."
-  ) +
-  gsi::method ("rename_cellview", static_cast<void (lay::LayoutViewBase::*) (const std::string &, int)> (&lay::LayoutViewBase::rename_cellview), gsi::arg ("name"), gsi::arg ("index"),
-    "@brief Renames the cellview with the given index\n"
-    "\n"
-    "If the name is not unique, a unique name will be constructed from the name given.\n"
-    "The name may be different from the filename but is associated with the layout object.\n"
-    "If a layout is shared between multiple cellviews (which may happen due to a clone of the layout view\n"
-    "for example), all cellviews are renamed.\n"
-  ) +
-  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, const db::LoadLayoutOptions &, const std::string &, bool)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("technology"), gsi::arg ("add_cellview", true),
-    "@brief Loads a (new) file into the layout view with the given technology\n"
-    "\n"
-    "Loads the file given by the \"filename\" parameter and associates it with the given technology.\n"
-    "The options specify various options for reading the file.\n"
-    "The add_cellview param controls whether to create a new cellview (true)\n"
-    "or clear all cellviews before (false).\n"
-    "\n"
-    "@return The index of the cellview loaded.\n"
-    "\n"
-    "This version has been introduced in version 0.22. The 'add_cellview' argument has been made optional in version 0.28.\n"
-  ) +
-  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, const db::LoadLayoutOptions &, bool)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("add_cellview", true),
-    "@brief Loads a (new) file into the layout view\n"
-    "\n"
-    "Loads the file given by the \"filename\" parameter.\n"
-    "The options specify various options for reading the file.\n"
-    "The add_cellview param controls whether to create a new cellview (true)\n"
-    "or clear all cellviews before (false).\n"
-    "\n"
-    "@return The index of the cellview loaded.\n"
-    "\n"
-    "This method has been introduced in version 0.18. The 'add_cellview' argument has been made optional in version 0.28.\n"
-  ) +
-  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, const std::string &, bool)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("technology"), gsi::arg ("add_cellview", true),
-    "@brief Loads a (new) file into the layout view with the given technology\n"
-    "\n"
-    "Loads the file given by the \"filename\" parameter and associates it with the given technology.\n"
-    "The add_cellview param controls whether to create a new cellview (true)\n"
-    "or clear all cellviews before (false).\n"
-    "\n"
-    "@return The index of the cellview loaded.\n"
-    "\n"
-    "This version has been introduced in version 0.22. The 'add_cellview' argument has been made optional in version 0.28.\n"
-  ) +
-  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &filename, bool add_cellview)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("add_cellview", true),
-    "@brief Loads a (new) file into the layout view\n"
-    "\n"
-    "Loads the file given by the \"filename\" parameter.\n"
-    "The add_cellview param controls whether to create a new cellview (true)\n"
-    "or clear all cellviews before (false).\n"
-    "\n"
-    "@return The index of the cellview loaded. The 'add_cellview' argument has been made optional in version 0.28.\n"
-  ) +
-  gsi::method ("active_cellview", static_cast<lay::CellViewRef (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::active_cellview_ref),
-    "@brief Gets the active cellview (shown in hierarchy browser)\n"
-    "\n"
-    "This is a convenience method which is equivalent to \"cellview(active_cellview_index)\".\n"
-    "\n"
-    "This method has been introduced in version 0.19.\n"
-    "Starting from version 0.25, the returned object can be manipulated which will have an immediate effect "
-    "on the display."
-  ) +
-  gsi::method ("active_cellview_index", static_cast<int (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::active_cellview_index),
-    "@brief Gets the index of the active cellview (shown in hierarchy browser)\n"
-  ) +
-  gsi::method ("active_cellview_index=|#active_setview_index=|#set_active_cellview_index", &lay::LayoutViewBase::set_active_cellview_index, gsi::arg ("index"),
-    "@brief Makes the cellview with the given index the active one (shown in hierarchy browser)\n"
-    "See \\active_cellview_index.\n"
-    "Note, that this changing the active cell view index has side effects such as terminating an editing operation.\n"
-    "\n"
-    "This method has been renamed from set_active_cellview_index to active_cellview_index= in version 0.25. "
-    "The original name is still available, but is deprecated."
-  ) +
-  gsi::method_ext ("selected_cells_paths", &selected_cells_paths, gsi::arg ("cv_index"),
-    "@brief Gets the paths of the selected cells\n"
-    "\n"
-    "Gets a list of cell paths to the cells selected in the cellview given by \\cv_index. "
-    "The \"selected cells\" are the ones selected in the cell list or cell tree. This is not the \"current cell\" "
-    "which is the one that is shown in the layout window.\n"
-    "\n"
-    "The cell paths are arrays of cell indexes where the last element is the actual cell selected.\n"
-    "\n"
-    "This method has be introduced in version 0.25.\n"
-  ) +
-  gsi::method ("#get_current_cell_path", static_cast<lay::LayoutViewBase::cell_path_type (lay::LayoutViewBase::*) (int) const> (&lay::LayoutViewBase::get_current_cell_path), gsi::arg ("cv_index"),
-    "@brief Gets the cell path of the current cell\n"
-    "\n"
-    "The current cell is the one highlighted in the browser with the focus rectangle. The \n"
-    "current path is returned for the cellview given by cv_index.\n"
-    "The cell path is a list of cell indices from the top cell to the current cell.\n"
-    "\n"
-    "@param cv_index The cellview index for which to get the current path from (usually this will be the active cellview index)"
-    "\n"
-    "This method is was deprecated in version 0.25 since from then, the \\CellView object can be used to obtain an manipulate the selected cell."
-  ) +
-  gsi::method ("#set_current_cell_path", static_cast<void (lay::LayoutViewBase::*) (int, const lay::LayoutViewBase::cell_path_type &)> (&lay::LayoutViewBase::set_current_cell_path), gsi::arg ("cv_index"), gsi::arg ("cell_path"),
-    "@brief Sets the path to the current cell\n"
-    "\n"
-    "The current cell is the one highlighted in the browser with the focus rectangle. The\n"
-    "cell given by the path is highlighted and scrolled into view.\n"
-    "To select the cell to be drawn, use the \\select_cell or \\select_cell_path method.\n"
-    "\n"
-    "@param cv_index The cellview index for which to set the current path for (usually this will be the active cellview index)\n"
-    "@param path The path to the current cell\n"
-    "\n"
-    "This method is was deprecated in version 0.25 since from then, the \\CellView object can be used to obtain an manipulate the selected cell."
-  ) +
-  gsi::method ("cellviews", static_cast<unsigned int (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::cellviews),
-    "@brief Gets the number of cellviews\n"
-  ) + 
-  gsi::method ("cellview", static_cast<lay::CellViewRef (lay::LayoutViewBase::*) (unsigned int)> (&lay::LayoutViewBase::cellview_ref), gsi::arg ("cv_index"),
-    "@brief Gets the cellview object for a given index\n"
-    "\n"
-    "@param cv_index The cellview index for which to get the object for\n"
-    "\n"
-    "Starting with version 0.25, this method returns a \\CellView object that can be manipulated to directly reflect "
-    "any changes in the display."
-  ) + 
-  gsi::method ("zoom_fit", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::zoom_fit),
-    "@brief Fits the contents of the current view into the window"
-  ) +
-  gsi::method ("zoom_fit_sel", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::zoom_fit_sel),
-    "@brief Fits the contents of the current selection into the window\n"
-    "\n"
-    "This method has been introduced in version 0.25.\n"
-  ) +
-  gsi::method ("zoom_box", static_cast<void (lay::LayoutViewBase::*) (const db::DBox &)> (&lay::LayoutViewBase::zoom_box), gsi::arg ("box"),
-    "@brief Sets the viewport to the given box\n"
-    "\n"
-    "@param box The box to which to set the view in micron coordinates\n"
-  ) +
-  gsi::method ("zoom_in", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::zoom_in),
-    "@brief Zooms in somewhat"
-  ) +
-  gsi::method ("zoom_out", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::zoom_out),
-    "@brief Zooms out somewhat"
-  ) +
-  gsi::method ("pan_up", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::pan_up),
-    "@brief Pans upward"
-  ) +
-  gsi::method ("pan_down", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::pan_down),
-    "@brief Pans down"
-  ) +
-  gsi::method ("pan_left", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::pan_left),
-    "@brief Pans to the left"
-  ) +
-  gsi::method ("pan_right", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::pan_right),
-    "@brief Pans to the right"
-  ) +
-  gsi::method ("pan_center", static_cast<void (lay::LayoutViewBase::*) (const db::DPoint &)> (&lay::LayoutViewBase::pan_center), gsi::arg ("p"),
-    "@brief Pans to the given point\n"
-    "\n"
-    "The window is positioned such that \"p\" becomes the new center"
-  ) +
-  gsi::method ("box", static_cast<db::DBox (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::box),
-    "@brief Returns the displayed box in micron space"
-  ) +
-  gsi::method_ext ("viewport_trans", &viewport_trans,
-    "@brief Returns the transformation that converts micron coordinates to pixels\n"
-    "Hint: the transformation returned will convert any point in micron coordinate space into "
-    "a pixel coordinate. Contrary to usual convention, the y pixel coordinate is given in a mathematically "
-    "oriented space - which means the bottom coordinate is 0.\n"
-    "This method was introduced in version 0.18.\n"
-  ) +
-  gsi::method_ext ("viewport_width", &viewport_width,
-    "@brief Returns the viewport width in pixels\n"
-    "This method was introduced in version 0.18.\n"
-  ) +
-  gsi::method_ext ("viewport_height", &viewport_height,
-    "@brief Return the viewport height in pixels\n"
-    "This method was introduced in version 0.18.\n"
-  ) +
-  gsi::method ("add_missing_layers", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::add_missing_layers),
-    "@brief Adds new layers to layer list\n"
-    "This method was introduced in version 0.19.\n"
-  ) +
-  gsi::method ("remove_unused_layers", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::remove_unused_layers),
-    "@brief Removes unused layers from layer list\n"
-    "This method was introduced in version 0.19.\n"
-  ) +
-  gsi::method ("init_layer_properties", (void (lay::LayoutViewBase::*) (lay::LayerProperties &) const) &lay::LayoutViewBase::init_layer_properties, gsi::arg ("props"),
-    "@brief Fills the layer properties for a new layer\n"
-    "\n"
-    "This method initializes a layer properties object's color and stipples according to "
-    "the defaults for the given layer source specification. The layer's source must be set already "
-    "on the layer properties object.\n"
-    "\n"
-    "This method was introduced in version 0.19.\n"
-    "\n"
-    "@param props The layer properties object to initialize."
-  ) +
-  gsi::method ("switch_mode", static_cast<void (lay::LayoutViewBase::*) (const std::string &)> (&lay::LayoutViewBase::switch_mode), gsi::arg ("mode"),
-    "@brief Switches the mode.\n"
-    "\n"
-    "See \\mode_name about a method to get the name of the current mode and \\mode_names for a method "
-    "to retrieve all available mode names.\n"
-    "\n"
-    "This method has been introduced in version 0.28."
-  ) +
-  gsi::method ("mode_name", &lay::LayoutViewBase::mode_name,
-    "@brief Gets the name of the current mode.\n"
-    "\n"
-    "See \\switch_mode about a method to change the mode and \\mode_names for a method "
-    "to retrieve all available mode names.\n"
-    "\n"
-    "This method has been introduced in version 0.28."
-  ) +
-  gsi::method ("mode_names", &lay::LayoutViewBase::mode_names,
-    "@brief Gets the names of the available modes.\n"
-    "\n"
-    "This method allows asking the view for the available mode names for \\switch_mode and "
-    "for the value returned by \\mode.\n"
-    "\n"
-    "This method has been introduced in version 0.28."
-  ) +
-  gsi::method_ext ("menu", &menu,
-    "@brief Gets the \\AbstractMenu associated with this view.\n"
-    "\n"
-    "In normal UI application mode this is the main window's view. For a detached view or in non-UI "
-    "applications this is the view's private menu.\n"
-    "\n"
-    "This method has been introduced in version 0.28."
-  ) +
-  gsi::method ("call_menu", &lay::LayoutViewBase::menu_activated, gsi::arg ("symbol"),
-    "@brief Calls the menu item with the provided symbol.\n"
-    "To obtain all symbols, use \\menu_symbols.\n"
-    "\n"
-    "This method has been introduced in version 0.27."
-  ) +
-  gsi::method ("menu_symbols", &lay::LayoutViewBase::menu_symbols,
-    "@brief Gets all available menu symbols (see \\call_menu).\n"
-    "NOTE: currently this method delivers a superset of all available symbols. Depending on the context, no all symbols may trigger actual functionality.\n"
-    "\n"
-    "This method has been introduced in version 0.27."
-  ) +
-  gsi::method ("cancel", &lay::LayoutViewBase::cancel,
-    "@brief Cancels all edit operations\n"
-    "\n"
-    "This method will stop all pending edit operations (i.e. drag and drop) and cancel the current "
-    "selection. Calling this method is useful to ensure there are no potential interactions with the script's "
-    "functionality.\n"
-  ) +
-  gsi::method ("clear_selection", (void (lay::LayoutViewBase::*) ()) &lay::LayoutViewBase::clear_selection,
-    "@brief Clears the selection of all objects (shapes, annotations, images ...)\n"
-    "\n"
-    "This method has been introduced in version 0.26.2\n"
-  ) +
-  gsi::method ("select_all", (void (lay::LayoutViewBase::*) ()) &lay::LayoutViewBase::select_all,
-    "@brief Selects all objects from the view\n"
-    "\n"
-    "This method has been introduced in version 0.27\n"
-  ) +
-  gsi::method ("select_from", (void (lay::LayoutViewBase::*) (const db::DPoint &, lay::Editable::SelectionMode)) &lay::LayoutViewBase::select, gsi::arg ("point"), gsi::arg ("mode", lay::Editable::SelectionMode::Replace, "Replace"),
-    "@brief Selects the objects from a given point\n"
-    "\n"
-    "The mode indicates whether to add to the selection, replace the selection, remove from selection or invert the selected status of the objects "
-    "found around the given point.\n"
-    "\n"
-    "This method has been introduced in version 0.27\n"
-  ) +
-  gsi::method ("select_from", (void (lay::LayoutViewBase::*) (const db::DBox &, lay::Editable::SelectionMode)) &lay::LayoutViewBase::select, gsi::arg ("box"), gsi::arg ("mode", lay::Editable::SelectionMode::Replace, "Replace"),
-    "@brief Selects the objects from a given box\n"
-    "\n"
-    "The mode indicates whether to add to the selection, replace the selection, remove from selection or invert the selected status of the objects "
-    "found inside the given box.\n"
-    "\n"
-    "This method has been introduced in version 0.27\n"
-  ) +
-  gsi::method ("clear_transient_selection", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::clear_transient_selection),
-    "@brief Clears the transient selection (mouse-over hightlights) of all objects (shapes, annotations, images ...)\n"
-    "\n"
-    "This method has been introduced in version 0.26.2\n"
-  ) +
-  gsi::method ("transient_to_selection", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::transient_to_selection),
-    "@brief Turns the transient selection into the actual selection\n"
-    "\n"
-    "The current selection is cleared before. All highlighted objects under the mouse will become selected. "
-    "This applies to all types of objects (rulers, shapes, images ...).\n"
-    "\n"
-    "This method has been introduced in version 0.26.2\n"
-  ) +
-  gsi::method ("selection_bbox", static_cast<db::DBox (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::selection_bbox),
-    "@brief Returns the bounding box of the current selection\n"
-    "\n"
-    "This method has been introduced in version 0.26.2\n"
-  ) +
-  gsi::method ("selection_size", (size_t (lay::LayoutViewBase::*) ()) &lay::LayoutViewBase::selection_size,
-    "@brief Returns the number of selected objects\n"
-    "\n"
-    "This method has been introduced in version 0.27\n"
-  ) +
-  gsi::method ("has_selection?", (bool (lay::LayoutViewBase::*) ()) &lay::LayoutViewBase::has_selection,
-    "@brief Indicates whether any objects are selected\n"
-    "\n"
-    "This method has been introduced in version 0.27\n"
-  ) +
-  gsi::method ("stop", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::stop),
-    "@brief Stops redraw thread and close any browsers\n"
-    "This method usually does not need to be called explicitly. The redraw thread is stopped automatically."
-  ) +
-  gsi::method ("#select_cell_path", (void (lay::LayoutViewBase::*) (const lay::LayoutViewBase::cell_path_type &, int)) &lay::LayoutViewBase::select_cell, gsi::arg ("cell_index"), gsi::arg ("cv_index"),
-    "@brief Selects a cell by cell index for a certain cell view\n"
-    "\n"
-    "Select the current (top) cell by specifying a cell indexand the cellview index for which this cell should become the currently shown one. The path to the cell is constructed by "
-    "selecting one that leads to a top cell.\n"
-    "This method selects the cell to be drawn. In constrast, the \\set_current_cell_path method selects "
-    "the cell that is highlighted in the cell tree (but not necessarily drawn)."
-    "\n"
-    "This method is was deprecated in version 0.25 since from then, the \\CellView object can be used to obtain an manipulate the selected cell."
-  ) +
-  gsi::method ("#select_cell", (void (lay::LayoutViewBase::*) (lay::LayoutViewBase::cell_index_type, int)) &lay::LayoutViewBase::select_cell, gsi::arg ("cell_index"), gsi::arg ("cv_index"),
-    "@brief Selects a cell by index for a certain cell view\n"
-    "\n"
-    "Select the current (top) cell by specifying a path (a list of cell indices from top to "
-    "the actual cell) and the cellview index for which this cell should become the currently "
-    "shown one.\n"
-    "This method selects the cell to be drawn. In constrast, the \\set_current_cell_path method selects "
-    "the cell that is highlighted in the cell tree (but not necessarily drawn)."
-    "\n"
-    "This method is was deprecated in version 0.25 since from then, the \\CellView object can be used to obtain an manipulate the selected cell."
-  ) +
-  gsi::method ("descend", static_cast<void (lay::LayoutViewBase::*) (const std::vector<db::InstElement> &, int)> (&lay::LayoutViewBase::descend), gsi::arg ("path"), gsi::arg ("index"),
-    "@brief Descends further into the hierarchy.\n"
-    "\n"
-    "Adds the given path (given as an array of InstElement objects) to the specific path of the "
-    "cellview with the given index. In effect, the cell addressed by the terminal of the new path "
-    "components can be shown in the context of the upper cells, if the minimum hierarchy level is "
-    "set to a negative value.\n"
-    "The path is assumed to originate from the current cell and contain specific instances sorted from "
-    "top to bottom."
-  ) +
-  gsi::method ("ascend", static_cast<db::InstElement (lay::LayoutViewBase::*) (int)> (&lay::LayoutViewBase::ascend), gsi::arg ("index"),
-    "@brief Ascends upwards in the hierarchy.\n"
-    "\n"
-    "Removes one element from the specific path of the cellview with the given index. Returns the element "
-    "removed."
-  ) +
-  gsi::method ("is_cell_hidden?", static_cast<bool (lay::LayoutViewBase::*) (db::cell_index_type, int) const> (&lay::LayoutViewBase::is_cell_hidden), gsi::arg ("cell_index"), gsi::arg ("cv_index"),
-    "@brief Returns true, if the cell is hidden\n"
-    "\n"
-    "@return True, if the cell with \"cell_index\" is hidden for the cellview \"cv_index\""
-  ) +
-  gsi::method ("hide_cell", static_cast<void (lay::LayoutViewBase::*) (db::cell_index_type, int)> (&lay::LayoutViewBase::hide_cell), gsi::arg ("cell_index"), gsi::arg ("cv_index"),
-    "@brief Hides the given cell for the given cellview\n"
-  ) +
-  gsi::method ("show_cell", static_cast<void (lay::LayoutViewBase::*) (db::cell_index_type, int)> (&lay::LayoutViewBase::show_cell), gsi::arg ("cell_index"), gsi::arg ("cv_index"),
-    "@brief Shows the given cell for the given cellview (cancel effect of \\hide_cell)\n"
-  ) +
-  gsi::method ("show_all_cells", (void (lay::LayoutViewBase::*) ()) &lay::LayoutViewBase::show_all_cells,
-    "@brief Makes all cells shown (cancel effects of \\hide_cell)"
-  ) +
-  gsi::method ("show_all_cells", (void (lay::LayoutViewBase::*) (int)) &lay::LayoutViewBase::show_all_cells, gsi::arg ("cv_index"),
-    "@brief Makes all cells shown (cancel effects of \\hide_cell) for the specified cell view\n"
-    "Unlike \\show_all_cells, this method will only clear the hidden flag on the cell view selected by \\cv_index.\n"
-    "\n"
-    "This variant has been added in version 0.25."
-  ) +
-  gsi::method ("update_content", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::force_update_content),
-    "@brief Updates the layout view to the current state\n"
-    "\n"
-    "This method triggers an update of the hierarchy tree and layer view tree. Usually, this "
-    "method does not need to be called. The widgets are updated automatically in most cases.\n"
-    "\n"
-    "Currently, this method should be called however, after the layer view tree has been changed by "
-    "the \\insert_layer, \\replace_layer_node or \\delete_layer methods.\n" 
-  ) +
-  gsi::method ("max_hier", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::max_hier),
-    "@brief Selects all hierarchy levels available\n"
-    "\n"
-    "Show the layout in full depth down to the deepest level of hierarchy. "
-    "This method may cause a redraw."
-  ) +
-  gsi::method_ext ("is_dirty?", &view_is_dirty,
-    "@brief Gets a flag indicating whether one of the layouts displayed needs saving\n"
-    "A layout is 'dirty' if it is modified and needs saving. This method returns "
-    "true if this is the case for at least one of the layouts shown in the view.\n"
-    "\n"
-    "This method has been introduced in version 0.29.\n"
-  ) +
-  gsi::method ("resize", static_cast<void (lay::LayoutViewBase::*) (unsigned int, unsigned int)> (&lay::LayoutViewBase::resize), gsi::arg ("w"), gsi::arg ("h"),
-    "@brief Resizes the layout view to the given dimension\n"
-    "\n"
-    "This method has been made available in all builds in 0.28.\n"
-  ) +
+                                                                gsi::constant ("LV_NoLayers", (unsigned int) lay::LayoutViewBase::LV_NoLayers,
+                                                                               "@brief With this option, no layers view will be provided (see \\layer_control_frame)\n"
+                                                                               "Use this value with the constructor's 'options' argument.\n"
+                                                                               "\n"
+                                                                               "This constant has been introduced in version 0.27.\n") +
+                                                                  gsi::constant ("LV_NoHierarchyPanel", (unsigned int) lay::LayoutViewBase::LV_NoHierarchyPanel,
+                                                                                 "@brief With this option, no cell hierarchy view will be provided (see \\hierarchy_control_frame)\n"
+                                                                                 "Use this value with the constructor's 'options' argument.\n"
+                                                                                 "\n"
+                                                                                 "This constant has been introduced in version 0.27.\n") +
+                                                                  gsi::constant ("LV_NoLibrariesView", (unsigned int) lay::LayoutViewBase::LV_NoLibrariesView,
+                                                                                 "@brief With this option, no library view will be provided (see \\libraries_frame)\n"
+                                                                                 "Use this value with the constructor's 'options' argument.\n"
+                                                                                 "\n"
+                                                                                 "This constant has been introduced in version 0.27.\n") +
+                                                                  gsi::constant ("LV_NoEditorOptionsPanel", (unsigned int) lay::LayoutViewBase::LV_NoEditorOptionsPanel,
+                                                                                 "@brief With this option, no editor options panel will be provided (see \\editor_options_frame)\n"
+                                                                                 "Use this value with the constructor's 'options' argument.\n"
+                                                                                 "\n"
+                                                                                 "This constant has been introduced in version 0.27.\n") +
+                                                                  gsi::constant ("LV_NoBookmarksView", (unsigned int) lay::LayoutViewBase::LV_NoBookmarksView,
+                                                                                 "@brief With this option, no bookmarks view will be provided (see \\bookmarks_frame)\n"
+                                                                                 "Use this value with the constructor's 'options' argument.\n"
+                                                                                 "\n"
+                                                                                 "This constant has been introduced in version 0.27.\n") +
+                                                                  gsi::constant ("LV_Naked", (unsigned int) lay::LayoutViewBase::LV_Naked,
+                                                                                 "@brief With this option, no separate views will be provided\n"
+                                                                                 "Use this value with the constructor's 'options' argument.\n"
+                                                                                 "This option is basically equivalent to using \\LV_NoLayers+\\LV_NoHierarchyPanel+\\LV_NoLibrariesView+\\LV_NoBookmarksView\n"
+                                                                                 "\n"
+                                                                                 "This constant has been introduced in version 0.27.\n") +
+                                                                  gsi::constant ("LV_NoZoom", (unsigned int) lay::LayoutViewBase::LV_NoZoom,
+                                                                                 "@brief With this option, zooming is disabled\n"
+                                                                                 "Use this value with the constructor's 'options' argument.\n"
+                                                                                 "\n"
+                                                                                 "This constant has been introduced in version 0.27.\n") +
+                                                                  gsi::constant ("LV_NoGrid", (unsigned int) lay::LayoutViewBase::LV_NoGrid,
+                                                                                 "@brief With this option, the grid background is not shown\n"
+                                                                                 "Use this value with the constructor's 'options' argument.\n"
+                                                                                 "\n"
+                                                                                 "This constant has been introduced in version 0.27.\n") +
+                                                                  gsi::constant ("LV_NoMove", (unsigned int) lay::LayoutViewBase::LV_NoMove,
+                                                                                 "@brief With this option, move operations are not supported\n"
+                                                                                 "Use this value with the constructor's 'options' argument.\n"
+                                                                                 "\n"
+                                                                                 "This constant has been introduced in version 0.27.\n") +
+                                                                  gsi::constant ("LV_NoTracker", (unsigned int) lay::LayoutViewBase::LV_NoTracker,
+                                                                                 "@brief With this option, mouse position tracking is not supported\n"
+                                                                                 "Use this value with the constructor's 'options' argument.\n"
+                                                                                 "This option is not useful currently as no mouse tracking support is provided.\n"
+                                                                                 "\n"
+                                                                                 "This constant has been introduced in version 0.27.\n") +
+                                                                  gsi::constant ("LV_NoSelection", (unsigned int) lay::LayoutViewBase::LV_NoSelection,
+                                                                                 "@brief With this option, objects cannot be selected\n"
+                                                                                 "Use this value with the constructor's 'options' argument.\n"
+                                                                                 "\n"
+                                                                                 "This constant has been introduced in version 0.27.\n") +
+                                                                  gsi::constant ("LV_NoPlugins", (unsigned int) lay::LayoutViewBase::LV_NoPlugins,
+                                                                                 "@brief With this option, all plugins are disabled\n"
+                                                                                 "Use this value with the constructor's 'options' argument.\n"
+                                                                                 "\n"
+                                                                                 "This constant has been introduced in version 0.27.\n") +
+                                                                  gsi::constant ("LV_NoPropertiesPopup", (unsigned int) lay::LayoutViewBase::LV_NoPropertiesPopup,
+                                                                                 "@brief This option disables the properties popup on double click\n"
+                                                                                 "Use this value with the constructor's 'options' argument.\n"
+                                                                                 "\n"
+                                                                                 "This constant has been introduced in version 0.28.\n") +
+                                                                  gsi::constant ("LV_NoServices", (unsigned int) lay::LayoutViewBase::LV_NoServices,
+                                                                                 "@brief This option disables all services except the ones for pure viewing\n"
+                                                                                 "Use this value with the constructor's 'options' argument.\n"
+                                                                                 "With this option, all manipulation features are disabled, except zooming.\n"
+                                                                                 "It is equivalent to \\LV_NoMove + \\LV_NoTracker + \\LV_NoSelection + \\LV_NoPlugins.\n"
+                                                                                 "\n"
+                                                                                 "This constant has been introduced in version 0.27.\n") +
+                                                                  gsi::method ("stop_redraw", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::stop_redraw),
+                                                                               "@brief Stops the redraw thread\n"
+                                                                               "\n"
+                                                                               "It is very important to stop the redraw thread before applying changes to the "
+                                                                               "layout or the cell views and the LayoutView configuration. This is usually done automatically. "
+                                                                               "For rare cases, where this is not the case, this method is provided.\n") +
+                                                                  gsi::method ("title=|#set_title", static_cast<void (lay::LayoutViewBase::*) (const std::string &)> (&lay::LayoutViewBase::set_title), gsi::arg ("title"),
+                                                                               "@brief Sets the title of the view\n"
+                                                                               "\n"
+                                                                               "@param title The title string to use\n"
+                                                                               "\n"
+                                                                               "Override the standard title of the view indicating the file names loaded by "
+                                                                               "the specified title string. The title string can be reset with \\reset_title to "
+                                                                               "the standard title again.") +
+                                                                  gsi::method ("reset_title", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::reset_title),
+                                                                               "@brief Resets the title to the standard title\n"
+                                                                               "\n"
+                                                                               "See \\set_title and \\title for a description about how titles are handled.") +
+                                                                  gsi::method ("title", static_cast<const std::string &(lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::title),
+                                                                               "@brief Returns the view's title string\n"
+                                                                               "\n"
+                                                                               "@return The title string\n"
+                                                                               "\n"
+                                                                               "The title string is either a string composed of the file names loaded (in some "
+                                                                               "\"readable\" manner) or a customized title string set by \\set_title.") +
+                                                                  gsi::method ("save_layer_props", static_cast<void (lay::LayoutViewBase::*) (const std::string &)> (&lay::LayoutViewBase::save_layer_props), gsi::arg ("fn"),
+                                                                               "@brief Saves the layer properties\n"
+                                                                               "\n"
+                                                                               "Save the layer properties to the file given in \"fn\"") +
+                                                                  gsi::method ("load_layer_props", static_cast<void (lay::LayoutViewBase::*) (const std::string &)> (&lay::LayoutViewBase::load_layer_props), gsi::arg ("fn"),
+                                                                               "@brief Loads the layer properties\n"
+                                                                               "\n"
+                                                                               "@param fn The file name of the .lyp file to load\n"
+                                                                               "\n"
+                                                                               "Load the layer properties from the file given in \"fn\"") +
+                                                                  gsi::method ("load_layer_props", static_cast<void (lay::LayoutViewBase::*) (const std::string &, bool)> (&lay::LayoutViewBase::load_layer_props), gsi::arg ("fn"), gsi::arg ("add_default"),
+                                                                               "@brief Loads the layer properties with options\n"
+                                                                               "\n"
+                                                                               "@param fn The file name of the .lyp file to load\n"
+                                                                               "@param add_default If true, default layers will be added for each other layer in the layout\n"
+                                                                               "\n"
+                                                                               "Load the layer properties from the file given in \"fn\".\n"
+                                                                               "This version allows one to specify whether defaults should be used for all other layers by "
+                                                                               "setting \"add_default\" to true.\n"
+                                                                               "\n"
+                                                                               "This variant has been added on version 0.21.") +
+                                                                  gsi::method ("load_layer_props", static_cast<void (lay::LayoutViewBase::*) (const std::string &, int, bool)> (&lay::LayoutViewBase::load_layer_props), gsi::arg ("fn"), gsi::arg ("cv_index"), gsi::arg ("add_default"),
+                                                                               "@brief Loads the layer properties with options\n"
+                                                                               "\n"
+                                                                               "@param fn The file name of the .lyp file to load\n"
+                                                                               "@param cv_index See description text\n"
+                                                                               "@param add_default If true, default layers will be added for each other layer in the layout\n"
+                                                                               "\n"
+                                                                               "Load the layer properties from the file given in \"fn\".\n"
+                                                                               "This version allows one to specify whether defaults should be used for all other layers by "
+                                                                               "setting \"add_default\" to true. It can be used to load the layer properties for a specific "
+                                                                               "cellview by setting \"cv_index\" to the index for which the layer properties file should be applied. "
+                                                                               "All present definitions for this layout will be removed before the properties file is loaded. \"cv_index\" can "
+                                                                               "be set to -1. In that case, the layer properties file is applied to each of the layouts individually.\n"
+                                                                               "\n"
+                                                                               "Note that this version will override all cellview index definitions in the layer properties file.\n"
+                                                                               "\n"
+                                                                               "This variant has been added on version 0.21.") +
+                                                                  gsi::method ("min_hier_levels=", static_cast<void (lay::LayoutViewBase::*) (int)> (&lay::LayoutViewBase::set_min_hier_levels), gsi::arg ("level"),
+                                                                               "@brief Sets the minimum hierarchy level at which to display geometries\n"
+                                                                               "\n"
+                                                                               "@param level The minimum level above which to display something\n"
+                                                                               "\n"
+                                                                               "This methods allows setting the minimum hierarchy level above which to display geometries."
+                                                                               "This method may cause a redraw if required.") +
+                                                                  gsi::method ("min_hier_levels", static_cast<int (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::get_min_hier_levels),
+                                                                               "@brief Returns the minimum hierarchy level at which to display geometries\n"
+                                                                               "\n"
+                                                                               "@return The minimum level at which to display geometries") +
+                                                                  gsi::method ("max_hier_levels=", static_cast<void (lay::LayoutViewBase::*) (int)> (&lay::LayoutViewBase::set_max_hier_levels), gsi::arg ("level"),
+                                                                               "@brief Sets the maximum hierarchy level up to which to display geometries\n"
+                                                                               "\n"
+                                                                               "@param level The maximum level below which to display something\n"
+                                                                               "\n"
+                                                                               "This methods allows setting the maximum hierarchy below which to display geometries."
+                                                                               "This method may cause a redraw if required.") +
+                                                                  gsi::method ("max_hier_levels", static_cast<int (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::get_max_hier_levels),
+                                                                               "@brief Returns the maximum hierarchy level up to which to display geometries\n"
+                                                                               "\n"
+                                                                               "@return The maximum level up to which to display geometries") +
+                                                                  gsi::method ("enable_edits", static_cast<void (lay::LayoutViewBase::*) (bool)> (&lay::LayoutViewBase::enable_edits), gsi::arg ("enable"),
+                                                                               "@brief Enables or disables edits\n"
+                                                                               "\n"
+                                                                               "@param enable Enable edits if set to true\n"
+                                                                               "\n"
+                                                                               "This method allows putting the view into read-only mode by disabling all edit "
+                                                                               "functions. For doing so, this method has to be called with a 'false' argument. Calling it "
+                                                                               "with a 'true' parameter enables all edits again. This method must not be confused with the "
+                                                                               "edit/viewer mode. The LayoutView's enable_edits method is intended to temporarily disable "
+                                                                               "all menu entries and functions which could allow the user to alter the database."
+                                                                               "\n"
+                                                                               "In 0.25, this method has been moved from MainWindow to LayoutView.\n") +
+                                                                  gsi::method_ext ("add_marker", &add_marker, gsi::arg ("marker"),
+                                                                                   "@brief Adds a persistent marker to the view (transferring ownership)\n"
+                                                                                   "\n"
+                                                                                   "This method allows creating markers and transferring ownership to the view, hence making them persistent. "
+                                                                                   "This means, when the variable with the marker object goes out of scope, the marker will still exist in the view.\n"
+                                                                                   "\n"
+                                                                                   "To create a persistent marker, use the following code:\n"
+                                                                                   "\n"
+                                                                                   "@code\n"
+                                                                                   "marker = RBA::Marker::new\n"
+                                                                                   "# ... configure marker ...\n"
+                                                                                   "view.add_marker(marker)\n"
+                                                                                   "@/code\n"
+                                                                                   "\n"
+                                                                                   "To remove all persistent markers owned by the view, use \\clear_markers.\n"
+                                                                                   "\n"
+                                                                                   "Persistent markers have been introduced in version 0.29.3\n") +
+                                                                  gsi::method_ext ("clear_markers", &clear_markers,
+                                                                                   "@brief Clears all persistent markers from the view\n"
+                                                                                   "See \\add_marker for details about persistent markers.\n"
+                                                                                   "\n"
+                                                                                   "Persistent markers have been introduced in version 0.29.3\n") +
+                                                                  gsi::method ("is_editable?", static_cast<bool (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::is_editable),
+                                                                               "@brief Returns true if the view is in editable mode\n"
+                                                                               "\n"
+                                                                               "This read-only attribute has been added in version 0.27.5.\n") +
+                                                                  gsi::method ("reload_layout", static_cast<void (lay::LayoutViewBase::*) (unsigned int)> (&lay::LayoutViewBase::reload_layout), gsi::arg ("cv"),
+                                                                               "@brief Reloads the given cellview\n"
+                                                                               "\n"
+                                                                               "@param cv The index of the cellview to reload") +
+                                                                  gsi::method ("create_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (bool)> (&lay::LayoutViewBase::create_layout), gsi::arg ("add_cellview"),
+                                                                               "@brief Creates a new, empty layout\n"
+                                                                               "\n"
+                                                                               "The add_cellview parameter controls whether to create a new cellview (true)\n"
+                                                                               "or clear all cellviews before (false).\n"
+                                                                               "\n"
+                                                                               "This version will associate the new layout with the default technology.\n"
+                                                                               "\n"
+                                                                               "@return The index of the cellview created.\n") +
+                                                                  gsi::method ("create_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, bool)> (&lay::LayoutViewBase::create_layout), gsi::arg ("tech"), gsi::arg ("add_cellview"),
+                                                                               "@brief Create a new, empty layout and associate it with the given technology\n"
+                                                                               "\n"
+                                                                               "The add_cellview parameter controls whether to create a new cellview (true)\n"
+                                                                               "or clear all cellviews before (false).\n"
+                                                                               "\n"
+                                                                               "@return The index of the cellview created.\n"
+                                                                               "\n"
+                                                                               "This variant has been introduced in version 0.22.\n") +
+                                                                  gsi::method ("create_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, bool, bool)> (&lay::LayoutViewBase::create_layout), gsi::arg ("tech"), gsi::arg ("add_cellview"), gsi::arg ("init_layers"),
+                                                                               "@brief Create a new, empty layout and associate it with the given technology\n"
+                                                                               "\n"
+                                                                               "The add_cellview parameter controls whether to create a new cellview (true)\n"
+                                                                               "or clear all cellviews before (false). This variant also allows one to control whether the layer properties are\n"
+                                                                               "initialized (init_layers = true) or not (init_layers = false).\n"
+                                                                               "\n"
+                                                                               "@return The index of the cellview created.\n"
+                                                                               "\n"
+                                                                               "This variant has been introduced in version 0.22.\n") +
+                                                                  gsi::method_ext ("show_layout", &show_layout1, gsi::arg ("layout"), gsi::arg ("add_cellview"),
+                                                                                   "@brief Shows an existing layout in the view\n"
+                                                                                   "\n"
+                                                                                   "Shows the given layout in the view. If add_cellview is true, the new layout is added to the list of "
+                                                                                   "cellviews in the view.\n"
+                                                                                   "\n"
+                                                                                   "Note: once a layout is passed to the view with show_layout, it is owned by the view and must not be "
+                                                                                   "destroyed with the 'destroy' method.\n"
+                                                                                   "\n"
+                                                                                   "@return The index of the cellview created.\n"
+                                                                                   "\n"
+                                                                                   "This method has been introduced in version 0.22.\n") +
+                                                                  gsi::method_ext ("show_layout", &show_layout2, gsi::arg ("layout"), gsi::arg ("tech"), gsi::arg ("add_cellview"), gsi::arg ("init_layers", true),
+                                                                                   "@brief Shows an existing layout in the view\n"
+                                                                                   "\n"
+                                                                                   "Shows the given layout in the view. If add_cellview is true, the new layout is added to the list of "
+                                                                                   "cellviews in the view.\n"
+                                                                                   "The technology to use for that layout can be specified as well with the 'tech' parameter. Depending "
+                                                                                   "on the definition of the technology, layer properties may be loaded for example.\n"
+                                                                                   "The technology string can be empty for the default technology.\n"
+                                                                                   "This variant also allows one to control whether the layer properties are\n"
+                                                                                   "initialized (init_layers = true) or not (init_layers = false).\n"
+                                                                                   "\n"
+                                                                                   "Note: once a layout is passed to the view with show_layout, it is owned by the view and must not be "
+                                                                                   "destroyed with the 'destroy' method.\n"
+                                                                                   "\n"
+                                                                                   "@return The index of the cellview created.\n"
+                                                                                   "\n"
+                                                                                   "This method has been introduced in version 0.22.\n") +
+                                                                  gsi::method_ext ("show_layout", &show_layout_handle, gsi::arg ("layout_handle"), gsi::arg ("add_cellview"), gsi::arg ("init_layers", true),
+                                                                                   "@brief Shows an existing layout (from a handle) in the view\n"
+                                                                                   "\n"
+                                                                                   "This variant of \\show_layout takes a layout handle instead of the layout. Layout handles are reference-counted pointers\n"
+                                                                                   "and can be used to hold a reference to a layout object. This way, ownership over the layout can be shared between different\n"
+                                                                                   "objects.\n"
+                                                                                   "\n"
+                                                                                   "@return The index of the cellview created.\n"
+                                                                                   "\n"
+                                                                                   "This method has been introduced in version 0.30.7.\n") +
+                                                                  gsi::method ("erase_cellview", static_cast<void (lay::LayoutViewBase::*) (unsigned int)> (&lay::LayoutViewBase::erase_cellview), gsi::arg ("index"),
+                                                                               "@brief Erases the cellview with the given index\n"
+                                                                               "\n"
+                                                                               "This closes the given cellview and unloads the layout associated with it, unless referred to by another cellview.") +
+                                                                  gsi::method ("rename_cellview", static_cast<void (lay::LayoutViewBase::*) (const std::string &, int)> (&lay::LayoutViewBase::rename_cellview), gsi::arg ("name"), gsi::arg ("index"),
+                                                                               "@brief Renames the cellview with the given index\n"
+                                                                               "\n"
+                                                                               "If the name is not unique, a unique name will be constructed from the name given.\n"
+                                                                               "The name may be different from the filename but is associated with the layout object.\n"
+                                                                               "If a layout is shared between multiple cellviews (which may happen due to a clone of the layout view\n"
+                                                                               "for example), all cellviews are renamed.\n") +
+                                                                  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, const db::LoadLayoutOptions &, const std::string &, bool)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("technology"), gsi::arg ("add_cellview", true),
+                                                                               "@brief Loads a (new) file into the layout view with the given technology\n"
+                                                                               "\n"
+                                                                               "Loads the file given by the \"filename\" parameter and associates it with the given technology.\n"
+                                                                               "The options specify various options for reading the file.\n"
+                                                                               "The add_cellview param controls whether to create a new cellview (true)\n"
+                                                                               "or clear all cellviews before (false).\n"
+                                                                               "\n"
+                                                                               "@return The index of the cellview loaded.\n"
+                                                                               "\n"
+                                                                               "This version has been introduced in version 0.22. The 'add_cellview' argument has been made optional in version 0.28.\n") +
+                                                                  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, const db::LoadLayoutOptions &, bool)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("add_cellview", true),
+                                                                               "@brief Loads a (new) file into the layout view\n"
+                                                                               "\n"
+                                                                               "Loads the file given by the \"filename\" parameter.\n"
+                                                                               "The options specify various options for reading the file.\n"
+                                                                               "The add_cellview param controls whether to create a new cellview (true)\n"
+                                                                               "or clear all cellviews before (false).\n"
+                                                                               "\n"
+                                                                               "@return The index of the cellview loaded.\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.18. The 'add_cellview' argument has been made optional in version 0.28.\n") +
+                                                                  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, const std::string &, bool)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("technology"), gsi::arg ("add_cellview", true),
+                                                                               "@brief Loads a (new) file into the layout view with the given technology\n"
+                                                                               "\n"
+                                                                               "Loads the file given by the \"filename\" parameter and associates it with the given technology.\n"
+                                                                               "The add_cellview param controls whether to create a new cellview (true)\n"
+                                                                               "or clear all cellviews before (false).\n"
+                                                                               "\n"
+                                                                               "@return The index of the cellview loaded.\n"
+                                                                               "\n"
+                                                                               "This version has been introduced in version 0.22. The 'add_cellview' argument has been made optional in version 0.28.\n") +
+                                                                  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &filename, bool add_cellview)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("add_cellview", true),
+                                                                               "@brief Loads a (new) file into the layout view\n"
+                                                                               "\n"
+                                                                               "Loads the file given by the \"filename\" parameter.\n"
+                                                                               "The add_cellview param controls whether to create a new cellview (true)\n"
+                                                                               "or clear all cellviews before (false).\n"
+                                                                               "\n"
+                                                                               "@return The index of the cellview loaded. The 'add_cellview' argument has been made optional in version 0.28.\n") +
+                                                                  gsi::method ("active_cellview", static_cast<lay::CellViewRef (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::active_cellview_ref),
+                                                                               "@brief Gets the active cellview (shown in hierarchy browser)\n"
+                                                                               "\n"
+                                                                               "This is a convenience method which is equivalent to \"cellview(active_cellview_index)\".\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.19.\n"
+                                                                               "Starting from version 0.25, the returned object can be manipulated which will have an immediate effect "
+                                                                               "on the display.") +
+                                                                  gsi::method ("active_cellview_index", static_cast<int (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::active_cellview_index),
+                                                                               "@brief Gets the index of the active cellview (shown in hierarchy browser)\n") +
+                                                                  gsi::method ("active_cellview_index=|#active_setview_index=|#set_active_cellview_index", &lay::LayoutViewBase::set_active_cellview_index, gsi::arg ("index"),
+                                                                               "@brief Makes the cellview with the given index the active one (shown in hierarchy browser)\n"
+                                                                               "See \\active_cellview_index.\n"
+                                                                               "Note, that this changing the active cell view index has side effects such as terminating an editing operation.\n"
+                                                                               "\n"
+                                                                               "This method has been renamed from set_active_cellview_index to active_cellview_index= in version 0.25. "
+                                                                               "The original name is still available, but is deprecated.") +
+                                                                  gsi::method_ext ("selected_cells_paths", &selected_cells_paths, gsi::arg ("cv_index"),
+                                                                                   "@brief Gets the paths of the selected cells\n"
+                                                                                   "\n"
+                                                                                   "Gets a list of cell paths to the cells selected in the cellview given by \\cv_index. "
+                                                                                   "The \"selected cells\" are the ones selected in the cell list or cell tree. This is not the \"current cell\" "
+                                                                                   "which is the one that is shown in the layout window.\n"
+                                                                                   "\n"
+                                                                                   "The cell paths are arrays of cell indexes where the last element is the actual cell selected.\n"
+                                                                                   "\n"
+                                                                                   "This method has be introduced in version 0.25.\n") +
+                                                                  gsi::method ("#get_current_cell_path", static_cast<lay::LayoutViewBase::cell_path_type (lay::LayoutViewBase::*) (int) const> (&lay::LayoutViewBase::get_current_cell_path), gsi::arg ("cv_index"),
+                                                                               "@brief Gets the cell path of the current cell\n"
+                                                                               "\n"
+                                                                               "The current cell is the one highlighted in the browser with the focus rectangle. The \n"
+                                                                               "current path is returned for the cellview given by cv_index.\n"
+                                                                               "The cell path is a list of cell indices from the top cell to the current cell.\n"
+                                                                               "\n"
+                                                                               "@param cv_index The cellview index for which to get the current path from (usually this will be the active cellview index)"
+                                                                               "\n"
+                                                                               "This method is was deprecated in version 0.25 since from then, the \\CellView object can be used to obtain an manipulate the selected cell.") +
+                                                                  gsi::method ("#set_current_cell_path", static_cast<void (lay::LayoutViewBase::*) (int, const lay::LayoutViewBase::cell_path_type &)> (&lay::LayoutViewBase::set_current_cell_path), gsi::arg ("cv_index"), gsi::arg ("cell_path"),
+                                                                               "@brief Sets the path to the current cell\n"
+                                                                               "\n"
+                                                                               "The current cell is the one highlighted in the browser with the focus rectangle. The\n"
+                                                                               "cell given by the path is highlighted and scrolled into view.\n"
+                                                                               "To select the cell to be drawn, use the \\select_cell or \\select_cell_path method.\n"
+                                                                               "\n"
+                                                                               "@param cv_index The cellview index for which to set the current path for (usually this will be the active cellview index)\n"
+                                                                               "@param path The path to the current cell\n"
+                                                                               "\n"
+                                                                               "This method is was deprecated in version 0.25 since from then, the \\CellView object can be used to obtain an manipulate the selected cell.") +
+                                                                  gsi::method ("cellviews", static_cast<unsigned int (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::cellviews),
+                                                                               "@brief Gets the number of cellviews\n") +
+                                                                  gsi::method ("cellview", static_cast<lay::CellViewRef (lay::LayoutViewBase::*) (unsigned int)> (&lay::LayoutViewBase::cellview_ref), gsi::arg ("cv_index"),
+                                                                               "@brief Gets the cellview object for a given index\n"
+                                                                               "\n"
+                                                                               "@param cv_index The cellview index for which to get the object for\n"
+                                                                               "\n"
+                                                                               "Starting with version 0.25, this method returns a \\CellView object that can be manipulated to directly reflect "
+                                                                               "any changes in the display.") +
+                                                                  gsi::method ("zoom_fit", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::zoom_fit),
+                                                                               "@brief Fits the contents of the current view into the window") +
+                                                                  gsi::method ("zoom_fit_sel", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::zoom_fit_sel),
+                                                                               "@brief Fits the contents of the current selection into the window\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.25.\n") +
+                                                                  gsi::method ("zoom_box", static_cast<void (lay::LayoutViewBase::*) (const db::DBox &)> (&lay::LayoutViewBase::zoom_box), gsi::arg ("box"),
+                                                                               "@brief Sets the viewport to the given box\n"
+                                                                               "\n"
+                                                                               "@param box The box to which to set the view in micron coordinates\n") +
+                                                                  gsi::method ("zoom_in", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::zoom_in),
+                                                                               "@brief Zooms in somewhat") +
+                                                                  gsi::method ("zoom_out", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::zoom_out),
+                                                                               "@brief Zooms out somewhat") +
+                                                                  gsi::method ("pan_up", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::pan_up),
+                                                                               "@brief Pans upward") +
+                                                                  gsi::method ("pan_down", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::pan_down),
+                                                                               "@brief Pans down") +
+                                                                  gsi::method ("pan_left", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::pan_left),
+                                                                               "@brief Pans to the left") +
+                                                                  gsi::method ("pan_right", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::pan_right),
+                                                                               "@brief Pans to the right") +
+                                                                  gsi::method ("pan_center", static_cast<void (lay::LayoutViewBase::*) (const db::DPoint &)> (&lay::LayoutViewBase::pan_center), gsi::arg ("p"),
+                                                                               "@brief Pans to the given point\n"
+                                                                               "\n"
+                                                                               "The window is positioned such that \"p\" becomes the new center") +
+                                                                  gsi::method ("box", static_cast<db::DBox (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::box),
+                                                                               "@brief Returns the displayed box in micron space") +
+                                                                  gsi::method_ext ("viewport_trans", &viewport_trans,
+                                                                                   "@brief Returns the transformation that converts micron coordinates to pixels\n"
+                                                                                   "Hint: the transformation returned will convert any point in micron coordinate space into "
+                                                                                   "a pixel coordinate. Contrary to usual convention, the y pixel coordinate is given in a mathematically "
+                                                                                   "oriented space - which means the bottom coordinate is 0.\n"
+                                                                                   "This method was introduced in version 0.18.\n") +
+                                                                  gsi::method_ext ("viewport_width", &viewport_width,
+                                                                                   "@brief Returns the viewport width in pixels\n"
+                                                                                   "This method was introduced in version 0.18.\n") +
+                                                                  gsi::method_ext ("viewport_height", &viewport_height,
+                                                                                   "@brief Return the viewport height in pixels\n"
+                                                                                   "This method was introduced in version 0.18.\n") +
+                                                                  gsi::method ("add_missing_layers", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::add_missing_layers),
+                                                                               "@brief Adds new layers to layer list\n"
+                                                                               "This method was introduced in version 0.19.\n") +
+                                                                  gsi::method ("remove_unused_layers", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::remove_unused_layers),
+                                                                               "@brief Removes unused layers from layer list\n"
+                                                                               "This method was introduced in version 0.19.\n") +
+                                                                  gsi::method ("init_layer_properties", (void (lay::LayoutViewBase::*) (lay::LayerProperties &) const) & lay::LayoutViewBase::init_layer_properties, gsi::arg ("props"),
+                                                                               "@brief Fills the layer properties for a new layer\n"
+                                                                               "\n"
+                                                                               "This method initializes a layer properties object's color and stipples according to "
+                                                                               "the defaults for the given layer source specification. The layer's source must be set already "
+                                                                               "on the layer properties object.\n"
+                                                                               "\n"
+                                                                               "This method was introduced in version 0.19.\n"
+                                                                               "\n"
+                                                                               "@param props The layer properties object to initialize.") +
+                                                                  gsi::method ("switch_mode", static_cast<void (lay::LayoutViewBase::*) (const std::string &)> (&lay::LayoutViewBase::switch_mode), gsi::arg ("mode"),
+                                                                               "@brief Switches the mode.\n"
+                                                                               "\n"
+                                                                               "See \\mode_name about a method to get the name of the current mode and \\mode_names for a method "
+                                                                               "to retrieve all available mode names.\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.28.") +
+                                                                  gsi::method ("mode_name", &lay::LayoutViewBase::mode_name,
+                                                                               "@brief Gets the name of the current mode.\n"
+                                                                               "\n"
+                                                                               "See \\switch_mode about a method to change the mode and \\mode_names for a method "
+                                                                               "to retrieve all available mode names.\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.28.") +
+                                                                  gsi::method ("mode_names", &lay::LayoutViewBase::mode_names,
+                                                                               "@brief Gets the names of the available modes.\n"
+                                                                               "\n"
+                                                                               "This method allows asking the view for the available mode names for \\switch_mode and "
+                                                                               "for the value returned by \\mode.\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.28.") +
+                                                                  gsi::method_ext ("menu", &menu,
+                                                                                   "@brief Gets the \\AbstractMenu associated with this view.\n"
+                                                                                   "\n"
+                                                                                   "In normal UI application mode this is the main window's view. For a detached view or in non-UI "
+                                                                                   "applications this is the view's private menu.\n"
+                                                                                   "\n"
+                                                                                   "This method has been introduced in version 0.28.") +
+                                                                  gsi::method ("call_menu", &lay::LayoutViewBase::menu_activated, gsi::arg ("symbol"),
+                                                                               "@brief Calls the menu item with the provided symbol.\n"
+                                                                               "To obtain all symbols, use \\menu_symbols.\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.27.") +
+                                                                  gsi::method ("menu_symbols", &lay::LayoutViewBase::menu_symbols,
+                                                                               "@brief Gets all available menu symbols (see \\call_menu).\n"
+                                                                               "NOTE: currently this method delivers a superset of all available symbols. Depending on the context, no all symbols may trigger actual functionality.\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.27.") +
+                                                                  gsi::method ("cancel", &lay::LayoutViewBase::cancel,
+                                                                               "@brief Cancels all edit operations\n"
+                                                                               "\n"
+                                                                               "This method will stop all pending edit operations (i.e. drag and drop) and cancel the current "
+                                                                               "selection. Calling this method is useful to ensure there are no potential interactions with the script's "
+                                                                               "functionality.\n") +
+                                                                  gsi::method ("clear_selection", (void (lay::LayoutViewBase::*) ()) &lay::LayoutViewBase::clear_selection,
+                                                                               "@brief Clears the selection of all objects (shapes, annotations, images ...)\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.26.2\n") +
+                                                                  gsi::method ("select_all", (void (lay::LayoutViewBase::*) ()) &lay::LayoutViewBase::select_all,
+                                                                               "@brief Selects all objects from the view\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.27\n") +
+                                                                  gsi::method ("select_from", (void (lay::LayoutViewBase::*) (const db::DPoint &, lay::Editable::SelectionMode)) &lay::LayoutViewBase::select, gsi::arg ("point"), gsi::arg ("mode", lay::Editable::SelectionMode::Replace, "Replace"),
+                                                                               "@brief Selects the objects from a given point\n"
+                                                                               "\n"
+                                                                               "The mode indicates whether to add to the selection, replace the selection, remove from selection or invert the selected status of the objects "
+                                                                               "found around the given point.\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.27\n") +
+                                                                  gsi::method ("select_from", (void (lay::LayoutViewBase::*) (const db::DBox &, lay::Editable::SelectionMode)) &lay::LayoutViewBase::select, gsi::arg ("box"), gsi::arg ("mode", lay::Editable::SelectionMode::Replace, "Replace"),
+                                                                               "@brief Selects the objects from a given box\n"
+                                                                               "\n"
+                                                                               "The mode indicates whether to add to the selection, replace the selection, remove from selection or invert the selected status of the objects "
+                                                                               "found inside the given box.\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.27\n") +
+                                                                  gsi::method ("clear_transient_selection", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::clear_transient_selection),
+                                                                               "@brief Clears the transient selection (mouse-over hightlights) of all objects (shapes, annotations, images ...)\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.26.2\n") +
+                                                                  gsi::method ("transient_to_selection", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::transient_to_selection),
+                                                                               "@brief Turns the transient selection into the actual selection\n"
+                                                                               "\n"
+                                                                               "The current selection is cleared before. All highlighted objects under the mouse will become selected. "
+                                                                               "This applies to all types of objects (rulers, shapes, images ...).\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.26.2\n") +
+                                                                  gsi::method ("selection_bbox", static_cast<db::DBox (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::selection_bbox),
+                                                                               "@brief Returns the bounding box of the current selection\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.26.2\n") +
+                                                                  gsi::method ("selection_size", (size_t (lay::LayoutViewBase::*) ()) &lay::LayoutViewBase::selection_size,
+                                                                               "@brief Returns the number of selected objects\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.27\n") +
+                                                                  gsi::method ("has_selection?", (bool (lay::LayoutViewBase::*) ()) &lay::LayoutViewBase::has_selection,
+                                                                               "@brief Indicates whether any objects are selected\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.27\n") +
+                                                                  gsi::method ("stop", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::stop),
+                                                                               "@brief Stops redraw thread and close any browsers\n"
+                                                                               "This method usually does not need to be called explicitly. The redraw thread is stopped automatically.") +
+                                                                  gsi::method ("#select_cell_path", (void (lay::LayoutViewBase::*) (const lay::LayoutViewBase::cell_path_type &, int)) &lay::LayoutViewBase::select_cell, gsi::arg ("cell_index"), gsi::arg ("cv_index"),
+                                                                               "@brief Selects a cell by cell index for a certain cell view\n"
+                                                                               "\n"
+                                                                               "Select the current (top) cell by specifying a cell indexand the cellview index for which this cell should become the currently shown one. The path to the cell is constructed by "
+                                                                               "selecting one that leads to a top cell.\n"
+                                                                               "This method selects the cell to be drawn. In constrast, the \\set_current_cell_path method selects "
+                                                                               "the cell that is highlighted in the cell tree (but not necessarily drawn)."
+                                                                               "\n"
+                                                                               "This method is was deprecated in version 0.25 since from then, the \\CellView object can be used to obtain an manipulate the selected cell.") +
+                                                                  gsi::method ("#select_cell", (void (lay::LayoutViewBase::*) (lay::LayoutViewBase::cell_index_type, int)) &lay::LayoutViewBase::select_cell, gsi::arg ("cell_index"), gsi::arg ("cv_index"),
+                                                                               "@brief Selects a cell by index for a certain cell view\n"
+                                                                               "\n"
+                                                                               "Select the current (top) cell by specifying a path (a list of cell indices from top to "
+                                                                               "the actual cell) and the cellview index for which this cell should become the currently "
+                                                                               "shown one.\n"
+                                                                               "This method selects the cell to be drawn. In constrast, the \\set_current_cell_path method selects "
+                                                                               "the cell that is highlighted in the cell tree (but not necessarily drawn)."
+                                                                               "\n"
+                                                                               "This method is was deprecated in version 0.25 since from then, the \\CellView object can be used to obtain an manipulate the selected cell.") +
+                                                                  gsi::method ("descend", static_cast<void (lay::LayoutViewBase::*) (const std::vector<db::InstElement> &, int)> (&lay::LayoutViewBase::descend), gsi::arg ("path"), gsi::arg ("index"),
+                                                                               "@brief Descends further into the hierarchy.\n"
+                                                                               "\n"
+                                                                               "Adds the given path (given as an array of InstElement objects) to the specific path of the "
+                                                                               "cellview with the given index. In effect, the cell addressed by the terminal of the new path "
+                                                                               "components can be shown in the context of the upper cells, if the minimum hierarchy level is "
+                                                                               "set to a negative value.\n"
+                                                                               "The path is assumed to originate from the current cell and contain specific instances sorted from "
+                                                                               "top to bottom.") +
+                                                                  gsi::method ("ascend", static_cast<db::InstElement (lay::LayoutViewBase::*) (int)> (&lay::LayoutViewBase::ascend), gsi::arg ("index"),
+                                                                               "@brief Ascends upwards in the hierarchy.\n"
+                                                                               "\n"
+                                                                               "Removes one element from the specific path of the cellview with the given index. Returns the element "
+                                                                               "removed.") +
+                                                                  gsi::method ("is_cell_hidden?", static_cast<bool (lay::LayoutViewBase::*) (db::cell_index_type, int) const> (&lay::LayoutViewBase::is_cell_hidden), gsi::arg ("cell_index"), gsi::arg ("cv_index"),
+                                                                               "@brief Returns true, if the cell is hidden\n"
+                                                                               "\n"
+                                                                               "@return True, if the cell with \"cell_index\" is hidden for the cellview \"cv_index\"") +
+                                                                  gsi::method ("hide_cell", static_cast<void (lay::LayoutViewBase::*) (db::cell_index_type, int)> (&lay::LayoutViewBase::hide_cell), gsi::arg ("cell_index"), gsi::arg ("cv_index"),
+                                                                               "@brief Hides the given cell for the given cellview\n") +
+                                                                  gsi::method ("show_cell", static_cast<void (lay::LayoutViewBase::*) (db::cell_index_type, int)> (&lay::LayoutViewBase::show_cell), gsi::arg ("cell_index"), gsi::arg ("cv_index"),
+                                                                               "@brief Shows the given cell for the given cellview (cancel effect of \\hide_cell)\n") +
+                                                                  gsi::method ("show_all_cells", (void (lay::LayoutViewBase::*) ()) &lay::LayoutViewBase::show_all_cells,
+                                                                               "@brief Makes all cells shown (cancel effects of \\hide_cell)") +
+                                                                  gsi::method ("show_all_cells", (void (lay::LayoutViewBase::*) (int)) &lay::LayoutViewBase::show_all_cells, gsi::arg ("cv_index"),
+                                                                               "@brief Makes all cells shown (cancel effects of \\hide_cell) for the specified cell view\n"
+                                                                               "Unlike \\show_all_cells, this method will only clear the hidden flag on the cell view selected by \\cv_index.\n"
+                                                                               "\n"
+                                                                               "This variant has been added in version 0.25.") +
+                                                                  gsi::method ("update_content", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::force_update_content),
+                                                                               "@brief Updates the layout view to the current state\n"
+                                                                               "\n"
+                                                                               "This method triggers an update of the hierarchy tree and layer view tree. Usually, this "
+                                                                               "method does not need to be called. The widgets are updated automatically in most cases.\n"
+                                                                               "\n"
+                                                                               "Currently, this method should be called however, after the layer view tree has been changed by "
+                                                                               "the \\insert_layer, \\replace_layer_node or \\delete_layer methods.\n") +
+                                                                  gsi::method ("max_hier", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::max_hier),
+                                                                               "@brief Selects all hierarchy levels available\n"
+                                                                               "\n"
+                                                                               "Show the layout in full depth down to the deepest level of hierarchy. "
+                                                                               "This method may cause a redraw.") +
+                                                                  gsi::method_ext ("is_dirty?", &view_is_dirty,
+                                                                                   "@brief Gets a flag indicating whether one of the layouts displayed needs saving\n"
+                                                                                   "A layout is 'dirty' if it is modified and needs saving. This method returns "
+                                                                                   "true if this is the case for at least one of the layouts shown in the view.\n"
+                                                                                   "\n"
+                                                                                   "This method has been introduced in version 0.29.\n") +
+                                                                  gsi::method ("resize", static_cast<void (lay::LayoutViewBase::*) (unsigned int, unsigned int)> (&lay::LayoutViewBase::resize), gsi::arg ("w"), gsi::arg ("h"),
+                                                                               "@brief Resizes the layout view to the given dimension\n"
+                                                                               "\n"
+                                                                               "This method has been made available in all builds in 0.28.\n") +
 #if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
-  gsi::method ("get_screenshot", static_cast<QImage (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::get_screenshot),
-    "@brief Gets a screenshot as a \\QImage\n"
-    "\n"
-    "Getting the image requires the drawing to be complete. Ideally, synchronous mode is switched on "
-    "for the application to guarantee this condition. The image will have the size of the viewport "
-    "showing the current layout."
-  ) +
-  gsi::method ("get_image", static_cast<QImage (lay::LayoutViewBase::*) (unsigned int, unsigned int)> (&lay::LayoutViewBase::get_image), gsi::arg ("width"), gsi::arg ("height"),
-    "@brief Gets the layout image as a \\QImage\n"
-    "\n"
-    "@param width The width of the image to render in pixel.\n"
-    "@param height The height of the image to render in pixel.\n"
-    "\n"
-    "The image contains the current scene (layout, annotations etc.).\n"
-    "The image is drawn synchronously with the given width and height. Drawing may take some time. "
-  ) +
-  gsi::method_ext ("get_image_with_options", &get_image_with_options, gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth", 0), gsi::arg ("oversampling", 0), gsi::arg ("resolution", 0.0), gsi::arg ("target", db::DBox (), "current"), gsi::arg ("monochrome", false),
-    "@brief Gets the layout image as a \\QImage (with options)\n"
-    "\n"
-    "@param width The width of the image to render in pixel.\n"
-    "@param height The height of the image to render in pixel.\n"
-    "@param linewidth The width of a line in pixels (usually 1) or 0 for default.\n"
-    "@param oversampling The oversampling factor (1..3) or 0 for default.\n"
-    "@param resolution The resolution (pixel size compared to a screen pixel size, i.e 1/oversampling) or 0 for default.\n"
-    "@param target_box The box to draw or an empty box for default.\n"
-    "@param monochrome If true, monochrome images will be produced.\n"
-    "\n"
-    "The image contains the current scene (layout, annotations etc.).\n"
-    "The image is drawn synchronously with the given width and height. Drawing may take some time. "
-    "Monochrome images don't have background or annotation objects currently.\n"
-    "\n"
-    "This method has been introduced in version 0.23.10.\n"
-  ) +
-  gsi::method_ext ("widget", &widget,
-    "@brief Gets the QWidget object of the view\n"
-    "\n"
-    "This method has been introduced in version 0.28.7.\n"
-  ) +
+                                                                  gsi::method ("get_screenshot", static_cast<QImage (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::get_screenshot),
+                                                                               "@brief Gets a screenshot as a \\QImage\n"
+                                                                               "\n"
+                                                                               "Getting the image requires the drawing to be complete. Ideally, synchronous mode is switched on "
+                                                                               "for the application to guarantee this condition. The image will have the size of the viewport "
+                                                                               "showing the current layout.") +
+                                                                  gsi::method ("get_image", static_cast<QImage (lay::LayoutViewBase::*) (unsigned int, unsigned int)> (&lay::LayoutViewBase::get_image), gsi::arg ("width"), gsi::arg ("height"),
+                                                                               "@brief Gets the layout image as a \\QImage\n"
+                                                                               "\n"
+                                                                               "@param width The width of the image to render in pixel.\n"
+                                                                               "@param height The height of the image to render in pixel.\n"
+                                                                               "\n"
+                                                                               "The image contains the current scene (layout, annotations etc.).\n"
+                                                                               "The image is drawn synchronously with the given width and height. Drawing may take some time. ") +
+                                                                  gsi::method_ext ("get_image_with_options", &get_image_with_options, gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth", 0), gsi::arg ("oversampling", 0), gsi::arg ("resolution", 0.0), gsi::arg ("target", db::DBox (), "current"), gsi::arg ("monochrome", false),
+                                                                                   "@brief Gets the layout image as a \\QImage (with options)\n"
+                                                                                   "\n"
+                                                                                   "@param width The width of the image to render in pixel.\n"
+                                                                                   "@param height The height of the image to render in pixel.\n"
+                                                                                   "@param linewidth The width of a line in pixels (usually 1) or 0 for default.\n"
+                                                                                   "@param oversampling The oversampling factor (1..3) or 0 for default.\n"
+                                                                                   "@param resolution The resolution (pixel size compared to a screen pixel size, i.e 1/oversampling) or 0 for default.\n"
+                                                                                   "@param target_box The box to draw or an empty box for default.\n"
+                                                                                   "@param monochrome If true, monochrome images will be produced.\n"
+                                                                                   "\n"
+                                                                                   "The image contains the current scene (layout, annotations etc.).\n"
+                                                                                   "The image is drawn synchronously with the given width and height. Drawing may take some time. "
+                                                                                   "Monochrome images don't have background or annotation objects currently.\n"
+                                                                                   "\n"
+                                                                                   "This method has been introduced in version 0.23.10.\n") +
+                                                                  gsi::method_ext ("widget", &widget,
+                                                                                   "@brief Gets the QWidget object of the view\n"
+                                                                                   "\n"
+                                                                                   "This method has been introduced in version 0.28.7.\n") +
 #endif
-  gsi::method ("get_screenshot_pixels", static_cast<tl::PixelBuffer (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::get_screenshot_pb),
-    "@brief Gets a screenshot as a \\PixelBuffer\n"
-    "\n"
-    "Getting the image requires the drawing to be complete. Ideally, synchronous mode is switched on "
-    "for the application to guarantee this condition. The image will have the size of the viewport "
-    "showing the current layout."
-    "\n"
-    "This method has been introduced in 0.28.\n"
-  ) +
-  gsi::method ("get_pixels", static_cast<tl::PixelBuffer (lay::LayoutViewBase::*) (unsigned int, unsigned int)> (&lay::LayoutViewBase::get_pixels), gsi::arg ("width"), gsi::arg ("height"),
-    "@brief Gets the layout image as a \\PixelBuffer\n"
-    "\n"
-    "@param width The width of the image to render in pixel.\n"
-    "@param height The height of the image to render in pixel.\n"
-    "\n"
-    "The image contains the current scene (layout, annotations etc.).\n"
-    "The image is drawn synchronously with the given width and height. Drawing may take some time. "
-    "\n"
-    "This method has been introduced in 0.28.\n"
-  ) +
-  gsi::method_ext ("get_pixels_with_options", &get_pixels_with_options, gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth", 0), gsi::arg ("oversampling", 0), gsi::arg ("resolution", 0.0), gsi::arg ("target", db::DBox (), "current"),
-    "@brief Gets the layout image as a \\PixelBuffer (with options)\n"
-    "\n"
-    "@param width The width of the image to render in pixel.\n"
-    "@param height The height of the image to render in pixel.\n"
-    "@param linewidth The width of a line in pixels (usually 1) or 0 for default.\n"
-    "@param oversampling The oversampling factor (1..3) or 0 for default.\n"
-    "@param resolution The resolution (pixel size compared to a screen pixel size, i.e 1/oversampling) or 0 for default.\n"
-    "@param target_box The box to draw or an empty box for default.\n"
-    "\n"
-    "The image contains the current scene (layout, annotations etc.).\n"
-    "The image is drawn synchronously with the given width and height. Drawing may take some time. "
-    "\n"
-    "This method has been introduced in 0.28.\n"
-  ) +
-  gsi::method_ext ("get_pixels_with_options_mono", &get_pixels_with_options_mono, gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth", 0), gsi::arg ("target", db::DBox (), "current"),
-    "@brief Gets the layout image as a \\PixelBuffer (with options)\n"
-    "\n"
-    "@param width The width of the image to render in pixel.\n"
-    "@param height The height of the image to render in pixel.\n"
-    "@param linewidth The width of a line in pixels (usually 1) or 0 for default.\n"
-    "@param target_box The box to draw or an empty box for default.\n"
-    "\n"
-    "The image contains the current scene (layout, annotations etc.).\n"
-    "The image is drawn synchronously with the given width and height. Drawing may take some time. "
-    "Monochrome images don't have background or annotation objects currently.\n"
-    "\n"
-    "This method has been introduced in 0.28.\n"
-  ) +
-  gsi::method ("save_screenshot", static_cast<void (lay::LayoutViewBase::*) (const std::string &)> (&lay::LayoutViewBase::save_screenshot), gsi::arg ("filename"),
-    "@brief Saves a screenshot to the given file\n"
-    "\n"
-    "@param filename The file to which to write the screenshot to.\n"
-    "\n"
-    "The screenshot is written as a PNG file to the given file. "
-    "This requires the drawing to be complete. Ideally, synchronous mode is switched on "
-    "for the application to guarantee this condition. The image will have the size of the viewport "
-    "showing the current layout."
-  ) +
-  gsi::method ("save_image", static_cast<void (lay::LayoutViewBase::*) (const std::string &, unsigned int, unsigned int)> (&lay::LayoutViewBase::save_image), gsi::arg ("filename"), gsi::arg ("width"), gsi::arg ("height"),
-    "@brief Saves the layout as an image to the given file\n"
-    "\n"
-    "@param filename The file to which to write the screenshot to.\n"
-    "@param width The width of the image to render in pixel.\n"
-    "@param height The height of the image to render in pixel.\n"
-    "\n"
-    "The image contains the current scene (layout, annotations etc.).\n"
-    "The image is written as a PNG file to the given file. "
-    "The image is drawn synchronously with the given width and height. Drawing may take some time. "
-  ) +
-  gsi::method_ext ("save_image_with_options", &save_image_with_options, gsi::arg ("filename"), gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth", 0), gsi::arg ("oversampling", 0), gsi::arg ("resolution", 0.0), gsi::arg ("target", db::DBox (), "current"), gsi::arg ("monochrome", false),
-    "@brief Saves the layout as an image to the given file (with options)\n"
-    "\n"
-    "@param filename The file to which to write the screenshot to.\n"
-    "@param width The width of the image to render in pixel.\n"
-    "@param height The height of the image to render in pixel.\n"
-    "@param linewidth The line width scale factor (usually 1) or 0 for 1/resolution.\n"
-    "@param oversampling The oversampling factor (1..3) or 0 for the oversampling the view was configured with.\n"
-    "@param resolution The resolution (pixel size compared to a screen pixel) or 0 for 1/oversampling.\n"
-    "@param target_box The box to draw or an empty box for default.\n"
-    "@param monochrome If true, monochrome images will be produced.\n"
-    "\n"
-    "The image contains the current scene (layout, annotations etc.).\n"
-    "The image is written as a PNG file to the given file. "
-    "The image is drawn synchronously with the given width and height. Drawing may take some time. "
-    "Monochrome images don't have background or annotation objects currently.\n"
-    "\n"
-    "The 'linewidth' factor scales the layout style line widths.\n"
-    "\n"
-    "The 'oversampling' factor will use multiple passes passes to create a single image pixels. An "
-    "oversampling factor of 2 uses 2x2 virtual pixels to generate an output pixel. This results in a "
-    "smoother image. This however comes with a corresponding memory and run time penalty. "
-    "When using oversampling, you can set linewidth and resolution to 0. This way, line widths and stipple "
-    "pattern are scaled such that the resulting image is equivalent to the standard image.\n"
-    "\n"
-    "The 'resolution' is the pixel size used to translate font sizes and stipple pattern. A resolution of 0.5 "
-    "renders twice as large fonts and stipple pattern. When combining this value with an oversampling factor of 2 "
-    "and a line width factor of 2, the resulting image is an oversampled version of the standard image.\n"
-    "\n"
-    "Examples:\n"
-    "\n"
-    "@code\n"
-    "# standard image 500x500 pixels (oversampling as configured in the view)\n"
-    "layout_view.save_image_with_options(\"image.png\", 500, 500)\n"
-    "\n"
-    "# 2x oversampled image with 500x500 pixels\n"
-    "layout_view.save_image_with_options(\"image.png\", 500, 500, 0, 2, 0)\n"
-    "\n"
-    "# 2x scaled image with 1000x1000 pixels\n"
-    "layout_view.save_image_with_options(\"image.png\", 1000, 1000, 2, 1, 0.5)\n"
-    "@/code\n"
-    "\n"
-    "This method has been introduced in 0.23.10.\n"
-  ) +
-  gsi::method_ext ("#save_as", &save_as2, gsi::arg ("index"), gsi::arg ("filename"), gsi::arg ("gzip"), gsi::arg ("options"),
-    "@brief Saves a layout to the given stream file\n"
-    "\n"
-    "@param index The cellview index of the layout to save.\n"
-    "@param filename The file to write.\n"
-    "@param gzip Ignored.\n"
-    "@param options Writer options.\n"
-    "\n"
-    "The layout with the given index is written to the stream file with the given options. "
-    "'options' is a \\SaveLayoutOptions object that specifies which format to write and further options such "
-    "as scaling factor etc.\n"
-    "Calling this method is equivalent to calling 'write' on the respective layout object.\n"
-    "\n"
-    "This method is deprecated starting from version 0.23. The compression mode is "
-    "determined from the file name automatically and the \\gzip parameter is ignored.\n"
-  ) +
-  gsi::method_ext ("save_as", &save_as1, gsi::arg ("index"), gsi::arg ("filename"), gsi::arg ("options"),
-    "@brief Saves a layout to the given stream file\n"
-    "\n"
-    "@param index The cellview index of the layout to save.\n"
-    "@param filename The file to write.\n"
-    "@param options Writer options.\n"
-    "\n"
-    "The layout with the given index is written to the stream file with the given options. "
-    "'options' is a \\SaveLayoutOptions object that specifies which format to write and further options such "
-    "as scaling factor etc.\n"
-    "Calling this method is equivalent to calling 'write' on the respective layout object.\n"
-    "\n"
-    "If the file name ends with a suffix \".gz\" or \".gzip\", the file is compressed with the zlib "
-    "algorithm.\n"
-  ) +
-  gsi::method ("set_layer_properties", static_cast<void (lay::LayoutViewBase::*) (const lay::LayerPropertiesConstIterator &, const lay::LayerProperties &)> (&lay::LayoutViewBase::set_properties), gsi::arg ("iter"), gsi::arg ("props"),
-    "@brief Sets the layer properties of the layer pointed to by the iterator\n"
-    "\n"
-    "This method replaces the layer properties of the element pointed to by \"iter\" by the properties "
-    "given by \"props\". It will not change the hierarchy but just the properties of the given node."
-  ) +
-  gsi::method ("set_layer_properties", static_cast<void (lay::LayoutViewBase::*) (unsigned int index, const lay::LayerPropertiesConstIterator &, const lay::LayerProperties &)> (&lay::LayoutViewBase::set_properties), gsi::arg ("index"), gsi::arg ("iter"), gsi::arg ("props"),
-    "@brief Sets the layer properties of the layer pointed to by the iterator\n"
-    "\n"
-    "This method replaces the layer properties of the element pointed to by \"iter\" by the properties "
-    "given by \"props\" in the tab given by \"index\". It will not change the hierarchy but just the properties of the given node."
-    "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
-    "This method has been introduced in version 0.21.\n"
-  ) +
-  gsi::method ("expand_layer_properties", (void (lay::LayoutViewBase::*) ()) &lay::LayoutViewBase::expand_properties,
-    "@brief Expands the layer properties for all tabs\n"
-    "\n"
-    "This method will expand all wildcard specifications in the layer properties by iterating over the specified objects (i.e. layers, cellviews) and "
-    "by replacing default colors and stipples by the ones specified with the palettes.\n"
-    "\n"
-    "This method was introduced in version 0.21.\n"
-  ) +
-  gsi::method ("expand_layer_properties", (void (lay::LayoutViewBase::*) (unsigned int)) &lay::LayoutViewBase::expand_properties, gsi::arg ("index"),
-    "@brief Expands the layer properties for the given tab\n"
-    "\n"
-    "This method will expand all wildcard specifications in the layer properties by iterating over the specified objects (i.e. layers, cellviews) and "
-    "by replacing default colors and stipples by the ones specified with the palettes.\n"
-    "\n"
-    "This method was introduced in version 0.21.\n"
-  ) +
-  gsi::method_ext ("replace_layer_node", &replace_layer_node1, gsi::arg ("iter"), gsi::arg ("node"),
-    "@brief Replaces the layer node at the position given by \"iter\" with a new one\n"
-    "\n"
-    "Since version 0.22, this method accepts LayerProperties and LayerPropertiesNode objects. A LayerPropertiesNode "
-    "object can contain a hierarchy of further nodes."
-  ) +
-  gsi::method_ext ("replace_layer_node", &replace_layer_node2, gsi::arg ("index"), gsi::arg ("iter"), gsi::arg ("node"),
-    "@brief Replaces the layer node at the position given by \"iter\" with a new one\n"
-    "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
-    "\n"
-    "This method has been introduced in version 0.21.\n"
-    "Since version 0.22, this method accepts LayerProperties and LayerPropertiesNode objects. A LayerPropertiesNode "
-    "object can contain a hierarchy of further nodes."
-  ) +
-  gsi::method_ext ("insert_layer", &insert_layer1, gsi::arg ("iter"), gsi::arg ("node", lay::LayerProperties (), "LayerProperties()"),
-    "@brief Inserts the given layer properties node into the list before the given position\n"
-    "\n"
-    "This method inserts the new properties node before the position given by \"iter\" and returns "
-    "a const reference to the element created. The iterator that specified the position will remain valid "
-    "after the node was inserted and will point to the newly created node. It can be used to add further nodes. "
-    "To add children to the node inserted, use iter.last_child as insertion point for the next insert operations.\n"
-    "\n"
-    "Since version 0.22, this method accepts LayerProperties and LayerPropertiesNode objects. A LayerPropertiesNode "
-    "object can contain a hierarchy of further nodes.\n"
-    "Since version 0.26 the node parameter is optional and the "
-    "reference returned by this method can be used to set the properties of the new node."
-  ) +
-  gsi::method_ext ("insert_layer", &insert_layer2, gsi::arg ("index"), gsi::arg ("iter"), gsi::arg ("node", lay::LayerProperties (), "LayerProperties()"),
-    "@brief Inserts the given layer properties node into the list before the given position\n"
-    "\n"
-    "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
-    "This method inserts the new properties node before the position given by \"iter\" and returns "
-    "a const reference to the element created. The iterator that specified the position will remain valid "
-    "after the node was inserted and will point to the newly created node. It can be used to add further nodes. "
-    "\n"
-    "This method has been introduced in version 0.21.\n"
-    "Since version 0.22, this method accepts LayerProperties and LayerPropertiesNode objects. A LayerPropertiesNode "
-    "object can contain a hierarchy of further nodes.\n"
-    "Since version 0.26 the node parameter is optional and the "
-    "reference returned by this method can be used to set the properties of the new node."
-  ) +
-  gsi::method_ext ("delete_layers", &delete_layers1, gsi::arg ("iterators"),
-    "@brief Deletes the layer properties nodes specified by the iterator\n"
-    "\n"
-    "This method deletes the nodes specifies by the iterators. This method is the most convenient way to "
-    "delete multiple entries.\n"
-    "\n"
-    "This method has been added in version 0.22.\n"
-  ) +
-  gsi::method_ext ("delete_layers", &delete_layers2, gsi::arg ("index"), gsi::arg ("iterators"),
-    "@brief Deletes the layer properties nodes specified by the iterator\n"
-    "\n"
-    "This method deletes the nodes specifies by the iterators. This method is the most convenient way to "
-    "delete multiple entries.\n"
-    "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
-    "This method has been introduced in version 0.22.\n"
-  ) +
-  gsi::method ("delete_layer", (void (lay::LayoutViewBase::*) (lay::LayerPropertiesConstIterator &iter)) &lay::LayoutViewBase::delete_layer, gsi::arg ("iter"),
-    "@brief Deletes the layer properties node specified by the iterator\n"
-    "\n"
-    "This method deletes the object that the iterator points to and invalidates\n"
-    "the iterator since the object that the iterator points to is no longer valid.\n"
-  ) +
-  gsi::method ("delete_layer", (void (lay::LayoutViewBase::*) (unsigned int index, lay::LayerPropertiesConstIterator &iter)) &lay::LayoutViewBase::delete_layer, gsi::arg ("index"), gsi::arg ("iter"),
-    "@brief Deletes the layer properties node specified by the iterator\n"
-    "\n"
-    "This method deletes the object that the iterator points to and invalidates\n"
-    "the iterator since the object that the iterator points to is no longer valid.\n"
-    "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
-    "This method has been introduced in version 0.21.\n"
-  ) +
-  gsi::iterator_ext ("each_layer", &each_layer,
-    "@brief Hierarchically iterates over the layers in the first layer list\n"
-    "\n"
-    "This iterator will recursively deliver the layers in the first layer list of the view. "
-    "The objects presented by the iterator are \\LayerPropertiesNodeRef objects. They can be manipulated to "
-    "apply changes to the layer settings or even the hierarchy of layers:\n"
-    "\n"
-    "@code\n"
-    "RBA::LayoutViewBase::current.each_layer do |lref|\n"
-    "  # lref is a RBA::LayerPropertiesNodeRef object\n"
-    "  lref.visible = false\n"
-    "end\n"
-    "@/code\n"
-    "\n"
-    "This method was introduced in version 0.25."
-  ) +
-  gsi::iterator_ext ("each_layer", &each_layer2, gsi::arg ("layer_list"),
-    "@brief Hierarchically iterates over the layers in the given layer list\n"
-    "\n"
-    "This version of this method allows specification of the layer list to be iterated over. "
-    "The layer list is specified by its index which is a value between 0 and \\num_layer_lists-1."
-    "For details see the parameter-less version of this method.\n"
-    "\n"
-    "This method was introduced in version 0.25."
-  ) +
-  gsi::method ("begin_layers", (lay::LayerPropertiesConstIterator (lay::LayoutViewBase::*) () const) &lay::LayoutViewBase::begin_layers,
-    "@brief Begin iterator for the layers\n"
-    "\n"
-    "This iterator delivers the layers of this view, either in a recursive or non-recursive\n"
-    "fashion, depending which iterator increment methods are used.\n"
-    "The iterator delivered by \\end_layers is the past-the-end iterator. It can be compared\n"
-    "against a current iterator to check, if there are no further elements.\n"
-    "\n"
-    "Starting from version 0.25, an alternative solution is provided with 'each_layer' which is based on the "
-    "\\LayerPropertiesNodeRef class."
-  ) +
-  gsi::method ("end_layers", (lay::LayerPropertiesConstIterator (lay::LayoutViewBase::*) () const) &lay::LayoutViewBase::end_layers,
-    "@brief End iterator for the layers\n"
-    "See \\begin_layers for a description about this iterator\n"
-  ) +
-  gsi::method ("begin_layers", (lay::LayerPropertiesConstIterator (lay::LayoutViewBase::*) (unsigned int index) const) &lay::LayoutViewBase::begin_layers, gsi::arg ("index"),
-    "@brief Begin iterator for the layers\n"
-    "\n"
-    "This iterator delivers the layers of this view, either in a recursive or non-recursive\n"
-    "fashion, depending which iterator increment methods are used.\n"
-    "The iterator delivered by \\end_layers is the past-the-end iterator. It can be compared\n"
-    "against a current iterator to check, if there are no further elements.\n"
-    "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
-    "This method has been introduced in version 0.21.\n"
-  ) +
-  gsi::method ("end_layers", (lay::LayerPropertiesConstIterator (lay::LayoutViewBase::*) (unsigned int index) const) &lay::LayoutViewBase::end_layers, gsi::arg ("index"),
-    "@brief End iterator for the layers\n"
-    "See \\begin_layers for a description about this iterator\n"
-    "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
-    "This method has been introduced in version 0.21.\n"
-  ) +
-  gsi::method ("clear_layers", (void (lay::LayoutViewBase::*) ()) &lay::LayoutViewBase::clear_layers,
-    "@brief Clears all layers\n"
-  ) +
-  gsi::method ("clear_layers", (void (lay::LayoutViewBase::*) (unsigned int index)) &lay::LayoutViewBase::clear_layers, gsi::arg ("index"),
-    "@brief Clears all layers for the given layer properties list\n"
-    "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
-    "This method has been introduced in version 0.21.\n"
-  ) +
-  gsi::method ("delete_layer_list", (void (lay::LayoutViewBase::*) (unsigned int index)) &lay::LayoutViewBase::delete_layer_list, gsi::arg ("index"),
-    "@brief Deletes the given properties list\n"
-    "At least one layer properties list must remain. This method may change the current properties list.\n"
-    "This method has been introduced in version 0.21.\n"
-  ) +
-  gsi::method ("insert_layer_list", (void (lay::LayoutViewBase::*) (unsigned int index)) &lay::LayoutViewBase::insert_layer_list, gsi::arg ("index"),
-    "@brief Inserts a new layer properties list at the given index\n"
-    "This method inserts a new tab at the given position. The current layer properties list will be changed to "
-    "the new list.\n"
-    "This method has been introduced in version 0.21.\n"
-  ) +
-  gsi::method ("num_layer_lists", static_cast<unsigned int (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::layer_lists),
-    "@brief Gets the number of layer properties tabs present\n"
-    "This method has been introduced in version 0.23.\n"
-  ) +
-  gsi::method ("current_layer_list", static_cast<unsigned int (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::current_layer_list),
-    "@brief Gets the index of the currently selected layer properties tab\n"
-    "This method has been introduced in version 0.21.\n"
-  ) +
-  gsi::method ("current_layer_list=|#set_current_layer_list", static_cast<void (lay::LayoutViewBase::*) (unsigned int)> (&lay::LayoutViewBase::set_current_layer_list), gsi::arg ("index"),
-    "@brief Sets the index of the currently selected layer properties tab\n"
-    "This method has been introduced in version 0.21.\n"
-  ) +
-  gsi::method ("rename_layer_list", static_cast<void (lay::LayoutViewBase::*) (unsigned int, const std::string &)> (&lay::LayoutViewBase::rename_properties), gsi::arg ("index"), gsi::arg ("name"),
-    "@brief Sets the title of the given layer properties tab\n"
-    "This method has been introduced in version 0.21.\n"
-  ) +
-  gsi::method_ext ("layer_list_name", &layer_list_name, gsi::arg ("index"),
-    "@brief Gets the title of the given layer properties tab\n"
-    "This method has been introduced in version 0.30.4.\n"
-  ) +
-  gsi::method_ext ("remove_stipple", &remove_stipple, gsi::arg ("index"),
-    "@brief Removes the stipple pattern with the given index\n"
-    "The pattern with an index less than the first custom pattern cannot be removed. "
-    "If a stipple pattern is removed that is still used, the results are undefined. "
-  ) +
-  gsi::method_ext ("clear_stipples", &clear_stipples,
-    "@brief Removes all custom line styles\n"
-    "All stipple pattern except the fixed ones are removed. If any of the custom stipple pattern is "
-    "still used by the layers displayed, the results will be undefined."
-  ) +
-  gsi::method_ext ("add_stipple", &add_stipple1, gsi::arg ("name"), gsi::arg ("data"), gsi::arg ("bits"),
-    "@brief Adds a stipple pattern\n"
-    "\n"
-    "'data' is an array of unsigned integers describing the bits that make up the stipple "
-    "pattern. If the array has less than 32 entries, the pattern will be repeated vertically. "
-    "The number of bits used can be less than 32 bit which can be specified by the 'bits' parameter. "
-    "Logically, the pattern will be put at the end of the list.\n"
-    "\n"
-    "@param name The name under which this pattern will appear in the stipple editor\n"
-    "@param data See above\n"
-    "@param bits See above\n"
-    "@return The index of the newly created stipple pattern, which can be used as the dither pattern index of \\LayerProperties."
-  ) +
-  gsi::method_ext ("add_stipple", &add_stipple2, gsi::arg ("name"), gsi::arg ("string"),
-    "@brief Adds a stipple pattern given by a string\n"
-    "\n"
-    "'string' is a string describing the pattern. It consists of one or more lines composed of '.' or '*' characters and "
-    "separated by newline characters. A '.' is for a missing pixel and '*' for a set pixel. The length of each line must be "
-    "the same. Blanks before or after each line are ignored.\n"
-    "\n"
-    "@param name The name under which this pattern will appear in the stipple editor\n"
-    "@param string See above\n"
-    "@return The index of the newly created stipple pattern, which can be used as the dither pattern index of \\LayerProperties."
-    "\n"
-    "This method has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("get_stipple", &get_stipple, gsi::arg ("index"),
-    "@brief Gets the stipple pattern string for the pattern with the given index\n"
-    "\n"
-    "This method will return the stipple pattern string for the pattern with the given index.\n"
-    "The format of the string is the same than the string accepted by \\add_stipple.\n"
-    "\n"
-    "This method has been introduced in version 0.25."
-  ) +
-  gsi::method_ext ("remove_line_style", &remove_line_style, gsi::arg ("index"),
-    "@brief Removes the line style with the given index\n"
-    "The line styles with an index less than the first custom style. "
-    "If a style is removed that is still used, the results are undefined.\n"
-    "\n"
-    "This method has been introduced in version 0.25.\n"
-  ) +
-  gsi::method_ext ("clear_line_styles", &clear_line_styles,
-    "@brief Removes all custom line styles\n"
-    "All line styles except the fixed ones are removed. If any of the custom styles is "
-    "still used by the layers displayed, the results will be undefined."
-    "\n"
-    "This method has been introduced in version 0.25.\n"
-  ) +
-  gsi::method_ext ("add_line_style", &add_line_style1, gsi::arg ("name"), gsi::arg ("data"), gsi::arg ("bits"),
-    "@brief Adds a custom line style\n"
-    "\n"
-    "@param name The name under which this pattern will appear in the style editor\n"
-    "@param data A bit set with the new line style pattern (bit 0 is the leftmost pixel)\n"
-    "@param bits The number of bits to be used\n"
-    "@return The index of the newly created style, which can be used as the line style index of \\LayerProperties."
-    "\n"
-    "This method has been introduced in version 0.25.\n"
-  ) +
-  gsi::method_ext ("add_line_style", &add_line_style2, gsi::arg ("name"), gsi::arg ("string"),
-    "@brief Adds a custom line style from a string\n"
-    "\n"
-    "@param name The name under which this pattern will appear in the style editor\n"
-    "@param string A string describing the bits of the pattern ('.' for missing pixel, '*' for a set pixel)\n"
-    "@return The index of the newly created style, which can be used as the line style index of \\LayerProperties."
-    "\n"
-    "This method has been introduced in version 0.25.\n"
-  ) +
-  gsi::method_ext ("get_line_style", &get_line_style, gsi::arg ("index"),
-    "@brief Gets the line style string for the style with the given index\n"
-    "\n"
-    "This method will return the line style string for the style with the given index.\n"
-    "The format of the string is the same than the string accepted by \\add_line_style.\n"
-    "An empty string corresponds to 'solid line'.\n"
-    "\n"
-    "This method has been introduced in version 0.25."
-  ) +
-  gsi::method ("current_layer", static_cast<lay::LayerPropertiesConstIterator (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::current_layer),
-    "@brief Gets the current layer view\n"
-    "\n"
-    "Returns the \\LayerPropertiesIterator pointing to the current layer view (the one that has the focus). "
-    "If no layer view is active currently, a null iterator is returned.\n"
-  ) +
-  gsi::method ("current_layer=", static_cast<void (lay::LayoutViewBase::*) (const lay::LayerPropertiesConstIterator &l)> (&lay::LayoutViewBase::set_current_layer), gsi::arg ("iter"),
-    "@brief Sets the current layer view\n"
-    "\n"
-    "Specifies an \\LayerPropertiesIterator pointing to the new current layer view.\n"
-    "\n"
-    "This method has been introduced in version 0.23.\n"
-  ) +
-  gsi::method ("selected_layers", static_cast<std::vector<lay::LayerPropertiesConstIterator> (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::selected_layers),
-    "@brief Gets the selected layers\n"
-    "\n"
-    "Returns an array of \\LayerPropertiesIterator objects pointing to the currently selected layers. "
-    "If no layer view is selected currently, an empty array is returned.\n"
-  ) +
-  gsi::method ("icon_for_layer", &lay::LayoutViewBase::icon_for_layer, gsi::arg ("iter"), gsi::arg ("w"), gsi::arg ("h"), gsi::arg ("dpr"), gsi::arg ("di_off", 0), gsi::arg ("no_state", false),
-    "@brief Creates an icon pixmap for the given layer.\n"
-    "\n"
-    "The icon will have size w times h pixels multiplied by the device pixel ratio (dpr). The dpr is "
-    "The number of physical pixels per logical pixels on high-DPI displays.\n"
-    "\n"
-    "'di_off' will shift the dither pattern by the given number of (physical) pixels. "
-    "If 'no_state' is true, the icon will not reflect visibility or validity states but rather the display style.\n"
-    "\n"
-    "This method has been introduced in version 0.28."
-  ) +
-  gsi::event ("on_active_cellview_changed", static_cast<tl::Event (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::active_cellview_changed_event),
-    "@brief An event indicating that the active cellview has changed\n"
-    "\n"
-    "If the active cellview is changed by selecting a new one from the drop-down list, this event is triggered.\n"
-    "When this event is triggered, the cellview has already been changed."
-    "\n"
-    "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
-    "(add_active_cellview_changed/remove_active_cellview_changed) have been removed in 0.25.\n"
-  ) +
-  gsi::event ("on_cellviews_changed", static_cast<tl::Event (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::cellviews_changed_event),
-    "@brief An event indicating that the cellview collection has changed\n"
-    "\n"
-    "If new cellviews are added or cellviews are removed, this event is triggered.\n"
-    "When this event is triggered, the cellviews have already been changed."
-    "\n"
-    "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
-    "(add_cellview_list_observer/remove_cellview_list_observer) have been removed in 0.25.\n"
-  ) +
-  gsi::event ("on_cellview_changed", static_cast<tl::event<int> (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::cellview_changed_event), gsi::arg ("cellview_index"),
-    "@brief An event indicating that a cellview has changed\n"
-    "\n"
-    "If a cellview is modified, this event is triggered.\n"
-    "When this event is triggered, the cellview have already been changed.\n"
-    "The integer parameter of this event will indicate the cellview that has changed.\n"
-    "\n"
-    "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
-    "(add_cellview_observer/remove_cellview_observer) have been removed in 0.25.\n"
-  ) +
-  gsi::event ("on_apply_technology", static_cast<tl::event<int> (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::apply_technology_event), gsi::arg ("cellview_index"),
-    "@brief An event indicating that a cellview has requested a new technology\n"
-    "\n"
-    "If the technology of a cellview is changed, this event is triggered.\n"
-    "The integer parameter of this event will indicate the cellview that has changed.\n"
-    "\n"
-    "This event has been introduced in version 0.28.\n"
-  ) +
-  gsi::event ("on_file_open", static_cast<tl::Event (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::file_open_event),
-    "@brief An event indicating that a file was opened\n"
-    "\n"
-    "If a file is loaded, this event is triggered.\n"
-    "When this event is triggered, the file was already loaded and the new file is the new active cellview.\n"
-    "Despite its name, this event is also triggered if a layout object is loaded into the view.\n"
-    "\n"
-    "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
-    "(add_file_open_observer/remove_file_open_observer) have been removed in 0.25.\n"
-  ) +
-  gsi::event ("on_viewport_changed", static_cast<tl::Event (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::viewport_changed_event),
-    "@brief An event indicating that the viewport (the visible rectangle) has changed\n"
-    "\n"
-    "This event is triggered after a new display rectangle was chosen - for example, because the user "
-    "zoomed into the layout.\n"
-    "\n"
-    "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
-    "(add_viewport_changed_observer/remove_viewport_changed_observer) have been removed in 0.25.\n"
-  ) +
-  gsi::event ("on_layer_list_changed", static_cast<tl::event<int> (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::layer_list_changed_event), gsi::arg ("flags"),
-    "@brief An event indicating that the layer list has changed\n"
-    "\n"
-    "This event is triggered after the layer list has changed its configuration.\n"
-    "The integer argument gives a hint about the nature of the changed:\n"
-    "Bit 0 is set, if the properties (visibility, color etc.) of one or more layers have changed. Bit 1 is\n"
-    "set if the hierarchy has changed. Bit 2 is set, if layer names have changed."
-    "\n"
-    "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
-    "(add_layer_list_observer/remove_layer_list_observer) have been removed in 0.25.\n"
-  ) +
-  gsi::event ("on_layer_list_inserted", static_cast<tl::event<int> (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::layer_list_inserted_event), gsi::arg ("index"),
-    "@brief An event indicating that a layer list (a tab) has been inserted\n"
-    "@param index The index of the layer list that was inserted\n"
-    "\n"
-    "This event is triggered after the layer list has been inserted - i.e. a new tab was created.\n"
-    "\n"
-    "This event was introduced in version 0.25.\n"
-  ) +
-  gsi::event ("on_layer_list_deleted", static_cast<tl::event<int> (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::layer_list_deleted_event), gsi::arg ("index"),
-    "@brief An event indicating that a layer list (a tab) has been removed\n"
-    "@param index The index of the layer list that was removed\n"
-    "\n"
-    "This event is triggered after the layer list has been removed - i.e. a tab was deleted.\n"
-    "\n"
-    "This event was introduced in version 0.25.\n"
-  ) +
-  gsi::event ("on_current_layer_list_changed", static_cast<tl::event<int> (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::current_layer_list_changed_event), gsi::arg ("index"),
-    "@brief An event indicating the current layer list (the selected tab) has changed\n"
-    "@param index The index of the new current layer list\n"
-    "\n"
-    "This event is triggered after the current layer list was changed - i.e. a new tab was selected.\n"
-    "\n"
-    "This event was introduced in version 0.25.\n"
-  ) +
-  gsi::event ("on_current_layer_changed", static_cast<tl::event<const lay::LayerPropertiesConstIterator &> (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::current_layer_changed_event), gsi::arg ("new_layer"),
-    "@brief An event indicating the current layer has changed\n"
-    "@param new_layer The layer iterator of the new current layer\n"
-    "\n"
-    "This event is triggered after the current layer was changed - i.e. a new layer is selected in the layer list.\n"
-    "\n"
-    "This event was introduced in version 0.30.5.\n"
-  ) +
-  gsi::event ("on_selected_layers_changed", static_cast<tl::Event (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::selected_layers_changed_event),
-    "@brief An event indicating the layer selection has changed\n"
-    "\n"
-    "This event is triggered after the layer selection was changed - i.e. layers got selected or unselected.\n"
-    "\n"
-    "This event was introduced in version 0.30.5.\n"
-  ) +
-  gsi::event ("on_cell_visibility_changed", static_cast<tl::Event (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::cell_visibility_changed_event),
-    "@brief An event indicating that the visibility of one or more cells has changed\n"
-    "\n"
-    "This event is triggered after the visibility of one or more cells has changed.\n"
-    "\n"
-    "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
-    "(add_cell_visibility_observer/remove_cell_visibility_observer) have been removed in 0.25.\n"
-  ) +
-  //  HINT: the cast is important to direct GSI to the LayoutView member rather than the
-  //  Editables member (in which case we get a segmentation violation ..)
-  gsi::event ("on_transient_selection_changed", (tl::Event (lay::LayoutViewBase::*)) &lay::LayoutViewBase::transient_selection_changed_event,
-    "@brief An event that is triggered if the transient selection is changed\n"
-    "\n"
-    "If the transient selection is changed, this event is triggered.\n"
-    "The transient selection is the highlighted selection when the mouse hovers over some object(s)."
-    "\n"
-    "This event was translated from the Observer pattern to an event in version 0.25."
-  ) +
-  //  HINT: the cast is important to direct GSI to the LayoutView method rather than the
-  //  Editables method (in which case we get a segmentation violation ..)
-  gsi::event ("on_selection_changed", (tl::Event (lay::LayoutViewBase::*)) &lay::LayoutViewBase::selection_changed_event,
-    "@brief An event that is triggered if the selection is changed\n"
-    "\n"
-    "If the selection changed, this event is triggered.\n"
-    "\n"
-    "This event was translated from the Observer pattern to an event in version 0.25."
-  ) +
-  gsi::event ("on_rdb_list_changed", static_cast<tl::Event (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::rdb_list_changed_event),
-    "@brief An event that is triggered the list of report databases is changed\n"
-    "\n"
-    "If a report database is added or removed, this event is triggered.\n"
-    "\n"
-    "This event was translated from the Observer pattern to an event in version 0.25."
-  ) +
-  gsi::method ("num_rdbs", static_cast<unsigned int (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::num_rdbs),
-    "@brief Gets the number of report databases loaded into this view\n"
-    "@return The number of \\ReportDatabase objects present in this view\n"
-  ) +
-  gsi::method ("remove_rdb", static_cast<void (lay::LayoutViewBase::*) (unsigned int)> (&lay::LayoutViewBase::remove_rdb), gsi::arg ("index"),
-    "@brief Removes a report database with the given index\n"
-    "@param The index of the report database to remove from this view"
-  ) +
-  gsi::method ("rdb", static_cast <rdb::Database *(lay::LayoutViewBase::*) (int index)> (&lay::LayoutViewBase::get_rdb), gsi::arg ("index"),
-    "@brief Gets the report database with the given index\n"
-    "@return The \\ReportDatabase object or nil if the index is not valid"
-  ) +
-  gsi::method ("add_rdb", static_cast<unsigned int (lay::LayoutViewBase::*) (rdb::Database *)> (&lay::LayoutViewBase::add_rdb), gsi::arg ("db"),
-    "@brief Adds the given report database to the view\n"
-    "\n"
-    "This method will add an existing database to the view. It will then appear in the marker database browser.\n"
-    "A similar method is \\create_rdb which will create a new database within the view.\n"
-    "\n"
-    "@return The index of the database within the view (see \\rdb)\n"
-    "\n"
-    "This method has been added in version 0.26."
-  ) +
-  gsi::method ("replace_rdb", static_cast<unsigned int (lay::LayoutViewBase::*) (unsigned int, rdb::Database *)> (&lay::LayoutViewBase::replace_rdb), gsi::arg ("db_index"), gsi::arg ("db"),
-    "@brief Replaces the report database with the given index\n"
-    "\n"
-    "If the index is not valid, the database will be added to the view (see \\add_rdb).\n"
-    "\n"
-    "@return The index of the database within the view (see \\rdb)\n"
-    "\n"
-    "This method has been added in version 0.26."
-  ) +
-  gsi::method_ext ("create_rdb", &create_rdb, gsi::arg ("name"),
-    "@brief Creates a new report database and returns the index of the new database\n"
-    "@param name The name of the new report database\n"
-    "@return The index of the new database\n"
-    "This method returns an index of the new report database. Use \\rdb to get the actual object. "
-    "If a report database with the given name already exists, a unique name will be created.\n"
-    "The name will be replaced by the file name when a file is loaded into the report database.\n"
-  ) +
-  gsi::event ("on_l2ndb_list_changed", static_cast<tl::Event (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::l2ndb_list_changed_event),
-    "@brief An event that is triggered the list of netlist databases is changed\n"
-    "\n"
-    "If a netlist database is added or removed, this event is triggered.\n"
-    "\n"
-    "This method has been added in version 0.26."
-  ) +
-  gsi::method ("num_l2ndbs", static_cast<unsigned int (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::num_l2ndbs),
-    "@brief Gets the number of netlist databases loaded into this view\n"
-    "@return The number of \\LayoutToNetlist objects present in this view\n"
-    "\n"
-    "This method has been added in version 0.26."
-  ) +
-  gsi::method ("remove_l2ndb", static_cast<void (lay::LayoutViewBase::*) (unsigned int)> (&lay::LayoutViewBase::remove_l2ndb), gsi::arg ("index"),
-    "@brief Removes a netlist database with the given index\n"
-    "@param The index of the netlist database to remove from this view"
-    "\n"
-    "This method has been added in version 0.26."
-  ) +
-  gsi::method ("l2ndb", static_cast <db::LayoutToNetlist *(lay::LayoutViewBase::*) (int index)> (&lay::LayoutViewBase::get_l2ndb), gsi::arg ("index"),
-    "@brief Gets the netlist database with the given index\n"
-    "@return The \\LayoutToNetlist object or nil if the index is not valid"
-    "\n"
-    "This method has been added in version 0.26."
-  ) +
-  gsi::method ("add_l2ndb", static_cast<unsigned int (lay::LayoutViewBase::*) (db::LayoutToNetlist *)> (&lay::LayoutViewBase::add_l2ndb), gsi::arg ("db"),
-    "@brief Adds the given netlist database to the view\n"
-    "\n"
-    "This method will add an existing database to the view. It will then appear in the netlist database browser.\n"
-    "A similar method is \\create_l2ndb which will create a new database within the view.\n"
-    "\n"
-    "@return The index of the database within the view (see \\l2ndb)\n"
-    "\n"
-    "This method has been added in version 0.26."
-  ) +
-  gsi::method ("replace_l2ndb", static_cast<unsigned int (lay::LayoutViewBase::*) (unsigned int, db::LayoutToNetlist *)> (&lay::LayoutViewBase::replace_l2ndb), gsi::arg ("db_index"), gsi::arg ("db"),
-    "@brief Replaces the netlist database with the given index\n"
-    "\n"
-    "If the index is not valid, the database will be added to the view (see \\add_lvsdb).\n"
-    "\n"
-    "@return The index of the database within the view (see \\lvsdb)\n"
-    "\n"
-    "This method has been added in version 0.26."
-  ) +
-  gsi::method_ext ("create_l2ndb", &create_l2ndb, gsi::arg ("name"),
-    "@brief Creates a new netlist database and returns the index of the new database\n"
-    "@param name The name of the new netlist database\n"
-    "@return The index of the new database\n"
-    "This method returns an index of the new netlist database. Use \\l2ndb to get the actual object. "
-    "If a netlist database with the given name already exists, a unique name will be created.\n"
-    "The name will be replaced by the file name when a file is loaded into the netlist database.\n"
-    "\n"
-    "This method has been added in version 0.26."
-  ) +
-  gsi::method_ext ("lvsdb", &get_lvsdb, gsi::arg ("index"),
-    "@brief Gets the netlist database with the given index\n"
-    "@return The \\LayoutVsSchematic object or nil if the index is not valid"
-    "\n"
-    "This method has been added in version 0.26."
-  ) +
-  gsi::method_ext ("add_lvsdb", &add_lvsdb, gsi::arg ("db"),
-    "@brief Adds the given database to the view\n"
-    "\n"
-    "This method will add an existing database to the view. It will then appear in the netlist database browser.\n"
-    "A similar method is \\create_lvsdb which will create a new database within the view.\n"
-    "\n"
-    "@return The index of the database within the view (see \\lvsdb)\n"
-    "\n"
-    "This method has been added in version 0.26."
-  ) +
-  gsi::method_ext ("replace_lvsdb", &replace_lvsdb, gsi::arg ("db_index"), gsi::arg ("db"),
-    "@brief Replaces the database with the given index\n"
-    "\n"
-    "If the index is not valid, the database will be added to the view (see \\add_lvsdb).\n"
-    "\n"
-    "@return The index of the database within the view (see \\lvsdb)\n"
-    "\n"
-    "This method has been added in version 0.26."
-  ) +
-  gsi::method_ext ("create_lvsdb", &create_lvsdb, gsi::arg ("name"),
-    "@brief Creates a new netlist database and returns the index of the new database\n"
-    "@param name The name of the new netlist database\n"
-    "@return The index of the new database\n"
-    "This method returns an index of the new netlist database. Use \\lvsdb to get the actual object. "
-    "If a netlist database with the given name already exists, a unique name will be created.\n"
-    "The name will be replaced by the file name when a file is loaded into the netlist database.\n"
-    "\n"
-    "This method has been added in version 0.26."
-  ) +
-  gsi::method_ext ("transaction", &gsi::transaction, gsi::arg ("description"),
-    "@brief Begins a transaction\n"
-    "\n"
-    "@param description A text that appears in the 'undo' description\n"
-    "\n"
-    "A transaction brackets a sequence of database modifications that appear as a single "
-    "undo action. Only modifications that are wrapped inside a transaction..commit call pair "
-    "can be undone.\n"
-    "Each transaction must be terminated with a \\commit method call, even if some error occurred. "
-    "It is advisable therefore to catch errors and issue a commit call in this case.\n"
-    "\n"
-    "This method was introduced in version 0.16."
-  ) +
-  gsi::method_ext ("commit", &gsi::commit,
-    "@brief Ends a transaction\n"
-    "\n"
-    "See \\transaction for a detailed description of transactions. "
-    "\n"
-    "This method was introduced in version 0.16."
-  ) +
-  gsi::method_ext ("is_transacting?", &gsi::transacting,
-    "@brief Indicates if a transaction is ongoing\n"
-    "\n"
-    "See \\transaction for a detailed description of transactions. "
-    "\n"
-    "This method was introduced in version 0.16."
-  ) +
-  gsi::method_ext ("clear_transactions", &gsi::clear_transactions,
-    "@brief Clears all transactions\n"
-    "\n"
-    "Discard all actions in the undo buffer. After clearing that buffer, no undo is available. "
-    "It is important to clear the buffer when making database modifications outside transactions, i.e "
-    "after that modifications have been done. If failing to do so, 'undo' operations are likely to produce "
-    "invalid results."
-    "\n"
-    "This method was introduced in version 0.16."
-  ) +
-  gsi::method_ext ("send_key_press_event", &send_key_press_event, gsi::arg ("key"), gsi::arg ("buttons"),
-    "@brief Sends a key press event\n"
-    "\n"
-    "This method is intended to emulate the key press events sent by Qt normally in environments where Qt is not present. "
-    "The arguments follow the conventions used within \\Plugin#key_event for example.\n"
-    "\n"
-    "This method was introduced in version 0.28."
-  ) +
-  gsi::method_ext ("send_mouse_move_event", &send_mouse_move_event, gsi::arg ("pt"), gsi::arg ("buttons"),
-    "@brief Sends a mouse move event\n"
-    "\n"
-    "This method is intended to emulate the mouse move events sent by Qt normally in environments where Qt is not present. "
-    "The arguments follow the conventions used within \\Plugin#mouse_moved_event for example.\n"
-    "\n"
-    "This method was introduced in version 0.28."
-  ) +
-  gsi::method_ext ("send_mouse_press_event", &send_mouse_press_event, gsi::arg ("pt"), gsi::arg ("buttons"),
-    "@brief Sends a mouse button press event\n"
-    "\n"
-    "This method is intended to emulate the mouse button press events sent by Qt normally in environments where Qt is not present. "
-    "The arguments follow the conventions used within \\Plugin#mouse_moved_event for example.\n"
-    "\n"
-    "This method was introduced in version 0.28."
-  ) +
-  gsi::method_ext ("send_mouse_double_clicked_event", &send_mouse_double_clicked_event, gsi::arg ("pt"), gsi::arg ("buttons"),
-    "@brief Sends a mouse button double-click event\n"
-    "\n"
-    "This method is intended to emulate the mouse button double-click events sent by Qt normally in environments where Qt is not present. "
-    "The arguments follow the conventions used within \\Plugin#mouse_moved_event for example.\n"
-    "\n"
-    "This method was introduced in version 0.28."
-  ) +
-  gsi::method_ext ("send_mouse_release_event", &send_mouse_release_event, gsi::arg ("pt"), gsi::arg ("buttons"),
-    "@brief Sends a mouse button release event\n"
-    "\n"
-    "This method is intended to emulate the mouse button release events sent by Qt normally in environments where Qt is not present. "
-    "The arguments follow the conventions used within \\Plugin#mouse_moved_event for example.\n"
-    "\n"
-    "This method was introduced in version 0.28."
-  ) +
-  gsi::method_ext ("send_leave_event", &send_leave_event,
-    "@brief Sends a mouse window leave event\n"
-    "\n"
-    "This method is intended to emulate the mouse mouse window leave events sent by Qt normally in environments where Qt is not present. "
-    "\n"
-    "This method was introduced in version 0.28."
-  ) +
-  gsi::method_ext ("send_enter_event", &send_enter_event,
-    "@brief Sends a mouse window leave event\n"
-    "\n"
-    "This method is intended to emulate the mouse mouse window leave events sent by Qt normally in environments where Qt is not present. "
-    "\n"
-    "This method was introduced in version 0.28."
-  ) +
-  gsi::method_ext ("send_wheel_event", &send_wheel_event, gsi::arg ("delta"), gsi::arg ("horizontal"), gsi::arg ("pt"), gsi::arg ("buttons"),
-    "@brief Sends a mouse wheel event\n"
-    "\n"
-    "This method is intended to emulate the mouse wheel events sent by Qt normally in environments where Qt is not present. "
-    "The arguments follow the conventions used within \\Plugin#wheel_event for example.\n"
-    "\n"
-    "This method was introduced in version 0.28."
-  ),
-  "@hide\n"
-  "@alias LayoutView\n"
-);
+                                                                  gsi::method ("get_screenshot_pixels", static_cast<tl::PixelBuffer (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::get_screenshot_pb),
+                                                                               "@brief Gets a screenshot as a \\PixelBuffer\n"
+                                                                               "\n"
+                                                                               "Getting the image requires the drawing to be complete. Ideally, synchronous mode is switched on "
+                                                                               "for the application to guarantee this condition. The image will have the size of the viewport "
+                                                                               "showing the current layout."
+                                                                               "\n"
+                                                                               "This method has been introduced in 0.28.\n") +
+                                                                  gsi::method ("get_pixels", static_cast<tl::PixelBuffer (lay::LayoutViewBase::*) (unsigned int, unsigned int)> (&lay::LayoutViewBase::get_pixels), gsi::arg ("width"), gsi::arg ("height"),
+                                                                               "@brief Gets the layout image as a \\PixelBuffer\n"
+                                                                               "\n"
+                                                                               "@param width The width of the image to render in pixel.\n"
+                                                                               "@param height The height of the image to render in pixel.\n"
+                                                                               "\n"
+                                                                               "The image contains the current scene (layout, annotations etc.).\n"
+                                                                               "The image is drawn synchronously with the given width and height. Drawing may take some time. "
+                                                                               "\n"
+                                                                               "This method has been introduced in 0.28.\n") +
+                                                                  gsi::method_ext ("get_pixels_with_options", &get_pixels_with_options, gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth", 0), gsi::arg ("oversampling", 0), gsi::arg ("resolution", 0.0), gsi::arg ("target", db::DBox (), "current"),
+                                                                                   "@brief Gets the layout image as a \\PixelBuffer (with options)\n"
+                                                                                   "\n"
+                                                                                   "@param width The width of the image to render in pixel.\n"
+                                                                                   "@param height The height of the image to render in pixel.\n"
+                                                                                   "@param linewidth The width of a line in pixels (usually 1) or 0 for default.\n"
+                                                                                   "@param oversampling The oversampling factor (1..3) or 0 for default.\n"
+                                                                                   "@param resolution The resolution (pixel size compared to a screen pixel size, i.e 1/oversampling) or 0 for default.\n"
+                                                                                   "@param target_box The box to draw or an empty box for default.\n"
+                                                                                   "\n"
+                                                                                   "The image contains the current scene (layout, annotations etc.).\n"
+                                                                                   "The image is drawn synchronously with the given width and height. Drawing may take some time. "
+                                                                                   "\n"
+                                                                                   "This method has been introduced in 0.28.\n") +
+                                                                  gsi::method_ext ("get_pixels_with_options_mono", &get_pixels_with_options_mono, gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth", 0), gsi::arg ("target", db::DBox (), "current"),
+                                                                                   "@brief Gets the layout image as a \\PixelBuffer (with options)\n"
+                                                                                   "\n"
+                                                                                   "@param width The width of the image to render in pixel.\n"
+                                                                                   "@param height The height of the image to render in pixel.\n"
+                                                                                   "@param linewidth The width of a line in pixels (usually 1) or 0 for default.\n"
+                                                                                   "@param target_box The box to draw or an empty box for default.\n"
+                                                                                   "\n"
+                                                                                   "The image contains the current scene (layout, annotations etc.).\n"
+                                                                                   "The image is drawn synchronously with the given width and height. Drawing may take some time. "
+                                                                                   "Monochrome images don't have background or annotation objects currently.\n"
+                                                                                   "\n"
+                                                                                   "This method has been introduced in 0.28.\n") +
+                                                                  gsi::method ("save_screenshot", static_cast<void (lay::LayoutViewBase::*) (const std::string &)> (&lay::LayoutViewBase::save_screenshot), gsi::arg ("filename"),
+                                                                               "@brief Saves a screenshot to the given file\n"
+                                                                               "\n"
+                                                                               "@param filename The file to which to write the screenshot to.\n"
+                                                                               "\n"
+                                                                               "The screenshot is written as a PNG file to the given file. "
+                                                                               "This requires the drawing to be complete. Ideally, synchronous mode is switched on "
+                                                                               "for the application to guarantee this condition. The image will have the size of the viewport "
+                                                                               "showing the current layout.") +
+                                                                  gsi::method ("save_image", static_cast<void (lay::LayoutViewBase::*) (const std::string &, unsigned int, unsigned int)> (&lay::LayoutViewBase::save_image), gsi::arg ("filename"), gsi::arg ("width"), gsi::arg ("height"),
+                                                                               "@brief Saves the layout as an image to the given file\n"
+                                                                               "\n"
+                                                                               "@param filename The file to which to write the screenshot to.\n"
+                                                                               "@param width The width of the image to render in pixel.\n"
+                                                                               "@param height The height of the image to render in pixel.\n"
+                                                                               "\n"
+                                                                               "The image contains the current scene (layout, annotations etc.).\n"
+                                                                               "The image is written as a PNG file to the given file. "
+                                                                               "The image is drawn synchronously with the given width and height. Drawing may take some time. ") +
+                                                                  gsi::method_ext ("save_image_with_options", &save_image_with_options, gsi::arg ("filename"), gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth", 0), gsi::arg ("oversampling", 0), gsi::arg ("resolution", 0.0), gsi::arg ("target", db::DBox (), "current"), gsi::arg ("monochrome", false),
+                                                                                   "@brief Saves the layout as an image to the given file (with options)\n"
+                                                                                   "\n"
+                                                                                   "@param filename The file to which to write the screenshot to.\n"
+                                                                                   "@param width The width of the image to render in pixel.\n"
+                                                                                   "@param height The height of the image to render in pixel.\n"
+                                                                                   "@param linewidth The line width scale factor (usually 1) or 0 for 1/resolution.\n"
+                                                                                   "@param oversampling The oversampling factor (1..3) or 0 for the oversampling the view was configured with.\n"
+                                                                                   "@param resolution The resolution (pixel size compared to a screen pixel) or 0 for 1/oversampling.\n"
+                                                                                   "@param target_box The box to draw or an empty box for default.\n"
+                                                                                   "@param monochrome If true, monochrome images will be produced.\n"
+                                                                                   "\n"
+                                                                                   "The image contains the current scene (layout, annotations etc.).\n"
+                                                                                   "The image is written as a PNG file to the given file. "
+                                                                                   "The image is drawn synchronously with the given width and height. Drawing may take some time. "
+                                                                                   "Monochrome images don't have background or annotation objects currently.\n"
+                                                                                   "\n"
+                                                                                   "The 'linewidth' factor scales the layout style line widths.\n"
+                                                                                   "\n"
+                                                                                   "The 'oversampling' factor will use multiple passes passes to create a single image pixels. An "
+                                                                                   "oversampling factor of 2 uses 2x2 virtual pixels to generate an output pixel. This results in a "
+                                                                                   "smoother image. This however comes with a corresponding memory and run time penalty. "
+                                                                                   "When using oversampling, you can set linewidth and resolution to 0. This way, line widths and stipple "
+                                                                                   "pattern are scaled such that the resulting image is equivalent to the standard image.\n"
+                                                                                   "\n"
+                                                                                   "The 'resolution' is the pixel size used to translate font sizes and stipple pattern. A resolution of 0.5 "
+                                                                                   "renders twice as large fonts and stipple pattern. When combining this value with an oversampling factor of 2 "
+                                                                                   "and a line width factor of 2, the resulting image is an oversampled version of the standard image.\n"
+                                                                                   "\n"
+                                                                                   "Examples:\n"
+                                                                                   "\n"
+                                                                                   "@code\n"
+                                                                                   "# standard image 500x500 pixels (oversampling as configured in the view)\n"
+                                                                                   "layout_view.save_image_with_options(\"image.png\", 500, 500)\n"
+                                                                                   "\n"
+                                                                                   "# 2x oversampled image with 500x500 pixels\n"
+                                                                                   "layout_view.save_image_with_options(\"image.png\", 500, 500, 0, 2, 0)\n"
+                                                                                   "\n"
+                                                                                   "# 2x scaled image with 1000x1000 pixels\n"
+                                                                                   "layout_view.save_image_with_options(\"image.png\", 1000, 1000, 2, 1, 0.5)\n"
+                                                                                   "@/code\n"
+                                                                                   "\n"
+                                                                                   "This method has been introduced in 0.23.10.\n") +
+                                                                  gsi::method_ext ("#save_as", &save_as2, gsi::arg ("index"), gsi::arg ("filename"), gsi::arg ("gzip"), gsi::arg ("options"),
+                                                                                   "@brief Saves a layout to the given stream file\n"
+                                                                                   "\n"
+                                                                                   "@param index The cellview index of the layout to save.\n"
+                                                                                   "@param filename The file to write.\n"
+                                                                                   "@param gzip Ignored.\n"
+                                                                                   "@param options Writer options.\n"
+                                                                                   "\n"
+                                                                                   "The layout with the given index is written to the stream file with the given options. "
+                                                                                   "'options' is a \\SaveLayoutOptions object that specifies which format to write and further options such "
+                                                                                   "as scaling factor etc.\n"
+                                                                                   "Calling this method is equivalent to calling 'write' on the respective layout object.\n"
+                                                                                   "\n"
+                                                                                   "This method is deprecated starting from version 0.23. The compression mode is "
+                                                                                   "determined from the file name automatically and the \\gzip parameter is ignored.\n") +
+                                                                  gsi::method_ext ("save_as", &save_as1, gsi::arg ("index"), gsi::arg ("filename"), gsi::arg ("options"),
+                                                                                   "@brief Saves a layout to the given stream file\n"
+                                                                                   "\n"
+                                                                                   "@param index The cellview index of the layout to save.\n"
+                                                                                   "@param filename The file to write.\n"
+                                                                                   "@param options Writer options.\n"
+                                                                                   "\n"
+                                                                                   "The layout with the given index is written to the stream file with the given options. "
+                                                                                   "'options' is a \\SaveLayoutOptions object that specifies which format to write and further options such "
+                                                                                   "as scaling factor etc.\n"
+                                                                                   "Calling this method is equivalent to calling 'write' on the respective layout object.\n"
+                                                                                   "\n"
+                                                                                   "If the file name ends with a suffix \".gz\" or \".gzip\", the file is compressed with the zlib "
+                                                                                   "algorithm.\n") +
+                                                                  gsi::method ("set_layer_properties", static_cast<void (lay::LayoutViewBase::*) (const lay::LayerPropertiesConstIterator &, const lay::LayerProperties &)> (&lay::LayoutViewBase::set_properties), gsi::arg ("iter"), gsi::arg ("props"),
+                                                                               "@brief Sets the layer properties of the layer pointed to by the iterator\n"
+                                                                               "\n"
+                                                                               "This method replaces the layer properties of the element pointed to by \"iter\" by the properties "
+                                                                               "given by \"props\". It will not change the hierarchy but just the properties of the given node.") +
+                                                                  gsi::method ("set_layer_properties", static_cast<void (lay::LayoutViewBase::*) (unsigned int index, const lay::LayerPropertiesConstIterator &, const lay::LayerProperties &)> (&lay::LayoutViewBase::set_properties), gsi::arg ("index"), gsi::arg ("iter"), gsi::arg ("props"),
+                                                                               "@brief Sets the layer properties of the layer pointed to by the iterator\n"
+                                                                               "\n"
+                                                                               "This method replaces the layer properties of the element pointed to by \"iter\" by the properties "
+                                                                               "given by \"props\" in the tab given by \"index\". It will not change the hierarchy but just the properties of the given node."
+                                                                               "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
+                                                                               "This method has been introduced in version 0.21.\n") +
+                                                                  gsi::method ("expand_layer_properties", (void (lay::LayoutViewBase::*) ()) &lay::LayoutViewBase::expand_properties,
+                                                                               "@brief Expands the layer properties for all tabs\n"
+                                                                               "\n"
+                                                                               "This method will expand all wildcard specifications in the layer properties by iterating over the specified objects (i.e. layers, cellviews) and "
+                                                                               "by replacing default colors and stipples by the ones specified with the palettes.\n"
+                                                                               "\n"
+                                                                               "This method was introduced in version 0.21.\n") +
+                                                                  gsi::method ("expand_layer_properties", (void (lay::LayoutViewBase::*) (unsigned int)) &lay::LayoutViewBase::expand_properties, gsi::arg ("index"),
+                                                                               "@brief Expands the layer properties for the given tab\n"
+                                                                               "\n"
+                                                                               "This method will expand all wildcard specifications in the layer properties by iterating over the specified objects (i.e. layers, cellviews) and "
+                                                                               "by replacing default colors and stipples by the ones specified with the palettes.\n"
+                                                                               "\n"
+                                                                               "This method was introduced in version 0.21.\n") +
+                                                                  gsi::method_ext ("replace_layer_node", &replace_layer_node1, gsi::arg ("iter"), gsi::arg ("node"),
+                                                                                   "@brief Replaces the layer node at the position given by \"iter\" with a new one\n"
+                                                                                   "\n"
+                                                                                   "Since version 0.22, this method accepts LayerProperties and LayerPropertiesNode objects. A LayerPropertiesNode "
+                                                                                   "object can contain a hierarchy of further nodes.") +
+                                                                  gsi::method_ext ("replace_layer_node", &replace_layer_node2, gsi::arg ("index"), gsi::arg ("iter"), gsi::arg ("node"),
+                                                                                   "@brief Replaces the layer node at the position given by \"iter\" with a new one\n"
+                                                                                   "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
+                                                                                   "\n"
+                                                                                   "This method has been introduced in version 0.21.\n"
+                                                                                   "Since version 0.22, this method accepts LayerProperties and LayerPropertiesNode objects. A LayerPropertiesNode "
+                                                                                   "object can contain a hierarchy of further nodes.") +
+                                                                  gsi::method_ext ("insert_layer", &insert_layer1, gsi::arg ("iter"), gsi::arg ("node", lay::LayerProperties (), "LayerProperties()"),
+                                                                                   "@brief Inserts the given layer properties node into the list before the given position\n"
+                                                                                   "\n"
+                                                                                   "This method inserts the new properties node before the position given by \"iter\" and returns "
+                                                                                   "a const reference to the element created. The iterator that specified the position will remain valid "
+                                                                                   "after the node was inserted and will point to the newly created node. It can be used to add further nodes. "
+                                                                                   "To add children to the node inserted, use iter.last_child as insertion point for the next insert operations.\n"
+                                                                                   "\n"
+                                                                                   "Since version 0.22, this method accepts LayerProperties and LayerPropertiesNode objects. A LayerPropertiesNode "
+                                                                                   "object can contain a hierarchy of further nodes.\n"
+                                                                                   "Since version 0.26 the node parameter is optional and the "
+                                                                                   "reference returned by this method can be used to set the properties of the new node.") +
+                                                                  gsi::method_ext ("insert_layer", &insert_layer2, gsi::arg ("index"), gsi::arg ("iter"), gsi::arg ("node", lay::LayerProperties (), "LayerProperties()"),
+                                                                                   "@brief Inserts the given layer properties node into the list before the given position\n"
+                                                                                   "\n"
+                                                                                   "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
+                                                                                   "This method inserts the new properties node before the position given by \"iter\" and returns "
+                                                                                   "a const reference to the element created. The iterator that specified the position will remain valid "
+                                                                                   "after the node was inserted and will point to the newly created node. It can be used to add further nodes. "
+                                                                                   "\n"
+                                                                                   "This method has been introduced in version 0.21.\n"
+                                                                                   "Since version 0.22, this method accepts LayerProperties and LayerPropertiesNode objects. A LayerPropertiesNode "
+                                                                                   "object can contain a hierarchy of further nodes.\n"
+                                                                                   "Since version 0.26 the node parameter is optional and the "
+                                                                                   "reference returned by this method can be used to set the properties of the new node.") +
+                                                                  gsi::method_ext ("delete_layers", &delete_layers1, gsi::arg ("iterators"),
+                                                                                   "@brief Deletes the layer properties nodes specified by the iterator\n"
+                                                                                   "\n"
+                                                                                   "This method deletes the nodes specifies by the iterators. This method is the most convenient way to "
+                                                                                   "delete multiple entries.\n"
+                                                                                   "\n"
+                                                                                   "This method has been added in version 0.22.\n") +
+                                                                  gsi::method_ext ("delete_layers", &delete_layers2, gsi::arg ("index"), gsi::arg ("iterators"),
+                                                                                   "@brief Deletes the layer properties nodes specified by the iterator\n"
+                                                                                   "\n"
+                                                                                   "This method deletes the nodes specifies by the iterators. This method is the most convenient way to "
+                                                                                   "delete multiple entries.\n"
+                                                                                   "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
+                                                                                   "This method has been introduced in version 0.22.\n") +
+                                                                  gsi::method ("delete_layer", (void (lay::LayoutViewBase::*) (lay::LayerPropertiesConstIterator &iter)) &lay::LayoutViewBase::delete_layer, gsi::arg ("iter"),
+                                                                               "@brief Deletes the layer properties node specified by the iterator\n"
+                                                                               "\n"
+                                                                               "This method deletes the object that the iterator points to and invalidates\n"
+                                                                               "the iterator since the object that the iterator points to is no longer valid.\n") +
+                                                                  gsi::method ("delete_layer", (void (lay::LayoutViewBase::*) (unsigned int index, lay::LayerPropertiesConstIterator &iter)) &lay::LayoutViewBase::delete_layer, gsi::arg ("index"), gsi::arg ("iter"),
+                                                                               "@brief Deletes the layer properties node specified by the iterator\n"
+                                                                               "\n"
+                                                                               "This method deletes the object that the iterator points to and invalidates\n"
+                                                                               "the iterator since the object that the iterator points to is no longer valid.\n"
+                                                                               "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
+                                                                               "This method has been introduced in version 0.21.\n") +
+                                                                  gsi::iterator_ext ("each_layer", &each_layer,
+                                                                                     "@brief Hierarchically iterates over the layers in the first layer list\n"
+                                                                                     "\n"
+                                                                                     "This iterator will recursively deliver the layers in the first layer list of the view. "
+                                                                                     "The objects presented by the iterator are \\LayerPropertiesNodeRef objects. They can be manipulated to "
+                                                                                     "apply changes to the layer settings or even the hierarchy of layers:\n"
+                                                                                     "\n"
+                                                                                     "@code\n"
+                                                                                     "RBA::LayoutViewBase::current.each_layer do |lref|\n"
+                                                                                     "  # lref is a RBA::LayerPropertiesNodeRef object\n"
+                                                                                     "  lref.visible = false\n"
+                                                                                     "end\n"
+                                                                                     "@/code\n"
+                                                                                     "\n"
+                                                                                     "This method was introduced in version 0.25.") +
+                                                                  gsi::iterator_ext ("each_layer", &each_layer2, gsi::arg ("layer_list"),
+                                                                                     "@brief Hierarchically iterates over the layers in the given layer list\n"
+                                                                                     "\n"
+                                                                                     "This version of this method allows specification of the layer list to be iterated over. "
+                                                                                     "The layer list is specified by its index which is a value between 0 and \\num_layer_lists-1."
+                                                                                     "For details see the parameter-less version of this method.\n"
+                                                                                     "\n"
+                                                                                     "This method was introduced in version 0.25.") +
+                                                                  gsi::method ("begin_layers", (lay::LayerPropertiesConstIterator (lay::LayoutViewBase::*) () const) & lay::LayoutViewBase::begin_layers,
+                                                                               "@brief Begin iterator for the layers\n"
+                                                                               "\n"
+                                                                               "This iterator delivers the layers of this view, either in a recursive or non-recursive\n"
+                                                                               "fashion, depending which iterator increment methods are used.\n"
+                                                                               "The iterator delivered by \\end_layers is the past-the-end iterator. It can be compared\n"
+                                                                               "against a current iterator to check, if there are no further elements.\n"
+                                                                               "\n"
+                                                                               "Starting from version 0.25, an alternative solution is provided with 'each_layer' which is based on the "
+                                                                               "\\LayerPropertiesNodeRef class.") +
+                                                                  gsi::method ("end_layers", (lay::LayerPropertiesConstIterator (lay::LayoutViewBase::*) () const) & lay::LayoutViewBase::end_layers,
+                                                                               "@brief End iterator for the layers\n"
+                                                                               "See \\begin_layers for a description about this iterator\n") +
+                                                                  gsi::method ("begin_layers", (lay::LayerPropertiesConstIterator (lay::LayoutViewBase::*) (unsigned int index) const) & lay::LayoutViewBase::begin_layers, gsi::arg ("index"),
+                                                                               "@brief Begin iterator for the layers\n"
+                                                                               "\n"
+                                                                               "This iterator delivers the layers of this view, either in a recursive or non-recursive\n"
+                                                                               "fashion, depending which iterator increment methods are used.\n"
+                                                                               "The iterator delivered by \\end_layers is the past-the-end iterator. It can be compared\n"
+                                                                               "against a current iterator to check, if there are no further elements.\n"
+                                                                               "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
+                                                                               "This method has been introduced in version 0.21.\n") +
+                                                                  gsi::method ("end_layers", (lay::LayerPropertiesConstIterator (lay::LayoutViewBase::*) (unsigned int index) const) & lay::LayoutViewBase::end_layers, gsi::arg ("index"),
+                                                                               "@brief End iterator for the layers\n"
+                                                                               "See \\begin_layers for a description about this iterator\n"
+                                                                               "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
+                                                                               "This method has been introduced in version 0.21.\n") +
+                                                                  gsi::method ("clear_layers", (void (lay::LayoutViewBase::*) ()) &lay::LayoutViewBase::clear_layers,
+                                                                               "@brief Clears all layers\n") +
+                                                                  gsi::method ("clear_layers", (void (lay::LayoutViewBase::*) (unsigned int index)) &lay::LayoutViewBase::clear_layers, gsi::arg ("index"),
+                                                                               "@brief Clears all layers for the given layer properties list\n"
+                                                                               "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
+                                                                               "This method has been introduced in version 0.21.\n") +
+                                                                  gsi::method ("delete_layer_list", (void (lay::LayoutViewBase::*) (unsigned int index)) &lay::LayoutViewBase::delete_layer_list, gsi::arg ("index"),
+                                                                               "@brief Deletes the given properties list\n"
+                                                                               "At least one layer properties list must remain. This method may change the current properties list.\n"
+                                                                               "This method has been introduced in version 0.21.\n") +
+                                                                  gsi::method ("insert_layer_list", (void (lay::LayoutViewBase::*) (unsigned int index)) &lay::LayoutViewBase::insert_layer_list, gsi::arg ("index"),
+                                                                               "@brief Inserts a new layer properties list at the given index\n"
+                                                                               "This method inserts a new tab at the given position. The current layer properties list will be changed to "
+                                                                               "the new list.\n"
+                                                                               "This method has been introduced in version 0.21.\n") +
+                                                                  gsi::method ("num_layer_lists", static_cast<unsigned int (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::layer_lists),
+                                                                               "@brief Gets the number of layer properties tabs present\n"
+                                                                               "This method has been introduced in version 0.23.\n") +
+                                                                  gsi::method ("current_layer_list", static_cast<unsigned int (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::current_layer_list),
+                                                                               "@brief Gets the index of the currently selected layer properties tab\n"
+                                                                               "This method has been introduced in version 0.21.\n") +
+                                                                  gsi::method ("current_layer_list=|#set_current_layer_list", static_cast<void (lay::LayoutViewBase::*) (unsigned int)> (&lay::LayoutViewBase::set_current_layer_list), gsi::arg ("index"),
+                                                                               "@brief Sets the index of the currently selected layer properties tab\n"
+                                                                               "This method has been introduced in version 0.21.\n") +
+                                                                  gsi::method ("rename_layer_list", static_cast<void (lay::LayoutViewBase::*) (unsigned int, const std::string &)> (&lay::LayoutViewBase::rename_properties), gsi::arg ("index"), gsi::arg ("name"),
+                                                                               "@brief Sets the title of the given layer properties tab\n"
+                                                                               "This method has been introduced in version 0.21.\n") +
+                                                                  gsi::method_ext ("layer_list_name", &layer_list_name, gsi::arg ("index"),
+                                                                                   "@brief Gets the title of the given layer properties tab\n"
+                                                                                   "This method has been introduced in version 0.30.4.\n") +
+                                                                  gsi::method_ext ("remove_stipple", &remove_stipple, gsi::arg ("index"),
+                                                                                   "@brief Removes the stipple pattern with the given index\n"
+                                                                                   "The pattern with an index less than the first custom pattern cannot be removed. "
+                                                                                   "If a stipple pattern is removed that is still used, the results are undefined. ") +
+                                                                  gsi::method_ext ("clear_stipples", &clear_stipples,
+                                                                                   "@brief Removes all custom line styles\n"
+                                                                                   "All stipple pattern except the fixed ones are removed. If any of the custom stipple pattern is "
+                                                                                   "still used by the layers displayed, the results will be undefined.") +
+                                                                  gsi::method_ext ("add_stipple", &add_stipple1, gsi::arg ("name"), gsi::arg ("data"), gsi::arg ("bits"),
+                                                                                   "@brief Adds a stipple pattern\n"
+                                                                                   "\n"
+                                                                                   "'data' is an array of unsigned integers describing the bits that make up the stipple "
+                                                                                   "pattern. If the array has less than 32 entries, the pattern will be repeated vertically. "
+                                                                                   "The number of bits used can be less than 32 bit which can be specified by the 'bits' parameter. "
+                                                                                   "Logically, the pattern will be put at the end of the list.\n"
+                                                                                   "\n"
+                                                                                   "@param name The name under which this pattern will appear in the stipple editor\n"
+                                                                                   "@param data See above\n"
+                                                                                   "@param bits See above\n"
+                                                                                   "@return The index of the newly created stipple pattern, which can be used as the dither pattern index of \\LayerProperties.") +
+                                                                  gsi::method_ext ("add_stipple", &add_stipple2, gsi::arg ("name"), gsi::arg ("string"),
+                                                                                   "@brief Adds a stipple pattern given by a string\n"
+                                                                                   "\n"
+                                                                                   "'string' is a string describing the pattern. It consists of one or more lines composed of '.' or '*' characters and "
+                                                                                   "separated by newline characters. A '.' is for a missing pixel and '*' for a set pixel. The length of each line must be "
+                                                                                   "the same. Blanks before or after each line are ignored.\n"
+                                                                                   "\n"
+                                                                                   "@param name The name under which this pattern will appear in the stipple editor\n"
+                                                                                   "@param string See above\n"
+                                                                                   "@return The index of the newly created stipple pattern, which can be used as the dither pattern index of \\LayerProperties."
+                                                                                   "\n"
+                                                                                   "This method has been introduced in version 0.25.") +
+                                                                  gsi::method_ext ("get_stipple", &get_stipple, gsi::arg ("index"),
+                                                                                   "@brief Gets the stipple pattern string for the pattern with the given index\n"
+                                                                                   "\n"
+                                                                                   "This method will return the stipple pattern string for the pattern with the given index.\n"
+                                                                                   "The format of the string is the same than the string accepted by \\add_stipple.\n"
+                                                                                   "\n"
+                                                                                   "This method has been introduced in version 0.25.") +
+                                                                  gsi::method_ext ("remove_line_style", &remove_line_style, gsi::arg ("index"),
+                                                                                   "@brief Removes the line style with the given index\n"
+                                                                                   "The line styles with an index less than the first custom style. "
+                                                                                   "If a style is removed that is still used, the results are undefined.\n"
+                                                                                   "\n"
+                                                                                   "This method has been introduced in version 0.25.\n") +
+                                                                  gsi::method_ext ("clear_line_styles", &clear_line_styles,
+                                                                                   "@brief Removes all custom line styles\n"
+                                                                                   "All line styles except the fixed ones are removed. If any of the custom styles is "
+                                                                                   "still used by the layers displayed, the results will be undefined."
+                                                                                   "\n"
+                                                                                   "This method has been introduced in version 0.25.\n") +
+                                                                  gsi::method_ext ("add_line_style", &add_line_style1, gsi::arg ("name"), gsi::arg ("data"), gsi::arg ("bits"),
+                                                                                   "@brief Adds a custom line style\n"
+                                                                                   "\n"
+                                                                                   "@param name The name under which this pattern will appear in the style editor\n"
+                                                                                   "@param data A bit set with the new line style pattern (bit 0 is the leftmost pixel)\n"
+                                                                                   "@param bits The number of bits to be used\n"
+                                                                                   "@return The index of the newly created style, which can be used as the line style index of \\LayerProperties."
+                                                                                   "\n"
+                                                                                   "This method has been introduced in version 0.25.\n") +
+                                                                  gsi::method_ext ("add_line_style", &add_line_style2, gsi::arg ("name"), gsi::arg ("string"),
+                                                                                   "@brief Adds a custom line style from a string\n"
+                                                                                   "\n"
+                                                                                   "@param name The name under which this pattern will appear in the style editor\n"
+                                                                                   "@param string A string describing the bits of the pattern ('.' for missing pixel, '*' for a set pixel)\n"
+                                                                                   "@return The index of the newly created style, which can be used as the line style index of \\LayerProperties."
+                                                                                   "\n"
+                                                                                   "This method has been introduced in version 0.25.\n") +
+                                                                  gsi::method_ext ("get_line_style", &get_line_style, gsi::arg ("index"),
+                                                                                   "@brief Gets the line style string for the style with the given index\n"
+                                                                                   "\n"
+                                                                                   "This method will return the line style string for the style with the given index.\n"
+                                                                                   "The format of the string is the same than the string accepted by \\add_line_style.\n"
+                                                                                   "An empty string corresponds to 'solid line'.\n"
+                                                                                   "\n"
+                                                                                   "This method has been introduced in version 0.25.") +
+                                                                  gsi::method ("current_layer", static_cast<lay::LayerPropertiesConstIterator (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::current_layer),
+                                                                               "@brief Gets the current layer view\n"
+                                                                               "\n"
+                                                                               "Returns the \\LayerPropertiesIterator pointing to the current layer view (the one that has the focus). "
+                                                                               "If no layer view is active currently, a null iterator is returned.\n") +
+                                                                  gsi::method ("current_layer=", static_cast<void (lay::LayoutViewBase::*) (const lay::LayerPropertiesConstIterator &l)> (&lay::LayoutViewBase::set_current_layer), gsi::arg ("iter"),
+                                                                               "@brief Sets the current layer view\n"
+                                                                               "\n"
+                                                                               "Specifies an \\LayerPropertiesIterator pointing to the new current layer view.\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.23.\n") +
+                                                                  gsi::method ("selected_layers", static_cast<std::vector<lay::LayerPropertiesConstIterator> (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::selected_layers),
+                                                                               "@brief Gets the selected layers\n"
+                                                                               "\n"
+                                                                               "Returns an array of \\LayerPropertiesIterator objects pointing to the currently selected layers. "
+                                                                               "If no layer view is selected currently, an empty array is returned.\n") +
+                                                                  gsi::method ("icon_for_layer", &lay::LayoutViewBase::icon_for_layer, gsi::arg ("iter"), gsi::arg ("w"), gsi::arg ("h"), gsi::arg ("dpr"), gsi::arg ("di_off", 0), gsi::arg ("no_state", false),
+                                                                               "@brief Creates an icon pixmap for the given layer.\n"
+                                                                               "\n"
+                                                                               "The icon will have size w times h pixels multiplied by the device pixel ratio (dpr). The dpr is "
+                                                                               "The number of physical pixels per logical pixels on high-DPI displays.\n"
+                                                                               "\n"
+                                                                               "'di_off' will shift the dither pattern by the given number of (physical) pixels. "
+                                                                               "If 'no_state' is true, the icon will not reflect visibility or validity states but rather the display style.\n"
+                                                                               "\n"
+                                                                               "This method has been introduced in version 0.28.") +
+                                                                  gsi::event ("on_active_cellview_changed", static_cast<tl::Event (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::active_cellview_changed_event),
+                                                                              "@brief An event indicating that the active cellview has changed\n"
+                                                                              "\n"
+                                                                              "If the active cellview is changed by selecting a new one from the drop-down list, this event is triggered.\n"
+                                                                              "When this event is triggered, the cellview has already been changed."
+                                                                              "\n"
+                                                                              "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
+                                                                              "(add_active_cellview_changed/remove_active_cellview_changed) have been removed in 0.25.\n") +
+                                                                  gsi::event ("on_cellviews_changed", static_cast<tl::Event (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::cellviews_changed_event),
+                                                                              "@brief An event indicating that the cellview collection has changed\n"
+                                                                              "\n"
+                                                                              "If new cellviews are added or cellviews are removed, this event is triggered.\n"
+                                                                              "When this event is triggered, the cellviews have already been changed."
+                                                                              "\n"
+                                                                              "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
+                                                                              "(add_cellview_list_observer/remove_cellview_list_observer) have been removed in 0.25.\n") +
+                                                                  gsi::event ("on_cellview_changed", static_cast<tl::event<int> (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::cellview_changed_event), gsi::arg ("cellview_index"),
+                                                                              "@brief An event indicating that a cellview has changed\n"
+                                                                              "\n"
+                                                                              "If a cellview is modified, this event is triggered.\n"
+                                                                              "When this event is triggered, the cellview have already been changed.\n"
+                                                                              "The integer parameter of this event will indicate the cellview that has changed.\n"
+                                                                              "\n"
+                                                                              "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
+                                                                              "(add_cellview_observer/remove_cellview_observer) have been removed in 0.25.\n") +
+                                                                  gsi::event ("on_apply_technology", static_cast<tl::event<int> (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::apply_technology_event), gsi::arg ("cellview_index"),
+                                                                              "@brief An event indicating that a cellview has requested a new technology\n"
+                                                                              "\n"
+                                                                              "If the technology of a cellview is changed, this event is triggered.\n"
+                                                                              "The integer parameter of this event will indicate the cellview that has changed.\n"
+                                                                              "\n"
+                                                                              "This event has been introduced in version 0.28.\n") +
+                                                                  gsi::event ("on_file_open", static_cast<tl::Event (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::file_open_event),
+                                                                              "@brief An event indicating that a file was opened\n"
+                                                                              "\n"
+                                                                              "If a file is loaded, this event is triggered.\n"
+                                                                              "When this event is triggered, the file was already loaded and the new file is the new active cellview.\n"
+                                                                              "Despite its name, this event is also triggered if a layout object is loaded into the view.\n"
+                                                                              "\n"
+                                                                              "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
+                                                                              "(add_file_open_observer/remove_file_open_observer) have been removed in 0.25.\n") +
+                                                                  gsi::event ("on_viewport_changed", static_cast<tl::Event (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::viewport_changed_event),
+                                                                              "@brief An event indicating that the viewport (the visible rectangle) has changed\n"
+                                                                              "\n"
+                                                                              "This event is triggered after a new display rectangle was chosen - for example, because the user "
+                                                                              "zoomed into the layout.\n"
+                                                                              "\n"
+                                                                              "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
+                                                                              "(add_viewport_changed_observer/remove_viewport_changed_observer) have been removed in 0.25.\n") +
+                                                                  gsi::event ("on_layer_list_changed", static_cast<tl::event<int> (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::layer_list_changed_event), gsi::arg ("flags"),
+                                                                              "@brief An event indicating that the layer list has changed\n"
+                                                                              "\n"
+                                                                              "This event is triggered after the layer list has changed its configuration.\n"
+                                                                              "The integer argument gives a hint about the nature of the changed:\n"
+                                                                              "Bit 0 is set, if the properties (visibility, color etc.) of one or more layers have changed. Bit 1 is\n"
+                                                                              "set if the hierarchy has changed. Bit 2 is set, if layer names have changed."
+                                                                              "\n"
+                                                                              "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
+                                                                              "(add_layer_list_observer/remove_layer_list_observer) have been removed in 0.25.\n") +
+                                                                  gsi::event ("on_layer_list_inserted", static_cast<tl::event<int> (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::layer_list_inserted_event), gsi::arg ("index"),
+                                                                              "@brief An event indicating that a layer list (a tab) has been inserted\n"
+                                                                              "@param index The index of the layer list that was inserted\n"
+                                                                              "\n"
+                                                                              "This event is triggered after the layer list has been inserted - i.e. a new tab was created.\n"
+                                                                              "\n"
+                                                                              "This event was introduced in version 0.25.\n") +
+                                                                  gsi::event ("on_layer_list_deleted", static_cast<tl::event<int> (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::layer_list_deleted_event), gsi::arg ("index"),
+                                                                              "@brief An event indicating that a layer list (a tab) has been removed\n"
+                                                                              "@param index The index of the layer list that was removed\n"
+                                                                              "\n"
+                                                                              "This event is triggered after the layer list has been removed - i.e. a tab was deleted.\n"
+                                                                              "\n"
+                                                                              "This event was introduced in version 0.25.\n") +
+                                                                  gsi::event ("on_current_layer_list_changed", static_cast<tl::event<int> (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::current_layer_list_changed_event), gsi::arg ("index"),
+                                                                              "@brief An event indicating the current layer list (the selected tab) has changed\n"
+                                                                              "@param index The index of the new current layer list\n"
+                                                                              "\n"
+                                                                              "This event is triggered after the current layer list was changed - i.e. a new tab was selected.\n"
+                                                                              "\n"
+                                                                              "This event was introduced in version 0.25.\n") +
+                                                                  gsi::event ("on_current_layer_changed", static_cast<tl::event<const lay::LayerPropertiesConstIterator &> (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::current_layer_changed_event), gsi::arg ("new_layer"),
+                                                                              "@brief An event indicating the current layer has changed\n"
+                                                                              "@param new_layer The layer iterator of the new current layer\n"
+                                                                              "\n"
+                                                                              "This event is triggered after the current layer was changed - i.e. a new layer is selected in the layer list.\n"
+                                                                              "\n"
+                                                                              "This event was introduced in version 0.30.5.\n") +
+                                                                  gsi::event ("on_selected_layers_changed", static_cast<tl::Event (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::selected_layers_changed_event),
+                                                                              "@brief An event indicating the layer selection has changed\n"
+                                                                              "\n"
+                                                                              "This event is triggered after the layer selection was changed - i.e. layers got selected or unselected.\n"
+                                                                              "\n"
+                                                                              "This event was introduced in version 0.30.5.\n") +
+                                                                  gsi::event ("on_cell_visibility_changed", static_cast<tl::Event (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::cell_visibility_changed_event),
+                                                                              "@brief An event indicating that the visibility of one or more cells has changed\n"
+                                                                              "\n"
+                                                                              "This event is triggered after the visibility of one or more cells has changed.\n"
+                                                                              "\n"
+                                                                              "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
+                                                                              "(add_cell_visibility_observer/remove_cell_visibility_observer) have been removed in 0.25.\n") +
+                                                                  //  HINT: the cast is important to direct GSI to the LayoutView member rather than the
+                                                                  //  Editables member (in which case we get a segmentation violation ..)
+                                                                  gsi::event ("on_transient_selection_changed", (tl::Event (lay::LayoutViewBase::*)) & lay::LayoutViewBase::transient_selection_changed_event,
+                                                                              "@brief An event that is triggered if the transient selection is changed\n"
+                                                                              "\n"
+                                                                              "If the transient selection is changed, this event is triggered.\n"
+                                                                              "The transient selection is the highlighted selection when the mouse hovers over some object(s)."
+                                                                              "\n"
+                                                                              "This event was translated from the Observer pattern to an event in version 0.25.") +
+                                                                  //  HINT: the cast is important to direct GSI to the LayoutView method rather than the
+                                                                  //  Editables method (in which case we get a segmentation violation ..)
+                                                                  gsi::event ("on_selection_changed", (tl::Event (lay::LayoutViewBase::*)) & lay::LayoutViewBase::selection_changed_event,
+                                                                              "@brief An event that is triggered if the selection is changed\n"
+                                                                              "\n"
+                                                                              "If the selection changed, this event is triggered.\n"
+                                                                              "\n"
+                                                                              "This event was translated from the Observer pattern to an event in version 0.25.") +
+                                                                  gsi::event ("on_rdb_list_changed", static_cast<tl::Event (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::rdb_list_changed_event),
+                                                                              "@brief An event that is triggered the list of report databases is changed\n"
+                                                                              "\n"
+                                                                              "If a report database is added or removed, this event is triggered.\n"
+                                                                              "\n"
+                                                                              "This event was translated from the Observer pattern to an event in version 0.25.") +
+                                                                  gsi::method ("num_rdbs", static_cast<unsigned int (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::num_rdbs),
+                                                                               "@brief Gets the number of report databases loaded into this view\n"
+                                                                               "@return The number of \\ReportDatabase objects present in this view\n") +
+                                                                  gsi::method ("remove_rdb", static_cast<void (lay::LayoutViewBase::*) (unsigned int)> (&lay::LayoutViewBase::remove_rdb), gsi::arg ("index"),
+                                                                               "@brief Removes a report database with the given index\n"
+                                                                               "@param The index of the report database to remove from this view") +
+                                                                  gsi::method ("rdb", static_cast<rdb::Database *(lay::LayoutViewBase::*) (int index)> (&lay::LayoutViewBase::get_rdb), gsi::arg ("index"),
+                                                                               "@brief Gets the report database with the given index\n"
+                                                                               "@return The \\ReportDatabase object or nil if the index is not valid") +
+                                                                  gsi::method ("add_rdb", static_cast<unsigned int (lay::LayoutViewBase::*) (rdb::Database *)> (&lay::LayoutViewBase::add_rdb), gsi::arg ("db"),
+                                                                               "@brief Adds the given report database to the view\n"
+                                                                               "\n"
+                                                                               "This method will add an existing database to the view. It will then appear in the marker database browser.\n"
+                                                                               "A similar method is \\create_rdb which will create a new database within the view.\n"
+                                                                               "\n"
+                                                                               "@return The index of the database within the view (see \\rdb)\n"
+                                                                               "\n"
+                                                                               "This method has been added in version 0.26.") +
+                                                                  gsi::method ("replace_rdb", static_cast<unsigned int (lay::LayoutViewBase::*) (unsigned int, rdb::Database *)> (&lay::LayoutViewBase::replace_rdb), gsi::arg ("db_index"), gsi::arg ("db"),
+                                                                               "@brief Replaces the report database with the given index\n"
+                                                                               "\n"
+                                                                               "If the index is not valid, the database will be added to the view (see \\add_rdb).\n"
+                                                                               "\n"
+                                                                               "@return The index of the database within the view (see \\rdb)\n"
+                                                                               "\n"
+                                                                               "This method has been added in version 0.26.") +
+                                                                  gsi::method_ext ("create_rdb", &create_rdb, gsi::arg ("name"),
+                                                                                   "@brief Creates a new report database and returns the index of the new database\n"
+                                                                                   "@param name The name of the new report database\n"
+                                                                                   "@return The index of the new database\n"
+                                                                                   "This method returns an index of the new report database. Use \\rdb to get the actual object. "
+                                                                                   "If a report database with the given name already exists, a unique name will be created.\n"
+                                                                                   "The name will be replaced by the file name when a file is loaded into the report database.\n") +
+                                                                  gsi::event ("on_l2ndb_list_changed", static_cast<tl::Event (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::l2ndb_list_changed_event),
+                                                                              "@brief An event that is triggered the list of netlist databases is changed\n"
+                                                                              "\n"
+                                                                              "If a netlist database is added or removed, this event is triggered.\n"
+                                                                              "\n"
+                                                                              "This method has been added in version 0.26.") +
+                                                                  gsi::method ("num_l2ndbs", static_cast<unsigned int (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::num_l2ndbs),
+                                                                               "@brief Gets the number of netlist databases loaded into this view\n"
+                                                                               "@return The number of \\LayoutToNetlist objects present in this view\n"
+                                                                               "\n"
+                                                                               "This method has been added in version 0.26.") +
+                                                                  gsi::method ("remove_l2ndb", static_cast<void (lay::LayoutViewBase::*) (unsigned int)> (&lay::LayoutViewBase::remove_l2ndb), gsi::arg ("index"),
+                                                                               "@brief Removes a netlist database with the given index\n"
+                                                                               "@param The index of the netlist database to remove from this view"
+                                                                               "\n"
+                                                                               "This method has been added in version 0.26.") +
+                                                                  gsi::method ("l2ndb", static_cast<db::LayoutToNetlist *(lay::LayoutViewBase::*) (int index)> (&lay::LayoutViewBase::get_l2ndb), gsi::arg ("index"),
+                                                                               "@brief Gets the netlist database with the given index\n"
+                                                                               "@return The \\LayoutToNetlist object or nil if the index is not valid"
+                                                                               "\n"
+                                                                               "This method has been added in version 0.26.") +
+                                                                  gsi::method ("add_l2ndb", static_cast<unsigned int (lay::LayoutViewBase::*) (db::LayoutToNetlist *)> (&lay::LayoutViewBase::add_l2ndb), gsi::arg ("db"),
+                                                                               "@brief Adds the given netlist database to the view\n"
+                                                                               "\n"
+                                                                               "This method will add an existing database to the view. It will then appear in the netlist database browser.\n"
+                                                                               "A similar method is \\create_l2ndb which will create a new database within the view.\n"
+                                                                               "\n"
+                                                                               "@return The index of the database within the view (see \\l2ndb)\n"
+                                                                               "\n"
+                                                                               "This method has been added in version 0.26.") +
+                                                                  gsi::method ("replace_l2ndb", static_cast<unsigned int (lay::LayoutViewBase::*) (unsigned int, db::LayoutToNetlist *)> (&lay::LayoutViewBase::replace_l2ndb), gsi::arg ("db_index"), gsi::arg ("db"),
+                                                                               "@brief Replaces the netlist database with the given index\n"
+                                                                               "\n"
+                                                                               "If the index is not valid, the database will be added to the view (see \\add_lvsdb).\n"
+                                                                               "\n"
+                                                                               "@return The index of the database within the view (see \\lvsdb)\n"
+                                                                               "\n"
+                                                                               "This method has been added in version 0.26.") +
+                                                                  gsi::method_ext ("create_l2ndb", &create_l2ndb, gsi::arg ("name"),
+                                                                                   "@brief Creates a new netlist database and returns the index of the new database\n"
+                                                                                   "@param name The name of the new netlist database\n"
+                                                                                   "@return The index of the new database\n"
+                                                                                   "This method returns an index of the new netlist database. Use \\l2ndb to get the actual object. "
+                                                                                   "If a netlist database with the given name already exists, a unique name will be created.\n"
+                                                                                   "The name will be replaced by the file name when a file is loaded into the netlist database.\n"
+                                                                                   "\n"
+                                                                                   "This method has been added in version 0.26.") +
+                                                                  gsi::method_ext ("lvsdb", &get_lvsdb, gsi::arg ("index"),
+                                                                                   "@brief Gets the netlist database with the given index\n"
+                                                                                   "@return The \\LayoutVsSchematic object or nil if the index is not valid"
+                                                                                   "\n"
+                                                                                   "This method has been added in version 0.26.") +
+                                                                  gsi::method_ext ("add_lvsdb", &add_lvsdb, gsi::arg ("db"),
+                                                                                   "@brief Adds the given database to the view\n"
+                                                                                   "\n"
+                                                                                   "This method will add an existing database to the view. It will then appear in the netlist database browser.\n"
+                                                                                   "A similar method is \\create_lvsdb which will create a new database within the view.\n"
+                                                                                   "\n"
+                                                                                   "@return The index of the database within the view (see \\lvsdb)\n"
+                                                                                   "\n"
+                                                                                   "This method has been added in version 0.26.") +
+                                                                  gsi::method_ext ("replace_lvsdb", &replace_lvsdb, gsi::arg ("db_index"), gsi::arg ("db"),
+                                                                                   "@brief Replaces the database with the given index\n"
+                                                                                   "\n"
+                                                                                   "If the index is not valid, the database will be added to the view (see \\add_lvsdb).\n"
+                                                                                   "\n"
+                                                                                   "@return The index of the database within the view (see \\lvsdb)\n"
+                                                                                   "\n"
+                                                                                   "This method has been added in version 0.26.") +
+                                                                  gsi::method_ext ("create_lvsdb", &create_lvsdb, gsi::arg ("name"),
+                                                                                   "@brief Creates a new netlist database and returns the index of the new database\n"
+                                                                                   "@param name The name of the new netlist database\n"
+                                                                                   "@return The index of the new database\n"
+                                                                                   "This method returns an index of the new netlist database. Use \\lvsdb to get the actual object. "
+                                                                                   "If a netlist database with the given name already exists, a unique name will be created.\n"
+                                                                                   "The name will be replaced by the file name when a file is loaded into the netlist database.\n"
+                                                                                   "\n"
+                                                                                   "This method has been added in version 0.26.") +
+                                                                  gsi::method_ext ("transaction", &gsi::transaction, gsi::arg ("description"),
+                                                                                   "@brief Begins a transaction\n"
+                                                                                   "\n"
+                                                                                   "@param description A text that appears in the 'undo' description\n"
+                                                                                   "\n"
+                                                                                   "A transaction brackets a sequence of database modifications that appear as a single "
+                                                                                   "undo action. Only modifications that are wrapped inside a transaction..commit call pair "
+                                                                                   "can be undone.\n"
+                                                                                   "Each transaction must be terminated with a \\commit method call, even if some error occurred. "
+                                                                                   "It is advisable therefore to catch errors and issue a commit call in this case.\n"
+                                                                                   "\n"
+                                                                                   "This method was introduced in version 0.16.") +
+                                                                  gsi::method_ext ("commit", &gsi::commit,
+                                                                                   "@brief Ends a transaction\n"
+                                                                                   "\n"
+                                                                                   "See \\transaction for a detailed description of transactions. "
+                                                                                   "\n"
+                                                                                   "This method was introduced in version 0.16.") +
+                                                                  gsi::method_ext ("is_transacting?", &gsi::transacting,
+                                                                                   "@brief Indicates if a transaction is ongoing\n"
+                                                                                   "\n"
+                                                                                   "See \\transaction for a detailed description of transactions. "
+                                                                                   "\n"
+                                                                                   "This method was introduced in version 0.16.") +
+                                                                  gsi::method_ext ("clear_transactions", &gsi::clear_transactions,
+                                                                                   "@brief Clears all transactions\n"
+                                                                                   "\n"
+                                                                                   "Discard all actions in the undo buffer. After clearing that buffer, no undo is available. "
+                                                                                   "It is important to clear the buffer when making database modifications outside transactions, i.e "
+                                                                                   "after that modifications have been done. If failing to do so, 'undo' operations are likely to produce "
+                                                                                   "invalid results."
+                                                                                   "\n"
+                                                                                   "This method was introduced in version 0.16.") +
+                                                                  gsi::method_ext ("send_key_press_event", &send_key_press_event, gsi::arg ("key"), gsi::arg ("buttons"),
+                                                                                   "@brief Sends a key press event\n"
+                                                                                   "\n"
+                                                                                   "This method is intended to emulate the key press events sent by Qt normally in environments where Qt is not present. "
+                                                                                   "The arguments follow the conventions used within \\Plugin#key_event for example.\n"
+                                                                                   "\n"
+                                                                                   "This method was introduced in version 0.28.") +
+                                                                  gsi::method_ext ("send_mouse_move_event", &send_mouse_move_event, gsi::arg ("pt"), gsi::arg ("buttons"),
+                                                                                   "@brief Sends a mouse move event\n"
+                                                                                   "\n"
+                                                                                   "This method is intended to emulate the mouse move events sent by Qt normally in environments where Qt is not present. "
+                                                                                   "The arguments follow the conventions used within \\Plugin#mouse_moved_event for example.\n"
+                                                                                   "\n"
+                                                                                   "This method was introduced in version 0.28.") +
+                                                                  gsi::method_ext ("send_mouse_press_event", &send_mouse_press_event, gsi::arg ("pt"), gsi::arg ("buttons"),
+                                                                                   "@brief Sends a mouse button press event\n"
+                                                                                   "\n"
+                                                                                   "This method is intended to emulate the mouse button press events sent by Qt normally in environments where Qt is not present. "
+                                                                                   "The arguments follow the conventions used within \\Plugin#mouse_moved_event for example.\n"
+                                                                                   "\n"
+                                                                                   "This method was introduced in version 0.28.") +
+                                                                  gsi::method_ext ("send_mouse_double_clicked_event", &send_mouse_double_clicked_event, gsi::arg ("pt"), gsi::arg ("buttons"),
+                                                                                   "@brief Sends a mouse button double-click event\n"
+                                                                                   "\n"
+                                                                                   "This method is intended to emulate the mouse button double-click events sent by Qt normally in environments where Qt is not present. "
+                                                                                   "The arguments follow the conventions used within \\Plugin#mouse_moved_event for example.\n"
+                                                                                   "\n"
+                                                                                   "This method was introduced in version 0.28.") +
+                                                                  gsi::method_ext ("send_mouse_release_event", &send_mouse_release_event, gsi::arg ("pt"), gsi::arg ("buttons"),
+                                                                                   "@brief Sends a mouse button release event\n"
+                                                                                   "\n"
+                                                                                   "This method is intended to emulate the mouse button release events sent by Qt normally in environments where Qt is not present. "
+                                                                                   "The arguments follow the conventions used within \\Plugin#mouse_moved_event for example.\n"
+                                                                                   "\n"
+                                                                                   "This method was introduced in version 0.28.") +
+                                                                  gsi::method_ext ("send_leave_event", &send_leave_event,
+                                                                                   "@brief Sends a mouse window leave event\n"
+                                                                                   "\n"
+                                                                                   "This method is intended to emulate the mouse mouse window leave events sent by Qt normally in environments where Qt is not present. "
+                                                                                   "\n"
+                                                                                   "This method was introduced in version 0.28.") +
+                                                                  gsi::method_ext ("send_enter_event", &send_enter_event,
+                                                                                   "@brief Sends a mouse window leave event\n"
+                                                                                   "\n"
+                                                                                   "This method is intended to emulate the mouse mouse window leave events sent by Qt normally in environments where Qt is not present. "
+                                                                                   "\n"
+                                                                                   "This method was introduced in version 0.28.") +
+                                                                  gsi::method_ext ("send_wheel_event", &send_wheel_event, gsi::arg ("delta"), gsi::arg ("horizontal"), gsi::arg ("pt"), gsi::arg ("buttons"),
+                                                                                   "@brief Sends a mouse wheel event\n"
+                                                                                   "\n"
+                                                                                   "This method is intended to emulate the mouse wheel events sent by Qt normally in environments where Qt is not present. "
+                                                                                   "The arguments follow the conventions used within \\Plugin#wheel_event for example.\n"
+                                                                                   "\n"
+                                                                                   "This method was introduced in version 0.28."),
+                                                                "@hide\n"
+                                                                "@alias LayoutView\n");
 
 gsi::EnumIn<lay::LayoutViewBase, lay::Editable::SelectionMode> decl_layLayoutView_SelectionMode ("lay", "SelectionMode",
-  gsi::enum_const ("Add", lay::Editable::SelectionMode::Add,
-    "@brief Adds to any existing selection\n"
-  ) +
-  gsi::enum_const ("Reset", lay::Editable::SelectionMode::Reset,
-    "@brief Removes from any existing selection\n"
-  ) +
-  gsi::enum_const ("Replace", lay::Editable::SelectionMode::Replace,
-    "@brief Replaces the existing selection\n"
-  ) +
-  gsi::enum_const ("Invert", lay::Editable::SelectionMode::Invert,
-    "@brief Adds to any existing selection, if it's not there yet or removes it from the selection if it's already selected\n"
-  ),
-  "@brief Specifies how selected objects interact with already selected ones.\n"
-  "\n"
-  "This enum was introduced in version 0.27.\n"
-);
+                                                                                                 gsi::enum_const ("Add", lay::Editable::SelectionMode::Add,
+                                                                                                                  "@brief Adds to any existing selection\n") +
+                                                                                                   gsi::enum_const ("Reset", lay::Editable::SelectionMode::Reset,
+                                                                                                                    "@brief Removes from any existing selection\n") +
+                                                                                                   gsi::enum_const ("Replace", lay::Editable::SelectionMode::Replace,
+                                                                                                                    "@brief Replaces the existing selection\n") +
+                                                                                                   gsi::enum_const ("Invert", lay::Editable::SelectionMode::Invert,
+                                                                                                                    "@brief Adds to any existing selection, if it's not there yet or removes it from the selection if it's already selected\n"),
+                                                                                                 "@brief Specifies how selected objects interact with already selected ones.\n"
+                                                                                                 "\n"
+                                                                                                 "This enum was introduced in version 0.27.\n");
 
 //  Inject the NetlistCrossReference::Status declarations into NetlistCrossReference:
 gsi::ClassExt<lay::LayoutViewBase> inject_SelectionMode_in_parent (decl_layLayoutView_SelectionMode.defs ());
 
 }
-

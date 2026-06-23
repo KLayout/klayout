@@ -45,7 +45,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIter
   : lay::EditorServiceBase (view),
     db::Object (manager),
     mp_view (view),
-    mp_transient_marker (0), 
+    mp_transient_marker (0),
     m_mouse_buttons (0), m_mouse_in_view (false), m_editing (false), m_immediate (false),
     m_selection_maybe_invalid (false),
     m_cell_inst_service (false),
@@ -61,7 +61,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIter
     m_seq (0),
     m_highlights_selected (false),
     dm_selection_to_view (this, &edt::Service::do_selection_to_view)
-{ 
+{
   mp_view->geom_changed_event.add (this, &edt::Service::geometry_changing);
 }
 
@@ -69,7 +69,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
   : lay::EditorServiceBase (view),
     db::Object (manager),
     mp_view (view),
-    mp_transient_marker (0), 
+    mp_transient_marker (0),
     m_mouse_buttons (0), m_mouse_in_view (false), m_editing (false), m_immediate (false),
     m_selection_maybe_invalid (false),
     m_cell_inst_service (true),
@@ -84,7 +84,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     m_seq (0),
     m_highlights_selected (false),
     dm_selection_to_view (this, &edt::Service::do_selection_to_view)
-{ 
+{
   mp_view->geom_changed_event.add (this, &edt::Service::geometry_changing);
 }
 
@@ -124,14 +124,14 @@ Service::move_ac () const
   return m_alt_ac != lay::AC_Global ? m_alt_ac : m_move_ac;
 }
 
-db::DPoint 
+db::DPoint
 Service::snap (db::DPoint p) const
 {
   //  snap according to the grid
   if (m_edit_grid == db::DVector ()) {
     p = lay::snap_xy (p, m_global_grid);
   } else if (m_edit_grid.x () < 1e-6) {
-    ; //  nothing 
+    ; //  nothing
   } else {
     p = lay::snap_xy (p, m_edit_grid);
   }
@@ -139,8 +139,7 @@ Service::snap (db::DPoint p) const
   return p;
 }
 
-void
-Service::update_vector_snapped_point (const db::DPoint &pt, db::DVector &vr, bool &result_set) const
+void Service::update_vector_snapped_point (const db::DPoint &pt, db::DVector &vr, bool &result_set) const
 {
   db::DVector v = snap (pt) - pt;
 
@@ -150,8 +149,7 @@ Service::update_vector_snapped_point (const db::DPoint &pt, db::DVector &vr, boo
   }
 }
 
-void
-Service::update_vector_snapped_marker (const lay::ShapeMarker *sm, const db::DTrans &trans, db::DVector &vr, bool &result_set, size_t &count) const
+void Service::update_vector_snapped_marker (const lay::ShapeMarker *sm, const db::DTrans &trans, db::DVector &vr, bool &result_set, size_t &count) const
 {
   const db::Shape &shape = sm->shape ();
   db::CplxTrans tr = db::DCplxTrans (trans) * db::DCplxTrans (-sm->trans ().disp ()) * sm->trans ();
@@ -204,12 +202,10 @@ Service::update_vector_snapped_marker (const lay::ShapeMarker *sm, const db::DTr
         --count;
       }
     }
-
   }
 }
 
-void
-Service::update_vector_snapped_marker (const lay::InstanceMarker *im, const db::DTrans &trans, db::DVector &vr, bool &result_set, size_t &count) const
+void Service::update_vector_snapped_marker (const lay::InstanceMarker *im, const db::DTrans &trans, db::DVector &vr, bool &result_set, size_t &count) const
 {
   const db::Instance &instance = im->instance ();
   db::CplxTrans tr = db::DCplxTrans (trans) * db::DCplxTrans (-im->trans ().disp ()) * im->trans ();
@@ -245,7 +241,6 @@ Service::snap_marker_to_grid (const db::DVector &v, bool &snapped) const
     } else if (im) {
       update_vector_snapped_marker (im, tt, vr, snapped, count);
     }
-
   }
 
   if (snapped) {
@@ -310,20 +305,18 @@ Service::snap2_details (const db::DPoint &p, const db::DPoint &plast, bool conne
   return snap2_details (p, plast, connect ? connect_ac () : move_ac ());
 }
 
-db::DPoint 
+db::DPoint
 Service::snap2 (const db::DPoint &p, const db::DPoint &plast, bool connect) const
 {
   return snap2_details (p, plast, connect ? connect_ac () : move_ac ()).snapped_point;
 }
 
-void
-Service::service_configuration_changed ()
+void Service::service_configuration_changed ()
 {
   //  The base class implementation does nothing
 }
 
-bool
-Service::configure (const std::string &name, const std::string &value)
+bool Service::configure (const std::string &name, const std::string &value)
 {
   lay::EditGridConverter egc;
   lay::ACConverter acc;
@@ -348,35 +341,35 @@ Service::configure (const std::string &name, const std::string &value)
     egc.from_string (value, m_edit_grid);
     service_configuration_changed ();
 
-    return true;  //  taken
+    return true; //  taken
 
   } else if (name == cfg_edit_snap_to_objects) {
 
     tl::from_string (value, m_snap_to_objects);
     service_configuration_changed ();
 
-    return true;  //  taken
+    return true; //  taken
 
   } else if (name == cfg_edit_snap_objects_to_grid) {
 
     tl::from_string (value, m_snap_objects_to_grid);
     service_configuration_changed ();
 
-    return true;  //  taken
+    return true; //  taken
 
   } else if (name == cfg_edit_move_angle_mode) {
 
     acc.from_string (value, m_move_ac);
     service_configuration_changed ();
 
-    return true;  //  taken
+    return true; //  taken
 
   } else if (name == cfg_edit_connect_angle_mode) {
 
     acc.from_string (value, m_connect_ac);
     service_configuration_changed ();
 
-    return true;  //  taken
+    return true; //  taken
 
   } else if (name == cfg_edit_top_level_selection) {
 
@@ -396,43 +389,38 @@ Service::configure (const std::string &name, const std::string &value)
     lay::EditorServiceBase::configure (name, value);
   }
 
-  return false;  //  not taken
+  return false; //  not taken
 }
 
-void 
-Service::clear_highlights ()
+void Service::clear_highlights ()
 {
   m_highlights_selected = true;
   m_selected_highlights.clear ();
   apply_highlights ();
 }
 
-void 
-Service::restore_highlights ()
+void Service::restore_highlights ()
 {
   m_highlights_selected = false;
   m_selected_highlights.clear ();
   apply_highlights ();
 }
 
-void
-Service::highlight (const std::set<const lay::ObjectInstPath *> &highlights)
+void Service::highlight (const std::set<const lay::ObjectInstPath *> &highlights)
 {
   m_highlights_selected = true;
   m_selected_highlights = highlights;
   apply_highlights ();
 }
 
-void
-Service::apply_highlights ()
+void Service::apply_highlights ()
 {
   for (auto r = m_markers.begin (); r != m_markers.end (); ++r) {
     r->second->visible (! m_highlights_selected || m_selected_highlights.find (r->first) != m_selected_highlights.end ());
   }
 }
 
-void
-Service::cut ()
+void Service::cut ()
 {
   if (has_selection () && view ()->is_editable ()) {
     //  copy & delete the selected objects
@@ -441,8 +429,7 @@ Service::cut ()
   }
 }
 
-void 
-Service::copy ()
+void Service::copy ()
 {
   if (view ()->is_editable ()) {
     //  copy the selected objects
@@ -450,8 +437,7 @@ Service::copy ()
   }
 }
 
-void
-Service::copy_selected ()
+void Service::copy_selected ()
 {
 #if defined(HAVE_QT)
   edt::CopyModeDialog mode_dialog (lay::widget_from_view (view ()));
@@ -483,7 +469,6 @@ Service::copy_selected ()
     }
 
     copy_selected (inst_mode);
-
   }
 #else
 
@@ -497,17 +482,16 @@ Service::copy_selected ()
 #endif
 }
 
-void
-Service::copy_selected (unsigned int inst_mode)
+void Service::copy_selected (unsigned int inst_mode)
 {
   //  create one ClipboardData object per cv_index because, this one assumes that there is
   //  only one source layout object.
-  std::set <unsigned int> cv_indices;
+  std::set<unsigned int> cv_indices;
   for (EditableSelectionIterator r = begin_selection (); ! r.at_end (); ++r) {
     cv_indices.insert (r->cv_index ());
   }
 
-  for (std::set <unsigned int>::const_iterator cvi = cv_indices.begin (); cvi != cv_indices.end (); ++cvi) {
+  for (std::set<unsigned int>::const_iterator cvi = cv_indices.begin (); cvi != cv_indices.end (); ++cvi) {
 
     db::ClipboardValue<edt::ClipboardData> *cd = new db::ClipboardValue<edt::ClipboardData> ();
 
@@ -524,12 +508,10 @@ Service::copy_selected (unsigned int inst_mode)
     }
 
     db::Clipboard::instance () += cd;
-
   }
 }
 
-bool  
-Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::angle_constraint_type /*ac*/)
+bool Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::angle_constraint_type /*ac*/)
 {
   if (view ()->is_editable () && mode == lay::Editable::Selected) {
 
@@ -551,16 +533,13 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
         inst_marker->set_draw_outline (! m_show_shapes_of_instances);
         inst_marker->set_max_shapes (m_show_shapes_of_instances ? m_max_shapes_of_instances : 0);
       }
-
     }
-
   }
 
   return false;
 }
 
-void  
-Service::move (const db::DPoint &pu, lay::angle_constraint_type ac)
+void Service::move (const db::DPoint &pu, lay::angle_constraint_type ac)
 {
   m_alt_ac = ac;
 
@@ -574,14 +553,12 @@ Service::move (const db::DPoint &pu, lay::angle_constraint_type ac)
     }
 
     move_markers (db::DTrans (p - db::DPoint ()) * db::DTrans (m_move_trans.fp_trans ()) * db::DTrans (db::DPoint () - ref));
-
   }
 
   m_alt_ac = lay::AC_Global;
 }
 
-void  
-Service::move_transform (const db::DPoint &pu, db::DFTrans tr, lay::angle_constraint_type ac)
+void Service::move_transform (const db::DPoint &pu, db::DFTrans tr, lay::angle_constraint_type ac)
 {
   m_alt_ac = ac;
 
@@ -595,14 +572,12 @@ Service::move_transform (const db::DPoint &pu, db::DFTrans tr, lay::angle_constr
     }
 
     move_markers (db::DTrans (p - db::DPoint ()) * db::DTrans (tr * m_move_trans.fp_trans ()) * db::DTrans (db::DPoint () - ref));
-
   }
 
   m_alt_ac = lay::AC_Global;
 }
 
-void
-Service::end_move (const db::DVector &v)
+void Service::end_move (const db::DVector &v)
 {
   if (view ()->is_editable () && m_moving) {
     transform (db::DCplxTrans (db::DTrans (v) * db::DTrans (m_move_trans.fp_trans ())));
@@ -614,8 +589,7 @@ Service::end_move (const db::DVector &v)
   m_alt_ac = lay::AC_Global;
 }
 
-void
-Service::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type /*ac*/)
+void Service::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type /*ac*/)
 {
   if (view ()->is_editable () && m_moving) {
     transform (db::DCplxTrans (m_move_trans));
@@ -627,10 +601,10 @@ Service::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type /*ac*/)
   m_alt_ac = lay::AC_Global;
 }
 
-db::DBox  
+db::DBox
 Service::selection_bbox ()
 {
-  //  build the transformation variants cache 
+  //  build the transformation variants cache
   //  TODO: this is done multiple times - once for each service!
   lay::TransformationVariants tv (view ());
   const db::DCplxTrans &vp = view ()->viewport ().trans ();
@@ -670,16 +644,13 @@ Service::selection_bbox ()
           box += *t * (ctx_trans * r->back ().bbox (bc));
         }
       }
-
     }
-
   }
 
   return box;
 }
 
-void
-Service::set_edit_marker (lay::ViewObject *edit_marker)
+void Service::set_edit_marker (lay::ViewObject *edit_marker)
 {
   for (std::vector<lay::ViewObject *>::iterator r = m_edit_markers.begin (); r != m_edit_markers.end (); ++r) {
     delete *r;
@@ -688,8 +659,7 @@ Service::set_edit_marker (lay::ViewObject *edit_marker)
   add_edit_marker (edit_marker);
 }
 
-void
-Service::add_edit_marker (lay::ViewObject *edit_marker)
+void Service::add_edit_marker (lay::ViewObject *edit_marker)
 {
   if (edit_marker) {
     m_edit_markers.push_back (edit_marker);
@@ -706,8 +676,7 @@ Service::edit_marker ()
   }
 }
 
-void 
-Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTrans> *p_trv)
+void Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTrans> *p_trv)
 {
   //  ignore this function in non-editable mode
   if (! view ()->is_editable ()) {
@@ -716,13 +685,13 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
 
   //  HINT: sorting the selected shapes/instances ensures that a shape/instance is not moved twice.
   //  This may happen due to per-instance selection of lower-level shapes.
-  
+
   size_t n;
 
-  //  build a list of object references corresponding to the p_trv vector 
-  std::vector <EditableSelectionIterator::pointer> obj_ptrs;
+  //  build a list of object references corresponding to the p_trv vector
+  std::vector<EditableSelectionIterator::pointer> obj_ptrs;
   for (EditableSelectionIterator r = begin_selection (); ! r.at_end (); ++r) {
-    obj_ptrs.push_back (r.operator-> ());
+    obj_ptrs.push_back (r.operator->());
   }
 
   //  build the transformation variants cache
@@ -732,15 +701,15 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
 
   //  sort the selected objects (the shapes) by the cell they are in
   //  The key is a triple: cell_index, cv_index, layer
-  std::map <std::pair <db::cell_index_type, std::pair <unsigned int, unsigned int> >, std::vector <size_t> > shapes_by_cell;
+  std::map<std::pair<db::cell_index_type, std::pair<unsigned int, unsigned int>>, std::vector<size_t>> shapes_by_cell;
   n = 0;
   for (EditableSelectionIterator r = begin_selection (); ! r.at_end (); ++r, ++n) {
     if (! r->is_cell_inst ()) {
-      shapes_by_cell.insert (std::make_pair (std::make_pair (r->cell_index (), std::make_pair (r->cv_index (), r->layer ())), std::vector <size_t> ())).first->second.push_back (n);
+      shapes_by_cell.insert (std::make_pair (std::make_pair (r->cell_index (), std::make_pair (r->cv_index (), r->layer ())), std::vector<size_t> ())).first->second.push_back (n);
     }
   }
 
-  for (std::map <std::pair <db::cell_index_type, std::pair <unsigned int, unsigned int> >, std::vector <size_t> >::iterator sbc = shapes_by_cell.begin (); sbc != shapes_by_cell.end (); ++sbc) {
+  for (std::map<std::pair<db::cell_index_type, std::pair<unsigned int, unsigned int>>, std::vector<size_t>>::iterator sbc = shapes_by_cell.begin (); sbc != shapes_by_cell.end (); ++sbc) {
 
     const lay::CellView &cv = view ()->cellview (sbc->first.second.first);
     if (cv.is_valid ()) {
@@ -753,9 +722,9 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
 
         db::Shapes &shapes = cv->layout ().cell (sbc->first.first).shapes (sbc->first.second.second);
 
-        std::map <db::Shape, db::Shape> new_shapes;
+        std::map<db::Shape, db::Shape> new_shapes;
 
-        for (std::vector <size_t>::iterator si = sbc->second.begin (); si != sbc->second.end (); ++si) {
+        for (std::vector<size_t>::iterator si = sbc->second.begin (); si != sbc->second.end (); ++si) {
 
           EditableSelectionIterator::pointer s = obj_ptrs [*si];
 
@@ -769,17 +738,16 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
             mt = db::ICplxTrans (t.inverted () * mt_mu * t);
           }
 
-          std::map <db::Shape, db::Shape>::iterator ns = new_shapes.find (s->shape ());
+          std::map<db::Shape, db::Shape>::iterator ns = new_shapes.find (s->shape ());
 
           if (ns == new_shapes.end ()) {
             new_shapes.insert (std::make_pair (s->shape (), shapes.transform (s->shape (), mt)));
           } else {
             ns->second = shapes.transform (ns->second, mt);
           }
-
         }
 
-        for (std::vector <size_t>::iterator si = sbc->second.begin (); si != sbc->second.end (); ++si) {
+        for (std::vector<size_t>::iterator si = sbc->second.begin (); si != sbc->second.end (); ++si) {
 
           EditableSelectionIterator::pointer &s = obj_ptrs [*si];
 
@@ -788,29 +756,25 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
 
           //  modify the selection
           m_selection.erase (*s);
-          s = m_selection.insert (new_path).first.operator-> ();
-
+          s = m_selection.insert (new_path).first.operator->();
         }
-
       }
-
     }
-
   }
-  
+
   //  2.) then transform all instances.
-  
+
   //  sort the selected objects (the instances) by the cell they are in
   //  The key is a pair: cell_index, cv_index
-  std::map <std::pair <db::cell_index_type, unsigned int>, std::vector <size_t> > insts_by_cell;
+  std::map<std::pair<db::cell_index_type, unsigned int>, std::vector<size_t>> insts_by_cell;
   n = 0;
   for (EditableSelectionIterator r = begin_selection (); ! r.at_end (); ++r, ++n) {
     if (r->is_cell_inst ()) {
-      insts_by_cell.insert (std::make_pair (std::make_pair (r->cell_index (), r->cv_index ()), std::vector <size_t> ())).first->second.push_back (n);
+      insts_by_cell.insert (std::make_pair (std::make_pair (r->cell_index (), r->cv_index ()), std::vector<size_t> ())).first->second.push_back (n);
     }
   }
 
-  for (std::map <std::pair <db::cell_index_type, unsigned int>, std::vector <size_t> >::iterator ibc = insts_by_cell.begin (); ibc != insts_by_cell.end (); ++ibc) {
+  for (std::map<std::pair<db::cell_index_type, unsigned int>, std::vector<size_t>>::iterator ibc = insts_by_cell.begin (); ibc != insts_by_cell.end (); ++ibc) {
 
     const lay::CellView &cv = view ()->cellview (ibc->first.second);
     if (cv.is_valid ()) {
@@ -821,11 +785,11 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
         db::CplxTrans tt = (*tv_list) [0] * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ();
         db::ICplxTrans mt_mu (tt.inverted () * trans * tt);
 
-        std::map <db::Instance, db::Instance> new_insts;
+        std::map<db::Instance, db::Instance> new_insts;
 
         db::Cell &cell = cv->layout ().cell (ibc->first.first);
 
-        for (std::vector <size_t>::iterator ii = ibc->second.begin (); ii != ibc->second.end (); ++ii) {
+        for (std::vector<size_t>::iterator ii = ibc->second.begin (); ii != ibc->second.end (); ++ii) {
 
           EditableSelectionIterator::pointer i = obj_ptrs [*ii];
 
@@ -841,17 +805,16 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
 
           db::Instance inst_ptr = i->back ().inst_ptr;
 
-          std::map <db::Instance, db::Instance>::iterator ni = new_insts.find (inst_ptr);
+          std::map<db::Instance, db::Instance>::iterator ni = new_insts.find (inst_ptr);
 
           if (ni == new_insts.end ()) {
             new_insts.insert (std::make_pair (inst_ptr, cell.transform (inst_ptr, mt)));
           } else {
             ni->second = cell.transform (inst_ptr, mt);
           }
-
         }
 
-        for (std::vector <size_t>::iterator ii = ibc->second.begin (); ii != ibc->second.end (); ++ii) {
+        for (std::vector<size_t>::iterator ii = ibc->second.begin (); ii != ibc->second.end (); ++ii) {
 
           EditableSelectionIterator::pointer &i = obj_ptrs [*ii];
 
@@ -860,22 +823,17 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
 
           //  modify the selection
           m_selection.erase (*i);
-          i = m_selection.insert (new_path).first.operator-> ();
-
+          i = m_selection.insert (new_path).first.operator->();
         }
-
       }
-
     }
-
   }
 
   handle_guiding_shape_changes (true);
   selection_to_view ();
 }
 
-void   
-Service::move_cancel ()
+void Service::move_cancel ()
 {
   if (m_move_trans != db::DTrans () && m_moving) {
 
@@ -886,7 +844,7 @@ Service::move_cancel ()
     m_move_trans = db::DTrans ();
     m_move_start = db::DPoint ();
 
-    //  reset to unmoved or clear selection and do not do anything 
+    //  reset to unmoved or clear selection and do not do anything
     if (m_move_sel) {
       selection_to_view ();
     } else {
@@ -894,12 +852,10 @@ Service::move_cancel ()
     }
 
     m_moving = false;
-
   }
 }
 
-bool   
-Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
+bool Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   m_mouse_pos = p;
   m_mouse_buttons = buttons;
@@ -930,27 +886,25 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
     } else if (prio) {
       do_mouse_move_inactive (p);
     }
-
   }
 
-  return false;  // not taken to allow the mouse tracker to receive events as well
+  return false; // not taken to allow the mouse tracker to receive events as well
 }
 
-bool   
-Service::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
+bool Service::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   m_mouse_pos = p;
   m_mouse_buttons = buttons;
 
   if (view ()->is_editable () && prio) {
-    
+
     if ((buttons & lay::LeftButton) != 0) {
 
       m_alt_ac = lay::ac_from_buttons (buttons);
 
       if (! m_editing) {
 
-        view ()->cancel ();  //  cancel any pending edit operations and clear the selection
+        view ()->cancel (); //  cancel any pending edit operations and clear the selection
         set_edit_marker (0);
         begin_edit (p);
 
@@ -963,30 +917,25 @@ Service::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio
       m_alt_ac = lay::AC_Global;
 
       return true;
-
     }
-
-  } 
+  }
 
   return false;
 }
 
-bool
-Service::leave_event (bool /*prio*/)
+bool Service::leave_event (bool /*prio*/)
 {
   m_mouse_in_view = false;
   return false;
 }
 
-bool
-Service::enter_event (bool /*prio*/)
+bool Service::enter_event (bool /*prio*/)
 {
   m_mouse_in_view = true;
   return false;
 }
 
-bool   
-Service::mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
+bool Service::mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   m_mouse_pos = p;
   m_mouse_buttons = buttons;
@@ -1000,8 +949,7 @@ Service::mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bo
   }
 }
 
-bool   
-Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
+bool Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   m_mouse_pos = p;
   m_mouse_buttons = buttons;
@@ -1016,8 +964,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
   }
 }
 
-bool
-Service::key_event (unsigned int key, unsigned int buttons)
+bool Service::key_event (unsigned int key, unsigned int buttons)
 {
   if (view ()->is_editable () && m_editing && buttons == 0 && key == lay::KeyBackspace) {
     do_delete ();
@@ -1031,8 +978,7 @@ Service::key_event (unsigned int key, unsigned int buttons)
   }
 }
 
-void
-Service::finish_editing (bool accept)
+void Service::finish_editing (bool accept)
 {
   do_finish_edit (accept);
 
@@ -1042,22 +988,19 @@ Service::finish_editing (bool accept)
   m_alt_ac = lay::AC_Global;
 }
 
-void
-Service::activated ()
+void Service::activated ()
 {
   if (view ()->is_editable ()) {
 
-    view ()->cancel ();  //  cancel any pending edit operations and clear the selection
+    view ()->cancel (); //  cancel any pending edit operations and clear the selection
     set_edit_marker (0);
 
     m_immediate = do_activated ();
     m_editing = false;
-
   }
 }
 
-void   
-Service::deactivated ()
+void Service::deactivated ()
 {
   lay::EditorServiceBase::deactivated ();
 
@@ -1066,8 +1009,7 @@ Service::deactivated ()
   m_immediate = false;
 }
 
-void   
-Service::edit_cancel ()
+void Service::edit_cancel ()
 {
   move_cancel ();
   if (m_editing) {
@@ -1077,8 +1019,7 @@ Service::edit_cancel ()
   }
 }
 
-void 
-Service::del ()
+void Service::del ()
 {
   if (has_selection () && view ()->is_editable ()) {
     //  delete the selected objects
@@ -1086,8 +1027,7 @@ Service::del ()
   }
 }
 
-void
-Service::del_selected ()
+void Service::del_selected ()
 {
   std::set<db::Layout *> needs_cleanup;
 
@@ -1103,7 +1043,7 @@ Service::del_selected ()
       } else {
         if (cell.is_valid (r->back ().inst_ptr)) {
           if (cv->layout ().cell (r->back ().inst_ptr.cell_index ()).is_proxy ()) {
-            needs_cleanup.insert (& cv->layout ());
+            needs_cleanup.insert (&cv->layout ());
           }
           cell.erase (r->back ().inst_ptr);
         }
@@ -1117,8 +1057,7 @@ Service::del_selected ()
   }
 }
 
-bool
-Service::has_selection ()
+bool Service::has_selection ()
 {
   return ! selection ().empty ();
 }
@@ -1129,8 +1068,7 @@ Service::selection_size ()
   return selection ().size ();
 }
 
-bool
-Service::has_transient_selection ()
+bool Service::has_transient_selection ()
 {
   return ! m_transient_selection.empty ();
 }
@@ -1170,8 +1108,8 @@ Service::click_proximity (const db::DPoint &pos, lay::Editable::SelectionMode mo
     lay::InstFinder finder (true, view ()->is_editable () && m_top_level_sel, view ()->is_editable () /*full arrays in editable mode*/, true /*enclose_inst*/, exclude, true /*visible layers*/);
 
     //  go through all cell views
-    std::set< std::pair<db::DCplxTrans, int> > variants = view ()->cv_transform_variants_with_empty();
-    for (std::set< std::pair<db::DCplxTrans, int> >::const_iterator v = variants.begin (); v != variants.end (); ++v) {
+    std::set<std::pair<db::DCplxTrans, int>> variants = view ()->cv_transform_variants_with_empty ();
+    for (std::set<std::pair<db::DCplxTrans, int>>::const_iterator v = variants.begin (); v != variants.end (); ++v) {
       finder.find (view (), v->second, v->first, search_box);
     }
 
@@ -1179,7 +1117,7 @@ Service::click_proximity (const db::DPoint &pos, lay::Editable::SelectionMode mo
     if (finder.begin () != finder.end ()) {
       return finder.proximity ();
     } else {
-      return lay::Editable::click_proximity (pos, mode); 
+      return lay::Editable::click_proximity (pos, mode);
     }
 
   } else {
@@ -1193,14 +1131,12 @@ Service::click_proximity (const db::DPoint &pos, lay::Editable::SelectionMode mo
     if (finder.begin () != finder.end ()) {
       return finder.proximity ();
     } else {
-      return lay::Editable::click_proximity (pos, mode); 
+      return lay::Editable::click_proximity (pos, mode);
     }
-
   }
 }
 
-bool
-Service::transient_select (const db::DPoint &pos)
+bool Service::transient_select (const db::DPoint &pos)
 {
   clear_transient_selection ();
 
@@ -1221,13 +1157,13 @@ Service::transient_select (const db::DPoint &pos)
     finder.consider_normal_cells (view ()->cell_box_visible ());
 
     //  go through all transform variants
-    std::set< std::pair<db::DCplxTrans, int> > variants = view ()->cv_transform_variants_with_empty ();
-    for (std::set< std::pair<db::DCplxTrans, int> >::const_iterator v = variants.begin (); v != variants.end (); ++v) {
+    std::set<std::pair<db::DCplxTrans, int>> variants = view ()->cv_transform_variants_with_empty ();
+    for (std::set<std::pair<db::DCplxTrans, int>>::const_iterator v = variants.begin (); v != variants.end (); ++v) {
       finder.find (view (), v->second, v->first, search_box);
     }
 
     //  collect the founds from the finder
-    lay::InstFinder::iterator r = finder.begin (); 
+    lay::InstFinder::iterator r = finder.begin ();
     if (r != finder.end ()) {
 
       m_transient_selection.insert (*r);
@@ -1278,7 +1214,6 @@ Service::transient_select (const db::DPoint &pos)
         marker->set_line_style (view ()->default_transient_line_style ());
 
         mp_transient_marker = marker;
-
       }
 
       if (! editables ()->has_selection ()) {
@@ -1345,9 +1280,7 @@ Service::transient_select (const db::DPoint &pos)
     } else {
       return false;
     }
-
   }
-
 }
 
 static std::string path_to_string (const db::Layout &layout, const lay::ObjectInstPath &p)
@@ -1361,7 +1294,7 @@ static std::string path_to_string (const db::Layout &layout, const lay::ObjectIn
     --e;
   }
 
-  r += "\\(";  //  group separator for shortening
+  r += "\\("; //  group separator for shortening
   if (layout.is_valid_cell_index (p.topcell ())) {
     r += layout.cell_name (p.topcell ());
   } else {
@@ -1370,7 +1303,7 @@ static std::string path_to_string (const db::Layout &layout, const lay::ObjectIn
   r += "\\)";
 
   while (b != e) {
-    r += "\\(";  //  group separator for shortening
+    r += "\\("; //  group separator for shortening
     r += "/";
     if (layout.is_valid_cell_index (b->inst_ptr.cell_index ())) {
       r += layout.cell_name (b->inst_ptr.cell_index ());
@@ -1386,11 +1319,9 @@ static std::string path_to_string (const db::Layout &layout, const lay::ObjectIn
   return r;
 }
 
-void 
-Service::display_status (bool transient)
+void Service::display_status (bool transient)
 {
-  if (transient && view ()->canvas ()->begin_mouse_receivers () != view ()->canvas ()->end_mouse_receivers ()
-                && (*view ()->canvas ()->begin_mouse_receivers ())->claims_message_bar ()) {
+  if (transient && view ()->canvas ()->begin_mouse_receivers () != view ()->canvas ()->end_mouse_receivers () && (*view ()->canvas ()->begin_mouse_receivers ())->claims_message_bar ()) {
     //  do not display transient if there is a plugin active that has captured the mouse and claims the message bar -
     //  this way we can use messages in active plugins and still get visual feedback by the transient selection.
     return;
@@ -1468,9 +1399,7 @@ Service::display_status (bool transient)
         msg += path_to_string (layout, *r);
 
         view ()->message (msg, transient ? 10 : 10000);
-
       }
-
     }
 
   } else {
@@ -1478,8 +1407,7 @@ Service::display_status (bool transient)
   }
 }
 
-void
-Service::clear_transient_selection ()
+void Service::clear_transient_selection ()
 {
   if (mp_transient_marker) {
     delete mp_transient_marker;
@@ -1489,14 +1417,12 @@ Service::clear_transient_selection ()
   m_transient_selection.clear ();
 }
 
-bool
-Service::selection_applies (const lay::ObjectInstPath & /*sel*/) const
+bool Service::selection_applies (const lay::ObjectInstPath & /*sel*/) const
 {
   return false;
 }
 
-void
-Service::transient_to_selection ()
+void Service::transient_to_selection ()
 {
   if (! m_transient_selection.empty ()) {
     m_selection.insert (m_transient_selection.begin (), m_transient_selection.end ());
@@ -1504,14 +1430,12 @@ Service::transient_to_selection ()
   }
 }
 
-void
-Service::clear_previous_selection ()
+void Service::clear_previous_selection ()
 {
   m_previous_selection.clear ();
 }
 
-bool 
-Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
+bool Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
 {
   //  compute search box
   double l = box.is_point () ? catch_distance () : catch_distance_box ();
@@ -1553,8 +1477,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
 
       //  extract all shapes
 
-      //  TODO: not implemented yet 
-
+      //  TODO: not implemented yet
     }
 
   } else if (m_cell_inst_service) {
@@ -1564,8 +1487,8 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
     finder.consider_normal_cells (view ()->cell_box_visible ());
 
     //  go through all cell views
-    std::set< std::pair<db::DCplxTrans, int> > variants = view ()->cv_transform_variants_with_empty ();
-    for (std::set< std::pair<db::DCplxTrans, int> >::const_iterator v = variants.begin (); v != variants.end (); ++v) {
+    std::set<std::pair<db::DCplxTrans, int>> variants = view ()->cv_transform_variants_with_empty ();
+    for (std::set<std::pair<db::DCplxTrans, int>>::const_iterator v = variants.begin (); v != variants.end (); ++v) {
       finder.find (view (), v->second, v->first, search_box);
     }
 
@@ -1601,7 +1524,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
     } else {
 
       //  clear the selection if it was consisting of a guiding shape before
-      objects::const_iterator s0 = m_selection.begin (); 
+      objects::const_iterator s0 = m_selection.begin ();
       if (s0 != m_selection.end () && s0->is_valid (view ()) && s0->layer () == view ()->cellview (s0->cv_index ())->layout ().guiding_shape_layer ()) {
         m_selection.clear ();
         m_selection_maybe_invalid = false;
@@ -1618,9 +1541,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
           any_selected = true;
         }
       }
-
     }
-      
   }
 
   //  if required, update the list of ruler objects to display the selection
@@ -1656,14 +1577,12 @@ Service::selection () const
     }
 
     m_selection_maybe_invalid = false;
-
   }
 
   return m_selection;
 }
 
-void 
-Service::get_selection (std::vector <lay::ObjectInstPath> &sel) const
+void Service::get_selection (std::vector<lay::ObjectInstPath> &sel) const
 {
   sel.clear ();
   sel.reserve (m_selection.size ());
@@ -1690,8 +1609,7 @@ Service::begin_transient_selection () const
   return EditableSelectionIterator (this, true);
 }
 
-bool
-Service::select (const lay::ObjectInstPath &obj, lay::Editable::SelectionMode mode)
+bool Service::select (const lay::ObjectInstPath &obj, lay::Editable::SelectionMode mode)
 {
   //  allocate next sequence number
   if (mode == lay::Editable::Replace) {
@@ -1706,10 +1624,9 @@ Service::select (const lay::ObjectInstPath &obj, lay::Editable::SelectionMode mo
     if (m_selection.find (obj) == m_selection.end ()) {
 
       obj_iterator o = m_selection.insert (obj).first;
-      (const_cast <lay::ObjectInstPath &> (*o)).set_seq (m_seq); // we can do that since the sequence number is not part of the less operator
+      (const_cast<lay::ObjectInstPath &> (*o)).set_seq (m_seq); // we can do that since the sequence number is not part of the less operator
       selection_to_view ();
       return true;
-
     }
 
   } else if (mode == lay::Editable::Reset) {
@@ -1720,7 +1637,6 @@ Service::select (const lay::ObjectInstPath &obj, lay::Editable::SelectionMode mo
       m_selection.erase (obj);
       selection_to_view ();
       return true;
-
     }
 
   } else {
@@ -1730,19 +1646,17 @@ Service::select (const lay::ObjectInstPath &obj, lay::Editable::SelectionMode mo
       m_selection.erase (obj);
     } else {
       obj_iterator o = m_selection.insert (obj).first;
-      (const_cast <lay::ObjectInstPath &> (*o)).set_seq (m_seq); // we can do that since the sequence number is not part of the less operator
+      (const_cast<lay::ObjectInstPath &> (*o)).set_seq (m_seq); // we can do that since the sequence number is not part of the less operator
     }
 
     selection_to_view ();
     return true;
-
   }
 
   return false;
 }
 
-void  
-Service::move_markers (const db::DTrans &t)
+void Service::move_markers (const db::DTrans &t)
 {
   if (has_selection ()) {
     propose_move_transformation (t, 0);
@@ -1757,36 +1671,30 @@ Service::move_markers (const db::DTrans &t)
         db::DCplxTrans dt = db::DCplxTrans (t) * db::DCplxTrans (m_move_trans).inverted ();
         marker->set_trans (dt * marker->trans ());
       }
-
     }
 
     m_move_trans = t;
-
   }
 }
 
-void
-Service::begin_edit (const db::DPoint &p)
+void Service::begin_edit (const db::DPoint &p)
 {
   do_begin_edit (p);
   show_toolbox (true);
   m_editing = true;
 }
 
-void
-Service::tap (const db::DPoint & /*pt*/)
+void Service::tap (const db::DPoint & /*pt*/)
 {
   //  .. nothing here ..
 }
 
-void
-Service::via (int /*dir*/)
+void Service::via (int /*dir*/)
 {
   //  .. nothing here ..
 }
 
-void
-Service::geometry_changing ()
+void Service::geometry_changing ()
 {
   //  selection may become invalid (issue-1145)
   m_selection_maybe_invalid = true;
@@ -1797,8 +1705,7 @@ Service::geometry_changing ()
   selection_to_view ();
 }
 
-void 
-Service::selection_to_view ()
+void Service::selection_to_view ()
 {
   //  we don't handle the transient selection properly, so clear it for safety reasons
   clear_transient_selection ();
@@ -1813,8 +1720,7 @@ Service::selection_to_view ()
   dm_selection_to_view ();
 }
 
-void 
-Service::do_selection_to_view ()
+void Service::do_selection_to_view ()
 {
   //  Hint: this is a lower bound:
   m_markers.reserve (selection_size ());
@@ -1844,7 +1750,7 @@ Service::do_selection_to_view ()
       if (tv_list == 0) {
         tv_list = &empty_tv;
       }
-      
+
       if (view ()->is_editable ()) {
 
 #if 0
@@ -1860,7 +1766,7 @@ Service::do_selection_to_view ()
           marker->set_dither_pattern (3);
         }
         marker->set (r->back ().inst_ptr, gt, *tv_list);
-        m_markers.push_back (std::make_pair (r.operator-> (), marker));
+        m_markers.push_back (std::make_pair (r.operator->(), marker));
 
       } else {
 
@@ -1873,8 +1779,7 @@ Service::do_selection_to_view ()
         }
         db::box_convert<db::CellInst, false> bc (cv->layout ());
         marker->set (bc (r->back ().inst_ptr.cell_inst ().object ()), gt * r->back ().inst_ptr.cell_inst ().complex_trans (*r->back ().array_inst), *tv_list);
-        m_markers.push_back (std::make_pair (r.operator-> (), marker));
-
+        m_markers.push_back (std::make_pair (r.operator->(), marker));
       }
 
     } else {
@@ -1883,9 +1788,9 @@ Service::do_selection_to_view ()
       if (tv_list != 0) {
 
         lay::ShapeMarker *marker = new lay::ShapeMarker (view (), r->cv_index ());
-        if (r->seq () > 0 && m_indicate_secondary_selection) { 
-          marker->set_dither_pattern (3); 
-        } 
+        if (r->seq () > 0 && m_indicate_secondary_selection) {
+          marker->set_dither_pattern (3);
+        }
 
         marker->set (r->shape (), gt, *tv_list);
 
@@ -1902,19 +1807,15 @@ Service::do_selection_to_view ()
           marker->set_vertex_size (9 /*cross vertex size*/);
         }
 
-        m_markers.push_back (std::make_pair (r.operator-> (), marker));
-
+        m_markers.push_back (std::make_pair (r.operator->(), marker));
       }
-
     }
-
   }
 
   apply_highlights ();
 }
 
-void 
-Service::set_selection (std::vector <lay::ObjectInstPath>::const_iterator s1, std::vector <lay::ObjectInstPath>::const_iterator s2)
+void Service::set_selection (std::vector<lay::ObjectInstPath>::const_iterator s1, std::vector<lay::ObjectInstPath>::const_iterator s2)
 {
   m_selection.clear ();
   m_selection.insert (s1, s2);
@@ -1922,15 +1823,13 @@ Service::set_selection (std::vector <lay::ObjectInstPath>::const_iterator s1, st
   selection_to_view ();
 }
 
-void 
-Service::remove_selection (const lay::ObjectInstPath &sel)
+void Service::remove_selection (const lay::ObjectInstPath &sel)
 {
   m_selection.erase (sel);
   selection_to_view ();
 }
 
-void 
-Service::add_selection (const lay::ObjectInstPath &sel)
+void Service::add_selection (const lay::ObjectInstPath &sel)
 {
   m_selection.insert (sel);
   selection_to_view ();
@@ -2005,13 +1904,13 @@ Service::handle_guiding_shape_changes (const lay::ObjectInstPath &obj, bool comm
   bool found = false;
   lay::ObjectInstPath new_obj = obj;
 
-  if (parent_cell != std::numeric_limits <db::cell_index_type>::max ()) {
+  if (parent_cell != std::numeric_limits<db::cell_index_type>::max ()) {
 
     db::Instance new_inst = layout->cell (parent_cell).change_pcell_parameters (parent_inst, parameters_for_pcell);
 
     //  try to identify the selected shape in the new shapes and select this one
     db::Shapes::shape_iterator sh = layout->cell (new_inst.cell_index ()).shapes (layout->guiding_shape_layer ()).begin (db::ShapeIterator::All);
-    while (! sh.at_end () && !found) {
+    while (! sh.at_end () && ! found) {
       const db::PropertiesSet &props = db::properties (sh->prop_id ());
       if (props.has_value (pn) && props.value (pn).to_string () == shape_name) {
         new_obj.back ().inst_ptr = new_inst;
@@ -2021,10 +1920,9 @@ Service::handle_guiding_shape_changes (const lay::ObjectInstPath &obj, bool comm
       }
       ++sh;
     }
-
   }
 
-  if (top_cell != std::numeric_limits <db::cell_index_type>::max ()) {
+  if (top_cell != std::numeric_limits<db::cell_index_type>::max ()) {
     // TODO: implement the case of a PCell variant being a top cell
     // Currently there is not way to create such a configuration ...
   }
@@ -2032,8 +1930,7 @@ Service::handle_guiding_shape_changes (const lay::ObjectInstPath &obj, bool comm
   return std::make_pair (found, new_obj);
 }
 
-bool 
-Service::handle_guiding_shape_changes (bool commit)
+bool Service::handle_guiding_shape_changes (bool commit)
 {
   EditableSelectionIterator s = begin_selection ();
 
@@ -2060,8 +1957,7 @@ Service::handle_guiding_shape_changes (bool commit)
   }
 }
 
-void
-Service::commit_recent ()
+void Service::commit_recent ()
 {
   lay::EditorOptionsPageCollection *eo_pages = view ()->editor_options_pages ();
   if (! eo_pages) {
@@ -2076,8 +1972,7 @@ Service::commit_recent ()
   }
 }
 
-void
-Service::show_toolbox (bool visible)
+void Service::show_toolbox (bool visible)
 {
   auto p = toolbox_widget ();
   if (p) {
@@ -2119,8 +2014,7 @@ EditableSelectionIterator::EditableSelectionIterator (const edt::Service *servic
   init ();
 }
 
-void
-EditableSelectionIterator::init ()
+void EditableSelectionIterator::init ()
 {
   if (! m_services.empty ()) {
     if (m_transient_selection) {
@@ -2134,8 +2028,7 @@ EditableSelectionIterator::init ()
   }
 }
 
-bool
-EditableSelectionIterator::at_end () const
+bool EditableSelectionIterator::at_end () const
 {
   return (m_service >= m_services.size ());
 }
@@ -2149,9 +2042,9 @@ EditableSelectionIterator::operator++ ()
 }
 
 EditableSelectionIterator::pointer
-EditableSelectionIterator::operator-> () const
+EditableSelectionIterator::operator->() const
 {
-  return m_iter.operator-> ();
+  return m_iter.operator->();
 }
 
 EditableSelectionIterator::reference
@@ -2160,8 +2053,7 @@ EditableSelectionIterator::operator* () const
   return m_iter.operator* ();
 }
 
-void
-EditableSelectionIterator::next ()
+void EditableSelectionIterator::next ()
 {
   while (m_iter == m_end) {
     ++m_service;
@@ -2188,7 +2080,7 @@ EditableSelectionIterator::next ()
 std::vector<edt::Service::objects::value_type> object_selection (const lay::LayoutViewBase *view)
 {
   std::vector<edt::Service::objects::value_type> result;
-  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view->get_plugins<edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
     std::vector<edt::Service::objects::value_type> sel;
     (*s)->get_selection (sel);
@@ -2204,7 +2096,7 @@ void set_object_selection (const lay::LayoutViewBase *view, const std::vector<ed
 {
   std::vector<edt::Service::objects::value_type> sel;
 
-  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view->get_plugins<edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
 
     sel.clear ();
@@ -2216,7 +2108,6 @@ void set_object_selection (const lay::LayoutViewBase *view, const std::vector<ed
     }
 
     (*s)->set_selection (sel.begin (), sel.end ());
-
   }
 }
 
@@ -2225,7 +2116,7 @@ void set_object_selection (const lay::LayoutViewBase *view, const std::vector<ed
  */
 bool has_object_selection (const lay::LayoutViewBase *view)
 {
-  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view->get_plugins<edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
     if ((*s)->has_selection ()) {
       return true;
@@ -2239,7 +2130,7 @@ bool has_object_selection (const lay::LayoutViewBase *view)
  */
 void clear_object_selection (const lay::LayoutViewBase *view)
 {
-  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view->get_plugins<edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
     (*s)->clear_selection ();
   }
@@ -2250,7 +2141,7 @@ void clear_object_selection (const lay::LayoutViewBase *view)
  */
 void select_object (const lay::LayoutViewBase *view, const edt::Service::objects::value_type &object)
 {
-  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view->get_plugins<edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
     if ((*s)->selection_applies (object)) {
       (*s)->add_selection (object);
@@ -2264,7 +2155,7 @@ void select_object (const lay::LayoutViewBase *view, const edt::Service::objects
  */
 void unselect_object (const lay::LayoutViewBase *view, const edt::Service::objects::value_type &object)
 {
-  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view->get_plugins<edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
     if ((*s)->selection_applies (object)) {
       (*s)->remove_selection (object);
@@ -2278,7 +2169,7 @@ void unselect_object (const lay::LayoutViewBase *view, const edt::Service::objec
  */
 bool has_transient_object_selection (const lay::LayoutViewBase *view)
 {
-  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
+  std::vector<edt::Service *> edt_services = view->get_plugins<edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
     if ((*s)->has_transient_selection ()) {
       return true;
@@ -2292,7 +2183,7 @@ bool has_transient_object_selection (const lay::LayoutViewBase *view)
  */
 EditableSelectionIterator begin_objects_selected (const lay::LayoutViewBase *view)
 {
-  return EditableSelectionIterator (view->get_plugins <edt::Service> (), false);
+  return EditableSelectionIterator (view->get_plugins<edt::Service> (), false);
 }
 
 /**
@@ -2300,7 +2191,7 @@ EditableSelectionIterator begin_objects_selected (const lay::LayoutViewBase *vie
  */
 EditableSelectionIterator begin_objects_selected_transient (const lay::LayoutViewBase *view)
 {
-  return EditableSelectionIterator (view->get_plugins <edt::Service> (), true);
+  return EditableSelectionIterator (view->get_plugins<edt::Service> (), true);
 }
 
 } // namespace edt

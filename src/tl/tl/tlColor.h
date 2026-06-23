@@ -29,7 +29,7 @@
 #include <string>
 
 #if defined(HAVE_QT)
-#  include <QColor>
+#include <QColor>
 #endif
 
 namespace tl
@@ -44,9 +44,9 @@ typedef uint32_t color_t;
  *  @brief Gets the color components from a color_t
  */
 inline unsigned int alpha (color_t c) { return (c >> 24) & 0xff; }
-inline unsigned int red (color_t c)   { return (c >> 16) & 0xff; }
+inline unsigned int red (color_t c) { return (c >> 16) & 0xff; }
 inline unsigned int green (color_t c) { return (c >> 8) & 0xff; }
-inline unsigned int blue (color_t c)  { return c & 0xff; }
+inline unsigned int blue (color_t c) { return c & 0xff; }
 
 /**
  *  @brief A wrapper for a color value

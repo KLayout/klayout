@@ -38,8 +38,7 @@ TriangulationRExtractor::TriangulationRExtractor (double dbu)
   m_tri_param.max_area = 0.0;
 }
 
-void
-TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<db::Point> &vertex_ports, const std::vector<db::Polygon> &polygon_ports, pex::RNetwork &rnetwork)
+void TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<db::Point> &vertex_ports, const std::vector<db::Polygon> &polygon_ports, pex::RNetwork &rnetwork)
 {
   rnetwork.clear ();
 
@@ -47,12 +46,12 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
 
   db::CplxTrans trans = db::CplxTrans (m_dbu) * db::ICplxTrans (db::Trans (db::Point () - polygon.box ().center ()));
   db::CplxTrans dbu_trans = db::CplxTrans (m_dbu);
-  db::DCplxTrans v2loc_trans = dbu_trans * trans.inverted ();  // vertex to node location
+  db::DCplxTrans v2loc_trans = dbu_trans * trans.inverted (); // vertex to node location
 
   db::plc::Graph plc;
   db::plc::Triangulation tri (&plc);
 
-  std::unordered_map <const db::plc::Vertex *, size_t> pp_vertexes;
+  std::unordered_map<const db::plc::Vertex *, size_t> pp_vertexes;
 
   if (polygon_ports.empty ()) {
 
@@ -77,7 +76,7 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
 
     tri.clear ();
 
-    std::vector<std::vector<db::plc::Vertex *> > edge_contours;
+    std::vector<std::vector<db::plc::Vertex *>> edge_contours;
 
     //  first step of the triangulation
 
@@ -94,7 +93,7 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
       //  create vertexes for the port polygon vertexes - this ensures we will find vertexes
       //  on the edges of the polygons - yet, they may be outside of the original polygon.
       //  In that case they will not be considered
-      for (auto e = p->begin_edge (); !e.at_end (); ++e) {
+      for (auto e = p->begin_edge (); ! e.at_end (); ++e) {
         tri.insert_point (trans * (*e).p1 ())->set_is_precious (true, id);
       }
     }
@@ -107,7 +106,7 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
     //  identify the vertexes present for the polygon port -> store them inside pp_vertexes
 
     for (auto p = polygon_ports.begin (); p != polygon_ports.end (); ++p) {
-      for (auto e = p->begin_edge (); !e.at_end (); ++e) {
+      for (auto e = p->begin_edge (); ! e.at_end (); ++e) {
         //  NOTE: this currently only works if one of the end points is an actual
         //  vertex.
         auto vport = tri.find_vertexes_along_line (trans * (*e).p1 (), trans * (*e).p2 ());
@@ -118,7 +117,6 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
     }
 
     tri.remove_outside_triangles ();
-
   }
 
   //  Create a network node for each triangle node.
@@ -174,15 +172,12 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
 
         n = rnetwork.create_node (pex::RNode::Internal, (unsigned int) internal_node_id++, 0);
         n->location = v2loc_trans * db::DBox (*vertex, *vertex);
-
       }
 
       if (n) {
         vertex2node.insert (std::make_pair (vertex, n));
       }
-
     }
-
   }
 
   //  check for vertex ports not assigned to a node
@@ -207,12 +202,9 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
           auto n = rnetwork.create_node (pex::RNode::VertexPort, (unsigned int) iv, 0);
           n->location = dbu_trans * db::Box (vp, vp);
           rnetwork.create_element (pex::RElement::short_value (), n, ip->second);
-
         }
-
       }
     }
-
   }
 
   //  produce the conductances for each triangle
@@ -228,8 +220,7 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
   }
 }
 
-void
-TriangulationRExtractor::create_conductances (const db::plc::Polygon &tri, const std::unordered_map<const db::plc::Vertex *, pex::RNode *> &vertex2node, RNetwork &rnetwork)
+void TriangulationRExtractor::create_conductances (const db::plc::Polygon &tri, const std::unordered_map<const db::plc::Vertex *, pex::RNode *> &vertex2node, RNetwork &rnetwork)
 {
   tl_assert (tri.size () == 3);
 
@@ -253,14 +244,11 @@ TriangulationRExtractor::create_conductances (const db::plc::Polygon &tri, const
       double s = (l0 + l1 - lm1) / (8.0 * a);
 
       rnetwork.create_element (s, i0->second, im1->second);
-
     }
-
   }
 }
 
-void
-TriangulationRExtractor::eliminate_all (RNetwork &rnetwork)
+void TriangulationRExtractor::eliminate_all (RNetwork &rnetwork)
 {
   if (tl::verbosity () >= m_tri_param.base_verbosity + 10) {
     tl::info << "Starting elimination with " << rnetwork.num_internal_nodes () << " internal nodes and " << rnetwork.num_elements () << " resistors";
@@ -282,7 +270,7 @@ TriangulationRExtractor::eliminate_all (RNetwork &rnetwork)
         if (n->type == pex::RNode::Internal) {
           size_t nn = n->elements ().size ();
           if (nn <= nmax) {
-            to_eliminate.push_back (const_cast<pex::RNode *> (n.operator-> ()));
+            to_eliminate.push_back (const_cast<pex::RNode *> (n.operator->()));
           } else if (nmax_next == 0 || nn < nmax_next) {
             nmax_next = nn;
           }
@@ -309,16 +297,12 @@ TriangulationRExtractor::eliminate_all (RNetwork &rnetwork)
         if (tl::verbosity () >= m_tri_param.base_verbosity + 10) {
           tl::info << "Nodes left after iteration " << niter << " with nmax=" << nmax << ": " << rnetwork.num_internal_nodes () << " with " << rnetwork.num_elements () << " edges.";
         }
-
       }
-
     }
-
   }
 }
 
-void
-TriangulationRExtractor::eliminate_node (pex::RNode *node, RNetwork &rnetwork)
+void TriangulationRExtractor::eliminate_node (pex::RNode *node, RNetwork &rnetwork)
 {
   double s_sum = 0.0;
   for (auto e = node->elements ().begin (); e != node->elements ().end (); ++e) {
@@ -329,9 +313,9 @@ TriangulationRExtractor::eliminate_node (pex::RNode *node, RNetwork &rnetwork)
     for (auto e = node->elements ().begin (); e != node->elements ().end (); ++e) {
       auto ee = e;
       ++ee;
-      for ( ; ee != node->elements ().end (); ++ee) {
-        pex::RNode *n1 = const_cast <pex::RNode *> ((*e)->other (node));
-        pex::RNode *n2 = const_cast <pex::RNode *> ((*ee)->other (node));
+      for (; ee != node->elements ().end (); ++ee) {
+        pex::RNode *n1 = const_cast<pex::RNode *> ((*e)->other (node));
+        pex::RNode *n2 = const_cast<pex::RNode *> ((*ee)->other (node));
         double c = (*e)->conductance * (*ee)->conductance / s_sum;
         rnetwork.create_element (c, n1, n2);
       }

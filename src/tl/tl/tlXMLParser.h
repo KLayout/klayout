@@ -45,7 +45,7 @@ namespace tl
 
 class TL_PUBLIC XMLException : public tl::Exception
 {
-public: 
+public:
   XMLException (const char *msg)
     : Exception (tl::to_string (tr ("XML parser error: %s")).c_str ()),
       m_msg (msg)
@@ -89,14 +89,14 @@ private:
     }
   }
 };
- 
+
 /**
  *  @brief A XML parser error exception class that additionally provides line and column information
  */
 
 class TL_PUBLIC XMLLocatedException : public XMLException
 {
-public: 
+public:
   XMLLocatedException (const std::string &msg, int line, int column)
     : XMLException (msg, line, column),
       m_line (line), m_column (column)
@@ -124,7 +124,7 @@ private:
   int m_line;
   int m_column;
 };
- 
+
 /**
  *  @brief An object wrapper base class for target object management
  *
@@ -135,8 +135,8 @@ private:
 class TL_PUBLIC XMLReaderProxyBase
 {
 public:
-  XMLReaderProxyBase () { }
-  virtual ~XMLReaderProxyBase () { }
+  XMLReaderProxyBase () {}
+  virtual ~XMLReaderProxyBase () {}
   virtual void release () = 0;
   virtual void detach () = 0;
 };
@@ -150,13 +150,14 @@ class TL_PUBLIC_TEMPLATE XMLReaderProxy
   : public XMLReaderProxyBase
 {
 public:
-  XMLReaderProxy (Obj *obj, bool owns_obj) 
-    : mp_obj (obj), m_owns_obj (owns_obj) 
-  { }
+  XMLReaderProxy (Obj *obj, bool owns_obj)
+    : mp_obj (obj), m_owns_obj (owns_obj)
+  {
+  }
 
-  virtual ~XMLReaderProxy () { }
+  virtual ~XMLReaderProxy () {}
 
-  virtual void release () 
+  virtual void release ()
   {
     if (m_owns_obj && mp_obj) {
       delete mp_obj;
@@ -169,7 +170,7 @@ public:
     m_owns_obj = false;
   }
 
-  Obj *ptr () const 
+  Obj *ptr () const
   {
     return mp_obj;
   }
@@ -184,20 +185,19 @@ private:
  */
 
 template <class Obj>
-struct XMLObjTag
-{
-  XMLObjTag() { }
+struct XMLObjTag {
+  XMLObjTag () {}
   typedef Obj obj;
 };
 
 /**
  *  @brief Helper class: The reader state
- * 
+ *
  *  The reader state mainly comprises of a stack of objects being parsed and
  *  a string in which to collect cdata.
  */
 
-class TL_PUBLIC XMLReaderState 
+class TL_PUBLIC XMLReaderState
 {
 public:
   /**
@@ -241,28 +241,28 @@ public:
    *  @brief Get the top object
    */
   template <class Obj>
-  Obj *back (XMLObjTag<Obj> /*tag*/) 
+  Obj *back (XMLObjTag<Obj> /*tag*/)
   {
     tl_assert (! m_objects.empty ());
-    return (dynamic_cast <XMLReaderProxy<Obj> &> (*m_objects.back ())).ptr ();
+    return (dynamic_cast<XMLReaderProxy<Obj> &> (*m_objects.back ())).ptr ();
   }
 
   /**
    *  @brief Get the top object and release
    */
   template <class Obj>
-  Obj *detach_back (XMLObjTag<Obj> /*tag*/) 
+  Obj *detach_back (XMLObjTag<Obj> /*tag*/)
   {
     tl_assert (! m_objects.empty ());
     m_objects.back ()->detach ();
-    return (dynamic_cast <XMLReaderProxy<Obj> &> (*m_objects.back ())).ptr ();
+    return (dynamic_cast<XMLReaderProxy<Obj> &> (*m_objects.back ())).ptr ();
   }
 
   /**
    *  @brief Pop an object from the stack
    */
   template <class Obj>
-  void pop (XMLObjTag<Obj> /*tag*/) 
+  void pop (XMLObjTag<Obj> /*tag*/)
   {
     tl_assert (! m_objects.empty ());
     m_objects.back ()->release ();
@@ -282,10 +282,10 @@ public:
    *  @brief Obtain the parent object from the stack
    */
   template <class Obj>
-  Obj *parent (XMLObjTag<Obj> /*tag*/) 
+  Obj *parent (XMLObjTag<Obj> /*tag*/)
   {
     tl_assert (m_objects.size () > 1);
-    return (dynamic_cast <XMLReaderProxy<Obj> &> (*m_objects.end () [-2])).ptr ();
+    return (dynamic_cast<XMLReaderProxy<Obj> &> (*m_objects.end () [-2])).ptr ();
   }
 
   /**
@@ -294,7 +294,7 @@ public:
   std::string cdata;
 
 private:
-  std::vector <XMLReaderProxyBase *> m_objects;
+  std::vector<XMLReaderProxyBase *> m_objects;
 };
 
 //  The opaque source type
@@ -303,12 +303,12 @@ class XMLSourcePrivateData;
 /**
  *  @brief A generic XML text source class
  *
- *  This class is the base class providing input for 
+ *  This class is the base class providing input for
  *  the Qt XML parser and basically maps to a QXmlInputSource object
  *  for compatibility with the "libparsifal" branch.
  */
 
-class TL_PUBLIC XMLSource 
+class TL_PUBLIC XMLSource
 {
 public:
   XMLSource ();
@@ -379,12 +379,12 @@ public:
 
 class TL_PUBLIC XMLElementBase;
 
-struct pass_by_value_tag { 
-  pass_by_value_tag () { } 
+struct pass_by_value_tag {
+  pass_by_value_tag () {}
 };
 
-struct pass_by_ref_tag { 
-  pass_by_ref_tag () { } 
+struct pass_by_ref_tag {
+  pass_by_ref_tag () {}
 };
 
 /**
@@ -404,7 +404,7 @@ public:
   void start_element (const std::string &uri, const std::string &lname, const std::string &qname);
 
 private:
-  std::vector <const XMLElementBase *> m_stack;
+  std::vector<const XMLElementBase *> m_stack;
   const XMLElementBase *mp_root;
   XMLReaderState *mp_state;
 };
@@ -436,13 +436,13 @@ private:
 /**
  *  @brief XMLElementProxy element of the XML structure definition
  *
- *  The purpose of this class is to provide a wrapper around the 
- *  different derivations of the XMLElementBase class, so we can 
+ *  The purpose of this class is to provide a wrapper around the
+ *  different derivations of the XMLElementBase class, so we can
  *  pack them into a vector. The proxy objects can be copied
  *  duplicating the wrapped objects with their "clone" methods.
- *  The proxy object can be given the pointer to the element 
+ *  The proxy object can be given the pointer to the element
  *  in two ways: the reference version creates a duplicate, the
- *  pointer version transfers the ownership of the XMLElementBase 
+ *  pointer version transfers the ownership of the XMLElementBase
  *  object.
  */
 
@@ -455,7 +455,7 @@ public:
 
   ~XMLElementProxy ();
 
-  XMLElementBase *operator-> () const
+  XMLElementBase *operator->() const
   {
     return mp_ptr;
   }
@@ -472,15 +472,15 @@ private:
 /**
  *  @brief A list of XML elements
  *
- *  This class provides a list of XML elements. 
- *  A list can be created by using the + operator and 
+ *  This class provides a list of XML elements.
+ *  A list can be created by using the + operator and
  *  supplying various objects based on XMLElementBase.
  */
 
-class TL_PUBLIC XMLElementList 
+class TL_PUBLIC XMLElementList
 {
 public:
-  typedef std::list <XMLElementProxy> children_list;
+  typedef std::list<XMLElementProxy> children_list;
   typedef children_list::const_iterator iterator;
 
   XMLElementList ()
@@ -536,20 +536,20 @@ public:
     return m_elements.end ();
   }
 
-  static XMLElementList empty () 
+  static XMLElementList empty ()
   {
     return XMLElementList ();
   }
 
 private:
-  std::list <XMLElementProxy> m_elements; 
+  std::list<XMLElementProxy> m_elements;
 };
 
 /**
- *  @brief Helper class: A stack of const objects being written 
+ *  @brief Helper class: A stack of const objects being written
  */
 
-class TL_PUBLIC XMLWriterState 
+class TL_PUBLIC XMLWriterState
 {
 public:
   /**
@@ -570,10 +570,10 @@ public:
    *  @brief Pop an object from the stack
    */
   template <class Obj>
-  const Obj *pop (XMLObjTag<Obj> /*tag*/) 
+  const Obj *pop (XMLObjTag<Obj> /*tag*/)
   {
     tl_assert (! m_objects.empty ());
-    const Obj *obj = reinterpret_cast <const Obj *> (m_objects.back ());
+    const Obj *obj = reinterpret_cast<const Obj *> (m_objects.back ());
     m_objects.pop_back ();
     return obj;
   }
@@ -582,21 +582,21 @@ public:
    *  @brief Obtain the parent object from the stack
    */
   template <class Obj>
-  const Obj *back (XMLObjTag<Obj> /*tag*/) 
+  const Obj *back (XMLObjTag<Obj> /*tag*/)
   {
     tl_assert (m_objects.size () > 0);
-    return reinterpret_cast <const Obj *> (m_objects.end () [-1]);
+    return reinterpret_cast<const Obj *> (m_objects.end () [-1]);
   }
 
 private:
-  std::vector <const void *> m_objects;
+  std::vector<const void *> m_objects;
 };
 
 /**
  *  @brief The XML element base object
  *
  *  This class is the base class for objects implementing
- *  the parser handler semantics. The basic methods are 
+ *  the parser handler semantics. The basic methods are
  *  create (create an actual object), cdata (supply data),
  *  finish (finalize the actual object).
  */
@@ -631,7 +631,7 @@ public:
   virtual ~XMLElementBase ()
   {
     if (m_owns_child_list) {
-      delete const_cast <XMLElementList *> (mp_children);
+      delete const_cast<XMLElementList *> (mp_children);
       mp_children = 0;
     }
   }
@@ -642,7 +642,7 @@ public:
   virtual void cdata (const std::string &cdata, XMLReaderState &objs) const = 0;
   virtual void finish (const XMLElementBase *parent, XMLReaderState &objs, const std::string &uri, const std::string &lname, const std::string &qname) const = 0;
 
-  virtual void write (const XMLElementBase * /*parent*/, tl::OutputStream & /*os*/, int /*indent*/, XMLWriterState & /*objs*/) const { }
+  virtual void write (const XMLElementBase * /*parent*/, tl::OutputStream & /*os*/, int /*indent*/, XMLWriterState & /*objs*/) const {}
   virtual bool has_any (XMLWriterState & /*objs*/) const { return false; }
 
   static void write_indent (tl::OutputStream &os, int indent);
@@ -679,18 +679,18 @@ private:
 };
 
 /**
- *  @brief A XML child element 
+ *  @brief A XML child element
  *
  *  This class is a XML structure component describing a child
  *  element in the XML tree. There is no limit about the number of
- *  child elements. 
+ *  child elements.
  *  This object must be provided a pointer to a factory method (in
  *  the parent's class), a name and a list of children (which can be
  *  empty).
  *  Write is a class providing a Obj &operator(Parent &) operator.
  *  It is supposed to create a new instance of Obj within Parent.
- *  Read is a class providing a start(const Parent &) method to start 
- *  iterating over the instances, a const Obj &operator() const for 
+ *  Read is a class providing a start(const Parent &) method to start
+ *  iterating over the instances, a const Obj &operator() const for
  *  access and a bool at_end() method to determine if the iterator
  *  is at the end and next() to increment the iterator.
  */
@@ -759,7 +759,7 @@ public:
     }
   }
 
-  virtual bool has_any (XMLWriterState &objs) const 
+  virtual bool has_any (XMLWriterState &objs) const
   {
     XMLObjTag<Parent> parent_tag;
     Read r (m_r);
@@ -865,7 +865,7 @@ public:
     }
   }
 
-  virtual bool has_any (XMLWriterState &objs) const 
+  virtual bool has_any (XMLWriterState &objs) const
   {
     XMLObjTag<Parent> parent_tag;
     Read r (m_r);
@@ -903,13 +903,13 @@ private:
  *  @brief A XML child element mapped to a member
  *
  *  This class is a XML structure component describing a child
- *  element in the XML tree. The value of the child element 
+ *  element in the XML tree. The value of the child element
  *  is directly mapped to a member of the parent's class.
- *  This object must be provided two adaptors: 
+ *  This object must be provided two adaptors:
  *  Write is a writer providing an operator() (Parent &, const Value &)
  *  that adds a new value or sets the value.
- *  Read is a class providing a start(const Parent &) method to start 
- *  iterating over the instances, a const Value &operator() const for 
+ *  Read is a class providing a start(const Parent &) method to start
+ *  iterating over the instances, a const Value &operator() const for
  *  access and a bool at_end() method to determine if the iterator
  *  is at the end and next() to increment the iterator.
  */
@@ -964,7 +964,7 @@ public:
   {
     XMLObjTag<Parent> parent_tag;
     Read r (m_r);
-    r.start (* objs.back (parent_tag));
+    r.start (*objs.back (parent_tag));
     while (! r.at_end ()) {
 
       std::string value = m_c.to_string (r ());
@@ -980,11 +980,10 @@ public:
       }
 
       r.next ();
-
     }
   }
 
-  virtual bool has_any (XMLWriterState &objs) const 
+  virtual bool has_any (XMLWriterState &objs) const
   {
     XMLObjTag<Parent> parent_tag;
     Read r (m_r);
@@ -1001,8 +1000,8 @@ private:
 /**
  *  @brief A XML wildcard reader
  *
- *  This class is a XML structure component that passes a key/value 
- *  pair to a given read adaptor. 
+ *  This class is a XML structure component that passes a key/value
+ *  pair to a given read adaptor.
  */
 
 template <class Value, class Parent, class Write, class Converter>
@@ -1051,11 +1050,11 @@ public:
     value_obj.pop (tag);
   }
 
-  virtual void write (const XMLElementBase * /*parent*/, tl::OutputStream & /*os*/, int  /*indent*/, XMLWriterState & /*objs*/) const
+  virtual void write (const XMLElementBase * /*parent*/, tl::OutputStream & /*os*/, int /*indent*/, XMLWriterState & /*objs*/) const
   {
   }
 
-  virtual bool has_any (XMLWriterState & /*objs*/) const 
+  virtual bool has_any (XMLWriterState & /*objs*/) const
   {
     return false;
   }
@@ -1119,7 +1118,7 @@ public:
   void write (tl::OutputStream &os, const Obj &root) const
   {
     XMLWriterState writer_state;
-    writer_state.push (& root);
+    writer_state.push (&root);
 
     os << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
     os << "<" << this->name () << ">\n";
@@ -1144,7 +1143,7 @@ public:
   }
 
 private:
-  virtual void write (const XMLElementBase*, tl::OutputStream &, int, XMLWriterState &) const
+  virtual void write (const XMLElementBase *, tl::OutputStream &, int, XMLWriterState &) const
   {
     // .. see write (os)
   }
@@ -1153,7 +1152,7 @@ private:
 /**
  *  @brief Utility: add a XML element to a list of some
  */
-inline XMLElementList 
+inline XMLElementList
 operator+ (const XMLElementList &l, const XMLElementBase &e)
 {
   return XMLElementList (l, e);
@@ -1164,7 +1163,7 @@ operator+ (const XMLElementList &l, const XMLElementBase &e)
  *
  *  This version transfers the ownership of the XMLElementBase object.
  */
-inline XMLElementList 
+inline XMLElementList
 operator+ (const XMLElementList &l, XMLElementBase *e)
 {
   return XMLElementList (l, e);
@@ -1174,29 +1173,27 @@ operator+ (const XMLElementList &l, XMLElementBase *e)
 //  Several adaptor classes needed to implement the various make_* utilities
 
 template <class Value, class Parent>
-struct XMLMemberDummyWriteAdaptor
-{
+struct XMLMemberDummyWriteAdaptor {
   XMLMemberDummyWriteAdaptor ()
   {
     // .. nothing yet ..
   }
-  
-  void operator () (Parent &, XMLReaderState &) const
+
+  void operator() (Parent &, XMLReaderState &) const
   {
     // .. nothing yet ..
   }
 };
- 
+
 template <class Value, class Parent>
-struct XMLMemberWriteAdaptor
-{
+struct XMLMemberWriteAdaptor {
   XMLMemberWriteAdaptor (Value Parent::*member)
     : mp_member (member)
   {
     // .. nothing yet ..
   }
-  
-  void operator () (Parent &owner, XMLReaderState &reader) const
+
+  void operator() (Parent &owner, XMLReaderState &reader) const
   {
     XMLObjTag<Value> tag;
     owner.*mp_member = *reader.back (tag);
@@ -1205,17 +1202,16 @@ struct XMLMemberWriteAdaptor
 private:
   Value Parent::*mp_member;
 };
- 
+
 template <class Value, class Parent>
-struct XMLMemberAccRefWriteAdaptor
-{
+struct XMLMemberAccRefWriteAdaptor {
   XMLMemberAccRefWriteAdaptor (void (Parent::*member) (const Value &))
     : mp_member (member)
   {
     // .. nothing yet ..
   }
-  
-  void operator () (Parent &owner, XMLReaderState &reader) const
+
+  void operator() (Parent &owner, XMLReaderState &reader) const
   {
     XMLObjTag<Value> tag;
     (owner.*mp_member) (*reader.back (tag));
@@ -1224,17 +1220,16 @@ struct XMLMemberAccRefWriteAdaptor
 private:
   void (Parent::*mp_member) (const Value &);
 };
- 
+
 template <class Value, class Parent>
-struct XMLMemberTransferWriteAdaptor
-{
+struct XMLMemberTransferWriteAdaptor {
   XMLMemberTransferWriteAdaptor (void (Parent::*member) (Value *))
     : mp_member (member)
   {
     // .. nothing yet ..
   }
-  
-  void operator () (Parent &owner, XMLReaderState &reader) const
+
+  void operator() (Parent &owner, XMLReaderState &reader) const
   {
     XMLObjTag<Value> tag;
     (owner.*mp_member) (reader.detach_back (tag));
@@ -1243,17 +1238,16 @@ struct XMLMemberTransferWriteAdaptor
 private:
   void (Parent::*mp_member) (Value *);
 };
- 
+
 template <class Value, class Parent>
-struct XMLMemberAccWriteAdaptor
-{
+struct XMLMemberAccWriteAdaptor {
   XMLMemberAccWriteAdaptor (void (Parent::*member) (Value))
     : mp_member (member)
   {
     // .. nothing yet ..
   }
-  
-  void operator () (Parent &owner, XMLReaderState &reader) const
+
+  void operator() (Parent &owner, XMLReaderState &reader) const
   {
     XMLObjTag<Value> tag;
     (owner.*mp_member) (*reader.back (tag));
@@ -1262,41 +1256,39 @@ struct XMLMemberAccWriteAdaptor
 private:
   void (Parent::*mp_member) (Value);
 };
- 
+
 template <class Value, class Parent>
-struct XMLMemberDummyReadAdaptor
-{
+struct XMLMemberDummyReadAdaptor {
   typedef pass_by_ref_tag tag;
 
   XMLMemberDummyReadAdaptor ()
   {
     // .. nothing yet ..
   }
-  
-  Value operator () () const
+
+  Value operator() () const
   {
     return Value ();
   }
 
-  bool at_end () const 
+  bool at_end () const
   {
     return true;
   }
 
-  void start (const Parent &) 
+  void start (const Parent &)
   {
     // .. nothing yet ..
   }
 
-  void next () 
+  void next ()
   {
     // .. nothing yet ..
   }
 };
- 
+
 template <class Value, class Parent>
-struct XMLMemberReadAdaptor
-{
+struct XMLMemberReadAdaptor {
   typedef pass_by_ref_tag tag;
 
   XMLMemberReadAdaptor (Value Parent::*member)
@@ -1304,24 +1296,24 @@ struct XMLMemberReadAdaptor
   {
     // .. nothing yet ..
   }
-  
-  const Value &operator () () const
+
+  const Value &operator() () const
   {
     return mp_owner->*mp_member;
   }
 
-  bool at_end () const 
+  bool at_end () const
   {
     return m_done;
   }
 
-  void start (const Parent &owner) 
+  void start (const Parent &owner)
   {
     mp_owner = &owner;
     m_done = false;
   }
 
-  void next () 
+  void next ()
   {
     m_done = true;
   }
@@ -1331,10 +1323,9 @@ private:
   const Parent *mp_owner;
   bool m_done;
 };
- 
+
 template <class Value, class Parent>
-struct XMLMemberAccRefReadAdaptor
-{
+struct XMLMemberAccRefReadAdaptor {
   typedef pass_by_ref_tag tag;
 
   XMLMemberAccRefReadAdaptor (const Value &(Parent::*member) () const)
@@ -1342,24 +1333,24 @@ struct XMLMemberAccRefReadAdaptor
   {
     // .. nothing yet ..
   }
-  
-  const Value &operator () () const
+
+  const Value &operator() () const
   {
     return (mp_owner->*mp_member) ();
   }
 
-  bool at_end () const 
+  bool at_end () const
   {
     return m_done;
   }
 
-  void start (const Parent &owner) 
+  void start (const Parent &owner)
   {
     mp_owner = &owner;
     m_done = false;
   }
 
-  void next () 
+  void next ()
   {
     m_done = true;
   }
@@ -1369,10 +1360,9 @@ private:
   const Parent *mp_owner;
   bool m_done;
 };
- 
+
 template <class Value, class Parent>
-struct XMLMemberAccReadAdaptor
-{
+struct XMLMemberAccReadAdaptor {
   typedef pass_by_value_tag tag;
 
   XMLMemberAccReadAdaptor (Value (Parent::*member) () const)
@@ -1380,24 +1370,24 @@ struct XMLMemberAccReadAdaptor
   {
     // .. nothing yet ..
   }
-  
-  Value operator () () const
+
+  Value operator() () const
   {
     return (mp_owner->*mp_member) ();
   }
 
-  bool at_end () const 
+  bool at_end () const
   {
     return m_done;
   }
 
-  void start (const Parent &owner) 
+  void start (const Parent &owner)
   {
     mp_owner = &owner;
     m_done = false;
   }
 
-  void next () 
+  void next ()
   {
     m_done = true;
   }
@@ -1407,10 +1397,9 @@ private:
   const Parent *mp_owner;
   bool m_done;
 };
- 
+
 template <class Value, class Iter, class Parent>
-struct XMLMemberIterReadAdaptor
-{
+struct XMLMemberIterReadAdaptor {
   typedef pass_by_ref_tag tag;
 
   XMLMemberIterReadAdaptor (Iter (Parent::*begin) () const, Iter (Parent::*end) () const)
@@ -1418,24 +1407,24 @@ struct XMLMemberIterReadAdaptor
   {
     // .. nothing yet ..
   }
-  
-  Value operator () () const
+
+  Value operator() () const
   {
     return *m_iter;
   }
 
-  bool at_end () const 
+  bool at_end () const
   {
     return m_iter == m_end;
   }
 
-  void start (const Parent &parent) 
+  void start (const Parent &parent)
   {
     m_iter = (parent.*mp_begin) ();
     m_end = (parent.*mp_end) ();
   }
 
-  void next () 
+  void next ()
   {
     ++m_iter;
   }
@@ -1445,323 +1434,323 @@ private:
   Iter (Parent::*mp_end) () const;
   Iter m_iter, m_end;
 };
- 
+
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Parent>
-XMLElement<Value, Parent, XMLMemberDummyReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberDummyReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>>
 make_element (void (Parent::*setter) (const Value &), const std::string &name, const XMLElementList *children)
 {
-  return XMLElement<Value, Parent, XMLMemberDummyReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > ( 
-          XMLMemberDummyReadAdaptor <Value, Parent> (), 
-          XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberDummyReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>> (
+    XMLMemberDummyReadAdaptor<Value, Parent> (),
+    XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Parent>
-XMLElement<Value, Parent, XMLMemberDummyReadAdaptor <Value, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberDummyReadAdaptor<Value, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>>
 make_element (void (Parent::*setter) (Value *), const std::string &name, const XMLElementList *children)
 {
-  return XMLElement<Value, Parent, XMLMemberDummyReadAdaptor <Value, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > ( 
-          XMLMemberDummyReadAdaptor <Value, Parent> (), 
-          XMLMemberTransferWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberDummyReadAdaptor<Value, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>> (
+    XMLMemberDummyReadAdaptor<Value, Parent> (),
+    XMLMemberTransferWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Parent>
-XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>>
 make_element (const Value &(Parent::*getter) () const, void (Parent::*setter) (const Value &), const std::string &name, const XMLElementList *children)
 {
-  return XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > ( 
-          XMLMemberAccRefReadAdaptor <Value, Parent> (getter), 
-          XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>> (
+    XMLMemberAccRefReadAdaptor<Value, Parent> (getter),
+    XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Parent>
-XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>>
 make_element (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value *), const std::string &name, const XMLElementList *children)
 {
-  return XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > ( 
-          XMLMemberAccRefReadAdaptor <Value, Parent> (getter), 
-          XMLMemberTransferWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>> (
+    XMLMemberAccRefReadAdaptor<Value, Parent> (getter),
+    XMLMemberTransferWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Parent>
-XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberAccWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberAccWriteAdaptor<Value, Parent>>
 make_element (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value), const std::string &name, const XMLElementList *children)
 {
-  return XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberAccWriteAdaptor <Value, Parent> > ( 
-          XMLMemberAccRefReadAdaptor <Value, Parent> (getter), 
-          XMLMemberAccWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberAccWriteAdaptor<Value, Parent>> (
+    XMLMemberAccRefReadAdaptor<Value, Parent> (getter),
+    XMLMemberAccWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Parent>
-XMLElement<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>>
 make_element (Value (Parent::*getter) () const, void (Parent::*setter) (const Value &), const std::string &name, const XMLElementList *children)
 {
-  return XMLElement<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > ( 
-          XMLMemberAccReadAdaptor <Value, Parent> (getter), 
-          XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>> (
+    XMLMemberAccReadAdaptor<Value, Parent> (getter),
+    XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Parent>
-XMLElement<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>>
 make_element (Value (Parent::*getter) () const, void (Parent::*setter) (Value *), const std::string &name, const XMLElementList *children)
 {
-  return XMLElement<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > ( 
-          XMLMemberAccReadAdaptor <Value, Parent> (getter), 
-          XMLMemberTransferWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>> (
+    XMLMemberAccReadAdaptor<Value, Parent> (getter),
+    XMLMemberTransferWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Parent>
-XMLElement<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberAccWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberAccWriteAdaptor<Value, Parent>>
 make_element (Value (Parent::*getter) () const, void (Parent::*setter) (Value), const std::string &name, const XMLElementList *children)
 {
-  return XMLElement<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberAccWriteAdaptor <Value, Parent> > ( 
-          XMLMemberAccReadAdaptor <Value, Parent> (getter), 
-          XMLMemberAccWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberAccWriteAdaptor<Value, Parent>> (
+    XMLMemberAccReadAdaptor<Value, Parent> (getter),
+    XMLMemberAccWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Parent>
-XMLElement<Value, Parent, XMLMemberReadAdaptor <Value, Parent>, XMLMemberWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberReadAdaptor<Value, Parent>, XMLMemberWriteAdaptor<Value, Parent>>
 make_element (Value Parent::*member, const std::string &name, const XMLElementList *children)
 {
-  return XMLElement<Value, Parent, XMLMemberReadAdaptor <Value, Parent>, XMLMemberWriteAdaptor <Value, Parent> > ( 
-          XMLMemberReadAdaptor <Value, Parent> (member), 
-          XMLMemberWriteAdaptor <Value, Parent> (member), name, children); 
+  return XMLElement<Value, Parent, XMLMemberReadAdaptor<Value, Parent>, XMLMemberWriteAdaptor<Value, Parent>> (
+    XMLMemberReadAdaptor<Value, Parent> (member),
+    XMLMemberWriteAdaptor<Value, Parent> (member), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Iter, class Parent>
-XMLElement<Value, Parent, XMLMemberIterReadAdaptor <const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberIterReadAdaptor<const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>>
 make_element (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (const Value &), const std::string &name, const XMLElementList *children)
 {
-  return XMLElement<Value, Parent, XMLMemberIterReadAdaptor <const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > ( 
-          XMLMemberIterReadAdaptor <const Value &, Iter, Parent> (begin, end), 
-          XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberIterReadAdaptor<const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>> (
+    XMLMemberIterReadAdaptor<const Value &, Iter, Parent> (begin, end),
+    XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Iter, class Parent>
-XMLElement<Value, Parent, XMLMemberIterReadAdaptor <const Value &, Iter, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberIterReadAdaptor<const Value &, Iter, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>>
 make_element (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (Value *), const std::string &name, const XMLElementList *children)
 {
-  return XMLElement<Value, Parent, XMLMemberIterReadAdaptor <const Value &, Iter, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > ( 
-          XMLMemberIterReadAdaptor <const Value &, Iter, Parent> (begin, end), 
-          XMLMemberTransferWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberIterReadAdaptor<const Value &, Iter, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>> (
+    XMLMemberIterReadAdaptor<const Value &, Iter, Parent> (begin, end),
+    XMLMemberTransferWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Parent>
-XMLElement<Value, Parent, XMLMemberDummyReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberDummyReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>>
 make_element (void (Parent::*setter) (const Value &), const std::string &name, const XMLElementList &children)
 {
-  return XMLElement<Value, Parent, XMLMemberDummyReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > ( 
-          XMLMemberDummyReadAdaptor <Value, Parent> (), 
-          XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberDummyReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>> (
+    XMLMemberDummyReadAdaptor<Value, Parent> (),
+    XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Parent>
-XMLElement<Value, Parent, XMLMemberDummyReadAdaptor <Value, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberDummyReadAdaptor<Value, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>>
 make_element (void (Parent::*setter) (Value *), const std::string &name, const XMLElementList &children)
 {
-  return XMLElement<Value, Parent, XMLMemberDummyReadAdaptor <Value, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > ( 
-          XMLMemberDummyReadAdaptor <Value, Parent> (), 
-          XMLMemberTransferWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberDummyReadAdaptor<Value, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>> (
+    XMLMemberDummyReadAdaptor<Value, Parent> (),
+    XMLMemberTransferWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Parent>
-XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>>
 make_element (const Value &(Parent::*getter) () const, void (Parent::*setter) (const Value &), const std::string &name, const XMLElementList &children)
 {
-  return XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > ( 
-          XMLMemberAccRefReadAdaptor <Value, Parent> (getter), 
-          XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>> (
+    XMLMemberAccRefReadAdaptor<Value, Parent> (getter),
+    XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Parent>
-XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>>
 make_element (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value *), const std::string &name, const XMLElementList &children)
 {
-  return XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > ( 
-          XMLMemberAccRefReadAdaptor <Value, Parent> (getter), 
-          XMLMemberTransferWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>> (
+    XMLMemberAccRefReadAdaptor<Value, Parent> (getter),
+    XMLMemberTransferWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Parent>
-XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberAccWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberAccWriteAdaptor<Value, Parent>>
 make_element (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value), const std::string &name, const XMLElementList &children)
 {
-  return XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberAccWriteAdaptor <Value, Parent> > ( 
-          XMLMemberAccRefReadAdaptor <Value, Parent> (getter), 
-          XMLMemberAccWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberAccWriteAdaptor<Value, Parent>> (
+    XMLMemberAccRefReadAdaptor<Value, Parent> (getter),
+    XMLMemberAccWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Parent>
-XMLElement<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>>
 make_element (Value (Parent::*getter) () const, void (Parent::*setter) (const Value &), const std::string &name, const XMLElementList &children)
 {
-  return XMLElement<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > ( 
-          XMLMemberAccReadAdaptor <Value, Parent> (getter), 
-          XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>> (
+    XMLMemberAccReadAdaptor<Value, Parent> (getter),
+    XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Parent>
-XMLElement<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>>
 make_element (Value (Parent::*getter) () const, void (Parent::*setter) (Value *), const std::string &name, const XMLElementList &children)
 {
-  return XMLElement<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > ( 
-          XMLMemberAccReadAdaptor <Value, Parent> (getter), 
-          XMLMemberTransferWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>> (
+    XMLMemberAccReadAdaptor<Value, Parent> (getter),
+    XMLMemberTransferWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Parent>
-XMLElement<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberAccWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberAccWriteAdaptor<Value, Parent>>
 make_element (Value (Parent::*getter) () const, void (Parent::*setter) (Value), const std::string &name, const XMLElementList &children)
 {
-  return XMLElement<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberAccWriteAdaptor <Value, Parent> > ( 
-          XMLMemberAccReadAdaptor <Value, Parent> (getter), 
-          XMLMemberAccWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberAccWriteAdaptor<Value, Parent>> (
+    XMLMemberAccReadAdaptor<Value, Parent> (getter),
+    XMLMemberAccWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Parent>
-XMLElement<Value, Parent, XMLMemberReadAdaptor <Value, Parent>, XMLMemberWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberReadAdaptor<Value, Parent>, XMLMemberWriteAdaptor<Value, Parent>>
 make_element (Value Parent::*member, const std::string &name, const XMLElementList &children)
 {
-  return XMLElement<Value, Parent, XMLMemberReadAdaptor <Value, Parent>, XMLMemberWriteAdaptor <Value, Parent> > ( 
-          XMLMemberReadAdaptor <Value, Parent> (member), 
-          XMLMemberWriteAdaptor <Value, Parent> (member), name, children); 
+  return XMLElement<Value, Parent, XMLMemberReadAdaptor<Value, Parent>, XMLMemberWriteAdaptor<Value, Parent>> (
+    XMLMemberReadAdaptor<Value, Parent> (member),
+    XMLMemberWriteAdaptor<Value, Parent> (member), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Iter, class Parent>
-XMLElement<Value, Parent, XMLMemberIterReadAdaptor <const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberIterReadAdaptor<const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>>
 make_element (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (const Value &), const std::string &name, const XMLElementList &children)
 {
-  return XMLElement<Value, Parent, XMLMemberIterReadAdaptor <const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > ( 
-          XMLMemberIterReadAdaptor <const Value &, Iter, Parent> (begin, end), 
-          XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberIterReadAdaptor<const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>> (
+    XMLMemberIterReadAdaptor<const Value &, Iter, Parent> (begin, end),
+    XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
  *  @brief Utility: create a XMLElement object
  */
 template <class Value, class Iter, class Parent>
-XMLElement<Value, Parent, XMLMemberIterReadAdaptor <const Value &, Iter, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > 
+XMLElement<Value, Parent, XMLMemberIterReadAdaptor<const Value &, Iter, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>>
 make_element (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (Value *), const std::string &name, const XMLElementList &children)
 {
-  return XMLElement<Value, Parent, XMLMemberIterReadAdaptor <const Value &, Iter, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > ( 
-          XMLMemberIterReadAdaptor <const Value &, Iter, Parent> (begin, end), 
-          XMLMemberTransferWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElement<Value, Parent, XMLMemberIterReadAdaptor<const Value &, Iter, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>> (
+    XMLMemberIterReadAdaptor<const Value &, Iter, Parent> (begin, end),
+    XMLMemberTransferWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 template <class Value, class Parent>
-XMLElementWithParentRef<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > 
+XMLElementWithParentRef<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>>
 make_element_with_parent_ref (const Value &(Parent::*getter) () const, void (Parent::*setter) (const Value &), const std::string &name, const XMLElementList &children)
 {
-  return XMLElementWithParentRef<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > ( 
-          XMLMemberAccRefReadAdaptor <Value, Parent> (getter), 
-          XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElementWithParentRef<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>> (
+    XMLMemberAccRefReadAdaptor<Value, Parent> (getter),
+    XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 template <class Value, class Parent>
-XMLElementWithParentRef<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > 
+XMLElementWithParentRef<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>>
 make_element_with_parent_ref (const Value &(Parent::*getter) () const, void (Parent::*setter) (const Value &), const std::string &name, const XMLElementList *children)
 {
-  return XMLElementWithParentRef<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > ( 
-          XMLMemberAccRefReadAdaptor <Value, Parent> (getter), 
-          XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElementWithParentRef<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>> (
+    XMLMemberAccRefReadAdaptor<Value, Parent> (getter),
+    XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 template <class Value, class Parent>
-XMLElementWithParentRef<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > 
+XMLElementWithParentRef<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>>
 make_element_with_parent_ref (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value *), const std::string &name, const XMLElementList &children)
 {
-  return XMLElementWithParentRef<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > ( 
-          XMLMemberAccRefReadAdaptor <Value, Parent> (getter), 
-          XMLMemberTransferWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElementWithParentRef<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>> (
+    XMLMemberAccRefReadAdaptor<Value, Parent> (getter),
+    XMLMemberTransferWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 template <class Value, class Parent>
-XMLElementWithParentRef<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > 
+XMLElementWithParentRef<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>>
 make_element_with_parent_ref (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value *), const std::string &name, const XMLElementList *children)
 {
-  return XMLElementWithParentRef<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > ( 
-          XMLMemberAccRefReadAdaptor <Value, Parent> (getter), 
-          XMLMemberTransferWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElementWithParentRef<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>> (
+    XMLMemberAccRefReadAdaptor<Value, Parent> (getter),
+    XMLMemberTransferWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 template <class Value, class Iter, class Parent>
-XMLElementWithParentRef<Value, Parent, XMLMemberIterReadAdaptor <const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > 
+XMLElementWithParentRef<Value, Parent, XMLMemberIterReadAdaptor<const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>>
 make_element_with_parent_ref (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (const Value &), const std::string &name, const XMLElementList &children)
 {
-  return XMLElementWithParentRef<Value, Parent, XMLMemberIterReadAdaptor <const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent> > ( 
-          XMLMemberIterReadAdaptor <const Value &, Iter, Parent> (begin, end), 
-          XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElementWithParentRef<Value, Parent, XMLMemberIterReadAdaptor<const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>> (
+    XMLMemberIterReadAdaptor<const Value &, Iter, Parent> (begin, end),
+    XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 template <class Value, class Iter, class Parent>
-XMLElementWithParentRef<Value, Parent, XMLMemberIterReadAdaptor <const Value &, Iter, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > 
+XMLElementWithParentRef<Value, Parent, XMLMemberIterReadAdaptor<const Value &, Iter, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>>
 make_element_with_parent_ref (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (Value *), const std::string &name, const XMLElementList &children)
 {
-  return XMLElementWithParentRef<Value, Parent, XMLMemberIterReadAdaptor <const Value &, Iter, Parent>, XMLMemberTransferWriteAdaptor <Value, Parent> > ( 
-          XMLMemberIterReadAdaptor <const Value &, Iter, Parent> (begin, end), 
-          XMLMemberTransferWriteAdaptor <Value, Parent> (setter), name, children); 
+  return XMLElementWithParentRef<Value, Parent, XMLMemberIterReadAdaptor<const Value &, Iter, Parent>, XMLMemberTransferWriteAdaptor<Value, Parent>> (
+    XMLMemberIterReadAdaptor<const Value &, Iter, Parent> (begin, end),
+    XMLMemberTransferWriteAdaptor<Value, Parent> (setter), name, children);
 }
 
 /**
@@ -1769,8 +1758,7 @@ make_element_with_parent_ref (Iter (Parent::*begin) () const, Iter (Parent::*end
  */
 
 template <class Value>
-struct XMLStdConverter
-{
+struct XMLStdConverter {
   std::string to_string (const Value &v) const
   {
     return tl::to_string (v);
@@ -1786,183 +1774,182 @@ struct XMLStdConverter
  *  @brief Utility: create a XMLMember object without read & write capability
  */
 template <class Parent>
-XMLMember<std::string, Parent, XMLMemberDummyReadAdaptor <std::string, Parent>, XMLMemberDummyWriteAdaptor <std::string, Parent>, XMLStdConverter <std::string> > 
+XMLMember<std::string, Parent, XMLMemberDummyReadAdaptor<std::string, Parent>, XMLMemberDummyWriteAdaptor<std::string, Parent>, XMLStdConverter<std::string>>
 make_member (const std::string &name)
 {
-  return XMLMember<std::string, Parent, XMLMemberDummyReadAdaptor <std::string, Parent>, XMLMemberDummyWriteAdaptor <std::string, Parent>, XMLStdConverter <std::string> > ( 
-          XMLMemberDummyReadAdaptor <std::string, Parent> (), 
-          XMLMemberDummyWriteAdaptor <std::string, Parent> (), name); 
+  return XMLMember<std::string, Parent, XMLMemberDummyReadAdaptor<std::string, Parent>, XMLMemberDummyWriteAdaptor<std::string, Parent>, XMLStdConverter<std::string>> (
+    XMLMemberDummyReadAdaptor<std::string, Parent> (),
+    XMLMemberDummyWriteAdaptor<std::string, Parent> (), name);
 }
 
 /**
  *  @brief Utility: create a XMLMember object
  */
 template <class Value, class Parent>
-XMLMember<Value, Parent, XMLMemberReadAdaptor <Value, Parent>, XMLMemberWriteAdaptor <Value, Parent>, XMLStdConverter <Value> > 
+XMLMember<Value, Parent, XMLMemberReadAdaptor<Value, Parent>, XMLMemberWriteAdaptor<Value, Parent>, XMLStdConverter<Value>>
 make_member (Value Parent::*member, const std::string &name)
 {
-  return XMLMember<Value, Parent, XMLMemberReadAdaptor <Value, Parent>, XMLMemberWriteAdaptor <Value, Parent>, XMLStdConverter <Value> > ( 
-          XMLMemberReadAdaptor <Value, Parent> (member), 
-          XMLMemberWriteAdaptor <Value, Parent> (member), name); 
+  return XMLMember<Value, Parent, XMLMemberReadAdaptor<Value, Parent>, XMLMemberWriteAdaptor<Value, Parent>, XMLStdConverter<Value>> (
+    XMLMemberReadAdaptor<Value, Parent> (member),
+    XMLMemberWriteAdaptor<Value, Parent> (member), name);
 }
 
 /**
  *  @brief Utility: create a XMLMember object
  */
 template <class Value, class Parent>
-XMLMember<Value, Parent, XMLMemberDummyReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent>, XMLStdConverter <Value> > 
+XMLMember<Value, Parent, XMLMemberDummyReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>, XMLStdConverter<Value>>
 make_member (void (Parent::*setter) (const Value &), const std::string &name)
 {
-  return XMLMember<Value, Parent, XMLMemberDummyReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent>, XMLStdConverter <Value> > ( 
-          XMLMemberDummyReadAdaptor <Value, Parent> (), 
-          XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name); 
+  return XMLMember<Value, Parent, XMLMemberDummyReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>, XMLStdConverter<Value>> (
+    XMLMemberDummyReadAdaptor<Value, Parent> (),
+    XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name);
 }
 
 /**
  *  @brief Utility: create a XMLMember object
  */
 template <class Value, class Parent>
-XMLMember<Value, Parent, XMLMemberDummyReadAdaptor <Value, Parent>, XMLMemberAccWriteAdaptor <Value, Parent>, XMLStdConverter <Value> >
+XMLMember<Value, Parent, XMLMemberDummyReadAdaptor<Value, Parent>, XMLMemberAccWriteAdaptor<Value, Parent>, XMLStdConverter<Value>>
 make_member (void (Parent::*setter) (Value), const std::string &name)
 {
-  return XMLMember<Value, Parent, XMLMemberDummyReadAdaptor <Value, Parent>, XMLMemberAccWriteAdaptor <Value, Parent>, XMLStdConverter <Value> > (
-          XMLMemberDummyReadAdaptor <Value, Parent> (),
-          XMLMemberAccWriteAdaptor <Value, Parent> (setter), name);
+  return XMLMember<Value, Parent, XMLMemberDummyReadAdaptor<Value, Parent>, XMLMemberAccWriteAdaptor<Value, Parent>, XMLStdConverter<Value>> (
+    XMLMemberDummyReadAdaptor<Value, Parent> (),
+    XMLMemberAccWriteAdaptor<Value, Parent> (setter), name);
 }
 
 /**
  *  @brief Utility: create a XMLMember object
  */
 template <class Value, class Parent>
-XMLMember<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent>, XMLStdConverter <Value> > 
+XMLMember<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>, XMLStdConverter<Value>>
 make_member (const Value &(Parent::*getter) () const, void (Parent::*setter) (const Value &), const std::string &name)
 {
-  return XMLMember<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent>, XMLStdConverter <Value> > ( 
-          XMLMemberAccRefReadAdaptor <Value, Parent> (getter), 
-          XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name); 
+  return XMLMember<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>, XMLStdConverter<Value>> (
+    XMLMemberAccRefReadAdaptor<Value, Parent> (getter),
+    XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name);
 }
 
 /**
  *  @brief Utility: create a XMLMember object
  */
 template <class Value, class Parent>
-XMLMember<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberAccWriteAdaptor <Value, Parent>, XMLStdConverter <Value> > 
+XMLMember<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberAccWriteAdaptor<Value, Parent>, XMLStdConverter<Value>>
 make_member (Value (Parent::*getter) () const, void (Parent::*setter) (Value), const std::string &name)
 {
-  return XMLMember<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberAccWriteAdaptor <Value, Parent>, XMLStdConverter <Value> > ( 
-          XMLMemberAccReadAdaptor <Value, Parent> (getter), 
-          XMLMemberAccWriteAdaptor <Value, Parent> (setter), name); 
+  return XMLMember<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberAccWriteAdaptor<Value, Parent>, XMLStdConverter<Value>> (
+    XMLMemberAccReadAdaptor<Value, Parent> (getter),
+    XMLMemberAccWriteAdaptor<Value, Parent> (setter), name);
 }
 
 /**
  *  @brief Utility: create a XMLMember object
  */
 template <class Value, class Parent>
-XMLMember<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberAccWriteAdaptor <Value, Parent>, XMLStdConverter <Value> > 
-make_member (const Value & (Parent::*getter) () const, void (Parent::*setter) (Value), const std::string &name)
+XMLMember<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberAccWriteAdaptor<Value, Parent>, XMLStdConverter<Value>>
+make_member (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value), const std::string &name)
 {
-  return XMLMember<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberAccWriteAdaptor <Value, Parent>, XMLStdConverter <Value> > ( 
-          XMLMemberAccRefReadAdaptor <Value, Parent> (getter), 
-          XMLMemberAccWriteAdaptor <Value, Parent> (setter), name); 
+  return XMLMember<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberAccWriteAdaptor<Value, Parent>, XMLStdConverter<Value>> (
+    XMLMemberAccRefReadAdaptor<Value, Parent> (getter),
+    XMLMemberAccWriteAdaptor<Value, Parent> (setter), name);
 }
 
 /**
  *  @brief Utility: create a XMLMember object
  */
 template <class Value, class Parent>
-XMLMember<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent>, XMLStdConverter <Value> > 
+XMLMember<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>, XMLStdConverter<Value>>
 make_member (Value (Parent::*getter) () const, void (Parent::*setter) (const Value &), const std::string &name)
 {
-  return XMLMember<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent>, XMLStdConverter <Value> > ( 
-          XMLMemberAccReadAdaptor <Value, Parent> (getter), 
-          XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name); 
+  return XMLMember<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>, XMLStdConverter<Value>> (
+    XMLMemberAccReadAdaptor<Value, Parent> (getter),
+    XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name);
 }
 
 /**
  *  @brief Utility: create a XMLMember object
  */
 template <class Value, class Iter, class Parent>
-XMLMember<Value, Parent, XMLMemberIterReadAdaptor <const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent>, XMLStdConverter <Value> > 
+XMLMember<Value, Parent, XMLMemberIterReadAdaptor<const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>, XMLStdConverter<Value>>
 make_member (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (const Value &), const std::string &name)
 {
-  return XMLMember<Value, Parent, XMLMemberIterReadAdaptor <const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent>, XMLStdConverter <Value> > ( 
-          XMLMemberIterReadAdaptor <const Value &, Iter, Parent> (begin, end), 
-          XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name); 
+  return XMLMember<Value, Parent, XMLMemberIterReadAdaptor<const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>, XMLStdConverter<Value>> (
+    XMLMemberIterReadAdaptor<const Value &, Iter, Parent> (begin, end),
+    XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name);
 }
 
 /**
  *  @brief Utility: create a XMLMember object
  */
 template <class Value, class Parent, class Converter>
-XMLMember<Value, Parent, XMLMemberReadAdaptor <Value, Parent>, XMLMemberWriteAdaptor <Value, Parent>, Converter> 
+XMLMember<Value, Parent, XMLMemberReadAdaptor<Value, Parent>, XMLMemberWriteAdaptor<Value, Parent>, Converter>
 make_member (Value Parent::*member, const std::string &name, Converter conv)
 {
-  return XMLMember<Value, Parent, XMLMemberReadAdaptor <Value, Parent>, XMLMemberWriteAdaptor <Value, Parent>, Converter> ( 
-          XMLMemberReadAdaptor <Value, Parent> (member), 
-          XMLMemberWriteAdaptor <Value, Parent> (member), name, conv); 
+  return XMLMember<Value, Parent, XMLMemberReadAdaptor<Value, Parent>, XMLMemberWriteAdaptor<Value, Parent>, Converter> (
+    XMLMemberReadAdaptor<Value, Parent> (member),
+    XMLMemberWriteAdaptor<Value, Parent> (member), name, conv);
 }
 
 /**
  *  @brief Utility: create a XMLMember object
  */
 template <class Value, class Parent, class Converter>
-XMLMember<Value, Parent, XMLMemberDummyReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent>, Converter> 
+XMLMember<Value, Parent, XMLMemberDummyReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>, Converter>
 make_member (void (Parent::*setter) (const Value &), const std::string &name, Converter conv)
 {
-  return XMLMember<Value, Parent, XMLMemberDummyReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent>, Converter> ( 
-          XMLMemberDummyReadAdaptor <Value, Parent> (), 
-          XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name, conv); 
+  return XMLMember<Value, Parent, XMLMemberDummyReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>, Converter> (
+    XMLMemberDummyReadAdaptor<Value, Parent> (),
+    XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name, conv);
 }
 
 /**
  *  @brief Utility: create a XMLMember object
  */
 template <class Value, class Parent, class Converter>
-XMLMember<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberDummyWriteAdaptor <Value, Parent>, Converter> 
+XMLMember<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberDummyWriteAdaptor<Value, Parent>, Converter>
 make_member (void (Parent::*setter) (Value), const std::string &name, Converter conv)
 {
-  return XMLMember<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberDummyWriteAdaptor <Value, Parent>, Converter> ( 
-          XMLMemberAccReadAdaptor <Value, Parent> (setter), 
-          XMLMemberDummyWriteAdaptor <Value, Parent> (), name, conv); 
+  return XMLMember<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberDummyWriteAdaptor<Value, Parent>, Converter> (
+    XMLMemberAccReadAdaptor<Value, Parent> (setter),
+    XMLMemberDummyWriteAdaptor<Value, Parent> (), name, conv);
 }
 
 /**
  *  @brief Utility: create a XMLMember object
  */
 template <class Value, class Parent, class Converter>
-XMLMember<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent>, Converter> 
+XMLMember<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>, Converter>
 make_member (const Value &(Parent::*getter) () const, void (Parent::*setter) (const Value &), const std::string &name, Converter conv)
 {
-  return XMLMember<Value, Parent, XMLMemberAccRefReadAdaptor <Value, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent>, Converter> ( 
-          XMLMemberAccRefReadAdaptor <Value, Parent> (getter), 
-          XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name, conv); 
+  return XMLMember<Value, Parent, XMLMemberAccRefReadAdaptor<Value, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>, Converter> (
+    XMLMemberAccRefReadAdaptor<Value, Parent> (getter),
+    XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name, conv);
 }
 
 /**
  *  @brief Utility: create a XMLMember object
  */
 template <class Value, class Parent, class Converter>
-XMLMember<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberAccWriteAdaptor <Value, Parent>, Converter> 
+XMLMember<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberAccWriteAdaptor<Value, Parent>, Converter>
 make_member (Value (Parent::*getter) () const, void (Parent::*setter) (Value), const std::string &name, Converter conv)
 {
-  return XMLMember<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberAccWriteAdaptor <Value, Parent>, Converter> ( 
-          XMLMemberAccReadAdaptor <Value, Parent> (getter), 
-          XMLMemberAccWriteAdaptor <Value, Parent> (setter), name, conv); 
+  return XMLMember<Value, Parent, XMLMemberAccReadAdaptor<Value, Parent>, XMLMemberAccWriteAdaptor<Value, Parent>, Converter> (
+    XMLMemberAccReadAdaptor<Value, Parent> (getter),
+    XMLMemberAccWriteAdaptor<Value, Parent> (setter), name, conv);
 }
 
 /**
  *  @brief Utility: create a XMLMember object
  */
 template <class Value, class Iter, class Parent, class Converter>
-XMLMember<Value, Parent, XMLMemberIterReadAdaptor <const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent>, Converter> 
+XMLMember<Value, Parent, XMLMemberIterReadAdaptor<const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>, Converter>
 make_member (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (const Value &), const std::string &name, Converter conv)
 {
-  return XMLMember<Value, Parent, XMLMemberIterReadAdaptor <const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor <Value, Parent>, Converter> ( 
-          XMLMemberIterReadAdaptor <const Value &, Iter, Parent> (begin, end), 
-          XMLMemberAccRefWriteAdaptor <Value, Parent> (setter), name, conv); 
+  return XMLMember<Value, Parent, XMLMemberIterReadAdaptor<const Value &, Iter, Parent>, XMLMemberAccRefWriteAdaptor<Value, Parent>, Converter> (
+    XMLMemberIterReadAdaptor<const Value &, Iter, Parent> (begin, end),
+    XMLMemberAccRefWriteAdaptor<Value, Parent> (setter), name, conv);
 }
 
 } // namespace tl
 
 #endif
-

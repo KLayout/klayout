@@ -49,12 +49,11 @@ MALYReaderOptionPage::~MALYReaderOptionPage ()
   mp_ui = 0;
 }
 
-void 
-MALYReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
+void MALYReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
 {
   static const db::MALYReaderOptions default_options;
   const db::MALYReaderOptions *options = dynamic_cast<const db::MALYReaderOptions *> (o);
-  if (!options) {
+  if (! options) {
     options = &default_options;
   }
 
@@ -63,8 +62,7 @@ MALYReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db:
   mp_ui->read_all_cbx->setChecked (options->create_other_layers);
 }
 
-void 
-MALYReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
+void MALYReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
 {
   db::MALYReaderOptions *options = dynamic_cast<db::MALYReaderOptions *> (o);
   if (options) {
@@ -76,7 +74,6 @@ MALYReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Tech
 
     options->layer_map = mp_ui->layer_map->get_layer_map ();
     options->create_other_layers = mp_ui->read_all_cbx->isChecked ();
-
   }
 }
 
@@ -107,4 +104,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> plugin_decl (new lay::MALYReaderPluginDeclaration (), 10000, "MALYReader");
 
 }
-

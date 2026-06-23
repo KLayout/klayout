@@ -40,14 +40,15 @@
 #include "tlThreads.h"
 #include "tlThreadedWorkers.h"
 
-namespace lay {
+namespace lay
+{
 
 class Viewport;
 
 //  update (snapshot) interval in ms
 const int update_interval = 500;
 
-class RedrawThread 
+class RedrawThread
   : public tl::Object,
     public tl::JobBase
 {
@@ -55,8 +56,8 @@ public:
   RedrawThread (lay::RedrawThreadCanvas *canvas, lay::LayoutViewBase *view);
   virtual ~RedrawThread ();
 
-  void commit (const std::vector <lay::RedrawLayerInfo> &layers, const lay::Viewport &vp, double resolution, double font_resolution);
-  void start (int workers, const std::vector <lay::RedrawLayerInfo> &layers, const lay::Viewport &vp, double resolution, double font_resolution, bool force_redraw);
+  void commit (const std::vector<lay::RedrawLayerInfo> &layers, const lay::Viewport &vp, double resolution, double font_resolution);
+  void start (int workers, const std::vector<lay::RedrawLayerInfo> &layers, const lay::Viewport &vp, double resolution, double font_resolution, bool force_redraw);
   void restart (const std::vector<int> &restart);
   void wakeup_checked ();
   void wakeup ();
@@ -88,7 +89,7 @@ protected:
 
 private:
   void start ();
-  void do_start (bool clear, const db::Vector *shift_vector, const std::vector <lay::RedrawLayerInfo> *layers, const std::vector<int> &restart, int workers);
+  void do_start (bool clear, const db::Vector *shift_vector, const std::vector<lay::RedrawLayerInfo> *layers, const std::vector<int> &restart, int workers);
   void done ();
 
   void layout_changed ();
@@ -99,7 +100,7 @@ private:
   }
 
   bool m_initial_update;
-  std::vector <RedrawLayerInfo> m_layers;
+  std::vector<RedrawLayerInfo> m_layers;
   int m_nlayers;
   bool m_boxes_already_drawn;
   bool m_custom_already_drawn;
@@ -127,4 +128,3 @@ private:
 }
 
 #endif
-

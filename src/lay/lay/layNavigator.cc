@@ -45,17 +45,21 @@ class NavigatorService
 {
 public:
   enum drag_mode_type {
-    DM_none, DM_move,
-    DM_l, DM_r, DM_t, DM_b
+    DM_none,
+    DM_move,
+    DM_l,
+    DM_r,
+    DM_t,
+    DM_b
   };
 
   NavigatorService (LayoutView *view)
-    : ViewService (view->canvas ()), 
+    : ViewService (view->canvas ()),
       mp_view (view), mp_source_view (0),
       mp_viewport_marker (0),
       m_drag_mode (DM_none),
       m_dragging (false),
-      mp_box (0), 
+      mp_box (0),
       m_color (0)
   {
     //  .. nothing yet ..
@@ -79,7 +83,7 @@ public:
       if (mp_view->widget ()) {
         c = tl::Color (mp_view->widget ()->palette ().color (QPalette::Normal, QPalette::Base).rgb ());
       } else {
-        c = tl::Color (0xffffff);  //  white
+        c = tl::Color (0xffffff); //  white
       }
     }
 
@@ -93,8 +97,8 @@ public:
     set_colors (c, contrast);
   }
 
-  bool mouse_release_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/) 
-  { 
+  bool mouse_release_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/)
+  {
     if (mp_box) {
 
       //  finish zoom box selection
@@ -120,8 +124,8 @@ public:
     }
   }
 
-  bool mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio) 
-  { 
+  bool mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
+  {
     if (! prio && (buttons & lay::RightButton) != 0) {
       db::DBox vp = ui ()->mouse_event_viewport ();
       if (mp_source_view && vp.contains (p)) {
@@ -132,8 +136,8 @@ public:
     return false;
   }
 
-  bool mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio) 
-  { 
+  bool mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
+  {
     if (! prio && (buttons & lay::RightButton) != 0) {
 
       mp_source_view->stop_redraw (); // TODO: how to restart if zoom is aborted?
@@ -172,7 +176,9 @@ public:
 
       if (mp_source_view) {
 
-        enum { horizontal, vertical, zoom } direction = zoom;
+        enum { horizontal,
+               vertical,
+               zoom } direction = zoom;
         if (mp_source_view->mouse_wheel_mode () == 0) {
 
           if ((buttons & lay::ShiftButton) != 0) {
@@ -192,7 +198,6 @@ public:
           } else {
             direction = vertical;
           }
-
         }
 
         if (direction == vertical) {
@@ -222,24 +227,21 @@ public:
             f = 1.0 + zoom_step * (-delta / 120.0);
           }
 
-          mp_source_view->zoom_box (db::DBox (p.x () - (p.x () - m_box.left ()) * f, 
+          mp_source_view->zoom_box (db::DBox (p.x () - (p.x () - m_box.left ()) * f,
                                               p.y () - (p.y () - m_box.bottom ()) * f,
-                                              p.x () - (p.x () - m_box.right ()) * f, 
+                                              p.x () - (p.x () - m_box.right ()) * f,
                                               p.y () - (p.y () - m_box.top ()) * f));
 
           update_marker ();
-
         }
-
       }
-
     }
 
     return false;
   }
 
-  bool mouse_move_event (const db::DPoint &p, unsigned int /*buttons*/, bool prio) 
-  { 
+  bool mouse_move_event (const db::DPoint &p, unsigned int /*buttons*/, bool prio)
+  {
     bool ret_value = false;
 
     if (mp_box) {
@@ -264,13 +266,13 @@ public:
 
       if (! m_box.empty ()) {
 
-        double mw = 5.0/*pixel*/ / mp_view->viewport ().trans ().ctrans (1.0/*micron*/);
+        double mw = 5.0 /*pixel*/ / mp_view->viewport ().trans ().ctrans (1.0 /*micron*/);
         db::DVector d = db::DVector (std::max (mw, m_box.width () * 0.5 - mw), std::max (mw, m_box.height () * 0.5 - mw));
         db::DBox move_box = db::DBox (m_box.center () - d, m_box.center () + d);
-        db::DBox l_box    = db::DBox (m_box.left ()   - mw, m_box.bottom ()     , m_box.left ()  + mw, m_box.top ()        );
-        db::DBox r_box    = db::DBox (m_box.right ()  - mw, m_box.bottom ()     , m_box.right () + mw, m_box.top ()        );
-        db::DBox t_box    = db::DBox (m_box.left ()       , m_box.top ()    - mw, m_box.right ()     , m_box.top ()    + mw);
-        db::DBox b_box    = db::DBox (m_box.left ()       , m_box.bottom () - mw, m_box.right ()     , m_box.bottom () + mw);
+        db::DBox l_box = db::DBox (m_box.left () - mw, m_box.bottom (), m_box.left () + mw, m_box.top ());
+        db::DBox r_box = db::DBox (m_box.right () - mw, m_box.bottom (), m_box.right () + mw, m_box.top ());
+        db::DBox t_box = db::DBox (m_box.left (), m_box.top () - mw, m_box.right (), m_box.top () + mw);
+        db::DBox b_box = db::DBox (m_box.left (), m_box.bottom () - mw, m_box.right (), m_box.bottom () + mw);
 
         if (move_box.contains (p)) {
           m_drag_mode = DM_move;
@@ -283,7 +285,6 @@ public:
         } else if (b_box.contains (p)) {
           m_drag_mode = DM_b;
         }
-
       }
 
     } else if (prio) {
@@ -318,9 +319,8 @@ public:
       update_marker ();
 
       ret_value = true;
-
     }
-    
+
     if (m_drag_mode == DM_move) {
       set_cursor (Cursor::size_all);
     } else if (m_drag_mode == DM_l) {
@@ -334,7 +334,6 @@ public:
     }
 
     return ret_value;
-
   }
 
   void update_marker ()
@@ -343,12 +342,12 @@ public:
       delete mp_viewport_marker;
       mp_viewport_marker = 0;
       m_box = db::DBox ();
-    } 
+    }
 
     if (mp_source_view) {
 
       m_box = mp_source_view->viewport ().box ();
-      // correct the box by a few pixels so it is more precisely reflecting the actual dimensions 
+      // correct the box by a few pixels so it is more precisely reflecting the actual dimensions
       double d = 1.0 / mp_view->viewport ().trans ().ctrans (1.0);
       m_box.set_right (m_box.right () - 2.0 * d);
       m_box.set_bottom (m_box.bottom () + d);
@@ -361,7 +360,6 @@ public:
       mp_viewport_marker->set_dither_pattern (1);
       mp_viewport_marker->set_frame_pattern (0);
       mp_viewport_marker->set (m_box);
-
     }
   }
 
@@ -378,7 +376,6 @@ public:
       background_color_changed ();
 
       update_marker ();
-
     }
   }
 
@@ -419,7 +416,7 @@ private:
   unsigned int m_color;
 
   void begin_pan (const db::DPoint &pos)
-  { 
+  {
     if (mp_box) {
       delete mp_box;
     }
@@ -432,7 +429,7 @@ private:
   }
 
   void begin (const db::DPoint &pos)
-  { 
+  {
     if (mp_box) {
       delete mp_box;
     }
@@ -451,13 +448,13 @@ private:
 const std::string freeze_action_path ("@@navigator_menu.navigator_main_menu.navigator_freeze");
 
 Navigator::Navigator (MainWindow *main_window)
-  : QFrame (main_window), 
+  : QFrame (main_window),
     m_show_all_hier_levels (false),
     m_show_images (true),
     m_update_layers_needed (true),
     m_update_needed (true),
-    mp_main_window (main_window), 
-    mp_source_view (0), 
+    mp_main_window (main_window),
+    mp_source_view (0),
     mp_service (0),
     m_do_view_changed (this, &Navigator::attach_view),
     m_do_layers_changed (this, &Navigator::update_layers),
@@ -507,21 +504,18 @@ Navigator::~Navigator ()
   }
 }
 
-void
-Navigator::menu_changed ()
+void Navigator::menu_changed ()
 {
   //  delay actual rebuilding of the menu to collect multiple change events.
   m_do_update_menu_dm ();
 }
 
-void 
-Navigator::do_update_menu ()
+void Navigator::do_update_menu ()
 {
   mp_main_window->menu ()->build_detached ("navigator_menu", mp_menu_bar);
 }
 
-void
-Navigator::show_images (bool f)
+void Navigator::show_images (bool f)
 {
   if (f != m_show_images) {
     m_show_images = f;
@@ -531,8 +525,7 @@ Navigator::show_images (bool f)
   }
 }
 
-void
-Navigator::all_hier_levels (bool f)
+void Navigator::all_hier_levels (bool f)
 {
   if (f != m_show_all_hier_levels) {
     m_show_all_hier_levels = f;
@@ -542,8 +535,7 @@ Navigator::all_hier_levels (bool f)
   }
 }
 
-void 
-Navigator::freeze_clicked ()
+void Navigator::freeze_clicked ()
 {
   Action *freeze_action = mp_main_window->menu ()->action (freeze_action_path);
 
@@ -558,8 +550,7 @@ Navigator::freeze_clicked ()
   }
 }
 
-void 
-Navigator::showEvent (QShowEvent *)
+void Navigator::showEvent (QShowEvent *)
 {
   if (mp_main_window->current_view () != mp_source_view) {
     attach_view ();
@@ -573,16 +564,14 @@ Navigator::showEvent (QShowEvent *)
   m_update_needed = false;
 }
 
-void 
-Navigator::closeEvent (QCloseEvent *)
+void Navigator::closeEvent (QCloseEvent *)
 {
   //  TODO: this is most likely never called
   mp_main_window->dispatcher ()->config_set (cfg_show_navigator, "false");
   mp_main_window->dispatcher ()->config_end ();
 }
 
-void 
-Navigator::view_changed ()
+void Navigator::view_changed ()
 {
   if (isVisible ()) {
     m_do_view_changed ();
@@ -592,8 +581,7 @@ Navigator::view_changed ()
   }
 }
 
-void 
-Navigator::layers_changed (int)
+void Navigator::layers_changed (int)
 {
   if (isVisible ()) {
     m_do_layers_changed ();
@@ -602,8 +590,7 @@ Navigator::layers_changed (int)
   }
 }
 
-void 
-Navigator::content_changed ()
+void Navigator::content_changed ()
 {
   if (isVisible ()) {
     m_do_content_changed ();
@@ -612,14 +599,12 @@ Navigator::content_changed ()
   }
 }
 
-void
-Navigator::attach_view ()
+void Navigator::attach_view ()
 {
   attach_view (mp_main_window->current_view ());
 }
 
-void
-Navigator::view_closed (int index)
+void Navigator::view_closed (int index)
 {
   LayoutView *view = mp_main_window->view ((unsigned int) index);
 
@@ -628,16 +613,14 @@ Navigator::view_closed (int index)
   }
 }
 
-void
-Navigator::resizeEvent (QResizeEvent *)
+void Navigator::resizeEvent (QResizeEvent *)
 {
   if (mp_view) {
     mp_view->setGeometry (mp_placeholder_label->geometry ());
   }
 }
 
-void
-Navigator::attach_view (LayoutView *view)
+void Navigator::attach_view (LayoutView *view)
 {
   if (view != mp_source_view) {
 
@@ -670,7 +653,7 @@ Navigator::attach_view (LayoutView *view)
       mp_source_view->cellview_changed_event.add (this, &Navigator::content_changed_with_int);
       mp_source_view->geom_changed_event.add (this, &Navigator::content_changed);
       mp_source_view->layer_list_changed_event.add (this, &Navigator::layers_changed),
-      mp_source_view->hier_levels_changed_event.add (this, &Navigator::hier_levels_changed);
+        mp_source_view->hier_levels_changed_event.add (this, &Navigator::hier_levels_changed);
 
       img::Service *image_plugin = mp_source_view->get_plugin<img::Service> ();
       if (image_plugin) {
@@ -678,9 +661,9 @@ Navigator::attach_view (LayoutView *view)
       }
 
       //  update the list of frozen flags per view
-      std::set <lay::LayoutView *> all_views;
+      std::set<lay::LayoutView *> all_views;
 
-      for (std::map <lay::LayoutView *, NavigatorFrozenViewInfo>::const_iterator f = m_frozen_list.begin (); f != m_frozen_list.end (); ++f) {
+      for (std::map<lay::LayoutView *, NavigatorFrozenViewInfo>::const_iterator f = m_frozen_list.begin (); f != m_frozen_list.end (); ++f) {
         all_views.insert (f->first);
       }
 
@@ -691,7 +674,7 @@ Navigator::attach_view (LayoutView *view)
         }
       }
 
-      for (std::set <lay::LayoutView *>::const_iterator v = all_views.begin (); v != all_views.end (); ++v) {
+      for (std::set<lay::LayoutView *>::const_iterator v = all_views.begin (); v != all_views.end (); ++v) {
         all_views.erase (*v);
       }
 
@@ -702,32 +685,27 @@ Navigator::attach_view (LayoutView *view)
       mp_service->attach_view (mp_source_view);
 
       update ();
-
     }
 
     delete old_view;
-
   }
 }
 
-void
-Navigator::hier_levels_changed ()
+void Navigator::hier_levels_changed ()
 {
   if (m_show_all_hier_levels && mp_source_view && m_frozen_list.find (mp_source_view) == m_frozen_list.end ()) {
     mp_view->view ()->set_hier_levels (mp_source_view->get_hier_levels ());
   }
 }
 
-void
-Navigator::update_layers ()
+void Navigator::update_layers ()
 {
   if (! mp_source_view || m_frozen_list.find (mp_source_view) == m_frozen_list.end ()) {
     update ();
   }
 }
 
-void
-Navigator::update ()
+void Navigator::update ()
 {
   if (! mp_view || ! mp_view->view () || ! mp_source_view) {
     return;
@@ -754,7 +732,6 @@ Navigator::update ()
         }
       }
     }
-
   }
 
   if (m_show_all_hier_levels && mp_source_view) {
@@ -801,4 +778,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new NavigatorPluginDeclaration (), -1, "NavigatorPlugin");
 
 }
-

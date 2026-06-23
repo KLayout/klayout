@@ -122,8 +122,7 @@ void FlatRegion::reserve (size_t n)
   mp_polygons->reserve (db::Polygon::tag (), n);
 }
 
-void
-FlatRegion::ensure_merged_polygons_valid () const
+void FlatRegion::ensure_merged_polygons_valid () const
 {
   if (! m_merged_polygons_valid) {
     merge_polygons_to (*mp_merged_polygons, min_coherence (), 0, join_properties_on_merge ());
@@ -131,8 +130,7 @@ FlatRegion::ensure_merged_polygons_valid () const
   }
 }
 
-void
-FlatRegion::ensure_unmerged_polygons_valid () const
+void FlatRegion::ensure_unmerged_polygons_valid () const
 {
   if (! m_is_merged || (m_area_ratio == 0.0 && m_max_vertex_count == 0)) {
     return;
@@ -325,7 +323,6 @@ RegionDelegate *FlatRegion::merged_in_place (bool min_coherence, unsigned int mi
     merge_polygons_to (*mp_polygons, min_coherence, min_wc, join_properties_on_merge);
 
     m_is_merged = true;
-
   }
 
   return this;
@@ -367,7 +364,6 @@ RegionDelegate *FlatRegion::add (const Region &other) const
         new_region->raw_polygons ().insert (db::PolygonWithProperties (*p, p.prop_id ()));
       }
     }
-
   }
 
   return new_region.release ();
@@ -395,7 +391,6 @@ RegionDelegate *FlatRegion::add_in_place (const Region &other)
         polygons.insert (db::PolygonWithProperties (*p, p.prop_id ()));
       }
     }
-
   }
 
   return this;
@@ -469,7 +464,6 @@ void FlatRegion::apply_property_translator (const db::PropertiesTranslator &pt)
     mp_polygons->swap (new_polygons);
 
     invalidate_cache ();
-
   }
 }
 
@@ -478,8 +472,7 @@ void FlatRegion::insert_into (Layout *layout, db::cell_index_type into_cell, uns
   layout->cell (into_cell).shapes (into_layer).insert (*mp_polygons);
 }
 
-void
-FlatRegion::do_insert (const db::Polygon &polygon, properties_id_type prop_id)
+void FlatRegion::do_insert (const db::Polygon &polygon, properties_id_type prop_id)
 {
   if (polygon.holes () > 0 || polygon.vertices () > 0) {
 
@@ -493,9 +486,7 @@ FlatRegion::do_insert (const db::Polygon &polygon, properties_id_type prop_id)
     set_is_merged (is_box);
 
     invalidate_cache ();
-
   }
 }
 
 }
-

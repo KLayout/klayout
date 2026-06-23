@@ -31,7 +31,7 @@ class QHBoxLayout;
 
 namespace lay
 {
-  class DecoratedLineEdit;
+class DecoratedLineEdit;
 }
 
 namespace ant
@@ -43,7 +43,7 @@ namespace ant
 class ToolkitWidget
   : public lay::EditorOptionsPageWidget
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   ToolkitWidget (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);

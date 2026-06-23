@@ -23,4 +23,4 @@
 #include "../pymodHelper.h"
 
 #include "QtGuiMain.h"
-DEFINE_PYMOD(QtGui, "QtGui", "KLayout/Qt module 'QtGui'")
+DEFINE_PYMOD (QtGui, "QtGui", "KLayout/Qt module 'QtGui'")

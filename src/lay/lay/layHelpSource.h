@@ -51,9 +51,8 @@ namespace lay
  *
  *  The normalized key is the string that can be used for comparing.
  */
-struct IndexEntry
-{
-  IndexEntry () { }
+struct IndexEntry {
+  IndexEntry () {}
   IndexEntry (const std::string &_key, const std::string &_title, const std::string &_path);
 
   std::string key;
@@ -77,14 +76,14 @@ public:
   HelpSource ();
   HelpSource (bool make_index);
 
-  ~HelpSource();
+  ~HelpSource ();
 
   virtual std::string get (const std::string &url);
   virtual BrowserOutline get_outline (const std::string &url);
   virtual QImage get_image (const std::string &url);
   virtual std::string get_css (const std::string &url);
 
-  virtual void search_completers(const std::string &search_string, std::list<std::string> &completers);
+  virtual void search_completers (const std::string &search_string, std::list<std::string> &completers);
 
   virtual std::string next_topic (const std::string &url);
   virtual std::string prev_topic (const std::string &url);
@@ -116,29 +115,29 @@ public:
     return m_parent_of.end ();
   }
 
-  void push_parent (const std::pair<std::string, std::string> &p) 
+  void push_parent (const std::pair<std::string, std::string> &p)
   {
     m_parent_of.insert (p);
   }
 
-  std::vector<std::pair <std::string, std::string> >::const_iterator begin_titles () const
+  std::vector<std::pair<std::string, std::string>>::const_iterator begin_titles () const
   {
     return m_titles.begin ();
   }
 
-  std::vector<std::pair <std::string, std::string> >::const_iterator end_titles () const
+  std::vector<std::pair<std::string, std::string>>::const_iterator end_titles () const
   {
     return m_titles.end ();
   }
 
-  void push_title (const std::pair<std::string, std::string> &p) 
+  void push_title (const std::pair<std::string, std::string> &p)
   {
     m_titles.push_back (p);
   }
 
   std::string klayout_version () const;
 
-  void set_klayout_version (const std::string &v) 
+  void set_klayout_version (const std::string &v)
   {
     m_klayout_version = v;
   }
@@ -173,7 +172,7 @@ public:
 private:
   std::vector<IndexEntry> m_index;
   std::map<std::string, std::string> m_parent_of;
-  std::vector<std::pair<std::string, std::string> > m_titles;
+  std::vector<std::pair<std::string, std::string>> m_titles;
   std::map<std::string, std::string> m_title_map;
   std::string m_klayout_version;
   int m_kindex;
@@ -197,11 +196,8 @@ private:
 
 namespace tl
 {
-  //  make registration available to external DLL's
-  template class LAY_PUBLIC tl::RegisteredClass<lay::HelpProvider>;
+//  make registration available to external DLL's
+template class LAY_PUBLIC tl::RegisteredClass<lay::HelpProvider>;
 }
 
 #endif
-
-
-

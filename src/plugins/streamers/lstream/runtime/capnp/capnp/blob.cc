@@ -21,8 +21,9 @@
 
 #include "blob.h"
 
-namespace capnp {
+namespace capnp
+{
 
-char Text::Builder::nulstr[1] = "";
+char Text::Builder::nulstr [1] = "";
 
-}  // namespace capnp
+} // namespace capnp

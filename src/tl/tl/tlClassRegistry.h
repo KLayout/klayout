@@ -20,7 +20,7 @@
 
 */
 
- 
+
 #ifndef HDR_tlClassRegistry
 #define HDR_tlClassRegistry
 
@@ -59,7 +59,7 @@ private:
   bool m_owned;
   int m_position;
   std::string m_name;
-  RegistrarNode *mp_next; 
+  RegistrarNode *mp_next;
 
   friend class Registrar<X>;
   friend class Registrar<X>::iterator;
@@ -73,16 +73,16 @@ private:
  *  The objects are classified by a base class they are derived of.
  *  The collection of registered objects can be iterated.
  *  See tlClassRegistry.ut for an example.
- */ 
+ */
 
 /**
  *  @brief A class representant that is registered
  */
 template <class X>
-class RegisteredClass 
+class RegisteredClass
 {
 public:
-  /** 
+  /**
    *  @brief register an object of type X
    *
    *  This will register the given object. The X pointer
@@ -91,16 +91,16 @@ public:
    *  chain - higher positions come later.
    *  The name is an arbitrary string that is used for debugging purposes only.
    */
-  RegisteredClass (X *inst, int position = 0, const char *name = "", bool owned = true) 
+  RegisteredClass (X *inst, int position = 0, const char *name = "", bool owned = true)
     : m_owned (owned)
-  { 
+  {
     Registrar<X> *instance = Registrar<X>::get_instance ();
     if (! instance) {
       instance = new Registrar<X> ();
       Registrar<X>::set_instance (instance);
     }
     mp_node = instance->insert (inst, owned, position, name);
-    
+
     if (tl::verbosity () >= 40) {
       tl::info << "Registered object '" << name << "' with priority " << position;
     }
@@ -119,19 +119,20 @@ public:
         delete instance;
         Registrar<X>::set_instance (0);
       }
-
     }
   }
 
 private:
   RegistrarNode<X> *mp_node;
-  bool m_owned; 
+  bool m_owned;
 };
 
 /**
  *  @brief A base class for the registrar types
  */
-class RegistrarBase { };
+class RegistrarBase
+{
+};
 
 /**
  *  @brief Sets the registrar instance by type
@@ -147,7 +148,7 @@ TL_PUBLIC RegistrarBase *registrar_instance_by_type (const std::type_info &ti);
 /**
  *  @brief The registrar capable of registering objects of type Y derived from X
  *
- *  Objects of type Y derived from X can simply be created and registered by 
+ *  Objects of type Y derived from X can simply be created and registered by
  *  instantiation (statically) an object of tl::Registrar<X>::Class which
  *  will receive an new'ed object of type Y and register it in the <X> registration
  *  space. This object will then be owned by the registrar and is destroyed upon
@@ -155,7 +156,7 @@ TL_PUBLIC RegistrarBase *registrar_instance_by_type (const std::type_info &ti);
  */
 template <class X>
 class Registrar
-    : public RegistrarBase
+  : public RegistrarBase
 {
 public:
   class iterator
@@ -177,7 +178,7 @@ public:
       return mp_pos != d.mp_pos;
     }
 
-    iterator &operator++ () 
+    iterator &operator++ ()
     {
       mp_pos = mp_pos->mp_next;
       return *this;
@@ -198,7 +199,7 @@ public:
       return *(mp_pos->mp_object);
     }
 
-    X *operator-> () const
+    X *operator->() const
     {
       return mp_pos->mp_object;
     }
@@ -226,24 +227,24 @@ public:
   /**
    *  @brief begin() iterator over the registered objects
    */
-  static iterator begin () 
+  static iterator begin ()
   {
     if (get_instance ()) {
       return iterator (get_instance ()->mp_first);
     } else {
-      return iterator (0); 
+      return iterator (0);
     }
   }
 
   /**
    *  @brief end() iterator over the registered objects
    */
-  static iterator end () 
+  static iterator end ()
   {
-    return iterator (0); 
+    return iterator (0);
   }
 
-  static Registrar<X> *get_instance () 
+  static Registrar<X> *get_instance ()
   {
     return static_cast<Registrar<X> *> (registrar_instance_by_type (typeid (X)));
   }
@@ -295,4 +296,3 @@ private:
 }
 
 #endif
-

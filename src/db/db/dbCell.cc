@@ -36,22 +36,22 @@ namespace db
 {
 
 struct CellOp
-  : public db::Op
-{
-  CellOp () { }
-  virtual ~CellOp () { }
+  : public db::Op {
+  CellOp () {}
+  virtual ~CellOp () {}
 
   virtual void redo (db::Cell *) const = 0;
   virtual void undo (db::Cell *) const = 0;
 };
 
-class SwapLayerOp 
+class SwapLayerOp
   : public CellOp
 {
 public:
   SwapLayerOp (unsigned int a, unsigned int b)
     : m_a (a), m_b (b)
-  { }
+  {
+  }
 
   virtual void redo (db::Cell *cell) const
   {
@@ -68,11 +68,11 @@ private:
 };
 
 struct SetCellPropId
-  : public CellOp
-{
+  : public CellOp {
   SetCellPropId (db::properties_id_type f, db::properties_id_type t)
     : m_from (f), m_to (t)
-  { }
+  {
+  }
 
   virtual void redo (db::Cell *cell) const
   {
@@ -90,8 +90,8 @@ private:
 
 Cell::box_type Cell::ms_empty_box = Cell::box_type ();
 
-Cell::Cell (cell_index_type ci, db::Layout &l) 
-  : db::Object (l.manager ()), 
+Cell::Cell (cell_index_type ci, db::Layout &l)
+  : db::Object (l.manager ()),
     m_cell_index (ci), mp_layout (&l), m_instances (this), m_prop_id (0), m_hier_levels (0),
     m_bbox_needs_update (false), m_locked (false), m_ghost_cell (false),
     mp_last (0), mp_next (0)
@@ -100,7 +100,7 @@ Cell::Cell (cell_index_type ci, db::Layout &l)
 }
 
 Cell::Cell (const Cell &d)
-  : db::Object (d), 
+  : db::Object (d),
     gsi::ObjectBase (),
     mp_layout (d.mp_layout), m_instances (this), m_prop_id (d.m_prop_id), m_hier_levels (d.m_hier_levels),
     mp_last (0), mp_next (0)
@@ -114,7 +114,7 @@ Cell::operator= (const Cell &d)
 {
   if (this != &d) {
 
-    //  Note: the cell index is part of the cell's identity - hence we do not change it here. It's copied in 
+    //  Note: the cell index is part of the cell's identity - hence we do not change it here. It's copied in
     //  the copy ctor however.
 
     invalidate_hier ();
@@ -133,7 +133,6 @@ Cell::operator= (const Cell &d)
     m_hier_levels = d.m_hier_levels;
     m_prop_id = d.m_prop_id;
     m_bbox_needs_update = d.m_bbox_needs_update;
-
   }
   return *this;
 }
@@ -164,8 +163,7 @@ Cell::layers () const
   }
 }
 
-bool
-Cell::empty () const
+bool Cell::empty () const
 {
   if (! m_instances.empty ()) {
     return false;
@@ -180,38 +178,36 @@ Cell::empty () const
   return true;
 }
 
-void 
-Cell::clear (unsigned int index)
+void Cell::clear (unsigned int index)
 {
   check_locked ();
 
-  shapes_map::iterator s = m_shapes_map.find(index);
-  if (s != m_shapes_map.end() && ! s->second.empty ()) {
-    mp_layout->invalidate_bboxes (index);  //  HINT: must come before the change is done!
+  shapes_map::iterator s = m_shapes_map.find (index);
+  if (s != m_shapes_map.end () && ! s->second.empty ()) {
+    mp_layout->invalidate_bboxes (index); //  HINT: must come before the change is done!
     s->second.clear ();
     m_bbox_needs_update = true;
   }
 }
 
-void
-Cell::clear (unsigned int index, unsigned int types)
+void Cell::clear (unsigned int index, unsigned int types)
 {
   check_locked ();
 
-  shapes_map::iterator s = m_shapes_map.find(index);
-  if (s != m_shapes_map.end() && ! s->second.empty ()) {
-    mp_layout->invalidate_bboxes (index);  //  HINT: must come before the change is done!
+  shapes_map::iterator s = m_shapes_map.find (index);
+  if (s != m_shapes_map.end () && ! s->second.empty ()) {
+    mp_layout->invalidate_bboxes (index); //  HINT: must come before the change is done!
     s->second.clear (types);
     m_bbox_needs_update = true;
   }
 }
 
 Cell::shapes_type &
-Cell::shapes (unsigned int index) 
+Cell::shapes (unsigned int index)
 {
-  shapes_map::iterator s = m_shapes_map.find(index);
-  if (s == m_shapes_map.end()) {
-    s = m_shapes_map.insert (std::make_pair(index, shapes_type (0, this, mp_layout ? mp_layout->is_editable () : true))).first;
+  shapes_map::iterator s = m_shapes_map.find (index);
+  if (s == m_shapes_map.end ()) {
+    s = m_shapes_map.insert (std::make_pair (index, shapes_type (0, this, mp_layout ? mp_layout->is_editable () : true))).first;
     s->second.manager (manager ());
   }
   return s->second;
@@ -220,8 +216,8 @@ Cell::shapes (unsigned int index)
 const Cell::shapes_type &
 Cell::shapes (unsigned int index) const
 {
-  shapes_map::const_iterator s = m_shapes_map.find(index);
-  if (s != m_shapes_map.end()) {
+  shapes_map::const_iterator s = m_shapes_map.find (index);
+  if (s != m_shapes_map.end ()) {
     return s->second;
   } else {
     //  Because of a gcc bug it seems to be not possible
@@ -245,23 +241,20 @@ Cell::index_of_shapes (const Cell::shapes_type *shapes) const
   return std::numeric_limits<unsigned int>::max ();
 }
 
-void
-Cell::clear_shapes ()
+void Cell::clear_shapes ()
 {
   check_locked ();
 
-  mp_layout->invalidate_bboxes (std::numeric_limits<unsigned int>::max ());  //  HINT: must come before the change is done!
+  mp_layout->invalidate_bboxes (std::numeric_limits<unsigned int>::max ()); //  HINT: must come before the change is done!
   clear_shapes_no_invalidate ();
 }
 
-void 
-Cell::update_relations ()
+void Cell::update_relations ()
 {
   m_instances.update_relations (mp_layout, cell_index ());
 }
 
-bool 
-Cell::is_shape_bbox_dirty () const
+bool Cell::is_shape_bbox_dirty () const
 {
   if (m_bbox_needs_update) {
     return true;
@@ -332,8 +325,7 @@ private:
 
 }
 
-bool 
-Cell::update_bbox (unsigned int layers)
+bool Cell::update_bbox (unsigned int layers)
 {
   //  determine the bounding box
   box_type org_bbox = m_bbox;
@@ -346,16 +338,16 @@ Cell::update_bbox (unsigned int layers)
   //  save the original boxes for simple compare
   box_map org_bboxes;
   org_bboxes.swap (m_bboxes);
-  
+
   //  compute the per-layer bboxes of the cell instances
   //  exploit the fact that these are sorted by instance,
   //  rotation and magnification.
-  for (instances_type::sorted_inst_iterator o = m_instances.begin_sorted_insts (); o != m_instances.end_sorted_insts (); ) {
+  for (instances_type::sorted_inst_iterator o = m_instances.begin_sorted_insts (); o != m_instances.end_sorted_insts ();) {
 
     const cell_inst_array_type *o1_inst = *o;
 
     instances_type::sorted_inst_iterator oo = o;
-    while (++oo != m_instances.end_sorted_insts () && (*oo)->raw_equal (*o1_inst)) 
+    while (++oo != m_instances.end_sorted_insts () && (*oo)->raw_equal (*o1_inst))
       ;
 
     box_type raw_box;
@@ -379,12 +371,10 @@ Cell::update_bbox (unsigned int layers)
           b->second += lbox;
         }
       }
-
     }
 
     InternalCellInstBoxConverter bc_we (mp_layout);
     m_bbox_with_empty += o1_inst->bbox_from_raw_bbox (raw_box, bc_we);
-    
   }
 
   box_type sbox_all;
@@ -400,12 +390,11 @@ Cell::update_bbox (unsigned int layers)
       sbox_all += sbox;
       box_map::iterator b = m_bboxes.find (s->first);
       if (b == m_bboxes.end ()) {
-         m_bboxes.insert (std::make_pair (s->first, sbox));
+        m_bboxes.insert (std::make_pair (s->first, sbox));
       } else {
-         b->second += sbox;
+        b->second += sbox;
       }
     }
-   
   }
 
   //  combine shapes in all-layer boxes
@@ -420,12 +409,11 @@ Cell::update_bbox (unsigned int layers)
   //  reset "dirty child instances" flag
   m_bbox_needs_update = false;
 
-  //  return true, if anything has changed with the box 
+  //  return true, if anything has changed with the box
   return (org_bbox != m_bbox || org_bbox_with_empty != m_bbox_with_empty || org_bboxes != m_bboxes);
 }
 
-void
-Cell::copy (unsigned int src, unsigned int dest)
+void Cell::copy (unsigned int src, unsigned int dest)
 {
   check_locked ();
 
@@ -440,8 +428,7 @@ Cell::copy (unsigned int src, unsigned int dest)
   }
 }
 
-void
-Cell::copy (unsigned int src, unsigned int dest, unsigned int types)
+void Cell::copy (unsigned int src, unsigned int dest, unsigned int types)
 {
   check_locked ();
 
@@ -456,8 +443,7 @@ Cell::copy (unsigned int src, unsigned int dest, unsigned int types)
   }
 }
 
-void
-Cell::move (unsigned int src, unsigned int dest)
+void Cell::move (unsigned int src, unsigned int dest)
 {
   check_locked ();
 
@@ -467,8 +453,7 @@ Cell::move (unsigned int src, unsigned int dest)
   }
 }
 
-void
-Cell::move (unsigned int src, unsigned int dest, unsigned int types)
+void Cell::move (unsigned int src, unsigned int dest, unsigned int types)
 {
   check_locked ();
 
@@ -478,8 +463,7 @@ Cell::move (unsigned int src, unsigned int dest, unsigned int types)
   }
 }
 
-void
-Cell::swap (unsigned int i1, unsigned int i2)
+void Cell::swap (unsigned int i1, unsigned int i2)
 {
   check_locked ();
 
@@ -494,16 +478,14 @@ Cell::swap (unsigned int i1, unsigned int i2)
   }
 }
 
-void 
-Cell::sort_shapes ()
+void Cell::sort_shapes ()
 {
   for (shapes_map::iterator s = m_shapes_map.begin (); s != m_shapes_map.end (); ++s) {
     s->second.sort ();
   }
 }
 
-void
-Cell::prop_id (db::properties_id_type id) 
+void Cell::prop_id (db::properties_id_type id)
 {
   if (m_prop_id != id) {
     if (manager () && manager ()->transacting ()) {
@@ -560,76 +542,74 @@ Cell::begin () const
   return m_instances.begin ();
 }
 
-Cell::overlapping_iterator 
+Cell::overlapping_iterator
 Cell::begin_overlapping (const box_type &b) const
 {
   mp_layout->update ();
   return m_instances.begin_overlapping (b, mp_layout);
 }
 
-Cell::touching_iterator 
+Cell::touching_iterator
 Cell::begin_touching (const box_type &b) const
 {
   mp_layout->update ();
   return m_instances.begin_touching (b, mp_layout);
 }
 
-Cell::parent_inst_iterator 
+Cell::parent_inst_iterator
 Cell::begin_parent_insts () const
 {
   mp_layout->update ();
   return m_instances.begin_parent_insts (mp_layout);
 }
 
-Cell::child_cell_iterator 
+Cell::child_cell_iterator
 Cell::begin_child_cells () const
 {
   mp_layout->update ();
   return m_instances.begin_child_cells ();
 }
 
-size_t 
+size_t
 Cell::child_cells () const
 {
   mp_layout->update ();
   return m_instances.child_cells ();
 }
 
-size_t 
+size_t
 Cell::parent_cells () const
 {
   mp_layout->update ();
   return m_instances.parent_cells ();
 }
 
-Cell::parent_cell_iterator 
+Cell::parent_cell_iterator
 Cell::begin_parent_cells () const
 {
   mp_layout->update ();
   return m_instances.begin_parent_cells ();
 }
 
-Cell::parent_cell_iterator 
+Cell::parent_cell_iterator
 Cell::end_parent_cells () const
 {
   mp_layout->update ();
   return m_instances.end_parent_cells ();
 }
 
-bool 
-Cell::is_top () const
+bool Cell::is_top () const
 {
   mp_layout->update ();
   return m_instances.is_top ();
 }
 
-bool 
-Cell::is_leaf () const
+bool Cell::is_leaf () const
 {
   return m_instances.empty ();
 }
 
-unsigned int 
+unsigned int
 Cell::hierarchy_levels () const
 {
   mp_layout->update ();
@@ -657,28 +637,23 @@ has_shapes_touching_impl (const db::Cell &cell, unsigned int layer, const db::Bo
       if (has_shapes_touching_impl (cell.layout ()->cell (i->cell_index ()), layer, cbox)) {
         return true;
       }
-
     }
-
   }
 
   return false;
 }
 
-bool
-Cell::has_shapes_touching (unsigned int layer, const db::Box &box) const
+bool Cell::has_shapes_touching (unsigned int layer, const db::Box &box) const
 {
   return has_shapes_touching_impl (*this, layer, box);
 }
 
-void 
-Cell::collect_caller_cells (std::set<cell_index_type> &callers) const
+void Cell::collect_caller_cells (std::set<cell_index_type> &callers) const
 {
   collect_caller_cells (callers, -1);
 }
 
-void 
-Cell::collect_caller_cells (std::set<cell_index_type> &callers, const std::set<cell_index_type> &cone, int levels) const
+void Cell::collect_caller_cells (std::set<cell_index_type> &callers, const std::set<cell_index_type> &cone, int levels) const
 {
   if (levels != 0) {
     for (parent_cell_iterator cc = begin_parent_cells (); cc != end_parent_cells (); ++cc) {
@@ -690,8 +665,7 @@ Cell::collect_caller_cells (std::set<cell_index_type> &callers, const std::set<c
   }
 }
 
-void 
-Cell::collect_caller_cells (std::set<cell_index_type> &callers, int levels) const
+void Cell::collect_caller_cells (std::set<cell_index_type> &callers, int levels) const
 {
   if (levels != 0) {
     for (parent_cell_iterator cc = begin_parent_cells (); cc != end_parent_cells (); ++cc) {
@@ -703,14 +677,12 @@ Cell::collect_caller_cells (std::set<cell_index_type> &callers, int levels) cons
   }
 }
 
-void 
-Cell::collect_called_cells (std::set<cell_index_type> &called) const
+void Cell::collect_called_cells (std::set<cell_index_type> &called) const
 {
   collect_called_cells (called, -1);
 }
 
-void 
-Cell::collect_called_cells (std::set<cell_index_type> &called, int levels) const
+void Cell::collect_called_cells (std::set<cell_index_type> &called, int levels) const
 {
   if (levels != 0) {
     for (child_cell_iterator cc = begin_child_cells (); ! cc.at_end (); ++cc) {
@@ -722,52 +694,47 @@ Cell::collect_called_cells (std::set<cell_index_type> &called, int levels) const
   }
 }
 
-void 
-Cell::invalidate_insts ()
+void Cell::invalidate_insts ()
 {
-  mp_layout->invalidate_hier ();  //  HINT: must come before the change is done!
+  mp_layout->invalidate_hier (); //  HINT: must come before the change is done!
   mp_layout->invalidate_bboxes (std::numeric_limits<unsigned int>::max ());
   m_bbox_needs_update = true;
 }
 
-void 
-Cell::invalidate_hier ()
+void Cell::invalidate_hier ()
 {
-  mp_layout->invalidate_hier ();  //  HINT: must come before the change is done!
+  mp_layout->invalidate_hier (); //  HINT: must come before the change is done!
 }
 
-void 
-Cell::redo (db::Op *op)
+void Cell::redo (db::Op *op)
 {
   db::CellOp *cell_op = dynamic_cast<db::CellOp *> (op);
   if (cell_op) {
     //  redo operation
     cell_op->redo (this);
   } else {
-    //  other actions are only queued by the instance list - this is should be 
+    //  other actions are only queued by the instance list - this is should be
     //  responsible for the handling of the latter.
     //  HACK: this is not really a nice concept, but it saves us a pointer to the manager.
     m_instances.redo (op);
   }
 }
 
-void 
-Cell::undo (db::Op *op) 
+void Cell::undo (db::Op *op)
 {
   db::CellOp *cell_op = dynamic_cast<db::CellOp *> (op);
   if (cell_op) {
     //  undo operation
     cell_op->undo (this);
   } else {
-    //  other actions are only queued by the instance list - this is should be 
+    //  other actions are only queued by the instance list - this is should be
     //  responsible for the handling of the latter.
     //  HACK: this is not really a nice concept, but it saves us a pointer to the manager.
     m_instances.undo (op);
   }
 }
 
-void
-Cell::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
+void Cell::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
 {
   if (! no_self) {
     stat->add (typeid (Cell), (void *) this, sizeof (Cell), sizeof (Cell), parent, purpose, cat);
@@ -777,8 +744,7 @@ Cell::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, 
   db::mem_stat (stat, MemStatistics::ShapesInfo, cat, m_shapes_map, true, (void *) this);
 }
 
-void 
-Cell::clear_shapes_no_invalidate ()
+void Cell::clear_shapes_no_invalidate ()
 {
   //  Hint: we can't simply clear the map because of the undo stack
   for (shapes_map::iterator s = m_shapes_map.begin (); s != m_shapes_map.end (); ++s) {
@@ -787,43 +753,40 @@ Cell::clear_shapes_no_invalidate ()
   m_bbox_needs_update = true;
 }
 
-unsigned int 
+unsigned int
 Cell::count_hier_levels () const
 {
   unsigned int l = 0;
 
-  for (const_iterator c = m_instances.begin (); !c.at_end (); ++c) {
+  for (const_iterator c = m_instances.begin (); ! c.at_end (); ++c) {
     l = std::max (l, (unsigned int) mp_layout->cell (c->cell_index ()).m_hier_levels + 1);
   }
 
   return l;
 }
 
-void 
-Cell::count_parent_insts (std::vector <size_t> &count) const
+void Cell::count_parent_insts (std::vector<size_t> &count) const
 {
   m_instances.count_parent_insts (count);
 }
 
-void 
-Cell::clear_parent_insts (size_t sz)
+void Cell::clear_parent_insts (size_t sz)
 {
   m_instances.clear_parent_insts (sz);
 }
 
-void 
-Cell::sort_child_insts ()
+void Cell::sort_child_insts ()
 {
   m_instances.sort_child_insts (false);
 }
 
-std::pair<bool, db::pcell_id_type> 
+std::pair<bool, db::pcell_id_type>
 Cell::is_pcell_instance (const instance_type &ref) const
 {
   return mp_layout->is_pcell_instance (ref.cell_index ());
 }
 
-std::map<std::string, tl::Variant> 
+std::map<std::string, tl::Variant>
 Cell::get_named_pcell_parameters (const instance_type &ref) const
 {
   return mp_layout->get_named_pcell_parameters (ref.cell_index ());
@@ -841,7 +804,7 @@ Cell::get_pcell_parameters (const instance_type &ref) const
   return mp_layout->get_pcell_parameters (ref.cell_index ());
 }
 
-Cell::instance_type 
+Cell::instance_type
 Cell::change_pcell_parameters (const instance_type &ref, const std::vector<tl::Variant> &new_parameters)
 {
   tl_assert (mp_layout != 0);
@@ -886,7 +849,6 @@ Cell::change_pcell_parameters (const instance_type &ref, const std::map<std::str
   } else {
     return ref;
   }
-
 }
 
 const db::PCellDeclaration *
@@ -913,8 +875,7 @@ Cell::pcell_declaration () const
   }
 }
 
-void 
-Cell::sort_inst_tree (bool force)
+void Cell::sort_inst_tree (bool force)
 {
   m_instances.sort_inst_tree (mp_layout, force);
 
@@ -922,7 +883,7 @@ Cell::sort_inst_tree (bool force)
   m_hier_levels = count_hier_levels ();
 }
 
-std::string 
+std::string
 Cell::get_basic_name () const
 {
   tl_assert (layout () != 0);
@@ -941,7 +902,7 @@ Cell::get_qualified_name () const
   return get_basic_name ();
 }
 
-std::string 
+std::string
 Cell::get_display_name () const
 {
   tl_assert (layout () != 0);
@@ -952,15 +913,13 @@ Cell::get_display_name () const
   }
 }
 
-void
-Cell::set_name (const std::string &name)
+void Cell::set_name (const std::string &name)
 {
   tl_assert (layout () != 0);
   layout ()->rename_cell (cell_index (), name.c_str ());
 }
 
-void
-Cell::set_ghost_cell (bool g)
+void Cell::set_ghost_cell (bool g)
 {
   //  NOTE: this change is not undo managed
   if (m_ghost_cell != g) {
@@ -969,20 +928,17 @@ Cell::set_ghost_cell (bool g)
     tl_assert (layout () != 0);
     //  To trigger a redraw and cell tree rebuild
     layout ()->cell_name_changed ();
-
   }
 }
 
-void
-Cell::check_locked () const
+void Cell::check_locked () const
 {
   if (m_locked) {
     throw tl::Exception (tl::to_string (tr ("Cell '%s' cannot be modified as it is locked")), get_basic_name ());
   }
 }
 
-void
-Cell::copy_shapes (const db::Cell &source_cell, const db::LayerMapping &layer_mapping)
+void Cell::copy_shapes (const db::Cell &source_cell, const db::LayerMapping &layer_mapping)
 {
   if (this == &source_cell) {
     throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same cell")));
@@ -1011,8 +967,7 @@ Cell::copy_shapes (const db::Cell &source_cell, const db::LayerMapping &layer_ma
   }
 }
 
-void
-Cell::copy_shapes (const db::Cell &source_cell)
+void Cell::copy_shapes (const db::Cell &source_cell)
 {
   if (this == &source_cell) {
     throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same cell")));
@@ -1038,8 +993,7 @@ Cell::copy_shapes (const db::Cell &source_cell)
   }
 }
 
-void
-Cell::copy_instances (const db::Cell &source_cell)
+void Cell::copy_instances (const db::Cell &source_cell)
 {
   if (this == &source_cell) {
     throw tl::Exception (tl::to_string (tr ("Cannot copy instances within the same cell")));
@@ -1076,20 +1030,19 @@ Cell::copy_tree (const db::Cell &source_cell)
   db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
 
   db::CellMapping cm;
-  std::vector <db::cell_index_type> new_cells = cm.create_single_mapping_full (*target_layout, cell_index (), *source_layout, source_cell.cell_index ());
+  std::vector<db::cell_index_type> new_cells = cm.create_single_mapping_full (*target_layout, cell_index (), *source_layout, source_cell.cell_index ());
 
   db::LayerMapping lm;
   lm.create_full (*target_layout, *source_cell.layout ());
 
-  std::vector <db::cell_index_type> source_cells;
+  std::vector<db::cell_index_type> source_cells;
   source_cells.push_back (source_cell.cell_index ());
   db::copy_shapes (*target_layout, *source_layout, trans, source_cells, cm.table (), lm.table ());
 
   return new_cells;
 }
 
-void
-Cell::copy_tree_shapes (const db::Cell &source_cell, const db::CellMapping &cm)
+void Cell::copy_tree_shapes (const db::Cell &source_cell, const db::CellMapping &cm)
 {
   if (this == &source_cell) {
     throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same cell")));
@@ -1111,13 +1064,12 @@ Cell::copy_tree_shapes (const db::Cell &source_cell, const db::CellMapping &cm)
   db::LayerMapping lm;
   lm.create_full (*target_layout, *source_cell.layout ());
 
-  std::vector <db::cell_index_type> source_cells;
+  std::vector<db::cell_index_type> source_cells;
   source_cells.push_back (source_cell.cell_index ());
   db::copy_shapes (*target_layout, *source_layout, trans, source_cells, cm.table (), lm.table ());
 }
 
-void
-Cell::copy_tree_shapes (const db::Cell &source_cell, const db::CellMapping &cm, const db::LayerMapping &lm)
+void Cell::copy_tree_shapes (const db::Cell &source_cell, const db::CellMapping &cm, const db::LayerMapping &lm)
 {
   if (this == &source_cell) {
     throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same cell")));
@@ -1136,13 +1088,12 @@ Cell::copy_tree_shapes (const db::Cell &source_cell, const db::CellMapping &cm, 
 
   db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
 
-  std::vector <db::cell_index_type> source_cells;
+  std::vector<db::cell_index_type> source_cells;
   source_cells.push_back (source_cell.cell_index ());
   db::copy_shapes (*target_layout, *source_layout, trans, source_cells, cm.table (), lm.table ());
 }
 
-void
-Cell::move_shapes (db::Cell &source_cell, const db::LayerMapping &layer_mapping)
+void Cell::move_shapes (db::Cell &source_cell, const db::LayerMapping &layer_mapping)
 {
   if (this == &source_cell) {
     throw tl::Exception (tl::to_string (tr ("Cannot move shapes within the same cell")));
@@ -1173,8 +1124,7 @@ Cell::move_shapes (db::Cell &source_cell, const db::LayerMapping &layer_mapping)
   }
 }
 
-void
-Cell::move_shapes (db::Cell &source_cell)
+void Cell::move_shapes (db::Cell &source_cell)
 {
   if (this == &source_cell) {
     throw tl::Exception (tl::to_string (tr ("Cannot move shapes within the same cell")));
@@ -1201,8 +1151,7 @@ Cell::move_shapes (db::Cell &source_cell)
   }
 }
 
-void
-Cell::move_instances (db::Cell &source_cell)
+void Cell::move_instances (db::Cell &source_cell)
 {
   if (this == &source_cell) {
     throw tl::Exception (tl::to_string (tr ("Cannot move instances within the same cell")));
@@ -1241,12 +1190,12 @@ Cell::move_tree (db::Cell &source_cell)
   db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
 
   db::CellMapping cm;
-  std::vector <db::cell_index_type> new_cells = cm.create_single_mapping_full (*target_layout, cell_index (), *source_layout, source_cell.cell_index ());
+  std::vector<db::cell_index_type> new_cells = cm.create_single_mapping_full (*target_layout, cell_index (), *source_layout, source_cell.cell_index ());
 
   db::LayerMapping lm;
   lm.create_full (*target_layout, *source_cell.layout ());
 
-  std::vector <db::cell_index_type> source_cells;
+  std::vector<db::cell_index_type> source_cells;
   source_cells.push_back (source_cell.cell_index ());
   db::move_shapes (*target_layout, *source_layout, trans, source_cells, cm.table (), lm.table ());
 
@@ -1255,8 +1204,7 @@ Cell::move_tree (db::Cell &source_cell)
   return new_cells;
 }
 
-void
-Cell::move_tree_shapes (db::Cell &source_cell, const db::CellMapping &cm)
+void Cell::move_tree_shapes (db::Cell &source_cell, const db::CellMapping &cm)
 {
   if (this == &source_cell) {
     throw tl::Exception (tl::to_string (tr ("Cannot move shapes within the same cell")));
@@ -1278,13 +1226,12 @@ Cell::move_tree_shapes (db::Cell &source_cell, const db::CellMapping &cm)
   db::LayerMapping lm;
   lm.create_full (*target_layout, *source_cell.layout ());
 
-  std::vector <db::cell_index_type> source_cells;
+  std::vector<db::cell_index_type> source_cells;
   source_cells.push_back (source_cell.cell_index ());
   db::move_shapes (*target_layout, *source_layout, trans, source_cells, cm.table (), lm.table ());
 }
 
-void
-Cell::move_tree_shapes (db::Cell &source_cell, const db::CellMapping &cm, const db::LayerMapping &lm)
+void Cell::move_tree_shapes (db::Cell &source_cell, const db::CellMapping &cm, const db::LayerMapping &lm)
 {
   if (this == &source_cell) {
     throw tl::Exception (tl::to_string (tr ("Cannot move shapes within the same cell")));
@@ -1303,10 +1250,9 @@ Cell::move_tree_shapes (db::Cell &source_cell, const db::CellMapping &cm, const 
 
   db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
 
-  std::vector <db::cell_index_type> source_cells;
+  std::vector<db::cell_index_type> source_cells;
   source_cells.push_back (source_cell.cell_index ());
   db::move_shapes (*target_layout, *source_layout, trans, source_cells, cm.table (), lm.table ());
 }
 
 }
-

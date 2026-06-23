@@ -63,8 +63,7 @@ MALYReader::~MALYReader ()
   //  .. nothing yet ..
 }
 
-bool
-MALYReader::test ()
+bool MALYReader::test ()
 {
   try {
 
@@ -107,8 +106,7 @@ MALYReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   return layer_map_out ();
 }
 
-void
-MALYReader::create_metadata (db::Layout &layout, const MALYData &data)
+void MALYReader::create_metadata (db::Layout &layout, const MALYData &data)
 {
   tl::Variant boundary_per_mask = tl::Variant::empty_array ();
 
@@ -121,8 +119,7 @@ MALYReader::create_metadata (db::Layout &layout, const MALYData &data)
   layout.add_meta_info ("boundary_per_mask", MetaInfo (tl::to_string (tr ("Physical mask boundary per mask name")), boundary_per_mask));
 }
 
-void
-MALYReader::import_data (db::Layout &layout, const MALYData &data)
+void MALYReader::import_data (db::Layout &layout, const MALYData &data)
 {
   db::LayoutLocker locker (&layout);
 
@@ -189,7 +186,6 @@ MALYReader::import_data (db::Layout &layout, const MALYData &data)
         }
 
         source_cell = cbm.second;
-
       }
 
       int source_layer = temp_layout.get_layer_maybe (db::LayerProperties (s->layer, 0));
@@ -231,9 +227,7 @@ MALYReader::import_data (db::Layout &layout, const MALYData &data)
         lm.map (source_layer, target_layer);
 
         layout.cell (target_cell).move_tree_shapes (temp_layout.cell (source_cell), cm, lm);
-
       }
-
     }
 
     //  produce the titles
@@ -255,15 +249,11 @@ MALYReader::import_data (db::Layout &layout, const MALYData &data)
       text.transform (db::CplxTrans (layout.dbu ()).inverted () * db::DCplxTrans (t->transformation) * db::CplxTrans (layout.dbu ()));
 
       text.insert_into (&layout, mask_cell.cell_index (), target_layer);
-
     }
-
   }
-
 }
 
-void
-MALYReader::unget_record ()
+void MALYReader::unget_record ()
 {
   m_record_returned = m_record;
 }
@@ -277,7 +267,6 @@ MALYReader::read_record ()
     m_record_returned.clear ();
 
     return tl::Extractor (m_record.c_str ());
-
   }
 
   while (! m_stream.at_end ()) {
@@ -291,7 +280,6 @@ MALYReader::read_record ()
     } else if (! ex.at_end ()) {
       return ex;
     }
-
   }
 
   return tl::Extractor ();
@@ -316,14 +304,14 @@ MALYReader::read_record_internal ()
           break;
         }
       } else if (cc == '*') {
-        m_stream.get_char ();  //  eat leading "*"
+        m_stream.get_char (); //  eat leading "*"
         while (! m_stream.at_end () && (m_stream.get_char () != '*' || m_stream.peek_char () != '/'))
           ;
         if (m_stream.at_end ()) {
           m_last_record_line = m_stream.line_number ();
           error (tl::to_string (tr ("/*...*/ comment not closed")));
         }
-        m_stream.get_char ();  //  eat trailing "/"
+        m_stream.get_char (); //  eat trailing "/"
         if (m_stream.at_end ()) {
           break;
         }
@@ -341,7 +329,7 @@ MALYReader::read_record_internal ()
         }
 
         //  continuation line
-        m_stream.get_char ();  //  eat "+"
+        m_stream.get_char (); //  eat "+"
         if (m_stream.at_end ()) {
           break;
         }
@@ -383,7 +371,6 @@ MALYReader::read_record_internal ()
     } else {
       rec += c;
     }
-
   }
 
   return rec;
@@ -401,8 +388,7 @@ MALYReader::read_maly_file ()
   return data;
 }
 
-void
-MALYReader::extract_title_trans (tl::Extractor &ex, MALYReaderTitleSpec &spec)
+void MALYReader::extract_title_trans (tl::Extractor &ex, MALYReaderTitleSpec &spec)
 {
   double x = 0.0, y = 0.0;
   bool ymirror = false;
@@ -416,9 +402,9 @@ MALYReader::extract_title_trans (tl::Extractor &ex, MALYReaderTitleSpec &spec)
     ex.read (spec.height);
     ex.read (spec.pitch);
   } else {
-    spec.width  = 1.0;
+    spec.width = 1.0;
     spec.height = 1.0;
-    spec.pitch  = 1.0;
+    spec.pitch = 1.0;
   }
 
   if (ex.test ("MIRROR")) {
@@ -454,8 +440,7 @@ MALYReader::string_to_base (const std::string &string)
   }
 }
 
-bool
-MALYReader::begin_section (tl::Extractor &ex, const std::string &name)
+bool MALYReader::begin_section (tl::Extractor &ex, const std::string &name)
 {
   tl::Extractor ex_saved = ex;
 
@@ -474,8 +459,7 @@ MALYReader::begin_section (tl::Extractor &ex, const std::string &name)
   return false;
 }
 
-bool
-MALYReader::end_section (tl::Extractor &ex)
+bool MALYReader::end_section (tl::Extractor &ex)
 {
   tl_assert (! m_sections.empty ());
   if (ex.at_end ()) {
@@ -492,12 +476,10 @@ MALYReader::end_section (tl::Extractor &ex)
   } else {
 
     return false;
-
   }
 }
 
-void
-MALYReader::skip_section ()
+void MALYReader::skip_section ()
 {
   while (true) {
     tl::Extractor ex = read_record ();
@@ -509,8 +491,7 @@ MALYReader::skip_section ()
   }
 }
 
-void
-MALYReader::read_parameter (MALYReaderParametersData &data)
+void MALYReader::read_parameter (MALYReaderParametersData &data)
 {
   while (true) {
 
@@ -580,12 +561,10 @@ MALYReader::read_parameter (MALYReaderParametersData &data)
     } else {
       warn (tl::to_string (tr ("Unknown record ignored")));
     }
-
   }
 }
 
-void
-MALYReader::read_title (MALYReaderTitleData &data)
+void MALYReader::read_title (MALYReaderTitleData &data)
 {
   while (true) {
 
@@ -634,12 +613,10 @@ MALYReader::read_title (MALYReaderTitleData &data)
     } else {
       warn (tl::to_string (tr ("Unknown record ignored")));
     }
-
   }
 }
 
-void
-MALYReader::read_strgroup (MALYReaderStrGroupData &data)
+void MALYReader::read_strgroup (MALYReaderStrGroupData &data)
 {
   while (true) {
 
@@ -712,12 +689,10 @@ MALYReader::read_strgroup (MALYReaderStrGroupData &data)
     } else {
       warn (tl::to_string (tr ("Unknown record ignored")));
     }
-
   }
 }
 
-void
-MALYReader::read_mask (MALYReaderMaskData &mask)
+void MALYReader::read_mask (MALYReaderMaskData &mask)
 {
   while (true) {
 
@@ -749,12 +724,10 @@ MALYReader::read_mask (MALYReaderMaskData &mask)
     } else {
       warn (tl::to_string (tr ("Unknown record ignored")));
     }
-
   }
 }
 
-bool
-MALYReader::read_maskset (MALYData &data)
+bool MALYReader::read_maskset (MALYData &data)
 {
   tl::Extractor ex = read_record ();
 
@@ -795,12 +768,10 @@ MALYReader::read_maskset (MALYData &data)
     } else {
       warn (tl::to_string (tr ("Unknown record ignored")));
     }
-
   }
 }
 
-void
-MALYReader::create_masks (const MALYReaderMaskData &cmask, const std::list<MALYReaderMaskData> &masks, MALYData &data)
+void MALYReader::create_masks (const MALYReaderMaskData &cmask, const std::list<MALYReaderMaskData> &masks, MALYData &data)
 {
   for (auto i = masks.begin (); i != masks.end (); ++i) {
 
@@ -883,7 +854,6 @@ MALYReader::create_masks (const MALYReaderMaskData &cmask, const std::list<MALYR
         m.structures.push_back (create_structure (i->parameters, cmask.parameters, *s, sg->name, base, array_base));
       }
     }
-
   }
 }
 
@@ -973,16 +943,13 @@ MALYReader::resolve_path (const MALYReaderParametersData &param, const std::stri
       if (tl::file_exists (p)) {
         return p;
       }
-
     }
-
   }
 
   return std::string ();
 }
 
-void
-MALYReader::do_read_maly_file (MALYData &data)
+void MALYReader::do_read_maly_file (MALYData &data)
 {
   tl::Extractor ex = read_record ();
   if (! begin_section (ex, "MALY")) {
@@ -1009,14 +976,12 @@ MALYReader::do_read_maly_file (MALYData &data)
   }
 }
 
-void 
-MALYReader::error (const std::string &msg)
+void MALYReader::error (const std::string &msg)
 {
   throw MALYReaderException (msg, m_last_record_line, m_stream.source ());
 }
 
-void 
-MALYReader::warn (const std::string &msg, int wl)
+void MALYReader::warn (const std::string &msg, int wl)
 {
   if (warn_level () < wl) {
     return;
@@ -1038,4 +1003,3 @@ MALYReader::warn (const std::string &msg, int wl)
 }
 
 }
-

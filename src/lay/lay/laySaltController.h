@@ -57,9 +57,10 @@ class MainWindow;
  *  initialization and configuration calls.
  */
 class SaltController
-  : public lay::PluginDeclaration, public tl::Object
+  : public lay::PluginDeclaration,
+    public tl::Object
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   /**
@@ -85,7 +86,7 @@ public:
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
-  void get_options (std::vector < std::pair<std::string, std::string> > &options) const;
+  void get_options (std::vector<std::pair<std::string, std::string>> &options) const;
 
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
@@ -100,7 +101,7 @@ public:
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
-  void config_finalize();
+  void config_finalize ();
 
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
@@ -202,7 +203,7 @@ signals:
 private:
   lay::SaltManagerDialog *mp_salt_dialog;
   lay::MainWindow *mp_mw;
-  lay::Dispatcher * mp_plugin_root;
+  lay::Dispatcher *mp_plugin_root;
   std::string m_salt_mine_url;
   lay::Salt m_salt;
   tl::FileSystemWatcher *m_file_watcher;
@@ -216,4 +217,3 @@ private:
 }
 
 #endif
-

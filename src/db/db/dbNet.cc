@@ -194,7 +194,6 @@ Net &Net::operator= (const Net &other)
     for (const_terminal_iterator i = other.begin_terminals (); i != other.end_terminals (); ++i) {
       add_terminal (*i);
     }
-
   }
   return *this;
 }

@@ -58,13 +58,13 @@ public:
 
   static tl::Extractor &skip_blanks (tl::Extractor &ex)
   {
-    while (! ex.at_end () && *ex != ';' && *ex != '-' && *ex != '(' && *ex != ')' && !isalnum(*ex)) {
+    while (! ex.at_end () && *ex != ';' && *ex != '-' && *ex != '(' && *ex != ')' && ! isalnum (*ex)) {
       ++ex;
     }
     return ex;
   }
 
-  virtual bool detect (tl::InputStream &s) const 
+  virtual bool detect (tl::InputStream &s) const
   {
     try {
 
@@ -121,7 +121,7 @@ public:
           ++ex;
           skip_blanks (ex);
           if (ex.at_end () || *ex != 'S') {
-            break;   // not "D<sep>S"
+            break; // not "D<sep>S"
           }
           ++ex;
           skip_blanks (ex);
@@ -143,7 +143,6 @@ public:
         } else {
           break;
         }
-
       }
 
     } catch (...) {
@@ -153,7 +152,7 @@ public:
     return false;
   }
 
-  virtual ReaderBase *create_reader (tl::InputStream &s) const 
+  virtual ReaderBase *create_reader (tl::InputStream &s) const
   {
     return new db::CIFReader (s);
   }
@@ -181,20 +180,18 @@ public:
   virtual tl::XMLElementBase *xml_reader_options_element () const
   {
     return new db::ReaderOptionsXMLElement<db::CIFReaderOptions> ("cif",
-      tl::make_member (&db::CIFReaderOptions::wire_mode, "wire-mode") +
-      tl::make_member (&db::CIFReaderOptions::dbu, "dbu") +
-      tl::make_member (&db::CIFReaderOptions::layer_map, "layer-map") +
-      tl::make_member (&db::CIFReaderOptions::create_other_layers, "create-other-layers") +
-      tl::make_member (&db::CIFReaderOptions::keep_layer_names, "keep-layer-names")
-    );
+                                                                  tl::make_member (&db::CIFReaderOptions::wire_mode, "wire-mode") +
+                                                                    tl::make_member (&db::CIFReaderOptions::dbu, "dbu") +
+                                                                    tl::make_member (&db::CIFReaderOptions::layer_map, "layer-map") +
+                                                                    tl::make_member (&db::CIFReaderOptions::create_other_layers, "create-other-layers") +
+                                                                    tl::make_member (&db::CIFReaderOptions::keep_layer_names, "keep-layer-names"));
   }
 
   virtual tl::XMLElementBase *xml_writer_options_element () const
   {
     return new db::WriterOptionsXMLElement<db::CIFWriterOptions> ("cif",
-      tl::make_member (&db::CIFWriterOptions::dummy_calls, "dummy-calls") +
-      tl::make_member (&db::CIFWriterOptions::blank_separator, "blank-separator")
-    );
+                                                                  tl::make_member (&db::CIFWriterOptions::dummy_calls, "dummy-calls") +
+                                                                    tl::make_member (&db::CIFWriterOptions::blank_separator, "blank-separator"));
   }
 };
 
@@ -206,5 +203,3 @@ static tl::RegisteredClass<db::StreamFormatDeclaration> reader_decl (new CIFForm
 int force_link_CIF = 0;
 
 }
-
-

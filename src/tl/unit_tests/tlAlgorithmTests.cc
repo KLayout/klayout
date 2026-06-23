@@ -31,7 +31,7 @@
 #include <algorithm>
 #include <vector>
 
-std::string to_string (const std::vector<std::string> &v) 
+std::string to_string (const std::vector<std::string> &v)
 {
   std::string t;
   for (std::vector<std::string>::const_iterator s = v.begin (); s != v.end (); ++s) {
@@ -44,12 +44,12 @@ std::string to_string (const std::vector<std::string> &v)
 class SimpleString
 {
 public:
-  ~SimpleString () 
+  ~SimpleString ()
   {
     delete [] m_cp;
   }
 
-  SimpleString () 
+  SimpleString ()
   {
     m_cp = new char [2];
     strcpy (m_cp, "");
@@ -64,19 +64,19 @@ public:
     }
     return *this;
   }
-    
+
   SimpleString (const SimpleString &d)
   {
     m_cp = new char [strlen (d.m_cp) + 1];
     strcpy (m_cp, d.m_cp);
   }
-    
+
   SimpleString (const std::string &cp)
   {
     m_cp = new char [strlen (cp.c_str ()) + 1];
     strcpy (m_cp, cp.c_str ());
   }
-    
+
   SimpleString (const char *cp)
   {
     m_cp = new char [strlen (cp) + 1];
@@ -87,13 +87,13 @@ public:
   {
     return strcmp (m_cp, d.m_cp) < 0;
   }
-    
+
   bool operator== (const SimpleString &d) const
   {
     return strcmp (m_cp, d.m_cp) == 0;
   }
-  
-  const char *c_str () const 
+
+  const char *c_str () const
   {
     return m_cp;
   }
@@ -123,7 +123,7 @@ struct test_compare {
   }
 };
 
-TEST(1) 
+TEST (1)
 {
   std::vector<std::string> v;
   v.push_back ("d");
@@ -133,12 +133,12 @@ TEST(1)
 
   tl::sort (v.begin (), v.end ());
   EXPECT_EQ (to_string (v), "a ba bx d ");
-  
+
   tl::sort (v.begin (), v.end (), test_compare ());
   EXPECT_EQ (to_string (v), "d bx ba a ");
 }
 
-TEST(2) 
+TEST (2)
 {
   std::vector<SimpleString> v;
 
@@ -160,7 +160,7 @@ TEST(2)
   }
 
   for (int i = 0; i < n; ++i) {
-    EXPECT_EQ (v[i], tl::sprintf ("%06x", i));
+    EXPECT_EQ (v [i], tl::sprintf ("%06x", i));
   }
 
   {
@@ -185,17 +185,16 @@ TEST(2)
   }
 
   for (int i = 0; i < n; ++i) {
-    EXPECT_EQ (v[i], tl::sprintf ("%06x", i));
+    EXPECT_EQ (v [i], tl::sprintf ("%06x", i));
   }
 
   {
     tl::SelfTimer timer ("std::sorting again");
     std::sort (v.begin (), v.end ());
   }
-
 }
 
-TEST(3) 
+TEST (3)
 {
   std::vector<int> v;
 
@@ -214,7 +213,6 @@ TEST(3)
   }
 
   for (int i = 0; i < n; ++i) {
-    EXPECT_EQ (v[i], i);
+    EXPECT_EQ (v [i], i);
   }
 }
-

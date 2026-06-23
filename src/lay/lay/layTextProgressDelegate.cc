@@ -34,14 +34,14 @@ TextProgressDelegate::TextProgressDelegate (MainWindow *mw, int verbosity)
 
 void TextProgressDelegate::update_progress (tl::Progress *progress)
 {
-  if (!mp_mw->update_progress (progress)) {
+  if (! mp_mw->update_progress (progress)) {
     lay::TextProgress::update_progress (progress);
   }
 }
 
 void TextProgressDelegate::show_progress_bar (bool show)
 {
-  if (!mp_mw->show_progress_bar (show)) {
+  if (! mp_mw->show_progress_bar (show)) {
     lay::TextProgress::show_progress_bar (show);
   }
 }

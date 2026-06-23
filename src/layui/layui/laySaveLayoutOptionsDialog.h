@@ -40,14 +40,14 @@ class QWidget;
 
 namespace db
 {
-  class SaveLayoutOptions;
-  class Technologies;
+class SaveLayoutOptions;
+class Technologies;
 }
 
 namespace Ui
 {
-  class SaveLayoutAsOptionsDialog;
-  class SaveLayoutOptionsDialog;
+class SaveLayoutAsOptionsDialog;
+class SaveLayoutOptionsDialog;
 }
 
 namespace lay
@@ -58,7 +58,7 @@ class LayoutViewBase;
 class LAYUI_PUBLIC SaveLayoutAsOptionsDialog
   : public QDialog
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   SaveLayoutAsOptionsDialog (QWidget *parent, const std::string &title);
@@ -72,7 +72,7 @@ public slots:
 
 private:
   Ui::SaveLayoutAsOptionsDialog *mp_ui;
-  std::vector< std::pair<StreamWriterOptionsPage *, std::string> > m_pages;
+  std::vector<std::pair<StreamWriterOptionsPage *, std::string>> m_pages;
   std::vector<int> m_tab_positions;
   std::string m_filename;
   db::SaveLayoutOptions m_options;
@@ -82,7 +82,7 @@ private:
 class LAYUI_PUBLIC SaveLayoutOptionsDialog
   : public QDialog
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   SaveLayoutOptionsDialog (QWidget *parent, const std::string &title);
@@ -99,7 +99,7 @@ public slots:
 
 private:
   Ui::SaveLayoutOptionsDialog *mp_ui;
-  std::vector< std::pair<StreamWriterOptionsPage *, std::string> > m_pages;
+  std::vector<std::pair<StreamWriterOptionsPage *, std::string>> m_pages;
   int m_technology_index;
   std::vector<db::SaveLayoutOptions> m_opt_array;
   std::vector<const db::Technology *> m_tech_array;
@@ -113,4 +113,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

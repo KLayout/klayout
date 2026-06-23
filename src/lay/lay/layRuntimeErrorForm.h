@@ -33,16 +33,17 @@
 
 namespace tl
 {
-  class ScriptError;
+class ScriptError;
 }
 
 namespace lay
 {
 
 class RuntimeErrorForm
-  : public QDialog, private Ui::RuntimeErrorForm
+  : public QDialog,
+    private Ui::RuntimeErrorForm
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   RuntimeErrorForm (QWidget *parent, const char *name, const tl::ScriptError *error);
@@ -54,4 +55,3 @@ public slots:
 }
 
 #endif
-

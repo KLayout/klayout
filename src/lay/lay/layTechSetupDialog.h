@@ -34,23 +34,23 @@
 
 namespace db
 {
-  class Technology;
+class Technology;
 }
 
 namespace lym
 {
-  class Macro;
-  class MacroCollection;
+class Macro;
+class MacroCollection;
 }
 
 namespace Ui
 {
-  class TechBaseEditorPage;
-  class TechComponentSetupDialog;
-  class TechSetupDialog;
-  class TechSaveOptionsEditorPage;
-  class TechLoadOptionsEditorPage;
-  class TechMacrosPage;
+class TechBaseEditorPage;
+class TechComponentSetupDialog;
+class TechSetupDialog;
+class TechSaveOptionsEditorPage;
+class TechLoadOptionsEditorPage;
+class TechMacrosPage;
 }
 
 class QLabel;
@@ -65,7 +65,7 @@ class TechnologyComponentEditor;
 class TechBaseEditorPage
   : public TechnologyComponentEditor
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   TechBaseEditorPage (QWidget *parent);
@@ -85,7 +85,7 @@ private:
 class TechMacrosPage
   : public TechnologyComponentEditor
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   TechMacrosPage (QWidget *parent, const std::string &cat, const std::string &cat_desc);
@@ -97,7 +97,7 @@ public:
 private:
   Ui::TechMacrosPage *mp_ui;
   std::string m_cat, m_cat_desc;
-  std::vector<std::pair<QLabel *, QString> > m_original_labels;
+  std::vector<std::pair<QLabel *, QString>> m_original_labels;
   std::unique_ptr<lym::MacroCollection> mp_collection;
   std::string m_current_path;
 
@@ -109,7 +109,7 @@ private slots:
 class TechLoadOptionsEditorPage
   : public TechnologyComponentEditor
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   TechLoadOptionsEditorPage (QWidget *parent);
@@ -120,13 +120,13 @@ public:
 
 private:
   Ui::TechLoadOptionsEditorPage *mp_ui;
-  std::vector< std::pair<lay::StreamReaderOptionsPage *, std::string> > m_pages;
+  std::vector<std::pair<lay::StreamReaderOptionsPage *, std::string>> m_pages;
 };
 
 class TechSaveOptionsEditorPage
   : public TechnologyComponentEditor
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   TechSaveOptionsEditorPage (QWidget *parent);
@@ -137,13 +137,13 @@ public:
 
 private:
   Ui::TechSaveOptionsEditorPage *mp_ui;
-  std::vector< std::pair<lay::StreamWriterOptionsPage *, std::string> > m_pages;
+  std::vector<std::pair<lay::StreamWriterOptionsPage *, std::string>> m_pages;
 };
 
 class LAY_PUBLIC TechSetupDialog
   : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   TechSetupDialog (QWidget *parent);
@@ -175,8 +175,8 @@ private:
   Ui::TechSetupDialog *mp_ui;
   db::Technologies m_technologies;
   db::Technology *mp_current_tech;
-  std::map <std::string, lay::TechnologyComponentEditor *> m_component_editors;
-  std::map <std::string, db::TechnologyComponent *> m_technology_components;
+  std::map<std::string, lay::TechnologyComponentEditor *> m_component_editors;
+  std::map<std::string, db::TechnologyComponent *> m_technology_components;
   lay::TechnologyComponentEditor *mp_current_editor;
   db::TechnologyComponent *mp_current_tech_component;
   bool m_current_tech_changed_enabled;
@@ -202,5 +202,3 @@ private:
 }
 
 #endif
-
-

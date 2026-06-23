@@ -40,8 +40,7 @@ GerberDrillFileReader::~GerberDrillFileReader ()
   // .. nothing yet ..
 }
 
-bool 
-GerberDrillFileReader::does_accept ()
+bool GerberDrillFileReader::does_accept ()
 {
   for (int i = 0; i < 100; ++i) {
     tl::Extractor ex (get_block ().c_str ());
@@ -61,8 +60,7 @@ GerberDrillFileReader::does_accept ()
   return false;
 }
 
-void
-GerberDrillFileReader::init ()
+void GerberDrillFileReader::init ()
 {
   //  Initialize reader:
   m_relative = false;
@@ -96,8 +94,7 @@ GerberDrillFileReader::do_scan ()
   return data;
 }
 
-void
-GerberDrillFileReader::do_read ()
+void GerberDrillFileReader::do_read ()
 {
   m_buffer.clear ();
   init ();
@@ -112,11 +109,9 @@ GerberDrillFileReader::do_read ()
       error (ex.msg ());
     }
   }
-
 }
 
-void 
-GerberDrillFileReader::process_line (const std::string &s)
+void GerberDrillFileReader::process_line (const std::string &s)
 {
   tl::Extractor ex (s.c_str ());
 
@@ -126,7 +121,7 @@ GerberDrillFileReader::process_line (const std::string &s)
   if (ex.at_end ()) {
 
     //  ignore empty line
- 
+
   } else if (ex.test ("%")) {
 
     //  blocks starting with a '%' are ignored and end the header
@@ -203,9 +198,7 @@ GerberDrillFileReader::process_line (const std::string &s)
 
         std::string s;
         ex.read (s, "");
-
       }
-
     }
 
     if (u == 0.0) {
@@ -351,11 +344,9 @@ GerberDrillFileReader::process_line (const std::string &s)
               fy = -fy;
             }
           }
-          
         }
 
         repeat_block (m_m02_xoffset, m_m02_yoffset, fx, fy, swapxy);
-
       }
 
     } else if (mcode == 1) {
@@ -364,7 +355,6 @@ GerberDrillFileReader::process_line (const std::string &s)
 
       m_m02_xoffset = 0.0;
       m_m02_yoffset = 0.0;
-
     }
 
   } else if (ex.test ("T")) {
@@ -405,7 +395,7 @@ GerberDrillFileReader::process_line (const std::string &s)
 
       } else {
 
-        //  following specs 
+        //  following specs
 
         if (m_tools.find (tcode) == m_tools.end ()) {
           if (tcode == 0) {
@@ -417,9 +407,7 @@ GerberDrillFileReader::process_line (const std::string &s)
         } else {
           m_current_diameter = m_tools [tcode];
         }
-
       }
-
     }
 
   } else if (! m_in_header && ex.test ("P")) {
@@ -455,7 +443,7 @@ GerberDrillFileReader::process_line (const std::string &s)
       if (mcode == 2) {
         use_block = true;
       }
-    } 
+    }
 
     if (ex.test ("X")) {
       dx = read_coord (ex);
@@ -477,12 +465,10 @@ GerberDrillFileReader::process_line (const std::string &s)
 
         next_hole ();
         produce_circle (m_x + m_xoff + i * dx, m_y + m_yoff + i * dy, m_current_diameter * 0.5);
-
       }
 
       m_x += n * dx;
       m_y += n * dy;
-
     }
 
   } else if (! m_in_header && (c == 'X' || c == 'Y' || c == 'G')) {
@@ -546,11 +532,13 @@ GerberDrillFileReader::process_line (const std::string &s)
         }
 
         if (has_xa) {
-          m_xoff += xa; m_x = 0; 
+          m_xoff += xa;
+          m_x = 0;
         }
 
         if (has_ya) {
-          m_yoff += ya; m_y = 0;
+          m_yoff += ya;
+          m_y = 0;
         }
 
       } else if (gcode == 2 || gcode == 3) {
@@ -587,7 +575,7 @@ GerberDrillFileReader::process_line (const std::string &s)
 
       } else if (gcode == 83 || gcode == 81 || gcode == 82) {
 
-        std::vector<std::pair<double, double> > coords;
+        std::vector<std::pair<double, double>> coords;
 
         while (! stream ().at_end () && coords.size () < 2) {
 
@@ -623,11 +611,8 @@ GerberDrillFileReader::process_line (const std::string &s)
               } else {
                 break;
               }
-
             }
-
           }
-
         }
 
         if (coords.size () == 2) {
@@ -636,10 +621,10 @@ GerberDrillFileReader::process_line (const std::string &s)
 
           if (gcode == 83) {
 
-            double xc = (coords[0].first + coords[1].first) * 0.5;
-            double yc = (coords[0].second + coords[1].second) * 0.5;
-            double xr = xc - coords[0].first;
-            double yr = yc - coords[0].second;
+            double xc = (coords [0].first + coords [1].first) * 0.5;
+            double yc = (coords [0].second + coords [1].second) * 0.5;
+            double xr = xc - coords [0].first;
+            double yr = yc - coords [0].second;
 
             for (int i = 0; i < 8; ++i) {
 
@@ -647,7 +632,6 @@ GerberDrillFileReader::process_line (const std::string &s)
 
               next_hole ();
               produce_circle (xc + m_xoff + cos (a) * xr - sin (a) * yr, yc + m_yoff + cos (a) * yr + sin (a) * xr, m_current_diameter * 0.5);
-
             }
 
           } else {
@@ -669,7 +653,7 @@ GerberDrillFileReader::process_line (const std::string &s)
 
             if (! has_xa || xa < 1e-6) {
               xa = 0.1 * 25400.0;
-            } 
+            }
             if (! has_ya || ya < 1e-6) {
               ya = 0.3 * 25400.0;
             }
@@ -677,36 +661,33 @@ GerberDrillFileReader::process_line (const std::string &s)
             int n = 0;
             double dx = 0.0, dy = 0.0;
 
-            if (fabs (fabs (coords[0].first - coords[1].first) - fabs (ya)) < fabs (fabs (coords[0].second - coords[1].second) - fabs (ya))) {
+            if (fabs (fabs (coords [0].first - coords [1].first) - fabs (ya)) < fabs (fabs (coords [0].second - coords [1].second) - fabs (ya))) {
               //  vertical
               dx = 0.0;
-              dy = xa * (coords[1].second < coords[0].second ? -1.0 : 1.0);
-              n = std::max (0, int (floor (0.5 + (coords[1].second - coords[0].second) / xa)));
+              dy = xa * (coords [1].second < coords [0].second ? -1.0 : 1.0);
+              n = std::max (0, int (floor (0.5 + (coords [1].second - coords [0].second) / xa)));
             } else {
               //  horizontal
               dy = 0.0;
-              dx = xa * (coords[1].first < coords[0].first ? -1.0 : 1.0);
-              n = std::max (0, int (floor (0.5 + (coords[1].first - coords[0].first) / xa)));
+              dx = xa * (coords [1].first < coords [0].first ? -1.0 : 1.0);
+              n = std::max (0, int (floor (0.5 + (coords [1].first - coords [0].first) / xa)));
             }
 
             for (int i = 0; i <= n; ++i) {
 
               next_hole ();
               produce_circle (coords [0].first + m_xoff, coords [0].second + m_yoff, m_current_diameter * 0.5);
-              coords[0].first += dx;
-              coords[0].second += dy;
+              coords [0].first += dx;
+              coords [0].second += dy;
 
               next_hole ();
               produce_circle (coords [1].first + m_xoff, coords [1].second + m_yoff, m_current_diameter * 0.5);
-              coords[1].first -= dx;
-              coords[1].second -= dy;
-
+              coords [1].first -= dx;
+              coords [1].second -= dy;
             }
-
           }
 
           end_pattern ();
-
         }
 
       } else if (gcode == 85) {
@@ -748,49 +729,45 @@ GerberDrillFileReader::process_line (const std::string &s)
 
         //  produce the slot
         produce_circle (x0 + m_xoff, y0 + m_yoff, m_current_diameter * 0.5, m_x + m_xoff, m_y + m_yoff);
-
       }
 
     } else if (has_xb || has_yb) {
 
       next_hole ();
 
-      if (!m_routing) {
+      if (! m_routing) {
         produce_circle (m_x + m_xoff, m_y + m_yoff, m_current_diameter * 0.5);
       } else if (m_plunged) {
         if (m_linear_interpolation) {
           produce_circle (xi + m_xoff, yi + m_yoff, m_current_diameter * 0.5, m_x + m_xoff, m_y + m_yoff);
         }
       }
-
     }
 
     if (! ex.at_end ()) {
       warn (tl::sprintf (tl::to_string (tr ("Part of line ignored: %s")), ex.skip ()));
     }
 
-  } else if (!m_in_header && c != 0) {
+  } else if (! m_in_header && c != 0) {
     warn (tl::to_string (tr ("Statement ignored")));
   }
 }
 
-void 
-GerberDrillFileReader::next_hole ()
+void GerberDrillFileReader::next_hole ()
 {
-  if (m_current_tool < 0 && !m_qty.empty ()) {
+  if (m_current_tool < 0 && ! m_qty.empty ()) {
     if (m_current_qty == 0) {
       m_current_qty = m_qty.front ().first;
       m_current_diameter = m_qty.front ().second;
       m_qty.pop_front ();
-    } 
+    }
     if (m_current_qty > 0) {
       --m_current_qty;
     }
-  } 
+  }
 }
 
-void 
-GerberDrillFileReader::read_line (std::string &b)
+void GerberDrillFileReader::read_line (std::string &b)
 {
   progress_checkpoint ();
 
@@ -818,21 +795,18 @@ GerberDrillFileReader::get_block ()
   return m_buffer;
 }
 
-void 
-GerberDrillFileReader::begin_pattern ()
+void GerberDrillFileReader::begin_pattern ()
 {
   m_record_pattern = true;
   m_pattern.clear ();
 }
 
-void 
-GerberDrillFileReader::end_pattern ()
+void GerberDrillFileReader::end_pattern ()
 {
   m_record_pattern = false;
 }
 
-void
-GerberDrillFileReader::repeat_pattern (double dx, double dy)
+void GerberDrillFileReader::repeat_pattern (double dx, double dy)
 {
   if (m_record_pattern) {
     return;
@@ -843,16 +817,14 @@ GerberDrillFileReader::repeat_pattern (double dx, double dy)
   }
 }
 
-void
-GerberDrillFileReader::start_step_and_repeat ()
+void GerberDrillFileReader::start_step_and_repeat ()
 {
   m_holes.clear ();
   m_recording = true;
   m_end_block = 0;
 }
 
-void
-GerberDrillFileReader::stop_step_and_repeat ()
+void GerberDrillFileReader::stop_step_and_repeat ()
 {
   m_recording = false;
 
@@ -861,8 +833,7 @@ GerberDrillFileReader::stop_step_and_repeat ()
   }
 }
 
-void
-GerberDrillFileReader::repeat_block (double dx, double dy, double fx, double fy, bool swapxy)
+void GerberDrillFileReader::repeat_block (double dx, double dy, double fx, double fy, bool swapxy)
 {
   for (size_t i = 0; i < m_end_block; ++i) {
 
@@ -891,18 +862,15 @@ GerberDrillFileReader::repeat_block (double dx, double dy, double fx, double fy,
     m_holes.back ().y += dy;
     m_holes.back ().ex += dx;
     m_holes.back ().ey += dy;
-
   }
 }
 
-void
-GerberDrillFileReader::end_block ()
+void GerberDrillFileReader::end_block ()
 {
   m_end_block = m_holes.size ();
 }
 
-void
-GerberDrillFileReader::produce_circle (double cx, double cy, double r, double ex, double ey)
+void GerberDrillFileReader::produce_circle (double cx, double cy, double r, double ex, double ey)
 {
   if (m_record_pattern) {
     m_pattern.push_back (DrillHoleDescriptor (cx, cy, r, ex, ey));
@@ -915,8 +883,7 @@ GerberDrillFileReader::produce_circle (double cx, double cy, double r, double ex
   }
 }
 
-void
-GerberDrillFileReader::produce_circle_raw (double cx, double cy, double r, double ex, double ey)
+void GerberDrillFileReader::produce_circle_raw (double cx, double cy, double r, double ex, double ey)
 {
   double mx = cx - ex;
   double my = cy - ey;
@@ -932,7 +899,7 @@ GerberDrillFileReader::produce_circle_raw (double cx, double cy, double r, doubl
   double nx = -my;
   double ny = mx;
 
-  std::vector <db::DPoint> points;
+  std::vector<db::DPoint> points;
 
   int n_circle = get_circle_points ();
 
@@ -958,4 +925,3 @@ GerberDrillFileReader::produce_circle_raw (double cx, double cy, double r, doubl
 }
 
 }
-

@@ -28,8 +28,8 @@
 #include "layEditorOptionsPage.h"
 
 #if defined(HAVE_QT)
-#  include "edtPropertiesPages.h"
-#  include "layTipDialog.h"
+#include "edtPropertiesPages.h"
+#include "layTipDialog.h"
 #endif
 
 namespace edt
@@ -41,7 +41,7 @@ namespace edt
 TextService::TextService (db::Manager *manager, lay::LayoutViewBase *view)
   : ShapeEditService (manager, view, db::ShapeIterator::Texts),
     m_rot (0)
-{ 
+{
   //  .. nothing yet ..
 }
 
@@ -60,8 +60,7 @@ TextService::properties_pages (db::Manager *manager, QWidget *parent)
 }
 #endif
 
-void 
-TextService::do_begin_edit (const db::DPoint &p)
+void TextService::do_begin_edit (const db::DPoint &p)
 {
   get_edit_layer ();
 
@@ -76,8 +75,7 @@ TextService::do_begin_edit (const db::DPoint &p)
   update_marker ();
 }
 
-void
-TextService::update_marker ()
+void TextService::update_marker ()
 {
   lay::DMarker *marker = dynamic_cast<lay::DMarker *> (edit_marker ());
   if (marker) {
@@ -85,7 +83,7 @@ TextService::update_marker ()
     marker->set (m_text);
 
     std::string pos = std::string ("x: ") +
-                      tl::micron_to_string (m_text.trans ().disp ().x ()) + 
+                      tl::micron_to_string (m_text.trans ().disp ().x ()) +
                       std::string ("  y: ") +
                       tl::micron_to_string (m_text.trans ().disp ().y ());
     if (m_text.trans ().rot () != 0) {
@@ -93,7 +91,6 @@ TextService::update_marker ()
     }
 
     view ()->message (pos);
-
   }
 
   //  call hooks with new shape
@@ -108,23 +105,20 @@ TextService::update_marker ()
   }
 }
 
-bool
-TextService::do_activated ()
+bool TextService::do_activated ()
 {
   m_rot = 0;
 
-  return true;  //  start editing immediately
+  return true; //  start editing immediately
 }
 
-void
-TextService::do_mouse_move_inactive (const db::DPoint &p)
+void TextService::do_mouse_move_inactive (const db::DPoint &p)
 {
   lay::PointSnapToObjectResult snap_details = snap2_details (p);
   mouse_cursor_from_snap_details (snap_details);
 }
 
-void
-TextService::do_mouse_move (const db::DPoint &p)
+void TextService::do_mouse_move (const db::DPoint &p)
 {
   do_mouse_move_inactive (p);
 
@@ -133,16 +127,14 @@ TextService::do_mouse_move (const db::DPoint &p)
   update_marker ();
 }
 
-void 
-TextService::do_mouse_transform (const db::DPoint &p, db::DFTrans trans)
+void TextService::do_mouse_transform (const db::DPoint &p, db::DFTrans trans)
 {
   m_rot = (db::DFTrans (m_rot) * trans).rot ();
   m_text.trans (db::DTrans (m_rot, p - db::DPoint ()));
   update_marker ();
 }
 
-bool 
-TextService::do_mouse_click (const db::DPoint &p)
+bool TextService::do_mouse_click (const db::DPoint &p)
 {
   do_mouse_move (p);
   return true;
@@ -155,8 +147,7 @@ TextService::get_text () const
   return db::Text (m_text.string (), db::Trans (m_text.trans ().rot (), p_dbu - db::Point ()), db::coord_traits<db::Coord>::rounded (trans ().ctrans (m_text.size ())), db::NoFont, m_text.halign (), m_text.valign ());
 }
 
-void 
-TextService::do_finish_edit (bool /*accept*/)
+void TextService::do_finish_edit (bool /*accept*/)
 {
   {
     db::Transaction transaction (manager (), tl::to_string (tr ("Create text")));
@@ -178,27 +169,23 @@ TextService::do_finish_edit (bool /*accept*/)
     if (button == lay::TipDialog::yes_button) {
       view ()->text_visible (true);
     }
-
   }
 #endif
 
   close_editor_hooks (true);
 }
 
-void 
-TextService::do_cancel_edit ()
+void TextService::do_cancel_edit ()
 {
   close_editor_hooks (false);
 }
 
-bool 
-TextService::selection_applies (const lay::ObjectInstPath &sel) const
+bool TextService::selection_applies (const lay::ObjectInstPath &sel) const
 {
-  return !sel.is_cell_inst () && sel.shape ().is_text ();
+  return ! sel.is_cell_inst () && sel.shape ().is_text ();
 }
 
-bool 
-TextService::configure (const std::string &name, const std::string &value)
+bool TextService::configure (const std::string &name, const std::string &value)
 {
   auto tb = toolbox_widget ();
   if (tb) {

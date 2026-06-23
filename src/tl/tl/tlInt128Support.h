@@ -33,26 +33,25 @@
 namespace std
 {
 
-#if !defined(__GLIBCXX_BITSIZE_INT_N_0) || __GLIBCXX_BITSIZE_INT_N_0 != 128
+#if ! defined(__GLIBCXX_BITSIZE_INT_N_0) || __GLIBCXX_BITSIZE_INT_N_0 != 128
 
-  //  Provide an implementation for abs(__int128_t) if there isn't one
-  inline __int128 abs (__int128 x)
-  {
-    return x < 0 ? -x : x;
-  }
+//  Provide an implementation for abs(__int128_t) if there isn't one
+inline __int128 abs (__int128 x)
+{
+  return x < 0 ? -x : x;
+}
 
 #endif
 
-  //  Provide ostream serialization for 128bit values
-  inline std::ostream &operator<< (std::ostream &os, __int128 x)
-  {
-    os << tl::to_string (x);
-    return os;
-  }
+//  Provide ostream serialization for 128bit values
+inline std::ostream &operator<< (std::ostream &os, __int128 x)
+{
+  os << tl::to_string (x);
+  return os;
+}
 
 }
 
 #endif
 
 #endif
-

@@ -36,7 +36,7 @@ namespace edt
 //  PathService implementation
 
 PathService::PathService (db::Manager *manager, lay::LayoutViewBase *view)
-  : ShapeEditService (manager, view, db::ShapeIterator::Paths), 
+  : ShapeEditService (manager, view, db::ShapeIterator::Paths),
     m_width (0.1), m_bgnext (0.0), m_endext (0.0), m_type (Flush), m_needs_update (true)
 {
   //  .. nothing yet ..
@@ -61,8 +61,7 @@ PathService::properties_pages (db::Manager *manager, QWidget *parent)
 }
 #endif
 
-void 
-PathService::do_begin_edit (const db::DPoint &p)
+void PathService::do_begin_edit (const db::DPoint &p)
 {
   get_edit_layer ();
 
@@ -81,14 +80,12 @@ PathService::do_begin_edit (const db::DPoint &p)
   update_marker ();
 }
 
-bool
-PathService::do_activated ()
+bool PathService::do_activated ()
 {
-  return false;  //  don't start editing immediately
+  return false; //  don't start editing immediately
 }
 
-void 
-PathService::set_last_point (const db::DPoint &p)
+void PathService::set_last_point (const db::DPoint &p)
 {
   m_points.back () = snap2 (p, m_last);
 
@@ -96,28 +93,25 @@ PathService::set_last_point (const db::DPoint &p)
   if (m_points.size () >= 3 && connect_ac () == lay::AC_Ortho) {
 
     db::DPoint p_grid = snap2 (p);
-    std::pair<bool, db::DPoint> ip = interpolate (m_points.end ()[-3], m_last, p_grid);
+    std::pair<bool, db::DPoint> ip = interpolate (m_points.end () [-3], m_last, p_grid);
     if (ip.first) {
 
-      m_points.end ()[-2] = ip.second;
+      m_points.end () [-2] = ip.second;
       m_points.back () = p_grid;
-
     }
 
   } else if (m_points.size () >= 2) {
-    m_points.end ()[-2] = m_last;
+    m_points.end () [-2] = m_last;
   }
 }
 
-void
-PathService::do_mouse_move_inactive (const db::DPoint &p)
+void PathService::do_mouse_move_inactive (const db::DPoint &p)
 {
   lay::PointSnapToObjectResult snap_details = snap2_details (p);
   mouse_cursor_from_snap_details (snap_details);
 }
 
-void
-PathService::do_mouse_move (const db::DPoint &p)
+void PathService::do_mouse_move (const db::DPoint &p)
 {
   do_mouse_move_inactive (p);
 
@@ -130,8 +124,7 @@ PathService::do_mouse_move (const db::DPoint &p)
   update_via ();
 }
 
-bool 
-PathService::do_mouse_click (const db::DPoint &p)
+bool PathService::do_mouse_click (const db::DPoint &p)
 {
   if (m_points.size () >= 1) {
     m_last = m_points.back ();
@@ -141,13 +134,12 @@ PathService::do_mouse_click (const db::DPoint &p)
   return false;
 }
 
-void
-PathService::do_delete ()
+void PathService::do_delete ()
 {
   if (m_points.size () > 2) {
 
     m_points.erase (m_points.end () - 2);
-    m_last = m_points.end()[-2];
+    m_last = m_points.end () [-2];
 
     update_marker ();
     update_via ();
@@ -155,13 +147,10 @@ PathService::do_delete ()
   } else if (! m_previous_segments.empty ()) {
 
     pop_segment ();
-
   }
-
 }
 
-void
-PathService::do_finish_edit (bool accept)
+void PathService::do_finish_edit (bool accept)
 {
   //  one point is reserved for the "current one" if accept is false
   if (! accept && ! m_points.empty ()) {
@@ -178,8 +167,7 @@ PathService::do_finish_edit (bool accept)
   close_editor_hooks (true);
 }
 
-void
-PathService::function (const std::string &name, const std::string &value)
+void PathService::function (const std::string &name, const std::string &value)
 {
   if (name == ShapeEditService::connection_function_name ()) {
 
@@ -195,17 +183,14 @@ PathService::function (const std::string &name, const std::string &value)
 
         update_marker ();
         update_via ();
-
       }
 
     } catch (...) {
     }
-
   }
 }
 
-void
-PathService::update_marker ()
+void PathService::update_marker ()
 {
   lay::Marker *marker = dynamic_cast<lay::Marker *> (edit_marker ());
   if (marker) {
@@ -226,7 +211,6 @@ PathService::update_marker ()
         tb->configure (ShapeEditService::connection_configure_name (), dim.to_string ());
       }
     }
-
   }
 
   //  call hooks with new shape
@@ -241,7 +225,7 @@ PathService::update_marker ()
   }
 }
 
-db::Path 
+db::Path
 PathService::get_path () const
 {
   db::Path path;
@@ -270,20 +254,17 @@ PathService::get_path () const
   return path;
 }
 
-void 
-PathService::do_cancel_edit ()
+void PathService::do_cancel_edit ()
 {
   close_editor_hooks (false);
 }
 
-bool 
-PathService::selection_applies (const lay::ObjectInstPath &sel) const
+bool PathService::selection_applies (const lay::ObjectInstPath &sel) const
 {
-  return !sel.is_cell_inst () && sel.shape ().is_path ();
+  return ! sel.is_cell_inst () && sel.shape ().is_path ();
 }
 
-void
-PathService::via (int dir)
+void PathService::via (int dir)
 {
 //  see TODO below
 #if defined(HAVE_QT)
@@ -328,8 +309,7 @@ PathService::get_layer_for_via (unsigned int cv_index)
 #endif
 }
 
-bool
-PathService::get_via_for (const db::LayerProperties &lp, unsigned int cv_index, int dir, db::SelectedViaDefinition &via_def)
+bool PathService::get_via_for (const db::LayerProperties &lp, unsigned int cv_index, int dir, db::SelectedViaDefinition &via_def)
 {
   const lay::CellView &cv = view ()->cellview (cv_index);
   if (! cv.is_valid ()) {
@@ -375,7 +355,6 @@ PathService::get_via_for (const db::LayerProperties &lp, unsigned int cv_index, 
 
     via_def = via_defs [action->data ().toInt ()];
 #endif
-
   }
 
   return true;
@@ -401,8 +380,7 @@ PathService::make_via (const db::SelectedViaDefinition &via_def, double w_bottom
   return cell ().insert (db::CellInstArray (db::CellInst (via_cell), db::Trans (trans () * via_pos - db::Point ())));
 }
 
-void
-PathService::via_initial (int dir)
+void PathService::via_initial (int dir)
 {
   if (! mouse_in_view ()) {
     return;
@@ -456,8 +434,7 @@ PathService::via_initial (int dir)
   }
 }
 
-void
-PathService::compute_via_wh (double &w, double &h, const db::DVector &dwire, double var_ext, double grid)
+void PathService::compute_via_wh (double &w, double &h, const db::DVector &dwire, double var_ext, double grid)
 {
   w = 0.0, h = 0.0;
 
@@ -534,9 +511,7 @@ PathService::compute_via_wh (double &w, double &h, const db::DVector &dwire, dou
       if (swap_xy) {
         std::swap (w, h);
       }
-
     }
-
   }
 
   //  round to grid or DBU
@@ -549,8 +524,7 @@ PathService::compute_via_wh (double &w, double &h, const db::DVector &dwire, dou
   h = floor (h / grid + db::epsilon) * grid;
 }
 
-void
-PathService::via_editing (int dir)
+void PathService::via_editing (int dir)
 {
   //  not enough points to form a path
   if (m_points.size () < 2) {
@@ -604,8 +578,7 @@ PathService::via_editing (int dir)
   update_via ();
 }
 
-void
-PathService::update_via ()
+void PathService::update_via ()
 {
   if (! editing () || m_points.size () < 2) {
     return;
@@ -651,8 +624,7 @@ PathService::update_via ()
   }
 }
 
-void
-PathService::push_segment (const db::Shape &shape, const db::Instance &instance, const db::ViaType &via_type, db::Manager::transaction_id_t transaction_id)
+void PathService::push_segment (const db::Shape &shape, const db::Instance &instance, const db::ViaType &via_type, db::Manager::transaction_id_t transaction_id)
 {
   m_previous_segments.push_back (PathSegment ());
 
@@ -670,17 +642,15 @@ PathService::push_segment (const db::Shape &shape, const db::Instance &instance,
     cfg_edit_path_width,
     cfg_edit_path_ext_var_begin,
     cfg_edit_path_ext_var_end,
-    cfg_edit_path_ext_type
-  };
+    cfg_edit_path_ext_type};
 
-  for (unsigned int i = 0; i < sizeof (path_config_keys) / sizeof (path_config_keys[0]); ++i) {
+  for (unsigned int i = 0; i < sizeof (path_config_keys) / sizeof (path_config_keys [0]); ++i) {
     ps.config.push_back (std::make_pair (path_config_keys [i], std::string ()));
     dispatcher ()->config_get (ps.config.back ().first, ps.config.back ().second);
   }
 }
 
-void
-PathService::pop_segment ()
+void PathService::pop_segment ()
 {
   PathSegment ps = m_previous_segments.back ();
   m_previous_segments.pop_back ();
@@ -707,7 +677,6 @@ PathService::pop_segment ()
     if (! ps.via_instance.is_null () && ps.via_instance.instances ()) {
       ps.via_instance.instances ()->erase (ps.via_instance);
     }
-
   }
 
   set_layer (ps.layer, ps.cv_index);
@@ -726,8 +695,7 @@ PathService::pop_segment ()
   update_marker ();
 }
 
-bool 
-PathService::configure (const std::string &name, const std::string &value)
+bool PathService::configure (const std::string &name, const std::string &value)
 {
   auto tb = toolbox_widget ();
   if (tb) {
@@ -768,8 +736,7 @@ PathService::configure (const std::string &name, const std::string &value)
   return ShapeEditService::configure (name, value);
 }
 
-void 
-PathService::config_finalize ()
+void PathService::config_finalize ()
 {
   if (m_needs_update) {
     update_marker ();

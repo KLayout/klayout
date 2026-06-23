@@ -81,14 +81,12 @@ LCPTreeWidget::~LCPTreeWidget ()
   // .. nothing yet ..
 }
 
-QSize 
-LCPTreeWidget::sizeHint () const
+QSize LCPTreeWidget::sizeHint () const
 {
   return QSize (0, 0);
 }
 
-void 
-LCPTreeWidget::set_selection (const std::vector<lay::LayerPropertiesConstIterator> &sel) 
+void LCPTreeWidget::set_selection (const std::vector<lay::LayerPropertiesConstIterator> &sel)
 {
   clearSelection ();
   for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator s = sel.begin (); s != sel.end (); ++s) {
@@ -101,15 +99,13 @@ LCPTreeWidget::set_selection (const std::vector<lay::LayerPropertiesConstIterato
   }
 }
 
-void 
-LCPTreeWidget::set_current (const lay::LayerPropertiesConstIterator &sel) 
+void LCPTreeWidget::set_current (const lay::LayerPropertiesConstIterator &sel)
 {
   selectionModel ()->select (mp_model->index (sel, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
   selectionModel ()->setCurrentIndex (mp_model->index (sel, 1), QItemSelectionModel::Current | QItemSelectionModel::Rows);
 }
 
-void 
-LCPTreeWidget::mouseDoubleClickEvent (QMouseEvent *event)
+void LCPTreeWidget::mouseDoubleClickEvent (QMouseEvent *event)
 {
   QModelIndex index (indexAt (event->pos ()));
   if (index.isValid ()) {
@@ -117,14 +113,12 @@ LCPTreeWidget::mouseDoubleClickEvent (QMouseEvent *event)
   }
 }
 
-bool
-LCPTreeWidget::focusNextPrevChild (bool /*next*/)
+bool LCPTreeWidget::focusNextPrevChild (bool /*next*/)
 {
   return false;
 }
 
-bool
-LCPTreeWidget::event (QEvent *event)
+bool LCPTreeWidget::event (QEvent *event)
 {
 #if 0
   //  Handling this event makes the widget receive all keystrokes.
@@ -140,11 +134,10 @@ LCPTreeWidget::event (QEvent *event)
   return QTreeView::event (event);
 }
 
-void
-LCPTreeWidget::keyPressEvent (QKeyEvent *event)
+void LCPTreeWidget::keyPressEvent (QKeyEvent *event)
 {
   QString t = event->text ();
-  if (!t.isEmpty () && t[0].isPrint ()) {
+  if (! t.isEmpty () && t [0].isPrint ()) {
     // "/" is a search initiator
     if (t == QString::fromUtf8 ("/")) {
       t.clear ();
@@ -155,8 +148,7 @@ LCPTreeWidget::keyPressEvent (QKeyEvent *event)
   }
 }
 
-void
-LCPTreeWidget::collapse_all ()
+void LCPTreeWidget::collapse_all ()
 {
 #if QT_VERSION >= 0x040200
   collapseAll ();
@@ -176,8 +168,7 @@ LCPTreeWidget::collapse_all ()
 #endif
 }
 
-void
-LCPTreeWidget::expand_all ()
+void LCPTreeWidget::expand_all ()
 {
 #if QT_VERSION >= 0x040200
   expandAll ();
@@ -201,16 +192,16 @@ LCPTreeWidget::expand_all ()
 //  LayerControlPanel implementation
 
 LayerControlPanel::LayerControlPanel (lay::LayoutViewBase *view, db::Manager *manager, QWidget *parent, const char *name)
-  : QFrame (parent), 
+  : QFrame (parent),
     db::Object (manager),
-    mp_view (view), 
-    m_needs_update (true), 
+    mp_view (view),
+    m_needs_update (true),
     m_expanded_state_needs_update (false),
-    m_tabs_need_update (true), 
+    m_tabs_need_update (true),
     m_hidden_flags_need_update (true),
     m_in_update (false),
     m_current_layer (0),
-    m_phase (0), 
+    m_phase (0),
     m_do_update_content_dm (this, &LayerControlPanel::do_update_content),
     m_do_update_visibility_dm (this, &LayerControlPanel::do_update_visibility),
     m_no_stipples (false),
@@ -302,7 +293,7 @@ LayerControlPanel::LayerControlPanel (lay::LayoutViewBase *view, db::Manager *ma
   connect (mp_tab_bar, SIGNAL (currentChanged (int)), this, SLOT (tab_selected (int)));
   l->addWidget (mp_tab_bar);
   mp_tab_bar->setContextMenuPolicy (Qt::CustomContextMenu);
-  connect (mp_tab_bar, SIGNAL(customContextMenuRequested (const QPoint &)), this, SLOT (tab_context_menu (const QPoint &)));
+  connect (mp_tab_bar, SIGNAL (customContextMenuRequested (const QPoint &)), this, SLOT (tab_context_menu (const QPoint &)));
 
   mp_model = new lay::LayerTreeModel (this, view);
   mp_layer_list = new LCPTreeWidget (this, mp_model, "layer_tree");
@@ -318,7 +309,7 @@ LayerControlPanel::LayerControlPanel (lay::LayoutViewBase *view, db::Manager *ma
   connect (mp_layer_list->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &)));
   connect (mp_layer_list->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (selection_changed (const QItemSelection &, const QItemSelection &)));
   mp_layer_list->setContextMenuPolicy (Qt::CustomContextMenu);
-  connect (mp_layer_list, SIGNAL(customContextMenuRequested (const QPoint &)), this, SLOT (context_menu (const QPoint &)));
+  connect (mp_layer_list, SIGNAL (customContextMenuRequested (const QPoint &)), this, SLOT (context_menu (const QPoint &)));
   mp_layer_list->header ()->hide ();
   mp_layer_list->setSelectionMode (QTreeView::ExtendedSelection);
   mp_layer_list->setRootIsDecorated (false);
@@ -392,8 +383,7 @@ LayerControlPanel::~LayerControlPanel ()
   //  .. nothing yet ..
 }
 
-void
-LayerControlPanel::recover ()
+void LayerControlPanel::recover ()
 {
   cancel_updates ();
   if (manager ()) {
@@ -401,8 +391,7 @@ LayerControlPanel::recover ()
   }
 }
 
-void 
-LayerControlPanel::cm_delete ()
+void LayerControlPanel::cm_delete ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -410,22 +399,22 @@ LayerControlPanel::cm_delete ()
   do_delete ();
   commit ();
 
-  END_PROTECTED_CLEANUP { 
-    recover (); 
+  END_PROTECTED_CLEANUP
+  {
+    recover ();
     commit ();
   }
 }
 
 struct LayerSelectionClearOp
-  : public db::Op
-{
+  : public db::Op {
   LayerSelectionClearOp ()
     : db::Op ()
-  { }
+  {
+  }
 };
 
-void
-LayerControlPanel::do_delete ()
+void LayerControlPanel::do_delete ()
 {
   std::vector<lay::LayerPropertiesConstIterator> sel = selected_layers ();
   if (! sel.empty ()) {
@@ -444,12 +433,10 @@ LayerControlPanel::do_delete ()
     end_updates ();
 
     emit order_changed ();
-      
   }
 }
 
-void 
-LayerControlPanel::cm_remove_unused ()
+void LayerControlPanel::cm_remove_unused ()
 {
   BEGIN_PROTECTED_CLEANUP
   begin_updates ();
@@ -461,8 +448,7 @@ LayerControlPanel::cm_remove_unused ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void 
-LayerControlPanel::cm_add_missing ()
+void LayerControlPanel::cm_add_missing ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -475,8 +461,7 @@ LayerControlPanel::cm_add_missing ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void 
-LayerControlPanel::cm_insert ()
+void LayerControlPanel::cm_insert ()
 {
   lay::LayerPropertiesConstIterator sel = current_layer ();
   if (sel.is_null ()) {
@@ -510,17 +495,15 @@ LayerControlPanel::cm_insert ()
     //  HINT: this must be the last action in this method since it will trigger the event loop which will
     //  dispatch further actions.
     if (mp_view->is_editable () && lp.layer_index () < 0 && lp.cellview_index () >= 0 && lp.source (true).special_purpose () == ParsedLayerSource::SP_None) {
-      QMessageBox::warning (0, QObject::tr ("Layer does not exist"), 
-                               QObject::tr ("The layer specified does not exist. To create that layer, use 'New/Layer' from the 'Edit' menu"));
+      QMessageBox::warning (0, QObject::tr ("Layer does not exist"),
+                            QObject::tr ("The layer specified does not exist. To create that layer, use 'New/Layer' from the 'Edit' menu"));
     }
 
     END_PROTECTED_CLEANUP { recover (); }
-
   }
 }
 
-void 
-LayerControlPanel::cm_group ()
+void LayerControlPanel::cm_group ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -556,14 +539,12 @@ LayerControlPanel::cm_group ()
     commit ();
 
     emit order_changed ();
-
   }
 
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void 
-LayerControlPanel::cm_ungroup ()
+void LayerControlPanel::cm_ungroup ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -582,7 +563,7 @@ LayerControlPanel::cm_ungroup ()
     lay::LayerPropertiesConstIterator ins_pos = sel;
     mp_view->delete_layer (sel);
 
-    for (lay::LayerPropertiesNode::const_iterator c = node.end_children (); c != node.begin_children (); ) {
+    for (lay::LayerPropertiesNode::const_iterator c = node.end_children (); c != node.begin_children ();) {
       --c;
       mp_view->insert_layer (ins_pos, c->flat ());
     }
@@ -597,14 +578,12 @@ LayerControlPanel::cm_ungroup ()
     end_updates ();
 
     emit order_changed ();
-
   }
 
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void 
-LayerControlPanel::cut ()
+void LayerControlPanel::cut ()
 {
   BEGIN_PROTECTED_CLEANUP
   do_copy ();
@@ -612,20 +591,17 @@ LayerControlPanel::cut ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-bool 
-LayerControlPanel::has_focus () const
+bool LayerControlPanel::has_focus () const
 {
   return mp_layer_list->hasFocus ();
 }
 
-bool
-LayerControlPanel::has_selection () const
+bool LayerControlPanel::has_selection () const
 {
   return ! mp_layer_list->selectionModel ()->selectedIndexes ().isEmpty ();
 }
 
-void 
-LayerControlPanel::copy ()
+void LayerControlPanel::copy ()
 {
   BEGIN_PROTECTED_CLEANUP
   do_copy ();
@@ -633,7 +609,7 @@ LayerControlPanel::copy ()
 }
 
 static void
-collect_dpi (const lay::LayerPropertiesNode &node, std::set <unsigned int> &dpi) 
+collect_dpi (const lay::LayerPropertiesNode &node, std::set<unsigned int> &dpi)
 {
   if (node.dither_pattern (false) >= 0) {
     dpi.insert (node.dither_pattern (false));
@@ -644,9 +620,9 @@ collect_dpi (const lay::LayerPropertiesNode &node, std::set <unsigned int> &dpi)
 }
 
 static void
-update_dpi (lay::LayerPropertiesNode &node, const std::map <unsigned int, unsigned int> &dpi_map)
+update_dpi (lay::LayerPropertiesNode &node, const std::map<unsigned int, unsigned int> &dpi_map)
 {
-  std::map <unsigned int, unsigned int>::const_iterator new_dpi = dpi_map.find ((unsigned int) node.dither_pattern (false));
+  std::map<unsigned int, unsigned int>::const_iterator new_dpi = dpi_map.find ((unsigned int) node.dither_pattern (false));
   if (new_dpi != dpi_map.end ()) {
     node.set_dither_pattern (new_dpi->second);
   }
@@ -655,18 +631,17 @@ update_dpi (lay::LayerPropertiesNode &node, const std::map <unsigned int, unsign
   }
 }
 
-void
-LayerControlPanel::do_copy ()
+void LayerControlPanel::do_copy ()
 {
   std::vector<lay::LayerPropertiesConstIterator> sel = selected_layers ();
 
   db::Clipboard::instance ().clear ();
   //  determine the custom dither pattern if required
-  std::set <unsigned int> dp_to_save;
+  std::set<unsigned int> dp_to_save;
   for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = sel.begin (); l != sel.end (); ++l) {
     collect_dpi (**l, dp_to_save);
   }
-  for (std::set <unsigned int>::const_iterator dp = dp_to_save.begin (); dp != dp_to_save.end (); ++dp) {
+  for (std::set<unsigned int>::const_iterator dp = dp_to_save.begin (); dp != dp_to_save.end (); ++dp) {
     if (*dp >= (unsigned int) std::distance (mp_view->dither_pattern ().begin (), mp_view->dither_pattern ().begin_custom ())) {
       lay::DitherPatternInfo dpi (mp_view->dither_pattern ().begin () [*dp]);
       //  use order index to save the pattern's index
@@ -679,8 +654,7 @@ LayerControlPanel::do_copy ()
   }
 }
 
-void 
-LayerControlPanel::paste ()
+void LayerControlPanel::paste ()
 {
   try {
 
@@ -694,9 +668,9 @@ LayerControlPanel::paste ()
     begin_updates ();
 
     //  restore custom dither pattern, if required
- 
+
     lay::DitherPattern dither_pattern (mp_view->dither_pattern ());
-    std::map <unsigned int, unsigned int> dpi_map;
+    std::map<unsigned int, unsigned int> dpi_map;
 
     bool needs_update = false;
 
@@ -717,9 +691,7 @@ LayerControlPanel::paste ()
           needs_update = true;
         }
         dpi_map.insert (std::make_pair (dp_obj->get ().order_index (), (unsigned int) found_dpi));
-
       }
-
     }
 
     if (needs_update) {
@@ -753,8 +725,7 @@ LayerControlPanel::paste ()
   }
 }
 
-void 
-LayerControlPanel::cm_source ()
+void LayerControlPanel::cm_source ()
 {
   lay::LayerPropertiesConstIterator sel = current_layer ();
   if (! sel.is_null ()) {
@@ -776,14 +747,11 @@ LayerControlPanel::cm_source ()
       commit ();
 
       END_PROTECTED_CLEANUP { recover (); }
-
     }
-
   }
 }
 
-void 
-LayerControlPanel::cm_rename ()
+void LayerControlPanel::cm_rename ()
 {
   lay::LayerPropertiesConstIterator sel = current_layer ();
   if (! sel.is_null ()) {
@@ -794,10 +762,10 @@ LayerControlPanel::cm_rename ()
     QString n = QInputDialog::getText (this,
                                        QObject::tr ("Rename layer"),
                                        QObject::tr ("Enter new name of layer"),
-                                       QLineEdit::Normal, 
+                                       QLineEdit::Normal,
                                        tl::to_qstring (props.name ()),
                                        &ok);
-   
+
     if (ok) {
 
       BEGIN_PROTECTED_CLEANUP
@@ -809,14 +777,11 @@ LayerControlPanel::cm_rename ()
       commit ();
 
       END_PROTECTED_CLEANUP { recover (); }
-
     }
-
   }
 }
 
-void 
-LayerControlPanel::cm_show_only ()
+void LayerControlPanel::cm_show_only ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -833,7 +798,7 @@ LayerControlPanel::cm_show_only ()
     mp_view->set_properties (l, props);
   }
 
-  // make all parents of selected nodes selected as well 
+  // make all parents of selected nodes selected as well
   for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator s = sel.begin (); s != sel.end (); ++s) {
     lay::LayerPropertiesConstIterator ll = *s;
     while (! ll.is_null ()) {
@@ -842,7 +807,7 @@ LayerControlPanel::cm_show_only ()
     }
   }
 
-  // make all children of originally selected nodes selected as well 
+  // make all children of originally selected nodes selected as well
   for (lay::LayerPropertiesConstIterator l = mp_view->begin_layers (); ! l.at_end (); ++l) {
     lay::LayerPropertiesConstIterator ll = l;
     while (! ll.is_null ()) {
@@ -868,8 +833,7 @@ LayerControlPanel::cm_show_only ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void 
-LayerControlPanel::cm_show ()
+void LayerControlPanel::cm_show ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -888,8 +852,7 @@ LayerControlPanel::cm_show ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void
-LayerControlPanel::cm_toggle_visibility ()
+void LayerControlPanel::cm_toggle_visibility ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -908,8 +871,7 @@ LayerControlPanel::cm_toggle_visibility ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void
-LayerControlPanel::cm_show_all ()
+void LayerControlPanel::cm_show_all ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -926,21 +888,20 @@ LayerControlPanel::cm_show_all ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void 
-LayerControlPanel::cm_rename_tab ()
+void LayerControlPanel::cm_rename_tab ()
 {
   BEGIN_PROTECTED_CLEANUP
 
   transaction (tl::to_string (QObject::tr ("Rename layer tab")));
 
   bool ok = false;
-  QString n = QInputDialog::getText (this, 
+  QString n = QInputDialog::getText (this,
                                      QObject::tr ("Rename Layer Tab"),
                                      QObject::tr ("New layer tab name"),
-                                     QLineEdit::Normal, 
+                                     QLineEdit::Normal,
                                      tl::to_qstring (mp_view->get_properties (mp_view->current_layer_list ()).name ()),
                                      &ok);
- 
+
   if (ok) {
     begin_updates ();
     mp_view->rename_properties (mp_view->current_layer_list (), tl::to_string (n));
@@ -952,8 +913,7 @@ LayerControlPanel::cm_rename_tab ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void 
-LayerControlPanel::cm_remove_tab ()
+void LayerControlPanel::cm_remove_tab ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -974,8 +934,7 @@ LayerControlPanel::cm_remove_tab ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void 
-LayerControlPanel::cm_new_tab ()
+void LayerControlPanel::cm_new_tab ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -992,8 +951,7 @@ LayerControlPanel::cm_new_tab ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void 
-LayerControlPanel::cm_make_valid ()
+void LayerControlPanel::cm_make_valid ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -1012,8 +970,7 @@ LayerControlPanel::cm_make_valid ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void 
-LayerControlPanel::cm_make_invalid ()
+void LayerControlPanel::cm_make_invalid ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -1032,8 +989,7 @@ LayerControlPanel::cm_make_invalid ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void 
-LayerControlPanel::cm_hide ()
+void LayerControlPanel::cm_hide ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -1052,8 +1008,7 @@ LayerControlPanel::cm_hide ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void 
-LayerControlPanel::cm_hide_all ()
+void LayerControlPanel::cm_hide_all ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -1074,18 +1029,16 @@ LayerControlPanel::cm_hide_all ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void 
-LayerControlPanel::cm_select_all ()
+void LayerControlPanel::cm_select_all ()
 {
   BEGIN_PROTECTED_CLEANUP
-  
+
   mp_layer_list->selectAll ();
 
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void
-LayerControlPanel::cm_invert_selection ()
+void LayerControlPanel::cm_invert_selection ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -1098,7 +1051,7 @@ LayerControlPanel::cm_invert_selection ()
 
   std::vector<lay::LayerPropertiesConstIterator> new_sel;
 
-  for (lay::LayerPropertiesConstIterator l = mp_view->begin_layers (); ! l.at_end (); ) {
+  for (lay::LayerPropertiesConstIterator l = mp_view->begin_layers (); ! l.at_end ();) {
     if (ids.find (l.uint ()) == ids.end ()) {
       new_sel.push_back (l);
       ++l;
@@ -1121,8 +1074,7 @@ LayerControlPanel::cm_invert_selection ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void
-LayerControlPanel::set_selection (const std::vector<lay::LayerPropertiesConstIterator> &new_sel)
+void LayerControlPanel::set_selection (const std::vector<lay::LayerPropertiesConstIterator> &new_sel)
 {
   //  If the tree has changed we need to delay the selection update until the model has been updated.
   if (m_in_update) {
@@ -1141,19 +1093,16 @@ LayerControlPanel::set_selection (const std::vector<lay::LayerPropertiesConstIte
     if (transacting ()) {
       manager ()->queue (this, new LayerSelectionClearOp ());
     }
-
   }
 }
 
-void 
-LayerControlPanel::clear_selection ()
+void LayerControlPanel::clear_selection ()
 {
   std::vector<lay::LayerPropertiesConstIterator> empty_sel;
   set_selection (empty_sel);
 }
 
-void
-LayerControlPanel::search_triggered (const QString &t)
+void LayerControlPanel::search_triggered (const QString &t)
 {
   if (mp_model) {
     mp_search_close_cb->setChecked (true);
@@ -1164,8 +1113,7 @@ LayerControlPanel::search_triggered (const QString &t)
   }
 }
 
-void
-LayerControlPanel::set_search_as_filter (bool f)
+void LayerControlPanel::set_search_as_filter (bool f)
 {
   if (f != search_as_filter ()) {
     mp_filter->setChecked (f);
@@ -1173,8 +1121,7 @@ LayerControlPanel::set_search_as_filter (bool f)
   }
 }
 
-void
-LayerControlPanel::set_search_case_sensitive (bool f)
+void LayerControlPanel::set_search_case_sensitive (bool f)
 {
   if (f != search_case_sensitive ()) {
     mp_case_sensitive->setChecked (f);
@@ -1182,8 +1129,7 @@ LayerControlPanel::set_search_case_sensitive (bool f)
   }
 }
 
-void
-LayerControlPanel::set_search_as_expression (bool f)
+void LayerControlPanel::set_search_as_expression (bool f)
 {
   if (f != search_as_expression ()) {
     mp_use_regular_expressions->setChecked (f);
@@ -1191,15 +1137,13 @@ LayerControlPanel::set_search_as_expression (bool f)
   }
 }
 
-void
-LayerControlPanel::search_edited ()
+void LayerControlPanel::search_edited ()
 {
   search_edited_no_signal ();
   emit search_options_changed ();
 }
 
-void
-LayerControlPanel::search_edited_no_signal ()
+void LayerControlPanel::search_edited_no_signal ()
 {
   if (! mp_model) {
     return;
@@ -1226,8 +1170,7 @@ LayerControlPanel::search_edited_no_signal ()
   lay::indicate_error (mp_search_edit_box, filter_invalid);
 }
 
-void
-LayerControlPanel::search_next ()
+void LayerControlPanel::search_next ()
 {
   if (! mp_model) {
     return;
@@ -1240,8 +1183,7 @@ LayerControlPanel::search_next ()
   }
 }
 
-void
-LayerControlPanel::search_prev ()
+void LayerControlPanel::search_prev ()
 {
   if (! mp_model) {
     return;
@@ -1254,8 +1196,7 @@ LayerControlPanel::search_prev ()
   }
 }
 
-void
-LayerControlPanel::search_editing_finished ()
+void LayerControlPanel::search_editing_finished ()
 {
   if (! mp_model) {
     return;
@@ -1265,8 +1206,7 @@ LayerControlPanel::search_editing_finished ()
   mp_search_frame->hide ();
 }
 
-void
-LayerControlPanel::cm_regroup_flatten ()
+void LayerControlPanel::cm_regroup_flatten ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -1279,8 +1219,7 @@ LayerControlPanel::cm_regroup_flatten ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void
-LayerControlPanel::cm_regroup_by_index ()
+void LayerControlPanel::cm_regroup_by_index ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -1293,8 +1232,7 @@ LayerControlPanel::cm_regroup_by_index ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void
-LayerControlPanel::cm_regroup_by_datatype ()
+void LayerControlPanel::cm_regroup_by_datatype ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -1307,8 +1245,7 @@ LayerControlPanel::cm_regroup_by_datatype ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void
-LayerControlPanel::cm_regroup_by_layer ()
+void LayerControlPanel::cm_regroup_by_layer ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -1321,8 +1258,7 @@ LayerControlPanel::cm_regroup_by_layer ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void
-LayerControlPanel::cm_sort_by_name ()
+void LayerControlPanel::cm_sort_by_name ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -1335,8 +1271,7 @@ LayerControlPanel::cm_sort_by_name ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void
-LayerControlPanel::cm_sort_by_ild ()
+void LayerControlPanel::cm_sort_by_ild ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -1349,8 +1284,7 @@ LayerControlPanel::cm_sort_by_ild ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void
-LayerControlPanel::cm_sort_by_idl ()
+void LayerControlPanel::cm_sort_by_idl ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -1363,8 +1297,7 @@ LayerControlPanel::cm_sort_by_idl ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void
-LayerControlPanel::cm_sort_by_ldi ()
+void LayerControlPanel::cm_sort_by_ldi ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -1377,8 +1310,7 @@ LayerControlPanel::cm_sort_by_ldi ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void
-LayerControlPanel::cm_sort_by_dli ()
+void LayerControlPanel::cm_sort_by_dli ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -1392,8 +1324,7 @@ LayerControlPanel::cm_sort_by_dli ()
 }
 
 struct LDSortingProps
-  : std::vector <int>
-{
+  : std::vector<int> {
   LDSortingProps (int l1, int l2, int l3)
   {
     reserve (3);
@@ -1403,8 +1334,7 @@ struct LDSortingProps
   }
 };
 
-struct LayerSorter 
-{
+struct LayerSorter {
   LayerSorter (const lay::LayoutViewBase *view, lay::LayerControlPanel::SortOrder order)
     : m_order (order), mp_view (view)
   {
@@ -1491,8 +1421,7 @@ private:
   const lay::LayoutViewBase *mp_view;
 };
 
-void
-LayerControlPanel::sort_layers (SortOrder order)
+void LayerControlPanel::sort_layers (SortOrder order)
 {
   std::vector<lay::LayerPropertiesNode> new_props;
 
@@ -1530,14 +1459,12 @@ LayerControlPanel::sort_layers (SortOrder order)
       //  :KLUDGE: the list should have an insert with a begin..end iterator pair ..
       pp->add_child (*np);
     }
-
   }
 
   mp_view->set_properties (prop_list);
 }
 
-struct LayerRegroupSorter 
-{
+struct LayerRegroupSorter {
   LayerRegroupSorter (lay::LayerControlPanel::RegroupMode mode)
     : m_mode (mode)
   {
@@ -1561,14 +1488,13 @@ private:
   lay::LayerControlPanel::RegroupMode m_mode;
 };
 
-void
-LayerControlPanel::regroup_layers (RegroupMode mode)
+void LayerControlPanel::regroup_layers (RegroupMode mode)
 {
   std::vector<lay::LayerProperties> linear_props;
   LayerPropertiesConstIterator l = mp_view->begin_layers ();
   while (! l.at_end ()) {
     if (! l->has_children ()) {
-      linear_props.push_back (l->flat ()); 
+      linear_props.push_back (l->flat ());
     }
     ++l;
   }
@@ -1586,7 +1512,7 @@ LayerControlPanel::regroup_layers (RegroupMode mode)
     std::vector<lay::LayerProperties>::const_iterator f = i;
     do {
       ++f;
-    } while (f != linear_props.end () && !sorter (*i, *f));
+    } while (f != linear_props.end () && ! sorter (*i, *f));
 
     //  make a new node from [i..f)
     if (mode == lay::LayerControlPanel::RegroupByIndex) {
@@ -1609,8 +1535,7 @@ LayerControlPanel::regroup_layers (RegroupMode mode)
       lay::ParsedLayerSource source;
       source.layer (i->source (true /*real*/).layer ());
       prop_list.back ().set_source (source);
-
-    } 
+    }
 
     for (std::vector<lay::LayerProperties>::const_iterator p = i; p != f; ++p) {
 
@@ -1631,24 +1556,20 @@ LayerControlPanel::regroup_layers (RegroupMode mode)
       } else {
         prop_list.push_back (pp);
       }
-
     }
 
     i = f;
-  
   }
 
   mp_view->set_properties (prop_list);
 }
 
-void
-LayerControlPanel::cm_expand_all ()
+void LayerControlPanel::cm_expand_all ()
 {
   mp_layer_list->expand_all ();
 }
 
-void
-LayerControlPanel::tab_context_menu (const QPoint &p)
+void LayerControlPanel::tab_context_menu (const QPoint &p)
 {
   QMenu *ctx_menu = mp_view->menu ()->detached_menu ("lcp_tabs_context_menu");
   if (ctx_menu) {
@@ -1656,8 +1577,7 @@ LayerControlPanel::tab_context_menu (const QPoint &p)
   }
 }
 
-void
-LayerControlPanel::context_menu (const QPoint &p)
+void LayerControlPanel::context_menu (const QPoint &p)
 {
   QMenu *ctx_menu = mp_view->menu ()->detached_menu ("lcp_context_menu");
   if (ctx_menu) {
@@ -1665,8 +1585,7 @@ LayerControlPanel::context_menu (const QPoint &p)
   }
 }
 
-void 
-LayerControlPanel::double_clicked (const QModelIndex &index, Qt::KeyboardModifiers modifiers)
+void LayerControlPanel::double_clicked (const QModelIndex &index, Qt::KeyboardModifiers modifiers)
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -1695,14 +1614,12 @@ LayerControlPanel::double_clicked (const QModelIndex &index, Qt::KeyboardModifie
     mp_view->set_properties (item, props);
 
     commit ();
-
   }
 
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void
-LayerControlPanel::set_no_stipples (bool ns)
+void LayerControlPanel::set_no_stipples (bool ns)
 {
   if (m_no_stipples != ns) {
     m_no_stipples = ns;
@@ -1711,8 +1628,7 @@ LayerControlPanel::set_no_stipples (bool ns)
   }
 }
 
-void
-LayerControlPanel::set_background_color (tl::Color c)
+void LayerControlPanel::set_background_color (tl::Color c)
 {
   QPalette pl (mp_layer_list->palette ());
   pl.setColor (QPalette::Base, QColor (c.rgb ()));
@@ -1720,8 +1636,7 @@ LayerControlPanel::set_background_color (tl::Color c)
   mp_model->set_background_color (QColor (c.rgb ()));
 }
 
-void
-LayerControlPanel::set_text_color (tl::Color c)
+void LayerControlPanel::set_text_color (tl::Color c)
 {
   QPalette pl (mp_layer_list->palette ());
   pl.setColor (QPalette::Text, QColor (c.rgb ()));
@@ -1729,15 +1644,13 @@ LayerControlPanel::set_text_color (tl::Color c)
   mp_model->set_text_color (QColor (c.rgb ()));
 }
 
-void
-LayerControlPanel::update_hidden_flags ()
+void LayerControlPanel::update_hidden_flags ()
 {
   m_hidden_flags_need_update = true;
   m_do_update_content_dm ();
 }
 
-void
-LayerControlPanel::set_layer_visibility_follows_selection (bool f)
+void LayerControlPanel::set_layer_visibility_follows_selection (bool f)
 {
   if (f != m_layer_visibility_follows_selection) {
     m_layer_visibility_follows_selection = f;
@@ -1745,56 +1658,48 @@ LayerControlPanel::set_layer_visibility_follows_selection (bool f)
   }
 }
 
-bool
-LayerControlPanel::layer_visibility_follows_selection ()
+bool LayerControlPanel::layer_visibility_follows_selection ()
 {
   return m_layer_visibility_follows_selection;
 }
 
-void
-LayerControlPanel::set_hide_empty_layers (bool f)
+void LayerControlPanel::set_hide_empty_layers (bool f)
 {
   mp_model->set_hide_empty_layers (f);
 }
 
-bool
-LayerControlPanel::hide_empty_layers ()
+bool LayerControlPanel::hide_empty_layers ()
 {
   return mp_model->get_hide_empty_layers ();
 }
 
-void
-LayerControlPanel::set_test_shapes_in_view (bool f)
+void LayerControlPanel::set_test_shapes_in_view (bool f)
 {
   mp_model->set_test_shapes_in_view (f);
 }
 
-void
-LayerControlPanel::begin_updates ()
+void LayerControlPanel::begin_updates ()
 {
   if (! m_in_update) {
 
     m_in_update = true;
     m_hidden_flags_need_update = true;
 
-    mp_model->signal_begin_layer_changed ();  //  this makes the view redraw the data
+    mp_model->signal_begin_layer_changed (); //  this makes the view redraw the data
 
     //  we force a clear_selection in this case, since we cannot make sure the
     //  selecting remains valid
     clear_selection ();
     m_current_layer = 0;
-
   }
 }
 
-bool 
-LayerControlPanel::model_updated ()
+bool LayerControlPanel::model_updated ()
 {
   return ! m_in_update;
 }
 
-void
-LayerControlPanel::tab_selected (int index)
+void LayerControlPanel::tab_selected (int index)
 {
   if (index >= 0 && (unsigned int) index < mp_view->layer_lists ()) {
     mp_view->set_current_layer_list ((unsigned int) index);
@@ -1802,8 +1707,7 @@ LayerControlPanel::tab_selected (int index)
   }
 }
 
-void
-LayerControlPanel::cancel_updates ()
+void LayerControlPanel::cancel_updates ()
 {
   m_in_update = false;
   m_needs_update = false;
@@ -1812,14 +1716,12 @@ LayerControlPanel::cancel_updates ()
   m_tabs_need_update = false;
 }
 
-void
-LayerControlPanel::end_updates ()
+void LayerControlPanel::end_updates ()
 {
   m_do_update_content_dm ();
 }
 
-void 
-LayerControlPanel::set_phase (int phase)
+void LayerControlPanel::set_phase (int phase)
 {
   if (m_phase != phase) {
     m_phase = phase;
@@ -1827,7 +1729,7 @@ LayerControlPanel::set_phase (int phase)
   }
 }
 
-static void 
+static void
 set_hidden_flags_rec (LayerTreeModel *model, QTreeView *tree_view, const QModelIndex &parent)
 {
   int rows = model->rowCount (parent);
@@ -1858,14 +1760,11 @@ set_hidden_flags_rec (LayerTreeModel *model, QTreeView *tree_view, const QModelI
       }
 
       tree_view->setRowHidden (r, parent, hide);
-
     }
-
   }
 }
 
-void
-LayerControlPanel::do_update_hidden_flags ()
+void LayerControlPanel::do_update_hidden_flags ()
 {
   set_hidden_flags_rec (mp_model, mp_layer_list, QModelIndex ());
 
@@ -1882,8 +1781,7 @@ LayerControlPanel::do_update_hidden_flags ()
   }
 }
 
-void
-LayerControlPanel::do_update_visibility ()
+void LayerControlPanel::do_update_visibility ()
 {
   if (! m_layer_visibility_follows_selection) {
     return;
@@ -1905,8 +1803,7 @@ LayerControlPanel::do_update_visibility ()
   }
 }
 
-void
-LayerControlPanel::do_update_content ()
+void LayerControlPanel::do_update_content ()
 {
   mp_model->set_phase (m_phase);
 
@@ -1936,7 +1833,6 @@ LayerControlPanel::do_update_content ()
           mp_tab_bar->setTabText (int (ll), tl::to_qstring (mp_view->get_properties (ll).name ()));
         }
       }
-
     }
 
     if (mp_tab_bar->currentIndex () != int (mp_view->current_layer_list ())) {
@@ -1946,7 +1842,6 @@ LayerControlPanel::do_update_content ()
     connect (mp_tab_bar, SIGNAL (currentChanged (int)), this, SLOT (tab_selected (int)));
 
     m_tabs_need_update = false;
-
   }
 
   if (m_in_update) {
@@ -1957,14 +1852,14 @@ LayerControlPanel::do_update_content ()
     QHoverEvent hoverEvent (QEvent::HoverLeave, QPoint (0, 0), QPoint (0, 0));
     QCoreApplication::sendEvent (mp_layer_list->viewport (), &hoverEvent);
     //  reset the current index for the same reason
-    mp_layer_list->setCurrentIndex(QModelIndex());
+    mp_layer_list->setCurrentIndex (QModelIndex ());
 
     //  this makes the view redraw the data and establishes a valid selection scheme
     mp_model->signal_layers_changed ();
 
     //  now realize the selection if required
     if (! m_new_sel.empty ()) {
-      std::vector <lay::LayerPropertiesConstIterator> new_sel;
+      std::vector<lay::LayerPropertiesConstIterator> new_sel;
       for (std::vector<size_t>::const_iterator s = m_new_sel.begin (); s != m_new_sel.end (); ++s) {
         new_sel.push_back (lay::LayerPropertiesConstIterator (mp_view->get_properties (), *s));
       }
@@ -2005,7 +1900,7 @@ LayerControlPanel::do_update_content ()
     mp_layer_list->reset ();
 
   } else {
-    mp_model->signal_data_changed ();  //  this makes the view redraw the data
+    mp_model->signal_data_changed (); //  this makes the view redraw the data
   }
 
   if (m_hidden_flags_need_update) {
@@ -2019,8 +1914,7 @@ LayerControlPanel::do_update_content ()
   }
 }
 
-void
-LayerControlPanel::set_current_layer (const lay::LayerPropertiesConstIterator &l)
+void LayerControlPanel::set_current_layer (const lay::LayerPropertiesConstIterator &l)
 {
   if (transacting ()) {
     manager ()->queue (this, new LayerSelectionClearOp ());
@@ -2036,7 +1930,7 @@ LayerControlPanel::set_current_layer (const lay::LayerPropertiesConstIterator &l
   }
 }
 
-lay::LayerPropertiesConstIterator 
+lay::LayerPropertiesConstIterator
 LayerControlPanel::current_layer () const
 {
   if (m_in_update) {
@@ -2046,12 +1940,12 @@ LayerControlPanel::current_layer () const
   }
 }
 
-std::vector <lay::LayerPropertiesConstIterator>
+std::vector<lay::LayerPropertiesConstIterator>
 LayerControlPanel::selected_layers () const
 {
   if (m_in_update) {
 
-    std::vector <lay::LayerPropertiesConstIterator> new_sel;
+    std::vector<lay::LayerPropertiesConstIterator> new_sel;
     for (std::vector<size_t>::const_iterator s = m_new_sel.begin (); s != m_new_sel.end (); ++s) {
       new_sel.push_back (lay::LayerPropertiesConstIterator (mp_view->get_properties (), *s));
     }
@@ -2062,7 +1956,7 @@ LayerControlPanel::selected_layers () const
 
     QModelIndexList selected = mp_layer_list->selectionModel ()->selectedIndexes ();
 
-    std::vector <lay::LayerPropertiesConstIterator> llist;
+    std::vector<lay::LayerPropertiesConstIterator> llist;
     llist.reserve (selected.size ());
     for (QModelIndexList::const_iterator i = selected.begin (); i != selected.end (); ++i) {
       if (i->column () == 0) {
@@ -2079,14 +1973,13 @@ LayerControlPanel::selected_layers () const
     std::sort (llist.begin (), llist.end ());
 
     std::vector<lay::LayerPropertiesConstIterator>::iterator write = llist.begin ();
-    for (std::vector<lay::LayerPropertiesConstIterator>::iterator read = llist.begin (); read != llist.end (); ) {
+    for (std::vector<lay::LayerPropertiesConstIterator>::iterator read = llist.begin (); read != llist.end ();) {
 
       lay::LayerPropertiesConstIterator n = *read;
       *write++ = n;
       n.next_sibling ();
 
       read = std::lower_bound (read + 1, llist.end (), n);
-
     }
 
     llist.erase (write, llist.end ());
@@ -2094,68 +1987,59 @@ LayerControlPanel::selected_layers () const
   }
 }
 
-void 
-LayerControlPanel::undo (db::Op *op)
+void LayerControlPanel::undo (db::Op *op)
 {
-  LayerSelectionClearOp *clrop = dynamic_cast <LayerSelectionClearOp *> (op);
+  LayerSelectionClearOp *clrop = dynamic_cast<LayerSelectionClearOp *> (op);
   if (clrop) {
     set_selection (std::vector<lay::LayerPropertiesConstIterator> ()); // clear selection
     return;
   }
 }
 
-void 
-LayerControlPanel::redo (db::Op *op)
+void LayerControlPanel::redo (db::Op *op)
 {
-  LayerSelectionClearOp *clrop = dynamic_cast <LayerSelectionClearOp *> (op);
+  LayerSelectionClearOp *clrop = dynamic_cast<LayerSelectionClearOp *> (op);
   if (clrop) {
     set_selection (std::vector<lay::LayerPropertiesConstIterator> ()); // clear selection
     return;
   }
 }
 
-void
-LayerControlPanel::signal_resolution_changed ()
+void LayerControlPanel::signal_resolution_changed ()
 {
   m_do_update_content_dm ();
 }
 
-void 
-LayerControlPanel::signal_vp_changed ()
+void LayerControlPanel::signal_vp_changed ()
 {
   if (mp_model->get_test_shapes_in_view ()) {
     update_required (1);
   }
 }
 
-void 
-LayerControlPanel::signal_cv_changed ()
+void LayerControlPanel::signal_cv_changed ()
 {
   update_required (1);
 }
 
-void
-LayerControlPanel::signal_cv_changed_with_int (int)
+void LayerControlPanel::signal_cv_changed_with_int (int)
 {
   update_required (1);
 }
 
-void
-LayerControlPanel::signal_ll_changed (int)
+void LayerControlPanel::signal_ll_changed (int)
 {
   // layer lists have changed - do a full update in this case
   update_required (7);
 }
 
-void 
-LayerControlPanel::signal_li_changed (int)
+void LayerControlPanel::signal_li_changed (int)
 {
   // layer list index has changed - do a full update in this case
   update_required (7);
 }
 
-void 
-LayerControlPanel::update_required (int f)
+void LayerControlPanel::update_required (int f)
 {
   //  the name of a layer list has changed
   if ((f & 8) != 0) {
@@ -2172,12 +2056,11 @@ LayerControlPanel::update_required (int f)
 
     m_needs_update = true;
 
-    //  if the signal arises from any action performed externally, we cannot rely on 
+    //  if the signal arises from any action performed externally, we cannot rely on
     //  getting a end_updates - we have to do this explicitly here.
     if (! m_in_update) {
       begin_updates ();
     }
-
   }
 
   if ((f & 3) != 0) {
@@ -2187,8 +2070,7 @@ LayerControlPanel::update_required (int f)
   m_do_update_content_dm ();
 }
 
-void
-LayerControlPanel::current_index_changed (const QModelIndex &index)
+void LayerControlPanel::current_index_changed (const QModelIndex &index)
 {
   lay::LayerPropertiesConstIterator iter = mp_model->iterator (index);
   if (! iter.is_null () && ! iter.at_end ()) {
@@ -2198,8 +2080,7 @@ LayerControlPanel::current_index_changed (const QModelIndex &index)
   }
 }
 
-void
-LayerControlPanel::selection_changed (const QItemSelection &, const QItemSelection &)
+void LayerControlPanel::selection_changed (const QItemSelection &, const QItemSelection &)
 {
   if (m_layer_visibility_follows_selection) {
     m_do_update_visibility_dm ();
@@ -2207,8 +2088,7 @@ LayerControlPanel::selection_changed (const QItemSelection &, const QItemSelecti
   emit selected_layers_changed ();
 }
 
-void
-LayerControlPanel::group_collapsed (const QModelIndex &index)
+void LayerControlPanel::group_collapsed (const QModelIndex &index)
 {
   auto iter = mp_model->iterator_nc (index);
   if (! iter.is_null () && ! iter.at_end ()) {
@@ -2216,8 +2096,7 @@ LayerControlPanel::group_collapsed (const QModelIndex &index)
   }
 }
 
-void
-LayerControlPanel::group_expanded (const QModelIndex &index)
+void LayerControlPanel::group_expanded (const QModelIndex &index)
 {
   auto iter = mp_model->iterator_nc (index);
   if (! iter.is_null () && ! iter.at_end ()) {
@@ -2225,8 +2104,7 @@ LayerControlPanel::group_expanded (const QModelIndex &index)
   }
 }
 
-void
-LayerControlPanel::restore_expanded ()
+void LayerControlPanel::restore_expanded ()
 {
   mp_layer_list->blockSignals (true);
 
@@ -2244,8 +2122,7 @@ LayerControlPanel::restore_expanded ()
   mp_layer_list->blockSignals (false);
 }
 
-void
-LayerControlPanel::up_clicked ()
+void LayerControlPanel::up_clicked ()
 {
   BEGIN_PROTECTED_CLEANUP
 
@@ -2258,11 +2135,10 @@ LayerControlPanel::up_clicked ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void
-LayerControlPanel::down_clicked ()
+void LayerControlPanel::down_clicked ()
 {
   BEGIN_PROTECTED_CLEANUP
-  
+
   if (mp_view) {
     mp_view->transaction (tl::to_string (QObject::tr ("Move down")));
     do_move (0 /*down*/);
@@ -2272,11 +2148,10 @@ LayerControlPanel::down_clicked ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void
-LayerControlPanel::downdown_clicked ()
+void LayerControlPanel::downdown_clicked ()
 {
   BEGIN_PROTECTED_CLEANUP
-  
+
   if (mp_view) {
     mp_view->transaction (tl::to_string (QObject::tr ("Move fully down")));
     do_move (2 /*downdown*/);
@@ -2286,11 +2161,10 @@ LayerControlPanel::downdown_clicked ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void
-LayerControlPanel::upup_clicked ()
+void LayerControlPanel::upup_clicked ()
 {
   BEGIN_PROTECTED_CLEANUP
-  
+
   if (mp_view) {
     mp_view->transaction (tl::to_string (QObject::tr ("Move fully up")));
     do_move (3 /*upup*/);
@@ -2301,8 +2175,8 @@ LayerControlPanel::upup_clicked ()
 }
 
 static void
-move_algo (std::vector<lay::LayerPropertiesConstIterator>::const_iterator from, 
-           std::vector<lay::LayerPropertiesConstIterator>::const_iterator to, 
+move_algo (std::vector<lay::LayerPropertiesConstIterator>::const_iterator from,
+           std::vector<lay::LayerPropertiesConstIterator>::const_iterator to,
            lay::LayerPropertiesConstIterator parent,
            lay::LayerPropertiesIterator new_parent,
            std::vector<lay::LayerPropertiesConstIterator> &new_sel,
@@ -2328,12 +2202,12 @@ move_algo (std::vector<lay::LayerPropertiesConstIterator>::const_iterator from,
   if (mode == 0 /*down*/) {
 
     lay::LayerPropertiesConstIterator l;
-    for (std::vector<lay::LayerPropertiesConstIterator>::iterator i = new_sel.end (); i != new_sel.begin () + nsel; ) {
+    for (std::vector<lay::LayerPropertiesConstIterator>::iterator i = new_sel.end (); i != new_sel.begin () + nsel;) {
       lay::LayerPropertiesConstIterator ns = *--i;
       ns.next_sibling ();
       if (! ns.at_end () && ns != l) {
         *i = ns;
-      } 
+      }
       l = *i;
     }
 
@@ -2347,27 +2221,26 @@ move_algo (std::vector<lay::LayerPropertiesConstIterator>::const_iterator from,
       }
       if (ns != l) {
         *i = ns;
-      } 
+      }
       l = *i;
     }
 
   } else if (mode == 2 /*downdown*/) {
 
     if (new_sel.end () != new_sel.begin () + nsel) {
-      size_t n = new_sel.begin ()[nsel].num_siblings ();
-      for (std::vector<lay::LayerPropertiesConstIterator>::iterator i = new_sel.end (); i != new_sel.begin () + nsel; ) {
+      size_t n = new_sel.begin () [nsel].num_siblings ();
+      for (std::vector<lay::LayerPropertiesConstIterator>::iterator i = new_sel.end (); i != new_sel.begin () + nsel;) {
         --i;
         i->to_sibling (--n);
       }
     }
 
   } else if (mode == 3 /*upup*/) {
-    
+
     size_t n = 0;
     for (std::vector<lay::LayerPropertiesConstIterator>::iterator i = new_sel.begin () + nsel; i != new_sel.end (); ++i) {
       i->to_sibling (n++);
     }
-
   }
 
   std::vector<lay::LayerPropertiesConstIterator>::const_iterator inew = new_sel.begin () + nsel;
@@ -2376,7 +2249,7 @@ move_algo (std::vector<lay::LayerPropertiesConstIterator>::const_iterator from,
   lay::LayerPropertiesIterator ins = new_parent;
   ins.down_first_child ();
 
-  std::vector< std::pair<lay::LayerPropertiesConstIterator, lay::LayerPropertiesIterator> > rec;
+  std::vector<std::pair<lay::LayerPropertiesConstIterator, lay::LayerPropertiesIterator>> rec;
 
   s = from;
   c = parent;
@@ -2397,7 +2270,6 @@ move_algo (std::vector<lay::LayerPropertiesConstIterator>::const_iterator from,
       }
       ins.next_sibling ();
     }
-
   }
 
   while (inew != new_sel.end () && ins == *inew) {
@@ -2409,14 +2281,12 @@ move_algo (std::vector<lay::LayerPropertiesConstIterator>::const_iterator from,
 
   //  now treat all nodes with children (it is important to do this at last, because then the
   //  child iterators will be valid finally and can be inserted into "new_sel")
-  for (std::vector< std::pair<lay::LayerPropertiesConstIterator, lay::LayerPropertiesIterator> >::iterator r = rec.begin (); r != rec.end (); ++r) {
+  for (std::vector<std::pair<lay::LayerPropertiesConstIterator, lay::LayerPropertiesIterator>>::iterator r = rec.begin (); r != rec.end (); ++r) {
     move_algo (from, to, r->first, r->second, new_sel, mode);
   }
-
 }
 
-void
-LayerControlPanel::do_move (int mode)
+void LayerControlPanel::do_move (int mode)
 {
   std::vector<lay::LayerPropertiesConstIterator> sel = mp_view->selected_layers ();
   std::vector<lay::LayerPropertiesConstIterator> new_sel;
@@ -2525,6 +2395,6 @@ public:
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new LayerControlPanelPluginDeclaration (), -9, "LayerControlPanelPlugin");
 
-} // namespace lay 
+} // namespace lay
 
 #endif

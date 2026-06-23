@@ -40,96 +40,96 @@ namespace db
 namespace
 {
 
-  class OriginalLayerRegionIterator
-    : public RegionIteratorDelegate
+class OriginalLayerRegionIterator
+  : public RegionIteratorDelegate
+{
+public:
+  OriginalLayerRegionIterator (const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans)
+    : m_rec_iter (iter), m_iter_trans (trans), m_prop_id (0)
   {
-  public:
-    OriginalLayerRegionIterator (const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans)
-      : m_rec_iter (iter), m_iter_trans (trans), m_prop_id (0)
-    {
-      set ();
+    set ();
+  }
+
+  virtual bool is_addressable () const
+  {
+    return false;
+  }
+
+  virtual bool at_end () const
+  {
+    return m_rec_iter.at_end ();
+  }
+
+  virtual void increment ()
+  {
+    do_increment ();
+    set ();
+  }
+
+  virtual const value_type *get () const
+  {
+    return &m_polygon;
+  }
+
+  virtual db::properties_id_type prop_id () const
+  {
+    return m_prop_id;
+  }
+
+  virtual RegionIteratorDelegate *clone () const
+  {
+    return new OriginalLayerRegionIterator (*this);
+  }
+
+  virtual bool equals (const generic_shape_iterator_delegate_base<value_type> *other) const
+  {
+    const OriginalLayerRegionIterator *o = dynamic_cast<const OriginalLayerRegionIterator *> (other);
+    return o && o->m_rec_iter == m_rec_iter && o->m_iter_trans.equal (m_iter_trans);
+  }
+
+  virtual void do_reset (const db::Box &region, bool overlapping)
+  {
+    if (region == db::Box::world ()) {
+      m_rec_iter.set_region (region);
+    } else {
+      m_rec_iter.set_region (m_iter_trans.inverted () * region);
     }
+    m_rec_iter.set_overlapping (overlapping);
+    set ();
+  }
 
-    virtual bool is_addressable() const
-    {
-      return false;
+  virtual db::Box bbox () const
+  {
+    return m_iter_trans * m_rec_iter.bbox ();
+  }
+
+private:
+  friend class Region;
+
+  db::RecursiveShapeIterator m_rec_iter;
+  db::ICplxTrans m_iter_trans;
+  db::Polygon m_polygon;
+  db::properties_id_type m_prop_id;
+
+  void set ()
+  {
+    while (! m_rec_iter.at_end () && ! (m_rec_iter->is_polygon () || m_rec_iter->is_path () || m_rec_iter->is_box ())) {
+      ++m_rec_iter;
     }
-
-    virtual bool at_end () const
-    {
-      return m_rec_iter.at_end ();
+    if (! m_rec_iter.at_end ()) {
+      m_rec_iter->polygon (m_polygon);
+      m_polygon.transform (m_iter_trans * m_rec_iter.trans (), false);
+      m_prop_id = m_rec_iter.prop_id ();
     }
+  }
 
-    virtual void increment ()
-    {
-      do_increment ();
-      set ();
+  void do_increment ()
+  {
+    if (! m_rec_iter.at_end ()) {
+      ++m_rec_iter;
     }
-
-    virtual const value_type *get () const
-    {
-      return &m_polygon;
-    }
-
-    virtual db::properties_id_type prop_id () const
-    {
-      return m_prop_id;
-    }
-
-    virtual RegionIteratorDelegate *clone () const
-    {
-      return new OriginalLayerRegionIterator (*this);
-    }
-
-    virtual bool equals (const generic_shape_iterator_delegate_base<value_type> *other) const
-    {
-      const OriginalLayerRegionIterator *o = dynamic_cast<const OriginalLayerRegionIterator *> (other);
-      return o && o->m_rec_iter == m_rec_iter && o->m_iter_trans.equal (m_iter_trans);
-    }
-
-    virtual void do_reset (const db::Box &region, bool overlapping)
-    {
-      if (region == db::Box::world ()) {
-        m_rec_iter.set_region (region);
-      } else {
-        m_rec_iter.set_region (m_iter_trans.inverted () * region);
-      }
-      m_rec_iter.set_overlapping (overlapping);
-      set ();
-    }
-
-    virtual db::Box bbox () const
-    {
-      return m_iter_trans * m_rec_iter.bbox ();
-    }
-
-  private:
-    friend class Region;
-
-    db::RecursiveShapeIterator m_rec_iter;
-    db::ICplxTrans m_iter_trans;
-    db::Polygon m_polygon;
-    db::properties_id_type m_prop_id;
-
-    void set ()
-    {
-      while (! m_rec_iter.at_end () && ! (m_rec_iter->is_polygon () || m_rec_iter->is_path () || m_rec_iter->is_box ())) {
-        ++m_rec_iter;
-      }
-      if (! m_rec_iter.at_end ()) {
-        m_rec_iter->polygon (m_polygon);
-        m_polygon.transform (m_iter_trans * m_rec_iter.trans (), false);
-        m_prop_id = m_rec_iter.prop_id ();
-      }
-    }
-
-    void do_increment ()
-    {
-      if (! m_rec_iter.at_end ()) {
-        ++m_rec_iter;
-      }
-    }
-  };
+  }
+};
 
 }
 
@@ -178,22 +178,19 @@ OriginalLayerRegion::clone () const
   return new OriginalLayerRegion (*this);
 }
 
-void
-OriginalLayerRegion::merged_semantics_changed ()
+void OriginalLayerRegion::merged_semantics_changed ()
 {
   m_merged_polygons.clear ();
   m_merged_polygons_valid = false;
 }
 
-void
-OriginalLayerRegion::join_properties_on_merge_changed ()
+void OriginalLayerRegion::join_properties_on_merge_changed ()
 {
   m_merged_polygons.clear ();
   m_merged_polygons_valid = false;
 }
 
-void
-OriginalLayerRegion::min_coherence_changed ()
+void OriginalLayerRegion::min_coherence_changed ()
 {
   m_is_merged = false;
   m_merged_polygons.clear ();
@@ -256,7 +253,6 @@ OriginalLayerRegion::count () const
     }
 
     return n;
-
   }
 }
 
@@ -296,7 +292,6 @@ OriginalLayerRegion::hier_count () const
     }
 
     return n;
-
   }
 }
 
@@ -313,7 +308,7 @@ OriginalLayerRegion::begin_merged () const
     return begin ();
   } else {
     ensure_merged_polygons_valid ();
-    return new FlatRegionIterator (& m_merged_polygons);
+    return new FlatRegionIterator (&m_merged_polygons);
   }
 }
 
@@ -346,14 +341,12 @@ OriginalLayerRegion::begin_unmerged_iter () const
   return std::make_pair (m_iter, m_iter_trans);
 }
 
-bool
-OriginalLayerRegion::empty () const
+bool OriginalLayerRegion::empty () const
 {
   return m_iter.at_end_no_lock ();
 }
 
-bool
-OriginalLayerRegion::is_merged () const
+bool OriginalLayerRegion::is_merged () const
 {
   return m_is_merged;
 }
@@ -370,14 +363,12 @@ OriginalLayerRegion::nth_prop_id (size_t) const
   throw tl::Exception (tl::to_string (tr ("Random access to polygons is available only for flat regions")));
 }
 
-bool
-OriginalLayerRegion::has_valid_polygons () const
+bool OriginalLayerRegion::has_valid_polygons () const
 {
   return false;
 }
 
-bool
-OriginalLayerRegion::has_valid_merged_polygons () const
+bool OriginalLayerRegion::has_valid_merged_polygons () const
 {
   return merged_semantics () && ! m_is_merged;
 }
@@ -388,8 +379,7 @@ OriginalLayerRegion::iter () const
   return &m_iter;
 }
 
-void
-OriginalLayerRegion::apply_property_translator (const db::PropertiesTranslator &pt)
+void OriginalLayerRegion::apply_property_translator (const db::PropertiesTranslator &pt)
 {
   m_iter.apply_property_translator (pt);
 
@@ -397,8 +387,7 @@ OriginalLayerRegion::apply_property_translator (const db::PropertiesTranslator &
   m_merged_polygons.clear ();
 }
 
-bool
-OriginalLayerRegion::equals (const Region &other) const
+bool OriginalLayerRegion::equals (const Region &other) const
 {
   const OriginalLayerRegion *other_delegate = dynamic_cast<const OriginalLayerRegion *> (other.delegate ());
   if (other_delegate && other_delegate->m_iter == m_iter && other_delegate->m_iter_trans == m_iter_trans) {
@@ -408,8 +397,7 @@ OriginalLayerRegion::equals (const Region &other) const
   }
 }
 
-bool
-OriginalLayerRegion::less (const Region &other) const
+bool OriginalLayerRegion::less (const Region &other) const
 {
   const OriginalLayerRegion *other_delegate = dynamic_cast<const OriginalLayerRegion *> (other.delegate ());
   if (other_delegate && other_delegate->m_iter == m_iter && other_delegate->m_iter_trans == m_iter_trans) {
@@ -419,26 +407,24 @@ OriginalLayerRegion::less (const Region &other) const
   }
 }
 
-void
-OriginalLayerRegion::init ()
+void OriginalLayerRegion::init ()
 {
   m_is_merged = false;
   m_merged_polygons_valid = false;
 }
 
-namespace {
-
-struct AssignProp
+namespace
 {
-  AssignProp () : prop_id (0) { }
+
+struct AssignProp {
+  AssignProp () : prop_id (0) {}
   db::properties_id_type operator() (db::properties_id_type) { return prop_id; }
   db::properties_id_type prop_id;
 };
 
 }
 
-void
-OriginalLayerRegion::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
+void OriginalLayerRegion::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
   //  explicitly update the layout if the source is equal to the target
   //  (needed because we lock the layout below and no update would happen)
@@ -452,15 +438,14 @@ OriginalLayerRegion::insert_into (Layout *layout, db::cell_index_type into_cell,
   //  lock the layout against updates while inserting
   db::LayoutLocker locker (layout);
   AssignProp ap;
-  for (db::RecursiveShapeIterator i = m_iter; !i.at_end (); ++i) {
+  for (db::RecursiveShapeIterator i = m_iter; ! i.at_end (); ++i) {
     db::properties_id_type prop_id = i.prop_id ();
     ap.prop_id = (prop_id != 0 ? prop_id : 0);
     sh.insert (*i, i.trans (), ap);
   }
 }
 
-void
-OriginalLayerRegion::ensure_merged_polygons_valid () const
+void OriginalLayerRegion::ensure_merged_polygons_valid () const
 {
   if (! m_merged_polygons_valid) {
 
@@ -468,7 +453,6 @@ OriginalLayerRegion::ensure_merged_polygons_valid () const
     merge_polygons_to (m_merged_polygons, min_coherence (), 0, join_properties_on_merge ());
 
     m_merged_polygons_valid = true;
-
   }
 }
 

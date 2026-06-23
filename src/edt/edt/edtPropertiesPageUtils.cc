@@ -41,23 +41,23 @@ namespace edt
 CombinedChangeApplicator::CombinedChangeApplicator ()
 {
 }
-    
+
 CombinedChangeApplicator::CombinedChangeApplicator (ChangeApplicator *a1)
 {
   m_appl.push_back (a1);
 }
-    
+
 CombinedChangeApplicator::CombinedChangeApplicator (ChangeApplicator *a1, ChangeApplicator *a2)
 {
   m_appl.push_back (a1);
   m_appl.push_back (a2);
 }
-    
+
 void CombinedChangeApplicator::add (ChangeApplicator *a)
 {
   m_appl.push_back (a);
 }
-    
+
 CombinedChangeApplicator::~CombinedChangeApplicator ()
 {
   for (std::vector<ChangeApplicator *>::const_iterator a = m_appl.begin (); a != m_appl.end (); ++a) {
@@ -66,14 +66,14 @@ CombinedChangeApplicator::~CombinedChangeApplicator ()
   m_appl.clear ();
 }
 
-bool CombinedChangeApplicator::supports_relative_mode () const 
-{ 
+bool CombinedChangeApplicator::supports_relative_mode () const
+{
   for (std::vector<ChangeApplicator *>::const_iterator a = m_appl.begin (); a != m_appl.end (); ++a) {
     if ((*a) && (*a)->supports_relative_mode ()) {
       return true;
     }
   }
-  return false; 
+  return false;
 }
 
 db::Shape CombinedChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, unsigned int cv_index, unsigned int layer, bool relative) const
@@ -87,7 +87,7 @@ db::Shape CombinedChangeApplicator::do_apply (db::Shapes &shapes, const db::Shap
   return s;
 }
 
-db::Instance CombinedChangeApplicator::do_apply_inst (db::Cell &cell, const db::Instance &instance, double dbu, bool relative) const 
+db::Instance CombinedChangeApplicator::do_apply_inst (db::Cell &cell, const db::Instance &instance, double dbu, bool relative) const
 {
   db::Instance i = instance;
   for (std::vector<ChangeApplicator *>::const_iterator a = m_appl.begin (); a != m_appl.end (); ++a) {
@@ -101,9 +101,9 @@ db::Instance CombinedChangeApplicator::do_apply_inst (db::Cell &cell, const db::
 // -------------------------------------------------------------------------
 //  ChangePropertiesApplicator implementation
 
-ChangePropertiesApplicator::ChangePropertiesApplicator (db::properties_id_type prop_id) 
+ChangePropertiesApplicator::ChangePropertiesApplicator (db::properties_id_type prop_id)
   : m_prop_id (prop_id)
-{ 
+{
   //  .. nothing yet ...
 }
 
@@ -112,7 +112,7 @@ db::Shape ChangePropertiesApplicator::do_apply (db::Shapes &shapes, const db::Sh
   return shapes.replace_prop_id (shape, m_prop_id);
 }
 
-db::Instance ChangePropertiesApplicator::do_apply_inst (db::Cell &cell, const db::Instance &instance, double /*dbu*/, bool /*relative*/) const 
+db::Instance ChangePropertiesApplicator::do_apply_inst (db::Cell &cell, const db::Instance &instance, double /*dbu*/, bool /*relative*/) const
 {
   return cell.replace_prop_id (instance, m_prop_id);
 }
@@ -162,9 +162,9 @@ db::Shape BoxDimensionsChangeApplicator::do_apply (db::Shapes &shapes, const db:
 
   db::Box new_box;
   if (relative) {
-    new_box = db::Box (org_box.left () + m_dl, 
+    new_box = db::Box (org_box.left () + m_dl,
                        org_box.bottom () + m_db,
-                       org_box.right () + m_dr, 
+                       org_box.right () + m_dr,
                        org_box.top () + m_dt);
   } else {
 
@@ -215,7 +215,6 @@ db::Shape BoxDimensionsChangeApplicator::do_apply (db::Shapes &shapes, const db:
     }
 
     new_box = db::Box (l, b, r, t);
-
   }
 
   if (new_box != org_box) {
@@ -554,7 +553,7 @@ db::Shape PathStartExtensionChangeApplicator::do_apply (db::Shapes &shapes, cons
   shape.path (org_path);
 
   db::Path new_path = org_path;
-  if (m_ext == std::numeric_limits <db::Coord>::min ()) {
+  if (m_ext == std::numeric_limits<db::Coord>::min ()) {
     new_path.bgn_ext (new_path.width () / 2);
   } else {
     new_path.bgn_ext (m_ext);
@@ -584,7 +583,7 @@ db::Shape PathEndExtensionChangeApplicator::do_apply (db::Shapes &shapes, const 
   shape.path (org_path);
 
   db::Path new_path = org_path;
-  if (m_ext == std::numeric_limits <db::Coord>::min ()) {
+  if (m_ext == std::numeric_limits<db::Coord>::min ()) {
     new_path.end_ext (new_path.width () / 2);
   } else {
     new_path.end_ext (m_ext);
@@ -634,7 +633,7 @@ ChangeTargetCellApplicator::ChangeTargetCellApplicator (db::cell_index_type cell
   //  .. nothing yet ..
 }
 
-db::Instance ChangeTargetCellApplicator::do_apply_inst (db::Cell &cell, const db::Instance &instance, double /*dbu*/, bool /*relative*/) const 
+db::Instance ChangeTargetCellApplicator::do_apply_inst (db::Cell &cell, const db::Instance &instance, double /*dbu*/, bool /*relative*/) const
 {
   tl_assert (cell.layout ());
 
@@ -702,9 +701,7 @@ ChangeTargetPCellApplicator::do_apply_inst (db::Cell &cell, const db::Instance &
       }
 
       lib = mp_new_lib;
-
     }
-
   }
 
   db::CellInstArray arr = instance.cell_inst ();
@@ -723,7 +720,6 @@ ChangeTargetPCellApplicator::do_apply_inst (db::Cell &cell, const db::Instance &
     if (lib) {
       inst_cell_index = layout->get_lib_proxy (lib, inst_cell_index);
     }
-
   }
 
   if (arr.object ().cell_index () != inst_cell_index) {
@@ -744,7 +740,7 @@ ChangeInstanceTransApplicator::ChangeInstanceTransApplicator (double a, double o
   //  .. nothing yet ..
 }
 
-db::Instance ChangeInstanceTransApplicator::do_apply_inst (db::Cell &cell, const db::Instance &instance, double dbu, bool relative) const 
+db::Instance ChangeInstanceTransApplicator::do_apply_inst (db::Cell &cell, const db::Instance &instance, double dbu, bool relative) const
 {
   db::CellInstArray::complex_trans_type tr = instance.complex_trans ();
 
@@ -768,7 +764,6 @@ db::Instance ChangeInstanceTransApplicator::do_apply_inst (db::Cell &cell, const
     bool mirror = (m_mirror != m_org_mirror) ? m_mirror : tr.is_mirror ();
 
     tr = db::CellInstArray::complex_trans_type (mag, angle, mirror, disp);
-
   }
 
   bool is_complex = (tr.is_mag () || ! tr.is_ortho ());
@@ -793,7 +788,6 @@ db::Instance ChangeInstanceTransApplicator::do_apply_inst (db::Cell &cell, const
     } else {
       new_inst = db::CellInstArray (db::CellInst (instance.cell_index ()), db::Trans (tr.rot (), tr.disp ()));
     }
-
   }
 
   if (new_inst != instance.cell_inst ()) {
@@ -813,7 +807,7 @@ ChangeInstanceArrayApplicator::ChangeInstanceArrayApplicator (const db::DVector 
   //  .. nothing yet ..
 }
 
-db::Instance ChangeInstanceArrayApplicator::do_apply_inst (db::Cell &cell, const db::Instance &instance, double dbu, bool /*relative*/) const 
+db::Instance ChangeInstanceArrayApplicator::do_apply_inst (db::Cell &cell, const db::Instance &instance, double dbu, bool /*relative*/) const
 {
   db::CellInstArray new_inst;
 
@@ -859,7 +853,7 @@ InstanceRemoveArrayApplicator::InstanceRemoveArrayApplicator ()
   //  .. nothing yet ..
 }
 
-db::Instance InstanceRemoveArrayApplicator::do_apply_inst (db::Cell &cell, const db::Instance &instance, double /*dbu*/, bool /*relative*/) const 
+db::Instance InstanceRemoveArrayApplicator::do_apply_inst (db::Cell &cell, const db::Instance &instance, double /*dbu*/, bool /*relative*/) const
 {
   db::CellInstArray new_inst;
   if (instance.is_complex ()) {

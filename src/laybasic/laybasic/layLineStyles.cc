@@ -68,8 +68,7 @@ static const char *style_strings [] = {
 
   // 7: dash-double-dotted
   "dash-double-dotted",
-  "***..*.*..**"
-};
+  "***..*.*..**"};
 
 
 // ---------------------------------------------------------------------
@@ -83,25 +82,24 @@ LineStyleInfo::LineStyleInfo ()
   m_pattern_stride = 1;
   memset (m_pattern, 0xff, sizeof (m_pattern));
 }
-  
+
 LineStyleInfo::LineStyleInfo (const LineStyleInfo &d)
   : m_width (d.m_width), m_order_index (d.m_order_index), m_name (d.m_name)
 {
   operator= (d);
 }
-  
+
 LineStyleInfo &
 LineStyleInfo::operator= (const LineStyleInfo &d)
 {
   if (&d != this) {
-    tl::MutexLocker locker (& s_mutex);
+    tl::MutexLocker locker (&s_mutex);
     assign_no_lock (d);
   }
   return *this;
 }
 
-void
-LineStyleInfo::assign_no_lock (const LineStyleInfo &d)
+void LineStyleInfo::assign_no_lock (const LineStyleInfo &d)
 {
   m_scaled_pattern.reset (0);
 
@@ -113,8 +111,7 @@ LineStyleInfo::assign_no_lock (const LineStyleInfo &d)
   memcpy (m_pattern, d.m_pattern, sizeof (m_pattern));
 }
 
-bool
-LineStyleInfo::same_bits (const LineStyleInfo &d) const
+bool LineStyleInfo::same_bits (const LineStyleInfo &d) const
 {
   if (m_width != d.m_width) {
     return false;
@@ -130,8 +127,7 @@ LineStyleInfo::same_bits (const LineStyleInfo &d) const
   return true;
 }
 
-bool 
-LineStyleInfo::less_bits (const LineStyleInfo &d) const
+bool LineStyleInfo::less_bits (const LineStyleInfo &d) const
 {
   if (m_width != d.m_width) {
     return m_width < d.m_width;
@@ -149,26 +145,23 @@ LineStyleInfo::less_bits (const LineStyleInfo &d) const
   return false;
 }
 
-bool 
-LineStyleInfo::operator== (const LineStyleInfo &d) const
+bool LineStyleInfo::operator== (const LineStyleInfo &d) const
 {
   return same_bits (d) && m_name == d.m_name && m_order_index == d.m_order_index;
 }
 
-bool 
-LineStyleInfo::operator< (const LineStyleInfo &d) const
+bool LineStyleInfo::operator< (const LineStyleInfo &d) const
 {
   if (! same_bits (d)) {
     return less_bits (d);
-  } 
+  }
   if (m_name != d.m_name) {
     return m_name < d.m_name;
   }
   return m_order_index < d.m_order_index;
 }
 
-bool
-LineStyleInfo::is_bit_set (unsigned int n) const
+bool LineStyleInfo::is_bit_set (unsigned int n) const
 {
   return (pattern () [(n / 32) % pattern_stride ()] & (1 << (n % 32))) != 0;
 }
@@ -182,7 +175,7 @@ LineStyleInfo::get_bitmap (int w, int h, int fw) const
   unsigned int frame_width = fw <= 0 ? 1 : (unsigned int) fw;
   unsigned int stride = (width + 7) / 8;
 
-  unsigned char *data = new unsigned char[stride * height];
+  unsigned char *data = new unsigned char [stride * height];
   memset (data, 0x00, size_t (stride * height));
 
   unsigned int hv = height - 2 * frame_width;
@@ -211,16 +204,15 @@ LineStyleInfo::get_bitmap (int w, int h, int fw) const
   }
 
   QBitmap bitmap (QBitmap::fromData (QSize (width, height), data, QImage::Format_MonoLSB));
-  delete[] data;
+  delete [] data;
 
   return bitmap;
 }
 #endif
 
-void
-LineStyleInfo::set_pattern (uint32_t pt, unsigned int w) 
+void LineStyleInfo::set_pattern (uint32_t pt, unsigned int w)
 {
-  tl::MutexLocker locker (& s_mutex);
+  tl::MutexLocker locker (&s_mutex);
   m_scaled_pattern.reset (0);
 
   memset (m_pattern, 0, sizeof (m_pattern));
@@ -232,7 +224,7 @@ LineStyleInfo::set_pattern (uint32_t pt, unsigned int w)
 
   //  w == 0 means solid pattern
   if (w == 0) {
-    m_pattern[0] = 0xffffffff;
+    m_pattern [0] = 0xffffffff;
     m_pattern_stride = 1;
     return;
   }
@@ -271,7 +263,7 @@ LineStyleInfo::scaled (unsigned int n) const
     return *this;
   }
 
-  tl::MutexLocker locker (& s_mutex);
+  tl::MutexLocker locker (&s_mutex);
 
   if (! m_scaled_pattern.get ()) {
     m_scaled_pattern.reset (new std::map<unsigned int, LineStyleInfo> ());
@@ -288,8 +280,7 @@ LineStyleInfo::scaled (unsigned int n) const
   return sp;
 }
 
-void
-LineStyleInfo::scale_pattern (unsigned int n)
+void LineStyleInfo::scale_pattern (unsigned int n)
 {
   if (m_width == 0 || n <= 1) {
     return;
@@ -383,8 +374,7 @@ static const char *uint_from_string (const char *s, uint32_t &w, unsigned int &w
   return s;
 }
 
-void
-LineStyleInfo::from_string (const std::string &cstr)
+void LineStyleInfo::from_string (const std::string &cstr)
 {
   unsigned int w = 0;
   uint32_t data = 0;
@@ -399,18 +389,17 @@ LineStyleInfo::from_string (const std::string &cstr)
 //  LineStyles implementation
 
 struct ReplaceLineStyleOp
-  : public db::Op
-{
-  ReplaceLineStyleOp (unsigned int i, const LineStyleInfo &o, const LineStyleInfo &n) 
-    : db::Op (), index (i), m_old (o), m_new (n) 
-  { }
+  : public db::Op {
+  ReplaceLineStyleOp (unsigned int i, const LineStyleInfo &o, const LineStyleInfo &n)
+    : db::Op (), index (i), m_old (o), m_new (n)
+  {
+  }
 
   unsigned int index;
   LineStyleInfo m_old, m_new;
 };
 
-LineStyles::LineStyles () :
-    db::Object (0)
+LineStyles::LineStyles () : db::Object (0)
 {
   for (unsigned int d = 0; d < sizeof (style_strings) / sizeof (style_strings [0]); d += 2) {
     m_styles.push_back (LineStyleInfo ());
@@ -419,8 +408,7 @@ LineStyles::LineStyles () :
   }
 }
 
-LineStyles::LineStyles (const LineStyles &p) :
-  db::Object (0)
+LineStyles::LineStyles (const LineStyles &p) : db::Object (0)
 {
   m_styles = p.m_styles;
 }
@@ -438,7 +426,7 @@ LineStyles::operator= (const LineStyles &p)
     for (i = 0; i < p.count (); ++i) {
       replace_style (i, p.begin () [i]);
     }
-    for ( ; i < count (); ++i) {
+    for (; i < count (); ++i) {
       replace_style (i, LineStyleInfo ());
     }
   }
@@ -456,8 +444,7 @@ LineStyles::style (unsigned int i) const
   }
 }
 
-void 
-LineStyles::replace_style (unsigned int i, const LineStyleInfo &p)
+void LineStyles::replace_style (unsigned int i, const LineStyleInfo &p)
 {
   while (i >= count ()) {
     m_styles.push_back (LineStyleInfo ());
@@ -471,7 +458,7 @@ LineStyles::replace_style (unsigned int i, const LineStyleInfo &p)
   }
 }
 
-unsigned int 
+unsigned int
 LineStyles::add_style (const LineStyleInfo &p)
 {
   unsigned int oi = 0;
@@ -481,7 +468,7 @@ LineStyles::add_style (const LineStyleInfo &p)
       iempty = i;
     } else if (i->order_index () > oi) {
       oi = i->order_index ();
-    } 
+    }
   }
 
   unsigned int index = std::distance (begin (), iempty);
@@ -495,28 +482,27 @@ LineStyles::add_style (const LineStyleInfo &p)
   return index;
 }
 
-namespace {
-  struct display_order
+namespace
+{
+struct display_order {
+  bool operator() (lay::LineStyles::iterator a, lay::LineStyles::iterator b)
   {
-    bool operator () (lay::LineStyles::iterator a, lay::LineStyles::iterator b)
-    {
-      return a->order_index () < b->order_index ();
-    }
-  };
+    return a->order_index () < b->order_index ();
+  }
+};
 }
 
-void 
-LineStyles::renumber ()
+void LineStyles::renumber ()
 {
   //  renumber the order indices
-  std::vector <lay::LineStyles::iterator> iters;
+  std::vector<lay::LineStyles::iterator> iters;
   for (lay::LineStyles::iterator i = begin_custom (); i != end (); ++i) {
     iters.push_back (i);
   }
   std::sort (iters.begin (), iters.end (), display_order ());
 
   unsigned int oi = 1;
-  for (std::vector <lay::LineStyles::iterator>::const_iterator i = iters.begin (); i != iters.end (); ++i) {
+  for (std::vector<lay::LineStyles::iterator>::const_iterator i = iters.begin (); i != iters.end (); ++i) {
     if ((*i)->order_index () > 0) {
       lay::LineStyleInfo p (**i);
       p.set_order_index (oi++);
@@ -538,34 +524,30 @@ LineStyles::default_style ()
   return empty;
 }
 
-void 
-LineStyles::undo (db::Op *op)
+void LineStyles::undo (db::Op *op)
 {
-  const ReplaceLineStyleOp *rop = dynamic_cast <const ReplaceLineStyleOp *> (op);
+  const ReplaceLineStyleOp *rop = dynamic_cast<const ReplaceLineStyleOp *> (op);
   if (rop) {
     replace_style (rop->index, rop->m_old);
   }
 }
 
-void 
-LineStyles::redo (db::Op *op)
+void LineStyles::redo (db::Op *op)
 {
-  const ReplaceLineStyleOp *rop = dynamic_cast <const ReplaceLineStyleOp *> (op);
+  const ReplaceLineStyleOp *rop = dynamic_cast<const ReplaceLineStyleOp *> (op);
   if (rop) {
     replace_style (rop->index, rop->m_new);
   }
 }
 
-struct style_less_f
-{
+struct style_less_f {
   bool operator() (const LineStyleInfo &a, const LineStyleInfo &b) const
   {
     return a.less_bits (b);
   }
 };
 
-void 
-LineStyles::merge (const LineStyles &other, std::map<unsigned int, unsigned int> &index_map)
+void LineStyles::merge (const LineStyles &other, std::map<unsigned int, unsigned int> &index_map)
 {
   //  insert the standard pattern into the map (for completeness)
   for (iterator c = begin (); c != begin_custom (); ++c) {
@@ -573,14 +555,14 @@ LineStyles::merge (const LineStyles &other, std::map<unsigned int, unsigned int>
   }
 
   //  build an index of present pattern
-  std::map <LineStyleInfo, unsigned int, style_less_f> styles;
+  std::map<LineStyleInfo, unsigned int, style_less_f> styles;
   for (iterator c = begin_custom (); c != end (); ++c) {
     styles.insert (std::make_pair (*c, (unsigned int) std::distance (begin (), c)));
   }
 
   //  map the pattern of other into *this, possibly creating new ones
   for (iterator c = other.begin_custom (); c != other.end (); ++c) {
-    std::map <LineStyleInfo, unsigned int, style_less_f>::const_iterator p = styles.find (*c);
+    std::map<LineStyleInfo, unsigned int, style_less_f>::const_iterator p = styles.find (*c);
     unsigned int new_index;
     if (p == styles.end ()) {
       new_index = add_style (*c);
@@ -593,4 +575,3 @@ LineStyles::merge (const LineStyles &other, std::map<unsigned int, unsigned int>
 }
 
 }
-

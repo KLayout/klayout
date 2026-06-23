@@ -32,9 +32,8 @@
 
 namespace drc
 {
-  DRC_PUBLIC int _force_link_f ();
-  int _force_link_target = _force_link_f ();
+DRC_PUBLIC int _force_link_f ();
+int _force_link_target = _force_link_f ();
 }
 
 #endif
-

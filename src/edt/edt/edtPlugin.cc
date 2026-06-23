@@ -40,17 +40,16 @@
 #include "edtRecentConfigurationPage.h"
 
 #if defined(HAVE_QT)
-#  include <QApplication>
-#  include <QLayout>
-#  include <QMessageBox>
-#  include "layTipDialog.h"
+#include <QApplication>
+#include <QLayout>
+#include <QMessageBox>
+#include "layTipDialog.h"
 #endif
 
 namespace edt
 {
 
-static
-void get_text_options (std::vector < std::pair<std::string, std::string> > &options)
+static void get_text_options (std::vector<std::pair<std::string, std::string>> &options)
 {
   options.push_back (std::pair<std::string, std::string> (cfg_edit_text_string, "ABC"));
   options.push_back (std::pair<std::string, std::string> (cfg_edit_text_size, "0"));
@@ -58,8 +57,7 @@ void get_text_options (std::vector < std::pair<std::string, std::string> > &opti
   options.push_back (std::pair<std::string, std::string> (cfg_edit_text_valign, "bottom"));
 }
 
-static 
-void get_path_options (std::vector < std::pair<std::string, std::string> > &options)
+static void get_path_options (std::vector<std::pair<std::string, std::string>> &options)
 {
   options.push_back (std::pair<std::string, std::string> (cfg_edit_path_width, "0.1"));
   options.push_back (std::pair<std::string, std::string> (cfg_edit_path_ext_type, "flush"));
@@ -67,8 +65,7 @@ void get_path_options (std::vector < std::pair<std::string, std::string> > &opti
   options.push_back (std::pair<std::string, std::string> (cfg_edit_path_ext_var_end, "0.0"));
 }
 
-static 
-void get_inst_options (std::vector < std::pair<std::string, std::string> > &options)
+static void get_inst_options (std::vector<std::pair<std::string, std::string>> &options)
 {
   options.push_back (std::pair<std::string, std::string> (cfg_edit_inst_cell_name, ""));
   options.push_back (std::pair<std::string, std::string> (cfg_edit_inst_angle, "0"));
@@ -93,14 +90,14 @@ class PluginDeclaration
   : public PluginDeclarationBase
 {
 public:
-  PluginDeclaration (const std::string &title, const std::string &mouse_mode, 
-                     void (*option_get_f) (std::vector < std::pair<std::string, std::string> > &) = 0)
+  PluginDeclaration (const std::string &title, const std::string &mouse_mode,
+                     void (*option_get_f) (std::vector<std::pair<std::string, std::string>> &) = 0)
     : m_title (title), m_mouse_mode (mouse_mode), mp_option_get_f (option_get_f)
   {
     //  .. nothing yet ..
   }
 
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> &options) const
   {
     if (mp_option_get_f != 0) {
       (*mp_option_get_f) (options);
@@ -131,7 +128,7 @@ public:
     title = m_title;
     return true;
   }
-  
+
   virtual bool implements_mouse_mode (std::string &title) const
   {
     if (! m_mouse_mode.empty ()) {
@@ -143,7 +140,7 @@ public:
   }
 
   virtual std::vector<std::string> additional_editor_options_pages (lay::LayoutViewBase *) const
-  {    
+  {
     std::vector<std::string> names;
     names.push_back ("GenericEditorOptions");
     return names;
@@ -153,45 +150,39 @@ private:
   std::string m_title;
   std::string m_mouse_mode;
 
-  void (*mp_option_get_f) (std::vector < std::pair<std::string, std::string> > &options);
+  void (*mp_option_get_f) (std::vector<std::pair<std::string, std::string>> &options);
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl1 (
   new edt::PluginDeclaration<edt::PolygonService> (tl::to_string (tr ("Polygons")), "polygon:edit_mode\t" + tl::to_string (tr ("Polygon")) + "<:polygon_24px.png>" + tl::to_string (tr ("{Create a polygon}")), 0),
-  4010, 
-  "edt::Service(Polygons)"
-);
+  4010,
+  "edt::Service(Polygons)");
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl2 (
   new edt::PluginDeclaration<edt::BoxService> (tl::to_string (tr ("Boxes")), "box:edit_mode\t" + tl::to_string (tr ("Box")) + "\t<:box_24px.png>" + tl::to_string (tr ("{Create a box}")), 0),
-  4011, 
-  "edt::Service(Boxes)"
-);
+  4011,
+  "edt::Service(Boxes)");
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl3 (
   new edt::PluginDeclaration<edt::TextService> (tl::to_string (tr ("Texts")), "text:edit_mode\t" + tl::to_string (tr ("Text")) + "\t<:text_24px.png>" + tl::to_string (tr ("{Create a text object}")), &get_text_options),
-  4012, 
-  "edt::Service(Texts)"
-);
+  4012,
+  "edt::Service(Texts)");
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl4 (
   new edt::PluginDeclaration<edt::PathService> (tl::to_string (tr ("Paths")), "path:edit_mode\t" + tl::to_string (tr ("Path")) + "\t<:path_24px.png>" + tl::to_string (tr ("{Create a path}")), &get_path_options),
-  4013, 
-  "edt::Service(Paths)"
-);
+  4013,
+  "edt::Service(Paths)");
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl5 (
   new edt::PluginDeclaration<edt::PointService> (tl::to_string (tr ("Points")), std::string (), 0),
   4014,
-  "edt::Service(Points)"
-);
+  "edt::Service(Points)");
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl6 (
   new edt::PluginDeclaration<edt::InstService> (tl::to_string (tr ("Instances")), "instance:edit_mode\t" + tl::to_string (tr ("Instance")) + "\t<:instance_24px.png>" + tl::to_string (tr ("{Create a cell instance}")), &get_inst_options),
-  4020, 
-  "edt::Service(CellInstances)"
-);
+  4020,
+  "edt::Service(CellInstances)");
 
 template <class Service>
 bool is_enabled ()
 {
   for (auto p = tl::Registrar<lay::PluginDeclaration>::begin (); p != tl::Registrar<lay::PluginDeclaration>::end (); ++p) {
-    auto pd = dynamic_cast<const edt::PluginDeclaration<Service> *> (p.operator-> ());
+    auto pd = dynamic_cast<const edt::PluginDeclaration<Service> *> (p.operator->());
     if (pd) {
       return pd->editable_enabled ();
     }
@@ -216,7 +207,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> &options) const
   {
     options.push_back (std::pair<std::string, std::string> (cfg_edit_top_level_selection, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_edit_hier_copy_mode, "-1"));
@@ -312,11 +303,11 @@ public:
 
 #if defined(HAVE_QT)
     //  add entries to the combine mode dialog
-    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_add",   new lay::ConfigureAction (tl::to_string (tr ("Add<:/cm_add.png>{Add shapes}")),   cfg_edit_combine_mode, CMConverter ().to_string (CM_Add)));
+    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_add", new lay::ConfigureAction (tl::to_string (tr ("Add<:/cm_add.png>{Add shapes}")), cfg_edit_combine_mode, CMConverter ().to_string (CM_Add)));
     mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_merge", new lay::ConfigureAction (tl::to_string (tr ("Merge<:/cm_merge.png>{Merge shapes with background}")), cfg_edit_combine_mode, CMConverter ().to_string (CM_Merge)));
     mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_erase", new lay::ConfigureAction (tl::to_string (tr ("Erase<:/cm_erase.png>{Erase shape from background}")), cfg_edit_combine_mode, CMConverter ().to_string (CM_Erase)));
-    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_mask",  new lay::ConfigureAction (tl::to_string (tr ("Mask<:/cm_mask.png>{Mask background with shape}")),  cfg_edit_combine_mode, CMConverter ().to_string (CM_Mask)));
-    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_diff",  new lay::ConfigureAction (tl::to_string (tr ("Diff<:/cm_diff.png>{Compute difference of shape with background}")),  cfg_edit_combine_mode, CMConverter ().to_string (CM_Diff)));
+    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_mask", new lay::ConfigureAction (tl::to_string (tr ("Mask<:/cm_mask.png>{Mask background with shape}")), cfg_edit_combine_mode, CMConverter ().to_string (CM_Mask)));
+    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_diff", new lay::ConfigureAction (tl::to_string (tr ("Diff<:/cm_diff.png>{Compute difference of shape with background}")), cfg_edit_combine_mode, CMConverter ().to_string (CM_Diff)));
 
     update_menu (CM_Add);
 #endif
@@ -368,10 +359,10 @@ public:
     lay::Action *combine_menu = mp->menu ()->action ("@toolbar.combine_mode");
 
     if (cm != CM_Add && combine_menu->is_visible () && mp->menu_parent_widget ()->isVisible ()) {
-      lay::TipDialog td (QApplication::activeWindow (), 
-                    tl::to_string (tr ("The background combination mode of the shape editor is set to some other mode than 'Add'.\n"
-                                       "This can be confusing, because a shape may not be drawn as expected.\n\nTo switch back to normal mode, choose 'Add' for the background combination mode in the toolbar.")),
-                    "has-non-add-edit-combine-mode");
+      lay::TipDialog td (QApplication::activeWindow (),
+                         tl::to_string (tr ("The background combination mode of the shape editor is set to some other mode than 'Add'.\n"
+                                            "This can be confusing, because a shape may not be drawn as expected.\n\nTo switch back to normal mode, choose 'Add' for the background combination mode in the toolbar.")),
+                         "has-non-add-edit-combine-mode");
       if (td.exec_dialog ()) {
         //  Don't bother the user with more dialogs.
         return;
@@ -408,7 +399,7 @@ public:
     title = m_title;
     return true;
   }
-  
+
   virtual bool implements_mouse_mode (std::string &title) const
   {
     title = m_mouse_mode;
@@ -429,9 +420,8 @@ private:
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl30 (
   new edt::PartialPluginDeclaration (tl::to_string (tr ("Partial shapes")), "partial:edit_mode\t" + tl::to_string (tr ("Partial{Edit points and edges of shapes}")) + "<:partial_24px.png>"),
-  4030, 
-  "edt::PartialService"
-);
+  4030,
+  "edt::PartialService");
 
 class MoveTrackerPluginDeclaration
   : public lay::PluginDeclaration
@@ -451,8 +441,6 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl40 (
   new MoveTrackerPluginDeclaration (),
   4100,
-  "edt::MoveTrackerService"
-);
+  "edt::MoveTrackerService");
 
 }
-

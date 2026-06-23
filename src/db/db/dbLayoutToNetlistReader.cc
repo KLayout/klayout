@@ -26,33 +26,34 @@
 namespace db
 {
 
-namespace l2n_std_reader {
+namespace l2n_std_reader
+{
 
-  Brace::Brace (db::LayoutToNetlistStandardReader *reader) : mp_reader (reader), m_checked (false)
-  {
-    m_has_brace = reader->test ("(");
-  }
+Brace::Brace (db::LayoutToNetlistStandardReader *reader) : mp_reader (reader), m_checked (false)
+{
+  m_has_brace = reader->test ("(");
+}
 
-  Brace::operator bool ()
-  {
-    if (! m_has_brace) {
-      m_checked = true;
-      return false;
-    } else if (mp_reader->test (")")) {
-      m_checked = true;
-      return false;
-    } else {
-      return true;
-    }
+Brace::operator bool ()
+{
+  if (! m_has_brace) {
+    m_checked = true;
+    return false;
+  } else if (mp_reader->test (")")) {
+    m_checked = true;
+    return false;
+  } else {
+    return true;
   }
+}
 
-  void Brace::done ()
-  {
-    if (m_has_brace && ! m_checked) {
-      mp_reader->expect (")");
-      m_checked = true;
-    }
+void Brace::done ()
+{
+  if (m_has_brace && ! m_checked) {
+    mp_reader->expect (")");
+    m_checked = true;
   }
+}
 
 }
 
@@ -70,35 +71,30 @@ LayoutToNetlistStandardReader::LayoutToNetlistStandardReader (tl::InputStream &s
   skip ();
 }
 
-bool
-LayoutToNetlistStandardReader::test (const std::string &token)
+bool LayoutToNetlistStandardReader::test (const std::string &token)
 {
   skip ();
   return ! at_end () && m_ex.test (token.c_str ());
 }
 
-void
-LayoutToNetlistStandardReader::expect (const std::string &token)
+void LayoutToNetlistStandardReader::expect (const std::string &token)
 {
   m_ex.expect (token.c_str ());
 }
 
-void
-LayoutToNetlistStandardReader::read_word_or_quoted (std::string &s)
+void LayoutToNetlistStandardReader::read_word_or_quoted (std::string &s)
 {
   m_ex.read_word_or_quoted (s);
 }
 
-int
-LayoutToNetlistStandardReader::read_int ()
+int LayoutToNetlistStandardReader::read_int ()
 {
   int i = 0;
   m_ex.read (i);
   return i;
 }
 
-bool
-LayoutToNetlistStandardReader::try_read_int (int &i)
+bool LayoutToNetlistStandardReader::try_read_int (int &i)
 {
   i = 0;
   return m_ex.try_read (i);
@@ -120,15 +116,13 @@ LayoutToNetlistStandardReader::read_double ()
   return d;
 }
 
-bool
-LayoutToNetlistStandardReader::at_end ()
+bool LayoutToNetlistStandardReader::at_end ()
 {
   skip ();
   return (m_ex.at_end () && m_stream.at_end ());
 }
 
-void
-LayoutToNetlistStandardReader::skip ()
+void LayoutToNetlistStandardReader::skip ()
 {
   while (m_ex.at_end () || *m_ex.skip () == '#') {
     if (m_stream.at_end ()) {
@@ -181,7 +175,6 @@ void LayoutToNetlistStandardReader::skip_element ()
     } else {
       throw tl::Exception (tl::to_string (tr ("Unexpected token")));
     }
-
   }
 }
 
@@ -476,7 +469,6 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
         } else {
           skip_element ();
         }
-
       }
 
       br.done ();
@@ -556,14 +548,13 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
         std::pair<bool, db::cell_index_type> ci_old = ly->cell_by_name (name.c_str ());
         device_cell_index = ci_old.first ? ci_old.second : ly->add_cell (name.c_str ());
         circuit->set_cell_index (device_cell_index);
-
       }
 
-      std::map<db::CellInstArray, std::list<Connections> > connections;
+      std::map<db::CellInstArray, std::list<Connections>> connections;
       ObjectMap map_local;
       ObjectMap *map = &map_local;
       if (map_per_circuit) {
-        map = &(*map_per_circuit)[circuit];
+        map = &(*map_per_circuit) [circuit];
       }
 
       while (br) {
@@ -587,7 +578,6 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
         } else {
           skip_element ();
         }
-
       }
       br.done ();
 
@@ -599,14 +589,13 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
         //  connections needs to be made after the instances (because in a readonly Instances container
         //  the Instance pointers will invalidate when new instances are added)
         for (db::Cell::const_iterator i = ccell.begin (); ! i.at_end (); ++i) {
-          std::map<db::CellInstArray, std::list<Connections> >::const_iterator c = connections.find (i->cell_inst ());
+          std::map<db::CellInstArray, std::list<Connections>>::const_iterator c = connections.find (i->cell_inst ());
           if (c != connections.end ()) {
             for (std::list<Connections>::const_iterator j = c->second.begin (); j != c->second.end (); ++j) {
               l2n->net_clusters ().clusters_per_cell (device_cell_index).add_connection (j->from_cluster, db::ClusterInstance (j->to_cluster, i->cell_index (), i->complex_trans (), i->prop_id ()));
             }
           }
         }
-
       }
 
     } else if (test (skeys::device_key) || test (lkeys::device_key)) {
@@ -648,7 +637,6 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
         } else {
           skip_element ();
         }
-
       }
 
       br.done ();
@@ -658,7 +646,6 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
     } else {
       skip_element ();
     }
-
   }
 
   if (l2n) {
@@ -692,8 +679,7 @@ LayoutToNetlistStandardReader::read_point ()
   return m_ref;
 }
 
-void
-LayoutToNetlistStandardReader::read_property (db::NetlistObject *obj)
+void LayoutToNetlistStandardReader::read_property (db::NetlistObject *obj)
 {
   Brace br (this);
 
@@ -742,8 +728,7 @@ LayoutToNetlistStandardReader::read_polygon ()
   return poly;
 }
 
-void
-LayoutToNetlistStandardReader::read_geometries (db::NetlistObject *obj, Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<db::NetShape> &lc, db::Cell &cell)
+void LayoutToNetlistStandardReader::read_geometries (db::NetlistObject *obj, Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<db::NetShape> &lc, db::Cell &cell)
 {
   m_ref = db::Point ();
   std::string lname;
@@ -819,8 +804,7 @@ LayoutToNetlistStandardReader::read_geometries (db::NetlistObject *obj, Brace &b
   }
 }
 
-void
-LayoutToNetlistStandardReader::read_net (db::Netlist * /*netlist*/, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map)
+void LayoutToNetlistStandardReader::read_net (db::Netlist * /*netlist*/, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map)
 {
   Brace br (this);
 
@@ -847,14 +831,12 @@ LayoutToNetlistStandardReader::read_net (db::Netlist * /*netlist*/, db::LayoutTo
 
     db::Cell &cell = l2n->internal_layout ()->cell (circuit->cell_index ());
     read_geometries (net, br, l2n, lc, cell);
-
   }
 
   br.done ();
 }
 
-void
-LayoutToNetlistStandardReader::read_pin (db::Netlist * /*netlist*/, db::LayoutToNetlist * /*l2n*/, db::Circuit *circuit, ObjectMap &map)
+void LayoutToNetlistStandardReader::read_pin (db::Netlist * /*netlist*/, db::LayoutToNetlist * /*l2n*/, db::Circuit *circuit, ObjectMap &map)
 {
   Brace br (this);
 
@@ -888,14 +870,13 @@ LayoutToNetlistStandardReader::read_pin (db::Netlist * /*netlist*/, db::LayoutTo
       }
 
       net = map.id2net [(unsigned int) netid];
-      if (!net) {
+      if (! net) {
         throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (netid));
       }
 
     } else {
       skip_element ();
     }
-
   }
 
   size_t pin_id = circuit->add_pin (pin).id ();
@@ -927,7 +908,7 @@ LayoutToNetlistStandardReader::device_model_by_name (db::Netlist *netlist, const
 {
   for (db::Netlist::device_abstract_iterator i = netlist->begin_device_abstracts (); i != netlist->end_device_abstracts (); ++i) {
     if (i->name () == dmname) {
-      return std::make_pair (i.operator-> (), i->device_class ());
+      return std::make_pair (i.operator->(), i->device_class ());
     }
   }
 
@@ -939,8 +920,7 @@ LayoutToNetlistStandardReader::device_model_by_name (db::Netlist *netlist, const
   return std::make_pair ((db::DeviceAbstract *) 0, cls);
 }
 
-void
-LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map, std::map<db::CellInstArray, std::list<Connections> > &connections)
+void LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map, std::map<db::CellInstArray, std::list<Connections>> &connections)
 {
   Brace br (this);
 
@@ -1034,12 +1014,11 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
 
         unsigned int netid = (unsigned int) read_int ();
         db::Net *net = map.id2net [netid];
-        if (!net) {
+        if (! net) {
           throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (netid));
         }
 
         device->connect_terminal (tid, net);
-
       }
 
       br2.done ();
@@ -1075,7 +1054,6 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
     } else {
       skip_element ();
     }
-
   }
 
   br.done ();
@@ -1104,7 +1082,6 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
       db::CellInstArray other_inst (db::CellInst (i->device_abstract->cell_index ()), dbu_inv * trans * i->trans * dbu);
       ccell.insert (other_inst);
       insts.push_back (other_inst);
-
     }
 
     //  register cluster collections to be made later
@@ -1129,25 +1106,20 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
             Connections ref (net->cluster_id (), da->cluster_id_for_terminal (i->other_terminal_id));
             connections [insts [i->device_index]].push_back (ref);
           }
-
         }
 
       } else {
 
         Connections ref (net->cluster_id (), dm.first->cluster_id_for_terminal (tid));
         connections [insts [0]].push_back (ref);
-
       }
-
     }
-
   }
 
   circuit->add_device (device.release ());
 }
 
-bool
-LayoutToNetlistStandardReader::read_trans_part (db::DCplxTrans &tr)
+bool LayoutToNetlistStandardReader::read_trans_part (db::DCplxTrans &tr)
 {
   if (test (skeys::location_key) || test (lkeys::location_key)) {
 
@@ -1181,14 +1153,12 @@ LayoutToNetlistStandardReader::read_trans_part (db::DCplxTrans &tr)
 
     tr = db::DCplxTrans (mag, tr.angle (), tr.is_mirror (), tr.disp ());
     return true;
-
   }
 
   return false;
 }
 
-void
-LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map, std::map<db::CellInstArray, std::list<Connections> > &connections)
+void LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map, std::map<db::CellInstArray, std::list<Connections>> &connections)
 {
   Brace br (this);
 
@@ -1241,7 +1211,7 @@ LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::Layout
       }
 
       db::Net *net = map.id2net [netid];
-      if (!net) {
+      if (! net) {
         throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (netid));
       }
 
@@ -1256,7 +1226,6 @@ LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::Layout
     } else {
       skip_element ();
     }
-
   }
 
   br.done ();
@@ -1276,14 +1245,12 @@ LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::Layout
     ccell.insert (inst);
 
     connections [inst] = refs;
-
   }
 
   circuit->add_subcircuit (subcircuit.release ());
 }
 
-void
-LayoutToNetlistStandardReader::read_abstract_terminal (db::LayoutToNetlist *l2n, db::DeviceAbstract *dm, db::DeviceClass *dc)
+void LayoutToNetlistStandardReader::read_abstract_terminal (db::LayoutToNetlist *l2n, db::DeviceAbstract *dm, db::DeviceClass *dc)
 {
   Brace br (this);
 
@@ -1316,7 +1283,6 @@ LayoutToNetlistStandardReader::read_abstract_terminal (db::LayoutToNetlist *l2n,
 
     db::Cell &cell = l2n->internal_layout ()->cell (dm->cell_index ());
     read_geometries (0, br, l2n, lc, cell);
-
   }
 
   br.done ();

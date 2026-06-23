@@ -32,24 +32,24 @@
 #include "tlStream.h"
 #include "tlUnitTest.h"
 
-class PD 
+class PD
   : public db::PCellDeclaration
 {
   virtual std::vector<db::PCellLayerDeclaration> get_layer_declarations (const db::pcell_parameters_type &) const
   {
     std::vector<db::PCellLayerDeclaration> layers;
 
-    layers.push_back(db::PCellLayerDeclaration ());
+    layers.push_back (db::PCellLayerDeclaration ());
     layers.back ().symbolic = "gate";
     layers.back ().layer = 16;
     layers.back ().datatype = 0;
 
-    layers.push_back(db::PCellLayerDeclaration ());
+    layers.push_back (db::PCellLayerDeclaration ());
     layers.back ().symbolic = "metal0";
     layers.back ().layer = 24;
     layers.back ().datatype = 0;
 
-    layers.push_back(db::PCellLayerDeclaration ());
+    layers.push_back (db::PCellLayerDeclaration ());
     layers.back ().symbolic = "cont";
     layers.back ().layer = 23;
     layers.back ().datatype = 0;
@@ -73,14 +73,14 @@ class PD
 
   virtual void produce (const db::Layout &layout, const std::vector<unsigned int> &layer_ids, const db::pcell_parameters_type &parameters, db::Cell &cell) const
   {
-    db::Coord width = db::coord_traits<db::Coord>::rounded (parameters[0].to_double () / layout.dbu ());
-    db::Coord height = db::coord_traits<db::Coord>::rounded (parameters[1].to_double () / layout.dbu ());
+    db::Coord width = db::coord_traits<db::Coord>::rounded (parameters [0].to_double () / layout.dbu ());
+    db::Coord height = db::coord_traits<db::Coord>::rounded (parameters [1].to_double () / layout.dbu ());
 
-    int orientation = parameters[2].to_long ();
+    int orientation = parameters [2].to_long ();
 
-    //unsigned int l_gate = layer_ids[0];
-    unsigned int l_metal0 = layer_ids[1];
-    //unsigned int l_cont = layer_ids[2];
+    // unsigned int l_gate = layer_ids[0];
+    unsigned int l_metal0 = layer_ids [1];
+    // unsigned int l_cont = layer_ids[2];
 
     const db::Cell &cell_a = layout.cell (layout.cell_by_name ("A").second);
 
@@ -91,18 +91,18 @@ class PD
 
   virtual std::string get_display_name (const db::pcell_parameters_type &parameters) const
   {
-    db::Coord width = db::coord_traits<db::Coord>::rounded (parameters[0].to_double () * 1000.0);
-    db::Coord height = db::coord_traits<db::Coord>::rounded (parameters[1].to_double () * 1000.0);
+    db::Coord width = db::coord_traits<db::Coord>::rounded (parameters [0].to_double () * 1000.0);
+    db::Coord height = db::coord_traits<db::Coord>::rounded (parameters [1].to_double () * 1000.0);
     return tl::sprintf ("PD(W=%d,H=%d)", width, height);
   }
 };
 
-TEST(0) 
+TEST (0)
 {
   db::Manager m (true);
-  db::Layout layout(&m);
+  db::Layout layout (&m);
   layout.dbu (0.001);
-  db::Layout layout_au(&m);
+  db::Layout layout_au (&m);
   layout_au.dbu (0.001);
 
   //  Note: this sample requires the BASIC lib
@@ -119,12 +119,12 @@ TEST(0)
   db::compare_layouts (_this, layout, tl::testdata () + "/gds/pcell_test_0_au.gds", db::NoNormalization);
 }
 
-TEST(1) 
+TEST (1)
 {
   db::Manager m (true);
-  db::Layout layout(&m);
+  db::Layout layout (&m);
   layout.dbu (0.001);
-  
+
   db::LayerProperties p;
 
   p.layer = 23;
@@ -136,8 +136,8 @@ TEST(1)
   unsigned int l_gate = layout.insert_layer (p);
 
   db::Cell &cell_a = layout.cell (layout.add_cell ("A"));
-  cell_a.shapes(l_cont).insert(db::Box (50, 50, 150, 150));
-  cell_a.shapes(l_gate).insert(db::Box (0, 0, 200, 1000));
+  cell_a.shapes (l_cont).insert (db::Box (50, 50, 150, 150));
+  cell_a.shapes (l_gate).insert (db::Box (0, 0, 200, 1000));
 
   db::Cell &top = layout.cell (layout.add_cell ("TOP"));
 
@@ -147,9 +147,9 @@ TEST(1)
   parameters.push_back (tl::Variant ());
   parameters.push_back (tl::Variant ());
   parameters.push_back (tl::Variant ());
-  tl::Variant &width = parameters[0];
-  tl::Variant &height = parameters[1];
-  tl::Variant &orientation = parameters[2];
+  tl::Variant &width = parameters [0];
+  tl::Variant &height = parameters [1];
+  tl::Variant &orientation = parameters [2];
 
   width = 0.5;
   height = 1.0;
@@ -175,9 +175,9 @@ TEST(1)
 
   EXPECT_NE (pd2, pd3);
 
-  EXPECT_EQ (layout.get_properties(0).to_string (), "23/0");
-  EXPECT_EQ (layout.get_properties(1).to_string (), "16/0");
-  EXPECT_EQ (layout.get_properties(2).to_string (), "24/0");
+  EXPECT_EQ (layout.get_properties (0).to_string (), "23/0");
+  EXPECT_EQ (layout.get_properties (1).to_string (), "16/0");
+  EXPECT_EQ (layout.get_properties (2).to_string (), "24/0");
 
   CHECKPOINT ();
   db::compare_layouts (_this, layout, tl::testdata () + "/gds/pcell_test.gds", db::NoNormalization);
@@ -190,15 +190,15 @@ TEST(1)
     i2 = top.change_pcell_parameters (i2, parameters);
     EXPECT_EQ (i2.cell_index (), pd3);
     EXPECT_NE (i2.cell_index (), pd1);
-    
+
     CHECKPOINT ();
     db::compare_layouts (_this, layout, tl::testdata () + "/gds/pcell_test2.gds", db::NoNormalization);
 
-    width = 1.0; 
+    width = 1.0;
     i1 = top.change_pcell_parameters (i1, parameters);
     EXPECT_NE (i1.cell_index (), pd3);
     EXPECT_NE (i1.cell_index (), pd1);
-    
+
     CHECKPOINT ();
     db::compare_layouts (_this, layout, tl::testdata () + "/gds/pcell_test3.gds", db::WriteGDS2);
     CHECKPOINT ();
@@ -232,7 +232,7 @@ TEST(1)
     db::Cell &copy_top = copy.cell (top.cell_index ());
 
     db::Instance i1_copy = *(copy_top.begin ());
-    const db::PCellVariant *pcv = dynamic_cast<const db::PCellVariant *> (&copy.cell (i1_copy.cell_index()));
+    const db::PCellVariant *pcv = dynamic_cast<const db::PCellVariant *> (&copy.cell (i1_copy.cell_index ()));
 
     EXPECT_EQ (pcv != 0, true);
     EXPECT_EQ (copy_top.is_pcell_instance (i1_copy).first, true);
@@ -244,18 +244,17 @@ TEST(1)
 
     std::vector<tl::Variant> parameters = copy_top.get_pcell_parameters (i1_copy);
     EXPECT_EQ (parameters.size (), size_t (3));
-    EXPECT_EQ (std::string (parameters[0].to_string()), "0.4");
-    EXPECT_EQ (std::string (parameters[1].to_string()), "0.8");
-    EXPECT_EQ (std::string (parameters[2].to_string()), "1");
+    EXPECT_EQ (std::string (parameters [0].to_string ()), "0.4");
+    EXPECT_EQ (std::string (parameters [1].to_string ()), "0.8");
+    EXPECT_EQ (std::string (parameters [2].to_string ()), "1");
 
-    parameters[0] = 1.5;
+    parameters [0] = 1.5;
     i1_copy = copy_top.change_pcell_parameters (i1_copy, parameters);
-    
+
     CHECKPOINT ();
     db::compare_layouts (_this, copy, tl::testdata () + "/gds/pcell_test4.gds", db::WriteGDS2);
     CHECKPOINT ();
     db::compare_layouts (_this, copy, tl::testdata () + "/gds/pcell_test4.gds", db::WriteOAS);
-
   }
 }
 
@@ -267,16 +266,16 @@ class PD2
 public:
   virtual std::string get_cell_name (const db::pcell_parameters_type &parameters) const
   {
-    db::Coord width = db::coord_traits<db::Coord>::rounded (parameters[0].to_double () * 1000.0);
-    db::Coord height = db::coord_traits<db::Coord>::rounded (parameters[1].to_double () * 1000.0);
+    db::Coord width = db::coord_traits<db::Coord>::rounded (parameters [0].to_double () * 1000.0);
+    db::Coord height = db::coord_traits<db::Coord>::rounded (parameters [1].to_double () * 1000.0);
     return tl::sprintf ("PD_W%d_H%d", width, height);
   }
 };
 
-TEST(2)
+TEST (2)
 {
   db::Manager m (true);
-  db::Layout layout(&m);
+  db::Layout layout (&m);
   layout.dbu (0.001);
 
   db::LayerProperties p;
@@ -290,8 +289,8 @@ TEST(2)
   unsigned int l_gate = layout.insert_layer (p);
 
   db::Cell &cell_a = layout.cell (layout.add_cell ("A"));
-  cell_a.shapes(l_cont).insert(db::Box (50, 50, 150, 150));
-  cell_a.shapes(l_gate).insert(db::Box (0, 0, 200, 1000));
+  cell_a.shapes (l_cont).insert (db::Box (50, 50, 150, 150));
+  cell_a.shapes (l_gate).insert (db::Box (0, 0, 200, 1000));
 
   db::Cell &top = layout.cell (layout.add_cell ("TOP"));
 
@@ -301,9 +300,9 @@ TEST(2)
   parameters.push_back (tl::Variant ());
   parameters.push_back (tl::Variant ());
   parameters.push_back (tl::Variant ());
-  tl::Variant &width = parameters[0];
-  tl::Variant &height = parameters[1];
-  tl::Variant &orientation = parameters[2];
+  tl::Variant &width = parameters [0];
+  tl::Variant &height = parameters [1];
+  tl::Variant &orientation = parameters [2];
 
   width = 0.5;
   height = 1.0;

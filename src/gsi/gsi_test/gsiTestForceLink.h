@@ -27,9 +27,9 @@
 #include "tlDefs.h"
 
 #if defined(MAKE_GSI_TEST_LIBRARY)
-#  define GSI_TEST_PUBLIC DEF_INSIDE_PUBLIC
+#define GSI_TEST_PUBLIC DEF_INSIDE_PUBLIC
 #else
-#  define GSI_TEST_PUBLIC DEF_OUTSIDE_PUBLIC
+#define GSI_TEST_PUBLIC DEF_OUTSIDE_PUBLIC
 #endif
 
 /**
@@ -38,9 +38,8 @@
 
 namespace gsi_test
 {
-  GSI_TEST_PUBLIC int _force_link_f ();
-  static int _force_link_target = _force_link_f ();
+GSI_TEST_PUBLIC int _force_link_f ();
+static int _force_link_target = _force_link_f ();
 }
 
 #endif
-

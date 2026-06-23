@@ -28,13 +28,13 @@
 
 #include "dbLayout.h"
 
-namespace db {
+namespace db
+{
 
 /**
- *  @brief A struct that describes a level of instantiation in the selection, hence a specific instance of an array (if the instance is one) 
+ *  @brief A struct that describes a level of instantiation in the selection, hence a specific instance of an array (if the instance is one)
  */
-struct DB_PUBLIC InstElement
-{
+struct DB_PUBLIC InstElement {
   db::Instance inst_ptr;
   db::CellInstArray::iterator array_inst;
 
@@ -48,7 +48,7 @@ struct DB_PUBLIC InstElement
   }
 
   /**
-   *  @brief Constructor providing an instance 
+   *  @brief Constructor providing an instance
    *
    *  The iterator will be set to the first element (the only one if it is a single instance)
    */
@@ -78,9 +78,9 @@ struct DB_PUBLIC InstElement
   }
 
   /**
-   *  @brief Compute the bounding box of the instance path element 
+   *  @brief Compute the bounding box of the instance path element
    *
-   *  If the instance path element is a whole array, the bounding box is computed for the array, 
+   *  If the instance path element is a whole array, the bounding box is computed for the array,
    *  otherwise for the instance.
    *
    *  @param bc The bounding box converter for the cell instance (db::box_convert<db::CellInst>)
@@ -108,7 +108,7 @@ struct DB_PUBLIC InstElement
   /**
    *  @brief Assignment
    */
-  InstElement &operator= (const InstElement &d) 
+  InstElement &operator= (const InstElement &d)
   {
     if (&d != this) {
       inst_ptr = d.inst_ptr;
@@ -122,8 +122,8 @@ struct DB_PUBLIC InstElement
    */
   bool operator< (const InstElement &d) const
   {
-    if (inst_ptr != d.inst_ptr) { 
-      return inst_ptr < d.inst_ptr; 
+    if (inst_ptr != d.inst_ptr) {
+      return inst_ptr < d.inst_ptr;
     }
     return *array_inst < *d.array_inst;
   }
@@ -141,7 +141,7 @@ struct DB_PUBLIC InstElement
    */
   bool operator!= (const InstElement &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
 
   /**
@@ -175,4 +175,3 @@ find_path (const db::Layout &layout, db::cell_index_type from, db::cell_index_ty
 } // namespace db
 
 #endif
-

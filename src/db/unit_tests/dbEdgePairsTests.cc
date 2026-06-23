@@ -29,7 +29,7 @@
 #include "dbRegion.h"
 #include "dbTestSupport.h"
 
-TEST(1) 
+TEST (1)
 {
   db::EdgePairs ep;
   EXPECT_EQ (ep.empty (), true);
@@ -83,7 +83,7 @@ TEST(1)
   EXPECT_EQ (ep2.bbox ().to_string (), "(-20,-110;120,10)");
 }
 
-TEST(2) 
+TEST (2)
 {
   db::EdgePairs ep;
   ep.insert (db::EdgePair (db::Edge (db::Point (10, 20), db::Point (110, 120)), db::Edge (db::Point (-10, -20), db::Point (90, 80))));
@@ -113,8 +113,7 @@ TEST(2)
 }
 
 struct EPTestFilter
-  : public db::EdgePairFilterBase
-{
+  : public db::EdgePairFilterBase {
   bool selected (const db::EdgePair &ep, db::properties_id_type) const
   {
     return ep.first ().double_length () < 50;
@@ -134,7 +133,7 @@ private:
   db::MagnificationReducer m_vars;
 };
 
-TEST(3) 
+TEST (3)
 {
   db::EdgePairs ep;
   ep.insert (db::EdgePair (db::Edge (db::Point (10, 20), db::Point (50, 50)), db::Edge (db::Point (-10, -20), db::Point (90, 80))));
@@ -146,7 +145,7 @@ TEST(3)
   EXPECT_EQ (ep.to_string (), "");
 }
 
-TEST(4)
+TEST (4)
 {
   db::EdgePairs ep;
   ep.insert (db::EdgePair (db::Edge (db::Point (10, 20), db::Point (50, 50)), db::Edge (db::Point (-10, -20), db::Point (90, 80))));
@@ -162,7 +161,7 @@ TEST(4)
   EXPECT_EQ (db::compare (r, "(-10,-21;9,20;50,51;91,80);(-10,-21;9,20;110,121;91,80)"), true);
 }
 
-TEST(5_InternalAngleFilter)
+TEST (5_InternalAngleFilter)
 {
   db::EdgePair ep0 (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 0), db::Point (0, 0)));
   db::EdgePair ep45 (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 0), db::Point (100, 100)));
@@ -211,7 +210,7 @@ TEST(5_InternalAngleFilter)
   EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (ep45inv, 0), false);
 }
 
-TEST(6_add_with_properties)
+TEST (6_add_with_properties)
 {
   db::DeepShapeStore dss ("TOP", 0.001);
   db::EdgePairs rd1 (dss), rd2 (dss);
@@ -279,7 +278,7 @@ TEST(6_add_with_properties)
   EXPECT_EQ ((ro1 + rf2).to_string (), "(10,20;-20,60)/(10,30;-20,70){net=>17};(-10,20;20,60)/(-10,30;20,70){net=>17}");
 }
 
-TEST(7_properties)
+TEST (7_properties)
 {
   db::PropertiesSet ps;
 
@@ -299,4 +298,3 @@ TEST(7_properties)
   EXPECT_EQ (edge_pairs.nth_prop_id (0), db::properties_id_type (0));
   EXPECT_EQ (edge_pairs.nth_prop_id (1), pid1);
 }
-

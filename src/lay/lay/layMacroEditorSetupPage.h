@@ -37,9 +37,10 @@ struct MacroEditorSetupDialogData;
  *  @brief The dialog for editing the properties of the debugger/editor
  */
 class MacroEditorSetupPage
-  : public lay::ConfigPage, private Ui::MacroEditorSetupPage
+  : public lay::ConfigPage,
+    private Ui::MacroEditorSetupPage
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   MacroEditorSetupPage (QWidget *parent);
@@ -66,4 +67,3 @@ private:
 }
 
 #endif
-

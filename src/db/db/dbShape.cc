@@ -110,7 +110,6 @@ void Shape::set_layer (unsigned int layer_index)
     db::Shape new_shape = target_sh->insert (*this);
     sh->erase_shape (*this);
     *this = new_shape;
-
   }
 }
 
@@ -628,41 +627,36 @@ Shape::perimeter_type Shape::perimeter () const
   case PolygonRef:
   case PolygonPtrArrayMember:
     return polygon_ref ().perimeter ();
-  case PolygonPtrArray:
-    {
-      const polygon_ptr_array_type *arr = basic_ptr (polygon_ptr_array_type::tag ());
-      return arr->size () * arr->object ().perimeter ();
-    }
+  case PolygonPtrArray: {
+    const polygon_ptr_array_type *arr = basic_ptr (polygon_ptr_array_type::tag ());
+    return arr->size () * arr->object ().perimeter ();
+  }
   case SimplePolygon:
     return simple_polygon ().perimeter ();
   case SimplePolygonRef:
   case SimplePolygonPtrArrayMember:
     return simple_polygon_ref ().perimeter ();
-  case SimplePolygonPtrArray:
-    {
-      const simple_polygon_ptr_array_type *arr = basic_ptr (simple_polygon_ptr_array_type::tag ());
-      return arr->size () * arr->object ().perimeter ();
-    }
+  case SimplePolygonPtrArray: {
+    const simple_polygon_ptr_array_type *arr = basic_ptr (simple_polygon_ptr_array_type::tag ());
+    return arr->size () * arr->object ().perimeter ();
+  }
   case Path:
     return path ().perimeter ();
   case PathRef:
   case PathPtrArrayMember:
     return path_ref ().obj ().perimeter ();
-  case PathPtrArray:
-    {
-      const path_ptr_array_type *arr = basic_ptr (path_ptr_array_type::tag ());
-      return arr->size () * arr->object ().obj ().perimeter ();
-    }
-  case BoxArray:
-    {
-      const box_array_type *arr = basic_ptr (box_array_type::tag ());
-      return arr->size () * arr->object ().perimeter ();
-    }
-  case ShortBoxArray:
-    {
-      const short_box_array_type *arr = basic_ptr (short_box_array_type::tag ());
-      return arr->size () * arr->object ().perimeter ();
-    }
+  case PathPtrArray: {
+    const path_ptr_array_type *arr = basic_ptr (path_ptr_array_type::tag ());
+    return arr->size () * arr->object ().obj ().perimeter ();
+  }
+  case BoxArray: {
+    const box_array_type *arr = basic_ptr (box_array_type::tag ());
+    return arr->size () * arr->object ().perimeter ();
+  }
+  case ShortBoxArray: {
+    const short_box_array_type *arr = basic_ptr (short_box_array_type::tag ());
+    return arr->size () * arr->object ().perimeter ();
+  }
   case Point:
     return 0;
   case Edge:
@@ -691,39 +685,34 @@ size_t Shape::array_size () const
   case PolygonRef:
   case PolygonPtrArrayMember:
     return 1;
-  case PolygonPtrArray:
-    {
-      const polygon_ptr_array_type *arr = basic_ptr (polygon_ptr_array_type::tag ());
-      return arr->size ();
-    }
+  case PolygonPtrArray: {
+    const polygon_ptr_array_type *arr = basic_ptr (polygon_ptr_array_type::tag ());
+    return arr->size ();
+  }
   case SimplePolygon:
   case SimplePolygonRef:
   case SimplePolygonPtrArrayMember:
     return 1;
-  case SimplePolygonPtrArray:
-    {
-      const simple_polygon_ptr_array_type *arr = basic_ptr (simple_polygon_ptr_array_type::tag ());
-      return arr->size ();
-    }
+  case SimplePolygonPtrArray: {
+    const simple_polygon_ptr_array_type *arr = basic_ptr (simple_polygon_ptr_array_type::tag ());
+    return arr->size ();
+  }
   case Path:
   case PathRef:
   case PathPtrArrayMember:
     return 1;
-  case PathPtrArray:
-    {
-      const path_ptr_array_type *arr = basic_ptr (path_ptr_array_type::tag ());
-      return arr->size ();
-    }
-  case BoxArray:
-    {
-      const box_array_type *arr = basic_ptr (box_array_type::tag ());
-      return arr->size ();
-    }
-  case ShortBoxArray:
-    {
-      const short_box_array_type *arr = basic_ptr (short_box_array_type::tag ());
-      return arr->size ();
-    }
+  case PathPtrArray: {
+    const path_ptr_array_type *arr = basic_ptr (path_ptr_array_type::tag ());
+    return arr->size ();
+  }
+  case BoxArray: {
+    const box_array_type *arr = basic_ptr (box_array_type::tag ());
+    return arr->size ();
+  }
+  case ShortBoxArray: {
+    const short_box_array_type *arr = basic_ptr (short_box_array_type::tag ());
+    return arr->size ();
+  }
   case Box:
   case ShortBox:
   case BoxArrayMember:
@@ -749,41 +738,36 @@ Shape::area_type Shape::area () const
   case PolygonRef:
   case PolygonPtrArrayMember:
     return polygon_ref ().area ();
-  case PolygonPtrArray:
-    {
-      const polygon_ptr_array_type *arr = basic_ptr (polygon_ptr_array_type::tag ());
-      return arr->size () * arr->object ().area ();
-    }
+  case PolygonPtrArray: {
+    const polygon_ptr_array_type *arr = basic_ptr (polygon_ptr_array_type::tag ());
+    return arr->size () * arr->object ().area ();
+  }
   case SimplePolygon:
     return simple_polygon ().area ();
   case SimplePolygonRef:
   case SimplePolygonPtrArrayMember:
     return simple_polygon_ref ().area ();
-  case SimplePolygonPtrArray:
-    {
-      const simple_polygon_ptr_array_type *arr = basic_ptr (simple_polygon_ptr_array_type::tag ());
-      return arr->size () * arr->object ().area ();
-    }
+  case SimplePolygonPtrArray: {
+    const simple_polygon_ptr_array_type *arr = basic_ptr (simple_polygon_ptr_array_type::tag ());
+    return arr->size () * arr->object ().area ();
+  }
   case Path:
     return path ().area ();
   case PathRef:
   case PathPtrArrayMember:
     return path_ref ().obj ().area ();
-  case PathPtrArray:
-    {
-      const path_ptr_array_type *arr = basic_ptr (path_ptr_array_type::tag ());
-      return arr->size () * arr->object ().obj ().area ();
-    }
-  case BoxArray:
-    {
-      const box_array_type *arr = basic_ptr (box_array_type::tag ());
-      return arr->size () * arr->object ().area ();
-    }
-  case ShortBoxArray:
-    {
-      const short_box_array_type *arr = basic_ptr (short_box_array_type::tag ());
-      return arr->size () * arr->object ().area ();
-    }
+  case PathPtrArray: {
+    const path_ptr_array_type *arr = basic_ptr (path_ptr_array_type::tag ());
+    return arr->size () * arr->object ().obj ().area ();
+  }
+  case BoxArray: {
+    const box_array_type *arr = basic_ptr (box_array_type::tag ());
+    return arr->size () * arr->object ().area ();
+  }
+  case ShortBoxArray: {
+    const short_box_array_type *arr = basic_ptr (short_box_array_type::tag ());
+    return arr->size () * arr->object ().area ();
+  }
   case Box:
   case ShortBox:
   case BoxArrayMember:
@@ -866,37 +850,33 @@ Shape::box_type Shape::rectangle () const
   case db::Shape::SimplePolygonRef:
   case db::Shape::SimplePolygonPtrArrayMember:
     return simple_polygon_ref ().is_box () ? simple_polygon_ref ().box () : box_type ();
-  case db::Shape::Path:
-    {
-      const path_type &p = path ();
-      if (! p.round () && p.points () <= 2 && p.points () > 0) {
-        point_type p1 = *p.begin ();
-        point_type p2 = p1;
-        if (p.points () == 2) {
-          p2 = *++p.begin ();
-        }
-        if (p1.x () == p2.x () || p1.y () == p2.y ()) {
-          return p.box ();
-        }
+  case db::Shape::Path: {
+    const path_type &p = path ();
+    if (! p.round () && p.points () <= 2 && p.points () > 0) {
+      point_type p1 = *p.begin ();
+      point_type p2 = p1;
+      if (p.points () == 2) {
+        p2 = *++p.begin ();
+      }
+      if (p1.x () == p2.x () || p1.y () == p2.y ()) {
+        return p.box ();
       }
     }
-    break;
+  } break;
   case db::Shape::PathRef:
-  case db::Shape::PathPtrArrayMember:
-    {
-      const path_ref_type &p = path_ref ();
-      if (! p.ptr ()->round () && p.ptr ()->points () <= 2 && p.ptr ()->points () > 0) {
-        point_type p1 = *p.begin ();
-        point_type p2 = p1;
-        if (p.ptr ()->points () == 2) {
-          p2 = *++p.begin ();
-        }
-        if (p1.x () == p2.x () || p1.y () == p2.y ()) {
-          return p.box ();
-        }
+  case db::Shape::PathPtrArrayMember: {
+    const path_ref_type &p = path_ref ();
+    if (! p.ptr ()->round () && p.ptr ()->points () <= 2 && p.ptr ()->points () > 0) {
+      point_type p1 = *p.begin ();
+      point_type p2 = p1;
+      if (p.ptr ()->points () == 2) {
+        p2 = *++p.begin ();
+      }
+      if (p1.x () == p2.x () || p1.y () == p2.y ()) {
+        return p.box ();
       }
     }
-    break;
+  } break;
   default:
     break;
   }
@@ -913,7 +893,7 @@ Shape::hash_value () const
   if (m_stable) {
     //  Use the bytes of the iterator binary pattern (see operator<)
     for (unsigned int i = 0; i < sizeof (tl::reuse_vector<box_type>::const_iterator); ++i) {
-      h = tl::hcombine (h, size_t (m_generic.iter[i]));
+      h = tl::hcombine (h, size_t (m_generic.iter [i]));
     }
   } else {
     h = tl::hcombine (h, size_t (m_generic.any));
@@ -925,7 +905,7 @@ Shape::hash_value () const
 std::string
 Shape::to_string () const
 {
-  std::string r; 
+  std::string r;
 
   switch (m_type) {
   case Null:
@@ -933,37 +913,31 @@ Shape::to_string () const
     break;
   case Polygon:
   case PolygonRef:
-  case PolygonPtrArrayMember:
-    {
-      polygon_type p;
-      polygon (p);
-      r = "polygon " + p.to_string ();
-    }
-    break;
+  case PolygonPtrArrayMember: {
+    polygon_type p;
+    polygon (p);
+    r = "polygon " + p.to_string ();
+  } break;
   case PolygonPtrArray:
     r = "polygon_array";
     break;
   case SimplePolygon:
   case SimplePolygonRef:
-  case SimplePolygonPtrArrayMember:
-    {
-      simple_polygon_type p;
-      simple_polygon (p);
-      r = "simple_polygon " + p.to_string ();
-    }
-    break;
+  case SimplePolygonPtrArrayMember: {
+    simple_polygon_type p;
+    simple_polygon (p);
+    r = "simple_polygon " + p.to_string ();
+  } break;
   case SimplePolygonPtrArray:
     r = "simple_polygon_array";
     break;
   case Text:
   case TextRef:
-  case TextPtrArrayMember:
-    {
-      text_type p;
-      text (p);
-      r = "text " + p.to_string ();
-    }
-    break;
+  case TextPtrArrayMember: {
+    text_type p;
+    text (p);
+    r = "text " + p.to_string ();
+  } break;
   case TextPtrArray:
     r = "text_array";
     break;
@@ -978,13 +952,11 @@ Shape::to_string () const
     break;
   case Path:
   case PathRef:
-  case PathPtrArrayMember:
-    {
-      path_type p;
-      path (p);
-      r = "path " + p.to_string ();
-    }
-    break;
+  case PathPtrArrayMember: {
+    path_type p;
+    path (p);
+    r = "path " + p.to_string ();
+  } break;
   case PathPtrArray:
     r = "path_array";
     break;
@@ -1006,7 +978,7 @@ Shape::to_string () const
   default:
     r = "invalid";
   }
-  
+
   if (has_prop_id ()) {
     r += " props=";
     r += db::properties (prop_id ()).to_dict_var ().to_string ();

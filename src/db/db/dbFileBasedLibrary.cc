@@ -44,8 +44,7 @@ FileBasedLibrary::FileBasedLibrary (const std::string &path, const std::string &
   }
 }
 
-void
-FileBasedLibrary::merge_with_other_layout (const std::string &path)
+void FileBasedLibrary::merge_with_other_layout (const std::string &path)
 {
   m_other_paths.push_back (path);
   if (m_is_loaded) {
@@ -53,14 +52,12 @@ FileBasedLibrary::merge_with_other_layout (const std::string &path)
   }
 }
 
-bool
-FileBasedLibrary::is_for_path (const std::string &path)
+bool FileBasedLibrary::is_for_path (const std::string &path)
 {
   return m_other_paths.empty () && m_path == path;
 }
 
-bool
-FileBasedLibrary::is_for_paths (const std::vector<std::string> &paths)
+bool FileBasedLibrary::is_for_paths (const std::vector<std::string> &paths)
 {
   if (paths.size () != m_other_paths.size () + 1) {
     return false;
@@ -115,8 +112,7 @@ FileBasedLibrary::reload ()
   return name;
 }
 
-void
-FileBasedLibrary::merge_impl (const std::string &path)
+void FileBasedLibrary::merge_impl (const std::string &path)
 {
   db::Layout ly;
 
@@ -143,4 +139,3 @@ FileBasedLibrary::merge_impl (const std::string &path)
 }
 
 }
-

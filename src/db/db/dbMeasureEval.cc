@@ -171,8 +171,7 @@ MeasureEval::MeasureEval (double dbu, bool with_put)
   mp_shape.any = 0;
 }
 
-void
-MeasureEval::init ()
+void MeasureEval::init ()
 {
   if (m_with_put) {
     define_function ("put", new PutFunction (this));
@@ -184,54 +183,47 @@ MeasureEval::init ()
   define_function ("values", new ValuesFunction (this));
 }
 
-void
-MeasureEval::set_shape (const db::Polygon *poly) const
+void MeasureEval::set_shape (const db::Polygon *poly) const
 {
   m_shape_type = Polygon;
   mp_shape.poly = poly;
 }
 
-void
-MeasureEval::set_shape (const db::PolygonRef *poly) const
+void MeasureEval::set_shape (const db::PolygonRef *poly) const
 {
   m_shape_type = PolygonRef;
   mp_shape.poly_ref = poly;
 }
 
-void
-MeasureEval::set_shape (const db::Edge *edge) const
+void MeasureEval::set_shape (const db::Edge *edge) const
 {
   m_shape_type = Edge;
   mp_shape.edge = edge;
 }
 
-void
-MeasureEval::set_shape (const db::EdgePair *edge_pair) const
+void MeasureEval::set_shape (const db::EdgePair *edge_pair) const
 {
   m_shape_type = EdgePair;
   mp_shape.edge_pair = edge_pair;
 }
 
-void
-MeasureEval::set_shape (const db::Text *text) const
+void MeasureEval::set_shape (const db::Text *text) const
 {
   m_shape_type = Text;
   mp_shape.text = text;
 }
 
-void
-MeasureEval::reset (db::properties_id_type prop_id) const
+void MeasureEval::reset (db::properties_id_type prop_id) const
 {
   m_prop_id = prop_id;
   m_skip = false;
 }
 
-void
-MeasureEval::resolve_name (const std::string &name, const tl::EvalFunction *&function, const tl::Variant *&value, tl::Variant *&var)
+void MeasureEval::resolve_name (const std::string &name, const tl::EvalFunction *&function, const tl::Variant *&value, tl::Variant *&var)
 {
   tl::Eval::resolve_name (name, function, value, var);
 
-  if (!function && !value && !var) {
+  if (! function && ! value && ! var) {
     //  connect the name with a function getting the property value
     tl::EvalFunction *f = new PropertyFunction (this, name);
     define_function (name, f);
@@ -239,8 +231,7 @@ MeasureEval::resolve_name (const std::string &name, const tl::EvalFunction *&fun
   }
 }
 
-void
-MeasureEval::skip_func (bool f) const
+void MeasureEval::skip_func (bool f) const
 {
   m_skip = f;
 }
@@ -252,19 +243,17 @@ MeasureEval::shape_func () const
 
     db::CplxTrans tr (m_dbu);
 
-    switch (m_shape_type)
-    {
+    switch (m_shape_type) {
     case None:
     default:
       return tl::Variant ();
     case Polygon:
       return tl::Variant (tr * *mp_shape.poly);
-    case PolygonRef:
-      {
-        db::Polygon poly;
-        mp_shape.poly_ref->instantiate (poly);
-        return tl::Variant (tr * poly);
-      }
+    case PolygonRef: {
+      db::Polygon poly;
+      mp_shape.poly_ref->instantiate (poly);
+      return tl::Variant (tr * poly);
+    }
     case Edge:
       return tl::Variant (tr * *mp_shape.edge);
     case EdgePair:
@@ -275,19 +264,17 @@ MeasureEval::shape_func () const
 
   } else {
 
-    switch (m_shape_type)
-    {
+    switch (m_shape_type) {
     case None:
     default:
       return tl::Variant ();
     case Polygon:
       return tl::Variant (*mp_shape.poly);
-    case PolygonRef:
-      {
-        db::Polygon poly;
-        mp_shape.poly_ref->instantiate (poly);
-        return tl::Variant (poly);
-      }
+    case PolygonRef: {
+      db::Polygon poly;
+      mp_shape.poly_ref->instantiate (poly);
+      return tl::Variant (poly);
+    }
     case Edge:
       return tl::Variant (*mp_shape.edge);
     case EdgePair:
@@ -295,7 +282,6 @@ MeasureEval::shape_func () const
     case Text:
       return tl::Variant (*mp_shape.text);
     }
-
   }
 }
 
@@ -340,8 +326,7 @@ MeasureEval::values_func (const tl::Variant &name) const
   return res;
 }
 
-void
-MeasureEval::put_func (const tl::Variant &name, const tl::Variant &value) const
+void MeasureEval::put_func (const tl::Variant &name, const tl::Variant &value) const
 {
   auto prop_name_id = db::property_names_id (name);
   m_prop_set_out.erase (prop_name_id);
@@ -587,22 +572,19 @@ MeasureNetEval::MeasureNetEval (LayoutToNetlist *l2n, double dbu)
   m_copy_max_polygons = std::numeric_limits<size_t>::max ();
 }
 
-void
-MeasureNetEval::set_primary_layer (unsigned int layer_index)
+void MeasureNetEval::set_primary_layer (unsigned int layer_index)
 {
   tl_assert (m_layers.empty ());
   m_layers.push_back (layer_index);
 }
 
-void
-MeasureNetEval::set_secondary_layer (const std::string &name, unsigned int layer_index)
+void MeasureNetEval::set_secondary_layer (const std::string &name, unsigned int layer_index)
 {
   set_var (name, tl::Variant (int (m_layers.size ())));
   m_layers.push_back (layer_index);
 }
 
-void
-MeasureNetEval::init ()
+void MeasureNetEval::init ()
 {
   define_function ("put", new NetPutFunction (this));
   define_function ("skip", new NetSkipFunction (this));
@@ -613,8 +595,7 @@ MeasureNetEval::init ()
   define_function ("db", new NetDbFunction (this));
 }
 
-void
-MeasureNetEval::reset (db::cell_index_type cell_index, size_t cluster_id) const
+void MeasureNetEval::reset (db::cell_index_type cell_index, size_t cluster_id) const
 {
   //  default action: copy primary layer, merged, no limit
   m_copy_layers.clear ();
@@ -629,8 +610,7 @@ MeasureNetEval::reset (db::cell_index_type cell_index, size_t cluster_id) const
   m_area_and_perimeter_cache.clear ();
 }
 
-void
-MeasureNetEval::put_func (const tl::Variant &name, const tl::Variant &value) const
+void MeasureNetEval::put_func (const tl::Variant &name, const tl::Variant &value) const
 {
   auto prop_name_id = db::property_names_id (name);
   m_prop_set_out.erase (prop_name_id);
@@ -681,8 +661,7 @@ MeasureNetEval::perimeter_func (int layer_index) const
   return ap->second.perimeter;
 }
 
-void
-MeasureNetEval::copy_func (const std::vector<unsigned int> &layer_indexes, bool merge, size_t max_polygons) const
+void MeasureNetEval::copy_func (const std::vector<unsigned int> &layer_indexes, bool merge, size_t max_polygons) const
 {
   m_copy_layers.clear ();
   m_copy_layers.reserve (layer_indexes.size ());
@@ -711,7 +690,7 @@ MeasureNetEval::net_func () const
       auto ci = c->cell_index ();
       for (auto n = c->begin_nets (); n != c->end_nets (); ++n) {
         auto cid = n->cluster_id ();
-        m_nets_per_cell_and_cluster_id->insert (std::make_pair (std::make_pair (ci, cid), n.operator-> ()));
+        m_nets_per_cell_and_cluster_id->insert (std::make_pair (std::make_pair (ci, cid), n.operator->()));
       }
     }
   }

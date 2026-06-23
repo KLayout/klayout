@@ -107,17 +107,14 @@ EmptyEdgePairs::add (const EdgePairs &other) const
   return other.delegate ()->clone ();
 }
 
-bool 
-EmptyEdgePairs::equals (const EdgePairs &other) const
+bool EmptyEdgePairs::equals (const EdgePairs &other) const
 {
   return other.empty ();
 }
 
-bool 
-EmptyEdgePairs::less (const EdgePairs &other) const
+bool EmptyEdgePairs::less (const EdgePairs &other) const
 {
   return other.empty () ? false : true;
 }
 
 }
-

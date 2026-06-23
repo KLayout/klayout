@@ -30,8 +30,8 @@ namespace lay
 // --------------------------------------------------------------------------------------
 //  HelpProvider implementation
 
-HelpProvider::HelpProvider () 
-{ 
+HelpProvider::HelpProvider ()
+{
   //  .. nothing yet ..
 }
 

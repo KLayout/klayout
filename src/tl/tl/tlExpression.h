@@ -35,7 +35,7 @@
 #include <vector>
 #include <memory>
 
-namespace tl 
+namespace tl
 {
 
 class Eval;
@@ -46,7 +46,7 @@ class ExpressionParserContext;
 
 /**
  *  @brief An interface handling the evaluation context
- * 
+ *
  *  This object serves to provide extended context for the expressions:
  *
  *  First, this object is supposed to replace angle-bracket expressions
@@ -61,14 +61,14 @@ public:
   /**
    *  @brief Constructor
    */
-  ContextHandler()
+  ContextHandler ()
   {
   }
 
   /**
    *  @brief Destructor
    */
-  virtual ~ContextHandler()
+  virtual ~ContextHandler ()
   {
   }
 
@@ -97,7 +97,7 @@ public:
 /**
  *  @brief An exception thrown by the evaluation
  */
-class TL_PUBLIC EvalError 
+class TL_PUBLIC EvalError
   : public tl::Exception
 {
 public:
@@ -107,7 +107,7 @@ public:
 /**
  *  @brief An exception indicating that no such method exists
  */
-class TL_PUBLIC NoMethodError 
+class TL_PUBLIC NoMethodError
   : public EvalError
 {
 public:
@@ -209,7 +209,7 @@ public:
   /**
    *  @brief Execute the node
    */
-  virtual void execute (EvalTarget &out) const = 0; 
+  virtual void execute (EvalTarget &out) const = 0;
 
   /**
    *  @brief Clone the node
@@ -217,7 +217,7 @@ public:
   virtual ExpressionNode *clone (const tl::Expression *expr) const = 0;
 
 protected:
-  std::vector <ExpressionNode *> m_c;
+  std::vector<ExpressionNode *> m_c;
   ExpressionParserContext m_context;
   std::string m_name;
 
@@ -233,7 +233,7 @@ protected:
 /**
  *  @brief A class handler for user objects within tl::Variant
  *
- *  In order to enable objects for expressions, the user object in tl::Variant must be provided with 
+ *  In order to enable objects for expressions, the user object in tl::Variant must be provided with
  *  a class derived from tl::VariantUserClassBase which implements eval_cls to return an EvalClass
  *  implementation which executes the method.
  */
@@ -241,22 +241,22 @@ class TL_PUBLIC EvalClass
 {
 public:
   /**
-   *  @brief Constructor 
+   *  @brief Constructor
    *
    *  @param test_function_name The name of the function which will be created and which tests if the variant is of the given type.
    */
-  EvalClass () { }
+  EvalClass () {}
 
   /**
    *  @brief Destructor
    */
-  virtual ~EvalClass () { }
-    
-  /** 
+  virtual ~EvalClass () {}
+
+  /**
    *  @brief Execute the method with the given name on the object
    *
    *  @param node The current location in the syntax tree
-   *  @param out The return value 
+   *  @param out The return value
    *  @param object The object on which to execute the method
    *  @param method The name of the method
    *  @param args The arguments of the method
@@ -267,7 +267,7 @@ public:
 };
 
 /**
- *  @brief A base class for a function 
+ *  @brief A base class for a function
  */
 class TL_PUBLIC EvalFunction
 {
@@ -275,12 +275,12 @@ public:
   /**
    *  @brief Constructor
    */
-  EvalFunction () { }
+  EvalFunction () {}
 
   /**
    *  @brief Destructor
    */
-  virtual ~EvalFunction () { }
+  virtual ~EvalFunction () {}
 
   /**
    *  @brief Specifies whether keyword parameters are supported
@@ -292,7 +292,7 @@ public:
    *
    *  @param ex The position inside the current expression
    *  @param args The arguments of the method
-   *  @return The return value 
+   *  @return The return value
    */
   virtual void execute (const ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const = 0;
 };
@@ -361,19 +361,19 @@ private:
   friend class Eval;
 
   /**
-   *  @brief Private constructor for Eval 
+   *  @brief Private constructor for Eval
    */
   Expression (Eval *eval, const std::string &expr);
 
   /**
-   *  @brief Private constructor for Eval 
+   *  @brief Private constructor for Eval
    */
   Expression (Eval *eval, const char *expr);
 
   /**
    *  @brief Accessor to the root node
    */
-  std::unique_ptr<ExpressionNode> &root () 
+  std::unique_ptr<ExpressionNode> &root ()
   {
     return m_root;
   }
@@ -542,7 +542,7 @@ public:
   /**
    *  @brief Provide access to the match substrings
    */
-  std::vector<std::string> &match_substrings () 
+  std::vector<std::string> &match_substrings ()
   {
     return m_match_substrings;
   }
@@ -550,7 +550,7 @@ public:
   /**
    *  @brief Provide access to the match substrings (const version)
    */
-  const std::vector<std::string> &match_substrings () const 
+  const std::vector<std::string> &match_substrings () const
   {
     return m_match_substrings;
   }
@@ -598,8 +598,8 @@ private:
   friend class Expression;
 
   Eval *mp_parent, *mp_global;
-  std::map <std::string, tl::Variant> m_local_vars;
-  std::map <std::string, EvalFunction *> m_local_functions;
+  std::map<std::string, tl::Variant> m_local_vars;
+  std::map<std::string, EvalFunction *> m_local_functions;
   bool m_sloppy;
   const ContextHandler *mp_ctx_handler;
   std::vector<std::string> m_match_substrings;
@@ -623,4 +623,3 @@ private:
 }
 
 #endif
-

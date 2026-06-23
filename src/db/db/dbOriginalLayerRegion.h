@@ -28,7 +28,8 @@
 
 #include "dbAsIfFlatRegion.h"
 
-namespace db {
+namespace db
+{
 
 class EdgesDelegate;
 class RegionDelegate;
@@ -97,4 +98,3 @@ private:
 }
 
 #endif
-

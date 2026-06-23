@@ -71,24 +71,23 @@ PythonModule::PythonModule ()
 
 PythonModule::~PythonModule ()
 {
-  while (!m_methods_heap.empty ()) {
+  while (! m_methods_heap.empty ()) {
     delete m_methods_heap.back ();
     m_methods_heap.pop_back ();
   }
 
-  while (!m_getseters_heap.empty ()) {
+  while (! m_getseters_heap.empty ()) {
     delete m_getseters_heap.back ();
     m_getseters_heap.pop_back ();
   }
 
   if (mp_mod_def) {
-    delete[] mp_mod_def;
+    delete [] mp_mod_def;
     mp_mod_def = 0;
   }
 }
 
-void
-PythonModule::cleanup ()
+void PythonModule::cleanup ()
 {
   //  the Python objects are probably deleted by Python itself as it exits -
   //  don't try to delete them again in the destructor.
@@ -107,8 +106,7 @@ PythonModule::take_module ()
   return mp_module.release ();
 }
 
-void
-PythonModule::init (const char *mod_name, const char *description)
+void PythonModule::init (const char *mod_name, const char *description)
 {
   //  create a (standalone) Python interpreter if we don't have one yet
   //  NOTE: Python itself will take care to remove this instance in this case.
@@ -127,8 +125,8 @@ PythonModule::init (const char *mod_name, const char *description)
 
 #if PY_MAJOR_VERSION < 3
 
-  static PyMethodDef module_methods[] = {
-    {NULL}  // Sentinel
+  static PyMethodDef module_methods [] = {
+    {NULL} // Sentinel
   };
 
   module = Py_InitModule3 (m_mod_name.c_str (), module_methods, m_mod_description.c_str ());
@@ -136,30 +134,28 @@ PythonModule::init (const char *mod_name, const char *description)
 #else
 
   struct PyModuleDef mod_def = {
-     PyModuleDef_HEAD_INIT,
-     m_mod_name.c_str (),
-     NULL,     // module documentation
-     -1,       // size of per-interpreter state of the module,
-               // if the module keeps state in global variables.
-     NULL
-  };
+    PyModuleDef_HEAD_INIT,
+    m_mod_name.c_str (),
+    NULL, // module documentation
+    -1,   // size of per-interpreter state of the module,
+          // if the module keeps state in global variables.
+    NULL};
 
   tl_assert (! mp_mod_def);
 
   //  prepare a persistent structure with the module definition
   //  and pass this one to PyModule_Create
-  mp_mod_def = new char[sizeof (PyModuleDef)];
+  mp_mod_def = new char [sizeof (PyModuleDef)];
   memcpy ((void *) mp_mod_def, (const void *) &mod_def, sizeof (PyModuleDef));
 
   module = PyModule_Create ((PyModuleDef *) mp_mod_def);
-  
+
 #endif
 
   mp_module = PythonRef (module);
 }
 
-void
-PythonModule::init (const char *mod_name, PyObject *module)
+void PythonModule::init (const char *mod_name, PyObject *module)
 {
   //  do some checks before we create the module
   tl_assert (mp_module.get () == 0);
@@ -171,7 +167,7 @@ PythonModule::init (const char *mod_name, PyObject *module)
 PyMethodDef *
 PythonModule::make_method_def ()
 {
-  static PyMethodDef md = { };
+  static PyMethodDef md = {};
   m_methods_heap.push_back (new PyMethodDef (md));
   return m_methods_heap.back ();
 }
@@ -179,7 +175,7 @@ PythonModule::make_method_def ()
 PyGetSetDef *
 PythonModule::make_getset_def ()
 {
-  static PyGetSetDef gsd = { };
+  static PyGetSetDef gsd = {};
   m_getseters_heap.push_back (new PyGetSetDef (gsd));
   return m_getseters_heap.back ();
 }
@@ -191,16 +187,14 @@ PythonModule::make_string (const std::string &s)
   return const_cast<char *> (m_string_heap.back ().c_str ());
 }
 
-void
-PythonModule::add_python_doc (const gsi::ClassBase & /*cls*/, const MethodTable *mt, int mid, const std::string &doc)
+void PythonModule::add_python_doc (const gsi::ClassBase & /*cls*/, const MethodTable *mt, int mid, const std::string &doc)
 {
   for (MethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
     add_python_doc (*m, doc);
   }
 }
 
-void
-PythonModule::add_python_doc (const gsi::MethodBase *m, const std::string &doc)
+void PythonModule::add_python_doc (const gsi::MethodBase *m, const std::string &doc)
 {
   std::string &doc_string = m_python_doc [m];
   doc_string += doc;
@@ -271,11 +265,9 @@ public:
           Py_INCREF ((PyObject *) pt);
           PyModule_AddObject (mp_module->module (), cls->name ().c_str (), (PyObject *) pt);
         }
-
       }
 
       return pt;
-
     }
 
     PythonRef bases;
@@ -325,9 +317,9 @@ public:
     PyTypeObject *type = (PyTypeObject *) PyObject_Call ((PyObject *) &PyType_Type, args.get (), NULL);
     if (type == NULL) {
       try {
-      	check_error ();
+        check_error ();
       } catch (tl::Exception &ex) {
-	tl::error << ex.msg ();
+        tl::error << ex.msg ();
       }
       tl_assert (false);
     }
@@ -414,7 +406,6 @@ public:
               end_getters = mt_base->end_getters (t.second);
             }
           }
-
         }
 
         std::string doc;
@@ -467,13 +458,10 @@ public:
           desc->getter = begin_getters != end_getters ? get_property_getter_adaptor (getter_mid) : NULL;
           desc->setter = begin_setters != end_setters ? get_property_setter_adaptor (setter_mid) : NULL;
           attr = PythonRef (desc);
-
         }
 
         set_type_attr (type, name, attr);
-
       }
-
     }
 
     if (! as_static) {
@@ -511,7 +499,6 @@ public:
             name += "_";
             mp_module->add_python_doc (*cls, mt, int (mid), tl::sprintf (tl::to_string (tr ("This method is available as '%s' in Python to distiguish it from the property with the same name")), name));
           }
-
         }
 
         //  create documentation
@@ -523,7 +510,7 @@ public:
           doc += (*m)->doc ();
         }
 
-        if (! mt->is_static (mid)) {  //  Bound methods
+        if (! mt->is_static (mid)) { //  Bound methods
 
           PyMethodDef *method = mp_module->make_method_def ();
           method->ml_name = mp_module->make_string (name);
@@ -541,7 +528,7 @@ public:
           PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
           set_type_attr (type, name, attr);
 
-        } else {  //  Class methods
+        } else { //  Class methods
 
           PyMethodDef *method = mp_module->make_method_def ();
           method->ml_name = mp_module->make_string (name);
@@ -551,9 +538,7 @@ public:
 
           PythonRef attr = PythonRef (PyDescr_NewClassMethod (type, method));
           set_type_attr (type, name, attr);
-
         }
-
       }
 
       //  Complete the comparison operators if necessary.
@@ -587,7 +572,6 @@ public:
 
           PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
           set_type_attr (type, method->ml_name, attr);
-
         }
 
         if (has_lt && ! has_le) {
@@ -600,7 +584,6 @@ public:
 
           PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
           set_type_attr (type, method->ml_name, attr);
-
         }
 
         if (has_lt && ! has_gt) {
@@ -613,7 +596,6 @@ public:
 
           PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
           set_type_attr (type, method->ml_name, attr);
-
         }
 
         if (has_lt && ! has_ge) {
@@ -626,9 +608,7 @@ public:
 
           PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
           set_type_attr (type, method->ml_name, attr);
-
         }
-
       }
 
       //  install the static/non-static dispatcher descriptor
@@ -667,11 +647,8 @@ public:
           PythonRef name (c2python (*a));
           //  Note: we use the setattro function since that one allows us setting attributes on built-in types
           (PyType_Type.tp_setattro) ((PyObject *) type, name.get (), desc);
-
         }
-
       }
-
     }
 
     mt->finish ();
@@ -682,13 +659,12 @@ public:
 private:
   PythonModule *mp_module;
   PyObject *m_all_list;
-  std::map<const gsi::ClassBase *, std::vector<const gsi::ClassBase *> > m_extensions_for;
+  std::map<const gsi::ClassBase *, std::vector<const gsi::ClassBase *>> m_extensions_for;
 };
 
 }
 
-void
-PythonModule::make_classes (const char *mod_name)
+void PythonModule::make_classes (const char *mod_name)
 {
   PyObject *module = mp_module.get ();
 

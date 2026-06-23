@@ -34,20 +34,28 @@
 
 namespace Ui
 {
-  class MarkerBrowserConfigPage;
-  class MarkerBrowserConfigPage2;
+class MarkerBrowserConfigPage;
+class MarkerBrowserConfigPage2;
 }
 
 namespace rdb
 {
 
-enum context_mode_type { AnyCell = 0 , DatabaseTop, Current, CurrentOrAny, Local };
-enum window_type { DontChange = 0, FitCell, FitMarker, Center, CenterSize };
+enum context_mode_type { AnyCell = 0,
+                         DatabaseTop,
+                         Current,
+                         CurrentOrAny,
+                         Local };
+enum window_type { DontChange = 0,
+                   FitCell,
+                   FitMarker,
+                   Center,
+                   CenterSize };
 
 class MarkerBrowserConfigPage
   : public lay::ConfigPage
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   MarkerBrowserConfigPage (QWidget *parent);
@@ -66,7 +74,7 @@ private:
 class MarkerBrowserConfigPage2
   : public lay::ConfigPage
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
   MarkerBrowserConfigPage2 (QWidget *parent);
@@ -97,4 +105,4 @@ public:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

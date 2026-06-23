@@ -25,7 +25,7 @@
 
 #include <limits>
 
-namespace db 
+namespace db
 {
 
 LayoutStateModel::LayoutStateModel (bool busy)
@@ -59,36 +59,32 @@ LayoutStateModel::~LayoutStateModel ()
   //  .. nothing yet ..
 }
 
-void
-LayoutStateModel::do_invalidate_prop_ids ()
+void LayoutStateModel::do_invalidate_prop_ids ()
 {
   prop_ids_changed_event ();
 }
 
-void
-LayoutStateModel::do_invalidate_hier ()
+void LayoutStateModel::do_invalidate_hier ()
 {
   hier_changed_event ();
 }
 
-void 
-LayoutStateModel::do_invalidate_bboxes (unsigned int index)
+void LayoutStateModel::do_invalidate_bboxes (unsigned int index)
 {
   bboxes_changed_event (index);
   bboxes_changed_any_event ();
 }
 
-void
-LayoutStateModel::invalidate_bboxes (unsigned int index)
+void LayoutStateModel::invalidate_bboxes (unsigned int index)
 {
   if (index == std::numeric_limits<unsigned int>::max ()) {
     if (! m_all_bboxes_dirty || m_busy) {
-      do_invalidate_bboxes (index);  //  must be called before the bboxes are invalidated (stopping of redraw thread requires this)
+      do_invalidate_bboxes (index); //  must be called before the bboxes are invalidated (stopping of redraw thread requires this)
       m_all_bboxes_dirty = true;
     }
   } else {
     if ((! m_all_bboxes_dirty && (index >= (unsigned int) m_bboxes_dirty.size () || ! m_bboxes_dirty [index])) || m_busy) {
-      do_invalidate_bboxes (index);  //  must be called before the bboxes are invalidated (stopping of redraw thread requires this)
+      do_invalidate_bboxes (index); //  must be called before the bboxes are invalidated (stopping of redraw thread requires this)
       if (index >= (unsigned int) m_bboxes_dirty.size ()) {
         m_bboxes_dirty.resize (index + 1, false);
       }
@@ -98,14 +94,12 @@ LayoutStateModel::invalidate_bboxes (unsigned int index)
   }
 }
 
-bool
-LayoutStateModel::bboxes_dirty () const
+bool LayoutStateModel::bboxes_dirty () const
 {
   return m_some_bboxes_dirty || m_all_bboxes_dirty;
 }
 
-void
-LayoutStateModel::invalidate_prop_ids ()
+void LayoutStateModel::invalidate_prop_ids ()
 {
   if (! m_prop_ids_dirty) {
     do_invalidate_prop_ids ();
@@ -113,8 +107,7 @@ LayoutStateModel::invalidate_prop_ids ()
   }
 }
 
-void
-LayoutStateModel::update ()
+void LayoutStateModel::update ()
 {
   if (bboxes_dirty () || m_hier_dirty || m_prop_ids_dirty) {
     do_update ();
@@ -127,4 +120,3 @@ LayoutStateModel::update ()
 }
 
 }
-

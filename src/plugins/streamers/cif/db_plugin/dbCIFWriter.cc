@@ -40,9 +40,8 @@ namespace db
 namespace
 {
 
-struct CellNameValidator
-{
-  CellNameValidator () { }
+struct CellNameValidator {
+  CellNameValidator () {}
 
   bool is_valid (const std::string &name)
   {
@@ -75,9 +74,8 @@ struct CellNameValidator
   }
 };
 
-struct LayerNameValidator
-{
-  LayerNameValidator () { }
+struct LayerNameValidator {
+  LayerNameValidator () {}
 
   bool is_valid (const std::string &name)
   {
@@ -133,12 +131,11 @@ std::string cif_layer_name (const db::LayerProperties &lp)
 //  CIFValidNameGenerator implementation
 
 template <class ID>
-CIFValidNameGenerator<ID>::CIFValidNameGenerator () { }
+CIFValidNameGenerator<ID>::CIFValidNameGenerator () {}
 
 template <class ID>
 template <class Validator>
-void
-CIFValidNameGenerator<ID>::insert (ID id, const std::string &name, Validator validator)
+void CIFValidNameGenerator<ID>::insert (ID id, const std::string &name, Validator validator)
 {
   if (m_existing_names.find (name) == m_existing_names.end () && validator.is_valid (name)) {
     m_valid_names.insert (std::make_pair (id, name));
@@ -170,8 +167,7 @@ CIFValidNameGenerator<ID>::valid_name_for_id (ID id, Validator validator)
 }
 
 template <class ID>
-void
-CIFValidNameGenerator<ID>::clear ()
+void CIFValidNameGenerator<ID>::clear ()
 {
   m_existing_names.clear ();
   m_valid_names.clear ();
@@ -191,21 +187,21 @@ CIFWriter::CIFWriter ()
 }
 
 CIFWriter &
-CIFWriter::operator<<(const char *s)
+CIFWriter::operator<< (const char *s)
 {
-  mp_stream->put(s, strlen(s));
+  mp_stream->put (s, strlen (s));
   return *this;
 }
 
 CIFWriter &
-CIFWriter::operator<<(const std::string &s)
+CIFWriter::operator<< (const std::string &s)
 {
-  mp_stream->put(s.c_str(), s.size());
+  mp_stream->put (s.c_str (), s.size ());
   return *this;
 }
 
 CIFWriter &
-CIFWriter::operator<<(endl_tag)
+CIFWriter::operator<< (endl_tag)
 {
   *this << "\n";
   return *this;
@@ -217,8 +213,7 @@ CIFWriter::xy_sep () const
   return m_options.blank_separator ? " " : ",";
 }
 
-void 
-CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options)
+void CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options)
 {
   stream.set_as_text (true);
 
@@ -231,14 +226,14 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
   //  compute the scale factor to get to the 10 nm basic database unit of CIF
   double tl_scale = options.scale_factor () * layout.dbu () / 0.01;
 
-  std::vector <std::pair <unsigned int, db::LayerProperties> > layers;
+  std::vector<std::pair<unsigned int, db::LayerProperties>> layers;
   options.get_valid_layers (layout, layers, db::SaveLayoutOptions::LP_AssignName);
 
-  std::set <db::cell_index_type> cell_set;
+  std::set<db::cell_index_type> cell_set;
   options.get_cells (layout, cell_set, layers);
 
   //  create a cell index vector sorted bottom-up
-  std::vector <db::cell_index_type> cells;
+  std::vector<db::cell_index_type> cells;
   cells.reserve (cell_set.size ());
 
   for (db::Layout::bottom_up_const_iterator cell = layout.begin_bottom_up (); cell != layout.end_bottom_up (); ++cell) {
@@ -247,14 +242,14 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
     }
   }
 
-  time_t t = time(NULL);
-  struct tm tt = *localtime(&t);
+  time_t t = time (NULL);
+  struct tm tt = *localtime (&t);
 
-  char timestr[100];
-  strftime(timestr, sizeof (timestr), "%F %T", &tt);
+  char timestr [100];
+  strftime (timestr, sizeof (timestr), "%F %T", &tt);
 
   //  Write header
-  *this << "(CIF file written " << (const char *)timestr << " by KLayout);" << m_endl;
+  *this << "(CIF file written " << (const char *) timestr << " by KLayout);" << m_endl;
 
   //  TODO: this can be done more intelligently ..
   int tl_scale_divider;
@@ -267,11 +262,11 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
   }
 
   int cell_index = 0;
-  std::map <db::cell_index_type, int> db_to_cif_index_map;
-  std::set <db::cell_index_type> called_cells;
+  std::map<db::cell_index_type, int> db_to_cif_index_map;
+  std::set<db::cell_index_type> called_cells;
 
   //  register layers for generating valid names
-  for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator layer = layers.begin (); layer != layers.end (); ++layer) {
+  for (std::vector<std::pair<unsigned int, db::LayerProperties>>::const_iterator layer = layers.begin (); layer != layers.end (); ++layer) {
     m_layer_names.insert (layer->first, cif_layer_name (layer->second), LayerNameValidator ());
   }
 
@@ -285,7 +280,7 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
 
     m_progress.set (mp_stream->pos ());
 
-    //  cell body 
+    //  cell body
     const db::Cell &cref (layout.cell (*cell));
 
     ++cell_index;
@@ -307,25 +302,25 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
         m_progress.set (mp_stream->pos ());
 
         std::map<db::cell_index_type, int>::const_iterator cif_index = db_to_cif_index_map.find (inst->cell_index ());
-        tl_assert(cif_index != db_to_cif_index_map.end ());
+        tl_assert (cif_index != db_to_cif_index_map.end ());
 
         // resolve instance arrays
         for (db::Cell::cell_inst_array_type::iterator pp = inst->begin (); ! pp.at_end (); ++pp) {
 
           *this << "C" << cif_index->second;
-          
+
           // convert the transformation into CIF's notation
 
           db::CplxTrans t (inst->complex_trans (*pp));
-          db::Vector d (t.disp() * sf);
+          db::Vector d (t.disp () * sf);
 
-          if (t.is_mirror()) {
+          if (t.is_mirror ()) {
             *this << " MY";
           }
-          
-          double a = t.angle();
-          double xa = cos(a / 180.0 * M_PI);
-          double ya = sin(a / 180.0 * M_PI);
+
+          double a = t.angle ();
+          double xa = cos (a / 180.0 * M_PI);
+          double ya = sin (a / 180.0 * M_PI);
 
           //  normalize xa or ya whichever is better
           double n;
@@ -345,18 +340,15 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
 
           *this << " R" << floor (0.5 + xa) << xy_sep () << floor (0.5 + ya);
 
-          *this << " T" << d.x() << xy_sep () << d.y();
+          *this << " T" << d.x () << xy_sep () << d.y ();
 
           *this << ";" << m_endl;
-
         }
-
       }
-
     }
 
     //  shapes
-    for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
+    for (std::vector<std::pair<unsigned int, db::LayerProperties>>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
 
       m_needs_emit = true;
       m_layer = l->first;
@@ -367,12 +359,10 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
       write_boxes (layout, cref, l->first, sf);
 
       m_progress.set (mp_stream->pos ());
-
     }
 
     //  end of cell
     *this << "DF;" << m_endl;
-
   }
 
   if (m_options.dummy_calls) {
@@ -383,24 +373,19 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
       if (called_cells.find (*cell) == called_cells.end ()) {
 
         std::map<db::cell_index_type, int>::const_iterator cif_index = db_to_cif_index_map.find (*cell);
-        tl_assert(cif_index != db_to_cif_index_map.end ());
+        tl_assert (cif_index != db_to_cif_index_map.end ());
         *this << "C" << cif_index->second << ";" << m_endl;
-
       }
-
     }
-
   }
 
   //  end of file
   *this << "E" << m_endl;
 
   m_progress.set (mp_stream->pos ());
-
 }
 
-void 
-CIFWriter::emit_layer()
+void CIFWriter::emit_layer ()
 {
   if (m_needs_emit) {
     m_needs_emit = false;
@@ -408,8 +393,7 @@ CIFWriter::emit_layer()
   }
 }
 
-void 
-CIFWriter::write_texts (const db::Layout &layout, const db::Cell &cell, unsigned int layer, double sf)
+void CIFWriter::write_texts (const db::Layout &layout, const db::Cell &cell, unsigned int layer, double sf)
 {
   db::ShapeIterator shape (cell.shapes (layer).begin (db::ShapeIterator::Texts));
   while (! shape.at_end ()) {
@@ -418,20 +402,18 @@ CIFWriter::write_texts (const db::Layout &layout, const db::Cell &cell, unsigned
 
     emit_layer ();
 
-    *this << "94 " << tl::to_word_or_quoted_string (shape->text_string(), "0123456789:<>/&%$!.-_#+*?\\[]{}");
+    *this << "94 " << tl::to_word_or_quoted_string (shape->text_string (), "0123456789:<>/&%$!.-_#+*?\\[]{}");
 
     double h = shape->text_size () * layout.dbu ();
 
     db::Vector p (shape->text_trans ().disp () * sf);
-    *this << " " << p.x() << xy_sep () << p.y () << " " << h << ";" << m_endl;
+    *this << " " << p.x () << xy_sep () << p.y () << " " << h << ";" << m_endl;
 
     ++shape;
-
   }
 }
 
-void 
-CIFWriter::write_polygons (const db::Layout & /*layout*/, const db::Cell &cell, unsigned int layer, double sf)
+void CIFWriter::write_polygons (const db::Layout & /*layout*/, const db::Cell &cell, unsigned int layer, double sf)
 {
   db::ShapeIterator shape (cell.shapes (layer).begin (db::ShapeIterator::Polygons));
   while (! shape.at_end ()) {
@@ -463,12 +445,10 @@ CIFWriter::write_polygons (const db::Layout & /*layout*/, const db::Cell &cell, 
     }
 
     ++shape;
-
   }
 }
 
-void 
-CIFWriter::write_polygon (const db::Polygon &polygon, double sf)
+void CIFWriter::write_polygon (const db::Polygon &polygon, double sf)
 {
   emit_layer ();
   *this << "P";
@@ -479,8 +459,7 @@ CIFWriter::write_polygon (const db::Polygon &polygon, double sf)
   *this << ";" << m_endl;
 }
 
-void 
-CIFWriter::write_boxes (const db::Layout & /*layout*/, const db::Cell &cell, unsigned int layer, double sf)
+void CIFWriter::write_boxes (const db::Layout & /*layout*/, const db::Cell &cell, unsigned int layer, double sf)
 {
   db::ShapeIterator shape (cell.shapes (layer).begin (db::ShapeIterator::Boxes));
   while (! shape.at_end ()) {
@@ -493,12 +472,10 @@ CIFWriter::write_boxes (const db::Layout & /*layout*/, const db::Cell &cell, uns
     *this << "B " << b.width () << " " << b.height () << " " << b.center ().x () << xy_sep () << b.center ().y () << ";" << m_endl;
 
     ++shape;
-
   }
 }
 
-void 
-CIFWriter::write_paths (const db::Layout & /*layout*/, const db::Cell &cell, unsigned int layer, double sf)
+void CIFWriter::write_paths (const db::Layout & /*layout*/, const db::Cell &cell, unsigned int layer, double sf)
 {
   db::ShapeIterator shape (cell.shapes (layer).begin (db::ShapeIterator::Paths));
   while (! shape.at_end ()) {
@@ -589,9 +566,7 @@ CIFWriter::write_paths (const db::Layout & /*layout*/, const db::Cell &cell, uns
 #endif
 
     ++shape;
-
   }
 }
 
 }
-

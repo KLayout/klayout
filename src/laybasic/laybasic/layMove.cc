@@ -45,7 +45,7 @@ MoveService::MoveService (lay::LayoutViewBase *view)
     mp_editables (view),
     mp_view (view),
     m_global_grid (0.001)
-{ 
+{
   //  .. nothing yet ..
 }
 
@@ -54,8 +54,7 @@ MoveService::~MoveService ()
   drag_cancel ();
 }
 
-void
-MoveService::deactivated ()
+void MoveService::deactivated ()
 {
   EditorServiceBase::deactivated ();
   m_shift = db::DPoint ();
@@ -67,8 +66,7 @@ MoveService::deactivated ()
   }
 }
 
-bool
-MoveService::configure (const std::string &name, const std::string &value)
+bool MoveService::configure (const std::string &name, const std::string &value)
 {
   if (lay::EditorServiceBase::configure (name, value)) {
     return true;
@@ -78,11 +76,10 @@ MoveService::configure (const std::string &name, const std::string &value)
     tl::from_string (value, m_global_grid);
   }
 
-  return false;  //  not taken
+  return false; //  not taken
 }
 
-void
-MoveService::function (const std::string &name, const std::string &value)
+void MoveService::function (const std::string &name, const std::string &value)
 {
   if (name == move_function_name) {
 
@@ -106,12 +103,10 @@ MoveService::function (const std::string &name, const std::string &value)
 
     } catch (...) {
     }
-
   }
 }
 
-bool
-MoveService::key_event (unsigned int key, unsigned int buttons)
+bool MoveService::key_event (unsigned int key, unsigned int buttons)
 {
   if (lay::EditorServiceBase::key_event (key, buttons)) {
     return true;
@@ -145,7 +140,7 @@ MoveService::key_event (unsigned int key, unsigned int buttons)
         if (d < dmin) {
           d *= 2.0;
         }
-      } 
+      }
     }
 
     db::DVector s = db::DVector (dx * d, dy * d);
@@ -163,8 +158,7 @@ MoveService::key_event (unsigned int key, unsigned int buttons)
   }
 }
 
-bool
-MoveService::shortcut_override_event (unsigned int key, unsigned int buttons)
+bool MoveService::shortcut_override_event (unsigned int key, unsigned int buttons)
 {
   if (! m_dragging) {
     if (int (key) == lay::KeyDown ||
@@ -178,8 +172,7 @@ MoveService::shortcut_override_event (unsigned int key, unsigned int buttons)
   return lay::EditorServiceBase::shortcut_override_event (key, buttons);
 }
 
-void
-MoveService::show_toolbox (bool visible)
+void MoveService::show_toolbox (bool visible)
 {
   lay::EditorOptionsPage *tb = toolbox_widget ();
   if (tb) {
@@ -193,8 +186,7 @@ MoveService::toolbox_widget ()
   return mp_view->editor_options_pages () ? mp_view->editor_options_pages ()->page_with_name (move_editor_options_name) : 0;
 }
 
-bool 
-MoveService::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio) 
+bool MoveService::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   bool ret = false;
 
@@ -216,7 +208,6 @@ MoveService::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool p
       if (tb) {
         tb->configure (move_distance_setter_name, pmv.second.disp ().to_string ());
       }
-
     }
 
   } else if (prio) {
@@ -225,17 +216,15 @@ MoveService::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool p
     if (selector) {
       ret = selector->mouse_move_event (p, buttons, prio);
     }
-
   }
 
   //  track mouse position for the infix move initiation
   m_mouse_pos = p;
 
-  return ret;  // not taken to allow the mouse tracker to receive events as well
+  return ret; // not taken to allow the mouse tracker to receive events as well
 }
 
-bool 
-MoveService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
+bool MoveService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (prio && (buttons & lay::RightButton) != 0 && m_dragging) {
     if ((buttons & lay::ShiftButton) != 0) {
@@ -244,12 +233,12 @@ MoveService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool 
       mp_editables->move_transform (p, db::DFTrans (db::DFTrans::r90), ac_from_buttons (buttons));
     }
     return true;
-  } 
+  }
   if (prio && (buttons & lay::LeftButton) != 0) {
     if (handle_click (p, buttons, false, 0)) {
       return true;
     }
-  } 
+  }
   if (prio) {
     lay::SelectionService *selector = mp_view->selection_service ();
     if (selector) {
@@ -259,8 +248,7 @@ MoveService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool 
   return false;
 }
 
-bool 
-MoveService::mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
+bool MoveService::mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (prio) {
 
@@ -276,14 +264,12 @@ MoveService::mouse_double_click_event (const db::DPoint &p, unsigned int buttons
         return selector->mouse_double_click_event (p, buttons, prio);
       }
     }
-
   }
   return false;
 }
 
-bool 
-MoveService::mouse_release_event (const db::DPoint &p, unsigned int buttons, bool prio) 
-{ 
+bool MoveService::mouse_release_event (const db::DPoint &p, unsigned int buttons, bool prio)
+{
   if (prio) {
     lay::SelectionService *selector = mp_view->selection_service ();
     if (selector) {
@@ -293,8 +279,7 @@ MoveService::mouse_release_event (const db::DPoint &p, unsigned int buttons, boo
   return false;
 }
 
-bool 
-MoveService::wheel_event (int delta, bool horizontal, const db::DPoint &p, unsigned int buttons, bool prio)
+bool MoveService::wheel_event (int delta, bool horizontal, const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (prio) {
     lay::SelectionService *selector = mp_view->selection_service ();
@@ -305,14 +290,13 @@ MoveService::wheel_event (int delta, bool horizontal, const db::DPoint &p, unsig
   return false;
 }
 
-bool 
-MoveService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
+bool MoveService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (prio && (buttons & lay::LeftButton) != 0) {
     if (handle_click (p, buttons, false, 0)) {
       return true;
     }
-  } 
+  }
   if (prio) {
     lay::SelectionService *selector = mp_view->selection_service ();
     if (selector) {
@@ -322,8 +306,7 @@ MoveService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool 
   return false;
 }
 
-bool
-MoveService::start_move (db::Transaction *transaction, bool transient_selection)
+bool MoveService::start_move (db::Transaction *transaction, bool transient_selection)
 {
   if (m_dragging) {
     return false;
@@ -352,7 +335,6 @@ MoveService::start_move (db::Transaction *transaction, bool transient_selection)
 
     //  inherit transient selection mode from previous operation
     drag_transient = transient_selection;
-
   }
 
   db::DBox bbox = mp_editables->selection_bbox ();
@@ -377,16 +359,14 @@ MoveService::start_move (db::Transaction *transaction, bool transient_selection)
   return handle_click (pstart, 0, drag_transient, trans_holder.release ());
 }
 
-void
-MoveService::finish_move ()
+void MoveService::finish_move ()
 {
   if (m_dragging) {
     handle_click (m_mouse_pos, 0, false, 0);
   }
 }
 
-bool 
-MoveService::handle_click (const db::DPoint &p, unsigned int buttons, bool drag_transient, db::Transaction *transaction)
+bool MoveService::handle_click (const db::DPoint &p, unsigned int buttons, bool drag_transient, db::Transaction *transaction)
 {
   std::unique_ptr<db::Transaction> trans_holder (transaction);
 
@@ -398,7 +378,7 @@ MoveService::handle_click (const db::DPoint &p, unsigned int buttons, bool drag_
     if (mp_editables->begin_move (p, ac_from_buttons (buttons))) {
 
       ui ()->hover_reset ();
-        
+
       mp_editables->clear_transient_selection ();
 
       m_dragging = true;
@@ -410,7 +390,6 @@ MoveService::handle_click (const db::DPoint &p, unsigned int buttons, bool drag_
       m_shift = db::DPoint ();
 
       return true;
-
     }
 
   } else {
@@ -427,13 +406,11 @@ MoveService::handle_click (const db::DPoint &p, unsigned int buttons, bool drag_
     }
 
     return true;
-
   }
   return false;
 }
 
-void
-MoveService::drag_cancel ()
+void MoveService::drag_cancel ()
 {
   m_shift = db::DPoint ();
   if (m_dragging) {
@@ -442,13 +419,11 @@ MoveService::drag_cancel ()
     ui ()->ungrab_mouse (this);
 
     m_dragging = false;
-
   }
 }
 
-void
-MoveService::cancel_transaction ()
-{ 
+void MoveService::cancel_transaction ()
+{
   if (m_dragging) {
     if (mp_transaction.get ()) {
       mp_transaction->cancel ();
@@ -457,8 +432,7 @@ MoveService::cancel_transaction ()
   }
 }
 
-void
-MoveService::finish_transaction ()
+void MoveService::finish_transaction ()
 {
   if (m_dragging) {
     mp_transaction.reset (0);

@@ -31,7 +31,8 @@
 #include "dbEdgeBoolean.h"
 #include "dbEdgePairs.h"
 
-namespace db {
+namespace db
+{
 
 class Edges;
 class DeepRegion;
@@ -40,7 +41,8 @@ class DeepRegion;
  *  @brief Provides hierarchical edges implementation
  */
 class DB_PUBLIC DeepEdges
-  : public db::MutableEdges, public db::DeepShapeCollectionDelegateBase
+  : public db::MutableEdges,
+    public db::DeepShapeCollectionDelegateBase
 {
 public:
   DeepEdges ();
@@ -98,7 +100,7 @@ public:
   {
     return run_check (db::WidthRelation, 0, d, options);
   }
-    
+
   virtual EdgePairsDelegate *space_check (db::Coord d, const db::EdgesCheckOptions &options) const
   {
     return run_check (db::SpaceRelation, 0, d, options);
@@ -207,4 +209,3 @@ private:
 }
 
 #endif
-

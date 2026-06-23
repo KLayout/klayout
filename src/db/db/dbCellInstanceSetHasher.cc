@@ -54,8 +54,8 @@ CellInstanceSetHasher::MatrixHash::MatrixHash (const db::CellInstArray &array)
     *this *= double (na * nb);
 
     db::DVector dab = db::DVector (a) * double ((nb * (na - 1) * na) / 2) + db::DVector (b) * double ((na * (nb - 1) * nb) / 2);
-    m() [0][2] += dab.x ();
-    m() [1][2] += dab.y ();
+    m () [0][2] += dab.x ();
+    m () [1][2] += dab.y ();
 
   } else if (array.is_iterated_array ()) {
 
@@ -71,9 +71,8 @@ CellInstanceSetHasher::MatrixHash::MatrixHash (const db::CellInstArray &array)
 
     *this *= n;
 
-    m() [0][2] += dab.x ();
-    m() [1][2] += dab.y ();
-
+    m () [0][2] += dab.x ();
+    m () [1][2] += dab.y ();
   }
 }
 
@@ -91,14 +90,14 @@ CellInstanceSetHasher::MatrixHash::hash_value () const
   //  rotation/shear/scale submatrix elements (m11, m12, m21, m22).
   const double res = 1024.0;
 
-  size_t h =        d2h (m ()[0][0] * res);
-  h = tl::hcombine (d2h (m ()[0][1] * res), h);
-  h = tl::hcombine (d2h (m ()[0][2]), h);
-  h = tl::hcombine (d2h (m ()[1][0] * res), h);
-  h = tl::hcombine (d2h (m ()[1][1] * res), h);
-  h = tl::hcombine (d2h (m ()[1][2]), h);
+  size_t h = d2h (m () [0][0] * res);
+  h = tl::hcombine (d2h (m () [0][1] * res), h);
+  h = tl::hcombine (d2h (m () [0][2]), h);
+  h = tl::hcombine (d2h (m () [1][0] * res), h);
+  h = tl::hcombine (d2h (m () [1][1] * res), h);
+  h = tl::hcombine (d2h (m () [1][2]), h);
   //  m31 and m32 are always zero, so we don't count them here
-  h = tl::hcombine (d2h (m ()[2][2]), h);
+  h = tl::hcombine (d2h (m () [2][2]), h);
   return h;
 }
 
@@ -147,7 +146,6 @@ CellInstanceSetHasher::get_hash_uncached (cell_index_type for_cell)
     }
 
     return hm;
-
   }
 }
 

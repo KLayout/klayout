@@ -34,7 +34,7 @@ namespace lib
 /**
  *  @brief Implements the "PIE" PCell of the basic library
  */
-class BasicPie 
+class BasicPie
   : public db::PCellDeclaration
 {
 public:
@@ -72,4 +72,3 @@ public:
 }
 
 #endif
-

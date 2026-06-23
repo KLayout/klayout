@@ -41,13 +41,14 @@ class Dispatcher;
 class ConfigPage;
 
 class SettingsForm
-  : public QDialog, private Ui::SettingsForm 
+  : public QDialog,
+    private Ui::SettingsForm
 {
   Q_OBJECT
 
 public:
   SettingsForm (QWidget *parent, lay::Dispatcher *dispatcher, const char *name);
-  
+
   void setup ();
   void commit ();
 
@@ -59,11 +60,10 @@ public slots:
 
 private:
   lay::Dispatcher *mp_dispatcher;
-  std::vector <lay::ConfigPage *> m_config_pages;
+  std::vector<lay::ConfigPage *> m_config_pages;
   bool m_finalize_recursion;
 };
 
 }
 
 #endif
-

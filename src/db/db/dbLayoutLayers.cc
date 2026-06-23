@@ -38,7 +38,7 @@ LayerIterator::LayerIterator (unsigned int layer_index, const db::LayoutLayers &
 }
 
 LayerIterator &
-LayerIterator::operator++() 
+LayerIterator::operator++ ()
 {
   do {
     ++m_layer_index;
@@ -47,8 +47,8 @@ LayerIterator::operator++()
   return *this;
 }
 
-std::pair<unsigned int, const db::LayerProperties *> 
-LayerIterator::operator*() const
+std::pair<unsigned int, const db::LayerProperties *>
+LayerIterator::operator* () const
 {
   return std::pair<unsigned int, const db::LayerProperties *> (m_layer_index, &m_layout.get_properties (m_layer_index));
 }
@@ -77,8 +77,7 @@ LayoutLayers::~LayoutLayers ()
   //  .. nothing yet ..
 }
 
-void
-LayoutLayers::clear ()
+void LayoutLayers::clear ()
 {
   m_free_indices.clear ();
   m_layer_states.clear ();
@@ -103,15 +102,13 @@ LayoutLayers::operator= (const LayoutLayers &d)
     m_layer_states = d.m_layer_states;
     m_layer_props = d.m_layer_props;
     m_layers_by_props = d.m_layers_by_props;
-
   }
   return *this;
 }
 
-void
-LayoutLayers::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
+void LayoutLayers::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
 {
-  if (!no_self) {
+  if (! no_self) {
     stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
   }
 
@@ -121,8 +118,7 @@ LayoutLayers::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, i
   db::mem_stat (stat, purpose, cat, m_layers_by_props, true, (void *) this);
 }
 
-void 
-LayoutLayers::delete_layer (unsigned int n)
+void LayoutLayers::delete_layer (unsigned int n)
 {
   const db::LayerProperties &lp = m_layer_props [n];
   if (! lp.is_null ()) {
@@ -139,7 +135,7 @@ LayoutLayers::delete_layer (unsigned int n)
   m_layer_states [n] = Free;
 }
 
-unsigned int 
+unsigned int
 LayoutLayers::insert_layer (const LayerProperties &props)
 {
   unsigned int i = do_insert_layer ();
@@ -147,8 +143,7 @@ LayoutLayers::insert_layer (const LayerProperties &props)
   return i;
 }
 
-void 
-LayoutLayers::insert_layer (unsigned int index, const LayerProperties &props)
+void LayoutLayers::insert_layer (unsigned int index, const LayerProperties &props)
 {
   if (layer_state (index) == Normal) {
     delete_layer (index);
@@ -157,8 +152,7 @@ LayoutLayers::insert_layer (unsigned int index, const LayerProperties &props)
   set_properties (index, props);
 }
 
-int
-LayoutLayers::get_layer_maybe (const db::LayerProperties &lp) const
+int LayoutLayers::get_layer_maybe (const db::LayerProperties &lp) const
 {
   if (lp.is_null ()) {
     return -1;
@@ -211,7 +205,7 @@ LayoutLayers::guiding_shape_layer () const
   return (unsigned int) m_guiding_shape_layer;
 }
 
-unsigned int 
+unsigned int
 LayoutLayers::insert_special_layer (const LayerProperties &props)
 {
   unsigned int i = do_insert_layer (true /*special*/);
@@ -219,8 +213,7 @@ LayoutLayers::insert_special_layer (const LayerProperties &props)
   return i;
 }
 
-void 
-LayoutLayers::insert_special_layer (unsigned int index, const LayerProperties &props)
+void LayoutLayers::insert_special_layer (unsigned int index, const LayerProperties &props)
 {
   if (layer_state (index) == Normal) {
     delete_layer (index);
@@ -230,8 +223,8 @@ LayoutLayers::insert_special_layer (unsigned int index, const LayerProperties &p
   set_properties (index, props);
 }
 
-unsigned int 
-LayoutLayers::do_insert_layer (bool special) 
+unsigned int
+LayoutLayers::do_insert_layer (bool special)
 {
   if (m_free_indices.size () > 0) {
     unsigned int i = m_free_indices.back ();
@@ -245,8 +238,7 @@ LayoutLayers::do_insert_layer (bool special)
   }
 }
 
-void 
-LayoutLayers::do_insert_layer (unsigned int index, bool special) 
+void LayoutLayers::do_insert_layer (unsigned int index, bool special)
 {
   if (index >= layers ()) {
 
@@ -270,19 +262,15 @@ LayoutLayers::do_insert_layer (unsigned int index, bool special)
         break;
       }
     }
-  
   }
-
 }
 
-void 
-LayoutLayers::reserve_layers (unsigned int n)
+void LayoutLayers::reserve_layers (unsigned int n)
 {
   m_layer_states.reserve (n);
 }
 
-void 
-LayoutLayers::set_properties (unsigned int n, const LayerProperties &props)
+void LayoutLayers::set_properties (unsigned int n, const LayerProperties &props)
 {
   while (m_layer_props.size () <= n) {
     m_layer_props.push_back (LayerProperties ());
@@ -306,4 +294,3 @@ LayoutLayers::set_properties (unsigned int n, const LayerProperties &props)
 }
 
 }
-

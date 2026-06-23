@@ -96,135 +96,112 @@ static void set_cell_conflict_resolution (db::LoadLayoutOptions *options, db::Ce
 }
 
 //  extend lay::LoadLayoutOptions with the Common options
-static
-gsi::ClassExt<db::LoadLayoutOptions> common_reader_options (
+static gsi::ClassExt<db::LoadLayoutOptions> common_reader_options (
   gsi::method_ext ("set_layer_map", &set_layer_map, gsi::arg ("map"), gsi::arg ("create_other_layers"),
-    "@brief Sets the layer map\n"
-    "This sets a layer mapping for the reader. The layer map allows selection and translation of the original layers, for example to add a layer name.\n"
-    "@param map The layer map to set."
-    "@param create_other_layers The flag telling whether other layer should be created as well. Set to false if just the layers in the mapping table should be read.\n"
-    "\n"
-    "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration."
-  ) +
-  gsi::method_ext ("layer_map=", &set_layer_map1, gsi::arg ("map"),
-    "@brief Sets the layer map, but does not affect the \"create_other_layers\" flag.\n"
-    "Use \\create_other_layers? to enable or disable other layers not listed in the layer map.\n"
-    "@param map The layer map to set."
-    "\n"
-    "This convenience method has been introduced with version 0.26."
-  ) +
-  gsi::method_ext ("select_all_layers", &select_all_layers,
-    "@brief Selects all layers and disables the layer map\n"
-    "\n"
-    "This disables any layer map and enables reading of all layers.\n"
-    "New layers will be created when required.\n"
-    "\n"
-    "Starting with version 0.25 this method only applies to GDS2 and OASIS format. Other formats provide their own configuration."
-  ) +
-  gsi::method_ext ("layer_map", &get_layer_map,
-    "@brief Gets the layer map\n"
-    "@return A reference to the layer map\n"
-    "\n"
-    "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration."
-    "\n"
-    "Python note: this method has been turned into a property in version 0.26."
-  ) +
-  gsi::method_ext ("create_other_layers?", &create_other_layers,
-    "@brief Gets a value indicating whether other layers shall be created\n"
-    "@return True, if other layers should be created.\n"
-    "This attribute acts together with a layer map (see \\layer_map=). Layers not listed in this map are created as well when "
-    "\\create_other_layers? is true. Otherwise they are ignored.\n"
-    "\n"
-    "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration."
-  ) +
-  gsi::method_ext ("create_other_layers=", &set_create_other_layers, gsi::arg ("create"),
-    "@brief Specifies whether other layers shall be created\n"
-    "@param create True, if other layers should be created.\n"
-    "See \\create_other_layers? for a description of this attribute.\n"
-    "\n"
-    "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration."
-  ) +
-  gsi::method_ext ("text_enabled?|#is_text_enabled?", &get_text_enabled,
-    "@brief Gets a value indicating whether text objects shall be read\n"
-    "@return True, if text objects should be read."
-    "\n"
-    "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration."
-  ) +
-  gsi::method_ext ("text_enabled=", &set_text_enabled, gsi::arg ("enabled"),
-    "@brief Specifies whether text objects shall be read\n"
-    "@param enabled True, if text objects should be read."
-    "\n"
-    "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration."
-  ) +
-  gsi::method_ext ("properties_enabled?|#is_properties_enabled?", &get_properties_enabled,
-    "@brief Gets a value indicating whether properties shall be read\n"
-    "@return True, if properties should be read."
-    "\n"
-    "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration."
-  ) +
-  gsi::method_ext ("properties_enabled=", &set_properties_enabled, gsi::arg ("enabled"),
-    "@brief Specifies whether properties should be read\n"
-    "@param enabled True, if properties should be read."
-    "\n"
-    "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration."
-  ) +
-  gsi::method_ext ("cell_conflict_resolution", &get_cell_conflict_resolution,
-    "@brief Gets the cell conflict resolution mode\n"
-    "\n"
-    "Multiple layout files can be collected into a single Layout object by reading file after file into the Layout object. "
-    "Cells with same names are considered a conflict. This mode indicates how such conflicts are resolved. See \\LoadLayoutOptions::CellConflictResolution "
-    "for the values allowed. The default mode is \\LoadLayoutOptions::CellConflictResolution#AddToCell.\n"
-    "\n"
-    "This option has been introduced in version 0.27."
-  ) +
-  gsi::method_ext ("cell_conflict_resolution=", &set_cell_conflict_resolution, gsi::arg ("mode"),
-    "@brief Sets the cell conflict resolution mode\n"
-    "\n"
-    "See \\cell_conflict_resolution for details about this option.\n"
-    "\n"
-    "This option has been introduced in version 0.27."
-  ),
-  ""
-);
+                   "@brief Sets the layer map\n"
+                   "This sets a layer mapping for the reader. The layer map allows selection and translation of the original layers, for example to add a layer name.\n"
+                   "@param map The layer map to set."
+                   "@param create_other_layers The flag telling whether other layer should be created as well. Set to false if just the layers in the mapping table should be read.\n"
+                   "\n"
+                   "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration.") +
+    gsi::method_ext ("layer_map=", &set_layer_map1, gsi::arg ("map"),
+                     "@brief Sets the layer map, but does not affect the \"create_other_layers\" flag.\n"
+                     "Use \\create_other_layers? to enable or disable other layers not listed in the layer map.\n"
+                     "@param map The layer map to set."
+                     "\n"
+                     "This convenience method has been introduced with version 0.26.") +
+    gsi::method_ext ("select_all_layers", &select_all_layers,
+                     "@brief Selects all layers and disables the layer map\n"
+                     "\n"
+                     "This disables any layer map and enables reading of all layers.\n"
+                     "New layers will be created when required.\n"
+                     "\n"
+                     "Starting with version 0.25 this method only applies to GDS2 and OASIS format. Other formats provide their own configuration.") +
+    gsi::method_ext ("layer_map", &get_layer_map,
+                     "@brief Gets the layer map\n"
+                     "@return A reference to the layer map\n"
+                     "\n"
+                     "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration."
+                     "\n"
+                     "Python note: this method has been turned into a property in version 0.26.") +
+    gsi::method_ext ("create_other_layers?", &create_other_layers,
+                     "@brief Gets a value indicating whether other layers shall be created\n"
+                     "@return True, if other layers should be created.\n"
+                     "This attribute acts together with a layer map (see \\layer_map=). Layers not listed in this map are created as well when "
+                     "\\create_other_layers? is true. Otherwise they are ignored.\n"
+                     "\n"
+                     "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration.") +
+    gsi::method_ext ("create_other_layers=", &set_create_other_layers, gsi::arg ("create"),
+                     "@brief Specifies whether other layers shall be created\n"
+                     "@param create True, if other layers should be created.\n"
+                     "See \\create_other_layers? for a description of this attribute.\n"
+                     "\n"
+                     "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration.") +
+    gsi::method_ext ("text_enabled?|#is_text_enabled?", &get_text_enabled,
+                     "@brief Gets a value indicating whether text objects shall be read\n"
+                     "@return True, if text objects should be read."
+                     "\n"
+                     "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration.") +
+    gsi::method_ext ("text_enabled=", &set_text_enabled, gsi::arg ("enabled"),
+                     "@brief Specifies whether text objects shall be read\n"
+                     "@param enabled True, if text objects should be read."
+                     "\n"
+                     "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration.") +
+    gsi::method_ext ("properties_enabled?|#is_properties_enabled?", &get_properties_enabled,
+                     "@brief Gets a value indicating whether properties shall be read\n"
+                     "@return True, if properties should be read."
+                     "\n"
+                     "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration.") +
+    gsi::method_ext ("properties_enabled=", &set_properties_enabled, gsi::arg ("enabled"),
+                     "@brief Specifies whether properties should be read\n"
+                     "@param enabled True, if properties should be read."
+                     "\n"
+                     "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration.") +
+    gsi::method_ext ("cell_conflict_resolution", &get_cell_conflict_resolution,
+                     "@brief Gets the cell conflict resolution mode\n"
+                     "\n"
+                     "Multiple layout files can be collected into a single Layout object by reading file after file into the Layout object. "
+                     "Cells with same names are considered a conflict. This mode indicates how such conflicts are resolved. See \\LoadLayoutOptions::CellConflictResolution "
+                     "for the values allowed. The default mode is \\LoadLayoutOptions::CellConflictResolution#AddToCell.\n"
+                     "\n"
+                     "This option has been introduced in version 0.27.") +
+    gsi::method_ext ("cell_conflict_resolution=", &set_cell_conflict_resolution, gsi::arg ("mode"),
+                     "@brief Sets the cell conflict resolution mode\n"
+                     "\n"
+                     "See \\cell_conflict_resolution for details about this option.\n"
+                     "\n"
+                     "This option has been introduced in version 0.27."),
+  "");
 
 
 gsi::EnumIn<db::LoadLayoutOptions, db::CellConflictResolution> decl_dbCommonReader_CellConflictResolution ("db", "CellConflictResolution",
-  gsi::enum_const ("AddToCell", db::AddToCell,
-    "@brief Add content to existing cell\n"
-    "This is the mode use in before version 0.27. Content of new cells is simply added to existing cells with the same name.\n"
-    "Before version 0.29.2, this mode also merged instances, rendering it difficult to merge two identical cell hierarchies.\n"
-    "Since version 0.29.2, no instance duplicates are generated. Instead only new instances are added to existing cells.\n"
-    "With this feature in place, it is safe to merge two identical cell hierarchies stored in different files using AddToCell mode.\n"
-    "In that application, the shapes and layers of the layouts are combined, but the cell hierarchy stays identical."
-  ) +
-  gsi::enum_const ("OverwriteCell", db::OverwriteCell,
-    "@brief The old cell is overwritten entirely (including child cells which are not used otherwise).\n"
-  ) +
-  gsi::enum_const ("SkipNewCell", db::SkipNewCell,
-    "@brief The new cell is skipped entirely (including child cells which are not used otherwise).\n"
-  ) +
-  gsi::enum_const ("RenameCell", db::RenameCell,
-    "@brief The new cell will be renamed to become unique.\n"
-    "In this mode, two files are are combined rendering independent cell hierarchies coming from the original files.\n"
-    "Cells may be renamed however. Also, new top cells will appear after merging a file into the layout using RenameCell mode.\n"
-  ),
-  "@brief This enum specifies how cell conflicts are handled if a layout read into another layout and a cell name conflict arises.\n"
-  "Until version 0.26.8 and before, the mode was always 'AddToCell'. On reading, a cell was 'reopened' when encountering a cell name "
-  "which already existed. This mode is still the default. The other modes are made available to support other ways of merging layouts.\n"
-  "\n"
-  "Proxy cells are never modified in the existing layout. Proxy cells are always local to their layout file. So if the existing cell is "
-  "a proxy cell, the new cell will be renamed.\n"
-  "\n"
-  "If the new or existing cell is a ghost cell, both cells are merged always.\n"
-  "\n"
-  "This enum was introduced in version 0.27.\n"
-);
+                                                                                                           gsi::enum_const ("AddToCell", db::AddToCell,
+                                                                                                                            "@brief Add content to existing cell\n"
+                                                                                                                            "This is the mode use in before version 0.27. Content of new cells is simply added to existing cells with the same name.\n"
+                                                                                                                            "Before version 0.29.2, this mode also merged instances, rendering it difficult to merge two identical cell hierarchies.\n"
+                                                                                                                            "Since version 0.29.2, no instance duplicates are generated. Instead only new instances are added to existing cells.\n"
+                                                                                                                            "With this feature in place, it is safe to merge two identical cell hierarchies stored in different files using AddToCell mode.\n"
+                                                                                                                            "In that application, the shapes and layers of the layouts are combined, but the cell hierarchy stays identical.") +
+                                                                                                             gsi::enum_const ("OverwriteCell", db::OverwriteCell,
+                                                                                                                              "@brief The old cell is overwritten entirely (including child cells which are not used otherwise).\n") +
+                                                                                                             gsi::enum_const ("SkipNewCell", db::SkipNewCell,
+                                                                                                                              "@brief The new cell is skipped entirely (including child cells which are not used otherwise).\n") +
+                                                                                                             gsi::enum_const ("RenameCell", db::RenameCell,
+                                                                                                                              "@brief The new cell will be renamed to become unique.\n"
+                                                                                                                              "In this mode, two files are are combined rendering independent cell hierarchies coming from the original files.\n"
+                                                                                                                              "Cells may be renamed however. Also, new top cells will appear after merging a file into the layout using RenameCell mode.\n"),
+                                                                                                           "@brief This enum specifies how cell conflicts are handled if a layout read into another layout and a cell name conflict arises.\n"
+                                                                                                           "Until version 0.26.8 and before, the mode was always 'AddToCell'. On reading, a cell was 'reopened' when encountering a cell name "
+                                                                                                           "which already existed. This mode is still the default. The other modes are made available to support other ways of merging layouts.\n"
+                                                                                                           "\n"
+                                                                                                           "Proxy cells are never modified in the existing layout. Proxy cells are always local to their layout file. So if the existing cell is "
+                                                                                                           "a proxy cell, the new cell will be renamed.\n"
+                                                                                                           "\n"
+                                                                                                           "If the new or existing cell is a ghost cell, both cells are merged always.\n"
+                                                                                                           "\n"
+                                                                                                           "This enum was introduced in version 0.27.\n");
 
 //  Inject the NetlistCrossReference::Status declarations into NetlistCrossReference:
 gsi::ClassExt<db::LoadLayoutOptions> inject_CellConflictResolution_in_parent (decl_dbCommonReader_CellConflictResolution.defs ());
 
 }
-
-
-
-

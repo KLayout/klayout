@@ -83,7 +83,7 @@ AsIfFlatEdges::to_string (size_t nmax) const
   std::ostringstream os;
   EdgesIterator p (begin ());
   bool first = true;
-  for ( ; ! p.at_end () && nmax != 0; ++p, --nmax) {
+  for (; ! p.at_end () && nmax != 0; ++p, --nmax) {
     if (! first) {
       os << ";";
     }
@@ -99,7 +99,8 @@ AsIfFlatEdges::to_string (size_t nmax) const
   return os.str ();
 }
 
-namespace {
+namespace
+{
 
 class OutputPairHolder
 {
@@ -107,11 +108,11 @@ public:
   OutputPairHolder (int inverse, bool merged_semantics)
   {
     m_e1.reset (new FlatEdges (merged_semantics));
-    m_results.push_back (& m_e1->raw_edges ());
+    m_results.push_back (&m_e1->raw_edges ());
 
     if (inverse == 0) {
       m_e2.reset (new FlatEdges (merged_semantics));
-      m_results.push_back (& m_e2->raw_edges ());
+      m_results.push_back (&m_e2->raw_edges ());
     }
   }
 
@@ -139,7 +140,7 @@ AsIfFlatEdges::selected_interacting_generic (const Region &other, EdgeInteractio
     return ((mode == EdgesOutside) == inverse) ? new EmptyEdges () : clone ();
   }
 
-  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+  bool counting = ! (min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
   OutputPairHolder oph (inverse ? 1 : -1, merged_semantics () || is_merged ());
 
   db::EdgesIterator edges (begin_merged ());
@@ -151,7 +152,7 @@ AsIfFlatEdges::selected_interacting_generic (const Region &other, EdgeInteractio
   proc.set_description (progress_desc ());
   proc.set_report_progress (report_progress ());
 
-  std::vector<generic_shape_iterator<db::Polygon> > others;
+  std::vector<generic_shape_iterator<db::Polygon>> others;
   //  NOTE: with counting the other region needs to be merged
   others.push_back (counting || mode != EdgesInteract ? other.begin_merged () : other.begin ());
 
@@ -170,7 +171,7 @@ AsIfFlatEdges::selected_interacting_generic (const Edges &other, EdgeInteraction
     return ((mode == EdgesOutside) == inverse) ? new EmptyEdges () : clone ();
   }
 
-  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+  bool counting = ! (min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
   OutputPairHolder oph (inverse ? 1 : -1, merged_semantics () || is_merged ());
 
   db::EdgesIterator edges (begin_merged ());
@@ -182,7 +183,7 @@ AsIfFlatEdges::selected_interacting_generic (const Edges &other, EdgeInteraction
   proc.set_description (progress_desc ());
   proc.set_report_progress (report_progress ());
 
-  std::vector<generic_shape_iterator<db::Edge> > others;
+  std::vector<generic_shape_iterator<db::Edge>> others;
   //  NOTE: with counting the other edge collection needs to be merged
   others.push_back (counting || mode != EdgesInteract ? other.begin_merged () : other.begin ());
 
@@ -205,7 +206,7 @@ AsIfFlatEdges::selected_interacting_pair_generic (const Region &other, EdgeInter
     }
   }
 
-  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+  bool counting = ! (min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
   OutputPairHolder oph (0, merged_semantics () || is_merged ());
 
   db::EdgesIterator edges (begin_merged ());
@@ -217,7 +218,7 @@ AsIfFlatEdges::selected_interacting_pair_generic (const Region &other, EdgeInter
   proc.set_description (progress_desc ());
   proc.set_report_progress (report_progress ());
 
-  std::vector<generic_shape_iterator<db::Polygon> > others;
+  std::vector<generic_shape_iterator<db::Polygon>> others;
   //  NOTE: with counting the other region needs to be merged
   others.push_back (counting || mode != EdgesInteract ? other.begin_merged () : other.begin ());
 
@@ -240,7 +241,7 @@ AsIfFlatEdges::selected_interacting_pair_generic (const Edges &other, EdgeIntera
     }
   }
 
-  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+  bool counting = ! (min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
   OutputPairHolder oph (0, merged_semantics () || is_merged ());
 
   db::EdgesIterator edges (begin_merged ());
@@ -252,7 +253,7 @@ AsIfFlatEdges::selected_interacting_pair_generic (const Edges &other, EdgeIntera
   proc.set_description (progress_desc ());
   proc.set_report_progress (report_progress ());
 
-  std::vector<generic_shape_iterator<db::Edge> > others;
+  std::vector<generic_shape_iterator<db::Edge>> others;
   //  NOTE: with counting the other edge collection needs to be merged
   others.push_back (counting || mode != EdgesInteract ? other.begin_merged () : other.begin ());
 
@@ -269,14 +270,14 @@ AsIfFlatEdges::pull_generic (const Edges &edges) const
 
   AddressableEdgeDelivery e (begin ());
 
-  for ( ; ! e.at_end (); ++e) {
-    scanner.insert (e.operator-> (), 1);
+  for (; ! e.at_end (); ++e) {
+    scanner.insert (e.operator->(), 1);
   }
 
   AddressableEdgeDelivery ee = edges.addressable_merged_edges ();
 
-  for ( ; ! ee.at_end (); ++ee) {
-    scanner.insert (ee.operator-> (), 0);
+  for (; ! ee.at_end (); ++ee) {
+    scanner.insert (ee.operator->(), 0);
   }
 
   std::unique_ptr<FlatEdges> output (new FlatEdges (true));
@@ -298,14 +299,14 @@ AsIfFlatEdges::pull_generic (const Region &other) const
 
   AddressableEdgeDelivery e (begin ());
 
-  for ( ; ! e.at_end (); ++e) {
-    scanner.insert1 (e.operator-> (), 0);
+  for (; ! e.at_end (); ++e) {
+    scanner.insert1 (e.operator->(), 0);
   }
 
   AddressablePolygonDelivery p = other.addressable_merged_polygons ();
 
-  for ( ; ! p.at_end (); ++p) {
-    scanner.insert2 (p.operator-> (), 1);
+  for (; ! p.at_end (); ++p) {
+    scanner.insert2 (p.operator->(), 1);
   }
 
   std::unique_ptr<FlatRegion> output (new FlatRegion (true));
@@ -441,8 +442,7 @@ namespace
 {
 
 struct JoinEdgesClusterCollector
-  : public db::cluster_collector<db::Edge, size_t, JoinEdgesCluster>
-{
+  : public db::cluster_collector<db::Edge, size_t, JoinEdgesCluster> {
   typedef db::Edge::coord_type coord_type;
 
   JoinEdgesClusterCollector (db::PolygonSink *output, coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i)
@@ -478,8 +478,8 @@ AsIfFlatEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, c
     AddressableEdgeDelivery e (begin ());
 
     size_t n = 0;
-    for ( ; ! e.at_end (); ++e) {
-      scanner.insert (e.operator-> (), n);
+    for (; ! e.at_end (); ++e) {
+      scanner.insert (e.operator->(), n);
       ++n;
     }
 
@@ -501,7 +501,6 @@ AsIfFlatEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, c
     }
 
     return output.release ();
-
   }
 }
 
@@ -514,7 +513,7 @@ AsIfFlatEdges::in (const Edges &other, bool invert) const
     return new EmptyEdges ();
   }
 
-  std::set <db::Edge> op;
+  std::set<db::Edge> op;
   for (EdgesIterator o (other.begin_merged ()); ! o.at_end (); ++o) {
     op.insert (*o);
   }
@@ -539,7 +538,7 @@ AsIfFlatEdges::in_and_out (const Edges &other) const
     return std::make_pair (new EmptyEdges (), new EmptyEdges ());
   }
 
-  std::set <db::Edge> op;
+  std::set<db::Edge> op;
   for (EdgesIterator o (other.begin_merged ()); ! o.at_end (); ++o) {
     op.insert (*o);
   }
@@ -592,19 +591,16 @@ AsIfFlatEdges::length (const db::Box &box) const
         db::Coord dy = ce.second.dy ();
         db::Coord x = ce.second.p1 ().x ();
         db::Coord y = ce.second.p1 ().y ();
-        if ((dx == 0 && x == box.left ()   && dy < 0) ||
-            (dx == 0 && x == box.right ()  && dy > 0) ||
-            (dy == 0 && y == box.top ()    && dx < 0) ||
+        if ((dx == 0 && x == box.left () && dy < 0) ||
+            (dx == 0 && x == box.right () && dy > 0) ||
+            (dy == 0 && y == box.top () && dx < 0) ||
             (dy == 0 && y == box.bottom () && dx > 0)) {
           //  not counted -> box is at outside side of the edge
         } else {
           l += ce.second.length ();
         }
-
       }
-
     }
-
   }
 
   return l;
@@ -771,8 +767,8 @@ AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Co
   AddressableEdgeDelivery e (begin_merged ());
 
   size_t n = 0;
-  for ( ; ! e.at_end (); ++e) {
-    scanner.insert (e.operator-> (), n);
+  for (; ! e.at_end (); ++e) {
+    scanner.insert (e.operator->(), n);
     n += 2;
   }
 
@@ -781,8 +777,8 @@ AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Co
   if (other) {
     ee = other->addressable_merged_edges ();
     n = 1;
-    for ( ; ! ee.at_end (); ++ee) {
-      scanner.insert (ee.operator-> (), n);
+    for (; ! ee.at_end (); ++ee) {
+      scanner.insert (ee.operator->(), n);
       n += 2;
     }
   }
@@ -907,7 +903,7 @@ AsIfFlatEdges::intersections (const Edges &other) const
   }
 }
 
-EdgesDelegate * 
+EdgesDelegate *
 AsIfFlatEdges::boolean (const Edges *other, EdgeBoolOp op) const
 {
   std::unique_ptr<FlatEdges> output (new FlatEdges (true));
@@ -918,16 +914,16 @@ AsIfFlatEdges::boolean (const Edges *other, EdgeBoolOp op) const
 
   AddressableEdgeDelivery e (begin ());
 
-  for ( ; ! e.at_end (); ++e) {
-    scanner.insert (e.operator-> (), 0);
+  for (; ! e.at_end (); ++e) {
+    scanner.insert (e.operator->(), 0);
   }
 
   AddressableEdgeDelivery ee;
 
   if (other) {
     ee = other->addressable_edges ();
-    for ( ; ! ee.at_end (); ++ee) {
-      scanner.insert (ee.operator-> (), 1);
+    for (; ! ee.at_end (); ++ee) {
+      scanner.insert (ee.operator->(), 1);
     }
   }
 
@@ -948,16 +944,16 @@ AsIfFlatEdges::boolean_andnot (const Edges *other) const
 
   AddressableEdgeDelivery e (begin ());
 
-  for ( ; ! e.at_end (); ++e) {
-    scanner.insert (e.operator-> (), 0);
+  for (; ! e.at_end (); ++e) {
+    scanner.insert (e.operator->(), 0);
   }
 
   AddressableEdgeDelivery ee;
 
   if (other) {
     ee = other->addressable_edges ();
-    for ( ; ! ee.at_end (); ++ee) {
-      scanner.insert (ee.operator-> (), 1);
+    for (; ! ee.at_end (); ++ee) {
+      scanner.insert (ee.operator->(), 1);
     }
   }
 
@@ -1037,7 +1033,6 @@ AsIfFlatEdges::edge_region_op (const Region &other, db::EdgePolygonOp::mode_t mo
     if (res.second) {
       output_second->add_in_place (db::Edges (res.second));
     }
-
   }
 
   return std::make_pair (output.release (), output_second.release ());
@@ -1083,12 +1078,10 @@ AsIfFlatEdges::add (const Edges &other) const
     }
 
     return new_edges.release ();
-
   }
 }
 
-bool
-AsIfFlatEdges::equals (const Edges &other) const
+bool AsIfFlatEdges::equals (const Edges &other) const
 {
   if (empty () != other.empty ()) {
     return false;
@@ -1108,8 +1101,7 @@ AsIfFlatEdges::equals (const Edges &other) const
   return true;
 }
 
-bool
-AsIfFlatEdges::less (const Edges &other) const
+bool AsIfFlatEdges::less (const Edges &other) const
 {
   if (empty () != other.empty ()) {
     return empty () < other.empty ();
@@ -1129,8 +1121,7 @@ AsIfFlatEdges::less (const Edges &other) const
   return false;
 }
 
-void
-AsIfFlatEdges::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
+void AsIfFlatEdges::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
   //  improves performance when inserting an original layout into the same layout
   db::LayoutLocker locker (layout);
@@ -1146,4 +1137,3 @@ AsIfFlatEdges::insert_into (Layout *layout, db::cell_index_type into_cell, unsig
 }
 
 }
-

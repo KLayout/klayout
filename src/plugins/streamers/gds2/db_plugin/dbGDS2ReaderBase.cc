@@ -37,8 +37,8 @@ namespace db
 //  GDS2ReaderBase
 
 GDS2ReaderBase::GDS2ReaderBase ()
-  : m_dbu (0.001), 
-    m_dbuu (1.0), 
+  : m_dbu (0.001),
+    m_dbuu (1.0),
     m_read_texts (true),
     m_read_properties (true),
     m_allow_multi_xy_records (false),
@@ -52,8 +52,7 @@ GDS2ReaderBase::~GDS2ReaderBase ()
   // .. nothing yet ..
 }
 
-void
-GDS2ReaderBase::init (const db::LoadLayoutOptions &options)
+void GDS2ReaderBase::init (const db::LoadLayoutOptions &options)
 {
   CommonReader::init (options);
 
@@ -66,8 +65,7 @@ GDS2ReaderBase::init (const db::LoadLayoutOptions &options)
   m_box_mode = gds2_options.box_mode;
 }
 
-void
-GDS2ReaderBase::finish_element ()
+void GDS2ReaderBase::finish_element ()
 {
   while (true) {
 
@@ -79,7 +77,7 @@ GDS2ReaderBase::finish_element ()
       //  skip this record
     } else if (rec_id == sPROPVALUE) {
       //  skip this record
-    } else if (rec_id == sTEXT || rec_id == sPATH || rec_id == sBOUNDARY || rec_id == sBOX || 
+    } else if (rec_id == sTEXT || rec_id == sPATH || rec_id == sBOUNDARY || rec_id == sBOX ||
                rec_id == sAREF || rec_id == sSREF || rec_id == sENDSTR) {
       unget_record (rec_id);
       warn (tl::to_string (tr ("ENDEL record expected - assuming missing ENDEL")));
@@ -87,12 +85,11 @@ GDS2ReaderBase::finish_element ()
     } else {
       error (tl::to_string (tr ("ENDEL, PROPATTR or PROPVALUE record expected")));
     }
-
-  } 
+  }
 }
 
 
-std::pair <bool, db::properties_id_type> 
+std::pair<bool, db::properties_id_type>
 GDS2ReaderBase::finish_element_with_props ()
 {
   bool any = false;
@@ -116,7 +113,7 @@ GDS2ReaderBase::finish_element_with_props ()
         any = true;
       }
 
-    } else if (rec_id == sTEXT || rec_id == sPATH || rec_id == sBOUNDARY || rec_id == sBOX || 
+    } else if (rec_id == sTEXT || rec_id == sPATH || rec_id == sBOUNDARY || rec_id == sBOX ||
                rec_id == sAREF || rec_id == sSREF || rec_id == sENDSTR) {
       unget_record (rec_id);
       warn (tl::to_string (tr ("ENDEL record expected - assuming missing ENDEL")));
@@ -124,8 +121,7 @@ GDS2ReaderBase::finish_element_with_props ()
     } else {
       error (tl::to_string (tr ("ENDEL, PROPATTR or PROPVALUE record expected")));
     }
-
-  } 
+  }
 
   if (any) {
     return std::make_pair (true, db::properties_id (properties));
@@ -135,12 +131,12 @@ GDS2ReaderBase::finish_element_with_props ()
 }
 
 
-inline db::Point 
-pt_conv (const GDS2XY &p) 
+inline db::Point
+pt_conv (const GDS2XY &p)
 {
   //  TODO: this can be done more efficiently ..
-  int x = (int (p.x[0]) << 24) | (int (p.x[1]) << 16) | (int (p.x[2]) << 8) | int (p.x[3]);
-  int y = (int (p.y[0]) << 24) | (int (p.y[1]) << 16) | (int (p.y[2]) << 8) | int (p.y[3]);
+  int x = (int (p.x [0]) << 24) | (int (p.x [1]) << 16) | (int (p.x [2]) << 8) | int (p.x [3]);
+  int y = (int (p.y [0]) << 24) | (int (p.y [1]) << 16) | (int (p.y [2]) << 8) | int (p.y [3]);
   return db::Point (x, y);
 }
 
@@ -150,22 +146,21 @@ v_conv (const GDS2XY &p)
   return pt_conv (p) - db::Point ();
 }
 
-inline bool 
+inline bool
 eq_x (const GDS2XY &a, const GDS2XY &b)
 {
   /// Re-cast pointer to char[4] as pointer to 32bit int for faster comparison
-  return *(( int*)a.x) == *(( int*)b.x);
+  return *((int *) a.x) == *((int *) b.x);
 }
 
-inline bool 
+inline bool
 eq_y (const GDS2XY &a, const GDS2XY &b)
 {
   /// Re-cast pointer to char[4] as pointer to 32bit int for faster comparison
-  return *(( int*)a.y) == *(( int*)b.y);
+  return *((int *) a.y) == *((int *) b.y);
 }
 
-void 
-GDS2ReaderBase::do_read (db::Layout &layout) 
+void GDS2ReaderBase::do_read (db::Layout &layout)
 {
   m_cellname = "";
   m_libname = "";
@@ -178,16 +173,16 @@ GDS2ReaderBase::do_read (db::Layout &layout)
     error (tl::to_string (tr ("BGNLIB record expected")));
   }
 
-  unsigned int mod_time[6] = { 0, 0, 0, 0, 0, 0 };
-  unsigned int access_time[6] = { 0, 0, 0, 0, 0, 0 };
+  unsigned int mod_time [6] = {0, 0, 0, 0, 0, 0};
+  unsigned int access_time [6] = {0, 0, 0, 0, 0, 0};
   get_time (mod_time, access_time);
-  layout.add_meta_info ("mod_time", MetaInfo (tl::to_string (tr ("Modification Time")), tl::sprintf ("%d/%d/%d %d:%02d:%02d", mod_time[1], mod_time[2], mod_time[0], mod_time[3], mod_time[4], mod_time[5])));
-  layout.add_meta_info ("access_time", MetaInfo (tl::to_string (tr ("Access Time")), tl::sprintf ("%d/%d/%d %d:%02d:%02d", access_time[1], access_time[2], access_time[0], access_time[3], access_time[4], access_time[5])));
+  layout.add_meta_info ("mod_time", MetaInfo (tl::to_string (tr ("Modification Time")), tl::sprintf ("%d/%d/%d %d:%02d:%02d", mod_time [1], mod_time [2], mod_time [0], mod_time [3], mod_time [4], mod_time [5])));
+  layout.add_meta_info ("access_time", MetaInfo (tl::to_string (tr ("Access Time")), tl::sprintf ("%d/%d/%d %d:%02d:%02d", access_time [1], access_time [2], access_time [0], access_time [3], access_time [4], access_time [5])));
 
   long attr = 0;
   db::PropertiesSet layout_properties;
 
-  //  read until 
+  //  read until
   short rec_id = 0;
   do {
     rec_id = get_record ();
@@ -202,7 +197,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
         rec_id == sENDMASKS) {
 
       //  OK and overread
-      
+
     } else if (rec_id == sLIBNAME) {
 
       m_libname = get_string ();
@@ -229,7 +224,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
       //  get units
       double dbuu = get_double ();
       double dbum = get_double ();
-      
+
       layout.add_meta_info ("dbuu", MetaInfo (tl::to_string (tr ("Database unit in user units")), tl::to_string (dbuu)));
       layout.add_meta_info ("dbum", MetaInfo (tl::to_string (tr ("Database unit in meter")), tl::to_string (dbum)));
       layout.add_meta_info ("libname", MetaInfo (tl::to_string (tr ("Library name")), m_libname));
@@ -265,7 +260,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
     progress_checkpoint ();
 
-    //  erase current instance list 
+    //  erase current instance list
     instances.erase (instances.begin (), instances.end ());
     instances_with_props.erase (instances_with_props.begin (), instances_with_props.end ());
 
@@ -302,9 +297,8 @@ GDS2ReaderBase::do_read (db::Layout &layout)
         }
 
         layout.fill_meta_info_from_context (cell_index, ci);
-
       }
-      
+
       db::Cell *cell = 0;
       if (! ignore_cell) {
         cell = &layout.cell (cell_index);
@@ -314,7 +308,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
       db::PropertiesSet cell_properties;
 
       //  read cell content
-      while ((rec_id = get_record ()) != sENDSTR) { 
+      while ((rec_id = get_record ()) != sENDSTR) {
 
         progress_checkpoint ();
 
@@ -359,18 +353,17 @@ GDS2ReaderBase::do_read (db::Layout &layout)
           } else if (m_box_mode == 3) {
             error (tl::to_string (tr ("BOX record encountered (reader is configured to produce an error in this case)")));
           } else {
-            while (get_record () != sENDEL) { }
+            while (get_record () != sENDEL) {}
           }
 
         } else if (rec_id == sNODE) {
 
           //  NODE records are ignored.
-          while (get_record () != sENDEL) { }
+          while (get_record () != sENDEL) {}
 
         } else {
           error (tl::to_string (tr ("Invalid record or data type")));
         }
-      
       }
 
       //  insert all instances collected
@@ -385,12 +378,10 @@ GDS2ReaderBase::do_read (db::Layout &layout)
       if (! cell_properties.empty ()) {
         cell->prop_id (db::properties_id (cell_properties));
       }
-
     }
 
     m_cellname = "";
     first_cell = false;
-
   }
 
   //  deserialize global context information
@@ -406,14 +397,13 @@ GDS2ReaderBase::do_read (db::Layout &layout)
   }
 }
 
-void
-GDS2ReaderBase::read_context_info_cell ()
+void GDS2ReaderBase::read_context_info_cell ()
 {
   short rec_id = 0;
   std::string cn;
 
   //  read cell content
-  while ((rec_id = get_record ()) != sENDSTR) { 
+  while ((rec_id = get_record ()) != sENDSTR) {
 
     progress_checkpoint ();
 
@@ -452,13 +442,12 @@ GDS2ReaderBase::read_context_info_cell ()
       }
 
       valid_hook = true;
-
     }
 
     if (valid_hook) {
 
-      std::vector <std::string> &strings = m_context_info.insert (std::make_pair (cn, std::vector <std::string> ())).first->second;
-      std::map <size_t, std::vector<std::string> > strings_ex;
+      std::vector<std::string> &strings = m_context_info.insert (std::make_pair (cn, std::vector<std::string> ())).first->second;
+      std::map<size_t, std::vector<std::string>> strings_ex;
 
       size_t attr = 0;
 
@@ -481,7 +470,7 @@ GDS2ReaderBase::read_context_info_cell ()
           //  attribute numbers may not be unique.
           //  See issue #1794.
 
-          if (str[0] == '#') {
+          if (str [0] == '#') {
 
             tl::Extractor ex (str + 1);
             size_t n = 0, p = 0;
@@ -489,11 +478,11 @@ GDS2ReaderBase::read_context_info_cell ()
               if (strings.size () <= n) {
                 strings.resize (n + 1, std::string ());
               }
-              std::vector<std::string> &sv = strings_ex[n];
+              std::vector<std::string> &sv = strings_ex [n];
               if (sv.size () <= p) {
                 sv.resize (p + 1, std::string ());
               }
-              sv[p] = ex.get ();
+              sv [p] = ex.get ();
             }
 
           } else {
@@ -502,13 +491,11 @@ GDS2ReaderBase::read_context_info_cell ()
               strings.resize (attr + 1, std::string ());
             }
             strings [attr] = str;
-
           }
 
         } else {
           error (tl::to_string (tr ("ENDEL, PROPATTR or PROPVALUE record expected")));
         }
-
       }
 
       //  combine the multipart strings (#1794)
@@ -530,14 +517,12 @@ GDS2ReaderBase::read_context_info_cell ()
     } else {
       error (tl::to_string (tr ("Invalid record inside a context info cell")));
     }
-  
   }
 }
 
-void 
-GDS2ReaderBase::read_boundary (db::Layout &layout, db::Cell &cell, bool from_box_record)
+void GDS2ReaderBase::read_boundary (db::Layout &layout, db::Cell &cell, bool from_box_record)
 {
-  LDPair ld; 
+  LDPair ld;
   short rec_id = 0;
 
   do {
@@ -573,17 +558,17 @@ GDS2ReaderBase::read_boundary (db::Layout &layout, db::Cell &cell, bool from_box
 
     //  create a box object if possible
     GDS2XY *xy = xy_data;
-    if ((xy_length == 4 || 
-         (xy_length == 5 && pt_conv (xy[4]) == pt_conv (xy[0]))) && 
-        ((eq_x (xy[0], xy[1]) && eq_x (xy[2], xy[3]) && 
-          eq_y (xy[1], xy[2]) && eq_y (xy[0], xy[3])) ||
-         (eq_x (xy[1], xy[2]) && eq_x (xy[0], xy[3]) && 
-          eq_y (xy[0], xy[1]) && eq_y (xy[2], xy[3])))) {
+    if ((xy_length == 4 ||
+         (xy_length == 5 && pt_conv (xy [4]) == pt_conv (xy [0]))) &&
+        ((eq_x (xy [0], xy [1]) && eq_x (xy [2], xy [3]) &&
+          eq_y (xy [1], xy [2]) && eq_y (xy [0], xy [3])) ||
+         (eq_x (xy [1], xy [2]) && eq_x (xy [0], xy [3]) &&
+          eq_y (xy [0], xy [1]) && eq_y (xy [2], xy [3])))) {
 
       //  we can create a box object:
       db::Point p1 = pt_conv (*xy++);
       db::Point p2 = p1;
-       
+
       while (xy < xy_data + 4) {
         db::Point p (pt_conv (*xy++));
         if (p.x () < p1.x ()) {
@@ -633,8 +618,7 @@ GDS2ReaderBase::read_boundary (db::Layout &layout, db::Cell &cell, bool from_box
             unget_record (rec_id);
             break;
           }
-
-        } 
+        }
 
         //  remove redundant start and endpoint
         if (! m_all_points.empty () && m_all_points.back () == m_all_points.front ()) {
@@ -651,7 +635,6 @@ GDS2ReaderBase::read_boundary (db::Layout &layout, db::Cell &cell, bool from_box
         }
 
         poly.assign_hull (xy_data, xy_data + xy_length, pt_conv, false /*no compression*/);
-
       }
 
       if (poly.hull ().size () < 3) {
@@ -666,12 +649,11 @@ GDS2ReaderBase::read_boundary (db::Layout &layout, db::Cell &cell, bool from_box
           cell.shapes (ll.second).insert (db::SimplePolygonRef (poly, layout.shape_repository ()));
         }
       }
-
     }
 
   } else {
 
-    while ((rec_id = get_record ()) == sXY) { 
+    while ((rec_id = get_record ()) == sXY) {
       // read over multi-XY records
       if (! m_allow_multi_xy_records) {
         error (tl::to_string (tr ("Multiple XY records detected on BOUNDARY element (reader is configured not to allow this)")));
@@ -680,14 +662,12 @@ GDS2ReaderBase::read_boundary (db::Layout &layout, db::Cell &cell, bool from_box
     unget_record (rec_id);
 
     finish_element ();
-
   }
 }
 
-void 
-GDS2ReaderBase::read_path (db::Layout &layout, db::Cell &cell)
+void GDS2ReaderBase::read_path (db::Layout &layout, db::Cell &cell)
 {
-  LDPair ld; 
+  LDPair ld;
   short rec_id = 0;
 
   do {
@@ -701,12 +681,12 @@ GDS2ReaderBase::read_path (db::Layout &layout, db::Cell &cell)
     error (tl::to_string (tr ("DATATYPE record expected")));
   }
   ld.datatype = get_ushort ();
-    
+
   rec_id = get_record ();
 
-  short type = 0; 
+  short type = 0;
   if (rec_id == sPATHTYPE) {
-    type = get_ushort (); 
+    type = get_ushort ();
     rec_id = get_record ();
   }
 
@@ -730,7 +710,7 @@ GDS2ReaderBase::read_path (db::Layout &layout, db::Cell &cell)
   } else {
     if (type == 2 || type == 1) {
       bgn_ext = w / 2;
-    } 
+    }
   }
 
   if (rec_id == sENDEXTN) {
@@ -739,7 +719,7 @@ GDS2ReaderBase::read_path (db::Layout &layout, db::Cell &cell)
   } else {
     if (type == 2 || type == 1) {
       end_ext = w / 2;
-    } 
+    }
   }
 
   if (rec_id != sXY) {
@@ -776,7 +756,6 @@ GDS2ReaderBase::read_path (db::Layout &layout, db::Cell &cell)
           unget_record (rec_id);
           break;
         }
-
       }
 
       path.assign (m_all_points.begin (), m_all_points.end ());
@@ -815,14 +794,12 @@ GDS2ReaderBase::read_path (db::Layout &layout, db::Cell &cell)
     unget_record (rec_id);
 
     finish_element ();
-
   }
 }
 
-void 
-GDS2ReaderBase::read_text (db::Layout &layout, db::Cell &cell)
+void GDS2ReaderBase::read_text (db::Layout &layout, db::Cell &cell)
 {
-  LDPair ld; 
+  LDPair ld;
   short rec_id = 0;
 
   do {
@@ -902,11 +879,9 @@ GDS2ReaderBase::read_text (db::Layout &layout, db::Cell &cell)
           angle -= 4;
         }
       }
-
     }
 
     rec_id = get_record ();
-      
   }
 
   if (rec_id != sXY) {
@@ -944,10 +919,9 @@ GDS2ReaderBase::read_text (db::Layout &layout, db::Cell &cell)
   }
 }
 
-void 
-GDS2ReaderBase::read_box (db::Layout &layout, db::Cell &cell)
+void GDS2ReaderBase::read_box (db::Layout &layout, db::Cell &cell)
 {
-  LDPair ld; 
+  LDPair ld;
   short rec_id = 0;
 
   do {
@@ -993,8 +967,7 @@ GDS2ReaderBase::read_box (db::Layout &layout, db::Cell &cell)
   }
 }
 
-void 
-GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, tl::vector<db::CellInstArray> &instances, tl::vector<db::CellInstArrayWithProperties> &instances_with_props)
+void GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, tl::vector<db::CellInstArray> &instances, tl::vector<db::CellInstArrayWithProperties> &instances_with_props)
 {
   short rec_id = 0;
 
@@ -1024,10 +997,10 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
       }
       if ((f & (4 | 2)) != 0) {
         warn (tl::to_string (tr ("Absolute transformations are not supported")));
-      }  
+      }
     } else if (rec_id == sMAG) {
       mag = get_double ();
-      if (fabs (mag - 1.0) > 1e-9) { 
+      if (fabs (mag - 1.0) > 1e-9) {
         is_mag = true;
       }
     } else if (rec_id == sANGLE) {
@@ -1048,7 +1021,6 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
     }
 
     rec_id = get_record ();
-
   }
 
   if (array) {
@@ -1115,7 +1087,7 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
 
       int ic = 0;
       while (ic < cols) {
-         
+
         int ic0 = ic;
 
         if (! split_cols) {
@@ -1130,12 +1102,11 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
             p1d += cd;
             p1 += c;
           } while (ic < cols && fabs (p1d.x () - p1.x ()) < 0.5 && fabs (p1d.y () - p1.y ()) < 0.5);
-
         }
 
         int ir = 0;
         while (ir < rows) {
-         
+
           int ir0 = ir;
 
           if (! split_rows) {
@@ -1145,12 +1116,11 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
             db::DPoint p2d = db::DPoint () + rd * double (ir);
             db::Point p2 = db::Point (p2d);
 
-            do { 
+            do {
               ++ir;
               p2d += rd;
               p2 += r;
-            } while (ir < rows && fabs(p2d.x () - p2.x ()) < 0.5 && fabs(p2d.y () - p2.y ()) < 0.5);
-
+            } while (ir < rows && fabs (p2d.x () - p2.x ()) < 0.5 && fabs (p2d.y () - p2.y ()) < 0.5);
           }
 
           db::Vector p = xy + db::Vector (cd * double (ic0) + rd * double (ir0));
@@ -1159,10 +1129,10 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
           db::CellInstArray inst;
 
           if (is_mag || angle < 0) {
-            inst = db::CellInstArray (db::CellInst (ci), 
+            inst = db::CellInstArray (db::CellInst (ci),
                                       db::ICplxTrans (mag, angle_deg, mirror, p), r, c, ir - ir0, ic - ic0);
           } else {
-            inst = db::CellInstArray (db::CellInst (ci), 
+            inst = db::CellInstArray (db::CellInst (ci),
                                       db::Trans (angle, mirror, p), r, c, ir - ir0, ic - ic0);
           }
 
@@ -1171,9 +1141,7 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
           } else {
             instances.push_back (inst);
           }
-
         }
-
       }
 
     } else {
@@ -1189,10 +1157,10 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
       db::CellInstArray inst;
 
       if (is_mag || angle < 0) {
-        inst = db::CellInstArray (db::CellInst (ci), 
+        inst = db::CellInstArray (db::CellInst (ci),
                                   db::ICplxTrans (mag, angle_deg, mirror, xy), r, c, rows, cols);
       } else {
-        inst = db::CellInstArray (db::CellInst (ci), 
+        inst = db::CellInstArray (db::CellInst (ci),
                                   db::Trans (angle, mirror, xy), r, c, rows, cols);
       }
 
@@ -1201,7 +1169,6 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
       } else {
         instances.push_back (inst);
       }
-
     }
 
   } else {
@@ -1237,10 +1204,8 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
     } else {
       instances.push_back (inst);
     }
-
-  }  
+  }
 }
 
 
 }
-

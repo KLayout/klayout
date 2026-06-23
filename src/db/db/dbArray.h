@@ -27,9 +27,9 @@
 
 #include "dbCommon.h"
 
-#include <algorithm> 
-#include <limits> 
-#include <vector> 
+#include <algorithm>
+#include <limits>
+#include <vector>
 
 #include "dbTypes.h"
 #include "dbMemStatistics.h"
@@ -51,8 +51,7 @@ template <class C, bool AllowEmpty = true> struct box_convert;
  */
 
 template <class Coord>
-struct basic_array_iterator 
-{
+struct basic_array_iterator {
   typedef Coord coord_type;
   typedef db::point<coord_type> point_type;
   typedef db::vector<coord_type> vector_type;
@@ -60,7 +59,7 @@ struct basic_array_iterator
   typedef db::box<coord_type> box_type;
 
   virtual ~basic_array_iterator ()
-  { 
+  {
     // .. nothing yet ..
   }
 
@@ -73,18 +72,17 @@ struct basic_array_iterator
 
   virtual size_t quad_id () const { return 0; }
   virtual box_type quad_box () const { return box_type::world (); }
-  virtual void skip_quad () { }
+  virtual void skip_quad () {}
 
   virtual disp_type get () const = 0;
-  
+
   virtual basic_array_iterator<Coord> *clone () const = 0;
 };
 
 /**
  *  @brief A generic base class for all array incarnations
  */
-struct ArrayBase
-{
+struct ArrayBase {
   ArrayBase ()
     : in_repository (false)
   {
@@ -140,16 +138,15 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
 
 template <class Coord>
 struct basic_array
-  : public ArrayBase
-{
+  : public ArrayBase {
   typedef Coord coord_type;
-  typedef db::box <coord_type> box_type;
-  typedef db::point <coord_type> point_type;
-  typedef db::vector <coord_type> vector_type;
-  typedef db::complex_trans <coord_type, coord_type> complex_trans_type;
-  typedef db::simple_trans <coord_type> simple_trans_type;
-  typedef db::unit_trans <coord_type> unit_trans_type;
-  typedef db::disp_trans <coord_type> disp_trans_type;
+  typedef db::box<coord_type> box_type;
+  typedef db::point<coord_type> point_type;
+  typedef db::vector<coord_type> vector_type;
+  typedef db::complex_trans<coord_type, coord_type> complex_trans_type;
+  typedef db::simple_trans<coord_type> simple_trans_type;
+  typedef db::unit_trans<coord_type> unit_trans_type;
+  typedef db::disp_trans<coord_type> disp_trans_type;
   typedef db::disp_trans<coord_type> disp_type;
 
   basic_array ()
@@ -163,17 +160,17 @@ struct basic_array
   }
 
   virtual std::pair<basic_array_iterator<Coord> *, bool> begin_touching (const box_type &b) const = 0;
-  
+
   virtual std::pair<basic_array_iterator<Coord> *, bool> begin () const = 0;
-  
+
   virtual std::pair<basic_array_iterator<Coord> *, bool> begin_regular (long /*a*/, long /*b*/) const { return begin (); }
-  
-  virtual ArrayBase *basic_clone () const 
+
+  virtual ArrayBase *basic_clone () const
   {
     return clone ();
   }
 
-  virtual basic_array <Coord> *clone () const = 0;
+  virtual basic_array<Coord> *clone () const = 0;
 
   virtual box_type bbox (const box_type &obox) const = 0;
 
@@ -191,14 +188,14 @@ struct basic_array
     return false;
   }
 
-  virtual bool is_complex () const 
-  { 
-    return false; 
+  virtual bool is_complex () const
+  {
+    return false;
   }
 
-  virtual complex_trans_type complex_trans (const simple_trans_type &s) const 
-  { 
-    return complex_trans_type (s); 
+  virtual complex_trans_type complex_trans (const simple_trans_type &s) const
+  {
+    return complex_trans_type (s);
   }
 
   virtual unsigned int type () const
@@ -208,23 +205,22 @@ struct basic_array
 
   virtual const ArrayBase *cast (const ArrayBase *other) const
   {
-    return dynamic_cast <const basic_array<Coord> *> (other);
+    return dynamic_cast<const basic_array<Coord> *> (other);
   }
 
-  void transform (const unit_trans_type & /*st*/) { }
+  void transform (const unit_trans_type & /*st*/) {}
 
-  void transform (const disp_trans_type & /*st*/) { }
+  void transform (const disp_trans_type & /*st*/) {}
 
-  virtual void transform (const simple_trans_type & /*st*/) { }
+  virtual void transform (const simple_trans_type & /*st*/) {}
 
-  virtual void transform (const complex_trans_type & /*ct*/) { }
+  virtual void transform (const complex_trans_type & /*ct*/) {}
 };
 
 /**
  *  @brief A helper function to compare base class objects
  */
-struct array_base_ptr_cmp_f
-{
+struct array_base_ptr_cmp_f {
   bool operator() (const ArrayBase *p1, const ArrayBase *p2) const
   {
     if (p1->type () != p2->type ()) {
@@ -237,9 +233,9 @@ struct array_base_ptr_cmp_f
 /**
  *  @brief The array repository
  *
- *  This repository may be used to hold the base objects 
+ *  This repository may be used to hold the base objects
  *  for compacter memory representation. Multiple array
- *  objects may share the same base object. Base objects 
+ *  objects may share the same base object. Base objects
  *  stored herein have the "in_repository" flag set and
  *  are managed by the repository.
  */
@@ -275,7 +271,7 @@ public:
 
     basic_repository::iterator f = r->find ((ArrayBase *) &base);
     if (f != r->end ()) {
-      return dynamic_cast <basic_array<Coord> *> (*f);
+      return dynamic_cast<basic_array<Coord> *> (*f);
     } else {
       basic_array<Coord> *bb = base.clone ();
       bb->in_repository = true;
@@ -310,8 +306,7 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
 
 template <class Coord>
 struct regular_array_iterator
-  : public basic_array_iterator <Coord>
-{
+  : public basic_array_iterator<Coord> {
   typedef typename basic_array_iterator<Coord>::coord_type coord_type;
   typedef typename basic_array_iterator<Coord>::point_type point_type;
   typedef typename basic_array_iterator<Coord>::vector_type vector_type;
@@ -323,7 +318,7 @@ struct regular_array_iterator
       m_amin (amin), m_amax (amax),
       m_bmin (bmin), m_bmax (bmax),
       m_ai (amin), m_bi (bmin)
-  { 
+  {
     //  if there is no way to iterate for ai, just finish:
     if (m_amin >= m_amax) {
       m_bi = m_bmax;
@@ -332,15 +327,15 @@ struct regular_array_iterator
 
   virtual ~regular_array_iterator ()
   {
-    //  .. nothing yet .. 
+    //  .. nothing yet ..
   }
 
-  virtual disp_type get () const 
+  virtual disp_type get () const
   {
     return disp_type (vector_type (m_ai * m_a.x () + m_bi * m_b.x (), m_ai * m_a.y () + m_bi * m_b.y ()));
   }
-  
-  virtual void inc () 
+
+  virtual void inc ()
   {
     ++m_ai;
     if (m_ai >= m_amax) {
@@ -349,26 +344,26 @@ struct regular_array_iterator
     }
   }
 
-  virtual bool at_end () const 
+  virtual bool at_end () const
   {
     return m_bi >= m_bmax;
   }
 
-  virtual basic_array_iterator<Coord> *clone () const 
+  virtual basic_array_iterator<Coord> *clone () const
   {
-    return new regular_array_iterator <Coord> (*this);
+    return new regular_array_iterator<Coord> (*this);
   }
 
-  virtual long index_a () const 
-  { 
-    return long (m_ai); 
+  virtual long index_a () const
+  {
+    return long (m_ai);
   }
 
-  virtual long index_b () const 
-  { 
-    return long (m_bi); 
+  virtual long index_b () const
+  {
+    return long (m_bi);
   }
-  
+
 private:
   vector_type m_a, m_b;
   unsigned long m_amin, m_amax, m_bmin, m_bmax;
@@ -383,9 +378,8 @@ private:
  */
 
 template <class Coord>
-struct regular_array 
-  : public basic_array <Coord>
-{
+struct regular_array
+  : public basic_array<Coord> {
   typedef typename basic_array<Coord>::point_type point_type;
   typedef typename basic_array<Coord>::vector_type vector_type;
   typedef typename basic_array<Coord>::box_type box_type;
@@ -396,13 +390,13 @@ struct regular_array
 
   regular_array (const vector_type &a, const vector_type &b, unsigned long amax, unsigned long bmax)
     : m_a (a), m_b (b), m_amax (amax), m_bmax (bmax)
-  { 
+  {
     compute_det ();
   }
 
   virtual ~regular_array ()
   {
-    //  .. nothing yet .. 
+    //  .. nothing yet ..
   }
 
   virtual std::pair<basic_array_iterator<Coord> *, bool>
@@ -410,7 +404,7 @@ struct regular_array
   {
     if (b.empty ()) {
 
-      return std::make_pair (new regular_array_iterator <Coord> (m_a, m_b, 0, 0, 0, 0), false);
+      return std::make_pair (new regular_array_iterator<Coord> (m_a, m_b, 0, 0, 0, 0), false);
 
     } else if (fabs (m_det) < 0.5) {
 
@@ -418,12 +412,11 @@ struct regular_array
 
     } else {
 
-      std::pair <double, double> ab [4] = {
+      std::pair<double, double> ab [4] = {
         ab_coord (b.p1 ()),
         ab_coord (point_type (b.left (), b.top ())),
         ab_coord (point_type (b.right (), b.bottom ())),
-        ab_coord (b.p2 ())
-      };
+        ab_coord (b.p2 ())};
 
       //  NOTE: we need to take some care we don't overiterate in case of vanishing row
       //  or column vectors. Hence eff_amax and eff_bmax which are 1 in this case.
@@ -452,8 +445,8 @@ struct regular_array
 
       unsigned long amini = 0;
       if (amin >= epsilon) {
-        if (amin > double (std::numeric_limits <unsigned long>::max () - 1)) {
-          amini = std::numeric_limits <unsigned long>::max () - 1;
+        if (amin > double (std::numeric_limits<unsigned long>::max () - 1)) {
+          amini = std::numeric_limits<unsigned long>::max () - 1;
         } else {
           amini = (unsigned long) (amin + 1.0 - epsilon);
         }
@@ -461,11 +454,11 @@ struct regular_array
           amini = eff_amax;
         }
       }
-         
+
       unsigned long amaxi = 0;
       if (amax >= -epsilon) {
-        if (amax > double (std::numeric_limits <unsigned long>::max () - 1)) {
-          amaxi = std::numeric_limits <unsigned long>::max () - 1;
+        if (amax > double (std::numeric_limits<unsigned long>::max () - 1)) {
+          amaxi = std::numeric_limits<unsigned long>::max () - 1;
         } else {
           amaxi = (unsigned long) (amax + epsilon) + 1;
         }
@@ -476,8 +469,8 @@ struct regular_array
 
       unsigned long bmini = 0;
       if (bmin >= epsilon) {
-        if (bmin > double (std::numeric_limits <unsigned long>::max () - 1)) {
-          bmini = std::numeric_limits <unsigned long>::max () - 1;
+        if (bmin > double (std::numeric_limits<unsigned long>::max () - 1)) {
+          bmini = std::numeric_limits<unsigned long>::max () - 1;
         } else {
           bmini = (unsigned long) (bmin + 1.0 - epsilon);
         }
@@ -485,11 +478,11 @@ struct regular_array
           bmini = eff_bmax;
         }
       }
-         
+
       unsigned long bmaxi = 0;
       if (bmax >= -epsilon) {
-        if (bmax > double (std::numeric_limits <unsigned long>::max () - 1)) {
-          bmaxi = std::numeric_limits <unsigned long>::max () - 1;
+        if (bmax > double (std::numeric_limits<unsigned long>::max () - 1)) {
+          bmaxi = std::numeric_limits<unsigned long>::max () - 1;
         } else {
           bmaxi = (unsigned long) (bmax + epsilon) + 1;
         }
@@ -497,26 +490,26 @@ struct regular_array
           bmaxi = eff_bmax;
         }
       }
-      
-      return std::make_pair (new regular_array_iterator <Coord> (m_a, m_b, amini, amaxi, bmini, bmaxi), false);
+
+      return std::make_pair (new regular_array_iterator<Coord> (m_a, m_b, amini, amaxi, bmini, bmaxi), false);
     }
   }
-  
-  virtual std::pair <basic_array_iterator <Coord> *, bool>
+
+  virtual std::pair<basic_array_iterator<Coord> *, bool>
   begin_regular (long a, long b) const
   {
-    return std::make_pair (new regular_array_iterator <Coord> (m_a, m_b, (unsigned long) std::max (long (0), a), m_amax, (unsigned long) std::max (long (0), b), m_bmax), false);
+    return std::make_pair (new regular_array_iterator<Coord> (m_a, m_b, (unsigned long) std::max (long (0), a), m_amax, (unsigned long) std::max (long (0), b), m_bmax), false);
   }
 
-  virtual std::pair <basic_array_iterator <Coord> *, bool>
+  virtual std::pair<basic_array_iterator<Coord> *, bool>
   begin () const
   {
-    return std::make_pair (new regular_array_iterator <Coord> (m_a, m_b, 0, m_amax, 0, m_bmax), false);
+    return std::make_pair (new regular_array_iterator<Coord> (m_a, m_b, 0, m_amax, 0, m_bmax), false);
   }
 
-  virtual basic_array <Coord> *clone () const 
+  virtual basic_array<Coord> *clone () const
   {
-    return new regular_array <Coord> (*this);
+    return new regular_array<Coord> (*this);
   }
 
   virtual box_type bbox (const box_type &obox) const
@@ -538,16 +531,15 @@ struct regular_array
       }
 
       return box_type (obox.p1 () + (b.p1 () - point_type ()), obox.p2 () + (b.p2 () - point_type ()));
-
     }
   }
 
-  virtual size_t size () const 
+  virtual size_t size () const
   {
     return m_amax * m_bmax;
   }
 
-  virtual void invert (simple_trans_type &t) 
+  virtual void invert (simple_trans_type &t)
   {
     t.invert ();
     db::fixpoint_trans<coord_type> f (t.rot ());
@@ -571,17 +563,13 @@ struct regular_array
   virtual bool less (const ArrayBase *b) const
   {
     const regular_array<Coord> *d = static_cast<const regular_array<Coord> *> (b);
-    return m_a < d->m_a || (m_a == d->m_a && (
-           m_b < d->m_b || (m_b == d->m_b && (
-           m_amax < d->m_amax || (m_amax == d->m_amax && m_bmax < d->m_bmax)))));
+    return m_a < d->m_a || (m_a == d->m_a && (m_b < d->m_b || (m_b == d->m_b && (m_amax < d->m_amax || (m_amax == d->m_amax && m_bmax < d->m_bmax)))));
   }
 
   virtual bool fuzzy_less (const ArrayBase *b) const
   {
     const regular_array<Coord> *d = static_cast<const regular_array<Coord> *> (b);
-    return m_a.less (d->m_a) || (m_a.equal (d->m_a) && (
-           m_b.less (d->m_b) || (m_b.equal (d->m_b) && (
-           m_amax < d->m_amax || (m_amax == d->m_amax && m_bmax < d->m_bmax)))));
+    return m_a.less (d->m_a) || (m_a.equal (d->m_a) && (m_b.less (d->m_b) || (m_b.equal (d->m_b) && (m_amax < d->m_amax || (m_amax == d->m_amax && m_bmax < d->m_bmax)))));
   }
 
   virtual bool is_regular_array (vector_type &a, vector_type &b, unsigned long &amax, unsigned long &bmax) const
@@ -595,7 +583,7 @@ struct regular_array
 
   virtual void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
-    if (!no_self) {
+    if (! no_self) {
       stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
     }
   }
@@ -605,15 +593,15 @@ struct regular_array
     return 1;
   }
 
-  virtual void transform (const simple_trans_type &st) 
-  { 
+  virtual void transform (const simple_trans_type &st)
+  {
     m_a.transform (st.fp_trans ());
     m_b.transform (st.fp_trans ());
     compute_det ();
   }
 
-  virtual void transform (const complex_trans_type &ct) 
-  { 
+  virtual void transform (const complex_trans_type &ct)
+  {
     //  transform with the matrix, do not displace, since a and b are displacements already
     m_a = vector_type (ct * m_a);
     m_b = vector_type (ct * m_b);
@@ -651,7 +639,7 @@ protected:
     }
   }
 
-  std::pair <double, double> ab_coord (const point_type &p) const
+  std::pair<double, double> ab_coord (const point_type &p) const
   {
     vector_type a = eff_a (), b = eff_b ();
     double ia = (double (p.x ()) * double (b.y ()) - double (p.y ()) * double (b.x ())) / m_det;
@@ -659,7 +647,7 @@ protected:
     return std::make_pair (ia, ib);
   }
 
-  void compute_det () 
+  void compute_det ()
   {
     vector_type a = eff_a (), b = eff_b ();
     m_det = double (a.x ()) * double (b.y ()) - double (a.y ()) * double (b.x ());
@@ -677,9 +665,8 @@ protected:
  */
 
 template <class Coord>
-struct regular_complex_array 
-  : public regular_array<Coord>
-{
+struct regular_complex_array
+  : public regular_array<Coord> {
   typedef typename basic_array<Coord>::point_type point_type;
   typedef typename basic_array<Coord>::vector_type vector_type;
   typedef typename basic_array<Coord>::box_type box_type;
@@ -690,19 +677,19 @@ struct regular_complex_array
 
   regular_complex_array (double acos, double mag, const vector_type &a, const vector_type &b, unsigned long amax, unsigned long bmax)
     : regular_array<Coord> (a, b, amax, bmax), m_acos (acos), m_mag (mag)
-  { 
+  {
     //  .. nothing yet ..
   }
 
-  virtual basic_array <Coord> *clone () const 
+  virtual basic_array<Coord> *clone () const
   {
-    return new regular_complex_array <Coord> (*this);
+    return new regular_complex_array<Coord> (*this);
   }
 
-  virtual void invert (simple_trans_type &t) 
+  virtual void invert (simple_trans_type &t)
   {
     //  recompute the array parameters such that every per-instance transformation
-    //  is inverted. 
+    //  is inverted.
     complex_trans_type r = complex_trans_type (t, m_acos, m_mag).inverted ();
     m_mag = r.mag ();
     m_acos = r.rcos ();
@@ -762,7 +749,7 @@ struct regular_complex_array
 
   virtual void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
-    if (!no_self) {
+    if (! no_self) {
       stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
     }
   }
@@ -794,42 +781,41 @@ private:
 
 template <class Coord>
 struct iterated_array_iterator
-  : public basic_array_iterator <Coord>
-{
+  : public basic_array_iterator<Coord> {
   typedef typename basic_array_iterator<Coord>::coord_type coord_type;
   typedef typename basic_array_iterator<Coord>::point_type point_type;
   typedef typename basic_array_iterator<Coord>::vector_type vector_type;
   typedef typename basic_array_iterator<Coord>::box_type box_type;
   typedef typename basic_array_iterator<Coord>::disp_type disp_type;
   typedef box_convert<vector_type> box_convert_type;
-  typedef unstable_box_tree <box_type, vector_type, box_convert_type> box_tree_type;
+  typedef unstable_box_tree<box_type, vector_type, box_convert_type> box_tree_type;
   typedef typename box_tree_type::const_iterator box_tree_const_iterator;
   typedef typename box_tree_type::touching_iterator box_tree_touching_iterator;
 
   iterated_array_iterator (box_tree_const_iterator from, box_tree_const_iterator to)
     : m_normal (true)
-  { 
+  {
     m_b = from;
     m_e = to;
   }
 
   iterated_array_iterator (box_tree_touching_iterator from)
     : m_normal (false)
-  { 
+  {
     m_t = from;
   }
 
   virtual ~iterated_array_iterator ()
   {
-    //  .. nothing yet .. 
+    //  .. nothing yet ..
   }
 
-  virtual disp_type get () const 
+  virtual disp_type get () const
   {
     return disp_type (m_normal ? *m_b : *m_t);
   }
-  
-  virtual void inc () 
+
+  virtual void inc ()
   {
     if (m_normal) {
       ++m_b;
@@ -838,7 +824,7 @@ struct iterated_array_iterator
     }
   }
 
-  virtual bool at_end () const 
+  virtual bool at_end () const
   {
     if (m_normal) {
       return m_b == m_e;
@@ -847,9 +833,9 @@ struct iterated_array_iterator
     }
   }
 
-  virtual basic_array_iterator<Coord> *clone () const 
+  virtual basic_array_iterator<Coord> *clone () const
   {
-    return new iterated_array_iterator <Coord> (*this);
+    return new iterated_array_iterator<Coord> (*this);
   }
 
   virtual size_t quad_id () const
@@ -880,9 +866,8 @@ private:
  */
 
 template <class Coord>
-struct iterated_array 
-  : public basic_array <Coord>
-{
+struct iterated_array
+  : public basic_array<Coord> {
   typedef typename basic_array<Coord>::point_type point_type;
   typedef typename basic_array<Coord>::vector_type vector_type;
   typedef typename basic_array<Coord>::box_type box_type;
@@ -891,14 +876,14 @@ struct iterated_array
   typedef typename basic_array<Coord>::simple_trans_type simple_trans_type;
   typedef typename basic_array<Coord>::complex_trans_type complex_trans_type;
   typedef box_convert<vector_type> box_convert_type;
-  typedef unstable_box_tree <box_type, vector_type, box_convert_type> box_tree_type;
+  typedef unstable_box_tree<box_type, vector_type, box_convert_type> box_tree_type;
   typedef typename box_tree_type::const_iterator const_iterator;
   typedef typename box_tree_type::iterator iterator;
   typedef typename box_tree_type::touching_iterator touching_iterator;
 
   iterated_array ()
-  { 
-    //  .. nothing yet .. 
+  {
+    //  .. nothing yet ..
   }
 
   template <class I>
@@ -909,7 +894,7 @@ struct iterated_array
 
   virtual ~iterated_array ()
   {
-    //  .. nothing yet .. 
+    //  .. nothing yet ..
   }
 
   void reserve (size_t n)
@@ -958,29 +943,29 @@ struct iterated_array
 
   void sort ()
   {
-    m_v.sort (db::box_convert <vector_type> ());
+    m_v.sort (db::box_convert<vector_type> ());
   }
 
-  virtual std::pair <basic_array_iterator <Coord> *, bool>
+  virtual std::pair<basic_array_iterator<Coord> *, bool>
   begin_touching (const box_type &b) const
   {
     if (b.empty () || ! b.touches (m_box)) {
-      return std::make_pair (new iterated_array_iterator <Coord> (m_v.end (), m_v.end ()), false);
+      return std::make_pair (new iterated_array_iterator<Coord> (m_v.end (), m_v.end ()), false);
     } else {
       box_convert_type bc;
-      return std::make_pair (new iterated_array_iterator <Coord> (m_v.begin_touching (b, bc)), false);
+      return std::make_pair (new iterated_array_iterator<Coord> (m_v.begin_touching (b, bc)), false);
     }
   }
-  
-  virtual std::pair <basic_array_iterator <Coord> *, bool>
+
+  virtual std::pair<basic_array_iterator<Coord> *, bool>
   begin () const
   {
-    return std::make_pair (new iterated_array_iterator <Coord> (m_v.begin (), m_v.end ()), false);
+    return std::make_pair (new iterated_array_iterator<Coord> (m_v.begin (), m_v.end ()), false);
   }
 
-  virtual basic_array <Coord> *clone () const 
+  virtual basic_array<Coord> *clone () const
   {
-    return new iterated_array <Coord> (*this);
+    return new iterated_array<Coord> (*this);
   }
 
   virtual box_type bbox (const box_type &obox) const
@@ -992,12 +977,12 @@ struct iterated_array
     }
   }
 
-  virtual size_t size () const 
+  virtual size_t size () const
   {
     return m_v.size ();
   }
 
-  virtual void invert (simple_trans_type &t) 
+  virtual void invert (simple_trans_type &t)
   {
     t.invert ();
     db::fixpoint_trans<coord_type> f (t.rot ());
@@ -1067,7 +1052,7 @@ struct iterated_array
 
   virtual void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
-    if (!no_self) {
+    if (! no_self) {
       stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
     }
     db::mem_stat (stat, purpose, cat, m_v, true, (void *) this);
@@ -1079,7 +1064,7 @@ struct iterated_array
   }
 
   virtual void transform (const complex_trans_type &ct)
-  { 
+  {
     m_box = box_type ();
     for (iterator p = m_v.begin (); p != m_v.end (); ++p) {
       *p = vector_type (ct * *p);
@@ -1113,9 +1098,8 @@ protected:
  */
 
 template <class Coord>
-struct iterated_complex_array 
-  : public iterated_array<Coord>
-{
+struct iterated_complex_array
+  : public iterated_array<Coord> {
   typedef typename basic_array<Coord>::point_type point_type;
   typedef typename basic_array<Coord>::vector_type vector_type;
   typedef typename basic_array<Coord>::box_type box_type;
@@ -1126,26 +1110,26 @@ struct iterated_complex_array
 
   iterated_complex_array (double acos, double mag)
     : iterated_array<Coord> (), m_acos (acos), m_mag (mag)
-  { 
+  {
     //  .. nothing yet ..
   }
 
   template <class I>
   iterated_complex_array (double acos, double mag, I from, I to)
     : iterated_array<Coord> (from, to), m_acos (acos), m_mag (mag)
-  { 
+  {
     //  .. nothing yet ..
   }
 
-  virtual basic_array <Coord> *clone () const 
+  virtual basic_array<Coord> *clone () const
   {
-    return new iterated_complex_array <Coord> (*this);
+    return new iterated_complex_array<Coord> (*this);
   }
 
-  virtual void invert (simple_trans_type &t) 
+  virtual void invert (simple_trans_type &t)
   {
     //  recompute the array parameters such that every per-instance transformation
-    //  is inverted. This code is somewhat complex to maintain the splitting between 
+    //  is inverted. This code is somewhat complex to maintain the splitting between
     //  the simple transformation part and the residual given by m_acos and m_mag.
     complex_trans_type r = complex_trans_type (t, m_acos, m_mag).inverted ();
     m_mag = r.mag ();
@@ -1234,9 +1218,8 @@ private:
  */
 
 template <class Coord>
-struct single_complex_inst 
-  : public basic_array <Coord>
-{
+struct single_complex_inst
+  : public basic_array<Coord> {
   typedef typename basic_array<Coord>::point_type point_type;
   typedef typename basic_array<Coord>::box_type box_type;
   typedef typename basic_array<Coord>::coord_type coord_type;
@@ -1246,25 +1229,25 @@ struct single_complex_inst
 
   single_complex_inst (double acos, double mag)
     : m_acos (acos), m_mag (mag)
-  { 
+  {
     //  .. nothing yet ..
   }
 
-  virtual std::pair <basic_array_iterator <Coord> *, bool>
+  virtual std::pair<basic_array_iterator<Coord> *, bool>
   begin_touching (const box_type &b) const
   {
-    return std::make_pair ((basic_array_iterator <Coord> *) 0, ! b.contains (point_type (0, 0))); 
-  }
-  
-  virtual std::pair <basic_array_iterator <Coord> *, bool>
-  begin () const
-  {
-    return std::make_pair ((basic_array_iterator <Coord> *) 0, false);
+    return std::make_pair ((basic_array_iterator<Coord> *) 0, ! b.contains (point_type (0, 0)));
   }
 
-  virtual basic_array <Coord> *clone () const 
+  virtual std::pair<basic_array_iterator<Coord> *, bool>
+  begin () const
   {
-    return new single_complex_inst <Coord> (*this);
+    return std::make_pair ((basic_array_iterator<Coord> *) 0, false);
+  }
+
+  virtual basic_array<Coord> *clone () const
+  {
+    return new single_complex_inst<Coord> (*this);
   }
 
   virtual box_type bbox (const box_type &obox) const
@@ -1272,12 +1255,12 @@ struct single_complex_inst
     return obox;
   }
 
-  virtual size_t size () const 
+  virtual size_t size () const
   {
     return 1;
   }
 
-  virtual void invert (simple_trans_type &t) 
+  virtual void invert (simple_trans_type &t)
   {
     complex_trans_type r = complex_trans_type (t, m_acos, m_mag).inverted ();
     m_mag = r.mag ();
@@ -1285,7 +1268,7 @@ struct single_complex_inst
     t = simple_trans_type (r);
   }
 
-  virtual bool equal (const ArrayBase *b) const 
+  virtual bool equal (const ArrayBase *b) const
   {
     const double epsilon = 1e-10;
     const single_complex_inst<Coord> *d = static_cast<const single_complex_inst<Coord> *> (b);
@@ -1323,7 +1306,7 @@ struct single_complex_inst
 
   virtual void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
-    if (!no_self) {
+    if (! no_self) {
       stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
     }
   }
@@ -1347,29 +1330,26 @@ private:
   double m_acos, m_mag;
 };
 
-//  this template computes the result type for the array iterator given 
+//  this template computes the result type for the array iterator given
 //  a transformation and the minimum required capabilities to represent a displacement
 
 template <class C, class T>
-struct compute_result_trans
-{
+struct compute_result_trans {
   typedef T result_trans;
 };
 
 template <class C>
-struct compute_result_trans<C, unit_trans<C> >
-{
+struct compute_result_trans<C, unit_trans<C>> {
   typedef disp_trans<C> result_trans;
 };
 
 template <class C>
-struct compute_result_trans<C, fixpoint_trans<C> >
-{
+struct compute_result_trans<C, fixpoint_trans<C>> {
   typedef disp_trans<C> result_trans;
 };
 
-/** 
- *  @brief The array iterator 
+/**
+ *  @brief The array iterator
  *
  *  This facade object wraps the actual basic_array iterator
  *  object. The iterator is not end-tested through comparing
@@ -1379,12 +1359,11 @@ struct compute_result_trans<C, fixpoint_trans<C> >
  */
 
 template <class Coord, class Trans>
-struct array_iterator
-{
+struct array_iterator {
   typedef Coord coord_type;
-  typedef db::point <coord_type> point_type;
-  typedef db::vector <coord_type> vector_type;
-  typedef db::complex_trans <coord_type, coord_type> complex_trans_type;
+  typedef db::point<coord_type> point_type;
+  typedef db::vector<coord_type> vector_type;
+  typedef db::complex_trans<coord_type, coord_type> complex_trans_type;
   typedef Trans trans_type;
   typedef typename compute_result_trans<coord_type, trans_type>::result_trans result_type;
   //  dummy definitions to satisfy iterator traits (without making much sense):
@@ -1400,7 +1379,7 @@ struct array_iterator
    */
   array_iterator ()
     : m_trans (), mp_base (0), m_done (true)
-  { 
+  {
     // .. nothing yet ..
   }
 
@@ -1411,9 +1390,9 @@ struct array_iterator
    *  and take over ownership over this.
    *  This is a convenience constructor that combines the next two constructors.
    */
-  array_iterator (const trans_type &trans, std::pair <db::basic_array_iterator <Coord> *, bool> base)
+  array_iterator (const trans_type &trans, std::pair<db::basic_array_iterator<Coord> *, bool> base)
     : m_trans (trans), mp_base (base.first), m_done (base.second)
-  { 
+  {
     // .. nothing yet ..
   }
 
@@ -1423,9 +1402,9 @@ struct array_iterator
    *  The constructor will receive a basic_array_iterator object
    *  and take over ownership over this.
    */
-  array_iterator (const trans_type &trans, db::basic_array_iterator <Coord> *base)
+  array_iterator (const trans_type &trans, db::basic_array_iterator<Coord> *base)
     : m_trans (trans), mp_base (base), m_done (false)
-  { 
+  {
     // .. nothing yet ..
   }
 
@@ -1437,7 +1416,7 @@ struct array_iterator
    */
   array_iterator (const trans_type &trans, bool done)
     : m_trans (trans), mp_base (0), m_done (done)
-  { 
+  {
     // .. nothing yet ..
   }
 
@@ -1489,7 +1468,7 @@ struct array_iterator
    *  This delivers a displacement vector that is associated with
    *  the iterator's "position".
    */
-  result_type operator* () const 
+  result_type operator* () const
   {
     if (mp_base) {
       return result_type (mp_base->get ()) * result_type (m_trans);
@@ -1497,11 +1476,11 @@ struct array_iterator
       return result_type (m_trans);
     }
   }
-  
+
   /**
    *  @brief Increment operator
    */
-  array_iterator &operator++ () 
+  array_iterator &operator++ ()
   {
     if (mp_base) {
       mp_base->inc ();
@@ -1516,7 +1495,7 @@ struct array_iterator
    *
    *  @return true, if the iterator is at the end.
    */
-  bool at_end () const 
+  bool at_end () const
   {
     return mp_base ? mp_base->at_end () : m_done;
   }
@@ -1584,7 +1563,7 @@ struct array_iterator
 
 private:
   trans_type m_trans;
-  basic_array_iterator <Coord> *mp_base;
+  basic_array_iterator<Coord> *mp_base;
   bool m_done;
 };
 
@@ -1595,12 +1574,12 @@ private:
  *  which is either a regular_array or another object derived
  *  from a basic_array object.
  *  Access to the object instances is through the iterators which
- *  deliver the displacement vectors of the various instances, 
+ *  deliver the displacement vectors of the various instances,
  *  possibly filtered by a box region.
  *
  *  Arrays are currently used for creating shape and instance arrays.
  *  There is a fundamental difference between shape and instance arrays:
- *  while shape arrays can transform the object and must not make use 
+ *  while shape arrays can transform the object and must not make use
  *  of complex transformation type arrays, instance arrays cannot transform
  *  the object itself and must store every aspect of the transformation
  *  in the array. Instance arrays thus make use of the complex type
@@ -1608,20 +1587,19 @@ private:
  */
 
 template <class Obj, class Trans>
-struct array
-{
+struct array {
   typedef typename Trans::coord_type coord_type;
-  typedef db::box <coord_type> box_type;
-  typedef db::point <coord_type> point_type;
-  typedef db::vector <coord_type> vector_type;
-  typedef db::complex_trans <coord_type, coord_type> complex_trans_type;
-  typedef db::simple_trans <coord_type> simple_trans_type;
-  typedef db::disp_trans <coord_type> disp_trans_type;
-  typedef db::unit_trans <coord_type> unit_trans_type;
+  typedef db::box<coord_type> box_type;
+  typedef db::point<coord_type> point_type;
+  typedef db::vector<coord_type> vector_type;
+  typedef db::complex_trans<coord_type, coord_type> complex_trans_type;
+  typedef db::simple_trans<coord_type> simple_trans_type;
+  typedef db::disp_trans<coord_type> disp_trans_type;
+  typedef db::unit_trans<coord_type> unit_trans_type;
   typedef Trans trans_type;
-  typedef db::array_iterator <coord_type, Trans> iterator;
+  typedef db::array_iterator<coord_type, Trans> iterator;
   typedef Obj object_type;
-  typedef db::object_tag< array<Obj, Trans> > tag;
+  typedef db::object_tag<array<Obj, Trans>> tag;
   typedef db::iterated_array<coord_type> iterated_array_type;
   typedef db::iterated_complex_array<coord_type> iterated_complex_array_type;
 
@@ -1643,7 +1621,7 @@ struct array
    *  @param obj The object to put into an array
    *  @param base The basic_array object that describes the array further
    */
-  array (const Obj &obj, const trans_type &trans, basic_array <coord_type> *base)
+  array (const Obj &obj, const trans_type &trans, basic_array<coord_type> *base)
     : m_obj (obj), m_trans (trans), mp_base (base)
   {
     //  .. nothing yet ..
@@ -1656,25 +1634,25 @@ struct array
    *  an appropriate basic_array object.
    */
   array (const Obj &obj, const trans_type &trans, const vector_type &a, const vector_type &b, unsigned long amax, unsigned long bmax)
-    : m_obj (obj), m_trans (trans), mp_base (new regular_array <coord_type> (a, b, amax, bmax))
+    : m_obj (obj), m_trans (trans), mp_base (new regular_array<coord_type> (a, b, amax, bmax))
   {
     //  .. nothing yet ..
   }
-  
+
   /**
    *  @brief The regular array constructor using an array repository
    *
    *  This is basically a convenience function that creates
-   *  an appropriate basic_array object. 
-   *  It uses the array repository to store the base object rather than providing 
+   *  an appropriate basic_array object.
+   *  It uses the array repository to store the base object rather than providing
    *  it's own storage.
    */
   array (const Obj &obj, const trans_type &trans, ArrayRepository &rep, const vector_type &a, const vector_type &b, unsigned long amax, unsigned long bmax)
-    : m_obj (obj), m_trans (trans), mp_base (rep.insert (regular_array <coord_type> (a, b, amax, bmax)))
+    : m_obj (obj), m_trans (trans), mp_base (rep.insert (regular_array<coord_type> (a, b, amax, bmax)))
   {
     //  .. nothing yet ..
   }
-  
+
   /**
    *  @brief The singular array constructor
    *
@@ -1682,13 +1660,12 @@ struct array
    *  an appropriate basic_array object.
    *  mp_base == 0 is implicitly a single-object array.
    */
-  explicit 
-  array (const Obj &obj, const trans_type &trans)
+  explicit array (const Obj &obj, const trans_type &trans)
     : m_obj (obj), m_trans (trans), mp_base (0)
   {
     //  .. nothing yet ..
   }
-  
+
   /**
    *  @brief The regular complex array constructor
    *
@@ -1696,11 +1673,11 @@ struct array
    *  an appropriate basic_array object.
    */
   array (const Obj &obj, const trans_type &trans, double acos, double mag, const vector_type &a, const vector_type &b, unsigned long amax, unsigned long bmax)
-    : m_obj (obj), m_trans (trans), mp_base (new regular_complex_array <coord_type> (acos, mag, a, b, amax, bmax))
+    : m_obj (obj), m_trans (trans), mp_base (new regular_complex_array<coord_type> (acos, mag, a, b, amax, bmax))
   {
     //  .. nothing yet ..
   }
-  
+
   /**
    *  @brief The regular complex array constructor
    *
@@ -1708,48 +1685,47 @@ struct array
    *  an appropriate basic_array object using a complex transformation.
    */
   array (const Obj &obj, const complex_trans_type &ct, const vector_type &a, const vector_type &b, unsigned long amax, unsigned long bmax)
-    : m_obj (obj), m_trans (ct), mp_base (ct.is_complex () ? new regular_complex_array <coord_type> (ct.rcos (), ct.mag (), a, b, amax, bmax) : new regular_array <coord_type> (a, b, amax, bmax))
+    : m_obj (obj), m_trans (ct), mp_base (ct.is_complex () ? new regular_complex_array<coord_type> (ct.rcos (), ct.mag (), a, b, amax, bmax) : new regular_array<coord_type> (a, b, amax, bmax))
   {
     //  .. nothing yet ..
   }
-  
+
   /**
    *  @brief The regular complex array constructor using an array repository
    *
    *  This is basically a convenience function that creates
    *  an appropriate basic_array object.
-   *  It uses the array repository to store the base object rather than providing 
+   *  It uses the array repository to store the base object rather than providing
    *  it's own storage.
    */
   array (const Obj &obj, const trans_type &trans, ArrayRepository &rep, double acos, double mag, const vector_type &a, const vector_type &b, unsigned long amax, unsigned long bmax)
-    : m_obj (obj), m_trans (trans), mp_base (rep.insert (regular_complex_array <coord_type> (acos, mag, a, b, amax, bmax)))
+    : m_obj (obj), m_trans (trans), mp_base (rep.insert (regular_complex_array<coord_type> (acos, mag, a, b, amax, bmax)))
   {
     //  .. nothing yet ..
   }
-  
+
   /**
    *  @brief The regular complex array constructor using an array repository
    *
    *  This is basically a convenience function that creates
    *  an appropriate basic_array object using a complex transformation.
-   *  It uses the array repository to store the base object rather than providing 
+   *  It uses the array repository to store the base object rather than providing
    *  it's own storage.
    */
   array (const Obj &obj, const complex_trans_type &ct, ArrayRepository &rep, const vector_type &a, const vector_type &b, unsigned long amax, unsigned long bmax)
-    : m_obj (obj), m_trans (ct), mp_base (ct.is_complex () ? rep.insert (regular_complex_array <coord_type> (ct.rcos (), ct.mag (), a, b, amax, bmax)) : rep.insert (regular_array <coord_type> (a, b, amax, bmax)))
+    : m_obj (obj), m_trans (ct), mp_base (ct.is_complex () ? rep.insert (regular_complex_array<coord_type> (ct.rcos (), ct.mag (), a, b, amax, bmax)) : rep.insert (regular_array<coord_type> (a, b, amax, bmax)))
   {
     //  .. nothing yet ..
   }
-  
+
   /**
    *  @brief The singular complex instance constructor
    *
    *  This is basically a convenience function that creates
    *  an appropriate basic_array object.
    */
-  explicit 
-  array (const Obj &obj, const trans_type &trans, double acos, double mag)
-    : m_obj (obj), m_trans (trans), mp_base (new single_complex_inst <coord_type> (acos, mag))
+  explicit array (const Obj &obj, const trans_type &trans, double acos, double mag)
+    : m_obj (obj), m_trans (trans), mp_base (new single_complex_inst<coord_type> (acos, mag))
   {
     //  .. nothing yet ..
   }
@@ -1762,7 +1738,7 @@ struct array
    */
   template <class Iter>
   array (const Obj &obj, const trans_type &trans, Iter from, Iter to)
-    : m_obj (obj), m_trans (trans), mp_base (new iterated_array <coord_type> (from, to))
+    : m_obj (obj), m_trans (trans), mp_base (new iterated_array<coord_type> (from, to))
   {
     //  .. nothing yet ..
   }
@@ -1775,7 +1751,7 @@ struct array
    */
   template <class Iter>
   array (const Obj &obj, const complex_trans_type &ct, Iter from, Iter to)
-    : m_obj (obj), m_trans (ct), mp_base (ct.is_complex () ? new iterated_complex_array <coord_type> (ct.rcos (), ct.mag (), from, to) : new iterated_array <coord_type> (from, to))
+    : m_obj (obj), m_trans (ct), mp_base (ct.is_complex () ? new iterated_complex_array<coord_type> (ct.rcos (), ct.mag (), from, to) : new iterated_array<coord_type> (from, to))
   {
     //  .. nothing yet ..
   }
@@ -1786,9 +1762,8 @@ struct array
    *  This is basically a convenience function that creates
    *  an appropriate basic_array object using a complex transformation.
    */
-  explicit 
-  array (const Obj &obj, const complex_trans_type &ct)
-    : m_obj (obj), m_trans (ct), mp_base (ct.is_complex () ? new single_complex_inst <coord_type> (ct.rcos (), ct.mag ()) : 0)
+  explicit array (const Obj &obj, const complex_trans_type &ct)
+    : m_obj (obj), m_trans (ct), mp_base (ct.is_complex () ? new single_complex_inst<coord_type> (ct.rcos (), ct.mag ()) : 0)
   {
     //  .. nothing yet ..
   }
@@ -1798,12 +1773,11 @@ struct array
    *
    *  This is basically a convenience function that creates
    *  an appropriate basic_array object.
-   *  It uses the array repository to store the base object rather than providing 
+   *  It uses the array repository to store the base object rather than providing
    *  it's own storage.
    */
-  explicit 
-  array (const Obj &obj, const trans_type &trans, ArrayRepository &rep, double acos, double mag)
-    : m_obj (obj), m_trans (trans), mp_base (rep.insert (single_complex_inst <coord_type> (acos, mag)))
+  explicit array (const Obj &obj, const trans_type &trans, ArrayRepository &rep, double acos, double mag)
+    : m_obj (obj), m_trans (trans), mp_base (rep.insert (single_complex_inst<coord_type> (acos, mag)))
   {
     //  .. nothing yet ..
   }
@@ -1813,12 +1787,11 @@ struct array
    *
    *  This is basically a convenience function that creates
    *  an appropriate basic_array object using a complex transformation.
-   *  It uses the array repository to store the base object rather than providing 
+   *  It uses the array repository to store the base object rather than providing
    *  it's own storage.
    */
-  explicit 
-  array (const Obj &obj, const complex_trans_type &ct, ArrayRepository &rep)
-    : m_obj (obj), m_trans (ct), mp_base (ct.is_complex () ? rep.insert (single_complex_inst <coord_type> (ct.rcos (), ct.mag ())) : 0)
+  explicit array (const Obj &obj, const complex_trans_type &ct, ArrayRepository &rep)
+    : m_obj (obj), m_trans (ct), mp_base (ct.is_complex () ? rep.insert (single_complex_inst<coord_type> (ct.rcos (), ct.mag ())) : 0)
   {
     //  .. nothing yet ..
   }
@@ -1891,21 +1864,21 @@ struct array
    *
    *  There is no end() method. Rather use the at_end() method
    *  of the iterator to determine the end of the sequence.
-   *  The iterator returned will report all object displacement 
-   *  vectors of the objects that touch the given box and 
+   *  The iterator returned will report all object displacement
+   *  vectors of the objects that touch the given box and
    *  possibly some more.
    */
   template <class BoxConv>
-  array_iterator <coord_type, Trans> begin_touching (const box_type &b, const BoxConv &bc) const 
+  array_iterator<coord_type, Trans> begin_touching (const box_type &b, const BoxConv &bc) const
   {
     if (b.empty ()) {
-      return array_iterator <coord_type, Trans> (m_trans, true);
+      return array_iterator<coord_type, Trans> (m_trans, true);
     } else if (b == box_type::world ()) {
       return begin ();
     } else if (mp_base) {
       box_type ob (bc (m_obj));
       if (ob.empty ()) {
-        return array_iterator <coord_type, Trans> (m_trans, true);
+        return array_iterator<coord_type, Trans> (m_trans, true);
       } else {
         if (mp_base->is_complex ()) {
           complex_trans_type ct = mp_base->complex_trans (simple_trans_type (m_trans));
@@ -1915,20 +1888,20 @@ struct array
           ob.transform (db::fixpoint_trans<coord_type> (m_trans.rot ()));
         }
         vector_type d = m_trans.disp ();
-        return array_iterator <coord_type, Trans> (m_trans, mp_base->begin_touching (box_type (point_type () + (b.p1 () - (ob.p2 () + d)), point_type () + (b.p2 () - (ob.p1 () + d)))));
+        return array_iterator<coord_type, Trans> (m_trans, mp_base->begin_touching (box_type (point_type () + (b.p1 () - (ob.p2 () + d)), point_type () + (b.p2 () - (ob.p1 () + d)))));
       }
     } else {
       box_type ob (bc (m_obj));
       if (ob.empty ()) {
-        return array_iterator <coord_type, Trans> (m_trans, true); 
+        return array_iterator<coord_type, Trans> (m_trans, true);
       } else {
         vector_type d = m_trans.disp ();
         ob.transform (db::fixpoint_trans<coord_type> (m_trans.rot ()));
-        return array_iterator <coord_type, Trans> (m_trans, ! box_type (point_type () + (b.p1 () - (ob.p2 () + d)), point_type () + (b.p2 () - (ob.p1 () + d))).contains (point_type ()));
+        return array_iterator<coord_type, Trans> (m_trans, ! box_type (point_type () + (b.p1 () - (ob.p2 () + d)), point_type () + (b.p2 () - (ob.p1 () + d))).contains (point_type ()));
       }
     }
   }
-  
+
   /**
    *  @brief The regular array member iterator
    *
@@ -1938,12 +1911,12 @@ struct array
    *  There is no end() method. Rather use the at_end() method
    *  of the iterator to determine the end of the sequence.
    */
-  array_iterator <coord_type, Trans> begin (long a, long b) const 
+  array_iterator<coord_type, Trans> begin (long a, long b) const
   {
     if (mp_base) {
-      return array_iterator <coord_type, Trans> (m_trans, mp_base->begin_regular (a, b));
+      return array_iterator<coord_type, Trans> (m_trans, mp_base->begin_regular (a, b));
     } else {
-      return array_iterator <coord_type, Trans> (m_trans, false);
+      return array_iterator<coord_type, Trans> (m_trans, false);
     }
   }
 
@@ -1953,12 +1926,12 @@ struct array
    *  There is no end() method. Rather use the at_end() method
    *  of the iterator to determine the end of the sequence.
    */
-  array_iterator <coord_type, Trans> begin () const 
+  array_iterator<coord_type, Trans> begin () const
   {
     if (mp_base) {
-      return array_iterator <coord_type, Trans> (m_trans, mp_base->begin ());
+      return array_iterator<coord_type, Trans> (m_trans, mp_base->begin ());
     } else {
-      return array_iterator <coord_type, Trans> (m_trans, false);
+      return array_iterator<coord_type, Trans> (m_trans, false);
     }
   }
 
@@ -1985,9 +1958,9 @@ struct array
    *  The raw bounding box is the box that encloses the array instantiation
    *  points, ignoring the extensions of the object.
    *  The raw bounding boxes can be accumulated for all arrays having the same
-   *  orientation, magnification and object. 
+   *  orientation, magnification and object.
    *  bbox_from_raw_bbox can be used to compute the total bbox from such an
-   *  accumulated raw bounding box. This is for example exploited in the 
+   *  accumulated raw bounding box. This is for example exploited in the
    *  update_bbox method of db::cell.
    */
   box_type raw_bbox () const
@@ -2094,7 +2067,7 @@ struct array
       if (mp_base->in_repository) {
         mp_base = mp_base->clone ();
       }
-      //  Hint: this assumes that the delegate does not carry a "superior" transformation over trans_type - 
+      //  Hint: this assumes that the delegate does not carry a "superior" transformation over trans_type -
       //  i.e. no complex trans inside arrays stating a unit_trans type for example. The assertion checks that.
       simple_trans_type t (m_trans);
       mp_base->invert (t);
@@ -2110,7 +2083,7 @@ struct array
    */
   bool operator!= (const array<Obj, Trans> &d) const
   {
-    return !operator== (d);
+    return ! operator== (d);
   }
 
   /**
@@ -2272,7 +2245,7 @@ struct array
   /**
    *  @brief Test, if the array is a complex array
    *
-   *  Returns true if the array represents complex instances (that is, with magnification and 
+   *  Returns true if the array represents complex instances (that is, with magnification and
    *  arbitrary rotation angles).
    */
   bool is_complex () const
@@ -2281,7 +2254,7 @@ struct array
   }
 
   /**
-   *  @brief Return the type code 
+   *  @brief Return the type code
    *
    *  Returns the type code of the array. Mainly used internally.
    */
@@ -2318,7 +2291,7 @@ struct array
    *  @brief Test, if the array is a regular one
    *
    *  Returns true and the array parameters if the array is a regular
-   *  one. 
+   *  one.
    */
   bool is_regular_array (vector_type &a, vector_type &b, unsigned long &amax, unsigned long &bmax) const
   {
@@ -2344,7 +2317,7 @@ struct array
    *  Hint this method is supposed to be used for shape arrays. Instance arrays to not support the translate method currently.
    *  TODO: this functionality should be put into the Shapes translate method rather than into this class ...
    */
-  void translate (const array<Obj, Trans> &d, db::generic_repository<coord_type> &rep, db::ArrayRepository &array_rep) 
+  void translate (const array<Obj, Trans> &d, db::generic_repository<coord_type> &rep, db::ArrayRepository &array_rep)
   {
     m_obj.translate (d.m_obj, rep, array_rep);
     m_trans = d.m_trans;
@@ -2359,13 +2332,13 @@ struct array
   }
 
   /**
-   *  @brief The translation operator with transformation 
+   *  @brief The translation operator with transformation
    *
    *  Hint this method is supposed to be used for shape arrays. Instance arrays to not support the translate method currently.
    *  TODO: this functionality should be put into the Shapes translate method rather than into this class ...
    */
   template <class T>
-  void translate (const array<Obj, Trans> &d, const T &t, db::generic_repository<coord_type> &rep, db::ArrayRepository &array_rep) 
+  void translate (const array<Obj, Trans> &d, const T &t, db::generic_repository<coord_type> &rep, db::ArrayRepository &array_rep)
   {
     //  Translate the array into the new system and if necessary, transform and translate the object
     translate_from (t, d, rep, array_rep);
@@ -2376,9 +2349,9 @@ struct array
       mp_base = 0;
     }
 
-    //  transform the delegate 
+    //  transform the delegate
     if (d.mp_base) {
-      basic_array <coord_type> *new_base = d.mp_base->clone ();
+      basic_array<coord_type> *new_base = d.mp_base->clone ();
       new_base->transform (t);
       mp_base = array_rep.insert (*new_base);
       delete new_base;
@@ -2415,9 +2388,9 @@ struct array
    *  @param tr The transformation to apply
    *  @param rep The repository where to enter the new array or 0 if no repository should be used
    *
-   *  Hint: this method is supposed to be used for arrays with simple_transformation for the transformation type mainly. 
-   *  The reason is that this method will create complex arrays from complex transformations. 
-   *  Arrays based on reduced transformations (unit_trans, disp_trans) must not use complex arrays because that 
+   *  Hint: this method is supposed to be used for arrays with simple_transformation for the transformation type mainly.
+   *  The reason is that this method will create complex arrays from complex transformations.
+   *  Arrays based on reduced transformations (unit_trans, disp_trans) must not use complex arrays because that
    *  is not supported currently. In other words, this method will not try to transform the object itself and rather
    *  put all transformation aspects into the array, which does not work on reduced transformation types, except
    *  if the applied transformation "tr" is also a reduced type.
@@ -2434,11 +2407,11 @@ struct array
    *     simple    all                   yes
    *
    *  For the non-compatible combinations, %translate is provided. This however requires that the object
-   *  can be transformed ("translated" in the more general sense). That specifically applies to 
+   *  can be transformed ("translated" in the more general sense). That specifically applies to
    *  shape arrays and references which are based on unit or disp transformations.
    */
   template <class T>
-  void transform (const T &tr, db::ArrayRepository *array_rep = 0) 
+  void transform (const T &tr, db::ArrayRepository *array_rep = 0)
   {
     transform_from (tr, *this);
     if (mp_base) {
@@ -2458,22 +2431,22 @@ struct array
   }
 
   /**
-   *  @brief Transformation into a new system 
+   *  @brief Transformation into a new system
    *
    *  Arrays are transformed into a new system by applying a formal transformation
    *  A' = T A Ti (Ti is the inverse of T). Hence T A = A' T. In other words: the transformation
-   *  T is propagated over the array A. This transformation is useful for transformation 
-   *  of hierarchies, since the transformation T can be propagated further down in the hierarchy 
+   *  T is propagated over the array A. This transformation is useful for transformation
+   *  of hierarchies, since the transformation T can be propagated further down in the hierarchy
    *  therefore.
    *
-   *  See the remarks on "transform" regarding compatibility of the transformation argument and 
+   *  See the remarks on "transform" regarding compatibility of the transformation argument and
    *  the Trans type of this array.
    *
    *  @param tr The transformation to apply
    *  @param rep The repository where to enter the new array or 0 if no repository should be used
    */
   template <class T>
-  void transform_into (const T &tr, db::ArrayRepository *array_rep = 0) 
+  void transform_into (const T &tr, db::ArrayRepository *array_rep = 0)
   {
     transform_into_from (tr, *this);
     if (mp_base) {
@@ -2486,7 +2459,7 @@ struct array
    *  @brief Transformation of an array
    */
   template <class T>
-  array transformed (const T &tr, db::ArrayRepository *array_rep = 0) const 
+  array transformed (const T &tr, db::ArrayRepository *array_rep = 0) const
   {
     array a (*this);
     a.transform (tr, array_rep);
@@ -2507,7 +2480,7 @@ struct array
    *  See the "transform_into" method for details about this transformation.
    */
   template <class T>
-  array transformed_into (const T &tr, db::ArrayRepository *array_rep = 0) const 
+  array transformed_into (const T &tr, db::ArrayRepository *array_rep = 0) const
   {
     array a (*this);
     a.transform_into (tr, array_rep);
@@ -2528,7 +2501,7 @@ struct array
 private:
   Obj m_obj;
   trans_type m_trans;
-  basic_array <coord_type> *mp_base;
+  basic_array<coord_type> *mp_base;
 
   void transform_into_from (const unit_trans_type & /*tr*/, const array<Obj, Trans> & /*d*/)
   {
@@ -2639,7 +2612,7 @@ private:
 
   void set_complex (double mag, double rcos, const array<Obj, Trans> &d)
   {
-    basic_array <coord_type> *new_base = 0;
+    basic_array<coord_type> *new_base = 0;
 
     //  if we finally have a complex transformation, set a new base object
     if (fabs (mag - 1.0) > epsilon || fabs (rcos - 1.0) > epsilon) {
@@ -2653,11 +2626,11 @@ private:
       bool is_iterated = d.is_iterated_array (&v);
 
       if (is_reg) {
-        new_base = new regular_complex_array <coord_type> (rcos, mag, a, b, amax, bmax);
+        new_base = new regular_complex_array<coord_type> (rcos, mag, a, b, amax, bmax);
       } else if (is_iterated) {
-        new_base = new iterated_complex_array <coord_type> (rcos, mag, v.begin (), v.end ());
+        new_base = new iterated_complex_array<coord_type> (rcos, mag, v.begin (), v.end ());
       } else {
-        new_base = new single_complex_inst <coord_type> (rcos, mag);
+        new_base = new single_complex_inst<coord_type> (rcos, mag);
       }
 
     } else if (d.is_complex ()) {
@@ -2671,9 +2644,9 @@ private:
       bool is_iterated = d.is_iterated_array (&v);
 
       if (is_reg) {
-        new_base = new regular_array <coord_type> (a, b, amax, bmax);
+        new_base = new regular_array<coord_type> (a, b, amax, bmax);
       } else if (is_iterated) {
-        new_base = new iterated_array <coord_type> (v.begin (), v.end ());
+        new_base = new iterated_array<coord_type> (v.begin (), v.end ());
       } else {
         //  a complex transformation delegate is no longer required
         if (mp_base && ! mp_base->in_repository) {
@@ -2681,7 +2654,6 @@ private:
         }
         mp_base = 0;
       }
-
     }
 
     if (new_base) {
@@ -2693,7 +2665,7 @@ private:
   }
 
   template <class T>
-  void transform_delegate (const T &tr, db::ArrayRepository *array_rep) 
+  void transform_delegate (const T &tr, db::ArrayRepository *array_rep)
   {
     //  transform the delegate
     if (! array_rep && ! mp_base->in_repository) {
@@ -2703,7 +2675,7 @@ private:
 
     } else {
 
-      basic_array <coord_type> *new_base = mp_base->clone ();
+      basic_array<coord_type> *new_base = mp_base->clone ();
       new_base->transform (tr);
 
       if (! mp_base->in_repository) {
@@ -2716,7 +2688,6 @@ private:
       } else {
         mp_base = new_base;
       }
-
     }
   }
 };
@@ -2735,7 +2706,7 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
 namespace std
 {
 
-//  injecting a global std::swap for arrays into the 
+//  injecting a global std::swap for arrays into the
 //  std namespace
 template <class Obj, class Trans>
 void swap (db::array<Obj, Trans> &a, db::array<Obj, Trans> &b)
@@ -2746,4 +2717,3 @@ void swap (db::array<Obj, Trans> &a, db::array<Obj, Trans> &b)
 } // namespace std
 
 #endif
-

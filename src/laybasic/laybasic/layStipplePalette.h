@@ -37,7 +37,6 @@ namespace lay
 class LAYBASIC_PUBLIC StipplePalette
 {
 public:
-
   /**
    *  @brief Default constructor
    *
@@ -46,7 +45,7 @@ public:
   StipplePalette ();
 
   /**
-   *  @brief Constructor from the data 
+   *  @brief Constructor from the data
    *
    *  @param stipples The stipples as a vector
    *  @param standard The list of standard stipple indices as a vector
@@ -96,7 +95,7 @@ public:
    */
   void clear_standard_stipples ();
 
-  /** 
+  /**
    *  @brief Retrieve the stipple by index
    */
   unsigned int stipple_by_index (unsigned int n) const;
@@ -108,7 +107,7 @@ public:
    */
   unsigned int stipples () const;
 
-  /** 
+  /**
    *  @brief Retrieve the standard stipple by index
    */
   unsigned int
@@ -117,7 +116,7 @@ public:
     return stipple_by_index (standard_stipple_index_by_index (n));
   }
 
-  /** 
+  /**
    *  @brief Retrieve the standard stipple index by index (0 to standard_stipples()-1)
    *
    *  The index returned is the index of the stipple referenced. The actual stipple
@@ -135,8 +134,8 @@ public:
    */
   unsigned int standard_stipples () const;
 
-  /** 
-   *  @brief Conversion to a string 
+  /**
+   *  @brief Conversion to a string
    */
   std::string to_string () const;
 
@@ -151,15 +150,13 @@ public:
   /**
    *  @brief Deliver the default palette
    */
-  static StipplePalette default_palette (); 
+  static StipplePalette default_palette ();
 
 private:
-  std::vector <unsigned int> m_stipples;
-  std::vector <unsigned int> m_standard;
-
+  std::vector<unsigned int> m_stipples;
+  std::vector<unsigned int> m_standard;
 };
 
 }
 
 #endif
-

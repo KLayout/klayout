@@ -40,8 +40,7 @@ Margin::Margin (double value, bool relative)
   }
 }
 
-bool
-Margin::operator== (const lay::Margin &other) const
+bool Margin::operator== (const lay::Margin &other) const
 {
   return m_relative_mode == other.m_relative_mode &&
          fabs (m_absolute_value - other.m_absolute_value) < delta &&
@@ -111,4 +110,3 @@ Margin::get (const db::DBox &box) const
 }
 
 }
-

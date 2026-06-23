@@ -40,11 +40,11 @@ class Dispatcher;
  *  This interface defines some services the configuration page
  *  must provide (i.e. setup, commit)
  */
-class LAYBASIC_PUBLIC ConfigPage 
+class LAYBASIC_PUBLIC ConfigPage
   : public QFrame
 {
 public:
-  ConfigPage (QWidget *parent) 
+  ConfigPage (QWidget *parent)
     : QFrame (parent)
   {
     // .. nothing else ..
@@ -64,15 +64,14 @@ public:
   /**
    *  @brief Commit the page
    *
-   *  The implementation is supposed to read the configuration (and 
+   *  The implementation is supposed to read the configuration (and
    *  throw exceptions if the configuration something is invalid)
-   *  and commit the changes through 
+   *  and commit the changes through
    */
   virtual void commit (Dispatcher * /*root*/)
   {
     //  the default implementation does nothing.
   }
-
 };
 
 }
@@ -80,4 +79,4 @@ public:
 #endif
 
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

@@ -28,7 +28,7 @@
 #include <memory>
 #include <limits>
 
-TEST(1_SerialResistors)
+TEST (1_SerialResistors)
 {
   db::DeviceClassResistor *res = new db::DeviceClassResistor ();
 
@@ -73,23 +73,21 @@ TEST(1_SerialResistors)
   circuit->connect_pin (pin_b.id (), n3);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3);\n"
-    "  device '' r1 (A=n1,B=n2) (R=1,L=6,W=1,A=5,P=10);\n"
-    "  device '' r2 (A=n2,B=n3) (R=3,L=12,W=2,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3);\n"
+             "  device '' r1 (A=n1,B=n2) (R=1,L=6,W=1,A=5,P=10);\n"
+             "  device '' r2 (A=n2,B=n3) (R=3,L=12,W=2,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3);\n"
-    "  device '' r1 (A=n1,B=n3) (R=4,L=18,W=1.5,A=6,P=12);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3);\n"
+             "  device '' r1 (A=n1,B=n3) (R=4,L=18,W=1.5,A=6,P=12);\n"
+             "end;\n");
 }
 
-TEST(2_SerialResistors1Swapped)
+TEST (2_SerialResistors1Swapped)
 {
   db::DeviceClassResistor *res = new db::DeviceClassResistor ();
 
@@ -134,23 +132,21 @@ TEST(2_SerialResistors1Swapped)
   circuit->connect_pin (pin_b.id (), n3);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3);\n"
-    "  device '' r1 (A=n1,B=n2) (R=1,L=6,W=1,A=5,P=10);\n"
-    "  device '' r2 (A=n3,B=n2) (R=3,L=12,W=2,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3);\n"
+             "  device '' r1 (A=n1,B=n2) (R=1,L=6,W=1,A=5,P=10);\n"
+             "  device '' r2 (A=n3,B=n2) (R=3,L=12,W=2,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3);\n"
-    "  device '' r1 (A=n1,B=n3) (R=4,L=18,W=1.5,A=6,P=12);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3);\n"
+             "  device '' r1 (A=n1,B=n3) (R=4,L=18,W=1.5,A=6,P=12);\n"
+             "end;\n");
 }
 
-TEST(3_SerialResistors1OtherSwapped)
+TEST (3_SerialResistors1OtherSwapped)
 {
   db::DeviceClassResistor *res = new db::DeviceClassResistor ();
 
@@ -195,23 +191,21 @@ TEST(3_SerialResistors1OtherSwapped)
   circuit->connect_pin (pin_b.id (), n3);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3);\n"
-    "  device '' r1 (A=n2,B=n1) (R=1,L=6,W=1,A=5,P=10);\n"
-    "  device '' r2 (A=n2,B=n3) (R=3,L=12,W=2,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3);\n"
+             "  device '' r1 (A=n2,B=n1) (R=1,L=6,W=1,A=5,P=10);\n"
+             "  device '' r2 (A=n2,B=n3) (R=3,L=12,W=2,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3);\n"
-    "  device '' r1 (A=n3,B=n1) (R=4,L=18,W=1.5,A=6,P=12);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3);\n"
+             "  device '' r1 (A=n3,B=n1) (R=4,L=18,W=1.5,A=6,P=12);\n"
+             "end;\n");
 }
 
-TEST(4_SerialResistors2Swapped)
+TEST (4_SerialResistors2Swapped)
 {
   db::DeviceClassResistor *res = new db::DeviceClassResistor ();
 
@@ -256,23 +250,21 @@ TEST(4_SerialResistors2Swapped)
   circuit->connect_pin (pin_b.id (), n3);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3);\n"
-    "  device '' r1 (A=n2,B=n1) (R=1,L=6,W=1,A=5,P=10);\n"
-    "  device '' r2 (A=n3,B=n2) (R=3,L=12,W=2,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3);\n"
+             "  device '' r1 (A=n2,B=n1) (R=1,L=6,W=1,A=5,P=10);\n"
+             "  device '' r2 (A=n3,B=n2) (R=3,L=12,W=2,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3);\n"
-    "  device '' r1 (A=n3,B=n1) (R=4,L=18,W=1.5,A=6,P=12);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3);\n"
+             "  device '' r1 (A=n3,B=n1) (R=4,L=18,W=1.5,A=6,P=12);\n"
+             "end;\n");
 }
 
-TEST(5_SerialResistorsNoCombination)
+TEST (5_SerialResistorsNoCombination)
 {
   db::DeviceClassResistor *res = new db::DeviceClassResistor ();
 
@@ -309,7 +301,7 @@ TEST(5_SerialResistorsNoCombination)
 
   db::Net *n2 = new db::Net ("n2");
   circuit->add_net (n2);
-  circuit->connect_pin (pin_c.id (), n2);  // prevents combination
+  circuit->connect_pin (pin_c.id (), n2); // prevents combination
   r1->connect_terminal (db::DeviceClassResistor::terminal_id_B, n2);
   r2->connect_terminal (db::DeviceClassResistor::terminal_id_A, n2);
 
@@ -319,24 +311,22 @@ TEST(5_SerialResistorsNoCombination)
   circuit->connect_pin (pin_b.id (), n3);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3,C=n2);\n"
-    "  device '' r1 (A=n1,B=n2) (R=1,L=6,W=1,A=5,P=10);\n"
-    "  device '' r2 (A=n2,B=n3) (R=3,L=12,W=2,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3,C=n2);\n"
+             "  device '' r1 (A=n1,B=n2) (R=1,L=6,W=1,A=5,P=10);\n"
+             "  device '' r2 (A=n2,B=n3) (R=3,L=12,W=2,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3,C=n2);\n"
-    "  device '' r1 (A=n1,B=n2) (R=1,L=6,W=1,A=5,P=10);\n"
-    "  device '' r2 (A=n2,B=n3) (R=3,L=12,W=2,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3,C=n2);\n"
+             "  device '' r1 (A=n1,B=n2) (R=1,L=6,W=1,A=5,P=10);\n"
+             "  device '' r2 (A=n2,B=n3) (R=3,L=12,W=2,A=1,P=2);\n"
+             "end;\n");
 }
 
-TEST(6_ParallelResistors)
+TEST (6_ParallelResistors)
 {
   db::DeviceClassResistor *res = new db::DeviceClassResistor ();
 
@@ -378,23 +368,21 @@ TEST(6_ParallelResistors)
   r2->connect_terminal (db::DeviceClassResistor::terminal_id_B, n2);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2);\n"
-    "  device '' r1 (A=n1,B=n2) (R=2,L=6,W=1,A=5,P=10);\n"
-    "  device '' r2 (A=n1,B=n2) (R=3,L=12,W=2,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2);\n"
+             "  device '' r1 (A=n1,B=n2) (R=2,L=6,W=1,A=5,P=10);\n"
+             "  device '' r2 (A=n1,B=n2) (R=3,L=12,W=2,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2);\n"
-    "  device '' r1 (A=n1,B=n2) (R=1.2,L=9,W=3,A=6,P=12);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2);\n"
+             "  device '' r1 (A=n1,B=n2) (R=1.2,L=9,W=3,A=6,P=12);\n"
+             "end;\n");
 }
 
-TEST(7_ParallelResistors1Swapped)
+TEST (7_ParallelResistors1Swapped)
 {
   db::DeviceClassResistor *res = new db::DeviceClassResistor ();
 
@@ -436,23 +424,21 @@ TEST(7_ParallelResistors1Swapped)
   r2->connect_terminal (db::DeviceClassResistor::terminal_id_B, n2);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2);\n"
-    "  device '' r1 (A=n2,B=n1) (R=2,L=6,W=1,A=5,P=10);\n"
-    "  device '' r2 (A=n1,B=n2) (R=3,L=12,W=2,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2);\n"
+             "  device '' r1 (A=n2,B=n1) (R=2,L=6,W=1,A=5,P=10);\n"
+             "  device '' r2 (A=n1,B=n2) (R=3,L=12,W=2,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2);\n"
-    "  device '' r1 (A=n2,B=n1) (R=1.2,L=9,W=3,A=6,P=12);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2);\n"
+             "  device '' r1 (A=n2,B=n1) (R=1.2,L=9,W=3,A=6,P=12);\n"
+             "end;\n");
 }
 
-TEST(8_ParallelResistors1OtherSwapped)
+TEST (8_ParallelResistors1OtherSwapped)
 {
   db::DeviceClassResistor *res = new db::DeviceClassResistor ();
 
@@ -494,23 +480,21 @@ TEST(8_ParallelResistors1OtherSwapped)
   r2->connect_terminal (db::DeviceClassResistor::terminal_id_A, n2);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2);\n"
-    "  device '' r1 (A=n1,B=n2) (R=2,L=6,W=1,A=5,P=10);\n"
-    "  device '' r2 (A=n2,B=n1) (R=3,L=12,W=2,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2);\n"
+             "  device '' r1 (A=n1,B=n2) (R=2,L=6,W=1,A=5,P=10);\n"
+             "  device '' r2 (A=n2,B=n1) (R=3,L=12,W=2,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2);\n"
-    "  device '' r1 (A=n1,B=n2) (R=1.2,L=9,W=3,A=6,P=12);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2);\n"
+             "  device '' r1 (A=n1,B=n2) (R=1.2,L=9,W=3,A=6,P=12);\n"
+             "end;\n");
 }
 
-TEST(9_ParallelResistors2Swapped)
+TEST (9_ParallelResistors2Swapped)
 {
   db::DeviceClassResistor *res = new db::DeviceClassResistor ();
 
@@ -552,23 +536,21 @@ TEST(9_ParallelResistors2Swapped)
   r2->connect_terminal (db::DeviceClassResistor::terminal_id_A, n2);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2);\n"
-    "  device '' r1 (A=n2,B=n1) (R=2,L=6,W=1,A=5,P=10);\n"
-    "  device '' r2 (A=n2,B=n1) (R=3,L=12,W=2,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2);\n"
+             "  device '' r1 (A=n2,B=n1) (R=2,L=6,W=1,A=5,P=10);\n"
+             "  device '' r2 (A=n2,B=n1) (R=3,L=12,W=2,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2);\n"
-    "  device '' r1 (A=n2,B=n1) (R=1.2,L=9,W=3,A=6,P=12);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2);\n"
+             "  device '' r1 (A=n2,B=n1) (R=1.2,L=9,W=3,A=6,P=12);\n"
+             "end;\n");
 }
 
-TEST(10_ComplexResistorCombination)
+TEST (10_ComplexResistorCombination)
 {
   db::DeviceClassResistor *res = new db::DeviceClassResistor ();
 
@@ -635,25 +617,23 @@ TEST(10_ComplexResistorCombination)
   r4->connect_terminal (db::DeviceClassResistor::terminal_id_B, n4);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n4);\n"
-    "  device '' r1 (A=n1,B=n2) (R=1,L=0,W=0,A=2,P=3);\n"
-    "  device '' r2 (A=n2,B=n3) (R=1,L=0,W=0,A=4,P=10);\n"
-    "  device '' r3 (A=n1,B=n3) (R=3,L=0,W=0,A=1,P=1);\n"
-    "  device '' r4 (A=n3,B=n4) (R=0.8,L=0,W=0,A=1,P=1);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n4);\n"
+             "  device '' r1 (A=n1,B=n2) (R=1,L=0,W=0,A=2,P=3);\n"
+             "  device '' r2 (A=n2,B=n3) (R=1,L=0,W=0,A=4,P=10);\n"
+             "  device '' r3 (A=n1,B=n3) (R=3,L=0,W=0,A=1,P=1);\n"
+             "  device '' r4 (A=n3,B=n4) (R=0.8,L=0,W=0,A=1,P=1);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n4);\n"
-    "  device '' r4 (A=n1,B=n4) (R=2,L=0,W=0,A=8,P=15);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n4);\n"
+             "  device '' r4 (A=n1,B=n4) (R=2,L=0,W=0,A=8,P=15);\n"
+             "end;\n");
 }
 
-TEST(11_SerialInductors)
+TEST (11_SerialInductors)
 {
   db::DeviceClassInductor *ind = new db::DeviceClassInductor ();
 
@@ -690,23 +670,21 @@ TEST(11_SerialInductors)
   circuit->connect_pin (pin_b.id (), n3);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3);\n"
-    "  device '' l1 (A=n1,B=n2) (L=1);\n"
-    "  device '' l2 (A=n2,B=n3) (L=3);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3);\n"
+             "  device '' l1 (A=n1,B=n2) (L=1);\n"
+             "  device '' l2 (A=n2,B=n3) (L=3);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3);\n"
-    "  device '' l1 (A=n1,B=n3) (L=4);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3);\n"
+             "  device '' l1 (A=n1,B=n3) (L=4);\n"
+             "end;\n");
 }
 
-TEST(12_ParallelInductors)
+TEST (12_ParallelInductors)
 {
   db::DeviceClassInductor *ind = new db::DeviceClassInductor ();
 
@@ -740,23 +718,21 @@ TEST(12_ParallelInductors)
   l2->connect_terminal (db::DeviceClassInductor::terminal_id_B, n2);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2);\n"
-    "  device '' l1 (A=n1,B=n2) (L=2);\n"
-    "  device '' l2 (A=n1,B=n2) (L=3);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2);\n"
+             "  device '' l1 (A=n1,B=n2) (L=2);\n"
+             "  device '' l2 (A=n1,B=n2) (L=3);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2);\n"
-    "  device '' l1 (A=n1,B=n2) (L=1.2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2);\n"
+             "  device '' l1 (A=n1,B=n2) (L=1.2);\n"
+             "end;\n");
 }
 
-TEST(13_SerialCapacitors)
+TEST (13_SerialCapacitors)
 {
   db::DeviceClassCapacitor *cap = new db::DeviceClassCapacitor ();
 
@@ -797,23 +773,21 @@ TEST(13_SerialCapacitors)
   circuit->connect_pin (pin_b.id (), n3);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3);\n"
-    "  device '' c1 (A=n1,B=n2) (C=2,A=5,P=10);\n"
-    "  device '' c2 (A=n2,B=n3) (C=3,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3);\n"
+             "  device '' c1 (A=n1,B=n2) (C=2,A=5,P=10);\n"
+             "  device '' c2 (A=n2,B=n3) (C=3,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3);\n"
-    "  device '' c1 (A=n1,B=n3) (C=1.2,A=6,P=12);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3);\n"
+             "  device '' c1 (A=n1,B=n3) (C=1.2,A=6,P=12);\n"
+             "end;\n");
 }
 
-TEST(14_ParallelCapacitors)
+TEST (14_ParallelCapacitors)
 {
   db::DeviceClassCapacitor *cap = new db::DeviceClassCapacitor ();
 
@@ -851,23 +825,21 @@ TEST(14_ParallelCapacitors)
   c2->connect_terminal (db::DeviceClassCapacitor::terminal_id_B, n2);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2);\n"
-    "  device '' c1 (A=n1,B=n2) (C=1,A=5,P=10);\n"
-    "  device '' c2 (A=n1,B=n2) (C=3,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2);\n"
+             "  device '' c1 (A=n1,B=n2) (C=1,A=5,P=10);\n"
+             "  device '' c2 (A=n1,B=n2) (C=3,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2);\n"
-    "  device '' c1 (A=n1,B=n2) (C=4,A=6,P=12);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2);\n"
+             "  device '' c1 (A=n1,B=n2) (C=4,A=6,P=12);\n"
+             "end;\n");
 }
 
-TEST(15_SerialDiodes)
+TEST (15_SerialDiodes)
 {
   db::DeviceClassDiode *diode = new db::DeviceClassDiode ();
 
@@ -906,11 +878,10 @@ TEST(15_SerialDiodes)
   circuit->connect_pin (pin_b.id (), n3);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3);\n"
-    "  device '' d1 (A=n1,C=n2) (A=2,P=5);\n"
-    "  device '' d2 (A=n2,C=n3) (A=3,P=1);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3);\n"
+             "  device '' d1 (A=n1,C=n2) (A=2,P=5);\n"
+             "  device '' d2 (A=n2,C=n3) (A=3,P=1);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
@@ -918,14 +889,13 @@ TEST(15_SerialDiodes)
   //  serial diodes are not combined!
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3);\n"
-    "  device '' d1 (A=n1,C=n2) (A=2,P=5);\n"
-    "  device '' d2 (A=n2,C=n3) (A=3,P=1);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3);\n"
+             "  device '' d1 (A=n1,C=n2) (A=2,P=5);\n"
+             "  device '' d2 (A=n2,C=n3) (A=3,P=1);\n"
+             "end;\n");
 }
 
-TEST(16_ParallelDiodes)
+TEST (16_ParallelDiodes)
 {
   db::DeviceClassDiode *diode = new db::DeviceClassDiode ();
 
@@ -961,23 +931,21 @@ TEST(16_ParallelDiodes)
   d2->connect_terminal (db::DeviceClassDiode::terminal_id_C, n2);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2);\n"
-    "  device '' d1 (A=n1,C=n2) (A=1,P=5);\n"
-    "  device '' d2 (A=n1,C=n2) (A=3,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2);\n"
+             "  device '' d1 (A=n1,C=n2) (A=1,P=5);\n"
+             "  device '' d2 (A=n1,C=n2) (A=3,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2);\n"
-    "  device '' d1 (A=n1,C=n2) (A=4,P=7);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2);\n"
+             "  device '' d1 (A=n1,C=n2) (A=4,P=7);\n"
+             "end;\n");
 }
 
-TEST(17_AntiParallelDiodes)
+TEST (17_AntiParallelDiodes)
 {
   db::DeviceClassDiode *diode = new db::DeviceClassDiode ();
 
@@ -1013,11 +981,10 @@ TEST(17_AntiParallelDiodes)
   d2->connect_terminal (db::DeviceClassDiode::terminal_id_A, n2);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2);\n"
-    "  device '' d1 (A=n1,C=n2) (A=1,P=5);\n"
-    "  device '' d2 (A=n2,C=n1) (A=3,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2);\n"
+             "  device '' d1 (A=n1,C=n2) (A=1,P=5);\n"
+             "  device '' d2 (A=n2,C=n1) (A=3,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
@@ -1025,14 +992,13 @@ TEST(17_AntiParallelDiodes)
   //  anti-parallel diodes are not combined
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2);\n"
-    "  device '' d1 (A=n1,C=n2) (A=1,P=5);\n"
-    "  device '' d2 (A=n2,C=n1) (A=3,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2);\n"
+             "  device '' d1 (A=n1,C=n2) (A=1,P=5);\n"
+             "  device '' d2 (A=n2,C=n1) (A=3,P=2);\n"
+             "end;\n");
 }
 
-TEST(20_ParallelMOS3Transistors)
+TEST (20_ParallelMOS3Transistors)
 {
   db::DeviceClassMOS3Transistor *cls = new db::DeviceClassMOS3Transistor ();
 
@@ -1083,23 +1049,21 @@ TEST(20_ParallelMOS3Transistors)
   d2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, n3);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
-    "  device '' d2 (S=n1,G=n3,D=n2) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3);\n"
+             "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+             "  device '' d2 (S=n1,G=n3,D=n2) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=3,AS=5,AD=7,PS=25,PD=27);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3);\n"
+             "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=3,AS=5,AD=7,PS=25,PD=27);\n"
+             "end;\n");
 }
 
-TEST(21_AntiParallelMOS3Transistors)
+TEST (21_AntiParallelMOS3Transistors)
 {
   db::DeviceClassMOS3Transistor *cls = new db::DeviceClassMOS3Transistor ();
 
@@ -1150,23 +1114,21 @@ TEST(21_AntiParallelMOS3Transistors)
   d2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, n3);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
-    "  device '' d2 (S=n2,G=n3,D=n1) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3);\n"
+             "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+             "  device '' d2 (S=n2,G=n3,D=n1) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=3,AS=5,AD=7,PS=25,PD=27);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3);\n"
+             "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=3,AS=5,AD=7,PS=25,PD=27);\n"
+             "end;\n");
 }
 
-TEST(22_ParallelMOS3TransistorsDisconnectedGates)
+TEST (22_ParallelMOS3TransistorsDisconnectedGates)
 {
   db::DeviceClassMOS3Transistor *cls = new db::DeviceClassMOS3Transistor ();
 
@@ -1222,11 +1184,10 @@ TEST(22_ParallelMOS3TransistorsDisconnectedGates)
   d2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, n4);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C1=n3,C2=n4);\n"
-    "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
-    "  device '' d2 (S=n1,G=n4,D=n2) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C1=n3,C2=n4);\n"
+             "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+             "  device '' d2 (S=n1,G=n4,D=n2) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
@@ -1234,14 +1195,13 @@ TEST(22_ParallelMOS3TransistorsDisconnectedGates)
   //  because of the disconnected gates, devices will no be joined:
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C1=n3,C2=n4);\n"
-    "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
-    "  device '' d2 (S=n1,G=n4,D=n2) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C1=n3,C2=n4);\n"
+             "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+             "  device '' d2 (S=n1,G=n4,D=n2) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+             "end;\n");
 }
 
-TEST(23_ParallelMOS3TransistorsDifferentLength)
+TEST (23_ParallelMOS3TransistorsDifferentLength)
 {
   db::DeviceClassMOS3Transistor *cls = new db::DeviceClassMOS3Transistor ();
 
@@ -1292,11 +1252,10 @@ TEST(23_ParallelMOS3TransistorsDifferentLength)
   d2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, n3);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
-    "  device '' d2 (S=n1,G=n3,D=n2) (L=0.75,W=2,AS=3,AD=4,PS=13,PD=14);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3);\n"
+             "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+             "  device '' d2 (S=n1,G=n3,D=n2) (L=0.75,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
@@ -1304,14 +1263,13 @@ TEST(23_ParallelMOS3TransistorsDifferentLength)
   //  because of different length, the devices will not be combined:
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
-    "  device '' d2 (S=n1,G=n3,D=n2) (L=0.75,W=2,AS=3,AD=4,PS=13,PD=14);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3);\n"
+             "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+             "  device '' d2 (S=n1,G=n3,D=n2) (L=0.75,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+             "end;\n");
 }
 
-TEST(30_ParallelMOS4Transistors)
+TEST (30_ParallelMOS4Transistors)
 {
   db::DeviceClassMOS4Transistor *cls = new db::DeviceClassMOS4Transistor ();
 
@@ -1369,23 +1327,21 @@ TEST(30_ParallelMOS4Transistors)
   d2->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, n0);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
-    "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
-    "  device '' d2 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
+             "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+             "  device '' d2 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
-    "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=3,AS=5,AD=7,PS=25,PD=27);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
+             "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=3,AS=5,AD=7,PS=25,PD=27);\n"
+             "end;\n");
 }
 
-TEST(31_AntiParallelMOS4Transistors)
+TEST (31_AntiParallelMOS4Transistors)
 {
   db::DeviceClassMOS4Transistor *cls = new db::DeviceClassMOS4Transistor ();
 
@@ -1443,23 +1399,21 @@ TEST(31_AntiParallelMOS4Transistors)
   d2->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, n0);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
-    "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
-    "  device '' d2 (S=n2,G=n3,D=n1,B=n0) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
+             "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+             "  device '' d2 (S=n2,G=n3,D=n1,B=n0) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
-    "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=3,AS=5,AD=7,PS=25,PD=27);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
+             "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=3,AS=5,AD=7,PS=25,PD=27);\n"
+             "end;\n");
 }
 
-TEST(32_ParallelMOS4TransistorsDisconnectedGates)
+TEST (32_ParallelMOS4TransistorsDisconnectedGates)
 {
   db::DeviceClassMOS4Transistor *cls = new db::DeviceClassMOS4Transistor ();
 
@@ -1522,11 +1476,10 @@ TEST(32_ParallelMOS4TransistorsDisconnectedGates)
   d2->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, n0);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C1=n3a,C2=n3b,D=n0);\n"
-    "  device '' d1 (S=n1,G=n3a,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
-    "  device '' d2 (S=n1,G=n3b,D=n2,B=n0) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C1=n3a,C2=n3b,D=n0);\n"
+             "  device '' d1 (S=n1,G=n3a,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+             "  device '' d2 (S=n1,G=n3b,D=n2,B=n0) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
@@ -1534,14 +1487,13 @@ TEST(32_ParallelMOS4TransistorsDisconnectedGates)
   //  not combined because gate is different:
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C1=n3a,C2=n3b,D=n0);\n"
-    "  device '' d1 (S=n1,G=n3a,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
-    "  device '' d2 (S=n1,G=n3b,D=n2,B=n0) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C1=n3a,C2=n3b,D=n0);\n"
+             "  device '' d1 (S=n1,G=n3a,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+             "  device '' d2 (S=n1,G=n3b,D=n2,B=n0) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+             "end;\n");
 }
 
-TEST(33_ParallelMOS4TransistorsDisconnectedBulk)
+TEST (33_ParallelMOS4TransistorsDisconnectedBulk)
 {
   db::DeviceClassMOS4Transistor *cls = new db::DeviceClassMOS4Transistor ();
 
@@ -1604,11 +1556,10 @@ TEST(33_ParallelMOS4TransistorsDisconnectedBulk)
   d2->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, n0b);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3,D1=n0a,D2=n0b);\n"
-    "  device '' d1 (S=n1,G=n3,D=n2,B=n0a) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
-    "  device '' d2 (S=n1,G=n3,D=n2,B=n0b) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3,D1=n0a,D2=n0b);\n"
+             "  device '' d1 (S=n1,G=n3,D=n2,B=n0a) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+             "  device '' d2 (S=n1,G=n3,D=n2,B=n0b) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+             "end;\n");
 
   //  not combined because bulk is different:
 
@@ -1616,14 +1567,13 @@ TEST(33_ParallelMOS4TransistorsDisconnectedBulk)
   nl.purge ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3,D1=n0a,D2=n0b);\n"
-    "  device '' d1 (S=n1,G=n3,D=n2,B=n0a) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
-    "  device '' d2 (S=n1,G=n3,D=n2,B=n0b) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3,D1=n0a,D2=n0b);\n"
+             "  device '' d1 (S=n1,G=n3,D=n2,B=n0a) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+             "  device '' d2 (S=n1,G=n3,D=n2,B=n0b) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+             "end;\n");
 }
 
-TEST(34_ParallelMOS4TransistorsDifferentLength)
+TEST (34_ParallelMOS4TransistorsDifferentLength)
 {
   db::DeviceClassMOS4Transistor *cls = new db::DeviceClassMOS4Transistor ();
 
@@ -1681,11 +1631,10 @@ TEST(34_ParallelMOS4TransistorsDifferentLength)
   d2->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, n0);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
-    "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
-    "  device '' d2 (S=n1,G=n3,D=n2,B=n0) (L=0.75,W=2,AS=3,AD=4,PS=13,PD=14);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
+             "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+             "  device '' d2 (S=n1,G=n3,D=n2,B=n0) (L=0.75,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+             "end;\n");
 
   nl.combine_devices ();
   nl.purge ();
@@ -1693,14 +1642,13 @@ TEST(34_ParallelMOS4TransistorsDifferentLength)
   //  not combined because length is different:
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
-    "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
-    "  device '' d2 (S=n1,G=n3,D=n2,B=n0) (L=0.75,W=2,AS=3,AD=4,PS=13,PD=14);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
+             "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+             "  device '' d2 (S=n1,G=n3,D=n2,B=n0) (L=0.75,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+             "end;\n");
 }
 
-TEST(35_SerialCapacitorsWithBulk)
+TEST (35_SerialCapacitorsWithBulk)
 {
   db::DeviceClassCapacitorWithBulk *cap = new db::DeviceClassCapacitorWithBulk ();
 
@@ -1748,41 +1696,37 @@ TEST(35_SerialCapacitorsWithBulk)
   circuit->connect_pin (pin_b.id (), n3);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3,BULK=nb);\n"
-    "  device '' c1 (A=n1,B=n2,W=nb) (C=2,A=5,P=10);\n"
-    "  device '' c2 (A=n2,B=n3,W=n2) (C=3,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3,BULK=nb);\n"
+             "  device '' c1 (A=n1,B=n2,W=nb) (C=2,A=5,P=10);\n"
+             "  device '' c2 (A=n2,B=n3,W=n2) (C=3,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
 
   //  no combination because bulk terminals are connected differently
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3,BULK=nb);\n"
-    "  device '' c1 (A=n1,B=n2,W=nb) (C=2,A=5,P=10);\n"
-    "  device '' c2 (A=n2,B=n3,W=n2) (C=3,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3,BULK=nb);\n"
+             "  device '' c1 (A=n1,B=n2,W=nb) (C=2,A=5,P=10);\n"
+             "  device '' c2 (A=n2,B=n3,W=n2) (C=3,A=1,P=2);\n"
+             "end;\n");
 
   c2->connect_terminal (db::DeviceClassCapacitorWithBulk::terminal_id_W, nb);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3,BULK=nb);\n"
-    "  device '' c1 (A=n1,B=n2,W=nb) (C=2,A=5,P=10);\n"
-    "  device '' c2 (A=n2,B=n3,W=nb) (C=3,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3,BULK=nb);\n"
+             "  device '' c1 (A=n1,B=n2,W=nb) (C=2,A=5,P=10);\n"
+             "  device '' c2 (A=n2,B=n3,W=nb) (C=3,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3,BULK=nb);\n"
-    "  device '' c1 (A=n1,B=n3,W=nb) (C=1.2,A=6,P=12);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3,BULK=nb);\n"
+             "  device '' c1 (A=n1,B=n3,W=nb) (C=1.2,A=6,P=12);\n"
+             "end;\n");
 }
 
-TEST(36_ParallelCapacitorsWithBulk)
+TEST (36_ParallelCapacitorsWithBulk)
 {
   db::DeviceClassCapacitorWithBulk *cap = new db::DeviceClassCapacitorWithBulk ();
 
@@ -1827,41 +1771,37 @@ TEST(36_ParallelCapacitorsWithBulk)
   c2->connect_terminal (db::DeviceClassCapacitorWithBulk::terminal_id_W, n2);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,BULK=nb);\n"
-    "  device '' c1 (A=n1,B=n2,W=nb) (C=1,A=5,P=10);\n"
-    "  device '' c2 (A=n1,B=n2,W=n2) (C=3,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,BULK=nb);\n"
+             "  device '' c1 (A=n1,B=n2,W=nb) (C=1,A=5,P=10);\n"
+             "  device '' c2 (A=n1,B=n2,W=n2) (C=3,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
 
   //  devices are not combined as the bulk terminals are connected differently
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,BULK=nb);\n"
-    "  device '' c1 (A=n1,B=n2,W=nb) (C=1,A=5,P=10);\n"
-    "  device '' c2 (A=n1,B=n2,W=n2) (C=3,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,BULK=nb);\n"
+             "  device '' c1 (A=n1,B=n2,W=nb) (C=1,A=5,P=10);\n"
+             "  device '' c2 (A=n1,B=n2,W=n2) (C=3,A=1,P=2);\n"
+             "end;\n");
 
   c2->connect_terminal (db::DeviceClassCapacitorWithBulk::terminal_id_W, nb);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,BULK=nb);\n"
-    "  device '' c1 (A=n1,B=n2,W=nb) (C=1,A=5,P=10);\n"
-    "  device '' c2 (A=n1,B=n2,W=nb) (C=3,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,BULK=nb);\n"
+             "  device '' c1 (A=n1,B=n2,W=nb) (C=1,A=5,P=10);\n"
+             "  device '' c2 (A=n1,B=n2,W=nb) (C=3,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,BULK=nb);\n"
-    "  device '' c1 (A=n1,B=n2,W=nb) (C=4,A=6,P=12);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,BULK=nb);\n"
+             "  device '' c1 (A=n1,B=n2,W=nb) (C=4,A=6,P=12);\n"
+             "end;\n");
 }
 
-TEST(37_SerialResistorsWithBulk)
+TEST (37_SerialResistorsWithBulk)
 {
   db::DeviceClassResistorWithBulk *cap = new db::DeviceClassResistorWithBulk ();
 
@@ -1909,41 +1849,37 @@ TEST(37_SerialResistorsWithBulk)
   circuit->connect_pin (pin_b.id (), n3);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3,BULK=nb);\n"
-    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,L=0,W=0,A=5,P=10);\n"
-    "  device '' r2 (A=n2,B=n3,W=n2) (R=0.5,L=0,W=0,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3,BULK=nb);\n"
+             "  device '' r1 (A=n1,B=n2,W=nb) (R=2,L=0,W=0,A=5,P=10);\n"
+             "  device '' r2 (A=n2,B=n3,W=n2) (R=0.5,L=0,W=0,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
 
   //  no combination because bulk terminals are connected differently
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3,BULK=nb);\n"
-    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,L=0,W=0,A=5,P=10);\n"
-    "  device '' r2 (A=n2,B=n3,W=n2) (R=0.5,L=0,W=0,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3,BULK=nb);\n"
+             "  device '' r1 (A=n1,B=n2,W=nb) (R=2,L=0,W=0,A=5,P=10);\n"
+             "  device '' r2 (A=n2,B=n3,W=n2) (R=0.5,L=0,W=0,A=1,P=2);\n"
+             "end;\n");
 
   r2->connect_terminal (db::DeviceClassResistorWithBulk::terminal_id_W, nb);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3,BULK=nb);\n"
-    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,L=0,W=0,A=5,P=10);\n"
-    "  device '' r2 (A=n2,B=n3,W=nb) (R=0.5,L=0,W=0,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3,BULK=nb);\n"
+             "  device '' r1 (A=n1,B=n2,W=nb) (R=2,L=0,W=0,A=5,P=10);\n"
+             "  device '' r2 (A=n2,B=n3,W=nb) (R=0.5,L=0,W=0,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n3,BULK=nb);\n"
-    "  device '' r1 (A=n1,B=n3,W=nb) (R=2.5,L=0,W=0,A=6,P=12);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n3,BULK=nb);\n"
+             "  device '' r1 (A=n1,B=n3,W=nb) (R=2.5,L=0,W=0,A=6,P=12);\n"
+             "end;\n");
 }
 
-TEST(38_ParallelResistorsWithBulk)
+TEST (38_ParallelResistorsWithBulk)
 {
   db::DeviceClassResistorWithBulk *cap = new db::DeviceClassResistorWithBulk ();
 
@@ -1988,41 +1924,37 @@ TEST(38_ParallelResistorsWithBulk)
   r2->connect_terminal (db::DeviceClassResistorWithBulk::terminal_id_W, n2);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,BULK=nb);\n"
-    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,L=0,W=0,A=5,P=10);\n"
-    "  device '' r2 (A=n1,B=n2,W=n2) (R=0.5,L=0,W=0,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,BULK=nb);\n"
+             "  device '' r1 (A=n1,B=n2,W=nb) (R=2,L=0,W=0,A=5,P=10);\n"
+             "  device '' r2 (A=n1,B=n2,W=n2) (R=0.5,L=0,W=0,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
 
   //  devices are not combined as the bulk terminals are connected differently
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,BULK=nb);\n"
-    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,L=0,W=0,A=5,P=10);\n"
-    "  device '' r2 (A=n1,B=n2,W=n2) (R=0.5,L=0,W=0,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,BULK=nb);\n"
+             "  device '' r1 (A=n1,B=n2,W=nb) (R=2,L=0,W=0,A=5,P=10);\n"
+             "  device '' r2 (A=n1,B=n2,W=n2) (R=0.5,L=0,W=0,A=1,P=2);\n"
+             "end;\n");
 
   r2->connect_terminal (db::DeviceClassResistorWithBulk::terminal_id_W, nb);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,BULK=nb);\n"
-    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,L=0,W=0,A=5,P=10);\n"
-    "  device '' r2 (A=n1,B=n2,W=nb) (R=0.5,L=0,W=0,A=1,P=2);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,BULK=nb);\n"
+             "  device '' r1 (A=n1,B=n2,W=nb) (R=2,L=0,W=0,A=5,P=10);\n"
+             "  device '' r2 (A=n1,B=n2,W=nb) (R=0.5,L=0,W=0,A=1,P=2);\n"
+             "end;\n");
 
   nl.combine_devices ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,BULK=nb);\n"
-    "  device '' r1 (A=n1,B=n2,W=nb) (R=0.4,L=0,W=0,A=6,P=12);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,BULK=nb);\n"
+             "  device '' r1 (A=n1,B=n2,W=nb) (R=0.4,L=0,W=0,A=6,P=12);\n"
+             "end;\n");
 }
 
-TEST(39_ParallelBJT3Transistors)
+TEST (39_ParallelBJT3Transistors)
 {
   db::DeviceClassBJT3Transistor *cls = new db::DeviceClassBJT3Transistor ();
 
@@ -2074,41 +2006,37 @@ TEST(39_ParallelBJT3Transistors)
   d1->connect_terminal (db::DeviceClassBJT3Transistor::terminal_id_E, n3);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14,NE=1);\n"
-    "  device '' d2 (C=n1,B=n2,E=n2) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15,NE=4);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3);\n"
+             "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14,NE=1);\n"
+             "  device '' d2 (C=n1,B=n2,E=n2) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15,NE=4);\n"
+             "end;\n");
 
   nl.combine_devices ();
 
   //  no combination as emitters are connected differently
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14,NE=1);\n"
-    "  device '' d2 (C=n1,B=n2,E=n2) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15,NE=4);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3);\n"
+             "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14,NE=1);\n"
+             "  device '' d2 (C=n1,B=n2,E=n2) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15,NE=4);\n"
+             "end;\n");
 
   d2->connect_terminal (db::DeviceClassBJT3Transistor::terminal_id_E, n3);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14,NE=1);\n"
-    "  device '' d2 (C=n1,B=n2,E=n3) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15,NE=4);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3);\n"
+             "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14,NE=1);\n"
+             "  device '' d2 (C=n1,B=n2,E=n3) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15,NE=4);\n"
+             "end;\n");
 
   nl.combine_devices ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3) (AE=5,PE=25,AB=3,PB=13,AC=4,PC=14,NE=5);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3);\n"
+             "  device '' d1 (C=n1,B=n2,E=n3) (AE=5,PE=25,AB=3,PB=13,AC=4,PC=14,NE=5);\n"
+             "end;\n");
 }
 
-TEST(40_ParallelBJT4Transistors)
+TEST (40_ParallelBJT4Transistors)
 {
   db::DeviceClassBJT4Transistor *cls = new db::DeviceClassBJT4Transistor ();
 
@@ -2168,41 +2096,37 @@ TEST(40_ParallelBJT4Transistors)
   d2->connect_terminal (db::DeviceClassBJT4Transistor::terminal_id_S, n4);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3,D=n4);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14,NE=2);\n"
-    "  device '' d2 (C=n1,B=n2,E=n2,S=n4) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15,NE=3);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3,D=n4);\n"
+             "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14,NE=2);\n"
+             "  device '' d2 (C=n1,B=n2,E=n2,S=n4) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15,NE=3);\n"
+             "end;\n");
 
   nl.combine_devices ();
 
   //  no combination as emitters are connected differently
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3,D=n4);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14,NE=2);\n"
-    "  device '' d2 (C=n1,B=n2,E=n2,S=n4) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15,NE=3);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3,D=n4);\n"
+             "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14,NE=2);\n"
+             "  device '' d2 (C=n1,B=n2,E=n2,S=n4) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15,NE=3);\n"
+             "end;\n");
 
   d2->connect_terminal (db::DeviceClassBJT4Transistor::terminal_id_E, n3);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3,D=n4);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14,NE=2);\n"
-    "  device '' d2 (C=n1,B=n2,E=n3,S=n4) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15,NE=3);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3,D=n4);\n"
+             "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14,NE=2);\n"
+             "  device '' d2 (C=n1,B=n2,E=n3,S=n4) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15,NE=3);\n"
+             "end;\n");
 
   nl.combine_devices ();
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,C=n3,D=n4);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=5,PE=25,AB=3,PB=13,AC=4,PC=14,NE=5);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,C=n3,D=n4);\n"
+             "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=5,PE=25,AB=3,PB=13,AC=4,PC=14,NE=5);\n"
+             "end;\n");
 }
 
-TEST(50_SplitGatesSimple)
+TEST (50_SplitGatesSimple)
 {
   db::DeviceClassMOS3Transistor *mos = new db::DeviceClassMOS3Transistor ();
 
@@ -2270,28 +2194,26 @@ TEST(50_SplitGatesSimple)
   m22->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g2);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    "  device '' m11 (S=n1,G=g1,D=sd1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+             "  device '' m11 (S=n1,G=g1,D=sd1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   std::unique_ptr<db::Netlist> nl2;
   nl2.reset (new db::Netlist (nl));
 
-  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator->()))->join_split_gates (nl2->begin_top_down ().operator->());
 
   EXPECT_EQ (nl2->to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    "  device '' m11 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    //  sd2 -> sd1
-    "  device '' m12 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+             "  device '' m11 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             //  sd2 -> sd1
+             "  device '' m12 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   //  can switch S/D for non-strict devices ...
 
@@ -2299,53 +2221,49 @@ TEST(50_SplitGatesSimple)
   m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, sd1);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    "  device '' m11 (S=sd1,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+             "  device '' m11 (S=sd1,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   nl2.reset (new db::Netlist (nl));
 
-  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator->()))->join_split_gates (nl2->begin_top_down ().operator->());
 
   EXPECT_EQ (nl2->to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    //  sd1 -> sd2
-    "  device '' m11 (S='sd1,sd2',G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+             //  sd1 -> sd2
+             "  device '' m11 (S='sd1,sd2',G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   //  different lengths disable split_gate ...
 
   m11->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 7);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    "  device '' m11 (S=sd1,G=g1,D=n1) (L=7,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+             "  device '' m11 (S=sd1,G=g1,D=n1) (L=7,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   nl2.reset (new db::Netlist (nl));
 
-  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator->()))->join_split_gates (nl2->begin_top_down ().operator->());
 
   EXPECT_EQ (nl2->to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    "  device '' m11 (S=sd1,G=g1,D=n1) (L=7,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+             "  device '' m11 (S=sd1,G=g1,D=n1) (L=7,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   m11->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 6);
 
@@ -2364,7 +2282,7 @@ TEST(50_SplitGatesSimple)
   mp1->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, n1);
   mp1->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g1);
   mp2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, n2);
-  mp2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g1);  //  NOTE: not g2!
+  mp2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g1); //  NOTE: not g2!
 
   db::Net *sd3 = new db::Net ("sd3");
   circuit->add_net (sd3);
@@ -2372,31 +2290,29 @@ TEST(50_SplitGatesSimple)
   mp2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, sd3);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    "  device '' m11 (S=sd1,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+             "  device '' m11 (S=sd1,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   nl2.reset (new db::Netlist (nl));
 
-  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator->()))->join_split_gates (nl2->begin_top_down ().operator->());
 
   EXPECT_EQ (nl2->to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    //  sd1 -> sd2
-    "  device '' m11 (S='sd1,sd2',G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+             //  sd1 -> sd2
+             "  device '' m11 (S='sd1,sd2',G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   //  different device class can't be split-gated
 
@@ -2406,33 +2322,31 @@ TEST(50_SplitGatesSimple)
   m11->set_device_class (mos2);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    "  device X m11 (S=sd1,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+             "  device X m11 (S=sd1,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   nl2.reset (new db::Netlist (nl));
 
-  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator->()))->join_split_gates (nl2->begin_top_down ().operator->());
 
   EXPECT_EQ (nl2->to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    "  device X m11 (S=sd1,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+             "  device X m11 (S=sd1,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 }
 
-TEST(51_SplitGatesStrict)
+TEST (51_SplitGatesStrict)
 {
   db::DeviceClassMOS3Transistor *mos = new db::DeviceClassMOS3Transistor ();
   mos->set_strict (true);
@@ -2501,28 +2415,26 @@ TEST(51_SplitGatesStrict)
   m22->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g2);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    "  device '' m11 (S=n1,G=g1,D=sd1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+             "  device '' m11 (S=n1,G=g1,D=sd1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   std::unique_ptr<db::Netlist> nl2;
   nl2.reset (new db::Netlist (nl));
 
-  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator->()))->join_split_gates (nl2->begin_top_down ().operator->());
 
   EXPECT_EQ (nl2->to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    "  device '' m11 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    //  sd2 -> sd1
-    "  device '' m12 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+             "  device '' m11 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             //  sd2 -> sd1
+             "  device '' m12 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   //  cannot switch S/D for non-strict devices ...
 
@@ -2530,27 +2442,25 @@ TEST(51_SplitGatesStrict)
   m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, sd1);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    "  device '' m11 (S=sd1,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+             "  device '' m11 (S=sd1,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   nl2.reset (new db::Netlist (nl));
 
-  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator->()))->join_split_gates (nl2->begin_top_down ().operator->());
 
   EXPECT_EQ (nl2->to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    //  no change!
-    "  device '' m11 (S=sd1,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+             //  no change!
+             "  device '' m11 (S=sd1,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, n1);
   m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, sd1);
@@ -2560,26 +2470,24 @@ TEST(51_SplitGatesStrict)
   m11->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 7);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    "  device '' m11 (S=n1,G=g1,D=sd1) (L=7,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+             "  device '' m11 (S=n1,G=g1,D=sd1) (L=7,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   nl2.reset (new db::Netlist (nl));
 
-  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator->()))->join_split_gates (nl2->begin_top_down ().operator->());
 
   EXPECT_EQ (nl2->to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    "  device '' m11 (S=n1,G=g1,D=sd1) (L=7,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+             "  device '' m11 (S=n1,G=g1,D=sd1) (L=7,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   m11->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 6);
 
@@ -2598,7 +2506,7 @@ TEST(51_SplitGatesStrict)
   mp1->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, n1);
   mp1->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g1);
   mp2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, n2);
-  mp2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g1);  //  NOTE: not g2!
+  mp2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g1); //  NOTE: not g2!
 
   db::Net *sd3 = new db::Net ("sd3");
   circuit->add_net (sd3);
@@ -2606,34 +2514,32 @@ TEST(51_SplitGatesStrict)
   mp2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, sd3);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    "  device '' m11 (S=n1,G=g1,D=sd1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+             "  device '' m11 (S=n1,G=g1,D=sd1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   nl2.reset (new db::Netlist (nl));
 
-  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator->()))->join_split_gates (nl2->begin_top_down ().operator->());
 
   EXPECT_EQ (nl2->to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    //  sd1 -> sd2
-    "  device '' m11 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+             //  sd1 -> sd2
+             "  device '' m11 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 }
 
-TEST(52_SplitGatesMOS4)
+TEST (52_SplitGatesMOS4)
 {
   db::DeviceClassMOS4Transistor *mos = new db::DeviceClassMOS4Transistor ();
 
@@ -2710,28 +2616,26 @@ TEST(52_SplitGatesMOS4)
   m22->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g2);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
-    "  device '' m11 (S=n1,G=g1,D=sd1,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
+             "  device '' m11 (S=n1,G=g1,D=sd1,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S=sd1,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D=sd2,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S=sd2,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   std::unique_ptr<db::Netlist> nl2;
   nl2.reset (new db::Netlist (nl));
 
-  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator->()))->join_split_gates (nl2->begin_top_down ().operator->());
 
   EXPECT_EQ (nl2->to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
-    "  device '' m11 (S=n1,G=g1,D='sd1,sd2',B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S='sd1,sd2',G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    //  sd2 -> sd1
-    "  device '' m12 (S=n1,G=g1,D='sd1,sd2',B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S='sd1,sd2',G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
+             "  device '' m11 (S=n1,G=g1,D='sd1,sd2',B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S='sd1,sd2',G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             //  sd2 -> sd1
+             "  device '' m12 (S=n1,G=g1,D='sd1,sd2',B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S='sd1,sd2',G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   //  can switch S/D for non-strict devices ...
 
@@ -2739,53 +2643,47 @@ TEST(52_SplitGatesMOS4)
   m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, sd1);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
-    "  device '' m11 (S=sd1,G=g1,D=n1,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
+             "  device '' m11 (S=sd1,G=g1,D=n1,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S=sd1,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D=sd2,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S=sd2,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   nl2.reset (new db::Netlist (nl));
 
-  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator->()))->join_split_gates (nl2->begin_top_down ().operator->());
 
   EXPECT_EQ (nl2->to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
-    //  sd1 -> sd2
-    "  device '' m11 (S='sd1,sd2',G=g1,D=n1,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S='sd1,sd2',G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D='sd1,sd2',B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S='sd1,sd2',G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
+             //  sd1 -> sd2
+             "  device '' m11 (S='sd1,sd2',G=g1,D=n1,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S='sd1,sd2',G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D='sd1,sd2',B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S='sd1,sd2',G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   //  different bulk pins disable split_gates ...
 
   m11->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, n1);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
-    "  device '' m11 (S=sd1,G=g1,D=n1,B=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
+             "  device '' m11 (S=sd1,G=g1,D=n1,B=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S=sd1,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D=sd2,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S=sd2,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 
   nl2.reset (new db::Netlist (nl));
 
-  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator->()))->join_split_gates (nl2->begin_top_down ().operator->());
 
   EXPECT_EQ (nl2->to_string (),
-    "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
-    "  device '' m11 (S=sd1,G=g1,D=n1,B=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-  );
-
+             "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
+             "  device '' m11 (S=sd1,G=g1,D=n1,B=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m21 (S=sd1,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m12 (S=n1,G=g1,D=sd2,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "  device '' m22 (S=sd2,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+             "end;\n");
 }
-

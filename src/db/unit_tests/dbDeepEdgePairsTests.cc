@@ -31,7 +31,7 @@
 #include "tlUnitTest.h"
 #include "tlStream.h"
 
-TEST(1_Basics)
+TEST (1_Basics)
 {
   db::Layout ly;
   {
@@ -47,7 +47,7 @@ TEST(1_Basics)
     for (db::Layout::iterator c = ly.begin (); c != ly.end (); ++c) {
       db::Shapes out (ly.is_editable ());
       db::Shapes &in = c->shapes ((*l).first);
-      for (db::Shapes::shape_iterator s = in.begin (db::ShapeIterator::All); !s.at_end (); ++s) {
+      for (db::Shapes::shape_iterator s = in.begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
         if (s->is_box ()) {
           db::Box b = s->box ();
           db::EdgePair ep (db::Edge (b.p1 (), b.upper_left ()), db::Edge (b.p2 (), b.lower_right ()));
@@ -101,6 +101,6 @@ TEST(1_Basics)
   db::EdgePairs ep2_copy (ep2);
   ep2_copy.insert_into_as_polygons (&target, target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), 1);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edge_pairs_au1.gds");
 }

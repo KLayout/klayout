@@ -29,7 +29,8 @@
 #include "dbBoxScanner.h"
 #include "dbEdgePairRelations.h"
 
-namespace db {
+namespace db
+{
 
 /**
  *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
@@ -122,12 +123,12 @@ protected:
   /**
    *  @brief Normal edge pair output (violations)
    */
-  virtual void put (const db::EdgePair & /*edge*/, bool /*intra-polygon*/) const { }
+  virtual void put (const db::EdgePair & /*edge*/, bool /*intra-polygon*/) const {}
 
   /**
    *  @brief Negative edge output
    */
-  virtual void put_negative (const db::Edge & /*edge*/, int /*layer*/) const { }
+  virtual void put_negative (const db::Edge & /*edge*/, int /*layer*/) const {}
 
 private:
   const EdgeRelationFilter *mp_check;
@@ -136,7 +137,7 @@ private:
   EdgeRelationFilter::distance_type m_distance;
   std::vector<db::EdgePair> m_ep;
   std::multimap<std::pair<db::Edge, size_t>, size_t> m_e2ep;
-  std::set<std::pair<db::Edge, size_t> > m_pseudo_edges;
+  std::set<std::pair<db::Edge, size_t>> m_pseudo_edges;
   size_t m_first_pseudo;
   std::vector<bool> m_ep_discarded, m_ep_intra_polygon;
   bool m_with_shielding;
@@ -173,13 +174,13 @@ protected:
   {
     if (! inter_polygon || ! mp_output_intra) {
       if (m_prop_id != 0) {
-        mp_output_inter->insert (db::EdgePairWithProperties(edge, m_prop_id));
+        mp_output_inter->insert (db::EdgePairWithProperties (edge, m_prop_id));
       } else {
         mp_output_inter->insert (edge);
       }
     } else {
       if (m_prop_id != 0) {
-        mp_output_intra->insert (db::EdgePairWithProperties(edge, m_prop_id));
+        mp_output_intra->insert (db::EdgePairWithProperties (edge, m_prop_id));
       } else {
         mp_output_intra->insert (edge);
       }
@@ -326,7 +327,7 @@ public:
 
   void clear ();
 
-  void single (const PolygonType&o, size_t p);
+  void single (const PolygonType &o, size_t p);
 
   void connect (Edge2EdgeCheckBase &output);
   void enter (const PolygonType &o, size_t p);
@@ -436,4 +437,3 @@ private:
 } // namespace db
 
 #endif
-

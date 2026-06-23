@@ -34,7 +34,7 @@ static std::string v2s (const QVector3D &v)
   return tl::to_string (v.x ()) + "," + tl::to_string (v.y ()) + "," + tl::to_string (v.z ());
 }
 
-TEST(1_Transformations)
+TEST (1_Transformations)
 {
   lay::D25Camera cam;
 

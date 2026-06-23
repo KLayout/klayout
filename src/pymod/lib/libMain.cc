@@ -28,4 +28,4 @@ static PyObject *lib_module_init (const char *pymod_name, const char *mod_name, 
 }
 
 #include "libMain.h"
-DEFINE_PYMOD_WITH_INIT(libcore, "lib", "KLayout core module 'lib'", lib_module_init)
+DEFINE_PYMOD_WITH_INIT (libcore, "lib", "KLayout core module 'lib'", lib_module_init)

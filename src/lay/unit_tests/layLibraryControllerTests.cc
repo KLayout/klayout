@@ -34,25 +34,25 @@ TEST (1)
 
   tl_assert (file_info.size () == size_t (3));
 
-  EXPECT_EQ (file_info[0].name, "");
-  EXPECT_EQ (file_info[0].path, tl::combine_path (tl::absolute_path (lib_file), "noname.gds"));
-  EXPECT_EQ (file_info[0].replicate, true);
-  EXPECT_EQ (file_info[0].description, "");
-  EXPECT_EQ (tl::join (file_info[0].tech.begin (), file_info[0].tech.end (), ","), "T1");
+  EXPECT_EQ (file_info [0].name, "");
+  EXPECT_EQ (file_info [0].path, tl::combine_path (tl::absolute_path (lib_file), "noname.gds"));
+  EXPECT_EQ (file_info [0].replicate, true);
+  EXPECT_EQ (file_info [0].description, "");
+  EXPECT_EQ (tl::join (file_info [0].tech.begin (), file_info [0].tech.end (), ","), "T1");
 
-  EXPECT_EQ (file_info[1].name, "L2");
-  EXPECT_EQ (file_info[1].path, tl::absolute_file_path (lib_file) + ".zzz");
-  EXPECT_EQ (file_info[1].replicate, true);
-  EXPECT_EQ (file_info[1].description, "Library L2");
-  EXPECT_EQ (file_info[1].tech.size (), size_t (0));
+  EXPECT_EQ (file_info [1].name, "L2");
+  EXPECT_EQ (file_info [1].path, tl::absolute_file_path (lib_file) + ".zzz");
+  EXPECT_EQ (file_info [1].replicate, true);
+  EXPECT_EQ (file_info [1].description, "Library L2");
+  EXPECT_EQ (file_info [1].tech.size (), size_t (0));
 
-  EXPECT_EQ (file_info[2].name, "L3");
-  EXPECT_EQ (file_info[2].path, tl::combine_path (tl::absolute_path (lib_file), "subdir/l3.gds"));
-  EXPECT_EQ (file_info[2].replicate, false);
-  EXPECT_EQ (tl::join (file_info[2].tech.begin (), file_info[2].tech.end (), ","), "T2,T3");
+  EXPECT_EQ (file_info [2].name, "L3");
+  EXPECT_EQ (file_info [2].path, tl::combine_path (tl::absolute_path (lib_file), "subdir/l3.gds"));
+  EXPECT_EQ (file_info [2].replicate, false);
+  EXPECT_EQ (tl::join (file_info [2].tech.begin (), file_info [2].tech.end (), ","), "T2,T3");
 }
 
-TEST(2)
+TEST (2)
 {
   std::string lib_file = tl::testdata () + "/lay/b.libdef";
 
@@ -61,18 +61,18 @@ TEST(2)
 
   tl_assert (file_info.size () == size_t (5));
 
-  EXPECT_EQ (file_info[0].name, "L0");
-  EXPECT_EQ (file_info[0].path, tl::combine_path (tl::absolute_path (lib_file), "l0.gds"));
-  EXPECT_EQ (file_info[0].replicate, true);
-  EXPECT_EQ (file_info[0].tech.size (), size_t (0));
+  EXPECT_EQ (file_info [0].name, "L0");
+  EXPECT_EQ (file_info [0].path, tl::combine_path (tl::absolute_path (lib_file), "l0.gds"));
+  EXPECT_EQ (file_info [0].replicate, true);
+  EXPECT_EQ (file_info [0].tech.size (), size_t (0));
 
-  EXPECT_EQ (file_info[1].name, "");
-  EXPECT_EQ (file_info[1].path, tl::combine_path (tl::absolute_path (lib_file), "noname.gds"));
-  EXPECT_EQ (file_info[1].replicate, true);
-  EXPECT_EQ (tl::join (file_info[1].tech.begin (), file_info[1].tech.end (), ","), "TX");
+  EXPECT_EQ (file_info [1].name, "");
+  EXPECT_EQ (file_info [1].path, tl::combine_path (tl::absolute_path (lib_file), "noname.gds"));
+  EXPECT_EQ (file_info [1].replicate, true);
+  EXPECT_EQ (tl::join (file_info [1].tech.begin (), file_info [1].tech.end (), ","), "TX");
 
-  EXPECT_EQ (file_info[4].name, "L4");
-  EXPECT_EQ (file_info[4].path, tl::combine_path (tl::absolute_path (lib_file), "l4.gds"));
-  EXPECT_EQ (file_info[4].replicate, true);
-  EXPECT_EQ (tl::join (file_info[4].tech.begin (), file_info[4].tech.end (), ","), "TX");
+  EXPECT_EQ (file_info [4].name, "L4");
+  EXPECT_EQ (file_info [4].path, tl::combine_path (tl::absolute_path (lib_file), "l4.gds"));
+  EXPECT_EQ (file_info [4].replicate, true);
+  EXPECT_EQ (tl::join (file_info [4].tech.begin (), file_info [4].tech.end (), ","), "TX");
 }

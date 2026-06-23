@@ -37,16 +37,16 @@
 
 namespace lay
 {
-  class CellViewRef;
-  class LayoutViewBase;
-  class LayerProperties;
-  class ObjectInstPath;
+class CellViewRef;
+class LayoutViewBase;
+class LayerProperties;
+class ObjectInstPath;
 }
 
 namespace db
 {
-  class Instance;
-  class Shape;
+class Instance;
+class Shape;
 }
 
 namespace edt
@@ -73,7 +73,8 @@ namespace edt
  */
 
 class EDT_PUBLIC EditorHooks
-  : public gsi::ObjectBase, public tl::Object
+  : public gsi::ObjectBase,
+    public tl::Object
 {
 public:
   /**
@@ -91,29 +92,29 @@ public:
   virtual ~EditorHooks ();
 
   //  shape creation protocol
-  virtual void begin_create_shapes (lay::CellViewRef & /*cv*/, const lay::LayerProperties & /*layer*/) { }
-  virtual void begin_new_shapes () { }
-  virtual void create_shape (const db::Shape & /*shape*/, const db::CplxTrans & /*view_trans*/) { }
-  virtual void end_new_shapes () { }
-  virtual void commit_shapes () { }
-  virtual void end_create_shapes () { }
+  virtual void begin_create_shapes (lay::CellViewRef & /*cv*/, const lay::LayerProperties & /*layer*/) {}
+  virtual void begin_new_shapes () {}
+  virtual void create_shape (const db::Shape & /*shape*/, const db::CplxTrans & /*view_trans*/) {}
+  virtual void end_new_shapes () {}
+  virtual void commit_shapes () {}
+  virtual void end_create_shapes () {}
 
   //  instance creation protocol
-  virtual void begin_create_instances (lay::CellViewRef & /*cv*/) { }
-  virtual void begin_new_instances () { }
-  virtual void create_instance (const db::Instance & /*instance*/, const db::CplxTrans & /*view_trans*/) { }
-  virtual void end_new_instances () { }
-  virtual void commit_instances () { }
-  virtual void end_create_instances () { }
+  virtual void begin_create_instances (lay::CellViewRef & /*cv*/) {}
+  virtual void begin_new_instances () {}
+  virtual void create_instance (const db::Instance & /*instance*/, const db::CplxTrans & /*view_trans*/) {}
+  virtual void end_new_instances () {}
+  virtual void commit_instances () {}
+  virtual void end_create_instances () {}
 
   //  editing protocol
-  virtual void begin_edit (lay::CellViewRef & /*cv*/) { }
-  virtual void begin_edits () { }
-  virtual void transformed (const lay::ObjectInstPath & /*object*/, const db::ICplxTrans & /*applied*/, const db::CplxTrans & /*view_trans*/) { }
-  virtual void modified (const lay::ObjectInstPath & /*object*/, const db::Shape & /*shape*/, const db::CplxTrans & /*view_trans*/) { }
-  virtual void end_edits () { }
-  virtual void commit_edit () { }
-  virtual void end_edit () { }
+  virtual void begin_edit (lay::CellViewRef & /*cv*/) {}
+  virtual void begin_edits () {}
+  virtual void transformed (const lay::ObjectInstPath & /*object*/, const db::ICplxTrans & /*applied*/, const db::CplxTrans & /*view_trans*/) {}
+  virtual void modified (const lay::ObjectInstPath & /*object*/, const db::Shape & /*shape*/, const db::CplxTrans & /*view_trans*/) {}
+  virtual void end_edits () {}
+  virtual void commit_edit () {}
+  virtual void end_edit () {}
 
   /**
    *  @brief Gets the name
@@ -195,13 +196,12 @@ private:
  *  @brief A helper function to call editor hooks in the right sequence and with error handling
  */
 
-inline
-void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (EditorHooks::*meth) ())
+inline void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (EditorHooks::*meth) ())
 {
   for (auto h = hooks.begin (); h != hooks.end (); ++h) {
     try {
-      if (h.operator-> ()) {
-        (const_cast<EditorHooks *> (h.operator-> ())->*meth) ();
+      if (h.operator->()) {
+        (const_cast<EditorHooks *> (h.operator->())->*meth) ();
       }
     } catch (tl::CancelException &) {
       return;
@@ -220,13 +220,12 @@ void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (Edi
  */
 
 template <class A1>
-inline
-void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (EditorHooks::*meth) (A1), A1 a1)
+inline void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (EditorHooks::*meth) (A1), A1 a1)
 {
   for (auto h = hooks.begin (); h != hooks.end (); ++h) {
     try {
-      if (h.operator-> ()) {
-        (const_cast<EditorHooks *> (h.operator-> ())->*meth) (a1);
+      if (h.operator->()) {
+        (const_cast<EditorHooks *> (h.operator->())->*meth) (a1);
       }
     } catch (tl::CancelException &) {
       return;
@@ -245,13 +244,12 @@ void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (Edi
  */
 
 template <class A1, class A2>
-inline
-void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (EditorHooks::*meth) (A1, A2), A1 a1, A2 a2)
+inline void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (EditorHooks::*meth) (A1, A2), A1 a1, A2 a2)
 {
   for (auto h = hooks.begin (); h != hooks.end (); ++h) {
     try {
-      if (h.operator-> ()) {
-        (const_cast<EditorHooks *> (h.operator-> ())->*meth) (a1, a2);
+      if (h.operator->()) {
+        (const_cast<EditorHooks *> (h.operator->())->*meth) (a1, a2);
       }
     } catch (tl::CancelException &) {
       return;
@@ -270,13 +268,12 @@ void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (Edi
  */
 
 template <class A1, class A2, class A3>
-inline
-void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (EditorHooks::*meth) (A1, A2, A3), A1 a1, A2 a2, A3 a3)
+inline void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (EditorHooks::*meth) (A1, A2, A3), A1 a1, A2 a2, A3 a3)
 {
   for (auto h = hooks.begin (); h != hooks.end (); ++h) {
     try {
-      if (h.operator-> ()) {
-        (const_cast<EditorHooks *> (h.operator-> ())->*meth) (a1, a2, a3);
+      if (h.operator->()) {
+        (const_cast<EditorHooks *> (h.operator->())->*meth) (a1, a2, a3);
       }
     } catch (tl::CancelException &) {
       return;
@@ -291,4 +288,3 @@ void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (Edi
 }
 
 #endif
-

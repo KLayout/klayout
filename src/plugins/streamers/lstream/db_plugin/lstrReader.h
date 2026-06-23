@@ -43,7 +43,7 @@
 
 namespace kj
 {
-  class BufferedInputStream;
+class BufferedInputStream;
 }
 
 namespace lstr
@@ -51,19 +51,19 @@ namespace lstr
 
 /**
  *  @brief A reimplementation of the kj::InputStream interface to provide KLayout streams for Cap'n'Proto
- * 
+ *
  *  Note: this implementation is not based on the buffered streams of KLayout
  *  which are not compatible with kj::BufferedInputStreamWrapper as of now.
- *  Instead we use the unterlying basic stream of KLayout which is pretty 
+ *  Instead we use the unterlying basic stream of KLayout which is pretty
  *  much compatible with kj.
  */
-class InputStream 
+class InputStream
   : public kj::InputStream
 {
 public:
   InputStream (tl::InputStream *is)
     : mp_is (is), m_pos (is->pos ()), m_pos_before (is->pos ())
-  { 
+  {
     //  .. nothing yet ..
   }
 
@@ -116,16 +116,14 @@ private:
  *  @brief Generic base class of LStream reader exceptions
  */
 class DB_PLUGIN_PUBLIC LStreamReaderException
-  : public db::ReaderException 
+  : public db::ReaderException
 {
 public:
   LStreamReaderException (const std::string &msg, const std::string &cell, const std::string &source, const std::string &pos)
     : db::ReaderException (
-        cell.empty () ? 
-          tl::sprintf (tl::to_string (tr ("%s, in file: %s (position %s)")), msg, source, pos) :
-          tl::sprintf (tl::to_string (tr ("%s (cell=%s), in file: %s (position %s)")), msg, cell, source, pos)
-      )
-  { }
+        cell.empty () ? tl::sprintf (tl::to_string (tr ("%s, in file: %s (position %s)")), msg, source, pos) : tl::sprintf (tl::to_string (tr ("%s (cell=%s), in file: %s (position %s)")), msg, cell, source, pos))
+  {
+  }
 };
 
 /**
@@ -134,7 +132,7 @@ public:
 class DB_PLUGIN_PUBLIC Reader
   : public db::CommonReader
 {
-public: 
+public:
   /**
    *  @brief Construct a stream reader object
    *
@@ -142,7 +140,7 @@ public:
    */
   Reader (tl::InputStream &s);
 
-  /**  
+  /**
    *  @brief Destructor
    */
   ~Reader () noexcept;
@@ -155,7 +153,7 @@ public:
 protected:
   /**
    *  @brief Implementation of the db::CommonReader interface
-   * 
+   *
    *  This method will read the information from the stream
    *  passed in the constructor.
    */
@@ -163,8 +161,8 @@ protected:
 
   /**
    *  @brief Implementation of db::CommonReader InputStream
-   * 
-   *  This method is called to initialize the reader 
+   *
+   *  This method is called to initialize the reader
    *  from the given options.
    */
   virtual void init (const db::LoadLayoutOptions &options);
@@ -176,7 +174,7 @@ protected:
 
   /**
    *  @brief Issues a warning
-   * 
+   *
    *  The warning level indicates the severity.
    *  A higher value indicates lower severity.
    */
@@ -204,7 +202,7 @@ private:
   std::map<uint64_t, const db::StringRef *> m_text_strings_by_id;
   uint64_t m_layout_view_id;
   uint64_t m_meta_data_view_id;
-  std::vector<std::pair<db::cell_index_type, std::string> > m_cells;
+  std::vector<std::pair<db::cell_index_type, std::string>> m_cells;
 
   void yield_progress ();
   std::string position ();
@@ -223,9 +221,9 @@ private:
   void read_meta_data_view (db::cell_index_type cell_index, kj::BufferedInputStream &is);
   void read_layers (stream::library::ViewSpec::Reader view_specs);
   tl::Variant make_variant (stream::variant::Variant::Value::Reader variant);
-  void make_meta_data(const db::Cell *cell, stream::metaData::MetaData::Reader property_set);
+  void make_meta_data (const db::Cell *cell, stream::metaData::MetaData::Reader property_set);
   std::map<std::string, tl::Variant> make_pcell_parameters (stream::library::CellParameters::Reader cell_parameters);
-  void read_cells(stream::library::Library::Reader header);
+  void read_cells (stream::library::Library::Reader header);
   void read_library_refs (stream::library::Library::Reader header);
   void read_properties (stream::library::Library::Reader header);
   void read_text_strings (stream::library::Library::Reader header);
@@ -265,4 +263,3 @@ private:
 }
 
 #endif
-

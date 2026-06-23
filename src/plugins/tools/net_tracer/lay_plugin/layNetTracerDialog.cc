@@ -55,8 +55,8 @@ namespace lay
 
 NetTracerDialog::NetTracerDialog (lay::Dispatcher *root, LayoutViewBase *view)
   : lay::Browser (root, view, "net_tracer_dialog"),
-    lay::ViewService (view->canvas ()), 
-    m_cv_index (0), 
+    lay::ViewService (view->canvas ()),
+    m_cv_index (0),
     m_net_index (1),
     m_window (lay::NTFitNet),
     m_window_dim (0.0),
@@ -103,8 +103,7 @@ NetTracerDialog::~NetTracerDialog ()
   clear_nets ();
 }
 
-void
-NetTracerDialog::attach_events ()
+void NetTracerDialog::attach_events ()
 {
   detach_from_all_events ();
 
@@ -117,20 +116,17 @@ NetTracerDialog::attach_events ()
   mp_view->apply_technology_event.add (this, &NetTracerDialog::update_list_of_stacks_with_cellview);
 }
 
-void
-NetTracerDialog::update_list_of_stacks_with_technology (db::Technology *)
+void NetTracerDialog::update_list_of_stacks_with_technology (db::Technology *)
 {
   update_list_of_stacks ();
 }
 
-void
-NetTracerDialog::update_list_of_stacks_with_cellview (int)
+void NetTracerDialog::update_list_of_stacks_with_cellview (int)
 {
   update_list_of_stacks ();
 }
 
-void
-NetTracerDialog::update_list_of_stacks ()
+void NetTracerDialog::update_list_of_stacks ()
 {
   QString current_name = stack_selector->currentText ();
 
@@ -138,7 +134,7 @@ NetTracerDialog::update_list_of_stacks ()
   for (unsigned int cvi = 0; cvi < mp_view->cellviews (); ++cvi) {
     const db::Technology *tech = mp_view->cellview (cvi)->technology ();
     if (tech) {
-      const db::NetTracerTechnologyComponent *tech_component = dynamic_cast <const db::NetTracerTechnologyComponent *> (tech->component_by_name (db::net_tracer_component_name ()));
+      const db::NetTracerTechnologyComponent *tech_component = dynamic_cast<const db::NetTracerTechnologyComponent *> (tech->component_by_name (db::net_tracer_component_name ()));
       if (tech_component) {
         for (auto d = tech_component->begin (); d != tech_component->end (); ++d) {
           names.insert (tl::to_qstring (d->name ()));
@@ -166,17 +162,15 @@ NetTracerDialog::update_list_of_stacks ()
   stack_selector->setCurrentIndex (current_index);
 }
 
-void
-NetTracerDialog::clear_nets ()
+void NetTracerDialog::clear_nets ()
 {
-  for (std::vector <db::NetTracerNet *>::iterator n = mp_nets.begin (); n != mp_nets.end (); ++n) {
+  for (std::vector<db::NetTracerNet *>::iterator n = mp_nets.begin (); n != mp_nets.end (); ++n) {
     delete *n;
   }
   mp_nets.clear ();
 }
 
-void 
-NetTracerDialog::item_double_clicked (QListWidgetItem *item)
+void NetTracerDialog::item_double_clicked (QListWidgetItem *item)
 {
   int item_index = net_list->row (item);
   if (item_index >= 0 && item_index < int (mp_nets.size ())) {
@@ -196,14 +190,11 @@ NetTracerDialog::item_double_clicked (QListWidgetItem *item)
 
       update_list ();
       item_selection_changed ();
-
     }
-
   }
 }
 
-void
-NetTracerDialog::drag_cancel ()
+void NetTracerDialog::drag_cancel ()
 {
   if (m_mouse_state > 0) {
 
@@ -212,28 +203,24 @@ NetTracerDialog::drag_cancel ()
     set_cursor (lay::Cursor::none);
 
     m_mouse_state = 0;
-
   }
 }
 
-bool
-NetTracerDialog::claims_message_bar () const
+bool NetTracerDialog::claims_message_bar () const
 {
   return true;
 }
 
-bool 
-NetTracerDialog::mouse_move_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool prio) 
-{ 
+bool NetTracerDialog::mouse_move_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool prio)
+{
   if (prio && m_mouse_state != 0) {
     set_cursor (lay::Cursor::cross);
   }
   return false;
 }
 
-bool 
-NetTracerDialog::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio) 
-{ 
+bool NetTracerDialog::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
+{
   if (prio && (buttons & lay::LeftButton) != 0 && m_mouse_state != 0) {
 
     if (m_mouse_state == 2) {
@@ -251,7 +238,7 @@ NetTracerDialog::mouse_click_event (const db::DPoint &p, unsigned int buttons, b
         release_mouse ();
       }
 
-      //  prepare for the net tracing 
+      //  prepare for the net tracing
       clear_markers ();
 
       double l = double (view ()->search_range ()) / ui ()->mouse_event_trans ().mag ();
@@ -288,24 +275,21 @@ NetTracerDialog::mouse_click_event (const db::DPoint &p, unsigned int buttons, b
         update_list ();
         item_selection_changed ();
         net_list->setCurrentItem (net_list->item (int (mp_nets.size () - 1)));
-
       }
-
     }
 
     return true;
 
   } else {
-    return false; 
+    return false;
   }
 }
 
-void 
-NetTracerDialog::redo_trace_clicked ()
+void NetTracerDialog::redo_trace_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
-  std::set <db::NetTracerNet *> selected_nets;
+  std::set<db::NetTracerNet *> selected_nets;
 
   QList<QListWidgetItem *> selected_items = net_list->selectedItems ();
   for (QList<QListWidgetItem *>::const_iterator item = selected_items.begin (); item != selected_items.end (); ++item) {
@@ -315,14 +299,14 @@ BEGIN_PROTECTED
     }
   }
 
-  std::vector <db::NetTracerNet *> nets;
+  std::vector<db::NetTracerNet *> nets;
   nets.swap (mp_nets);
 
   m_net_index = 1;
 
-  std::vector <size_t> new_selection;
+  std::vector<size_t> new_selection;
 
-  for (std::vector <db::NetTracerNet *>::const_iterator n = nets.begin (); n != nets.end (); ++n) {
+  for (std::vector<db::NetTracerNet *>::const_iterator n = nets.begin (); n != nets.end (); ++n) {
 
     try {
 
@@ -342,7 +326,6 @@ BEGIN_PROTECTED
         if (selected_nets.find (*n) != selected_nets.end ()) {
           new_selection.push_back (mp_nets.size () - 1);
         }
-
       }
 
     } catch (...) {
@@ -350,24 +333,22 @@ BEGIN_PROTECTED
     }
 
     delete *n;
-
   }
 
   //  re-establish the selection
   net_list->blockSignals (true);
   update_list ();
-  for (std::vector <size_t>::const_iterator i = new_selection.begin (); i != new_selection.end (); ++i) {
+  for (std::vector<size_t>::const_iterator i = new_selection.begin (); i != new_selection.end (); ++i) {
     net_list->item (int (*i))->setSelected (true);
   }
   net_list->blockSignals (false);
 
   item_selection_changed ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-bool
-NetTracerDialog::get_net_tracer_setup_from_tech (const std::string &tech_name, const std::string &stack_name, const db::Layout &layout, db::NetTracerData &data)
+bool NetTracerDialog::get_net_tracer_setup_from_tech (const std::string &tech_name, const std::string &stack_name, const db::Layout &layout, db::NetTracerData &data)
 {
   //  fetch the net tracer data from the technology and apply to the current layout
   const db::Technology *tech = db::Technologies::instance ()->technology_by_name (tech_name);
@@ -375,7 +356,7 @@ NetTracerDialog::get_net_tracer_setup_from_tech (const std::string &tech_name, c
     return false;
   }
 
-  const db::NetTracerTechnologyComponent *tech_component = dynamic_cast <const db::NetTracerTechnologyComponent *> (tech->component_by_name (db::net_tracer_component_name ()));
+  const db::NetTracerTechnologyComponent *tech_component = dynamic_cast<const db::NetTracerTechnologyComponent *> (tech->component_by_name (db::net_tracer_component_name ()));
   if (! tech_component) {
     return false;
   }
@@ -383,7 +364,7 @@ NetTracerDialog::get_net_tracer_setup_from_tech (const std::string &tech_name, c
   const db::NetTracerConnectivity *connectivity = 0;
   for (auto d = tech_component->begin (); d != tech_component->end () && ! connectivity; ++d) {
     if (d->name () == stack_name) {
-      connectivity = d.operator-> ();
+      connectivity = d.operator->();
     }
   }
 
@@ -396,8 +377,7 @@ NetTracerDialog::get_net_tracer_setup_from_tech (const std::string &tech_name, c
   return true;
 }
 
-bool
-NetTracerDialog::get_net_tracer_setup (const lay::CellView &cv, db::NetTracerData &data)
+bool NetTracerDialog::get_net_tracer_setup (const lay::CellView &cv, db::NetTracerData &data)
 {
   //  fetch the net tracer data from the technology and apply to the current layout
   const db::Technology *tech = cv->technology ();
@@ -456,7 +436,6 @@ NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &sto
     start_shape = r->shape ();
     start_layer = r->layer ();
     start_trans = r->trans ();
-
   }
 
   //  determine the start point
@@ -476,7 +455,6 @@ NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &sto
     if (start_shape.polygon (poly) && db::inside_poly (poly.begin_edge (), start_trans.inverted () * start_point) < 0) {
       return 0;
     }
-
   }
 
   unsigned int stop_layer = 0;
@@ -522,7 +500,6 @@ NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &sto
     if (r->shape ().polygon (poly) && db::inside_poly (poly.begin_edge (), stop_trans.inverted () * stop_point) < 0) {
       return 0;
     }
-
   }
 
   db::NetTracer net_tracer;
@@ -548,12 +525,10 @@ NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &sto
     net->set_trace_path_flag (trace_path);
 
     return net;
-
   }
 }
 
-bool 
-NetTracerDialog::configure (const std::string &name, const std::string &value)
+bool NetTracerDialog::configure (const std::string &name, const std::string &value)
 {
   bool need_update = false;
   bool taken = true;
@@ -563,7 +538,7 @@ NetTracerDialog::configure (const std::string &name, const std::string &value)
     need_update = true;
 
   } else if (name == cfg_nt_trace_depth) {
-      
+
     unsigned int n = 0;
     tl::from_string (value, n);
     if (n > 0) {
@@ -682,8 +657,7 @@ NetTracerDialog::configure (const std::string &name, const std::string &value)
   return taken;
 }
 
-void  
-NetTracerDialog::menu_activated (const std::string &symbol)
+void NetTracerDialog::menu_activated (const std::string &symbol)
 {
   if (symbol == "lay::net_trace") {
 
@@ -707,14 +681,13 @@ NetTracerDialog::menu_activated (const std::string &symbol)
     if (cv.is_valid ()) {
 
       db::RecursiveShapeIterator si (cv->layout (), *cv.cell (), std::vector<unsigned int> ());
-      std::unique_ptr <db::LayoutToNetlist> l2ndb (new db::LayoutToNetlist (si));
+      std::unique_ptr<db::LayoutToNetlist> l2ndb (new db::LayoutToNetlist (si));
       trace_all_nets (l2ndb.get (), cv, flat);
 
       if (l2ndb->netlist ()) {
         unsigned int l2ndb_index = view ()->add_l2ndb (l2ndb.release ());
         view ()->open_l2ndb_browser (l2ndb_index, view ()->index_of_cellview (&cv));
       }
-
     }
 
   } else {
@@ -722,8 +695,7 @@ NetTracerDialog::menu_activated (const std::string &symbol)
   }
 }
 
-void 
-NetTracerDialog::net_color_changed (QColor qc)
+void NetTracerDialog::net_color_changed (QColor qc)
 {
   bool changed = false;
   tl::Color color (qc);
@@ -746,8 +718,7 @@ NetTracerDialog::net_color_changed (QColor qc)
   }
 }
 
-void 
-NetTracerDialog::item_selection_changed ()
+void NetTracerDialog::item_selection_changed ()
 {
   if (active ()) {
     update_highlights ();
@@ -756,22 +727,20 @@ NetTracerDialog::item_selection_changed ()
   }
 }
 
-void
-NetTracerDialog::detailed_mode_clicked ()
+void NetTracerDialog::detailed_mode_clicked ()
 {
   update_info ();
 }
 
-void
-NetTracerDialog::update_info ()
+void NetTracerDialog::update_info ()
 {
   bool detailed = detailed_cb->isChecked ();
 
   std::ostringstream info_stream;
   info_stream.imbue (std::locale ("C"));
 
-  tl::XMLWriter info (info_stream); 
-  
+  tl::XMLWriter info (info_stream);
+
   info.start_document ("");
   info.start_element ("html");
   info.start_element ("body");
@@ -802,19 +771,18 @@ NetTracerDialog::update_info ()
         }
         first = false;
 
-        info.cdata (tl::sprintf (tl::to_string (QObject::tr ("%ld Shapes")), mp_nets[item_index]->size ()));
+        info.cdata (tl::sprintf (tl::to_string (QObject::tr ("%ld Shapes")), mp_nets [item_index]->size ()));
         if (selected_items.size () > 1) {
-          info.cdata (" (" + mp_nets[item_index]->name () + ")");
+          info.cdata (" (" + mp_nets [item_index]->name () + ")");
         }
-        if (mp_nets[item_index]->incomplete ()) {
+        if (mp_nets [item_index]->incomplete ()) {
           info.start_element ("span");
           info.write_attribute ("style", "color:red; font-weight: bold");
-          info.cdata(" (" + tl::to_string (QObject::tr ("Net is incomplete")) + ") ");
+          info.cdata (" (" + tl::to_string (QObject::tr ("Net is incomplete")) + ") ");
           info.end_element ("span");
         }
 
-        ntot += mp_nets[item_index]->size ();
-
+        ntot += mp_nets [item_index]->size ();
       }
     }
 
@@ -856,32 +824,32 @@ NetTracerDialog::update_info ()
           info.start_element ("b");
           info.cdata (tl::to_string (QObject::tr ("Net name: ")));
           info.end_element ("b");
-          info.cdata (mp_nets[item_index]->name ());
+          info.cdata (mp_nets [item_index]->name ());
           info.start_element ("br");
           info.end_element ("br");
           info.start_element ("b");
           info.cdata (tl::to_string (QObject::tr ("Top cell: ")));
           info.end_element ("b");
-          info.cdata (mp_nets[item_index]->top_cell_name ());
+          info.cdata (mp_nets [item_index]->top_cell_name ());
           info.start_element ("br");
           info.end_element ("br");
           info.start_element ("b");
           info.cdata (tl::to_string (QObject::tr ("Layout: ")));
           info.end_element ("b");
-          info.cdata (mp_nets[item_index]->layout_name ());
+          info.cdata (mp_nets [item_index]->layout_name ());
           info.start_element ("br");
           info.end_element ("br");
           info.start_element ("b");
           info.cdata (tl::to_string (QObject::tr ("Layout file: ")));
           info.end_element ("b");
-          info.cdata (mp_nets[item_index]->layout_filename ());
+          info.cdata (mp_nets [item_index]->layout_filename ());
           info.end_element ("p");
 
           bool incomplete = false;
-          std::map<std::string, std::set<std::string> > shapes;
+          std::map<std::string, std::set<std::string>> shapes;
 
-          //  map as (layernumber, group of shapes by layer): 
-          std::map<unsigned int, std::vector<db::Polygon> > shapes_by_layer;
+          //  map as (layernumber, group of shapes by layer):
+          std::map<unsigned int, std::vector<db::Polygon>> shapes_by_layer;
           std::map<unsigned int, std::string> layer_names;
           std::map<unsigned int, db::coord_traits<db::Coord>::area_type> statinfo_area;
           std::map<unsigned int, db::coord_traits<db::Coord>::perimeter_type> statinfo_perimeter;
@@ -892,19 +860,19 @@ NetTracerDialog::update_info ()
             if (tot_shapes++ >= max_shapes) {
               incomplete = true;
               break;
-            } 
+            }
 
             std::string l (mp_nets [item_index]->layer_for (net_shape->layer ()).to_string ());
             if (l.empty ()) {
               l = "<anonymous>";
             }
 
-            //  Get layer number, to be used as key for map of merged_shapes 
+            //  Get layer number, to be used as key for map of merged_shapes
             unsigned int lay_num = net_shape->layer ();
 
-            //  Check if layer is already detected, otherwise create vector-of-Shape object to hold shapes 
+            //  Check if layer is already detected, otherwise create vector-of-Shape object to hold shapes
             //  plus initialize the perimeter and area sums
-            std::map<unsigned int, std::vector<db::Polygon> >::iterator s = shapes_by_layer.find (lay_num); 
+            std::map<unsigned int, std::vector<db::Polygon>>::iterator s = shapes_by_layer.find (lay_num);
             if (s == shapes_by_layer.end ()) {
               s = shapes_by_layer.insert (std::make_pair (lay_num, std::vector<db::Polygon> ())).first;
               layer_names.insert (std::make_pair (lay_num, l));
@@ -912,7 +880,7 @@ NetTracerDialog::update_info ()
               statinfo_area.insert (std::make_pair (lay_num, db::coord_traits<db::Coord>::area_type (0)));
             }
 
-            //  As layer now certainly exists, insert the shape 
+            //  As layer now certainly exists, insert the shape
             if (net_shape->shape ().is_box () || net_shape->shape ().is_path () || net_shape->shape ().is_polygon ()) {
               s->second.push_back (db::Polygon ());
               net_shape->shape ().polygon (s->second.back ());
@@ -947,33 +915,31 @@ NetTracerDialog::update_info ()
             if (! t.empty ()) {
               shapes.insert (std::make_pair (c, std::set<std::string> ())).first->second.insert (t);
             }
-
           }
 
-          //  Try to merge all shaped to polygons, use Map of (layernumber, group of polygons by layer) 
-          std::map<unsigned int, std::vector<db::Polygon> > polygons_by_layer;
-          for (std::map<unsigned int, std::vector<db::Polygon> >::iterator i = shapes_by_layer.begin(); i != shapes_by_layer.end (); ++i) { 
+          //  Try to merge all shaped to polygons, use Map of (layernumber, group of polygons by layer)
+          std::map<unsigned int, std::vector<db::Polygon>> polygons_by_layer;
+          for (std::map<unsigned int, std::vector<db::Polygon>>::iterator i = shapes_by_layer.begin (); i != shapes_by_layer.end (); ++i) {
 
             unsigned int l = i->first;
 
             db::EdgeProcessor ep;
-            std::vector <db::Polygon> &merged = polygons_by_layer.insert (std::make_pair (l, std::vector <db::Polygon> ())).first->second;
-            ep.merge(i->second, merged, 0, true, true);
+            std::vector<db::Polygon> &merged = polygons_by_layer.insert (std::make_pair (l, std::vector<db::Polygon> ())).first->second;
+            ep.merge (i->second, merged, 0, true, true);
 
             db::coord_traits<db::Coord>::area_type area = 0;
             db::coord_traits<db::Coord>::perimeter_type perimeter = 0;
 
             //  Despite merging, a multitude of separate non-touching polygons can exist.
-            for (std::vector <db::Polygon>::iterator j = merged.begin (); j != merged.end (); ++j) {
-              //  Sum area 
+            for (std::vector<db::Polygon>::iterator j = merged.begin (); j != merged.end (); ++j) {
+              //  Sum area
               area += j->area ();
-              //  Sum perimeter for the merged polygon 
+              //  Sum perimeter for the merged polygon
               perimeter += j->perimeter ();
             }
 
             statinfo_area [l] += area;
             statinfo_perimeter [l] += perimeter;
-
           }
 
           if (! shapes.empty ()) {
@@ -983,7 +949,7 @@ NetTracerDialog::update_info ()
               info.start_element ("h3");
               info.cdata (tl::to_string (QObject::tr ("Statistics:")));
               info.end_element ("h3");
-              
+
               db::coord_traits<db::Coord>::area_type total_area = 0;
               db::coord_traits<db::Coord>::perimeter_type total_perimeter = 0;
 
@@ -1014,7 +980,7 @@ NetTracerDialog::update_info ()
               info.end_element ("td");
               info.end_element ("tr");
 
-              for (std::map<unsigned int, db::coord_traits<db::Coord>::area_type>::iterator i = statinfo_area.begin (); i != statinfo_area.end(); ++i) {
+              for (std::map<unsigned int, db::coord_traits<db::Coord>::area_type>::iterator i = statinfo_area.begin (); i != statinfo_area.end (); ++i) {
 
                 unsigned int l = i->first;
 
@@ -1027,11 +993,10 @@ NetTracerDialog::update_info ()
                 info.cdata (tl::micron_to_string (statinfo_perimeter [l] * dbu_unidir));
                 info.end_element ("td");
                 info.start_element ("td");
-                total_area += statinfo_area[l];
+                total_area += statinfo_area [l];
                 info.cdata (tl::to_string (statinfo_area [l] * dbu_unidir * dbu_unidir));
                 info.end_element ("td");
                 info.end_element ("tr");
-
               }
 
               //  Only if more than one layer is involved, print summed values
@@ -1048,18 +1013,16 @@ NetTracerDialog::update_info ()
                 info.cdata (tl::to_string (total_area * dbu_unidir * dbu_unidir));
                 info.end_element ("td");
                 info.end_element ("tr");
-
               }
 
               info.end_element ("table");
-
             }
 
             info.start_element ("h3");
             info.cdata (tl::to_string (QObject::tr ("Shapes:")));
             info.end_element ("h3");
 
-            for (std::map<std::string, std::set<std::string> >::const_iterator s = shapes.begin (); s != shapes.end (); ++s) {
+            for (std::map<std::string, std::set<std::string>>::const_iterator s = shapes.begin (); s != shapes.end (); ++s) {
 
               info.start_element ("p");
 
@@ -1069,14 +1032,13 @@ NetTracerDialog::update_info ()
               info.cdata (":");
               info.end_element ("b");
 
-              for (std::set <std::string>::const_iterator l = s->second.begin (); l != s->second.end (); ++l) {
+              for (std::set<std::string>::const_iterator l = s->second.begin (); l != s->second.end (); ++l) {
                 info.start_element ("br");
                 info.end_element ("br");
                 info.cdata (*l);
               }
 
               info.end_element ("p");
-
             }
 
             if (incomplete) {
@@ -1084,7 +1046,6 @@ NetTracerDialog::update_info ()
               info.cdata ("...");
               info.end_element ("p");
             }
-
           }
 
         } else {
@@ -1103,9 +1064,7 @@ NetTracerDialog::update_info ()
 
               std::string t (std::string (mp_nets [item_index]->cell_name (net_shape->cell_index ())) + "." + net_shape->shape ().text_string ());
               labels.insert (t);
-
             }
-
           }
 
           if (! labels.empty ()) {
@@ -1116,7 +1075,7 @@ NetTracerDialog::update_info ()
 
             info.start_element ("p");
 
-            for (std::set <std::string>::const_iterator l = labels.begin (); l != labels.end (); ++l) {
+            for (std::set<std::string>::const_iterator l = labels.begin (); l != labels.end (); ++l) {
               if (l != labels.begin ()) {
                 info.start_element ("br");
                 info.end_element ("br");
@@ -1131,7 +1090,6 @@ NetTracerDialog::update_info ()
             }
 
             info.end_element ("p");
-
           }
 
           incomplete = false;
@@ -1156,7 +1114,7 @@ NetTracerDialog::update_info ()
 
             info.start_element ("p");
 
-            for (std::set <std::string>::const_iterator c = cells.begin (); c != cells.end (); ++c) {
+            for (std::set<std::string>::const_iterator c = cells.begin (); c != cells.end (); ++c) {
               if (c != cells.begin ()) {
                 info.start_element ("br");
                 info.end_element ("br");
@@ -1171,15 +1129,10 @@ NetTracerDialog::update_info ()
             }
 
             info.end_element ("p");
-
           }
-
         }
-
       }
-
     }
-
   }
 
   info.end_element ("body");
@@ -1205,12 +1158,10 @@ NetTracerDialog::update_info ()
 
     net_color->set_color (nc);
     net_color->setEnabled (true);
-
   }
 }
 
-void
-NetTracerDialog::update_list ()
+void NetTracerDialog::update_list ()
 {
   QSize icon_size (12, 12);
   net_list->setIconSize (icon_size);
@@ -1247,9 +1198,7 @@ NetTracerDialog::update_list ()
     } else {
 
       item->setIcon (QIcon (empty_pxmp));
-
     }
-
   }
 
   while (net_list->count () > int (mp_nets.size ())) {
@@ -1257,44 +1206,40 @@ NetTracerDialog::update_list ()
   }
 }
 
-void 
-NetTracerDialog::trace_path_button_clicked ()
+void NetTracerDialog::trace_path_button_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   commit ();
   net_list->setCurrentItem (0);
   m_mouse_state = 2;
   view ()->message (tl::to_string (QObject::tr ("Click on the first point in the net")), -1 /*infinitely*/, 10);
   ui ()->grab_mouse (this, false);
-END_PROTECTED
+  END_PROTECTED
 }
 
-void 
-NetTracerDialog::trace_net_button_clicked ()
+void NetTracerDialog::trace_net_button_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   commit ();
   net_list->setCurrentItem (0);
   m_mouse_state = 1;
   view ()->message (tl::to_string (QObject::tr ("Click on a point in the net")), -1 /*infinitely*/, 10);
   ui ()->grab_mouse (this, false);
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-NetTracerDialog::sticky_mode_clicked ()
+void NetTracerDialog::sticky_mode_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   if (! sticky_cbx->isChecked ()) {
     release_mouse ();
   } else {
     trace_net_button_clicked ();
   }
-END_PROTECTED
+  END_PROTECTED
 }
 
-void 
-NetTracerDialog::release_mouse ()
+void NetTracerDialog::release_mouse ()
 {
   add_pb->setChecked (false);
   add2_pb->setChecked (false);
@@ -1304,10 +1249,9 @@ NetTracerDialog::release_mouse ()
   set_cursor (lay::Cursor::none);
 }
 
-void
-NetTracerDialog::clear_all_button_clicked ()
+void NetTracerDialog::clear_all_button_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   release_mouse ();
 
   if (QMessageBox::question (this, QObject::tr ("Clear All Nets"),
@@ -1318,15 +1262,13 @@ BEGIN_PROTECTED
     clear_nets ();
     update_list ();
     item_selection_changed ();
-    
   }
-END_PROTECTED
+  END_PROTECTED
 }
 
-void 
-NetTracerDialog::delete_button_clicked ()
+void NetTracerDialog::delete_button_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   release_mouse ();
 
   std::vector<int> to_delete;
@@ -1341,7 +1283,7 @@ BEGIN_PROTECTED
 
   std::sort (to_delete.begin (), to_delete.end ());
 
-  for (std::vector<int>::const_iterator d = to_delete.end (); d != to_delete.begin (); ) {
+  for (std::vector<int>::const_iterator d = to_delete.end (); d != to_delete.begin ();) {
     --d;
     delete mp_nets [*d];
     mp_nets.erase (mp_nets.begin () + *d);
@@ -1350,14 +1292,13 @@ BEGIN_PROTECTED
   clear_markers ();
   update_list ();
   item_selection_changed ();
-    
-END_PROTECTED
+
+  END_PROTECTED
 }
 
-void 
-NetTracerDialog::layer_stack_clicked ()
+void NetTracerDialog::layer_stack_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   release_mouse ();
 
@@ -1384,13 +1325,12 @@ BEGIN_PROTECTED
     update_list_of_stacks ();
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void 
-NetTracerDialog::export_text_clicked ()
+void NetTracerDialog::export_text_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   release_mouse ();
 
@@ -1419,7 +1359,7 @@ BEGIN_PROTECTED
 
           w.start_element ("net");
 
-          const db::NetTracerNet *net = mp_nets[item_index];
+          const db::NetTracerNet *net = mp_nets [item_index];
 
           w.start_element ("name");
           w.cdata (net->name ());
@@ -1468,32 +1408,26 @@ BEGIN_PROTECTED
             w.end_element ("shape");
 
             w.end_element ("element");
-
           }
 
           w.end_element ("shapes");
 
           w.end_element ("net");
-
         }
-
       }
 
       w.end_element ("nets");
 
       w.end_document ();
-
     }
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void 
-NetTracerDialog::export_clicked ()
+void NetTracerDialog::export_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   release_mouse ();
 
@@ -1522,7 +1456,7 @@ BEGIN_PROTECTED
       std::pair<bool, db::cell_index_type> cbn = cv->layout ().cell_by_name (m_export_cell_name.c_str ());
       if (! cbn.first) {
         cbn.second = cv->layout ().add_cell (m_export_cell_name.c_str ());
-      } 
+      }
 
       db::Cell &export_cell = cv->layout ().cell (cbn.second);
 
@@ -1531,7 +1465,7 @@ BEGIN_PROTECTED
         int item_index = net_list->row (*item);
         if (item_index >= 0 && item_index < int (mp_nets.size ())) {
 
-          std::vector<unsigned int> new_layers = mp_nets[item_index]->export_net (cv->layout (), export_cell);
+          std::vector<unsigned int> new_layers = mp_nets [item_index]->export_net (cv->layout (), export_cell);
 
           //  Add a new entries in the layer list
           for (std::vector<unsigned int>::const_iterator l = new_layers.begin (); l != new_layers.end (); ++l) {
@@ -1540,31 +1474,26 @@ BEGIN_PROTECTED
             view ()->init_layer_properties (props);
             view ()->insert_layer (view ()->end_layers (), props);
           }
-
         }
-
       }
 
       view ()->select_cell (export_cell.cell_index (), view ()->active_cellview_index ());
-
     }
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void 
-NetTracerDialog::configure_clicked ()
+void NetTracerDialog::configure_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
   lay::ConfigurationDialog config_dialog (this, root (), "NetTracerPlugin");
   config_dialog.exec ();
-END_PROTECTED
+  END_PROTECTED
 }
 
 size_t
-NetTracerDialog::get_trace_depth()
+NetTracerDialog::get_trace_depth ()
 {
   double n = 0.0;
   try {
@@ -1582,42 +1511,37 @@ NetTracerDialog::get_trace_depth()
   return (size_t) n;
 }
 
-void
-NetTracerDialog::commit ()
+void NetTracerDialog::commit ()
 {
   root ()->config_set (cfg_nt_trace_depth, tl::to_string (get_trace_depth ()));
 }
 
-void  
-NetTracerDialog::deactivated ()
+void NetTracerDialog::deactivated ()
 {
   commit ();
   clear_markers ();
   release_mouse ();
 }
 
-void  
-NetTracerDialog::activated ()
+void NetTracerDialog::activated ()
 {
   // .. nothing yet ..
 }
 
-lay::ViewService * 
+lay::ViewService *
 NetTracerDialog::view_service_interface ()
 {
   return this;
 }
 
-void
-NetTracerDialog::layer_list_changed (int)
+void NetTracerDialog::layer_list_changed (int)
 {
   if (active ()) {
     update_highlights ();
   }
 }
 
-void
-NetTracerDialog::adjust_view ()
+void NetTracerDialog::adjust_view ()
 {
   int cv_index = view ()->active_cellview_index ();
   const lay::CellView &cv = view ()->cellview (cv_index);
@@ -1638,24 +1562,24 @@ NetTracerDialog::adjust_view ()
 
     if (item_index >= 0 && item_index < int (mp_nets.size ())) {
 
-      std::map<unsigned int, std::vector<db::DCplxTrans> > tv_by_layer = view ()->cv_transform_variants_by_layer (cv_index);
+      std::map<unsigned int, std::vector<db::DCplxTrans>> tv_by_layer = view ()->cv_transform_variants_by_layer (cv_index);
 
-      std::map <db::LayerProperties, unsigned int, db::LPLogicalLessFunc> lm;
+      std::map<db::LayerProperties, unsigned int, db::LPLogicalLessFunc> lm;
       for (db::Layout::layer_iterator l = cv->layout ().begin_layers (); l != cv->layout ().end_layers (); ++l) {
         lm.insert (std::make_pair (*(*l).second, (*l).first));
       }
 
-      std::map <unsigned int, unsigned int> llmap;
+      std::map<unsigned int, unsigned int> llmap;
 
       db::DBox cv_bbox;
 
-      //  Create markers for the shapes 
+      //  Create markers for the shapes
       for (db::NetTracerNet::iterator net_shape = mp_nets [item_index]->begin (); net_shape != mp_nets [item_index]->end (); ++net_shape) {
 
         //  Find the actual layer by looking up the layer properties ..
-        std::map <unsigned int, unsigned int>::const_iterator ll = llmap.find (net_shape->layer ());
+        std::map<unsigned int, unsigned int>::const_iterator ll = llmap.find (net_shape->layer ());
         if (ll == llmap.end ()) {
-          std::map <db::LayerProperties, unsigned int, db::LPLogicalLessFunc>::const_iterator i = lm.find (mp_nets [item_index]->representative_layer_for (net_shape->layer ()));
+          std::map<db::LayerProperties, unsigned int, db::LPLogicalLessFunc>::const_iterator i = lm.find (mp_nets [item_index]->representative_layer_for (net_shape->layer ()));
           if (i != lm.end ()) {
             ll = llmap.insert (std::make_pair (net_shape->layer (), i->second)).first;
           }
@@ -1666,22 +1590,18 @@ NetTracerDialog::adjust_view ()
           ly = ll->second;
         }
 
-        std::map<unsigned int, std::vector<db::DCplxTrans> >::const_iterator tv = tv_by_layer.find (ly);
+        std::map<unsigned int, std::vector<db::DCplxTrans>>::const_iterator tv = tv_by_layer.find (ly);
         if (tv != tv_by_layer.end ()) {
 
           db::Box shape_box = net_shape->shape ().bbox ();
           for (std::vector<db::DCplxTrans>::const_iterator t = tv->second.begin (); t != tv->second.end (); ++t) {
             cv_bbox += *t * db::CplxTrans (cv->layout ().dbu ()) * net_shape->trans () * shape_box;
           }
-
         }
-
       }
 
       bbox += cv_bbox;
-
     }
-
   }
 
   if (! bbox.empty ()) {
@@ -1698,18 +1618,14 @@ NetTracerDialog::adjust_view ()
 
       double w = std::max (bbox.width (), m_window_dim);
       double h = std::max (bbox.height (), m_window_dim);
-      db::DPoint center (bbox.p1() + (bbox.p2 () - bbox.p1 ()) * 0.5);
+      db::DPoint center (bbox.p1 () + (bbox.p2 () - bbox.p1 ()) * 0.5);
       db::DVector d (w * 0.5, h * 0.5);
       view ()->zoom_box (db::DBox (center - d, center + d));
-
     }
-
   }
-
 }
 
-void
-NetTracerDialog::update_highlights ()
+void NetTracerDialog::update_highlights ()
 {
   clear_markers ();
 
@@ -1728,25 +1644,25 @@ NetTracerDialog::update_highlights ()
 
     if (item_index >= 0 && item_index < int (mp_nets.size ())) {
 
-      std::map<unsigned int, std::vector<db::DCplxTrans> > tv_by_layer = view ()->cv_transform_variants_by_layer (cv_index);
+      std::map<unsigned int, std::vector<db::DCplxTrans>> tv_by_layer = view ()->cv_transform_variants_by_layer (cv_index);
       std::map<unsigned int, lay::LayerPropertiesConstIterator> layer_props;
 
-      std::map <db::LayerProperties, unsigned int, db::LPLogicalLessFunc> lm;
+      std::map<db::LayerProperties, unsigned int, db::LPLogicalLessFunc> lm;
       for (db::Layout::layer_iterator l = cv->layout ().begin_layers (); l != cv->layout ().end_layers (); ++l) {
         lm.insert (std::make_pair (*(*l).second, (*l).first));
       }
 
-      std::map <unsigned int, unsigned int> llmap;
+      std::map<unsigned int, unsigned int> llmap;
 
       tl::Color net_color = mp_nets [item_index]->color ();
 
-      //  Create markers for the shapes 
+      //  Create markers for the shapes
       for (db::NetTracerNet::iterator net_shape = mp_nets [item_index]->begin (); net_shape != mp_nets [item_index]->end () && n_marker < m_max_marker_count; ++net_shape) {
 
         //  Find the actual layer by looking up the layer properties ..
-        std::map <unsigned int, unsigned int>::const_iterator ll = llmap.find (net_shape->layer ());
+        std::map<unsigned int, unsigned int>::const_iterator ll = llmap.find (net_shape->layer ());
         if (ll == llmap.end ()) {
-          std::map <db::LayerProperties, unsigned int, db::LPLogicalLessFunc>::const_iterator i = lm.find (mp_nets [item_index]->representative_layer_for (net_shape->layer ()));
+          std::map<db::LayerProperties, unsigned int, db::LPLogicalLessFunc>::const_iterator i = lm.find (mp_nets [item_index]->representative_layer_for (net_shape->layer ()));
           if (i != lm.end ()) {
             ll = llmap.insert (std::make_pair (net_shape->layer (), i->second)).first;
           }
@@ -1757,7 +1673,7 @@ NetTracerDialog::update_highlights ()
           ly = ll->second;
         }
 
-        std::map<unsigned int, std::vector<db::DCplxTrans> >::const_iterator tv = tv_by_layer.find (ly);
+        std::map<unsigned int, std::vector<db::DCplxTrans>>::const_iterator tv = tv_by_layer.find (ly);
         if (tv != tv_by_layer.end ()) {
 
           lay::LayerPropertiesConstIterator original;
@@ -1766,8 +1682,8 @@ NetTracerDialog::update_highlights ()
           if (lp_cache != layer_props.end ()) {
             original = lp_cache->second;
           } else {
-            for (lay::LayerPropertiesConstIterator lp = view ()->begin_layers (); !lp.at_end (); ++lp) {
-              if (!lp->has_children () && lp->cellview_index () == int (cv_index) && lp->layer_index () == int (ly)) {
+            for (lay::LayerPropertiesConstIterator lp = view ()->begin_layers (); ! lp.at_end (); ++lp) {
+              if (! lp->has_children () && lp->cellview_index () == int (cv_index) && lp->layer_index () == int (ly)) {
                 layer_props.insert (std::make_pair (ly, lp));
                 original = lp;
                 break;
@@ -1816,29 +1732,22 @@ NetTracerDialog::update_highlights ()
           }
 
           ++n_marker;
-
         }
-
       }
-
     }
-
   }
-
 }
 
-void
-NetTracerDialog::clear_markers ()
+void NetTracerDialog::clear_markers ()
 {
-  for (std::vector <lay::ShapeMarker *>::iterator m = mp_markers.begin (); m != mp_markers.end (); ++m) {
+  for (std::vector<lay::ShapeMarker *>::iterator m = mp_markers.begin (); m != mp_markers.end (); ++m) {
     delete *m;
   }
 
   mp_markers.clear ();
 }
 
-void
-NetTracerDialog::trace_all_nets (db::LayoutToNetlist *l2ndb, const lay::CellView &cv, bool flat)
+void NetTracerDialog::trace_all_nets (db::LayoutToNetlist *l2ndb, const lay::CellView &cv, bool flat)
 {
   const db::Technology *tech = cv->technology ();
   if (! tech) {
@@ -1851,7 +1760,7 @@ NetTracerDialog::trace_all_nets (db::LayoutToNetlist *l2ndb, const lay::CellView
   std::vector<std::string> raw_stacks;
   int current = 0;
 
-  const db::NetTracerTechnologyComponent *tech_component = dynamic_cast <const db::NetTracerTechnologyComponent *> (tech->component_by_name (db::net_tracer_component_name ()));
+  const db::NetTracerTechnologyComponent *tech_component = dynamic_cast<const db::NetTracerTechnologyComponent *> (tech->component_by_name (db::net_tracer_component_name ()));
   if (tech_component) {
     for (auto d = tech_component->begin (); d != tech_component->end (); ++d) {
       raw_stacks.push_back (d->name ());
@@ -1925,6 +1834,3 @@ NetTracerDialog::trace_all_nets (db::LayoutToNetlist *l2ndb, const lay::CellView
 }
 
 }
-
-
-

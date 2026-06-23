@@ -32,9 +32,8 @@ namespace db
 /**
  *  @brief Dereferences the given shape into the given Shapes container
  */
-struct deref_into_shapes
-{
-  deref_into_shapes (Shapes *shapes) 
+struct deref_into_shapes {
+  deref_into_shapes (Shapes *shapes)
     : mp_shapes (shapes)
   {
     //  .. nothing yet ..
@@ -127,7 +126,7 @@ private:
   }
 
   template <class InnerSh, class Trans, class PropIdMap>
-  void op (const db::object_with_properties<db::text_ref<InnerSh, Trans> > &sh, PropIdMap &pm)
+  void op (const db::object_with_properties<db::text_ref<InnerSh, Trans>> &sh, PropIdMap &pm)
   {
     InnerSh inst;
     sh.instantiate (inst);
@@ -135,7 +134,7 @@ private:
   }
 
   template <class InnerSh, class Trans, class PropIdMap>
-  void op (const db::object_with_properties<db::polygon_ref<InnerSh, Trans> > &sh, PropIdMap &pm)
+  void op (const db::object_with_properties<db::polygon_ref<InnerSh, Trans>> &sh, PropIdMap &pm)
   {
     InnerSh inst;
     sh.instantiate (inst);
@@ -143,7 +142,7 @@ private:
   }
 
   template <class InnerSh, class Trans, class PropIdMap>
-  void op (const db::object_with_properties<db::path_ref<InnerSh, Trans> > &sh, PropIdMap &pm)
+  void op (const db::object_with_properties<db::path_ref<InnerSh, Trans>> &sh, PropIdMap &pm)
   {
     InnerSh inst;
     sh.instantiate (inst);
@@ -151,7 +150,7 @@ private:
   }
 
   template <class InnerSh, class ATrans, class PropIdMap>
-  void op (const db::object_with_properties<db::array<InnerSh, ATrans> > &sh, PropIdMap &pm)
+  void op (const db::object_with_properties<db::array<InnerSh, ATrans>> &sh, PropIdMap &pm)
   {
     for (typename db::array<InnerSh, ATrans>::iterator a = sh.begin (); ! a.at_end (); ++a) {
       mp_shapes->insert (db::object_with_properties<InnerSh> (*a * sh.object (), pm (sh.properties_id ())));
@@ -161,16 +160,16 @@ private:
   //  special transformation for boxes - this must consider the non-ortho case where
   //  a box becomes a non-box.
   template <class C, class R, class ATrans, class PropIdMap>
-  void op (const db::object_with_properties<db::array<db::box<C, R>, ATrans> > &sh, PropIdMap &pm)
+  void op (const db::object_with_properties<db::array<db::box<C, R>, ATrans>> &sh, PropIdMap &pm)
   {
     db::box<C> box (sh.object ()); // avoid problems with short boxes
     for (typename db::array<db::box<C, R>, ATrans>::iterator a = sh.begin (); ! a.at_end (); ++a) {
-      mp_shapes->insert (db::object_with_properties<db::box<C> > (box.transformed (*a), pm (sh.properties_id ())));
+      mp_shapes->insert (db::object_with_properties<db::box<C>> (box.transformed (*a), pm (sh.properties_id ())));
     }
   }
 
   template <class ATrans, class InnerSh, class Trans, class PropIdMap>
-  void op (const db::object_with_properties<db::array<db::text_ref<InnerSh, Trans>, ATrans> > &sh, PropIdMap &pm)
+  void op (const db::object_with_properties<db::array<db::text_ref<InnerSh, Trans>, ATrans>> &sh, PropIdMap &pm)
   {
     InnerSh inst;
     for (typename db::array<db::text_ref<InnerSh, Trans>, ATrans>::iterator a = sh.begin (); ! a.at_end (); ++a) {
@@ -180,7 +179,7 @@ private:
   }
 
   template <class ATrans, class InnerSh, class Trans, class PropIdMap>
-  void op (const db::object_with_properties<db::array<db::polygon_ref<InnerSh, Trans>, ATrans> > &sh, PropIdMap &pm)
+  void op (const db::object_with_properties<db::array<db::polygon_ref<InnerSh, Trans>, ATrans>> &sh, PropIdMap &pm)
   {
     InnerSh inst;
     for (typename db::array<db::polygon_ref<InnerSh, Trans>, ATrans>::iterator a = sh.begin (); ! a.at_end (); ++a) {
@@ -190,7 +189,7 @@ private:
   }
 
   template <class ATrans, class InnerSh, class Trans, class PropIdMap>
-  void op (const db::object_with_properties<db::array<db::path_ref<InnerSh, Trans>, ATrans> > &sh, PropIdMap &pm)
+  void op (const db::object_with_properties<db::array<db::path_ref<InnerSh, Trans>, ATrans>> &sh, PropIdMap &pm)
   {
     InnerSh inst;
     for (typename db::array<db::path_ref<InnerSh, Trans>, ATrans>::iterator a = sh.begin (); ! a.at_end (); ++a) {
@@ -203,7 +202,7 @@ public:
   template <class Sh>
   void operator() (const Sh &shape)
   {
-    tl::ident_map <db::properties_id_type> pm;
+    tl::ident_map<db::properties_id_type> pm;
     op (shape, pm);
   }
 
@@ -223,9 +222,8 @@ private:
 /**
  *  @brief Dereferences the given shape and transforms it into the given Shapes container
  */
-struct deref_and_transform_into_shapes
-{
-  deref_and_transform_into_shapes (Shapes *shapes) 
+struct deref_and_transform_into_shapes {
+  deref_and_transform_into_shapes (Shapes *shapes)
     : mp_shapes (shapes)
   {
     //  .. nothing yet ..
@@ -310,7 +308,7 @@ private:
   {
     InnerSh inst;
     sh.object ().instantiate (inst);
-    for (typename db::array<db::text_ref<InnerSh, RTrans>, ATrans >::iterator a = sh.begin (); ! a.at_end (); ++a) {
+    for (typename db::array<db::text_ref<InnerSh, RTrans>, ATrans>::iterator a = sh.begin (); ! a.at_end (); ++a) {
       mp_shapes->insert (inst.transformed (trans * Trans (*a)));
     }
   }
@@ -320,7 +318,7 @@ private:
   {
     InnerSh inst;
     sh.object ().instantiate (inst);
-    for (typename db::array<db::polygon_ref<InnerSh, RTrans>, ATrans >::iterator a = sh.begin (); ! a.at_end (); ++a) {
+    for (typename db::array<db::polygon_ref<InnerSh, RTrans>, ATrans>::iterator a = sh.begin (); ! a.at_end (); ++a) {
       mp_shapes->insert (inst.transformed (trans * Trans (*a)));
     }
   }
@@ -330,7 +328,7 @@ private:
   {
     InnerSh inst;
     sh.object ().instantiate (inst);
-    for (typename db::array<db::path_ref<InnerSh, RTrans>, ATrans >::iterator a = sh.begin (); ! a.at_end (); ++a) {
+    for (typename db::array<db::path_ref<InnerSh, RTrans>, ATrans>::iterator a = sh.begin (); ! a.at_end (); ++a) {
       mp_shapes->insert (inst.transformed (trans * Trans (*a)));
     }
   }
@@ -344,19 +342,19 @@ private:
   //  special transformation for boxes - this must consider the non-ortho case where
   //  a box becomes a non-box.
   template <class C, class R, class Trans, class PropIdMap>
-  void op (const db::object_with_properties<db::box<C, R> > &sh, const Trans &trans, PropIdMap &pm)
+  void op (const db::object_with_properties<db::box<C, R>> &sh, const Trans &trans, PropIdMap &pm)
   {
     if (trans.is_ortho ()) {
       db::box<C> box (sh); // avoid problems with short boxes
-      mp_shapes->insert (db::object_with_properties<db::box<C> > (box.transformed (trans), pm (sh.properties_id ())));
+      mp_shapes->insert (db::object_with_properties<db::box<C>> (box.transformed (trans), pm (sh.properties_id ())));
     } else {
-      db::polygon<C> poly  = db::polygon<C> (db::box<C> (sh));
-      mp_shapes->insert (db::object_with_properties<db::polygon<C> > (poly.transformed (trans), pm (sh.properties_id ())));
+      db::polygon<C> poly = db::polygon<C> (db::box<C> (sh));
+      mp_shapes->insert (db::object_with_properties<db::polygon<C>> (poly.transformed (trans), pm (sh.properties_id ())));
     }
   }
 
   template <class Trans, class InnerSh, class RTrans, class PropIdMap>
-  void op (const db::object_with_properties<db::text_ref<InnerSh, RTrans> > &sh, const Trans &trans, PropIdMap &pm)
+  void op (const db::object_with_properties<db::text_ref<InnerSh, RTrans>> &sh, const Trans &trans, PropIdMap &pm)
   {
     InnerSh inst;
     sh.instantiate (inst);
@@ -365,7 +363,7 @@ private:
   }
 
   template <class Trans, class InnerSh, class RTrans, class PropIdMap>
-  void op (const db::object_with_properties<db::polygon_ref<InnerSh, RTrans> > &sh, const Trans &trans, PropIdMap &pm)
+  void op (const db::object_with_properties<db::polygon_ref<InnerSh, RTrans>> &sh, const Trans &trans, PropIdMap &pm)
   {
     InnerSh inst;
     sh.instantiate (inst);
@@ -374,7 +372,7 @@ private:
   }
 
   template <class Trans, class InnerSh, class RTrans, class PropIdMap>
-  void op (const db::object_with_properties<db::path_ref<InnerSh, RTrans> > &sh, const Trans &trans, PropIdMap &pm)
+  void op (const db::object_with_properties<db::path_ref<InnerSh, RTrans>> &sh, const Trans &trans, PropIdMap &pm)
   {
     InnerSh inst;
     sh.instantiate (inst);
@@ -385,23 +383,23 @@ private:
   //  special transformation for boxes - this must consider the non-ortho case where
   //  a box becomes a non-box.
   template <class C, class R, class ATrans, class Trans, class PropIdMap>
-  void op (const db::object_with_properties<db::array<db::box<C, R>, ATrans> > &sh, const Trans &trans, PropIdMap &pm)
+  void op (const db::object_with_properties<db::array<db::box<C, R>, ATrans>> &sh, const Trans &trans, PropIdMap &pm)
   {
     if (trans.is_ortho ()) {
       db::box<C> box (sh.object ()); // avoid problems with short boxes
       for (typename db::array<db::box<C, R>, ATrans>::iterator a = sh.begin (); ! a.at_end (); ++a) {
-        mp_shapes->insert (db::object_with_properties<db::box<C> > (box.transformed (trans * Trans (*a)), pm (sh.properties_id ())));
+        mp_shapes->insert (db::object_with_properties<db::box<C>> (box.transformed (trans * Trans (*a)), pm (sh.properties_id ())));
       }
     } else {
-      db::polygon<C> poly  = db::polygon<C> (db::box<C> (sh.object ()));
+      db::polygon<C> poly = db::polygon<C> (db::box<C> (sh.object ()));
       for (typename db::array<db::box<C, R>, ATrans>::iterator a = sh.begin (); ! a.at_end (); ++a) {
-        mp_shapes->insert (db::object_with_properties<db::polygon<C> > (poly.transformed (trans * Trans (*a)), pm (sh.properties_id ())));
+        mp_shapes->insert (db::object_with_properties<db::polygon<C>> (poly.transformed (trans * Trans (*a)), pm (sh.properties_id ())));
       }
     }
   }
 
   template <class Trans, class AObject, class ATrans, class InnerSh, class PropIdMap>
-  void op (const db::object_with_properties<db::array<AObject, ATrans> > &sh, const Trans &trans, PropIdMap &pm)
+  void op (const db::object_with_properties<db::array<AObject, ATrans>> &sh, const Trans &trans, PropIdMap &pm)
   {
     InnerSh inst (sh.object ());
     for (typename db::array<AObject, ATrans>::iterator a = sh.begin (); ! a.at_end (); ++a) {
@@ -410,7 +408,7 @@ private:
   }
 
   template <class Trans, class ATrans, class InnerSh, class RTrans, class PropIdMap>
-  void op (const db::object_with_properties<db::array<db::text_ref<InnerSh, RTrans>, ATrans> > &sh, const Trans &trans, PropIdMap &pm)
+  void op (const db::object_with_properties<db::array<db::text_ref<InnerSh, RTrans>, ATrans>> &sh, const Trans &trans, PropIdMap &pm)
   {
     InnerSh inst;
     sh.object ().instantiate (inst);
@@ -420,7 +418,7 @@ private:
   }
 
   template <class Trans, class ATrans, class InnerSh, class RTrans, class PropIdMap>
-  void op (const db::object_with_properties<db::array<db::polygon_ref<InnerSh, RTrans>, ATrans> > &sh, const Trans &trans, PropIdMap &pm)
+  void op (const db::object_with_properties<db::array<db::polygon_ref<InnerSh, RTrans>, ATrans>> &sh, const Trans &trans, PropIdMap &pm)
   {
     InnerSh inst;
     sh.object ().instantiate (inst);
@@ -430,7 +428,7 @@ private:
   }
 
   template <class Trans, class ATrans, class InnerSh, class RTrans, class PropIdMap>
-  void op (const db::object_with_properties<db::array<db::path_ref<InnerSh, RTrans>, ATrans> > &sh, const Trans &trans, PropIdMap &pm)
+  void op (const db::object_with_properties<db::array<db::path_ref<InnerSh, RTrans>, ATrans>> &sh, const Trans &trans, PropIdMap &pm)
   {
     InnerSh inst;
     sh.object ().instantiate (inst);
@@ -443,7 +441,7 @@ public:
   template <class Sh, class T>
   void operator() (const Sh &shape, const T &trans)
   {
-    tl::ident_map <db::properties_id_type> pm;
+    tl::ident_map<db::properties_id_type> pm;
     op (shape, trans, pm);
   }
 
@@ -461,11 +459,10 @@ private:
 //  translate operator
 
 /**
- *  @brief Translates the given shape into the given Shapes container using the given array repository 
+ *  @brief Translates the given shape into the given Shapes container using the given array repository
  */
-struct translate_into_shapes
-{
-  translate_into_shapes (Shapes *shapes, GenericRepository &rep, ArrayRepository &array_rep) 
+struct translate_into_shapes {
+  translate_into_shapes (Shapes *shapes, GenericRepository &rep, ArrayRepository &array_rep)
     : mp_shapes (shapes), m_shape_rep (rep), m_array_rep (array_rep)
   {
     //  .. nothing yet ..
@@ -513,11 +510,10 @@ private:
 //  translate and transform operator
 
 /**
- *  @brief Translates and transforms the given shape into the given Shapes container using the given array repository 
+ *  @brief Translates and transforms the given shape into the given Shapes container using the given array repository
  */
-struct translate_and_transform_into_shapes
-{
-  translate_and_transform_into_shapes (Shapes *shapes, GenericRepository &rep, ArrayRepository &array_rep) 
+struct translate_and_transform_into_shapes {
+  translate_and_transform_into_shapes (Shapes *shapes, GenericRepository &rep, ArrayRepository &array_rep)
     : mp_shapes (shapes), m_shape_rep (rep), m_array_rep (array_rep)
   {
     //  .. nothing yet ..
@@ -557,14 +553,14 @@ private:
   //  special transformation for boxes - this must consider the non-ortho case where
   //  a box becomes a non-box.
   template <class C, class R, class T, class PropIdMap>
-  void op (const db::object_with_properties<box<C, R> > &sh, const T &trans, PropIdMap &pm)
+  void op (const db::object_with_properties<box<C, R>> &sh, const T &trans, PropIdMap &pm)
   {
     if (trans.is_ortho ()) {
       db::box<C> box (sh); // avoid problems with short boxes
-      mp_shapes->insert (db::object_with_properties<db::box<C> > (box.transformed (trans), pm (sh.properties_id ())));
+      mp_shapes->insert (db::object_with_properties<db::box<C>> (box.transformed (trans), pm (sh.properties_id ())));
     } else {
       db::polygon<C> poly = db::polygon<C> (db::box<C> (sh));
-      mp_shapes->insert (db::object_with_properties<db::polygon<C> > (poly.transformed (trans), pm (sh.properties_id ())));
+      mp_shapes->insert (db::object_with_properties<db::polygon<C>> (poly.transformed (trans), pm (sh.properties_id ())));
     }
   }
 
@@ -579,10 +575,10 @@ private:
       mp_shapes->insert (new_array);
     } else {
       //  Convert the box to a polygon reference and translate ..
-      db::polygon_ref<db::polygon<C>, db::unit_trans<C> > poly_ref (db::polygon<C> (db::box<C> (sh.object ())), m_shape_rep);
-      const db::basic_array<C> *ba = dynamic_cast <const db::basic_array<C> *> (sh.delegate ());
-      db::array<db::polygon_ref<db::polygon<C>, db::unit_trans<C> >, db::disp_trans<C> > poly_array (poly_ref, db::disp_trans<C> (sh.front ()), ba ? ba->clone () : 0);
-      db::array<db::polygon_ref<db::polygon<C>, db::unit_trans<C> >, db::disp_trans<C> > new_array;
+      db::polygon_ref<db::polygon<C>, db::unit_trans<C>> poly_ref (db::polygon<C> (db::box<C> (sh.object ())), m_shape_rep);
+      const db::basic_array<C> *ba = dynamic_cast<const db::basic_array<C> *> (sh.delegate ());
+      db::array<db::polygon_ref<db::polygon<C>, db::unit_trans<C>>, db::disp_trans<C>> poly_array (poly_ref, db::disp_trans<C> (sh.front ()), ba ? ba->clone () : 0);
+      db::array<db::polygon_ref<db::polygon<C>, db::unit_trans<C>>, db::disp_trans<C>> new_array;
       new_array.translate (poly_array, trans, m_shape_rep, m_array_rep);
       mp_shapes->insert (new_array);
     }
@@ -591,20 +587,20 @@ private:
   //  special transformation for boxes - this must consider the non-ortho case where
   //  a box becomes a non-box.
   template <class C, class R, class ATrans, class T, class PropIdMap>
-  void op (const db::object_with_properties<db::array<db::box<C, R>, ATrans> > &sh, const T &trans, PropIdMap &pm)
+  void op (const db::object_with_properties<db::array<db::box<C, R>, ATrans>> &sh, const T &trans, PropIdMap &pm)
   {
     if (trans.is_ortho ()) {
       db::array<db::box<C, R>, ATrans> new_array;
       new_array.translate (sh, trans, m_shape_rep, m_array_rep);
-      mp_shapes->insert (db::object_with_properties<db::array<db::box<C, R>, ATrans> > (new_array, pm (sh.properties_id ())));
+      mp_shapes->insert (db::object_with_properties<db::array<db::box<C, R>, ATrans>> (new_array, pm (sh.properties_id ())));
     } else {
       //  Convert the box to a polygon reference and translate ..
-      db::polygon_ref<db::polygon<C>, db::unit_trans<C> > poly_ref (db::polygon<C> (db::box<C> (sh.object ())), m_shape_rep);
-      const db::basic_array<C> *ba = dynamic_cast <const db::basic_array<C> *> (sh.delegate ());
-      db::array<db::polygon_ref<db::polygon<C>, db::unit_trans<C> >, db::disp_trans<C> > poly_array (poly_ref, db::disp_trans<C> (sh.front ()), ba ? ba->clone () : 0);
-      db::array<db::polygon_ref<db::polygon<C>, db::unit_trans<C> >, db::disp_trans<C> > new_array;
+      db::polygon_ref<db::polygon<C>, db::unit_trans<C>> poly_ref (db::polygon<C> (db::box<C> (sh.object ())), m_shape_rep);
+      const db::basic_array<C> *ba = dynamic_cast<const db::basic_array<C> *> (sh.delegate ());
+      db::array<db::polygon_ref<db::polygon<C>, db::unit_trans<C>>, db::disp_trans<C>> poly_array (poly_ref, db::disp_trans<C> (sh.front ()), ba ? ba->clone () : 0);
+      db::array<db::polygon_ref<db::polygon<C>, db::unit_trans<C>>, db::disp_trans<C>> new_array;
       new_array.translate (poly_array, trans, m_shape_rep, m_array_rep);
-      mp_shapes->insert (db::object_with_properties<db::array<db::polygon_ref<db::polygon<C>, db::unit_trans<C> >, db::disp_trans<C> > > (new_array, pm (sh.properties_id ())));
+      mp_shapes->insert (db::object_with_properties<db::array<db::polygon_ref<db::polygon<C>, db::unit_trans<C>>, db::disp_trans<C>>> (new_array, pm (sh.properties_id ())));
     }
   }
 
@@ -618,7 +614,7 @@ public:
   template <class Sh, class T>
   void operator() (const Sh &shape, const T &trans)
   {
-    tl::ident_map <db::properties_id_type> pm;
+    tl::ident_map<db::properties_id_type> pm;
     op (shape, trans, pm);
   }
 
@@ -753,7 +749,7 @@ inline unsigned int iterator_type_mask (ShapeIterator::user_object_type::tag)
 
 /// @brief Internal: ShapeIterator masks per shape type
 template <class Sh>
-inline unsigned int iterator_type_mask (db::object_tag< db::object_with_properties<Sh> >)
+inline unsigned int iterator_type_mask (db::object_tag<db::object_with_properties<Sh>>)
 {
   return iterator_type_mask (typename Sh::tag ()) | ShapeIterator::Properties;
 }
@@ -766,30 +762,27 @@ layer_class<Sh, StableTag>::clone () const
   r->m_layer = m_layer;
   return r;
 }
-  
+
 template <class Sh, class StableTag>
-void 
-layer_class<Sh, StableTag>::translate_into (Shapes *target, GenericRepository &rep, ArrayRepository &array_rep) const 
+void layer_class<Sh, StableTag>::translate_into (Shapes *target, GenericRepository &rep, ArrayRepository &array_rep) const
 {
   translate_into_shapes op (target, rep, array_rep);
   for (typename layer_type::iterator s = m_layer.begin (); s != m_layer.end (); ++s) {
     op (*s);
   }
 }
-  
+
 template <class Sh, class StableTag>
-void 
-layer_class<Sh, StableTag>::translate_into (Shapes *target, GenericRepository &rep, ArrayRepository &array_rep, pm_delegate_type &pm) const 
+void layer_class<Sh, StableTag>::translate_into (Shapes *target, GenericRepository &rep, ArrayRepository &array_rep, pm_delegate_type &pm) const
 {
   translate_into_shapes op (target, rep, array_rep);
   for (typename layer_type::iterator s = m_layer.begin (); s != m_layer.end (); ++s) {
     op (*s, pm);
   }
 }
-  
+
 template <class Sh, class StableTag>
-void 
-layer_class<Sh, StableTag>::transform_into (Shapes *target, const Trans &trans, GenericRepository &rep, ArrayRepository &array_rep) const 
+void layer_class<Sh, StableTag>::transform_into (Shapes *target, const Trans &trans, GenericRepository &rep, ArrayRepository &array_rep) const
 {
   translate_and_transform_into_shapes op (target, rep, array_rep);
   for (typename layer_type::iterator s = m_layer.begin (); s != m_layer.end (); ++s) {
@@ -798,8 +791,7 @@ layer_class<Sh, StableTag>::transform_into (Shapes *target, const Trans &trans, 
 }
 
 template <class Sh, class StableTag>
-void 
-layer_class<Sh, StableTag>::transform_into (Shapes *target, const Trans &trans, GenericRepository &rep, ArrayRepository &array_rep, pm_delegate_type &pm) const 
+void layer_class<Sh, StableTag>::transform_into (Shapes *target, const Trans &trans, GenericRepository &rep, ArrayRepository &array_rep, pm_delegate_type &pm) const
 {
   translate_and_transform_into_shapes op (target, rep, array_rep);
   for (typename layer_type::iterator s = m_layer.begin (); s != m_layer.end (); ++s) {
@@ -808,8 +800,7 @@ layer_class<Sh, StableTag>::transform_into (Shapes *target, const Trans &trans, 
 }
 
 template <class Sh, class StableTag>
-void 
-layer_class<Sh, StableTag>::transform_into (Shapes *target, const ICplxTrans &trans, GenericRepository &rep, ArrayRepository &array_rep) const 
+void layer_class<Sh, StableTag>::transform_into (Shapes *target, const ICplxTrans &trans, GenericRepository &rep, ArrayRepository &array_rep) const
 {
   translate_and_transform_into_shapes op (target, rep, array_rep);
   for (typename layer_type::iterator s = m_layer.begin (); s != m_layer.end (); ++s) {
@@ -818,8 +809,7 @@ layer_class<Sh, StableTag>::transform_into (Shapes *target, const ICplxTrans &tr
 }
 
 template <class Sh, class StableTag>
-void 
-layer_class<Sh, StableTag>::transform_into (Shapes *target, const ICplxTrans &trans, GenericRepository &rep, ArrayRepository &array_rep, pm_delegate_type &pm) const 
+void layer_class<Sh, StableTag>::transform_into (Shapes *target, const ICplxTrans &trans, GenericRepository &rep, ArrayRepository &array_rep, pm_delegate_type &pm) const
 {
   translate_and_transform_into_shapes op (target, rep, array_rep);
   for (typename layer_type::iterator s = m_layer.begin (); s != m_layer.end (); ++s) {
@@ -828,15 +818,13 @@ layer_class<Sh, StableTag>::transform_into (Shapes *target, const ICplxTrans &tr
 }
 
 template <class Sh, class StableTag>
-void
-layer_class<Sh, StableTag>::insert_into (Shapes *target)
+void layer_class<Sh, StableTag>::insert_into (Shapes *target)
 {
   target->insert (m_layer.begin (), m_layer.end ());
 }
 
 template <class Sh, class StableTag>
-void 
-layer_class<Sh, StableTag>::deref_into (Shapes *target) 
+void layer_class<Sh, StableTag>::deref_into (Shapes *target)
 {
   deref_into_shapes op (target);
   for (typename layer_type::iterator s = m_layer.begin (); s != m_layer.end (); ++s) {
@@ -845,8 +833,7 @@ layer_class<Sh, StableTag>::deref_into (Shapes *target)
 }
 
 template <class Sh, class StableTag>
-void 
-layer_class<Sh, StableTag>::deref_into (Shapes *target, pm_delegate_type &pm) 
+void layer_class<Sh, StableTag>::deref_into (Shapes *target, pm_delegate_type &pm)
 {
   deref_into_shapes op (target);
   for (typename layer_type::iterator s = m_layer.begin (); s != m_layer.end (); ++s) {
@@ -855,8 +842,7 @@ layer_class<Sh, StableTag>::deref_into (Shapes *target, pm_delegate_type &pm)
 }
 
 template <class Sh, class StableTag>
-void 
-layer_class<Sh, StableTag>::deref_and_transform_into (Shapes *target, const Trans &trans) 
+void layer_class<Sh, StableTag>::deref_and_transform_into (Shapes *target, const Trans &trans)
 {
   deref_and_transform_into_shapes deref_op (target);
   for (typename layer_type::iterator s = m_layer.begin (); s != m_layer.end (); ++s) {
@@ -865,8 +851,7 @@ layer_class<Sh, StableTag>::deref_and_transform_into (Shapes *target, const Tran
 }
 
 template <class Sh, class StableTag>
-void 
-layer_class<Sh, StableTag>::deref_and_transform_into (Shapes *target, const Trans &trans, pm_delegate_type &pm) 
+void layer_class<Sh, StableTag>::deref_and_transform_into (Shapes *target, const Trans &trans, pm_delegate_type &pm)
 {
   deref_and_transform_into_shapes deref_op (target);
   for (typename layer_type::iterator s = m_layer.begin (); s != m_layer.end (); ++s) {
@@ -875,8 +860,7 @@ layer_class<Sh, StableTag>::deref_and_transform_into (Shapes *target, const Tran
 }
 
 template <class Sh, class StableTag>
-void 
-layer_class<Sh, StableTag>::deref_and_transform_into (Shapes *target, const ICplxTrans &trans) 
+void layer_class<Sh, StableTag>::deref_and_transform_into (Shapes *target, const ICplxTrans &trans)
 {
   deref_and_transform_into_shapes op (target);
   for (typename layer_type::iterator s = m_layer.begin (); s != m_layer.end (); ++s) {
@@ -885,8 +869,7 @@ layer_class<Sh, StableTag>::deref_and_transform_into (Shapes *target, const ICpl
 }
 
 template <class Sh, class StableTag>
-void 
-layer_class<Sh, StableTag>::deref_and_transform_into (Shapes *target, const ICplxTrans &trans, pm_delegate_type &pm) 
+void layer_class<Sh, StableTag>::deref_and_transform_into (Shapes *target, const ICplxTrans &trans, pm_delegate_type &pm)
 {
   deref_and_transform_into_shapes op (target);
   for (typename layer_type::iterator s = m_layer.begin (); s != m_layer.end (); ++s) {
@@ -895,8 +878,8 @@ layer_class<Sh, StableTag>::deref_and_transform_into (Shapes *target, const ICpl
 }
 
 template <class Sh, class StableTag>
-unsigned int 
-layer_class<Sh, StableTag>::type_mask () const 
+unsigned int
+layer_class<Sh, StableTag>::type_mask () const
 {
   return iterator_type_mask (typename Sh::tag ());
 }
@@ -985,4 +968,3 @@ template class layer_class<db::Shape::user_object_type, db::unstable_layer_tag>;
 template class layer_class<db::object_with_properties<db::Shape::user_object_type>, db::unstable_layer_tag>;
 
 }
-

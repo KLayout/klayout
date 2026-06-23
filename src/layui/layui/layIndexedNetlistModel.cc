@@ -31,123 +31,114 @@ namespace lay
 // ----------------------------------------------------------------------------------
 //  SingleIndexedNetlistModel implementation
 
-namespace {
+namespace
+{
 
-  template <class Obj>
-  struct sort_single_by_name
+template <class Obj>
+struct sort_single_by_name {
+  inline bool operator() (const Obj *a, const Obj *b) const
   {
-    inline bool operator() (const Obj *a, const Obj *b) const
-    {
+    return a->name () < b->name ();
+  }
+};
+
+template <class Obj>
+struct sort_single_by_expanded_name {
+  inline bool operator() (const Obj *a, const Obj *b) const
+  {
+    //  NOTE: we don't use expanded_name () for performance
+    if (a->name ().empty () != b->name ().empty ()) {
+      //  named ones first
+      return a->name ().empty () < b->name ().empty ();
+    }
+    if (a->name ().empty ()) {
+      return a->id () < b->id ();
+    } else {
       return a->name () < b->name ();
     }
-  };
+  }
+};
 
-  template <class Obj>
-  struct sort_single_by_expanded_name
+template <class Obj>
+struct sort_single_by_pin_name {
+  inline bool operator() (const Obj *a, const Obj *b) const
   {
-    inline bool operator() (const Obj *a, const Obj *b) const
-    {
-      //  NOTE: we don't use expanded_name () for performance
-      if (a->name ().empty () != b->name ().empty ()) {
-        //  named ones first
-        return a->name ().empty () < b->name ().empty ();
-      }
-      if (a->name ().empty ()) {
-        return a->id () < b->id ();
-      } else {
-        return a->name () < b->name ();
-      }
+    return sort_single_by_expanded_name<db::Pin> () (a->pin (), b->pin ());
+  }
+};
+
+template <class Obj>
+struct sort_single_by_terminal_id {
+  inline bool operator() (const Obj *a, const Obj *b) const
+  {
+    return a->terminal_id () < b->terminal_id ();
+  }
+};
+
+template <class Obj, class SortBy>
+struct sort_with_null {
+  inline bool operator() (const Obj *a, const Obj *b) const
+  {
+    SortBy order;
+    if ((a != 0) != (b != 0)) {
+      return (a != 0) < (b != 0);
     }
-  };
-
-  template <class Obj>
-  struct sort_single_by_pin_name
-  {
-    inline bool operator() (const Obj *a, const Obj *b) const
-    {
-      return sort_single_by_expanded_name<db::Pin> () (a->pin (), b->pin ());
-    }
-  };
-
-  template <class Obj>
-  struct sort_single_by_terminal_id
-  {
-    inline bool operator() (const Obj *a, const Obj *b) const
-    {
-      return a->terminal_id () < b->terminal_id ();
-    }
-  };
-
-  template <class Obj, class SortBy>
-  struct sort_with_null
-  {
-    inline bool operator() (const Obj *a, const Obj *b) const
-    {
-      SortBy order;
-      if ((a != 0) != (b != 0)) {
-        return (a != 0) < (b != 0);
-      }
-      if (a) {
-        if (order (a, b)) {
-          return true;
-        } else if (order (b, a)) {
-          return false;
-        }
-      }
-      return false;
-    }
-  };
-
-  template <class Obj, class SortBy>
-  struct sort_pair
-  {
-    bool operator() (const std::pair<const Obj *, const Obj *> &a, const std::pair<const Obj *, const Obj *> &b) const
-    {
-      SortBy order;
-      if (order (a.first, b.first)) {
+    if (a) {
+      if (order (a, b)) {
         return true;
-      } else if (order (b.first, a.first)) {
+      } else if (order (b, a)) {
         return false;
       }
-      return order (a.second, b.second);
     }
-  };
+    return false;
+  }
+};
 
-  template <class Obj>
-  struct sort_by_name
-    : public sort_pair<Obj, sort_with_null<Obj, sort_single_by_name<Obj> > >
+template <class Obj, class SortBy>
+struct sort_pair {
+  bool operator() (const std::pair<const Obj *, const Obj *> &a, const std::pair<const Obj *, const Obj *> &b) const
   {
-    //  .. nothing yet ..
-  };
+    SortBy order;
+    if (order (a.first, b.first)) {
+      return true;
+    } else if (order (b.first, a.first)) {
+      return false;
+    }
+    return order (a.second, b.second);
+  }
+};
 
-  template <class Obj>
-  struct sort_by_expanded_name
-    : public sort_pair<Obj, sort_with_null<Obj, sort_single_by_expanded_name<Obj> > >
-  {
-    //  .. nothing yet ..
-  };
+template <class Obj>
+struct sort_by_name
+  : public sort_pair<Obj, sort_with_null<Obj, sort_single_by_name<Obj>>> {
+  //  .. nothing yet ..
+};
 
-  template <class Obj>
-  struct sort_by_pin_name
-    : public sort_pair<Obj, sort_with_null<Obj, sort_single_by_pin_name<Obj> > >
-  {
-    //  .. nothing yet ..
-  };
+template <class Obj>
+struct sort_by_expanded_name
+  : public sort_pair<Obj, sort_with_null<Obj, sort_single_by_expanded_name<Obj>>> {
+  //  .. nothing yet ..
+};
 
-  template <class Obj>
-  struct sort_by_terminal_id
-    : public sort_pair<Obj, sort_with_null<Obj, sort_single_by_terminal_id<Obj> > >
-  {
-    //  .. nothing yet ..
-  };
+template <class Obj>
+struct sort_by_pin_name
+  : public sort_pair<Obj, sort_with_null<Obj, sort_single_by_pin_name<Obj>>> {
+  //  .. nothing yet ..
+};
+
+template <class Obj>
+struct sort_by_terminal_id
+  : public sort_pair<Obj, sort_with_null<Obj, sort_single_by_terminal_id<Obj>>> {
+  //  .. nothing yet ..
+};
 
 }
 
-struct Unsorted { };
+struct Unsorted {
+};
 
 template <class Iter, class SortBy>
-struct sort_by
-{
+struct sort_by {
   void operator() (const Iter &begin, const Iter &end, const SortBy &sorter)
   {
     std::sort (begin, end, sorter);
@@ -155,8 +146,7 @@ struct sort_by
 };
 
 template <class Iter>
-struct sort_by<Iter, Unsorted>
-{
+struct sort_by<Iter, Unsorted> {
   void operator() (const Iter &, const Iter &, const Unsorted &)
   {
     //  don't sort
@@ -165,7 +155,7 @@ struct sort_by<Iter, Unsorted>
 
 
 template <class Attr, class Iter, class SortBy>
-static void fill_map (std::vector<std::pair<const Attr *, const Attr *> > &map, const Iter &begin1, const Iter &end1, const Iter &begin2, const Iter &end2, const SortBy &sorter)
+static void fill_map (std::vector<std::pair<const Attr *, const Attr *>> &map, const Iter &begin1, const Iter &end1, const Iter &begin2, const Iter &end2, const SortBy &sorter)
 {
   size_t n1 = 0, n2 = 0;
   for (Iter i = begin1; i != end1; ++i) {
@@ -174,27 +164,27 @@ static void fill_map (std::vector<std::pair<const Attr *, const Attr *> > &map, 
   for (Iter i = begin2; i != end2; ++i) {
     ++n2;
   }
-  map.resize (std::max (n1, n2), std::make_pair((const Attr *)0, (const Attr *)0));
+  map.resize (std::max (n1, n2), std::make_pair ((const Attr *) 0, (const Attr *) 0));
 
-  typename std::vector<std::pair<const Attr *, const Attr *> >::iterator j;
+  typename std::vector<std::pair<const Attr *, const Attr *>>::iterator j;
   j = map.begin ();
   for (Iter i = begin1; i != end1; ++i, ++j) {
-    j->first = i.operator-> ();
+    j->first = i.operator->();
   }
   j = map.begin ();
   for (Iter i = begin2; i != end2; ++i, ++j) {
-    j->second = i.operator-> ();
+    j->second = i.operator->();
   }
 
-  sort_by<typename std::vector<std::pair<const Attr *, const Attr *> >::iterator, SortBy> () (map.begin (), map.end (), sorter);
+  sort_by<typename std::vector<std::pair<const Attr *, const Attr *>>::iterator, SortBy> () (map.begin (), map.end (), sorter);
 }
 
 template <class Obj, class Attr, class Iter, class SortBy>
-static std::pair<const Attr *, const Attr *> attr_by_object_and_index (const std::pair<const Obj *, const Obj *> &obj, size_t index, const Iter &begin1, const Iter &end1, const Iter &begin2, const Iter &end2, std::map<std::pair<const Obj *, const Obj *>, std::vector<std::pair<const Attr *, const Attr *> > > &cache, const SortBy &sorter)
+static std::pair<const Attr *, const Attr *> attr_by_object_and_index (const std::pair<const Obj *, const Obj *> &obj, size_t index, const Iter &begin1, const Iter &end1, const Iter &begin2, const Iter &end2, std::map<std::pair<const Obj *, const Obj *>, std::vector<std::pair<const Attr *, const Attr *>>> &cache, const SortBy &sorter)
 {
-  typename std::map<std::pair<const Obj *, const Obj *>, std::vector<std::pair<const Attr *, const Attr *> > >::iterator cc = cache.find (obj);
+  typename std::map<std::pair<const Obj *, const Obj *>, std::vector<std::pair<const Attr *, const Attr *>>>::iterator cc = cache.find (obj);
   if (cc == cache.end ()) {
-    cc = cache.insert (std::make_pair (obj, std::vector<std::pair<const Attr *, const Attr *> > ())).first;
+    cc = cache.insert (std::make_pair (obj, std::vector<std::pair<const Attr *, const Attr *>> ())).first;
     fill_map (cc->second, begin1, end1, begin2, end2, sorter);
   }
 
@@ -210,7 +200,7 @@ static size_t index_from_attr (const std::pair<const Attr *, const Attr *> &attr
     return cc->second;
   }
 
-  std::vector<std::pair<const Attr *, const Attr *> > map;
+  std::vector<std::pair<const Attr *, const Attr *>> map;
   fill_map (map, begin1, end1, begin2, end2, sorter);
 
   for (size_t i = 0; i < map.size (); ++i) {
@@ -306,25 +296,25 @@ SingleIndexedNetlistModel::parent_of (const subcircuit_pair &subcircuits) const
   return std::make_pair (subcircuits.first ? subcircuits.first->circuit () : 0, (const db::Circuit *) 0);
 }
 
-std::pair<IndexedNetlistModel::circuit_pair, std::pair<IndexedNetlistModel::Status, std::string> > SingleIndexedNetlistModel::top_circuit_from_index (size_t index) const
+std::pair<IndexedNetlistModel::circuit_pair, std::pair<IndexedNetlistModel::Status, std::string>> SingleIndexedNetlistModel::top_circuit_from_index (size_t index) const
 {
   db::Netlist::const_top_down_circuit_iterator none;
   return std::make_pair (attr_by_object_and_index (std::make_pair ((const db::Circuit *) 0, (const db::Circuit *) 0), index, mp_netlist->begin_top_down (), mp_netlist->begin_top_down () + mp_netlist->top_circuit_count (), none, none, m_child_circuit_by_circuit_and_index, sort_by_name<db::Circuit> ()), std::make_pair (db::NetlistCrossReference::None, std::string ()));
 }
 
-std::pair<IndexedNetlistModel::circuit_pair, std::pair<IndexedNetlistModel::Status, std::string> > SingleIndexedNetlistModel::child_circuit_from_index (const circuit_pair &circuits, size_t index) const
+std::pair<IndexedNetlistModel::circuit_pair, std::pair<IndexedNetlistModel::Status, std::string>> SingleIndexedNetlistModel::child_circuit_from_index (const circuit_pair &circuits, size_t index) const
 {
   db::Circuit::const_child_circuit_iterator none;
   return std::make_pair (attr_by_object_and_index (circuits, index, circuits.first->begin_children (), circuits.first->end_children (), none, none, m_child_circuit_by_circuit_and_index, sort_by_name<db::Circuit> ()), std::make_pair (db::NetlistCrossReference::None, std::string ()));
 }
 
-std::pair<IndexedNetlistModel::circuit_pair, std::pair<IndexedNetlistModel::Status, std::string> > SingleIndexedNetlistModel::circuit_from_index (size_t index) const
+std::pair<IndexedNetlistModel::circuit_pair, std::pair<IndexedNetlistModel::Status, std::string>> SingleIndexedNetlistModel::circuit_from_index (size_t index) const
 {
   db::Netlist::const_circuit_iterator none;
   return std::make_pair (attr_by_object_and_index (std::make_pair (mp_netlist, (const db::Netlist *) 0), index, mp_netlist->begin_circuits (), mp_netlist->end_circuits (), none, none, m_circuit_by_index, sort_by_name<db::Circuit> ()), std::make_pair (db::NetlistCrossReference::None, std::string ()));
 }
 
-std::pair<IndexedNetlistModel::net_pair, std::pair<IndexedNetlistModel::Status, std::string> > SingleIndexedNetlistModel::net_from_index (const circuit_pair &circuits, size_t index) const
+std::pair<IndexedNetlistModel::net_pair, std::pair<IndexedNetlistModel::Status, std::string>> SingleIndexedNetlistModel::net_from_index (const circuit_pair &circuits, size_t index) const
 {
   db::Circuit::const_net_iterator none;
   return std::make_pair (attr_by_object_and_index (std::make_pair (circuits.first, (const db::Circuit *) 0), index, circuits.first->begin_nets (), circuits.first->end_nets (), none, none, m_net_by_circuit_and_index, sort_by_expanded_name<db::Net> ()), std::make_pair (db::NetlistCrossReference::None, std::string ()));
@@ -359,7 +349,7 @@ SingleIndexedNetlistModel::subcircuit_pinref_from_index (const subcircuit_pair &
     return IndexedNetlistModel::net_subcircuit_pin_pair ((const db::NetSubcircuitPinRef *) 0, (const db::NetSubcircuitPinRef *) 0);
   }
 
-  std::map<subcircuit_pair, std::vector<net_subcircuit_pin_pair> >::iterator i = m_subcircuit_pins_by_index.find (subcircuits);
+  std::map<subcircuit_pair, std::vector<net_subcircuit_pin_pair>>::iterator i = m_subcircuit_pins_by_index.find (subcircuits);
   if (i == m_subcircuit_pins_by_index.end ()) {
 
     i = m_subcircuit_pins_by_index.insert (std::make_pair (subcircuits, std::vector<net_subcircuit_pin_pair> ())).first;
@@ -370,11 +360,10 @@ SingleIndexedNetlistModel::subcircuit_pinref_from_index (const subcircuit_pair &
       const db::NetSubcircuitPinRef *ref = subcircuits.first->netref_for_pin (p->id ());
       if (! ref) {
         m_synthetic_pinrefs.push_back (db::NetSubcircuitPinRef (const_cast<db::SubCircuit *> (subcircuits.first), p->id ()));
-        ref = & m_synthetic_pinrefs.back ();
+        ref = &m_synthetic_pinrefs.back ();
       }
       refs.push_back (net_subcircuit_pin_pair (ref, (const db::NetSubcircuitPinRef *) 0));
     }
-
   }
 
   return index < i->second.size () ? i->second [index] : IndexedNetlistModel::net_subcircuit_pin_pair ((const db::NetSubcircuitPinRef *) 0, (const db::NetSubcircuitPinRef *) 0);
@@ -394,19 +383,19 @@ SingleIndexedNetlistModel::net_pinref_from_index (const net_pair &nets, size_t i
   return attr_by_object_and_index (std::make_pair (nets.first, (const db::Net *) 0), index, nets.first->begin_pins (), nets.first->end_pins (), none, none, m_pinref_by_net_and_index, sort_by_pin_name<db::NetPinRef> ());
 }
 
-std::pair<IndexedNetlistModel::device_pair, std::pair<IndexedNetlistModel::Status, std::string> > SingleIndexedNetlistModel::device_from_index (const circuit_pair &circuits, size_t index) const
+std::pair<IndexedNetlistModel::device_pair, std::pair<IndexedNetlistModel::Status, std::string>> SingleIndexedNetlistModel::device_from_index (const circuit_pair &circuits, size_t index) const
 {
   db::Circuit::const_device_iterator none;
   return std::make_pair (attr_by_object_and_index (std::make_pair (circuits.first, (const db::Circuit *) 0), index, circuits.first->begin_devices (), circuits.first->end_devices (), none, none, m_device_by_circuit_and_index, sort_by_expanded_name<db::Device> ()), std::make_pair (db::NetlistCrossReference::None, std::string ()));
 }
 
-std::pair<IndexedNetlistModel::pin_pair, std::pair<IndexedNetlistModel::Status, std::string> > SingleIndexedNetlistModel::pin_from_index (const circuit_pair &circuits, size_t index) const
+std::pair<IndexedNetlistModel::pin_pair, std::pair<IndexedNetlistModel::Status, std::string>> SingleIndexedNetlistModel::pin_from_index (const circuit_pair &circuits, size_t index) const
 {
   db::Circuit::const_pin_iterator none;
   return std::make_pair (attr_by_object_and_index (std::make_pair (circuits.first, (const db::Circuit *) 0), index, circuits.first->begin_pins (), circuits.first->end_pins (), none, none, m_pin_by_circuit_and_index, Unsorted ()), std::make_pair (db::NetlistCrossReference::None, std::string ()));
 }
 
-std::pair<IndexedNetlistModel::subcircuit_pair, std::pair<IndexedNetlistModel::Status, std::string> > SingleIndexedNetlistModel::subcircuit_from_index (const circuit_pair &circuits, size_t index) const
+std::pair<IndexedNetlistModel::subcircuit_pair, std::pair<IndexedNetlistModel::Status, std::string>> SingleIndexedNetlistModel::subcircuit_from_index (const circuit_pair &circuits, size_t index) const
 {
   db::Circuit::const_subcircuit_iterator none;
   return std::make_pair (attr_by_object_and_index (std::make_pair (circuits.first, (const db::Circuit *) 0), index, circuits.first->begin_subcircuits (), circuits.first->end_subcircuits (), none, none, m_subcircuit_by_circuit_and_index, sort_by_expanded_name<db::SubCircuit> ()), std::make_pair (db::NetlistCrossReference::None, std::string ()));

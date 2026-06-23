@@ -34,7 +34,7 @@ namespace rdb
 {
 
 class InfoWidget
-  : public QTextBrowser 
+  : public QTextBrowser
 {
 public:
   InfoWidget (QWidget *parent);
@@ -52,4 +52,4 @@ private:
 
 #endif
 
-#endif  //  defined(HAVE_QT)
+#endif //  defined(HAVE_QT)

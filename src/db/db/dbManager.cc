@@ -35,7 +35,7 @@ namespace db
 
 Manager::Manager (bool enabled)
   : m_transactions (),
-    m_current (m_transactions.begin ()), 
+    m_current (m_transactions.begin ()),
     m_opened (false), m_replay (false),
     m_enabled (enabled)
 {
@@ -46,8 +46,7 @@ Manager::~Manager ()
 {
   clear ();
 
-  for (std::vector<db::Object *>::const_iterator obj = m_id_table.begin (); obj != m_id_table.end (); ++obj)
-  {
+  for (std::vector<db::Object *>::const_iterator obj = m_id_table.begin (); obj != m_id_table.end (); ++obj) {
     if (*obj) {
       (*obj)->manager (0);
     }
@@ -67,14 +66,13 @@ Manager::object_by_id (ident_t id)
   }
 }
 
-void 
-Manager::release_object (ident_t id)
+void Manager::release_object (ident_t id)
 {
   m_id_table [id] = 0;
   m_unused_ids.push_back (id);
 }
 
-Manager::ident_t 
+Manager::ident_t
 Manager::next_id (db::Object *obj)
 {
   if (m_unused_ids.size () > 0) {
@@ -88,8 +86,7 @@ Manager::next_id (db::Object *obj)
   }
 }
 
-void
-Manager::clear ()
+void Manager::clear ()
 {
   tl_assert (! m_replay);
   m_opened = false;
@@ -97,8 +94,7 @@ Manager::clear ()
   m_current = m_transactions.begin ();
 }
 
-void
-Manager::erase_transactions (transactions_t::iterator from, transactions_t::iterator to)
+void Manager::erase_transactions (transactions_t::iterator from, transactions_t::iterator to)
 {
   for (transactions_t::iterator i = from; i != to; ++i) {
     for (operations_t::iterator o = i->first.begin (); o != i->first.end (); ++o) {
@@ -108,7 +104,7 @@ Manager::erase_transactions (transactions_t::iterator from, transactions_t::iter
   m_transactions.erase (from, to);
 }
 
-Manager::transaction_id_t 
+Manager::transaction_id_t
 Manager::transaction (const std::string &description, transaction_id_t join_with)
 {
   if (m_enabled) {
@@ -121,7 +117,7 @@ Manager::transaction (const std::string &description, transaction_id_t join_with
 
     tl_assert (! m_replay);
 
-    if (! m_transactions.empty () && reinterpret_cast<transaction_id_t> (& m_transactions.back ()) == join_with) {
+    if (! m_transactions.empty () && reinterpret_cast<transaction_id_t> (&m_transactions.back ()) == join_with) {
       if (! description.empty ()) {
         m_transactions.back ().second = description;
       }
@@ -133,17 +129,16 @@ Manager::transaction (const std::string &description, transaction_id_t join_with
     m_current = m_transactions.end ();
     --m_current;
     m_opened = true;
-  
   }
 
-  size_t id = m_transactions.empty () ? 0 : reinterpret_cast<transaction_id_t> (& m_transactions.back ());
+  size_t id = m_transactions.empty () ? 0 : reinterpret_cast<transaction_id_t> (&m_transactions.back ());
   return id;
 }
 
-Manager::transaction_id_t 
+Manager::transaction_id_t
 Manager::last_transaction_id () const
 {
-  return m_transactions.empty () ? 0 : reinterpret_cast<transaction_id_t> (& m_transactions.back ());
+  return m_transactions.empty () ? 0 : reinterpret_cast<transaction_id_t> (&m_transactions.back ());
 }
 
 Manager::transaction_id_t
@@ -154,7 +149,7 @@ Manager::transaction_id_for_undo () const
     return 0;
   } else {
     --c;
-    return reinterpret_cast<transaction_id_t> (c.operator-> ());
+    return reinterpret_cast<transaction_id_t> (c.operator->());
   }
 }
 
@@ -164,12 +159,11 @@ Manager::transaction_id_for_redo () const
   if (m_current == m_transactions.end ()) {
     return 0;
   } else {
-    return reinterpret_cast<transaction_id_t> (m_current.operator-> ());
+    return reinterpret_cast<transaction_id_t> (m_current.operator->());
   }
 }
 
-void
-Manager::cancel ()
+void Manager::cancel ()
 {
   //  equivalent to commit and undo. But takes care that an empty commit is not followed by undo
   //  (which would undo the previous transaction!)
@@ -187,12 +181,10 @@ Manager::cancel ()
     //  wipe following history as we don't want the cancelled operation to be redoable
     erase_transactions (m_current, m_transactions.end ());
     m_current = m_transactions.end ();
-
   }
 }
 
-void 
-Manager::commit ()
+void Manager::commit ()
 {
   if (m_enabled) {
 
@@ -207,12 +199,10 @@ Manager::commit ()
       erase_transactions (m_current, m_transactions.end ());
       m_current = m_transactions.end ();
     }
-
   }
 }
 
-void 
-Manager::undo ()
+void Manager::undo ()
 {
   //  anything to undo?
   if (m_current == m_transactions.begin ()) {
@@ -238,7 +228,6 @@ Manager::undo ()
       o->second->set_done (false);
 
       ++progress;
-
     }
 
     m_replay = false;
@@ -249,8 +238,7 @@ Manager::undo ()
   }
 }
 
-void 
-Manager::redo ()
+void Manager::redo ()
 {
   //  anything to redo?
   if (m_current == m_transactions.end ()) {
@@ -274,7 +262,6 @@ Manager::redo ()
       o->second->set_done (true);
 
       ++progress;
-
     }
     ++m_current;
     m_replay = false;
@@ -297,7 +284,7 @@ Manager::available_undo () const
   }
 }
 
-std::pair<bool, std::string> 
+std::pair<bool, std::string>
 Manager::available_redo () const
 {
   if (m_opened || m_current == m_transactions.end ()) {
@@ -307,8 +294,7 @@ Manager::available_redo () const
   }
 }
 
-int
-Manager::available_undo_items ()
+int Manager::available_undo_items ()
 {
   if (m_opened) {
     return 0;
@@ -321,8 +307,7 @@ Manager::available_undo_items ()
   return n;
 }
 
-int
-Manager::available_redo_items ()
+int Manager::available_redo_items ()
 {
   if (m_opened) {
     return 0;
@@ -367,13 +352,12 @@ Manager::undo_or_redo_item (int delta) const
     } else {
       return i->second;
     }
-
   }
 }
 
 
 db::Op *
-Manager::last_queued (db::Object *object) 
+Manager::last_queued (db::Object *object)
 {
   tl_assert (m_opened);
   tl_assert (! m_replay);
@@ -385,8 +369,7 @@ Manager::last_queued (db::Object *object)
   }
 }
 
-void 
-Manager::queue (db::Object *object, db::Op *op)
+void Manager::queue (db::Object *object, db::Op *op)
 {
   tl_assert (! m_replay);
 
@@ -402,10 +385,8 @@ Manager::queue (db::Object *object, db::Op *op)
     }
 
     m_current->first.push_back (std::make_pair (object->id (), op));
-
   }
 }
 
 
 } // namespace db
-

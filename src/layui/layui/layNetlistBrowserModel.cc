@@ -34,7 +34,7 @@
 #include <QTreeView>
 #include <QUrl>
 #if QT_VERSION >= 0x050000
-#  include <QUrlQuery>
+#include <QUrlQuery>
 #endif
 
 namespace lay
@@ -149,8 +149,7 @@ translate_net (const db::Net *&a, const db::NetlistCrossReference &xref)
   return true;
 }
 
-bool
-NetlistObjectsPath::translate (NetlistObjectsPath &p, const db::NetlistCrossReference &xref)
+bool NetlistObjectsPath::translate (NetlistObjectsPath &p, const db::NetlistCrossReference &xref)
 {
   if (! translate_circuit (p.root.first, xref) || ! translate_circuit (p.root.second, xref)) {
     return false;
@@ -233,8 +232,7 @@ static std::string str_from_names (const std::pair<const Obj *, const Obj *> &ob
   return s;
 }
 
-static
-std::string formatted_value (double v)
+static std::string formatted_value (double v)
 {
   double va = fabs (v);
   if (va < 1e-20) {
@@ -262,8 +260,7 @@ std::string formatted_value (double v)
   }
 }
 
-static
-std::string device_parameter_string (const db::Device *device)
+static std::string device_parameter_string (const db::Device *device)
 {
   std::string s;
   if (! device || ! device->device_class ()) {
@@ -317,8 +314,7 @@ std::string device_parameter_string (const db::Device *device)
   return s + term;
 }
 
-static
-std::string device_string (const db::Device *device)
+static std::string device_string (const db::Device *device)
 {
   if (! device || ! device->device_class ()) {
     return std::string ();
@@ -327,8 +323,7 @@ std::string device_string (const db::Device *device)
   return device->device_class ()->name () + device_parameter_string (device);
 }
 
-static
-std::string device_class_string (const db::Device *device, bool dash_for_empty = false)
+static std::string device_class_string (const db::Device *device, bool dash_for_empty = false)
 {
   std::string s;
   if (device && device->device_class ()) {
@@ -339,8 +334,7 @@ std::string device_class_string (const db::Device *device, bool dash_for_empty =
   return s;
 }
 
-static
-std::string devices_string (const std::pair<const db::Device *, const db::Device *> &devices, bool is_single, bool with_parameters)
+static std::string devices_string (const std::pair<const db::Device *, const db::Device *> &devices, bool is_single, bool with_parameters)
 {
   if (devices.first || devices.second) {
 
@@ -367,8 +361,7 @@ std::string devices_string (const std::pair<const db::Device *, const db::Device
   }
 }
 
-static
-IndexedNetlistModel::circuit_pair circuit_refs_from_subcircuits (const IndexedNetlistModel::subcircuit_pair &subcircuits)
+static IndexedNetlistModel::circuit_pair circuit_refs_from_subcircuits (const IndexedNetlistModel::subcircuit_pair &subcircuits)
 {
   const db::Circuit *circuit1 = 0, *circuit2 = 0;
   if (subcircuits.first) {
@@ -380,8 +373,7 @@ IndexedNetlistModel::circuit_pair circuit_refs_from_subcircuits (const IndexedNe
   return std::make_pair (circuit1, circuit2);
 }
 
-static
-IndexedNetlistModel::subcircuit_pair subcircuits_from_pinrefs (const IndexedNetlistModel::net_subcircuit_pin_pair &pinrefs)
+static IndexedNetlistModel::subcircuit_pair subcircuits_from_pinrefs (const IndexedNetlistModel::net_subcircuit_pin_pair &pinrefs)
 {
   const db::SubCircuit *subcircuit1 = 0, *subcircuit2 = 0;
   if (pinrefs.first) {
@@ -394,8 +386,7 @@ IndexedNetlistModel::subcircuit_pair subcircuits_from_pinrefs (const IndexedNetl
   return std::make_pair (subcircuit1, subcircuit2);
 }
 
-static
-IndexedNetlistModel::net_pair nets_from_pinrefs (const IndexedNetlistModel::net_subcircuit_pin_pair &pinrefs)
+static IndexedNetlistModel::net_pair nets_from_pinrefs (const IndexedNetlistModel::net_subcircuit_pin_pair &pinrefs)
 {
   const db::Net *net1 = 0, *net2 = 0;
   if (pinrefs.first) {
@@ -408,8 +399,7 @@ IndexedNetlistModel::net_pair nets_from_pinrefs (const IndexedNetlistModel::net_
   return std::make_pair (net1, net2);
 }
 
-static
-IndexedNetlistModel::device_pair devices_from_termrefs (const IndexedNetlistModel::net_terminal_pair &termrefs)
+static IndexedNetlistModel::device_pair devices_from_termrefs (const IndexedNetlistModel::net_terminal_pair &termrefs)
 {
   const db::Device *device1 = 0, *device2 = 0;
   if (termrefs.first) {
@@ -422,8 +412,7 @@ IndexedNetlistModel::device_pair devices_from_termrefs (const IndexedNetlistMode
   return std::make_pair (device1, device2);
 }
 
-static
-IndexedNetlistModel::pin_pair pins_from_pinrefs (const IndexedNetlistModel::net_subcircuit_pin_pair &pinrefs)
+static IndexedNetlistModel::pin_pair pins_from_pinrefs (const IndexedNetlistModel::net_subcircuit_pin_pair &pinrefs)
 {
   const db::Pin *pin1 = 0, *pin2 = 0;
   if (pinrefs.first) {
@@ -436,8 +425,7 @@ IndexedNetlistModel::pin_pair pins_from_pinrefs (const IndexedNetlistModel::net_
   return std::make_pair (pin1, pin2);
 }
 
-static
-IndexedNetlistModel::pin_pair pins_from_pinrefs (const IndexedNetlistModel::net_pin_pair &pinrefs)
+static IndexedNetlistModel::pin_pair pins_from_pinrefs (const IndexedNetlistModel::net_pin_pair &pinrefs)
 {
   const db::Pin *pin1 = 0, *pin2 = 0;
   if (pinrefs.first) {
@@ -450,8 +438,7 @@ IndexedNetlistModel::pin_pair pins_from_pinrefs (const IndexedNetlistModel::net_
   return std::make_pair (pin1, pin2);
 }
 
-static
-IndexedNetlistModel::pin_pair pins_from_netrefs (const IndexedNetlistModel::net_subcircuit_pin_pair &netrefs)
+static IndexedNetlistModel::pin_pair pins_from_netrefs (const IndexedNetlistModel::net_subcircuit_pin_pair &netrefs)
 {
   const db::Pin *pin1 = 0, *pin2 = 0;
   if (netrefs.first) {
@@ -464,8 +451,7 @@ IndexedNetlistModel::pin_pair pins_from_netrefs (const IndexedNetlistModel::net_
   return std::make_pair (pin1, pin2);
 }
 
-static
-IndexedNetlistModel::net_pair nets_from_circuit_pins (const IndexedNetlistModel::circuit_pair &circuits, const IndexedNetlistModel::pin_pair &pins)
+static IndexedNetlistModel::net_pair nets_from_circuit_pins (const IndexedNetlistModel::circuit_pair &circuits, const IndexedNetlistModel::pin_pair &pins)
 {
   const db::Net *net1 = 0, *net2 = 0;
   if (pins.first && circuits.first) {
@@ -488,11 +474,11 @@ static std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalD
   return std::make_pair (termrefs.first ? termrefs.first->terminal_def () : 0, termrefs.second ? termrefs.second->terminal_def () : 0);
 }
 
-static std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> > terminal_defs_from_device_classes (IndexedNetlistModel *model, const std::pair<const db::DeviceClass *, const db::DeviceClass *> &device_classes, const std::pair<const db::Device *, const db::Device *> &devices)
+static std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *>> terminal_defs_from_device_classes (IndexedNetlistModel *model, const std::pair<const db::DeviceClass *, const db::DeviceClass *> &device_classes, const std::pair<const db::Device *, const db::Device *> &devices)
 {
-  std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> > result;
+  std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *>> result;
 
-  std::map<size_t, std::pair<std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> >, std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> > > > nets;
+  std::map<size_t, std::pair<std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *>>, std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *>>>> nets;
 
   size_t n1 = 0;
   if (device_classes.first) {
@@ -519,34 +505,33 @@ static std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Dev
       size_t id_norm = device_classes.first->normalize_terminal_id (id);
       nets [id_norm].first.push_back (std::make_pair (&td, devices.first->net_for_terminal (id)));
     }
-
   }
 
-  for (std::map<size_t, std::pair<std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> >, std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> > > >::iterator n = nets.begin (); n != nets.end (); ++n) {
+  for (std::map<size_t, std::pair<std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *>>, std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *>>>>::iterator n = nets.begin (); n != nets.end (); ++n) {
 
-    std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> > &nn1 = n->second.first;
-    std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> > &nn2 = n->second.second;
+    std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *>> &nn1 = n->second.first;
+    std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *>> &nn2 = n->second.second;
 
     if (nn2.empty ()) {
 
-      for (std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> >::const_iterator i = nn1.begin (); i != nn1.end (); ++i) {
+      for (std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *>>::const_iterator i = nn1.begin (); i != nn1.end (); ++i) {
         result.push_back (std::make_pair (i->first, (const db::DeviceTerminalDefinition *) 0));
       }
 
     } else if (nn1.empty ()) {
 
-      for (std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> >::const_iterator j = nn2.begin (); j != nn2.end (); ++j) {
+      for (std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *>>::const_iterator j = nn2.begin (); j != nn2.end (); ++j) {
         result.push_back (std::make_pair ((const db::DeviceTerminalDefinition *) 0, j->first));
       }
 
     } else {
 
-      std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> >::iterator w = nn1.begin ();
-      for (std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> >::const_iterator i = nn1.begin (); i != nn1.end (); ++i) {
+      std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *>>::iterator w = nn1.begin ();
+      for (std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *>>::const_iterator i = nn1.begin (); i != nn1.end (); ++i) {
 
         bool found = false;
 
-        for (std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> >::iterator j = nn2.begin (); j != nn2.end () && ! found; ++j) {
+        for (std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *>>::iterator j = nn2.begin (); j != nn2.end () && ! found; ++j) {
           const db::Net *n2 = model->second_net_for (i->second);
           if (n2 == j->second) {
             result.push_back (std::make_pair (i->first, j->first));
@@ -559,7 +544,6 @@ static std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Dev
         if (! found) {
           *w++ = *i;
         }
-
       }
 
       nn1.erase (w, nn1.end ());
@@ -567,16 +551,13 @@ static std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Dev
       for (size_t i = 0; i < nn1.size () && i < nn2.size (); ++i) {
         result.push_back (std::make_pair (nn1 [i].first, nn2 [i].first));
       }
-
     }
-
   }
 
   return result;
 }
 
-static
-IndexedNetlistModel::net_pair nets_from_device_terminals (const IndexedNetlistModel::device_pair &devices, const std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> &termdefs)
+static IndexedNetlistModel::net_pair nets_from_device_terminals (const IndexedNetlistModel::device_pair &devices, const std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> &termdefs)
 {
   const db::Net *net1 = 0, *net2 = 0;
   if (termdefs.first && devices.first) {
@@ -676,9 +657,9 @@ static QIcon icon_for_device (const db::DeviceClass *dc, size_t term_id = 0)
   static QIcon icon_for_res;
   static QIcon icon_for_ind;
   static QIcon icon_for_cap;
-  static QIcon icons_for_diode[2];
-  static QIcon icons_for_bjt[4];
-  static QIcon icons_for_mos[4];
+  static QIcon icons_for_diode [2];
+  static QIcon icons_for_bjt [4];
+  static QIcon icons_for_mos [4];
 
   if (icon_for_res.isNull ()) {
     icon_for_res.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_48.png")));
@@ -699,45 +680,45 @@ static QIcon icon_for_device (const db::DeviceClass *dc, size_t term_id = 0)
     icon_for_cap.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_cap_24.png")));
     icon_for_cap.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_cap_16.png")));
   }
-  if (icons_for_diode[0].isNull ()) {
+  if (icons_for_diode [0].isNull ()) {
     QImage i48 (QString::fromUtf8 (":/images/icon_device_diode_48.png"));
     QImage i32 (QString::fromUtf8 (":/images/icon_device_diode_32.png"));
     QImage i24 (QString::fromUtf8 (":/images/icon_device_diode_24.png"));
     QImage i16 (QString::fromUtf8 (":/images/icon_device_diode_16.png"));
     QTransform tr;
     for (size_t i = 0; i < sizeof (icons_for_diode) / sizeof (icons_for_diode [0]); ++i) {
-      icons_for_diode[i].addPixmap (QPixmap::fromImage (i48.transformed (tr)));
-      icons_for_diode[i].addPixmap (QPixmap::fromImage (i32.transformed (tr)));
-      icons_for_diode[i].addPixmap (QPixmap::fromImage (i24.transformed (tr)));
-      icons_for_diode[i].addPixmap (QPixmap::fromImage (i16.transformed (tr)));
+      icons_for_diode [i].addPixmap (QPixmap::fromImage (i48.transformed (tr)));
+      icons_for_diode [i].addPixmap (QPixmap::fromImage (i32.transformed (tr)));
+      icons_for_diode [i].addPixmap (QPixmap::fromImage (i24.transformed (tr)));
+      icons_for_diode [i].addPixmap (QPixmap::fromImage (i16.transformed (tr)));
       tr.rotate (180.0);
     }
   }
-  if (icons_for_bjt[0].isNull ()) {
+  if (icons_for_bjt [0].isNull ()) {
     QImage i48 (QString::fromUtf8 (":/images/icon_device_bjt_48.png"));
     QImage i32 (QString::fromUtf8 (":/images/icon_device_bjt_32.png"));
     QImage i24 (QString::fromUtf8 (":/images/icon_device_bjt_24.png"));
     QImage i16 (QString::fromUtf8 (":/images/icon_device_bjt_16.png"));
     QTransform tr;
     for (size_t i = 0; i < sizeof (icons_for_bjt) / sizeof (icons_for_bjt [0]); ++i) {
-      icons_for_bjt[i].addPixmap (QPixmap::fromImage (i48.transformed (tr)));
-      icons_for_bjt[i].addPixmap (QPixmap::fromImage (i32.transformed (tr)));
-      icons_for_bjt[i].addPixmap (QPixmap::fromImage (i24.transformed (tr)));
-      icons_for_bjt[i].addPixmap (QPixmap::fromImage (i16.transformed (tr)));
+      icons_for_bjt [i].addPixmap (QPixmap::fromImage (i48.transformed (tr)));
+      icons_for_bjt [i].addPixmap (QPixmap::fromImage (i32.transformed (tr)));
+      icons_for_bjt [i].addPixmap (QPixmap::fromImage (i24.transformed (tr)));
+      icons_for_bjt [i].addPixmap (QPixmap::fromImage (i16.transformed (tr)));
       tr.rotate (90.0);
     }
   }
-  if (icons_for_mos[0].isNull ()) {
+  if (icons_for_mos [0].isNull ()) {
     QImage i48 (QString::fromUtf8 (":/images/icon_device_mos_48.png"));
     QImage i32 (QString::fromUtf8 (":/images/icon_device_mos_32.png"));
     QImage i24 (QString::fromUtf8 (":/images/icon_device_mos_24.png"));
     QImage i16 (QString::fromUtf8 (":/images/icon_device_mos_16.png"));
     QTransform tr;
     for (size_t i = 0; i < sizeof (icons_for_mos) / sizeof (icons_for_mos [0]); ++i) {
-      icons_for_mos[i].addPixmap (QPixmap::fromImage (i48.transformed (tr)));
-      icons_for_mos[i].addPixmap (QPixmap::fromImage (i32.transformed (tr)));
-      icons_for_mos[i].addPixmap (QPixmap::fromImage (i24.transformed (tr)));
-      icons_for_mos[i].addPixmap (QPixmap::fromImage (i16.transformed (tr)));
+      icons_for_mos [i].addPixmap (QPixmap::fromImage (i48.transformed (tr)));
+      icons_for_mos [i].addPixmap (QPixmap::fromImage (i32.transformed (tr)));
+      icons_for_mos [i].addPixmap (QPixmap::fromImage (i24.transformed (tr)));
+      icons_for_mos [i].addPixmap (QPixmap::fromImage (i16.transformed (tr)));
       tr.rotate (90.0);
     }
   }
@@ -821,11 +802,9 @@ static QIcon colored_icon (const tl::Color &color, const QIcon &original_icon)
           image.setPixel (x, y, pixel);
         }
       }
-
     }
 
     colored_icon.addPixmap (QPixmap::fromImage (image));
-
   }
 
   return colored_icon;
@@ -946,7 +925,10 @@ class CircuitItemNodeData
   : public NetlistModelItemData
 {
 public:
-  enum type { Nets, Devices, Pins, SubCircuits };
+  enum type { Nets,
+              Devices,
+              Pins,
+              SubCircuits };
 
   CircuitItemNodeData (NetlistModelItemData *parent, type t);
 
@@ -1294,17 +1276,19 @@ private:
 
 NetlistModelItemData::NetlistModelItemData ()
   : mp_parent (0), m_children_made (false), m_index (0)
-{ }
+{
+}
 
 NetlistModelItemData::NetlistModelItemData (NetlistModelItemData *parent)
   : mp_parent (parent), m_children_made (false), m_index (0)
-{ }
+{
+}
 
 NetlistModelItemData::~NetlistModelItemData ()
-{ }
+{
+}
 
-void
-NetlistModelItemData::ensure_children (NetlistBrowserModel *model)
+void NetlistModelItemData::ensure_children (NetlistBrowserModel *model)
 {
   if (! m_children_made) {
 
@@ -1321,17 +1305,15 @@ NetlistModelItemData::ensure_children (NetlistBrowserModel *model)
 
     size_t index = 0;
     for (iterator i = begin (); i != end (); ++i) {
-      m_children_per_index.push_back (i.operator-> ());
+      m_children_per_index.push_back (i.operator->());
       i->set_index (index++);
     }
 
     m_children_made = true;
-
   }
 }
 
-void
-NetlistModelItemData::push_back (NetlistModelItemData *child)
+void NetlistModelItemData::push_back (NetlistModelItemData *child)
 {
   m_children.push_back (child);
 }
@@ -1359,8 +1341,7 @@ NetlistModelItemData::circuits ()
   }
 }
 
-bool
-NetlistModelItemData::derived_from_circuits (const std::pair<const db::Circuit *, const db::Circuit *> &cp)
+bool NetlistModelItemData::derived_from_circuits (const std::pair<const db::Circuit *, const db::Circuit *> &cp)
 {
   if (! cp.first && ! cp.second) {
     return false;
@@ -1390,8 +1371,7 @@ NetlistModelItemData::devices ()
   }
 }
 
-bool
-NetlistModelItemData::derived_from_devices (const std::pair<const db::Device *, const db::Device *> &sp)
+bool NetlistModelItemData::derived_from_devices (const std::pair<const db::Device *, const db::Device *> &sp)
 {
   if (! sp.first && ! sp.second) {
     return false;
@@ -1421,8 +1401,7 @@ NetlistModelItemData::pins ()
   }
 }
 
-bool
-NetlistModelItemData::derived_from_pins (const std::pair<const db::Pin *, const db::Pin *> &sp)
+bool NetlistModelItemData::derived_from_pins (const std::pair<const db::Pin *, const db::Pin *> &sp)
 {
   if (! sp.first && ! sp.second) {
     return false;
@@ -1452,8 +1431,7 @@ NetlistModelItemData::subcircuits ()
   }
 }
 
-bool
-NetlistModelItemData::derived_from_subcircuits (const std::pair<const db::SubCircuit *, const db::SubCircuit *> &sp)
+bool NetlistModelItemData::derived_from_subcircuits (const std::pair<const db::SubCircuit *, const db::SubCircuit *> &sp)
 {
   if (! sp.first && ! sp.second) {
     return false;
@@ -1483,8 +1461,7 @@ NetlistModelItemData::nets ()
   }
 }
 
-bool
-NetlistModelItemData::derived_from_nets (const std::pair<const db::Net *, const db::Net *> &np)
+bool NetlistModelItemData::derived_from_nets (const std::pair<const db::Net *, const db::Net *> &np)
 {
   if (! np.first && ! np.second) {
     return false;
@@ -1504,8 +1481,7 @@ RootItemData::RootItemData ()
   //  .. nothing yet ..
 }
 
-void
-RootItemData::do_ensure_children (NetlistBrowserModel *model)
+void RootItemData::do_ensure_children (NetlistBrowserModel *model)
 {
   size_t n = model->indexer ()->circuit_count ();
   for (size_t i = 0; i < n; ++i) {
@@ -1513,8 +1489,7 @@ RootItemData::do_ensure_children (NetlistBrowserModel *model)
   }
 }
 
-QIcon
-RootItemData::icon (NetlistBrowserModel * /*model*/)
+QIcon RootItemData::icon (NetlistBrowserModel * /*model*/)
 {
   return QIcon ();
 }
@@ -1559,10 +1534,10 @@ RootItemData::circuit_item (NetlistBrowserModel *model, const IndexedNetlistMode
 
 CircuitItemData::CircuitItemData (NetlistModelItemData *parent, const IndexedNetlistModel::circuit_pair &cp)
   : NetlistModelItemData (parent), m_cp (cp)
-{ }
+{
+}
 
-void
-CircuitItemData::do_ensure_children (NetlistBrowserModel *model)
+void CircuitItemData::do_ensure_children (NetlistBrowserModel *model)
 {
   if (model->indexer ()->pin_count (circuits ()) > 0) {
     push_back (new CircuitItemNodeData (this, CircuitItemNodeData::Pins));
@@ -1578,8 +1553,7 @@ CircuitItemData::do_ensure_children (NetlistBrowserModel *model)
   }
 }
 
-bool
-CircuitItemData::has_children (NetlistBrowserModel *model)
+bool CircuitItemData::has_children (NetlistBrowserModel *model)
 {
   if (model->indexer ()->pin_count (circuits ()) > 0) {
     return true;
@@ -1597,8 +1571,7 @@ CircuitItemData::has_children (NetlistBrowserModel *model)
 }
 
 
-QIcon
-CircuitItemData::icon (NetlistBrowserModel * /*model*/)
+QIcon CircuitItemData::icon (NetlistBrowserModel * /*model*/)
 {
   return icon_for_circuit ();
 }
@@ -1611,7 +1584,7 @@ CircuitItemData::text (int column, NetlistBrowserModel *model)
   //  + dual mode:       name(a)/name(b)   | name(a)  | name(b)
   if (column == model->object_column ()) {
     return escaped (str_from_names (m_cp, model->indexer ()->is_single ()));
-  } else if (!model->indexer ()->is_single () && (column == model->first_column () || column == model->second_column ())) {
+  } else if (! model->indexer ()->is_single () && (column == model->first_column () || column == model->second_column ())) {
     return escaped (str_from_name (column == model->first_column () ? m_cp.first : m_cp.second));
   } else {
     return QString ();
@@ -1684,7 +1657,8 @@ CircuitItemData::circuit_subcircuit_item (NetlistBrowserModel *model, const Inde
 
 CircuitItemForSubCircuitData::CircuitItemForSubCircuitData (NetlistModelItemData *parent, const IndexedNetlistModel::subcircuit_pair &sp)
   : CircuitItemData (parent, circuit_refs_from_subcircuits (sp)), m_sp (sp)
-{ }
+{
+}
 
 QString
 CircuitItemForSubCircuitData::text (int column, NetlistBrowserModel *model)
@@ -1718,17 +1692,16 @@ CircuitItemForSubCircuitData::status (NetlistBrowserModel * /*model*/)
 
 CircuitItemNodeData::CircuitItemNodeData (NetlistModelItemData *parent, CircuitItemNodeData::type t)
   : NetlistModelItemData (parent), m_type (t)
-{ }
+{
+}
 
-bool
-CircuitItemNodeData::has_children (NetlistBrowserModel *)
+bool CircuitItemNodeData::has_children (NetlistBrowserModel *)
 {
   //  the node only exists if it has children
   return true;
 }
 
-void
-CircuitItemNodeData::do_ensure_children (NetlistBrowserModel *model)
+void CircuitItemNodeData::do_ensure_children (NetlistBrowserModel *model)
 {
   size_t n;
 
@@ -1759,12 +1732,10 @@ CircuitItemNodeData::do_ensure_children (NetlistBrowserModel *model)
     for (size_t i = 0; i < n; ++i) {
       push_back (new CircuitDeviceItemData (this, model->indexer ()->device_from_index (circuits (), i).first));
     }
-
   }
 }
 
-QIcon
-CircuitItemNodeData::icon (NetlistBrowserModel * /*model*/)
+QIcon CircuitItemNodeData::icon (NetlistBrowserModel * /*model*/)
 {
   if (m_type == Pins) {
     return icon_for_pin ();
@@ -1877,8 +1848,7 @@ CircuitPinItemData::CircuitPinItemData (NetlistModelItemData *parent, const Inde
   //  .. nothing yet ..
 }
 
-QIcon
-CircuitPinItemData::icon (NetlistBrowserModel * /*model*/)
+QIcon CircuitPinItemData::icon (NetlistBrowserModel * /*model*/)
 {
   return icon_for_pin ();
 }
@@ -1907,10 +1877,10 @@ CircuitPinItemData::search_text ()
 
 CircuitNetItemData::CircuitNetItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_pair &np)
   : NetlistModelItemData (parent), m_np (np), m_seen (parent && parent->derived_from_nets (np))
-{ }
+{
+}
 
-void
-CircuitNetItemData::do_ensure_children (NetlistBrowserModel *model)
+void CircuitNetItemData::do_ensure_children (NetlistBrowserModel *model)
 {
   //  no subnodes if already seen
   if (m_seen) {
@@ -1935,8 +1905,7 @@ CircuitNetItemData::do_ensure_children (NetlistBrowserModel *model)
   }
 }
 
-QIcon
-CircuitNetItemData::icon (NetlistBrowserModel *model)
+QIcon CircuitNetItemData::icon (NetlistBrowserModel *model)
 {
   return model->icon_for_nets (m_np);
 }
@@ -2000,10 +1969,10 @@ CircuitNetItemData::status (NetlistBrowserModel *model)
 
 CircuitNetDeviceTerminalItemData::CircuitNetDeviceTerminalItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_terminal_pair &tp)
   : NetlistModelItemData (parent), m_tp (tp), m_device_seen (parent && parent->derived_from_devices (dp ()))
-{ }
+{
+}
 
-void
-CircuitNetDeviceTerminalItemData::do_ensure_children (NetlistBrowserModel *model)
+void CircuitNetDeviceTerminalItemData::do_ensure_children (NetlistBrowserModel *model)
 {
   if (m_device_seen) {
     return;
@@ -2012,16 +1981,15 @@ CircuitNetDeviceTerminalItemData::do_ensure_children (NetlistBrowserModel *model
   std::pair<const db::Device *, const db::Device *> devices = dp ();
   std::pair<const db::DeviceClass *, const db::DeviceClass *> device_classes = device_classes_from_devices (devices);
 
-  std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> > tp = terminal_defs_from_device_classes (model->indexer (), device_classes, devices);
+  std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *>> tp = terminal_defs_from_device_classes (model->indexer (), device_classes, devices);
 
-  for (std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> >::const_iterator i = tp.begin (); i != tp.end (); ++i) {
+  for (std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *>>::const_iterator i = tp.begin (); i != tp.end (); ++i) {
     IndexedNetlistModel::net_pair nets = nets_from_device_terminals (dp (), *i);
     push_back (new CircuitNetDeviceTerminalOthersItemData (this, nets, *i));
   }
 }
 
-QIcon
-CircuitNetDeviceTerminalItemData::icon (NetlistBrowserModel * /*model*/)
+QIcon CircuitNetDeviceTerminalItemData::icon (NetlistBrowserModel * /*model*/)
 {
   std::pair<const db::DeviceClass *, const db::DeviceClass *> device_classes = device_classes_from_devices (dp ());
   return icon_for_devices (device_classes, terminal_defs_from_terminal_refs (m_tp));
@@ -2077,10 +2045,10 @@ CircuitNetDeviceTerminalItemData::status (NetlistBrowserModel *model)
 
 CircuitNetDeviceTerminalOthersItemData::CircuitNetDeviceTerminalOthersItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_pair &np, const std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> &tp)
   : CircuitNetItemData (parent, nets_from_device_terminals (parent->devices (), tp)), m_tp (tp), m_np (np)
-{ }
+{
+}
 
-QIcon
-CircuitNetDeviceTerminalOthersItemData::icon (NetlistBrowserModel *model)
+QIcon CircuitNetDeviceTerminalOthersItemData::icon (NetlistBrowserModel *model)
 {
   return model->icon_for_connection (nets_from_device_terminals (devices (), m_tp));
 }
@@ -2106,10 +2074,10 @@ CircuitNetDeviceTerminalOthersItemData::search_text ()
 
 CircuitNetSubCircuitPinItemData::CircuitNetSubCircuitPinItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_subcircuit_pin_pair &sp)
   : NetlistModelItemData (parent), m_sp (sp), m_subcircuit_seen (parent && parent->derived_from_subcircuits (subcircuits_from_pinrefs (sp)))
-{ }
+{
+}
 
-void
-CircuitNetSubCircuitPinItemData::do_ensure_children (NetlistBrowserModel *model)
+void CircuitNetSubCircuitPinItemData::do_ensure_children (NetlistBrowserModel *model)
 {
   if (m_subcircuit_seen) {
     return;
@@ -2126,8 +2094,7 @@ CircuitNetSubCircuitPinItemData::do_ensure_children (NetlistBrowserModel *model)
   push_back (new CircuitNetItemData (this, nets));
 }
 
-QIcon
-CircuitNetSubCircuitPinItemData::icon (NetlistBrowserModel * /*model*/)
+QIcon CircuitNetSubCircuitPinItemData::icon (NetlistBrowserModel * /*model*/)
 {
   return icon_for_subcircuit ();
 }
@@ -2174,16 +2141,15 @@ CircuitNetSubCircuitPinItemData::status (NetlistBrowserModel *model)
 
 CircuitNetPinItemData::CircuitNetPinItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_pin_pair &pp)
   : NetlistModelItemData (parent), m_pp (pp)
-{ }
+{
+}
 
-void
-CircuitNetPinItemData::do_ensure_children (NetlistBrowserModel *)
+void CircuitNetPinItemData::do_ensure_children (NetlistBrowserModel *)
 {
   //  nothing (leaf node)
 }
 
-QIcon
-CircuitNetPinItemData::icon (NetlistBrowserModel * /*model*/)
+QIcon CircuitNetPinItemData::icon (NetlistBrowserModel * /*model*/)
 {
   return icon_for_pin ();
 }
@@ -2224,16 +2190,15 @@ CircuitNetPinItemData::status (NetlistBrowserModel * /*model*/)
 
 CircuitSubCircuitPinsItemData::CircuitSubCircuitPinsItemData (NetlistModelItemData *parent, const IndexedNetlistModel::subcircuit_pair &sp)
   : NetlistModelItemData (parent), m_sp (sp)
-{ }
+{
+}
 
-bool
-CircuitSubCircuitPinsItemData::has_children (NetlistBrowserModel *model)
+bool CircuitSubCircuitPinsItemData::has_children (NetlistBrowserModel *model)
 {
   return model->indexer ()->subcircuit_pin_count (sp ()) > 0;
 }
 
-void
-CircuitSubCircuitPinsItemData::do_ensure_children (NetlistBrowserModel *model)
+void CircuitSubCircuitPinsItemData::do_ensure_children (NetlistBrowserModel *model)
 {
   size_t n = model->indexer ()->subcircuit_pin_count (sp ());
   for (size_t i = 0; i < n; ++i) {
@@ -2242,8 +2207,7 @@ CircuitSubCircuitPinsItemData::do_ensure_children (NetlistBrowserModel *model)
   }
 }
 
-QIcon
-CircuitSubCircuitPinsItemData::icon (NetlistBrowserModel * /*model*/)
+QIcon CircuitSubCircuitPinsItemData::icon (NetlistBrowserModel * /*model*/)
 {
   return icon_for_pin ();
 }
@@ -2280,10 +2244,10 @@ CircuitSubCircuitPinsItemData::status (NetlistBrowserModel * /*model*/)
 
 CircuitSubCircuitItemData::CircuitSubCircuitItemData (NetlistModelItemData *parent, const IndexedNetlistModel::subcircuit_pair &sp)
   : NetlistModelItemData (parent), m_sp (sp), mp_circuit_node (0)
-{ }
+{
+}
 
-void
-CircuitSubCircuitItemData::do_ensure_children (NetlistBrowserModel * /*model*/)
+void CircuitSubCircuitItemData::do_ensure_children (NetlistBrowserModel * /*model*/)
 {
   push_back (new CircuitSubCircuitPinsItemData (this, m_sp));
 
@@ -2292,8 +2256,7 @@ CircuitSubCircuitItemData::do_ensure_children (NetlistBrowserModel * /*model*/)
   push_back (mp_circuit_node);
 }
 
-QIcon
-CircuitSubCircuitItemData::icon (NetlistBrowserModel * /*model*/)
+QIcon CircuitSubCircuitItemData::icon (NetlistBrowserModel * /*model*/)
 {
   return icon_for_subcircuit ();
 }
@@ -2339,10 +2302,10 @@ CircuitSubCircuitItemData::status (NetlistBrowserModel *model)
 
 CircuitSubCircuitPinItemData::CircuitSubCircuitPinItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_subcircuit_pin_pair &pp)
   : CircuitNetItemData (parent, nets_from_pinrefs (pp)), m_pp (pp)
-{ }
+{
+}
 
-QIcon
-CircuitSubCircuitPinItemData::icon (NetlistBrowserModel * /*model*/)
+QIcon CircuitSubCircuitPinItemData::icon (NetlistBrowserModel * /*model*/)
 {
   return icon_for_pin ();
 }
@@ -2367,23 +2330,22 @@ CircuitSubCircuitPinItemData::search_text ()
 
 CircuitDeviceItemData::CircuitDeviceItemData (NetlistModelItemData *parent, const IndexedNetlistModel::device_pair &dp)
   : NetlistModelItemData (parent), m_dp (dp)
-{ }
+{
+}
 
-void
-CircuitDeviceItemData::do_ensure_children (NetlistBrowserModel *model)
+void CircuitDeviceItemData::do_ensure_children (NetlistBrowserModel *model)
 {
   std::pair<const db::Device *, const db::Device *> devices = dp ();
   std::pair<const db::DeviceClass *, const db::DeviceClass *> device_classes = device_classes_from_devices (devices);
 
-  std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> > tp = terminal_defs_from_device_classes (model->indexer (), device_classes, devices);
+  std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *>> tp = terminal_defs_from_device_classes (model->indexer (), device_classes, devices);
 
-  for (std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> >::const_iterator i = tp.begin (); i != tp.end (); ++i) {
+  for (std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *>>::const_iterator i = tp.begin (); i != tp.end (); ++i) {
     push_back (new CircuitDeviceTerminalItemData (this, *i));
   }
 }
 
-QIcon
-CircuitDeviceItemData::icon (NetlistBrowserModel * /*model*/)
+QIcon CircuitDeviceItemData::icon (NetlistBrowserModel * /*model*/)
 {
   std::pair<const db::DeviceClass *, const db::DeviceClass *> device_classes = device_classes_from_devices (m_dp);
   return icon_for_devices (device_classes);
@@ -2410,7 +2372,6 @@ CircuitDeviceItemData::text (int column, NetlistBrowserModel *model)
     } else if (column == model->second_column ()) {
       return escaped (str_from_expanded_name (m_dp.second) + field_sep + device_string (m_dp.second));
     }
-
   }
 
   return QString ();
@@ -2441,10 +2402,10 @@ CircuitDeviceItemData::status (NetlistBrowserModel *model)
 
 CircuitDeviceTerminalItemData::CircuitDeviceTerminalItemData (NetlistModelItemData *parent, const std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> &tp)
   : CircuitNetItemData (parent, nets_from_device_terminals (parent->devices (), tp)), m_tp (tp)
-{ }
+{
+}
 
-QIcon
-CircuitDeviceTerminalItemData::icon (NetlistBrowserModel *model)
+QIcon CircuitDeviceTerminalItemData::icon (NetlistBrowserModel *model)
 {
   return model->icon_for_connection (nets_of_this ());
 }
@@ -2522,8 +2483,7 @@ NetlistBrowserModel::root () const
   return dynamic_cast<RootItemData *> (mp_root.get ());
 }
 
-int
-NetlistBrowserModel::columnCount (const QModelIndex & /*parent*/) const
+int NetlistBrowserModel::columnCount (const QModelIndex & /*parent*/) const
 {
   //  Item type & icon, link or description
   return mp_indexer->is_single () ? 3 : 4;
@@ -2599,7 +2559,6 @@ NetlistBrowserModel::path_from_index (const QModelIndex &index) const
     }
 
     i = parent (i);
-
   }
 
   return np;
@@ -2612,7 +2571,7 @@ NetlistBrowserModel::index_from_path (const NetlistObjectsPath &path)
 
   CircuitItemData *node = dynamic_cast<CircuitItemData *> ((NetlistModelItemData *) (index.internalPointer ()));
 
-  for (std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *> >::const_iterator p = path.path.begin (); p != path.path.end () && node; ++p) {
+  for (std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *>>::const_iterator p = path.path.begin (); p != path.path.end () && node; ++p) {
     CircuitSubCircuitItemData *sc_node = node->circuit_subcircuit_item (this, *p);
     if (sc_node) {
       sc_node->ensure_children (this);
@@ -2716,7 +2675,6 @@ NetlistBrowserModel::make_link_to (const std::pair<const db::Net *, const db::Ne
     } else {
       return build_url (idx, str_from_expanded_names (nets, mp_indexer->is_single ()));
     }
-
   }
 }
 
@@ -2736,7 +2694,6 @@ NetlistBrowserModel::make_link_to (const std::pair<const db::Device *, const db:
     } else {
       return build_url (idx, str_from_expanded_names (devices, mp_indexer->is_single ()));
     }
-
   }
 }
 
@@ -2774,7 +2731,6 @@ NetlistBrowserModel::make_link_to (const std::pair<const db::Circuit *, const db
     } else {
       return build_url (idx, str_from_names (circuits, mp_indexer->is_single ()));
     }
-
   }
 }
 
@@ -2794,12 +2750,10 @@ NetlistBrowserModel::make_link_to (const std::pair<const db::SubCircuit *, const
     } else {
       return build_url (idx, str_from_expanded_names (subcircuits, mp_indexer->is_single ()));
     }
-
   }
 }
 
-bool
-NetlistBrowserModel::is_valid_net_pair (const std::pair<const db::Net *, const db::Net *> &nets) const
+bool NetlistBrowserModel::is_valid_net_pair (const std::pair<const db::Net *, const db::Net *> &nets) const
 {
   if (! nets.first && ! nets.second) {
     //  this is a valid case: e.g. two matching subcircuit pins without nets attached
@@ -2849,8 +2803,7 @@ NetlistBrowserModel::search_text (const QModelIndex &index) const
   }
 }
 
-QIcon
-NetlistBrowserModel::icon_for_nets (const std::pair<const db::Net *, const db::Net *> &nets) const
+QIcon NetlistBrowserModel::icon_for_nets (const std::pair<const db::Net *, const db::Net *> &nets) const
 {
   const db::Net *net = nets.first;
 
@@ -2871,8 +2824,7 @@ NetlistBrowserModel::icon_for_nets (const std::pair<const db::Net *, const db::N
   }
 }
 
-QIcon
-NetlistBrowserModel::icon_for_connection (const std::pair<const db::Net *, const db::Net *> &nets) const
+QIcon NetlistBrowserModel::icon_for_connection (const std::pair<const db::Net *, const db::Net *> &nets) const
 {
   const db::Net *net = nets.first;
 
@@ -2893,8 +2845,7 @@ NetlistBrowserModel::icon_for_connection (const std::pair<const db::Net *, const
   }
 }
 
-QIcon
-NetlistBrowserModel::icon (const QModelIndex &index) const
+QIcon NetlistBrowserModel::icon (const QModelIndex &index) const
 {
   NetlistModelItemData *d = (NetlistModelItemData *) (index.internalPointer ());
   if (! d) {
@@ -2910,8 +2861,7 @@ NetlistBrowserModel::flags (const QModelIndex & /*index*/) const
   return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
-bool
-NetlistBrowserModel::hasChildren (const QModelIndex &parent) const
+bool NetlistBrowserModel::hasChildren (const QModelIndex &parent) const
 {
   NetlistModelItemData *d = 0;
   if (parent.isValid ()) {
@@ -2971,10 +2921,9 @@ NetlistBrowserModel::index (int row, int column, const QModelIndex &parent) cons
   }
 }
 
-void
-NetlistBrowserModel::colors_changed ()
+void NetlistBrowserModel::colors_changed ()
 {
-  emit dataChanged (index (0, 0, QModelIndex ()), index (rowCount (QModelIndex()) - 1, 0, QModelIndex ()));
+  emit dataChanged (index (0, 0, QModelIndex ()), index (rowCount (QModelIndex ()) - 1, 0, QModelIndex ()));
 }
 
 QModelIndex
@@ -3085,8 +3034,7 @@ NetlistBrowserModel::parent (const QModelIndex &index) const
   }
 }
 
-int
-NetlistBrowserModel::rowCount (const QModelIndex &parent) const
+int NetlistBrowserModel::rowCount (const QModelIndex &parent) const
 {
   NetlistModelItemData *d = 0;
   if (parent.isValid ()) {
@@ -3102,8 +3050,7 @@ NetlistBrowserModel::rowCount (const QModelIndex &parent) const
   }
 }
 
-void
-NetlistBrowserModel::show_or_hide_items (QTreeView *view, const QModelIndex &parent, bool show_all, bool with_warnings, int levels)
+void NetlistBrowserModel::show_or_hide_items (QTreeView *view, const QModelIndex &parent, bool show_all, bool with_warnings, int levels)
 {
   int n = rowCount (parent);
   for (int i = 0; i < n; ++i) {
@@ -3117,12 +3064,10 @@ NetlistBrowserModel::show_or_hide_items (QTreeView *view, const QModelIndex &par
     if (visible && levels > 1) {
       show_or_hide_items (view, idx, show_all, with_warnings, levels - 1);
     }
-
   }
 }
 
-void
-NetlistBrowserModel::set_item_visibility (QTreeView *view, bool show_all, bool with_warnings)
+void NetlistBrowserModel::set_item_visibility (QTreeView *view, bool show_all, bool with_warnings)
 {
   //  TODO: this implementation is based on the model but is fairly inefficient
   show_or_hide_items (view, QModelIndex (), show_all, with_warnings, 3);

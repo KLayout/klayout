@@ -54,7 +54,7 @@ public:
   /**
    *  @brief Increment operator
    */
-  LayerIterator &operator++();
+  LayerIterator &operator++ ();
 
   /**
    *  @brief Equality
@@ -75,7 +75,7 @@ public:
   /**
    *  @brief Access operator
    */
-  std::pair<unsigned int, const db::LayerProperties *> operator*() const;
+  std::pair<unsigned int, const db::LayerProperties *> operator* () const;
 
 private:
   unsigned int m_layer_index;
@@ -93,7 +93,9 @@ class DB_PUBLIC LayoutLayers
 {
 public:
   typedef LayerIterator layer_iterator;
-  enum LayerState { Normal, Free, Special };
+  enum LayerState { Normal,
+                    Free,
+                    Special };
 
   /**
    *  @brief Standard constructor
@@ -120,12 +122,12 @@ public:
    */
   void clear ();
 
-  /**  
+  /**
    *  @brief Deletes a layer
    */
   void delete_layer (unsigned int n);
 
-  /**  
+  /**
    *  @brief Gets the layer's state
    */
   LayerState layer_state (unsigned int l) const
@@ -135,7 +137,7 @@ public:
 
   /**
    *  @brief Gets the number of layers defined so far
-   *  
+   *
    *  TODO: the list of 0 to nlayers-1 also contains the free layers -
    *  we should get a vector containing the layers that are actually
    *  allocated.
@@ -146,7 +148,7 @@ public:
   }
 
   /**
-   *  @brief The iterator of valid layers: begin 
+   *  @brief The iterator of valid layers: begin
    */
   layer_iterator begin_layers () const
   {
@@ -154,7 +156,7 @@ public:
   }
 
   /**
-   *  @brief The iterator of valid layers: end 
+   *  @brief The iterator of valid layers: end
    */
   layer_iterator end_layers () const
   {
@@ -259,7 +261,7 @@ private:
   int m_waste_layer;
   int m_error_layer;
 
-  /**  
+  /**
    *  @brief Insert a new layer
    *
    *  This creates a new index number, either from the free list
@@ -267,7 +269,7 @@ private:
    */
   unsigned int do_insert_layer (bool special = false);
 
-  /**  
+  /**
    *  @brief Insert a new layer at the given index
    *
    *  If the index is unused, create a new layer there.
@@ -278,5 +280,3 @@ private:
 }
 
 #endif
-
-

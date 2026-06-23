@@ -36,18 +36,18 @@
 
 #include <string>
 #if defined(HAVE_QT)
-# include <QString>
-# include <QByteArray>
+#include <QString>
+#include <QByteArray>
 #endif
 
 #include <typeinfo>
 
 namespace gsi
 {
-  class ClassBase;
-  class ArgType;
+class ClassBase;
+class ArgType;
 
-  GSI_PUBLIC const ClassBase *class_by_typeinfo_no_assert (const std::type_info &ti);
+GSI_PUBLIC const ClassBase *class_by_typeinfo_no_assert (const std::type_info &ti);
 }
 
 namespace pya
@@ -83,11 +83,10 @@ PYA_PUBLIC PyObject *
 object_to_python (void *obj, PYAObjectBase *self, const gsi::ArgType &atype);
 
 // -------------------------------------------------------------------
-//  Type checks 
+//  Type checks
 
 template <class T>
-struct test_type_func
-{
+struct test_type_func {
   bool operator() (PyObject * /*rval*/, bool /*loose*/)
   {
     return false;
@@ -95,12 +94,11 @@ struct test_type_func
 };
 
 template <>
-struct test_type_func<bool>
-{
+struct test_type_func<bool> {
   bool operator() (PyObject *rval, bool loose)
   {
     if (loose) {
-      return true;  // everything can be converted to bool
+      return true; // everything can be converted to bool
     } else {
       return PyBool_Check (rval) || rval == Py_None;
     }
@@ -109,37 +107,45 @@ struct test_type_func<bool>
 
 //  used for other integer types as well:
 template <>
-struct test_type_func<int>
-{
+struct test_type_func<int> {
   bool operator() (PyObject *rval, bool loose)
   {
     //  bool values don't count as int in strict mode
-    if (!loose && PyBool_Check (rval)) {
+    if (! loose && PyBool_Check (rval)) {
       return false;
     }
 #if PY_MAJOR_VERSION < 3
-   return PyInt_Check (rval) || PyLong_Check (rval) || (PyFloat_Check (rval) && loose);
+    return PyInt_Check (rval) || PyLong_Check (rval) || (PyFloat_Check (rval) && loose);
 #else
-   return PyLong_Check (rval) || (PyFloat_Check (rval) && loose);
+    return PyLong_Check (rval) || (PyFloat_Check (rval) && loose);
 #endif
   }
 };
 
-template <> struct test_type_func<unsigned int> : public test_type_func<int> { };
-template <> struct test_type_func<char> : public test_type_func<int> { };
-template <> struct test_type_func<signed char> : public test_type_func<int> { };
-template <> struct test_type_func<unsigned char> : public test_type_func<int> { };
-template <> struct test_type_func<short> : public test_type_func<int> { };
-template <> struct test_type_func<unsigned short> : public test_type_func<int> { };
-template <> struct test_type_func<long> : public test_type_func<int> { };
-template <> struct test_type_func<unsigned long> : public test_type_func<int> { };
-template <> struct test_type_func<long long> : public test_type_func<int> { };
-template <> struct test_type_func<unsigned long long> : public test_type_func<int> { };
+template <> struct test_type_func<unsigned int> : public test_type_func<int> {
+};
+template <> struct test_type_func<char> : public test_type_func<int> {
+};
+template <> struct test_type_func<signed char> : public test_type_func<int> {
+};
+template <> struct test_type_func<unsigned char> : public test_type_func<int> {
+};
+template <> struct test_type_func<short> : public test_type_func<int> {
+};
+template <> struct test_type_func<unsigned short> : public test_type_func<int> {
+};
+template <> struct test_type_func<long> : public test_type_func<int> {
+};
+template <> struct test_type_func<unsigned long> : public test_type_func<int> {
+};
+template <> struct test_type_func<long long> : public test_type_func<int> {
+};
+template <> struct test_type_func<unsigned long long> : public test_type_func<int> {
+};
 
 #if defined(HAVE_64BIT_COORD)
 template <>
-struct test_type_func<__int128>
-{
+struct test_type_func<__int128> {
   bool operator() (PyObject *rval, bool loose)
   {
     return test_type_func<int> () (rval, loose);
@@ -148,12 +154,11 @@ struct test_type_func<__int128>
 #endif
 
 template <>
-struct test_type_func<double>
-{
+struct test_type_func<double> {
   bool operator() (PyObject *rval, bool loose)
   {
     //  bool values don't count as int in strict mode
-    if (!loose && PyBool_Check (rval)) {
+    if (! loose && PyBool_Check (rval)) {
       return false;
     }
 #if PY_MAJOR_VERSION < 3
@@ -165,15 +170,16 @@ struct test_type_func<double>
 };
 
 template <>
-struct test_type_func<float> : public test_type_func<double> { };
+struct test_type_func<float> : public test_type_func<double> {
+};
 
 template <>
-struct test_type_func<void *> : public test_type_func<size_t> { };
+struct test_type_func<void *> : public test_type_func<size_t> {
+};
 
 //  used for strings in general:
 template <>
-struct test_type_func<const char *>
-{
+struct test_type_func<const char *> {
   bool operator() (PyObject *rval, bool /*loose*/)
   {
 #if PY_MAJOR_VERSION < 3
@@ -184,16 +190,19 @@ struct test_type_func<const char *>
   }
 };
 
-template <> struct test_type_func<std::string> : public test_type_func<const char *> { };
-template <> struct test_type_func<std::vector<char> > : public test_type_func<const char *> { };
+template <> struct test_type_func<std::string> : public test_type_func<const char *> {
+};
+template <> struct test_type_func<std::vector<char>> : public test_type_func<const char *> {
+};
 #if defined(HAVE_QT)
-template <> struct test_type_func<QString> : public test_type_func<const char *> { };
-template <> struct test_type_func<QByteArray> : public test_type_func<const char *> { };
+template <> struct test_type_func<QString> : public test_type_func<const char *> {
+};
+template <> struct test_type_func<QByteArray> : public test_type_func<const char *> {
+};
 #endif
 
 template <>
-struct test_type_func<tl::Variant>
-{
+struct test_type_func<tl::Variant> {
   bool operator() (PyObject * /*rval*/, bool /*loose*/)
   {
     return true;
@@ -201,8 +210,7 @@ struct test_type_func<tl::Variant>
 };
 
 template <class T>
-struct test_type_func<T &>
-{
+struct test_type_func<T &> {
   bool operator() (PyObject *rval, bool /*loose*/)
   {
     //  TODO: we currently don't check for non-constness
@@ -212,8 +220,7 @@ struct test_type_func<T &>
 };
 
 template <class T>
-struct test_type_func<const T &>
-{
+struct test_type_func<const T &> {
   bool operator() (PyObject *rval, bool loose)
   {
     return test_type_func<T &> () (rval, loose);
@@ -221,8 +228,7 @@ struct test_type_func<const T &>
 };
 
 template <class T>
-struct test_type_func<const T *>
-{
+struct test_type_func<const T *> {
   bool operator() (PyObject *rval, bool loose)
   {
     //  for the pointer types, None is an allowed value
@@ -231,8 +237,7 @@ struct test_type_func<const T *>
 };
 
 template <class T>
-struct test_type_func<T *>
-{
+struct test_type_func<T *> {
   bool operator() (PyObject *rval, bool loose)
   {
     //  for the pointer types, None is an allowed value
@@ -251,7 +256,7 @@ struct test_type_func<T *>
  *  @param loose If true, the type is checked more loosely. Use for second-pass matching.
  */
 template <class T>
-inline bool test_type (PyObject * rval, bool loose = false)
+inline bool test_type (PyObject *rval, bool loose = false)
 {
   return test_type_func<T> () (rval, loose);
 }
@@ -293,11 +298,10 @@ inline bool test_vector (PyObject *arr, bool loose = false)
 //  Python to C conversion
 
 template <class T>
-struct python2c_func
-{
+struct python2c_func {
   T operator() (PyObject * /*rval*/)
   {
-    tl_assert (false);  //  type not bound
+    tl_assert (false); //  type not bound
   }
 };
 
@@ -308,20 +312,25 @@ template <> PYA_PUBLIC char python2c_func<char>::operator() (PyObject *rval);
 
 template <class D, class C>
 struct python2c_func_cast
-  : public python2c_func<C>
-{
+  : public python2c_func<C> {
   D operator() (PyObject *rval)
   {
     return (D) (python2c_func<C>::operator() (rval));
   }
 };
 
-template <> struct python2c_func<signed char> : public python2c_func_cast<signed char, char> { };
-template <> struct python2c_func<unsigned char> : public python2c_func_cast<unsigned char, char> { };
-template <> struct python2c_func<short> : public python2c_func_cast<short, long> { };
-template <> struct python2c_func<unsigned short> : public python2c_func_cast<unsigned short, long> { };
-template <> struct python2c_func<int> : public python2c_func_cast<int, long> { };
-template <> struct python2c_func<unsigned int> : public python2c_func_cast<unsigned int, unsigned long> { };
+template <> struct python2c_func<signed char> : public python2c_func_cast<signed char, char> {
+};
+template <> struct python2c_func<unsigned char> : public python2c_func_cast<unsigned char, char> {
+};
+template <> struct python2c_func<short> : public python2c_func_cast<short, long> {
+};
+template <> struct python2c_func<unsigned short> : public python2c_func_cast<unsigned short, long> {
+};
+template <> struct python2c_func<int> : public python2c_func_cast<int, long> {
+};
+template <> struct python2c_func<unsigned int> : public python2c_func_cast<unsigned int, unsigned long> {
+};
 
 template <> PYA_PUBLIC long long python2c_func<long long>::operator() (PyObject *rval);
 template <> PYA_PUBLIC unsigned long long python2c_func<unsigned long long>::operator() (PyObject *rval);
@@ -331,21 +340,22 @@ template <> __int128 python2c_func<__int128>::operator() (PyObject *rval);
 #endif
 
 template <> PYA_PUBLIC double python2c_func<double>::operator() (PyObject *rval);
-template <> struct python2c_func<float> : public python2c_func_cast<float, double> { };
+template <> struct python2c_func<float> : public python2c_func_cast<float, double> {
+};
 
 template <> PYA_PUBLIC std::string python2c_func<std::string>::operator() (PyObject *rval);
-template <> PYA_PUBLIC std::vector<char> python2c_func<std::vector<char> >::operator() (PyObject *rval);
+template <> PYA_PUBLIC std::vector<char> python2c_func<std::vector<char>>::operator() (PyObject *rval);
 #if defined(HAVE_QT)
 template <> PYA_PUBLIC QByteArray python2c_func<QByteArray>::operator() (PyObject *rval);
 template <> PYA_PUBLIC QString python2c_func<QString>::operator() (PyObject *rval);
 #endif
 
-template <> struct python2c_func<void *> : public python2c_func_cast<void *, size_t> { };
+template <> struct python2c_func<void *> : public python2c_func_cast<void *, size_t> {
+};
 
 template <> PYA_PUBLIC tl::Variant python2c_func<tl::Variant>::operator() (PyObject *rval);
 
-template <class T> struct python2c_func<T &>
-{
+template <class T> struct python2c_func<T &> {
   T &operator() (PyObject *rval)
   {
     tl_assert (rval != Py_None);
@@ -355,20 +365,18 @@ template <class T> struct python2c_func<T &>
     tl_assert (is_derived_from (cls_decl, typeid (T)));
 
     PYAObjectBase *p = PYAObjectBase::from_pyobject (rval);
-    return *((T *)p->obj ());
+    return *((T *) p->obj ());
   }
 };
 
-template <class T> struct python2c_func<const T &>
-{
+template <class T> struct python2c_func<const T &> {
   const T &operator() (PyObject *rval)
   {
-    return python2c_func<T &>() (rval);
+    return python2c_func<T &> () (rval);
   }
 };
 
-template <class T> struct python2c_func<T *>
-{
+template <class T> struct python2c_func<T *> {
   T *operator() (PyObject *rval)
   {
     tl_assert (rval != Py_None);
@@ -376,13 +384,12 @@ template <class T> struct python2c_func<T *>
     if (rval == Py_None) {
       return 0;
     } else {
-      return &python2c_func<T &>() (rval);
+      return &python2c_func<T &> () (rval);
     }
   }
 };
 
-template <class T> struct python2c_func<const T *>
-{
+template <class T> struct python2c_func<const T *> {
   const T *operator() (PyObject *rval)
   {
     return python2c_func<T *> (rval);
@@ -402,8 +409,7 @@ inline T python2c (PyObject *rval)
 //  C to Python conversion
 
 template <class T>
-struct c2python_func
-{
+struct c2python_func {
   PyObject *operator() (T t);
 };
 
@@ -412,8 +418,7 @@ struct c2python_func
  *  T must be a registered type.
  */
 template <class T>
-struct c2python_func<T &>
-{
+struct c2python_func<T &> {
   PyObject *operator() (T &p)
   {
     return object_to_python ((void *) &p, 0, gsi::class_by_typeinfo_no_assert (typeid (T)), false /*==don't pass*/, false /*==non-const*/, false, false /*==can't destroy*/);
@@ -425,8 +430,7 @@ struct c2python_func<T &>
  *  T must be a registered type.
  */
 template <class T>
-struct c2python_func<const T &>
-{
+struct c2python_func<const T &> {
   PyObject *operator() (const T &p)
   {
     return object_to_python ((void *) &p, 0, gsi::class_by_typeinfo_no_assert (typeid (T)), false /*==don't pass*/, true /*==const*/, false, false /*==can't destroy*/);
@@ -440,8 +444,7 @@ struct c2python_func<const T &>
  *  T must be a registered type.
  */
 template <class T>
-struct c2python_func<T *>
-{
+struct c2python_func<T *> {
   PyObject *operator() (T *p)
   {
     if (! p) {
@@ -458,8 +461,7 @@ struct c2python_func<T *>
  *  T must be a registered type.
  */
 template <class T>
-struct c2python_func<const T *>
-{
+struct c2python_func<const T *> {
   PyObject *operator() (const T *p)
   {
     if (! p) {
@@ -471,8 +473,7 @@ struct c2python_func<const T *>
 };
 
 template <>
-struct c2python_func<bool>
-{
+struct c2python_func<bool> {
   PyObject *operator() (bool c)
   {
     if (c) {
@@ -484,8 +485,7 @@ struct c2python_func<bool>
 };
 
 template <>
-struct c2python_func<char>
-{
+struct c2python_func<char> {
   PyObject *operator() (char c)
   {
     return PyLong_FromLong (long (c));
@@ -493,8 +493,7 @@ struct c2python_func<char>
 };
 
 template <>
-struct c2python_func<signed char>
-{
+struct c2python_func<signed char> {
   PyObject *operator() (signed char c)
   {
     return PyLong_FromLong (long (c));
@@ -502,8 +501,7 @@ struct c2python_func<signed char>
 };
 
 template <>
-struct c2python_func<unsigned char>
-{
+struct c2python_func<unsigned char> {
   PyObject *operator() (unsigned char c)
   {
     return PyLong_FromLong (long (c));
@@ -511,8 +509,7 @@ struct c2python_func<unsigned char>
 };
 
 template <>
-struct c2python_func<short>
-{
+struct c2python_func<short> {
   PyObject *operator() (short c)
   {
     return PyLong_FromLong (long (c));
@@ -520,8 +517,7 @@ struct c2python_func<short>
 };
 
 template <>
-struct c2python_func<unsigned short>
-{
+struct c2python_func<unsigned short> {
   PyObject *operator() (unsigned short c)
   {
     return PyLong_FromLong (long (c));
@@ -529,8 +525,7 @@ struct c2python_func<unsigned short>
 };
 
 template <>
-struct c2python_func<int>
-{
+struct c2python_func<int> {
   PyObject *operator() (int c)
   {
     return PyLong_FromLong (long (c));
@@ -538,8 +533,7 @@ struct c2python_func<int>
 };
 
 template <>
-struct c2python_func<unsigned int>
-{
+struct c2python_func<unsigned int> {
   PyObject *operator() (unsigned int c)
   {
     return PyLong_FromUnsignedLong ((unsigned long) (c));
@@ -547,8 +541,7 @@ struct c2python_func<unsigned int>
 };
 
 template <>
-struct c2python_func<long>
-{
+struct c2python_func<long> {
   PyObject *operator() (long c)
   {
     return PyLong_FromLong (c);
@@ -556,8 +549,7 @@ struct c2python_func<long>
 };
 
 template <>
-struct c2python_func<unsigned long>
-{
+struct c2python_func<unsigned long> {
   PyObject *operator() (unsigned long c)
   {
     return PyLong_FromUnsignedLong (c);
@@ -565,8 +557,7 @@ struct c2python_func<unsigned long>
 };
 
 template <>
-struct c2python_func<long long>
-{
+struct c2python_func<long long> {
   PyObject *operator() (long long c)
   {
     return PyLong_FromLongLong (c);
@@ -574,8 +565,7 @@ struct c2python_func<long long>
 };
 
 template <>
-struct c2python_func<unsigned long long>
-{
+struct c2python_func<unsigned long long> {
   PyObject *operator() (unsigned long long c)
   {
     return PyLong_FromUnsignedLongLong (c);
@@ -584,8 +574,7 @@ struct c2python_func<unsigned long long>
 
 #if defined(HAVE_64BIT_COORD)
 template <>
-struct c2python_func<__int128>
-{
+struct c2python_func<__int128> {
   PyObject *operator() (const __int128 &c)
   {
     return PyLong_FromUnsignedLongLong (c);
@@ -594,8 +583,7 @@ struct c2python_func<__int128>
 #endif
 
 template <>
-struct c2python_func<double>
-{
+struct c2python_func<double> {
   PyObject *operator() (double c)
   {
     return PyFloat_FromDouble (double (c));
@@ -603,8 +591,7 @@ struct c2python_func<double>
 };
 
 template <>
-struct c2python_func<float>
-{
+struct c2python_func<float> {
   PyObject *operator() (float c)
   {
     return PyFloat_FromDouble (double (c));
@@ -615,27 +602,31 @@ template <> PYA_PUBLIC PyObject *c2python_func<const char *>::operator() (const 
 
 #if defined(HAVE_QT)
 template <> PYA_PUBLIC PyObject *c2python_func<const QString &>::operator() (const QString &c);
-template <> struct c2python_func<QString> : public c2python_func<const QString &> { };
+template <> struct c2python_func<QString> : public c2python_func<const QString &> {
+};
 template <> PYA_PUBLIC PyObject *c2python_func<const QByteArray &>::operator() (const QByteArray &c);
-template <> struct c2python_func<QByteArray> : public c2python_func<const QByteArray &> { };
+template <> struct c2python_func<QByteArray> : public c2python_func<const QByteArray &> {
+};
 #endif
 
 template <> PYA_PUBLIC PyObject *c2python_func<const std::string &>::operator() (const std::string &c);
-template <> struct c2python_func<std::string> : public c2python_func<const std::string &> { };
-template <> struct c2python_func<std::vector<char> > : public c2python_func<const std::vector<char> &> { };
+template <> struct c2python_func<std::string> : public c2python_func<const std::string &> {
+};
+template <> struct c2python_func<std::vector<char>> : public c2python_func<const std::vector<char> &> {
+};
 
 template <>
 struct c2python_func<void *>
-  : public c2python_func<size_t>
-{
+  : public c2python_func<size_t> {
   PyObject *operator() (void *p)
   {
-    return c2python_func<size_t>::operator () (size_t (p));
+    return c2python_func<size_t>::operator() (size_t (p));
   }
 };
 
 template <> PYA_PUBLIC PyObject *c2python_func<const tl::Variant &>::operator() (const tl::Variant &c);
-template <> struct c2python_func<tl::Variant> : public c2python_func<const tl::Variant &> { };
+template <> struct c2python_func<tl::Variant> : public c2python_func<const tl::Variant &> {
+};
 
 /**
  *  @brief Converts the Python object to the given type

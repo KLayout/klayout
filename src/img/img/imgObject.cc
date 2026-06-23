@@ -41,7 +41,7 @@
 #include <memory.h>
 
 #if defined(HAVE_QT)
-#  include <QImage>
+#include <QImage>
 #endif
 
 namespace img
@@ -52,9 +52,8 @@ namespace img
 namespace
 {
 
-struct compare_first_of_node
-{
-  bool operator() (const std::pair <double, std::pair<tl::Color, tl::Color> > &a, const std::pair <double, std::pair<tl::Color, tl::Color> > &b) const
+struct compare_first_of_node {
+  bool operator() (const std::pair<double, std::pair<tl::Color, tl::Color>> &a, const std::pair<double, std::pair<tl::Color, tl::Color>> &b) const
   {
     return a.first < b.first;
   }
@@ -63,7 +62,7 @@ struct compare_first_of_node
 }
 
 static tl::Color
-interpolated_color2 (const std::pair<double, std::pair<tl::Color, tl::Color> > &n1, const std::pair<double, std::pair<tl::Color, tl::Color> > &n2, double x)
+interpolated_color2 (const std::pair<double, std::pair<tl::Color, tl::Color>> &n1, const std::pair<double, std::pair<tl::Color, tl::Color>> &n2, double x)
 {
   double x1 = n1.first;
   double x2 = n2.first;
@@ -74,9 +73,9 @@ interpolated_color2 (const std::pair<double, std::pair<tl::Color, tl::Color> > &
   unsigned int h2 = 0, s2 = 0, v2 = 0;
   n2.second.first.get_hsv (h2, s2, v2);
 
-  int h = int (0.5 + h1 + double(x - x1) * double (int (h2) - int (h1)) / double(x2 - x1));
-  int s = int (0.5 + s1 + double(x - x1) * double (int (s2) - int (s1)) / double(x2 - x1));
-  int v = int (0.5 + v1 + double(x - x1) * double (int (v2) - int (v1)) / double(x2 - x1));
+  int h = int (0.5 + h1 + double (x - x1) * double (int (h2) - int (h1)) / double (x2 - x1));
+  int s = int (0.5 + s1 + double (x - x1) * double (int (s2) - int (s1)) / double (x2 - x1));
+  int v = int (0.5 + v1 + double (x - x1) * double (int (v2) - int (v1)) / double (x2 - x1));
 
   return tl::Color::from_hsv ((unsigned int) h, (unsigned int) s, (unsigned int) v);
 }
@@ -90,19 +89,18 @@ interpolated_color (const DataMapping::false_color_nodes_type &nodes, double x)
 
   } else if (nodes.size () < 2) {
 
-    return x < nodes[0].first ? nodes[0].second.first : nodes[0].second.second;
+    return x < nodes [0].first ? nodes [0].second.first : nodes [0].second.second;
 
   } else {
 
-    std::vector<std::pair<double, std::pair<tl::Color, tl::Color> > >::const_iterator p = std::lower_bound (nodes.begin (), nodes.end (), std::make_pair (x, std::make_pair (tl::Color (), tl::Color ())), compare_first_of_node ());
+    std::vector<std::pair<double, std::pair<tl::Color, tl::Color>>>::const_iterator p = std::lower_bound (nodes.begin (), nodes.end (), std::make_pair (x, std::make_pair (tl::Color (), tl::Color ())), compare_first_of_node ());
     if (p == nodes.end ()) {
       return nodes.back ().second.second;
     } else if (p == nodes.begin ()) {
       return nodes.front ().second.first;
     } else {
-      return interpolated_color2 (p[-1], *p, x);
+      return interpolated_color2 (p [-1], *p, x);
     }
-
   }
 }
 
@@ -116,8 +114,7 @@ DataMapping::DataMapping ()
   false_color_nodes.push_back (std::make_pair (1.0, std::make_pair (tl::Color (255, 255, 255), tl::Color (255, 255, 255))));
 }
 
-bool 
-DataMapping::operator== (const DataMapping &d) const
+bool DataMapping::operator== (const DataMapping &d) const
 {
   const double epsilon = 1e-6;
 
@@ -150,13 +147,13 @@ DataMapping::operator== (const DataMapping &d) const
   }
 
   for (unsigned int i = 0; i < false_color_nodes.size (); ++i) {
-    if (fabs (false_color_nodes[i].first - d.false_color_nodes[i].first) > epsilon) {
+    if (fabs (false_color_nodes [i].first - d.false_color_nodes [i].first) > epsilon) {
       return false;
     }
-    if (false_color_nodes[i].second.first != d.false_color_nodes[i].second.first) {
+    if (false_color_nodes [i].second.first != d.false_color_nodes [i].second.first) {
       return false;
     }
-    if (false_color_nodes[i].second.second != d.false_color_nodes[i].second.second) {
+    if (false_color_nodes [i].second.second != d.false_color_nodes [i].second.second) {
       return false;
     }
   }
@@ -164,8 +161,7 @@ DataMapping::operator== (const DataMapping &d) const
   return true;
 }
 
-bool 
-DataMapping::operator< (const DataMapping &d) const
+bool DataMapping::operator< (const DataMapping &d) const
 {
   const double epsilon = 1e-6;
 
@@ -198,14 +194,14 @@ DataMapping::operator< (const DataMapping &d) const
   }
 
   for (unsigned int i = 0; i < false_color_nodes.size (); ++i) {
-    if (fabs (false_color_nodes[i].first - d.false_color_nodes[i].first) > epsilon) {
-      return false_color_nodes[i].first < d.false_color_nodes[i].first;
+    if (fabs (false_color_nodes [i].first - d.false_color_nodes [i].first) > epsilon) {
+      return false_color_nodes [i].first < d.false_color_nodes [i].first;
     }
-    if (false_color_nodes[i].second.first != d.false_color_nodes[i].second.first) {
-      return false_color_nodes[i].second.first.rgb () < d.false_color_nodes[i].second.first.rgb ();
+    if (false_color_nodes [i].second.first != d.false_color_nodes [i].second.first) {
+      return false_color_nodes [i].second.first.rgb () < d.false_color_nodes [i].second.first.rgb ();
     }
-    if (false_color_nodes[i].second.second != d.false_color_nodes[i].second.second) {
-      return false_color_nodes[i].second.second.rgb () < d.false_color_nodes[i].second.second.rgb ();
+    if (false_color_nodes [i].second.second != d.false_color_nodes [i].second.second) {
+      return false_color_nodes [i].second.second.rgb () < d.false_color_nodes [i].second.second.rgb ();
     }
   }
 
@@ -257,7 +253,6 @@ DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, uns
     double y = 255 * pow (x, gamma);
 
     to_pixel->push_back (x, y);
-
   }
 
   tl::DataMappingBase *dm = 0;
@@ -296,7 +291,6 @@ DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, uns
         gray_to_color->push_back (xx, y);
 
         x += dx;
-
       }
 
       //  on discontinuous colors add another entry that manifests the discontinuity
@@ -307,9 +301,7 @@ DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, uns
         xfence = xx;
         double y = color_to_channel_value (false_color_nodes [i].second.first, channel);
         gray_to_color->push_back (xx, y);
-
       }
-
     }
 
     double x = false_color_nodes.back ().first;
@@ -319,24 +311,16 @@ DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, uns
     gray_to_color->push_back (xx, ylast);
 
     dm = new tl::CombinedDataMapping (
-                to_pixel, 
-                new tl::LinearCombinationDataMapping (
-                  0.0, new tl::CombinedDataMapping (
-                         linear, 
-                         new tl::CombinedDataMapping (gray_to_color, x_norm)
-                       ), scale
-                )
-              );
+      to_pixel,
+      new tl::LinearCombinationDataMapping (
+        0.0, new tl::CombinedDataMapping (linear, new tl::CombinedDataMapping (gray_to_color, x_norm)), scale));
 
   } else {
 
     dm = new tl::CombinedDataMapping (
-                to_pixel, 
-                new tl::LinearCombinationDataMapping (
-                  0.0, new tl::CombinedDataMapping (linear, x_norm), scale
-                )
-              );
-
+      to_pixel,
+      new tl::LinearCombinationDataMapping (
+        0.0, new tl::CombinedDataMapping (linear, x_norm), scale));
   }
 
   return dm;
@@ -381,7 +365,6 @@ public:
             mp_color_data [i][j] = 0.0;
           }
         }
-
       }
 
     } else {
@@ -390,20 +373,17 @@ public:
 
         mp_byte_data = new unsigned char [n];
         for (size_t j = 0; j < n; ++j) {
-          mp_byte_data[j] = 0;
+          mp_byte_data [j] = 0;
         }
 
       } else {
 
         mp_data = new float [n];
         for (size_t j = 0; j < n; ++j) {
-          mp_data[j] = 0.0;
+          mp_data [j] = 0.0;
         }
-
       }
-
     }
-
   }
 
   DataHeader (size_t w, size_t h, unsigned char *data, unsigned char *mask = 0)
@@ -424,9 +404,9 @@ public:
     mp_mask = mask;
     mp_byte_data = 0;
     mp_data = 0;
-    mp_color_byte_data[0] = red;
-    mp_color_byte_data[1] = green;
-    mp_color_byte_data[2] = blue;
+    mp_color_byte_data [0] = red;
+    mp_color_byte_data [1] = green;
+    mp_color_byte_data [2] = blue;
     for (unsigned int i = 0; i < 3; ++i) {
       mp_color_data [i] = 0;
     }
@@ -450,15 +430,15 @@ public:
     mp_mask = mask;
     mp_byte_data = 0;
     mp_data = 0;
-    mp_color_data[0] = red;
-    mp_color_data[1] = green;
-    mp_color_data[2] = blue;
+    mp_color_data [0] = red;
+    mp_color_data [1] = green;
+    mp_color_data [2] = blue;
     for (unsigned int i = 0; i < 3; ++i) {
       mp_color_byte_data [i] = 0;
     }
   }
 
-  void add_ref () 
+  void add_ref ()
   {
     ++m_ref_count;
   }
@@ -585,8 +565,7 @@ public:
             return (mp_byte_data [j] < d.mp_byte_data [j]);
           }
         }
-
-      } 
+      }
 
     } else {
 
@@ -609,9 +588,7 @@ public:
             return (mp_data [j] < d.mp_data [j]);
           }
         }
-
-      } 
-
+      }
     }
 
     return false;
@@ -666,8 +643,7 @@ public:
             return false;
           }
         }
-
-      } 
+      }
 
     } else {
 
@@ -690,9 +666,7 @@ public:
             return false;
           }
         }
-
-      } 
-
+      }
     }
 
     return true;
@@ -706,11 +680,11 @@ public:
 
     size_t n = data_length ();
     for (unsigned int i = 0; i < 3; ++i) {
-      if (mp_color_data[i]) {
-        stat->add (typeid (float []), (void *) mp_color_data[i], n * sizeof (float), n * sizeof (float), (void *) this, purpose, cat);
+      if (mp_color_data [i]) {
+        stat->add (typeid (float []), (void *) mp_color_data [i], n * sizeof (float), n * sizeof (float), (void *) this, purpose, cat);
       }
-      if (mp_color_byte_data[i]) {
-        stat->add (typeid (unsigned char []), (void *) mp_color_byte_data[i], n * sizeof (unsigned char), n * sizeof (unsigned char), (void *) this, purpose, cat);
+      if (mp_color_byte_data [i]) {
+        stat->add (typeid (unsigned char []), (void *) mp_color_byte_data [i], n * sizeof (unsigned char), n * sizeof (unsigned char), (void *) this, purpose, cat);
       }
     }
 
@@ -729,8 +703,8 @@ private:
   DataHeader (const DataHeader &);
   DataHeader &operator= (const DataHeader &);
 
-  ~DataHeader () 
-  { 
+  ~DataHeader ()
+  {
     if (mp_mask) {
       delete [] mp_mask;
       mp_mask = 0;
@@ -744,7 +718,7 @@ private:
       delete [] mp_byte_data;
       mp_byte_data = 0;
     }
-    
+
     for (unsigned int i = 0; i < 3; ++i) {
       if (mp_color_data [i]) {
         delete [] mp_color_data [i];
@@ -754,14 +728,14 @@ private:
         delete [] mp_color_byte_data [i];
         mp_color_byte_data [i] = 0;
       }
-    } 
+    }
   }
 
   size_t m_width, m_height;
-  float *mp_color_data[3];
+  float *mp_color_data [3];
   float *mp_data;
   unsigned char *mp_mask;
-  unsigned char *mp_color_byte_data[3];
+  unsigned char *mp_color_byte_data [3];
   unsigned char *mp_byte_data;
   int m_ref_count;
 };
@@ -825,7 +799,7 @@ Object::Object (size_t w, size_t h, const db::DCplxTrans &trans, float *d)
   m_updates_enabled = true;
 }
 
-Object::Object (size_t w, size_t h, const db::DCplxTrans &trans, const std::vector <double> &d)
+Object::Object (size_t w, size_t h, const db::DCplxTrans &trans, const std::vector<double> &d)
   : m_trans (trans), m_id (make_id ()), m_min_value (0.0), m_max_value (1.0), m_min_value_set (false), m_max_value_set (false), m_visible (true), m_z_position (0)
 {
   m_updates_enabled = false;
@@ -855,7 +829,7 @@ Object::Object (size_t w, size_t h, const db::DCplxTrans &trans, float *red, flo
   m_updates_enabled = true;
 }
 
-Object::Object (size_t w, size_t h, const db::DCplxTrans &trans, const std::vector <double> &red, const std::vector <double> &green, const std::vector <double> &blue)
+Object::Object (size_t w, size_t h, const db::DCplxTrans &trans, const std::vector<double> &red, const std::vector<double> &green, const std::vector<double> &blue)
   : m_trans (trans), m_id (make_id ()), m_min_value (0.0), m_max_value (1.0), m_min_value_set (false), m_max_value_set (false), m_visible (true), m_z_position (0)
 {
   m_updates_enabled = false;
@@ -932,7 +906,7 @@ Object::Object (size_t w, size_t h, const db::Matrix3d &trans, float *d)
   m_updates_enabled = true;
 }
 
-Object::Object (size_t w, size_t h, const db::Matrix3d &trans, const std::vector <double> &d)
+Object::Object (size_t w, size_t h, const db::Matrix3d &trans, const std::vector<double> &d)
   : m_trans (trans), m_id (make_id ()), m_min_value (0.0), m_max_value (1.0), m_min_value_set (false), m_max_value_set (false), m_visible (true), m_z_position (0)
 {
   m_updates_enabled = false;
@@ -962,7 +936,7 @@ Object::Object (size_t w, size_t h, const db::Matrix3d &trans, float *red, float
   m_updates_enabled = true;
 }
 
-Object::Object (size_t w, size_t h, const db::Matrix3d &trans, const std::vector <double> &red, const std::vector <double> &green, const std::vector <double> &blue)
+Object::Object (size_t w, size_t h, const db::Matrix3d &trans, const std::vector<double> &red, const std::vector<double> &green, const std::vector<double> &blue)
   : m_trans (trans), m_id (make_id ()), m_min_value (0.0), m_max_value (1.0), m_min_value_set (false), m_max_value_set (false), m_visible (true), m_z_position (0)
 {
   m_updates_enabled = false;
@@ -1056,23 +1030,20 @@ Object::operator= (const img::Object &d)
     if (m_updates_enabled) {
       property_changed ();
     }
-
   }
 
   return *this;
 }
 
-bool 
-Object::equals (const db::DUserObjectBase *d) const
+bool Object::equals (const db::DUserObjectBase *d) const
 {
-  const img::Object *img_object = dynamic_cast <const img::Object *> (d);
+  const img::Object *img_object = dynamic_cast<const img::Object *> (d);
   return img_object != 0 && *this == *img_object;
 }
 
-bool 
-Object::less (const db::DUserObjectBase *d) const
+bool Object::less (const db::DUserObjectBase *d) const
 {
-  const img::Object *img_object = dynamic_cast <const img::Object *> (d);
+  const img::Object *img_object = dynamic_cast<const img::Object *> (d);
   tl_assert (img_object != 0);
 
   if (m_z_position != img_object->m_z_position) {
@@ -1126,8 +1097,7 @@ Object::less (const db::DUserObjectBase *d) const
   return false;
 }
 
-bool 
-Object::operator== (const img::Object &d) const
+bool Object::operator== (const img::Object &d) const
 {
   if (m_z_position != d.m_z_position) {
     return false;
@@ -1181,7 +1151,7 @@ Object::operator== (const img::Object &d) const
   return true;
 }
 
-unsigned int 
+unsigned int
 Object::class_id () const
 {
   static unsigned int cid = db::get_unique_user_object_class_id ();
@@ -1194,8 +1164,7 @@ Object::clone () const
   return new img::Object (*this);
 }
 
-void
-Object::clear ()
+void Object::clear ()
 {
   if (is_byte_data ()) {
 
@@ -1214,7 +1183,6 @@ Object::clear ()
       for (size_t i = data_length (); i > 0; --i) {
         *d++ = 0.0;
       }
-
     }
 
   } else if (is_color ()) {
@@ -1232,7 +1200,6 @@ Object::clear ()
     for (size_t i = data_length (); i > 0; --i) {
       *d++ = 0.0;
     }
-
   }
 }
 
@@ -1251,8 +1218,8 @@ Object::image_box_poly (const db::DBox vp, const db::DCplxTrans &vpt) const
 
   int iinside = -1;
   for (unsigned int i = 0; i < 4; ++i) {
-    if (ti.can_transform (pb[i])) {
-      iinside = int(i);
+    if (ti.can_transform (pb [i])) {
+      iinside = int (i);
       break;
     }
   }
@@ -1266,24 +1233,24 @@ Object::image_box_poly (const db::DBox vp, const db::DCplxTrans &vpt) const
   //  clip the image box at the transformed viewport edges
 
   //  determine the orientation of the viewport edges
-  db::DVector v1 (ti.trans (pb[iinside], pb[(iinside + 3) % 4] - pb[iinside]));
-  db::DVector v2 (ti.trans (pb[iinside], pb[(iinside + 1) % 4] - pb[iinside]));
+  db::DVector v1 (ti.trans (pb [iinside], pb [(iinside + 3) % 4] - pb [iinside]));
+  db::DVector v2 (ti.trans (pb [iinside], pb [(iinside + 1) % 4] - pb [iinside]));
   bool mirrored = (db::vprod_sign (v1, v2) < 0);
 
   for (unsigned int i = 0; i < 4; ++i) {
 
     unsigned int ii = (i + 1) % 4;
 
-    if (ti.can_transform (pb[i]) || ti.can_transform (pb[ii])) {
+    if (ti.can_transform (pb [i]) || ti.can_transform (pb [ii])) {
 
       db::DPoint p1;
       db::DVector pv;
-      if (ti.can_transform (pb[i])) {
+      if (ti.can_transform (pb [i])) {
         p1 = ti.trans (pb [i]);
-        pv = ti.trans (pb[i], pb[ii] - pb[i]);
+        pv = ti.trans (pb [i], pb [ii] - pb [i]);
       } else {
         p1 = ti.trans (pb [ii]);
-        pv = ti.trans (pb[ii], pb[ii] - pb[i]);
+        pv = ti.trans (pb [ii], pb [ii] - pb [i]);
       }
 
       db::DEdge e (p1, p1 + pv);
@@ -1299,15 +1266,13 @@ Object::image_box_poly (const db::DBox vp, const db::DCplxTrans &vpt) const
       } else {
         image_box_poly = cp.front ();
       }
-
     }
-
   }
 
   return image_box_poly.transformed (t);
 }
 
-db::DBox 
+db::DBox
 Object::box () const
 {
   double w = double (width ());
@@ -1320,15 +1285,14 @@ Object::box () const
   b += m_trans * db::DPoint (w * 0.5, h * 0.5);
 
   // include landmarks
-  for (std::vector <db::DPoint>::const_iterator l = m_landmarks.begin (); l != m_landmarks.end (); ++l) {
+  for (std::vector<db::DPoint>::const_iterator l = m_landmarks.begin (); l != m_landmarks.end (); ++l) {
     b += m_trans * *l;
   }
-  
+
   return b;
 }
 
-void 
-Object::transform (const db::Matrix3d &t)
+void Object::transform (const db::Matrix3d &t)
 {
   m_trans = t * m_trans;
   if (m_updates_enabled) {
@@ -1336,8 +1300,7 @@ Object::transform (const db::Matrix3d &t)
   }
 }
 
-void 
-Object::transform (const db::DCplxTrans &t)
+void Object::transform (const db::DCplxTrans &t)
 {
   m_trans = db::Matrix3d (t) * m_trans;
   if (m_updates_enabled) {
@@ -1345,8 +1308,7 @@ Object::transform (const db::DCplxTrans &t)
   }
 }
 
-void 
-Object::transform (const db::DTrans &t)
+void Object::transform (const db::DTrans &t)
 {
   m_trans = db::Matrix3d (t) * m_trans;
   if (m_updates_enabled) {
@@ -1354,8 +1316,7 @@ Object::transform (const db::DTrans &t)
   }
 }
 
-void 
-Object::transform (const db::DFTrans &t)
+void Object::transform (const db::DFTrans &t)
 {
   m_trans = db::Matrix3d (t) * m_trans;
   if (m_updates_enabled) {
@@ -1363,8 +1324,7 @@ Object::transform (const db::DFTrans &t)
   }
 }
 
-void 
-Object::from_string (const char *str, const char *base_dir)
+void Object::from_string (const char *str, const char *base_dir)
 {
   bool en = m_updates_enabled;
   m_updates_enabled = false;
@@ -1422,7 +1382,7 @@ Object::from_string (const char *str, const char *base_dir)
         ex.read (m_data_mapping.blue_gain);
       } else if (ex.test ("color_mapping=")) {
 
-        ex.test("[");
+        ex.test ("[");
 
         double x = 0.0;
         lay::ColorConverter cc;
@@ -1452,7 +1412,6 @@ Object::from_string (const char *str, const char *base_dir)
           m_data_mapping.false_color_nodes.push_back (std::make_pair (x, std::make_pair (cl, cr)));
 
           ex.test (";");
-
         }
 
       } else if (ex.test ("width=")) {
@@ -1509,32 +1468,31 @@ Object::from_string (const char *str, const char *base_dir)
 
           if (color) {
             if (i < n) {
-              mp_data->byte_data (0)[i] = d;
+              mp_data->byte_data (0) [i] = d;
             }
             ex.test (",");
             ex.read (d);
             if (i < n) {
-              mp_data->byte_data (1)[i] = d;
+              mp_data->byte_data (1) [i] = d;
             }
             ex.test (",");
             ex.read (d);
             if (i < n) {
-              mp_data->byte_data (2)[i] = d;
+              mp_data->byte_data (2) [i] = d;
             }
           } else if (i < n) {
-            mp_data->byte_data ()[i] = d;
+            mp_data->byte_data () [i] = d;
           }
 
           if (ex.test (",")) {
             unsigned int m = 0;
             ex.read (m);
-            mp_data->set_mask ()[i] = m;
+            mp_data->set_mask () [i] = m;
           }
 
           ++i;
 
           ex.test (";");
-
         }
 
         ex.test ("]");
@@ -1555,32 +1513,31 @@ Object::from_string (const char *str, const char *base_dir)
 
           if (color) {
             if (i < n) {
-              mp_data->float_data (0)[i] = d;
+              mp_data->float_data (0) [i] = d;
             }
             ex.test (",");
             ex.read (d);
             if (i < n) {
-              mp_data->float_data (1)[i] = d;
+              mp_data->float_data (1) [i] = d;
             }
             ex.test (",");
             ex.read (d);
             if (i < n) {
-              mp_data->float_data (2)[i] = d;
+              mp_data->float_data (2) [i] = d;
             }
           } else if (i < n) {
-            mp_data->float_data ()[i] = d;
+            mp_data->float_data () [i] = d;
           }
 
           if (ex.test (",")) {
             unsigned int m = 0;
             ex.read (m);
-            mp_data->set_mask ()[i] = m;
+            mp_data->set_mask () [i] = m;
           }
 
           ++i;
 
           ex.test (";");
-
         }
 
         ex.test ("]");
@@ -1591,7 +1548,6 @@ Object::from_string (const char *str, const char *base_dir)
       }
 
       ex.test (";");
-
     }
 
     if (compatibility_mode) {
@@ -1609,8 +1565,7 @@ Object::from_string (const char *str, const char *base_dir)
   }
 }
 
-void 
-Object::load_data (const std::string &filename, bool adjust_min_max)
+void Object::load_data (const std::string &filename, bool adjust_min_max)
 {
   m_min_value_set = ! adjust_min_max;
   m_max_value_set = ! adjust_min_max;
@@ -1627,8 +1582,7 @@ Object::load_data (const std::string &filename, bool adjust_min_max)
   }
 }
 
-void 
-Object::read_file () 
+void Object::read_file ()
 {
   release ();
 
@@ -1676,8 +1630,7 @@ Object::read_file ()
 }
 
 #if defined(HAVE_QT)
-void
-Object::create_from_qimage (const QImage &qimage)
+void Object::create_from_qimage (const QImage &qimage)
 {
   if (qimage.isNull ()) {
     return;
@@ -1703,19 +1656,19 @@ Object::create_from_qimage (const QImage &qimage)
 
   if (is_color ()) {
 
-    unsigned char *red   = mp_data->byte_data (0);
+    unsigned char *red = mp_data->byte_data (0);
     unsigned char *green = mp_data->byte_data (1);
-    unsigned char *blue  = mp_data->byte_data (2);
-    unsigned char *msk   = qimage.hasAlphaChannel () ? mp_data->set_mask () : 0;
+    unsigned char *blue = mp_data->byte_data (2);
+    unsigned char *msk = qimage.hasAlphaChannel () ? mp_data->set_mask () : 0;
 
     for (size_t y = 0; y < h; ++y) {
       for (size_t x = 0; x < w; ++x) {
         QRgb rgb = qimage.pixel (QPoint (int (x), int (h - y - 1)));
-        red[i] = qRed (rgb);
-        green[i] = qGreen (rgb);
-        blue[i] = qBlue (rgb);
+        red [i] = qRed (rgb);
+        green [i] = qGreen (rgb);
+        blue [i] = qBlue (rgb);
         if (msk) {
-          msk[i] = qAlpha (rgb) > 128;
+          msk [i] = qAlpha (rgb) > 128;
         }
         ++i;
       }
@@ -1731,18 +1684,15 @@ Object::create_from_qimage (const QImage &qimage)
         QRgb rgb = qimage.pixel (QPoint (int (x), int (h - y - 1)));
         *d++ = qGreen (rgb);
         if (msk) {
-          msk[i] = qAlpha (rgb) > 128;
+          msk [i] = qAlpha (rgb) > 128;
         }
       }
     }
-
   }
-
 }
 #endif
 
-void
-Object::create_from_pixel_buffer (const tl::PixelBuffer &img)
+void Object::create_from_pixel_buffer (const tl::PixelBuffer &img)
 {
   bool is_color = false;
   for (unsigned int i = 0; i < img.height () && ! is_color; ++i) {
@@ -1772,10 +1722,10 @@ Object::create_from_pixel_buffer (const tl::PixelBuffer &img)
 
   if (is_color) {
 
-    unsigned char *red   = mp_data->byte_data (0);
+    unsigned char *red = mp_data->byte_data (0);
     unsigned char *green = mp_data->byte_data (1);
-    unsigned char *blue  = mp_data->byte_data (2);
-    unsigned char *msk   = img.transparent () ? mp_data->set_mask () : 0;
+    unsigned char *blue = mp_data->byte_data (2);
+    unsigned char *msk = img.transparent () ? mp_data->set_mask () : 0;
 
     for (unsigned int y = 0; y < h; ++y) {
       const tl::color_t *d = img.scan_line (h - y - 1);
@@ -1807,12 +1757,10 @@ Object::create_from_pixel_buffer (const tl::PixelBuffer &img)
         }
       }
     }
-
   }
 }
 
-void 
-Object::release () 
+void Object::release ()
 {
   if (mp_data) {
     mp_data->release_ref ();
@@ -1822,7 +1770,7 @@ Object::release ()
   invalidate_pixel_data ();
 }
 
-std::string 
+std::string
 Object::to_string () const
 {
   std::stringstream os (std::stringstream::out);
@@ -1839,15 +1787,15 @@ Object::to_string () const
     os << "matrix=";
     os << m_trans.to_string ();
     os << ";";
-  
+
     os << "min_value=";
     os << tl::to_string (m_min_value);
     os << ";";
-  
+
     os << "max_value=";
     os << tl::to_string (m_max_value);
     os << ";";
-  
+
     os << "is_visible=";
     os << tl::to_string (m_visible);
     os << ";";
@@ -1888,7 +1836,7 @@ Object::to_string () const
 
     if (! m_landmarks.empty ()) {
       os << "landmarks=[";
-      for (std::vector <db::DPoint>::const_iterator l = m_landmarks.begin (); l != m_landmarks.end (); ++l) {
+      for (std::vector<db::DPoint>::const_iterator l = m_landmarks.begin (); l != m_landmarks.end (); ++l) {
         if (l != m_landmarks.begin ()) {
           os << ",";
         }
@@ -1901,9 +1849,9 @@ Object::to_string () const
 
     lay::ColorConverter cc;
     for (unsigned int i = 0; i < data_mapping ().false_color_nodes.size (); ++i) {
-      os << data_mapping ().false_color_nodes[i].first;
+      os << data_mapping ().false_color_nodes [i].first;
       os << ",";
-      const std::pair<tl::Color, tl::Color> &clr = data_mapping ().false_color_nodes[i].second;
+      const std::pair<tl::Color, tl::Color> &clr = data_mapping ().false_color_nodes [i].second;
       os << tl::to_word_or_quoted_string (cc.to_string (clr.first));
       if (clr.first != clr.second) {
         os << ",";
@@ -1919,30 +1867,30 @@ Object::to_string () const
       os << "width=";
       os << tl::to_string (width ());
       os << ";";
-  
+
       os << "height=";
       os << tl::to_string (height ());
       os << ";";
-  
+
       if (is_byte_data ()) {
 
         os << "byte_data=[";
         size_t n = data_length ();
         if (is_color ()) {
           for (size_t i = 0; i < n; ++i) {
-            os << ((unsigned int) byte_data (0)[i]) << ","
-               << ((unsigned int) byte_data (1)[i]) << ","
-               << ((unsigned int) byte_data (2)[i]);
+            os << ((unsigned int) byte_data (0) [i]) << ","
+               << ((unsigned int) byte_data (1) [i]) << ","
+               << ((unsigned int) byte_data (2) [i]);
             if (mask ()) {
-              os << "," << (unsigned int) mask ()[i];
+              os << "," << (unsigned int) mask () [i];
             }
             os << ";";
           }
         } else {
           for (size_t i = 0; i < n; ++i) {
-            os << ((unsigned int) byte_data ()[i]);
+            os << ((unsigned int) byte_data () [i]);
             if (mask ()) {
-              os << "," << (unsigned int) mask ()[i];
+              os << "," << (unsigned int) mask () [i];
             }
             os << ";";
           }
@@ -1955,38 +1903,35 @@ Object::to_string () const
         size_t n = data_length ();
         if (is_color ()) {
           for (size_t i = 0; i < n; ++i) {
-            os << tl::to_string (float_data (0)[i]) << ","
-               << tl::to_string (float_data (1)[i]) << ","
-               << tl::to_string (float_data (2)[i]);
+            os << tl::to_string (float_data (0) [i]) << ","
+               << tl::to_string (float_data (1) [i]) << ","
+               << tl::to_string (float_data (2) [i]);
             if (mask ()) {
-              os << "," << (unsigned int) mask ()[i];
+              os << "," << (unsigned int) mask () [i];
             }
             os << ";";
           }
         } else {
           for (size_t i = 0; i < n; ++i) {
-            os << tl::to_string (float_data ()[i]);
+            os << tl::to_string (float_data () [i]);
             if (mask ()) {
-              os << "," << (unsigned int) mask ()[i];
+              os << "," << (unsigned int) mask () [i];
             }
             os << ";";
           }
         }
         os << "]";
-
       }
 
     } else {
       os << "file=" + tl::to_word_or_quoted_string (m_filename);
     }
-
   }
-  
+
   return os.str ();
 }
 
-void
-Object::swap (Object &other)
+void Object::swap (Object &other)
 {
   m_filename.swap (other.m_filename);
   m_tag.swap (other.m_tag);
@@ -2006,44 +1951,40 @@ Object::swap (Object &other)
   std::swap (m_updates_enabled, other.m_updates_enabled);
 }
 
-void
-Object::set_tag (const std::string &tag)
+void Object::set_tag (const std::string &tag)
 {
   m_tag = tag;
 }
 
-size_t 
+size_t
 Object::width () const
 {
   return mp_data ? mp_data->width () : 0;
 }
 
-size_t 
+size_t
 Object::height () const
 {
   return mp_data ? mp_data->height () : 0;
 }
 
-size_t 
+size_t
 Object::data_length () const
 {
   return mp_data ? mp_data->data_length () : 0;
 }
 
-bool 
-Object::is_empty () const
+bool Object::is_empty () const
 {
   return mp_data == 0;
 }
 
-bool 
-Object::is_byte_data () const
+bool Object::is_byte_data () const
 {
   return mp_data ? mp_data->is_byte_data () : false;
 }
 
-bool 
-Object::is_color () const
+bool Object::is_color () const
 {
   return mp_data ? mp_data->is_color () : false;
 }
@@ -2080,71 +2021,68 @@ Object::float_data (unsigned int component) const
   return mp_data ? mp_data->float_data (component) : 0;
 }
 
-bool
-Object::mask (size_t x, size_t y) const
+bool Object::mask (size_t x, size_t y) const
 {
   if (mp_data && mp_data->mask () && x < width () && y < height ()) {
-    return mp_data->mask ()[x + y * width ()] != 0;
+    return mp_data->mask () [x + y * width ()] != 0;
   } else {
     return true;
   }
 }
 
-void
-Object::set_mask (size_t x, size_t y, bool m) 
+void Object::set_mask (size_t x, size_t y, bool m)
 {
   if (mp_data && x < width () && y < height ()) {
-    mp_data->set_mask ()[x + y * width ()] = m;
+    mp_data->set_mask () [x + y * width ()] = m;
     if (m_updates_enabled) {
       property_changed ();
     }
   }
 }
 
-double 
+double
 Object::pixel (size_t x, size_t y) const
 {
   if (mp_data && x < width () && y < height () && ! is_color ()) {
     if (is_byte_data ()) {
-      return mp_data->byte_data ()[x + y * width ()];
+      return mp_data->byte_data () [x + y * width ()];
     } else {
-      return mp_data->float_data ()[x + y * width ()];
+      return mp_data->float_data () [x + y * width ()];
     }
   } else {
     return 0.0;
   }
 }
 
-double 
+double
 Object::pixel (size_t x, size_t y, unsigned int component) const
 {
   if (mp_data && x < width () && y < height ()) {
     if (! is_color ()) {
       if (is_byte_data ()) {
-        return mp_data->byte_data ()[x + y * width ()];
+        return mp_data->byte_data () [x + y * width ()];
       } else {
-        return mp_data->float_data ()[x + y * width ()];
+        return mp_data->float_data () [x + y * width ()];
       }
     } else if (component < 3) {
       if (is_byte_data ()) {
-        return mp_data->byte_data (component)[x + y * width ()];
+        return mp_data->byte_data (component) [x + y * width ()];
       } else {
-        return mp_data->float_data (component)[x + y * width ()];
+        return mp_data->float_data (component) [x + y * width ()];
       }
     }
-  } 
+  }
   return 0.0;
 }
 
-void 
-Object::set_pixel (size_t x, size_t y, double v)
+void Object::set_pixel (size_t x, size_t y, double v)
 {
   if (mp_data && x < width () && y < height () && ! is_color ()) {
     invalidate_pixel_data ();
     if (is_byte_data ()) {
-      mp_data->byte_data ()[x + y * width ()] = (unsigned char) v;
+      mp_data->byte_data () [x + y * width ()] = (unsigned char) v;
     } else {
-      mp_data->float_data ()[x + y * width ()] = v;
+      mp_data->float_data () [x + y * width ()] = v;
     }
     if (m_updates_enabled) {
       property_changed ();
@@ -2152,20 +2090,19 @@ Object::set_pixel (size_t x, size_t y, double v)
   }
 }
 
-void 
-Object::set_pixel (size_t x, size_t y, double red, double green, double blue)
+void Object::set_pixel (size_t x, size_t y, double red, double green, double blue)
 {
   if (mp_data && x < width () && y < height () && is_color ()) {
     invalidate_pixel_data ();
     size_t i = x + y * width ();
     if (is_byte_data ()) {
-      mp_data->byte_data (0)[i] = (unsigned char) red;
-      mp_data->byte_data (1)[i] = (unsigned char) green;
-      mp_data->byte_data (2)[i] = (unsigned char) blue;
+      mp_data->byte_data (0) [i] = (unsigned char) red;
+      mp_data->byte_data (1) [i] = (unsigned char) green;
+      mp_data->byte_data (2) [i] = (unsigned char) blue;
     } else {
-      mp_data->float_data (0)[i] = red;
-      mp_data->float_data (1)[i] = green;
-      mp_data->float_data (2)[i] = blue;
+      mp_data->float_data (0) [i] = red;
+      mp_data->float_data (1) [i] = green;
+      mp_data->float_data (2) [i] = blue;
     }
     if (m_updates_enabled) {
       property_changed ();
@@ -2173,8 +2110,7 @@ Object::set_pixel (size_t x, size_t y, double red, double green, double blue)
   }
 }
 
-void 
-Object::set_data (size_t w, size_t h, unsigned char *d)
+void Object::set_data (size_t w, size_t h, unsigned char *d)
 {
   release ();
 
@@ -2186,8 +2122,7 @@ Object::set_data (size_t w, size_t h, unsigned char *d)
   }
 }
 
-void 
-Object::set_data (size_t w, size_t h, float *d)
+void Object::set_data (size_t w, size_t h, float *d)
 {
   release ();
 
@@ -2199,8 +2134,7 @@ Object::set_data (size_t w, size_t h, float *d)
   }
 }
 
-void 
-Object::set_data (size_t w, size_t h, const std::vector<double> &d)
+void Object::set_data (size_t w, size_t h, const std::vector<double> &d)
 {
   release ();
 
@@ -2219,8 +2153,7 @@ Object::set_data (size_t w, size_t h, const std::vector<double> &d)
   }
 }
 
-void 
-Object::set_data (size_t w, size_t h, unsigned char *red, unsigned char *green, unsigned char *blue)
+void Object::set_data (size_t w, size_t h, unsigned char *red, unsigned char *green, unsigned char *blue)
 {
   release ();
 
@@ -2232,8 +2165,7 @@ Object::set_data (size_t w, size_t h, unsigned char *red, unsigned char *green, 
   }
 }
 
-void 
-Object::set_data (size_t w, size_t h, float *red, float *green, float *blue)
+void Object::set_data (size_t w, size_t h, float *red, float *green, float *blue)
 {
   release ();
 
@@ -2245,8 +2177,7 @@ Object::set_data (size_t w, size_t h, float *red, float *green, float *blue)
   }
 }
 
-void 
-Object::set_data (size_t w, size_t h, const std::vector<double> &red, const std::vector<double> &green, const std::vector<double> &blue)
+void Object::set_data (size_t w, size_t h, const std::vector<double> &red, const std::vector<double> &green, const std::vector<double> &blue)
 {
   release ();
 
@@ -2279,8 +2210,7 @@ Object::set_data (size_t w, size_t h, const std::vector<double> &red, const std:
   }
 }
 
-void
-img::Object::set_data_mapping (const DataMapping &dm)
+void img::Object::set_data_mapping (const DataMapping &dm)
 {
   invalidate_pixel_data ();
   m_data_mapping = dm;
@@ -2289,8 +2219,7 @@ img::Object::set_data_mapping (const DataMapping &dm)
   }
 }
 
-void
-img::Object::set_matrix (const db::Matrix3d &trans)
+void img::Object::set_matrix (const db::Matrix3d &trans)
 {
   m_trans = db::Matrix3d (trans);
   if (m_updates_enabled) {
@@ -2298,8 +2227,7 @@ img::Object::set_matrix (const db::Matrix3d &trans)
   }
 }
 
-void
-img::Object::set_min_value (double h)
+void img::Object::set_min_value (double h)
 {
   invalidate_pixel_data ();
   m_min_value = h;
@@ -2308,8 +2236,7 @@ img::Object::set_min_value (double h)
   }
 }
 
-void
-img::Object::set_max_value (double h)
+void img::Object::set_max_value (double h)
 {
   invalidate_pixel_data ();
   m_max_value = h;
@@ -2318,8 +2245,7 @@ img::Object::set_max_value (double h)
   }
 }
 
-static
-void get_min_max (const float *data, size_t n, double &min, double &max)
+static void get_min_max (const float *data, size_t n, double &min, double &max)
 {
   bool first = true;
   min = max = 0.0;
@@ -2335,8 +2261,7 @@ void get_min_max (const float *data, size_t n, double &min, double &max)
   }
 }
 
-void 
-Object::validate_pixel_data () const
+void Object::validate_pixel_data () const
 {
   if (mp_data != 0 && mp_pixel_data == 0 && ! is_empty ()) {
 
@@ -2350,17 +2275,16 @@ Object::validate_pixel_data () const
       get_min_max (mp_data->float_data (), n, min, max);
     }
 
-    tl::DataMappingLookupTable lut[3];
+    tl::DataMappingLookupTable lut [3];
 
     for (unsigned int i = 0; i < 3; ++i) {
 
-      lut[i].set_data_mapping (m_data_mapping.create_data_mapping (! mp_data->is_color (), m_min_value, m_max_value, i));
+      lut [i].set_data_mapping (m_data_mapping.create_data_mapping (! mp_data->is_color (), m_min_value, m_max_value, i));
 
       if (! mp_data->is_byte_data () && mp_data->is_color ()) {
         get_min_max (mp_data->float_data (i), n, min, max);
       }
-      lut[i].update_table (min, max, 1.0, 1 << ((2 - i) * 8));
-
+      lut [i].update_table (min, max, 1.0, 1 << ((2 - i) * 8));
     }
 
     if (mp_data->is_byte_data ()) {
@@ -2369,48 +2293,47 @@ Object::validate_pixel_data () const
 
         tl::color_t *pixel_data = nc_pixel_data;
         const unsigned char *f = mp_data->byte_data (0);
-        const tl::DataMappingLookupTable *l = &lut[0];
+        const tl::DataMappingLookupTable *l = &lut [0];
         for (size_t j = 0; j < n; ++j) {
           *pixel_data++ = (*l) (*f++);
         }
 
         pixel_data = nc_pixel_data;
         f = mp_data->byte_data (1);
-        l = &lut[1];
+        l = &lut [1];
         for (size_t j = 0; j < n; ++j) {
           *pixel_data++ |= (*l) (*f++);
         }
 
         pixel_data = nc_pixel_data;
         f = mp_data->byte_data (2);
-        l = &lut[2];
+        l = &lut [2];
         for (size_t j = 0; j < n; ++j) {
-          *pixel_data++ |= (*l) (*f++); 
+          *pixel_data++ |= (*l) (*f++);
         }
 
       } else {
 
         tl::color_t *pixel_data = nc_pixel_data;
         const unsigned char *f = mp_data->byte_data ();
-        const tl::DataMappingLookupTable *l = &lut[0];
+        const tl::DataMappingLookupTable *l = &lut [0];
         for (size_t j = 0; j < n; ++j) {
           *pixel_data++ = (*l) (*f++);
         }
 
         pixel_data = nc_pixel_data;
         f = mp_data->byte_data ();
-        l = &lut[1];
+        l = &lut [1];
         for (size_t j = 0; j < n; ++j) {
           *pixel_data++ |= (*l) (*f++);
         }
 
         pixel_data = nc_pixel_data;
         f = mp_data->byte_data ();
-        l = &lut[2];
+        l = &lut [2];
         for (size_t j = 0; j < n; ++j) {
-          *pixel_data++ |= (*l) (*f++); 
+          *pixel_data++ |= (*l) (*f++);
         }
-
       }
 
     } else {
@@ -2419,57 +2342,53 @@ Object::validate_pixel_data () const
 
         tl::color_t *pixel_data = nc_pixel_data;
         const float *f = mp_data->float_data (0);
-        const tl::DataMappingLookupTable *l = &lut[0];
+        const tl::DataMappingLookupTable *l = &lut [0];
         for (size_t j = 0; j < n; ++j) {
           *pixel_data++ = (*l) (*f++);
         }
 
         pixel_data = nc_pixel_data;
         f = mp_data->float_data (1);
-        l = &lut[1];
+        l = &lut [1];
         for (size_t j = 0; j < n; ++j) {
           *pixel_data++ |= (*l) (*f++);
         }
 
         pixel_data = nc_pixel_data;
         f = mp_data->float_data (2);
-        l = &lut[2];
+        l = &lut [2];
         for (size_t j = 0; j < n; ++j) {
-          *pixel_data++ |= (*l) (*f++); 
+          *pixel_data++ |= (*l) (*f++);
         }
 
       } else {
 
         tl::color_t *pixel_data = nc_pixel_data;
         const float *f = mp_data->float_data ();
-        const tl::DataMappingLookupTable *l = &lut[0];
+        const tl::DataMappingLookupTable *l = &lut [0];
         for (size_t j = 0; j < n; ++j) {
           *pixel_data++ = (*l) (*f++);
         }
 
         pixel_data = nc_pixel_data;
         f = mp_data->float_data ();
-        l = &lut[1];
+        l = &lut [1];
         for (size_t j = 0; j < n; ++j) {
           *pixel_data++ |= (*l) (*f++);
         }
 
         pixel_data = nc_pixel_data;
         f = mp_data->float_data ();
-        l = &lut[2];
+        l = &lut [2];
         for (size_t j = 0; j < n; ++j) {
-          *pixel_data++ |= (*l) (*f++); 
+          *pixel_data++ |= (*l) (*f++);
         }
-
       }
-
     }
-
   }
 }
 
-void
-Object::invalidate_pixel_data ()
+void Object::invalidate_pixel_data ()
 {
   if (mp_pixel_data != 0) {
     delete [] mp_pixel_data;
@@ -2477,20 +2396,18 @@ Object::invalidate_pixel_data ()
   }
 }
 
-void
-Object::property_changed ()
+void Object::property_changed ()
 {
   //  .. nothing yet ..
 }
 
-const std::vector <db::DPoint> &
+const std::vector<db::DPoint> &
 Object::landmarks () const
 {
   return m_landmarks;
 }
 
-void
-Object::set_landmarks (const std::vector <db::DPoint> &lm)
+void Object::set_landmarks (const std::vector<db::DPoint> &lm)
 {
   if (m_landmarks != lm) {
     m_landmarks = lm;
@@ -2500,18 +2417,16 @@ Object::set_landmarks (const std::vector <db::DPoint> &lm)
   }
 }
 
-bool 
-Object::is_valid_matrix (const db::Matrix3d &matrix)
+bool Object::is_valid_matrix (const db::Matrix3d &matrix)
 {
-  db::DPoint p[] = {
+  db::DPoint p [] = {
     db::DPoint (-0.5 * width (), -0.5 * height ()),
     db::DPoint (-0.5 * width (), 0.5 * height ()),
     db::DPoint (0.5 * width (), -0.5 * height ()),
-    db::DPoint (0.5 * width (), 0.5 * height ())
-  };
+    db::DPoint (0.5 * width (), 0.5 * height ())};
 
-  for (unsigned int i = 0; i < sizeof (p) / sizeof (p[0]); ++i) {
-    double z = matrix.m ()[2][0] * p[i].x () + matrix.m ()[2][1] * p[i].y () + matrix.m ()[2][2];
+  for (unsigned int i = 0; i < sizeof (p) / sizeof (p [0]); ++i) {
+    double z = matrix.m () [2][0] * p [i].x () + matrix.m () [2][1] * p [i].y () + matrix.m () [2][2];
     if (z < 1e-10) {
       return false;
     }
@@ -2520,8 +2435,7 @@ Object::is_valid_matrix (const db::Matrix3d &matrix)
   return true;
 }
 
-void
-Object::mem_stat (db::MemStatistics *stat, db::MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
+void Object::mem_stat (db::MemStatistics *stat, db::MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
 {
   if (! no_self) {
     stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
@@ -2549,4 +2463,3 @@ static db::DUserObjectDeclaration class_registrar (new db::user_object_factory_i
 static db::DUserObjectDeclaration class_registrar_v2 (new db::user_object_factory_impl<img::Object, db::DCoord> ("img::ObjectV2"));
 
 } // namespace img
-

@@ -39,6 +39,6 @@
 #include <QtDesigner/QExtensionFactory>
 #include <QtDesigner/QExtensionManager>
 #include <QtDesigner/QFormBuilder>
-//#include <QtDesigner/QtDesigner>
-//#include <QtDesigner/QtDesignerDepends>
+// #include <QtDesigner/QtDesigner>
+// #include <QtDesigner/QtDesignerDepends>
 #include <QtDesigner/QtDesignerVersion>

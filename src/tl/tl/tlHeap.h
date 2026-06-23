@@ -36,21 +36,22 @@ namespace tl
 /**
  *  @brief A helper class that provides a base class for wrapped pointers for HeapObject
  */
-class HeapObjectBase 
+class HeapObjectBase
 {
 public:
-  virtual ~HeapObjectBase () { }
+  virtual ~HeapObjectBase () {}
 };
 
 /**
  *  @brief A helper class that provides a wrapper to a custom type for HeapObject
  */
 template <class X>
-class HeapObjectCont : public HeapObjectBase 
+class HeapObjectCont : public HeapObjectBase
 {
 public:
-  HeapObjectCont (X *x) : mp_x (x) { }
+  HeapObjectCont (X *x) : mp_x (x) {}
   ~HeapObjectCont () { delete mp_x; }
+
 private:
   X *mp_x;
 };
@@ -66,10 +67,10 @@ public:
   ~HeapObject ();
 
   template <class X>
-  void set (X *x) 
-  { 
+  void set (X *x)
+  {
     tl_assert (mp_b == 0);
-    mp_b = new HeapObjectCont<X> (x); 
+    mp_b = new HeapObjectCont<X> (x);
   }
 
 private:
@@ -79,11 +80,11 @@ private:
 /**
  *  @brief A heap holding objects of an arbitrary type
  *
- *  The heap is basically a storage for temporary objects. 
+ *  The heap is basically a storage for temporary objects.
  *  Such objects are created on the heap and are destroyed automatically
  *  when the heap goes out of scope.
  *
- *  It is guaranteed that objects created on the heap will be 
+ *  It is guaranteed that objects created on the heap will be
  *  destroyed in the reverse order they are created.
  */
 class TL_PUBLIC Heap
@@ -113,7 +114,7 @@ public:
    *  @brief Convenience method: create and register an object of type X
    */
   template <class X>
-  X *create () 
+  X *create ()
   {
     X *x = new X ();
     push (x);
@@ -135,4 +136,3 @@ private:
 }
 
 #endif
-

@@ -38,14 +38,14 @@
 #include <QMimeData>
 #include <QClipboard>
 #if QT_VERSION >= 0x050000
-#  include <QGuiApplication>
+#include <QGuiApplication>
 #endif
 
 #if defined(__APPLE__) && (QT_VERSION < 0x050401)
 // A workaround for the issue of Qt 4.8.x when handling "File Reference URL" in OSX
 // By Kazunari Sekigawa (November 12, 2015)
 // Search down for my name for more details!
-# include <CoreFoundation/CoreFoundation.h>
+#include <CoreFoundation/CoreFoundation.h>
 #endif
 
 #include "tlInternational.h"
@@ -164,30 +164,30 @@ show_dock_widget (QDockWidget *dock_widget, bool visible)
 // -------------------------------------------------------------
 
 MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
-    : QMainWindow (0),
-      lay::DispatcherDelegate (),
-      m_dispatcher (this),
-      m_text_progress (this, 10 /*verbosity threshold*/),
-      m_mode (std::numeric_limits<unsigned int>::max ()),
-      mp_setup_form (0),
-      m_open_mode (0),
-      m_keep_backups (0),
-      m_disable_tab_selected (false),
-      m_exited (false),
-      dm_do_update_menu (this, &MainWindow::do_update_menu),
-      dm_do_update_grids (this, &MainWindow::do_update_grids),
-      dm_do_update_mru_menus (this, &MainWindow::do_update_mru_menus),
-      dm_exit (this, &MainWindow::exit),
-      m_grid_micron (0.001),
-      m_default_grid (0.0),
-      m_default_grids_updated (true),
-      m_new_layout_current_panel (false),
-      m_synchronized_views (false),
-      m_synchronous (false),
-      m_busy (false),
-      mp_app (app),
-      m_message_timer_priority (-1),
-      m_manager (undo_enabled)
+  : QMainWindow (0),
+    lay::DispatcherDelegate (),
+    m_dispatcher (this),
+    m_text_progress (this, 10 /*verbosity threshold*/),
+    m_mode (std::numeric_limits<unsigned int>::max ()),
+    mp_setup_form (0),
+    m_open_mode (0),
+    m_keep_backups (0),
+    m_disable_tab_selected (false),
+    m_exited (false),
+    dm_do_update_menu (this, &MainWindow::do_update_menu),
+    dm_do_update_grids (this, &MainWindow::do_update_grids),
+    dm_do_update_mru_menus (this, &MainWindow::do_update_mru_menus),
+    dm_exit (this, &MainWindow::exit),
+    m_grid_micron (0.001),
+    m_default_grid (0.0),
+    m_default_grids_updated (true),
+    m_new_layout_current_panel (false),
+    m_synchronized_views (false),
+    m_synchronous (false),
+    m_busy (false),
+    mp_app (app),
+    m_message_timer_priority (-1),
+    m_manager (undo_enabled)
 {
   setAnimated (false);
 
@@ -339,13 +339,13 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
 #if QT_VERSION >= 0x040500
   setTabPosition (Qt::AllDockWidgetAreas, QTabWidget::North);
 #endif
-  addDockWidget(Qt::LeftDockWidgetArea, mp_navigator_dock_widget);
-  addDockWidget(Qt::LeftDockWidgetArea, mp_hp_dock_widget);
-  addDockWidget(Qt::LeftDockWidgetArea, mp_libs_dock_widget);
-  addDockWidget(Qt::LeftDockWidgetArea, mp_eo_dock_widget);
-  addDockWidget(Qt::RightDockWidgetArea, mp_bm_dock_widget);
-  addDockWidget(Qt::RightDockWidgetArea, mp_lp_dock_widget);
-  addDockWidget(Qt::RightDockWidgetArea, mp_layer_toolbox_dock_widget);
+  addDockWidget (Qt::LeftDockWidgetArea, mp_navigator_dock_widget);
+  addDockWidget (Qt::LeftDockWidgetArea, mp_hp_dock_widget);
+  addDockWidget (Qt::LeftDockWidgetArea, mp_libs_dock_widget);
+  addDockWidget (Qt::LeftDockWidgetArea, mp_eo_dock_widget);
+  addDockWidget (Qt::RightDockWidgetArea, mp_bm_dock_widget);
+  addDockWidget (Qt::RightDockWidgetArea, mp_lp_dock_widget);
+  addDockWidget (Qt::RightDockWidgetArea, mp_layer_toolbox_dock_widget);
 
   mp_tool_bar = new QToolBar (this);
   mp_tool_bar->setWindowTitle (QObject::tr ("Toolbar"));
@@ -365,7 +365,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   mp_status_bar->setObjectName (QString::fromUtf8 ("status_bar"));
 
   QLabel *tech_status_icon = new QLabel (mp_status_bar);
-  tech_status_icon->setText(QString::fromUtf8 ("<html>&nbsp;<b>T</b></html>"));
+  tech_status_icon->setText (QString::fromUtf8 ("<html>&nbsp;<b>T</b></html>"));
   mp_status_bar->addWidget (tech_status_icon);
 
   mp_tech_status_label = new QLabel (mp_status_bar);
@@ -375,7 +375,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   mp_status_bar->addWidget (mp_tech_status_label);
 
   QLabel *sel_status_icon = new QLabel (mp_status_bar);
-  sel_status_icon->setText(QString::fromUtf8 ("<html><b>&nbsp;&nbsp;G</b></html>"));
+  sel_status_icon->setText (QString::fromUtf8 ("<html><b>&nbsp;&nbsp;G</b></html>"));
   mp_status_bar->addWidget (sel_status_icon);
 
   mp_msg_label = new QLabel (mp_status_bar);
@@ -384,7 +384,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   mp_status_bar->addWidget (mp_msg_label, 1);
 
   QLabel *xy_status_icon = new QLabel (mp_status_bar);
-  xy_status_icon->setText(QString::fromUtf8 ("<html><b>&nbsp;&nbsp;xy</b></html>"));
+  xy_status_icon->setText (QString::fromUtf8 ("<html><b>&nbsp;&nbsp;xy</b></html>"));
   mp_status_bar->addWidget (xy_status_icon);
 
   mp_cp_frame = new QFrame (mp_status_bar);
@@ -415,25 +415,25 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
 
   //  session file dialog
   mp_session_fdia = new lay::FileDialog (this,
-                          tl::to_string (QObject::tr ("Session File")),
-                          tl::to_string (QObject::tr ("Session files (*.lys);;All files (*)")),
-                          "lys");
+                                         tl::to_string (QObject::tr ("Session File")),
+                                         tl::to_string (QObject::tr ("Session files (*.lys);;All files (*)")),
+                                         "lys");
 
   //  bookmarks file dialog
   mp_bookmarks_fdia = new lay::FileDialog (this,
-                            tl::to_string (QObject::tr ("Bookmarks File")),
-                            tl::to_string (QObject::tr ("Bookmark files (*.lyb);;All files (*)")),
-                            "lyb");
+                                           tl::to_string (QObject::tr ("Bookmarks File")),
+                                           tl::to_string (QObject::tr ("Bookmark files (*.lyb);;All files (*)")),
+                                           "lyb");
   //  layer properties
   mp_lprops_fdia = new lay::FileDialog (this,
-                            tl::to_string (QObject::tr ("Layer Properties File")),
-                            tl::to_string (QObject::tr ("Layer properties files (*.lyp);;All files (*)")),
-                            "lyp");
+                                        tl::to_string (QObject::tr ("Layer Properties File")),
+                                        tl::to_string (QObject::tr ("Layer properties files (*.lyp);;All files (*)")),
+                                        "lyp");
   //  screenshots
   mp_screenshot_fdia = new lay::FileDialog (this,
-                            tl::to_string (QObject::tr ("Screenshot")),
-                            tl::to_string (QObject::tr ("PNG files (*.png);;All files (*)")),
-                            "png");
+                                            tl::to_string (QObject::tr ("Screenshot")),
+                                            tl::to_string (QObject::tr ("PNG files (*.png);;All files (*)")),
+                                            "png");
 
 
   //  layout file dialog
@@ -452,7 +452,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   m_message_timer.setSingleShot (true);
 
   //  install timer for reload message display
-  connect (&m_file_changed_timer, SIGNAL (timeout ()), this, SLOT (file_changed_timer()));
+  connect (&m_file_changed_timer, SIGNAL (timeout ()), this, SLOT (file_changed_timer ()));
   m_file_changed_timer.setSingleShot (true);
 
   //  install timer for menu update a
@@ -509,13 +509,12 @@ MainWindow::all_layout_file_formats () const
   return fmts;
 }
 
-void
-MainWindow::init_menu ()
+void MainWindow::init_menu ()
 {
   //  make the plugins create their menu items
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
     //  TODO: get rid of the const_cast hack
-    const_cast <lay::PluginDeclaration *> (&*cls)->init_menu (dispatcher ());
+    const_cast<lay::PluginDeclaration *> (&*cls)->init_menu (dispatcher ());
   }
 
   //  if in "viewer-only mode", hide all entries in the "hide_vo" group
@@ -528,7 +527,7 @@ MainWindow::init_menu ()
 
   //  if not in editable mode, hide all entries from "edit_mode" group
   //  TODO: later do this on each change of the view - each view might get its own editable mode
-  bool view_mode = (lay::ApplicationBase::instance () && !lay::ApplicationBase::instance ()->is_editable ());
+  bool view_mode = (lay::ApplicationBase::instance () && ! lay::ApplicationBase::instance ()->is_editable ());
 
   std::vector<std::string> edit_mode_grp = menu ()->group ("edit_mode");
   for (std::vector<std::string>::const_iterator g = edit_mode_grp.begin (); g != edit_mode_grp.end (); ++g) {
@@ -550,8 +549,7 @@ static std::string tech_string_from_name (const std::string &tn)
   }
 }
 
-void
-MainWindow::technology_changed ()
+void MainWindow::technology_changed ()
 {
   lay::TechnologyController *tc = lay::TechnologyController::instance ();
   if (tc) {
@@ -562,32 +560,30 @@ MainWindow::technology_changed ()
     }
   }
 
-  m_default_grids_updated = true;  //  potentially ...
+  m_default_grids_updated = true; //  potentially ...
   dm_do_update_grids ();
 }
 
-void
-MainWindow::dock_widget_visibility_changed (bool /*visible*/)
+void MainWindow::dock_widget_visibility_changed (bool /*visible*/)
 {
   if (sender () == mp_lp_dock_widget) {
-    dispatcher ()->config_set (cfg_show_layer_panel, tl::to_string (!mp_lp_dock_widget->isHidden ()));
+    dispatcher ()->config_set (cfg_show_layer_panel, tl::to_string (! mp_lp_dock_widget->isHidden ()));
   } else if (sender () == mp_hp_dock_widget) {
-    dispatcher ()->config_set (cfg_show_hierarchy_panel, tl::to_string (!mp_hp_dock_widget->isHidden ()));
+    dispatcher ()->config_set (cfg_show_hierarchy_panel, tl::to_string (! mp_hp_dock_widget->isHidden ()));
   } else if (sender () == mp_libs_dock_widget) {
-    dispatcher ()->config_set (cfg_show_libraries_view, tl::to_string (!mp_libs_dock_widget->isHidden ()));
+    dispatcher ()->config_set (cfg_show_libraries_view, tl::to_string (! mp_libs_dock_widget->isHidden ()));
   } else if (sender () == mp_bm_dock_widget) {
-    dispatcher ()->config_set (cfg_show_bookmarks_view, tl::to_string (!mp_bm_dock_widget->isHidden ()));
+    dispatcher ()->config_set (cfg_show_bookmarks_view, tl::to_string (! mp_bm_dock_widget->isHidden ()));
   } else if (sender () == mp_navigator_dock_widget) {
-    dispatcher ()->config_set (cfg_show_navigator, tl::to_string (!mp_navigator_dock_widget->isHidden ()));
+    dispatcher ()->config_set (cfg_show_navigator, tl::to_string (! mp_navigator_dock_widget->isHidden ()));
   } else if (sender () == mp_layer_toolbox_dock_widget) {
-    dispatcher ()->config_set (cfg_show_layer_toolbox, tl::to_string (!mp_layer_toolbox_dock_widget->isHidden ()));
+    dispatcher ()->config_set (cfg_show_layer_toolbox, tl::to_string (! mp_layer_toolbox_dock_widget->isHidden ()));
   } else if (sender () == mp_eo_dock_widget) {
-    dispatcher ()->config_set (cfg_show_tool_options, tl::to_string (!mp_eo_dock_widget->isHidden ()));
+    dispatcher ()->config_set (cfg_show_tool_options, tl::to_string (! mp_eo_dock_widget->isHidden ()));
   }
 }
 
-void
-MainWindow::file_changed_timer ()
+void MainWindow::file_changed_timer ()
 {
   //  Don't evaluate file changed notifications while an operation is busy -
   //  otherwise we'd interfere with such operations.
@@ -598,7 +594,6 @@ MainWindow::file_changed_timer ()
     m_file_changed_timer.start ();
 
     return;
-
   }
 
   std::set<QString> notified_files;
@@ -616,7 +611,7 @@ MainWindow::file_changed_timer ()
   std::vector<QString> changed_files;
   changed_files.swap (m_changed_files);
 
-  std::map<QString, std::vector<std::pair<lay::LayoutViewWidget *, int> > > views_per_file;
+  std::map<QString, std::vector<std::pair<lay::LayoutViewWidget *, int>>> views_per_file;
 
   for (auto v = mp_views.begin (); v != mp_views.end (); ++v) {
     for (int cv = 0; cv < int ((*v)->view ()->cellviews ()); ++cv) {
@@ -641,16 +636,12 @@ MainWindow::file_changed_timer ()
         lay::LayoutViewNotification n ("reload", title, tl::Variant (tl::to_string (*f)));
         n.add_action ("reload", tl::to_string (tr ("Reload")));
         w->first->add_notification (n);
-
       }
-
     }
-
   }
 }
 
-void
-MainWindow::file_changed (const QString &path)
+void MainWindow::file_changed (const QString &path)
 {
   m_changed_files.push_back (path);
 
@@ -659,22 +650,19 @@ MainWindow::file_changed (const QString &path)
   m_file_changed_timer.start ();
 }
 
-void
-MainWindow::file_removed (const QString & /*path*/)
+void MainWindow::file_removed (const QString & /*path*/)
 {
   // .. nothing yet ..
 }
 
-void
-MainWindow::show ()
+void MainWindow::show ()
 {
   QMainWindow::show ();
   m_default_window_state = saveState ();
   m_default_window_geometry = saveGeometry ();
 }
 
-void
-MainWindow::close_all ()
+void MainWindow::close_all ()
 {
   cancel ();
 
@@ -715,14 +703,12 @@ MainWindow::close_all ()
     mp_view_stack->remove_widget (mp_views.size ());
 
     delete view;
-
   }
 
   update_dock_widget_state ();
 }
 
-void
-MainWindow::about_to_exec ()
+void MainWindow::about_to_exec ()
 {
   //  NOTE: empirically by using "0" for the parent of the TipDialogs (not "this"),
   //  these dialog appear on the same screen than the application window. With "this"
@@ -733,7 +719,7 @@ MainWindow::about_to_exec ()
 
   f = false;
   dispatcher ()->config_get (cfg_full_hier_new_cell, f);
-  if (!f) {
+  if (! f) {
     TipDialog td (0,
                   tl::to_string (QObject::tr ("<html><body>"
                                               "<p>With the current settings, only the top cell's content is shown initially, but the child cells are not drawn.</p>"
@@ -759,7 +745,7 @@ MainWindow::about_to_exec ()
   }
 
   //  TODO: later, each view may get its own editable flag
-  if (lay::ApplicationBase::instance () && !lay::ApplicationBase::instance ()->is_editable ()) {
+  if (lay::ApplicationBase::instance () && ! lay::ApplicationBase::instance ()->is_editable ()) {
     TipDialog td (0,
                   tl::to_string (QObject::tr ("KLayout has been started in viewer mode. In this mode, editor functions are not available.\n\nTo enable these functions, start KLayout in editor mode by using the \"-e\" command line switch or select it as the default mode in the setup dialog. Choose \"Setup\" in the \"File\" menu and check \"Use editing mode by default\" on the \"Editing Mode\" page in the \"Application\" section.")),
                   "editor-mode");
@@ -806,10 +792,9 @@ MainWindow::about_to_exec ()
   }
 }
 
-void
-MainWindow::tech_message (const std::string &s)
+void MainWindow::tech_message (const std::string &s)
 {
-  mp_tech_status_label->setText(tl::to_qstring (s));
+  mp_tech_status_label->setText (tl::to_qstring (s));
 }
 
 static int fm_width (const QFontMetrics &fm, const QString &s)
@@ -821,8 +806,7 @@ static int fm_width (const QFontMetrics &fm, const QString &s)
 #endif
 }
 
-void
-MainWindow::format_message ()
+void MainWindow::format_message ()
 {
   std::string msg;
   if (! m_messages.empty ()) {
@@ -833,7 +817,7 @@ MainWindow::format_message ()
 
   std::string full_message;
   for (const char *c = msg.c_str (); *c; ++c) {
-    if (*c == '\\' && (c[1] == '(' || c[1] == ')')) {
+    if (*c == '\\' && (c [1] == '(' || c [1] == ')')) {
       ++c;
     } else {
       full_message += *c;
@@ -854,7 +838,7 @@ MainWindow::format_message ()
     short_message.clear ();
 
     for (const char *c = msg.c_str (); *c; ++c) {
-      if (*c == '\\' && c[1] == '(') {
+      if (*c == '\\' && c [1] == '(') {
         if (nsection++ < ndrop) {
           in_drop = true;
           if (use_ellipsis) {
@@ -863,7 +847,7 @@ MainWindow::format_message ()
           }
         }
         ++c;
-      } else if (*c == '\\' && c[1] == ')') {
+      } else if (*c == '\\' && c [1] == ')') {
         in_drop = false;
         ++c;
       } else if (! in_drop) {
@@ -880,8 +864,7 @@ MainWindow::format_message ()
   mp_msg_label->setToolTip (tl::to_qstring (full_message));
 }
 
-void
-MainWindow::message (const std::string &s, int ms, int priority)
+void MainWindow::message (const std::string &s, int ms, int priority)
 {
   if (s.empty () && priority < 0) {
 
@@ -898,7 +881,7 @@ MainWindow::message (const std::string &s, int ms, int priority)
       m_messages.erase (m_message_timer_priority);
     }
 
-    m_messages[priority] = s;
+    m_messages [priority] = s;
 
     if (ms >= 0) {
       m_message_timer_priority = priority;
@@ -906,14 +889,12 @@ MainWindow::message (const std::string &s, int ms, int priority)
     } else {
       m_message_timer_priority = -1;
     }
-
   }
 
   format_message ();
 }
 
-void
-MainWindow::clear_messages ()
+void MainWindow::clear_messages ()
 {
   m_message_timer.stop ();
   m_message_timer_priority = -1;
@@ -921,8 +902,7 @@ MainWindow::clear_messages ()
   format_message ();
 }
 
-void
-MainWindow::message_timer ()
+void MainWindow::message_timer ()
 {
   if (m_message_timer_priority >= 0) {
     m_messages.erase (m_message_timer_priority);
@@ -931,8 +911,7 @@ MainWindow::message_timer ()
   format_message ();
 }
 
-void
-MainWindow::config_finalize ()
+void MainWindow::config_finalize ()
 {
   // Not set the window state: this ensures we have handled cfg_window_geometry
   // before we restore the state
@@ -948,7 +927,6 @@ MainWindow::config_finalize ()
     //  Keep the editor options visibility state
     m_eo_visible = eo_visible;
     show_dock_widget (mp_eo_dock_widget, m_eo_visible);
-
   }
 
   // Update the default grids menu if necessary
@@ -960,8 +938,7 @@ MainWindow::config_finalize ()
   mp_setup_form->setup ();
 }
 
-bool
-MainWindow::configure (const std::string &name, const std::string &value)
+bool MainWindow::configure (const std::string &name, const std::string &value)
 {
   if (name == cfg_grid) {
 
@@ -1255,13 +1232,11 @@ MainWindow::configure (const std::string &name, const std::string &value)
   } else {
     return false;
   }
-
 }
 
-void
-MainWindow::apply_hidden ()
+void MainWindow::apply_hidden ()
 {
-  for (std::vector<std::pair<std::string, bool> >::const_iterator hf = m_hidden.begin (); hf != m_hidden.end (); ++hf) {
+  for (std::vector<std::pair<std::string, bool>>::const_iterator hf = m_hidden.begin (); hf != m_hidden.end (); ++hf) {
     lay::AbstractMenuItem *item = menu ()->find_item_exact (hf->first);
     if (item && item->primary ()) {
       lay::Action *a = item->action ();
@@ -1272,10 +1247,9 @@ MainWindow::apply_hidden ()
   }
 }
 
-void
-MainWindow::apply_key_bindings ()
+void MainWindow::apply_key_bindings ()
 {
-  for (std::vector<std::pair<std::string, std::string> >::const_iterator kb = m_key_bindings.begin (); kb != m_key_bindings.end (); ++kb) {
+  for (std::vector<std::pair<std::string, std::string>>::const_iterator kb = m_key_bindings.begin (); kb != m_key_bindings.end (); ++kb) {
     lay::AbstractMenuItem *item = menu ()->find_item_exact (kb->first);
     if (item && item->primary ()) {
       lay::Action *a = item->action ();
@@ -1286,17 +1260,15 @@ MainWindow::apply_key_bindings ()
   }
 }
 
-bool
-MainWindow::edits_enabled () const
+bool MainWindow::edits_enabled () const
 {
   //  NOTE: "edits_enabled" does not - contrary to the name - indicate that editing is enabled
   //  but that the system is accepting changes of any kind. Hence if there is no view open,
   //  we need to accept changes, otherwise we cannot open new files.
-  return !current_view () || current_view ()->edits_enabled ();
+  return ! current_view () || current_view ()->edits_enabled ();
 }
 
-void
-MainWindow::edits_enabled_changed ()
+void MainWindow::edits_enabled_changed ()
 {
   bool enable = edits_enabled ();
 
@@ -1306,37 +1278,33 @@ MainWindow::edits_enabled_changed ()
   }
 }
 
-void
-MainWindow::menu_needs_update ()
+void MainWindow::menu_needs_update ()
 {
   lay::LayoutView::update_menu (current_view (), *menu ());
 }
 
-void
-MainWindow::libraries_changed ()
+void MainWindow::libraries_changed ()
 {
   //  if the libraries have changed, remove all selections and cancel any operations to avoid
   //  that the view refers to an invalid instance or shape
-  for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+  for (std::vector<lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
     (*vp)->view ()->clear_selection ();
     (*vp)->view ()->cancel ();
   }
 }
 
-void
-MainWindow::read_dock_widget_state ()
+void MainWindow::read_dock_widget_state ()
 {
-  dispatcher ()->config_set (cfg_show_layer_panel, tl::to_string (!mp_lp_dock_widget->isHidden ()));
-  dispatcher ()->config_set (cfg_show_hierarchy_panel, tl::to_string (!mp_hp_dock_widget->isHidden ()));
-  dispatcher ()->config_set (cfg_show_libraries_view, tl::to_string (!mp_libs_dock_widget->isHidden ()));
-  dispatcher ()->config_set (cfg_show_bookmarks_view, tl::to_string (!mp_bm_dock_widget->isHidden ()));
-  dispatcher ()->config_set (cfg_show_navigator, tl::to_string (!mp_navigator_dock_widget->isHidden ()));
-  dispatcher ()->config_set (cfg_show_layer_toolbox, tl::to_string (!mp_layer_toolbox_dock_widget->isHidden ()));
-  dispatcher ()->config_set (cfg_show_tool_options, tl::to_string (!mp_eo_dock_widget->isHidden ()));
+  dispatcher ()->config_set (cfg_show_layer_panel, tl::to_string (! mp_lp_dock_widget->isHidden ()));
+  dispatcher ()->config_set (cfg_show_hierarchy_panel, tl::to_string (! mp_hp_dock_widget->isHidden ()));
+  dispatcher ()->config_set (cfg_show_libraries_view, tl::to_string (! mp_libs_dock_widget->isHidden ()));
+  dispatcher ()->config_set (cfg_show_bookmarks_view, tl::to_string (! mp_bm_dock_widget->isHidden ()));
+  dispatcher ()->config_set (cfg_show_navigator, tl::to_string (! mp_navigator_dock_widget->isHidden ()));
+  dispatcher ()->config_set (cfg_show_layer_toolbox, tl::to_string (! mp_layer_toolbox_dock_widget->isHidden ()));
+  dispatcher ()->config_set (cfg_show_tool_options, tl::to_string (! mp_eo_dock_widget->isHidden ()));
 }
 
-void
-MainWindow::update_dock_widget_state ()
+void MainWindow::update_dock_widget_state ()
 {
   if (m_hp_visible) {
     mp_hp_dock_widget->show ();
@@ -1381,17 +1349,15 @@ MainWindow::update_dock_widget_state ()
   }
 }
 
-void
-MainWindow::exit ()
+void MainWindow::exit ()
 {
   if (m_busy) {
     if (QMessageBox::warning (this,
-      QObject::tr ("Application Busy - Close Anyway?"),
-      QObject::tr ("The application is busy.\nYou can close the application now, but this will terminate any running operations.\nDo you want to close anyway?\n\n"
-                   "Press 'Yes' to end the application now."),
-      QMessageBox::Yes | QMessageBox::No,
-      QMessageBox::Yes) != QMessageBox::Yes)
-    {
+                              QObject::tr ("Application Busy - Close Anyway?"),
+                              QObject::tr ("The application is busy.\nYou can close the application now, but this will terminate any running operations.\nDo you want to close anyway?\n\n"
+                                           "Press 'Yes' to end the application now."),
+                              QMessageBox::Yes | QMessageBox::No,
+                              QMessageBox::Yes) != QMessageBox::Yes) {
       return;
     }
   }
@@ -1425,15 +1391,14 @@ MainWindow::exit ()
   }
 }
 
-int
-MainWindow::dirty_files (std::string &dirty_files)
+int MainWindow::dirty_files (std::string &dirty_files)
 {
   int dirty_layouts = 0;
 
-  std::vector <std::string> names;
+  std::vector<std::string> names;
   lay::LayoutHandle::get_names (names);
 
-  for (std::vector <std::string>::const_iterator n = names.begin (); n != names.end (); ++n) {
+  for (std::vector<std::string>::const_iterator n = names.begin (); n != names.end (); ++n) {
 
     lay::LayoutHandle *handle = lay::LayoutHandle::find (*n);
     if (handle && handle->layout ().is_editable () && handle->is_dirty ()) {
@@ -1448,16 +1413,13 @@ MainWindow::dirty_files (std::string &dirty_files)
         dirty_files += "  ";
         dirty_files += handle->name ();
       }
-
     }
-
   }
 
   return dirty_layouts;
 }
 
-bool
-MainWindow::can_close ()
+bool MainWindow::can_close ()
 {
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
     lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
@@ -1469,7 +1431,7 @@ MainWindow::can_close ()
   std::string df_list;
   int dirty_layouts = dirty_files (df_list);
 
-  if ( m_always_exit_without_saving || (dirty_layouts == 0) ) {
+  if (m_always_exit_without_saving || (dirty_layouts == 0)) {
     return true;
   } else {
 
@@ -1482,13 +1444,11 @@ MainWindow::can_close ()
 
     mbox.exec ();
 
-    return mbox.clickedButton() == exit_button;
-
+    return mbox.clickedButton () == exit_button;
   }
 }
 
-void
-MainWindow::do_close ()
+void MainWindow::do_close ()
 {
   //  don't close if busy in processEvents
   if (m_busy) {
@@ -1501,8 +1461,7 @@ MainWindow::do_close ()
   save_state_to_config ();
 }
 
-void
-MainWindow::save_state_to_config ()
+void MainWindow::save_state_to_config ()
 {
   //  save the dock widget state with all views closed (that state can be
   //  used for staring klayout without any layout)
@@ -1510,14 +1469,12 @@ MainWindow::save_state_to_config ()
   dispatcher ()->config_set (cfg_window_state, (const char *) saveState ().toBase64 ().data ());
 }
 
-void
-MainWindow::resizeEvent (QResizeEvent *)
+void MainWindow::resizeEvent (QResizeEvent *)
 {
   format_message ();
 }
 
-void
-MainWindow::closeEvent (QCloseEvent *event)
+void MainWindow::closeEvent (QCloseEvent *event)
 {
   if (! m_exited) {
     BEGIN_PROTECTED
@@ -1532,30 +1489,26 @@ MainWindow::closeEvent (QCloseEvent *event)
   }
 }
 
-void
-MainWindow::cm_navigator_freeze ()
+void MainWindow::cm_navigator_freeze ()
 {
   if (mp_navigator) {
     mp_navigator->freeze_clicked ();
   }
 }
 
-void
-MainWindow::cm_navigator_close ()
+void MainWindow::cm_navigator_close ()
 {
   if (mp_navigator) {
     mp_navigator->close ();
   }
 }
 
-void
-MainWindow::cm_view_log ()
+void MainWindow::cm_view_log ()
 {
   mp_log_viewer_dialog->show ();
 }
 
-void
-MainWindow::cm_print ()
+void MainWindow::cm_print ()
 {
   //  TODO: move to lay::LayoutView
 
@@ -1569,7 +1522,7 @@ MainWindow::cm_print ()
   mp_printer->setDocName (tl::to_qstring ("klayout_printout"));
 
   QPrintDialog print_dialog (mp_printer.get (), this);
-  if (print_dialog.exec() == QDialog::Accepted) {
+  if (print_dialog.exec () == QDialog::Accepted) {
 
     if (current_view ()) {
 
@@ -1611,9 +1564,9 @@ MainWindow::cm_print ()
                                                             1,
                                                             1.0 / scale_factor,
                                                             1.0 / scale_factor,
-                                                            tl::Color (QColor (Qt::white)),  //  foreground
-                                                            tl::Color (QColor (Qt::black)),  //  background
-                                                            tl::Color (QColor (Qt::black)),  //  active
+                                                            tl::Color (QColor (Qt::white)), //  foreground
+                                                            tl::Color (QColor (Qt::black)), //  background
+                                                            tl::Color (QColor (Qt::black)), //  active
                                                             db::DBox (),
                                                             false);
 
@@ -1627,7 +1580,7 @@ MainWindow::cm_print ()
 
       db::DBox vp = current_view ()->viewport ().box ();
       std::string vp_string = "(" + tl::micron_to_string (vp.left ()) + ", " + tl::micron_to_string (vp.bottom ()) + " ... " +
-                                    tl::micron_to_string (vp.right ()) + ", " + tl::micron_to_string (vp.top ()) + ")";
+                              tl::micron_to_string (vp.right ()) + ", " + tl::micron_to_string (vp.top ()) + ")";
       painter.drawText (text_rect, Qt::AlignRight | Qt::AlignBottom, tl::to_qstring (vp_string));
 
       painter.end ();
@@ -1635,12 +1588,10 @@ MainWindow::cm_print ()
     } else {
       throw tl::Exception (tl::to_string (QObject::tr ("No view open to print")));
     }
-
   }
 }
 
-void
-MainWindow::cm_exit ()
+void MainWindow::cm_exit ()
 {
   exit ();
 }
@@ -1665,8 +1616,7 @@ MainWindow::view (int index) const
   }
 }
 
-int
-MainWindow::index_of (const lay::LayoutView *view) const
+int MainWindow::index_of (const lay::LayoutView *view) const
 {
   for (int i = 0; i < int (mp_views.size ()); ++i) {
     if (mp_views [i]->view () == view) {
@@ -1677,8 +1627,7 @@ MainWindow::index_of (const lay::LayoutView *view) const
   return -1;
 }
 
-int
-MainWindow::current_view_index () const
+int MainWindow::current_view_index () const
 {
   return index_of (current_view ());
 }
@@ -1689,13 +1638,12 @@ MainWindow::current_view () const
   return lay::LayoutView::current ();
 }
 
-void
-MainWindow::select_mode (int m)
+void MainWindow::select_mode (int m)
 {
   if (m_mode != m) {
 
     m_mode = m;
-    for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+    for (std::vector<lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
       (*vp)->view ()->mode (m);
     }
 
@@ -1706,26 +1654,23 @@ MainWindow::select_mode (int m)
     std::vector<std::string> items = menu ()->items ("@toolbar");
     for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
       Action *a = menu ()->action (*i);
-      if (a->is_checkable()) {
+      if (a->is_checkable ()) {
         a->set_checked (a->is_for_mode (m_mode));
       }
     }
-
   }
 }
 
-void
-MainWindow::cm_reset_window_state ()
+void MainWindow::cm_reset_window_state ()
 {
   restoreState (m_default_window_state);
   restoreGeometry (m_default_window_geometry);
 }
 
-void
-MainWindow::cm_undo ()
+void MainWindow::cm_undo ()
 {
   if (current_view () && m_manager.available_undo ().first) {
-    for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+    for (std::vector<lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
       (*vp)->view ()->clear_selection ();
       (*vp)->view ()->cancel ();
     }
@@ -1733,8 +1678,7 @@ MainWindow::cm_undo ()
   }
 }
 
-void
-MainWindow::cm_undo_list ()
+void MainWindow::cm_undo_list ()
 {
   if (current_view () && m_manager.available_undo ().first) {
 
@@ -1742,7 +1686,7 @@ MainWindow::cm_undo_list ()
 
     int steps = 0;
     if (dialog->exec (steps)) {
-      for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+      for (std::vector<lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
         (*vp)->view ()->clear_selection ();
         (*vp)->view ()->cancel ();
       }
@@ -1750,15 +1694,13 @@ MainWindow::cm_undo_list ()
         m_manager.undo ();
       }
     }
-
   }
 }
 
-void
-MainWindow::cm_redo ()
+void MainWindow::cm_redo ()
 {
   if (current_view () && m_manager.available_redo ().first) {
-    for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+    for (std::vector<lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
       (*vp)->view ()->clear_selection ();
       (*vp)->view ()->cancel ();
     }
@@ -1766,8 +1708,7 @@ MainWindow::cm_redo ()
   }
 }
 
-void
-MainWindow::cm_redo_list ()
+void MainWindow::cm_redo_list ()
 {
   if (current_view () && m_manager.available_redo ().first) {
 
@@ -1775,7 +1716,7 @@ MainWindow::cm_redo_list ()
 
     int steps = 0;
     if (dialog->exec (steps)) {
-      for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+      for (std::vector<lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
         (*vp)->view ()->clear_selection ();
         (*vp)->view ()->cancel ();
       }
@@ -1783,12 +1724,10 @@ MainWindow::cm_redo_list ()
         m_manager.redo ();
       }
     }
-
   }
 }
 
-void
-MainWindow::cm_goto_position ()
+void MainWindow::cm_goto_position ()
 {
   if (current_view ()) {
 
@@ -1860,36 +1799,29 @@ MainWindow::cm_goto_position ()
           marker.set_category (goto_marker_cat);
 
           ant_service->insert_ruler (marker, false);
-
         }
 
         break;
-
       }
-
     }
-
   }
 }
 
-void
-MainWindow::cm_manage_bookmarks ()
+void MainWindow::cm_manage_bookmarks ()
 {
   if (current_view ()) {
     current_view ()->manage_bookmarks ();
   }
 }
 
-void
-MainWindow::cm_bookmark_view ()
+void MainWindow::cm_bookmark_view ()
 {
   if (current_view ()) {
     current_view ()->bookmark_current_view ();
   }
 }
 
-void
-MainWindow::update_content ()
+void MainWindow::update_content ()
 {
   mp_setup_form->setup ();
   if (current_view ()) {
@@ -1897,8 +1829,7 @@ MainWindow::update_content ()
   }
 }
 
-void
-MainWindow::update_action_states ()
+void MainWindow::update_action_states ()
 {
   try {
 
@@ -1919,7 +1850,6 @@ MainWindow::update_action_states ()
         Action *undo_list_action = menu ()->action ("edit_menu.undo_list");
         undo_list_action->set_enabled (undo_enable && edits_enabled ());
       }
-
     }
 
     if (menu ()->is_valid ("edit_menu.redo")) {
@@ -1939,7 +1869,6 @@ MainWindow::update_action_states ()
         Action *redo_list_action = menu ()->action ("edit_menu.redo_list");
         redo_list_action->set_enabled (redo_enable && edits_enabled ());
       }
-
     }
 
     if (menu ()->is_valid ("edit_menu.paste")) {
@@ -1962,16 +1891,14 @@ MainWindow::update_action_states ()
   }
 }
 
-void
-MainWindow::redraw ()
+void MainWindow::redraw ()
 {
   if (current_view ()) {
     current_view ()->redraw ();
   }
 }
 
-void
-MainWindow::cm_cancel ()
+void MainWindow::cm_cancel ()
 {
   cancel ();
 }
@@ -1979,8 +1906,7 @@ MainWindow::cm_cancel ()
 /**
  *  @brief Commits any operations, cancels any pending edit operations and clears the selection.
  */
-void
-MainWindow::cancel ()
+void MainWindow::cancel ()
 {
   //  if any transaction is pending (this may happen when an operation threw an exception)
   //  close transactions.
@@ -1988,18 +1914,17 @@ MainWindow::cancel ()
     m_manager.commit ();
   }
 
-  for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+  for (std::vector<lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
     (*vp)->view ()->cancel ();
   }
 
   select_mode (lay::LayoutView::default_mode ());
 }
 
-void
-MainWindow::load_layer_properties (const std::string &fn, bool all_views, bool add_default)
+void MainWindow::load_layer_properties (const std::string &fn, bool all_views, bool add_default)
 {
   if (all_views) {
-    for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+    for (std::vector<lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
       (*vp)->view ()->load_layer_props (fn, add_default);
     }
   } else if (current_view ()) {
@@ -2007,11 +1932,10 @@ MainWindow::load_layer_properties (const std::string &fn, bool all_views, bool a
   }
 }
 
-void
-MainWindow::load_layer_properties (const std::string &fn, int cv_index, bool all_views, bool add_default)
+void MainWindow::load_layer_properties (const std::string &fn, int cv_index, bool all_views, bool add_default)
 {
   if (all_views) {
-    for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+    for (std::vector<lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
       (*vp)->view ()->load_layer_props (fn, cv_index, add_default);
     }
   } else if (current_view ()) {
@@ -2019,8 +1943,7 @@ MainWindow::load_layer_properties (const std::string &fn, int cv_index, bool all
   }
 }
 
-void
-MainWindow::cm_save_layer_props ()
+void MainWindow::cm_save_layer_props ()
 {
   if (current_view ()) {
     std::string fn;
@@ -2033,8 +1956,7 @@ MainWindow::cm_save_layer_props ()
   }
 }
 
-void
-MainWindow::cm_load_layer_props ()
+void MainWindow::cm_load_layer_props ()
 {
   if (current_view ()) {
     std::string fn;
@@ -2047,8 +1969,7 @@ MainWindow::cm_load_layer_props ()
   }
 }
 
-void
-MainWindow::load_layer_props_from_file (const std::string &fn)
+void MainWindow::load_layer_props_from_file (const std::string &fn)
 {
   if (! current_view ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("No view open to load the layer properties for")));
@@ -2066,15 +1987,14 @@ MainWindow::load_layer_props_from_file (const std::string &fn)
     }
 
     bool ok;
-    QString item = QInputDialog::getItem(this, QObject::tr ("Apply Layer Properties File"),
-                                               QObject::tr ("There are multiple layouts in that panel but the layer properties file contains properties for a single one.\nWhat should be done?"),
-                                               items, 1, false, &ok);
-    if (!ok || item.isEmpty()) {
+    QString item = QInputDialog::getItem (this, QObject::tr ("Apply Layer Properties File"),
+                                          QObject::tr ("There are multiple layouts in that panel but the layer properties file contains properties for a single one.\nWhat should be done?"),
+                                          items, 1, false, &ok);
+    if (! ok || item.isEmpty ()) {
       return;
     }
 
     target_cv_index = items.indexOf (item) - 2;
-
   }
 
   if (target_cv_index > -2) {
@@ -2084,8 +2004,7 @@ MainWindow::load_layer_props_from_file (const std::string &fn)
   }
 }
 
-void
-MainWindow::save_session (const std::string &fn)
+void MainWindow::save_session (const std::string &fn)
 {
   m_current_session = fn;
   lay::Session session;
@@ -2093,8 +2012,7 @@ MainWindow::save_session (const std::string &fn)
   session.save (fn);
 }
 
-void
-MainWindow::restore_session (const std::string &fn)
+void MainWindow::restore_session (const std::string &fn)
 {
   m_current_session = fn;
   lay::Session session;
@@ -2112,30 +2030,27 @@ MainWindow::restore_session (const std::string &fn)
   }
 }
 
-void
-MainWindow::cm_save_session ()
+void MainWindow::cm_save_session ()
 {
   std::string df_list;
   int dirty_layouts = dirty_files (df_list);
 
   if (dirty_layouts == 0 ||
-    QMessageBox::warning (this,
-      QObject::tr ("Save Needed For Some Layouts"),
-      tl::to_qstring (tl::to_string (QObject::tr ("The following layouts need saving.\nThese layouts must be saved manually:\n\n")) + df_list + "\n\nPress 'Ok' to continue."),
-      QMessageBox::Ok | QMessageBox::Cancel,
-      QMessageBox::Cancel) == QMessageBox::Ok) {
+      QMessageBox::warning (this,
+                            QObject::tr ("Save Needed For Some Layouts"),
+                            tl::to_qstring (tl::to_string (QObject::tr ("The following layouts need saving.\nThese layouts must be saved manually:\n\n")) + df_list + "\n\nPress 'Ok' to continue."),
+                            QMessageBox::Ok | QMessageBox::Cancel,
+                            QMessageBox::Cancel) == QMessageBox::Ok) {
 
     std::string fn = m_current_session;
     if (mp_session_fdia->get_save (fn, tl::to_string (QObject::tr ("Save Session File")))) {
       save_session (fn);
       add_to_other_mru (fn, cfg_mru_sessions);
     }
-
   }
 }
 
-void
-MainWindow::cm_restore_session ()
+void MainWindow::cm_restore_session ()
 {
   std::string fn = m_current_session;
   if (mp_session_fdia->get_open (fn, tl::to_string (QObject::tr ("Load Session File")))) {
@@ -2159,18 +2074,15 @@ MainWindow::cm_restore_session ()
 
       mbox.exec ();
 
-      if (mbox.clickedButton() == discard_button) {
+      if (mbox.clickedButton () == discard_button) {
         restore_session (fn);
         add_to_other_mru (fn, cfg_mru_sessions);
       }
-
     }
-
   }
 }
 
-void
-MainWindow::cm_save_bookmarks ()
+void MainWindow::cm_save_bookmarks ()
 {
   if (current_view ()) {
     std::string fn;
@@ -2183,8 +2095,7 @@ MainWindow::cm_save_bookmarks ()
   }
 }
 
-void
-MainWindow::cm_load_bookmarks ()
+void MainWindow::cm_load_bookmarks ()
 {
   if (current_view ()) {
     std::string fn;
@@ -2199,8 +2110,7 @@ MainWindow::cm_load_bookmarks ()
   }
 }
 
-void
-MainWindow::cm_screenshot ()
+void MainWindow::cm_screenshot ()
 {
   if (current_view ()) {
     std::string fn;
@@ -2212,24 +2122,22 @@ MainWindow::cm_screenshot ()
   }
 }
 
-void
-MainWindow::cm_screenshot_to_clipboard ()
+void MainWindow::cm_screenshot_to_clipboard ()
 {
   if (current_view ()) {
     QImage screenshot = current_view ()->get_screenshot ();
 #if QT_VERSION >= 0x050000
-    QClipboard *clipboard = QGuiApplication::clipboard();
+    QClipboard *clipboard = QGuiApplication::clipboard ();
 #else
-    QClipboard *clipboard = QApplication::clipboard();
+    QClipboard *clipboard = QApplication::clipboard ();
 #endif
-    clipboard->setImage(screenshot);
+    clipboard->setImage (screenshot);
   } else {
     throw tl::Exception (tl::to_string (QObject::tr ("No view open to create a screenshot from")));
   }
 }
 
-void
-MainWindow::cm_save_current_cell_as ()
+void MainWindow::cm_save_current_cell_as ()
 {
   if (current_view ()) {
 
@@ -2268,26 +2176,19 @@ MainWindow::cm_save_current_cell_as ()
             cv->save_as (fn, om, options, false /*don't update*/, m_keep_backups);
 
             add_mru (fn, cv->tech_name ());
-
           }
-
         }
-
       }
-
     }
-
   }
 }
 
-void
-MainWindow::cm_save ()
+void MainWindow::cm_save ()
 {
   do_save (false);
 }
 
-void
-MainWindow::cm_save_as ()
+void MainWindow::cm_save_as ()
 {
   do_save (true);
 }
@@ -2296,7 +2197,7 @@ static db::SaveLayoutOptions
 get_save_options_from_cv (const lay::CellView &cv)
 {
   db::SaveLayoutOptions options = cv->save_options ();
-  if (!cv->save_options_valid () && cv->technology ()) {
+  if (! cv->save_options_valid () && cv->technology ()) {
     options = cv->technology ()->save_layout_options ();
     options.set_format (cv->save_options ().format ());
   }
@@ -2315,8 +2216,7 @@ get_save_options_from_cv (const lay::CellView &cv)
   return options;
 }
 
-void
-MainWindow::do_save (bool as)
+void MainWindow::do_save (bool as)
 {
   if (current_view ()) {
 
@@ -2370,13 +2270,9 @@ MainWindow::do_save (bool as)
             //  freeze writer options in the 'save_as' case, so we can do another "save" and get the
             //  selected options again
             cv->set_save_options (options, true);
-
           }
-
         }
-
       }
-
     }
 
   } else {
@@ -2384,8 +2280,7 @@ MainWindow::do_save (bool as)
   }
 }
 
-void
-MainWindow::cm_save_all ()
+void MainWindow::cm_save_all ()
 {
   for (int view_index = 0; view_index < int (views ()); ++view_index) {
 
@@ -2406,23 +2301,18 @@ MainWindow::cm_save_all ()
 
         view (view_index)->save_as (cv_index, fn, om, options, true, m_keep_backups);
         add_mru (fn, cv->tech_name ());
-
       }
-
     }
-
   }
 }
 
-void
-MainWindow::cm_setup ()
+void MainWindow::cm_setup ()
 {
   mp_setup_form->show ();
   mp_setup_form->setup ();
 }
 
-void
-MainWindow::view_selected (int index)
+void MainWindow::view_selected (int index)
 {
   if (index >= 0 && index < int (views ())) {
 
@@ -2434,12 +2324,10 @@ MainWindow::view_selected (int index)
     if (! m_disable_tab_selected) {
       select_view (index);
     }
-
   }
 }
 
-void
-MainWindow::select_view (int index)
+void MainWindow::select_view (int index)
 {
   bool dis = m_disable_tab_selected;
   m_disable_tab_selected = true; // prevent recursion
@@ -2474,7 +2362,6 @@ MainWindow::select_view (int index)
       mp_eo_stack->raise_widget (index);
       mp_bm_stack->raise_widget (index);
       mp_setup_form->setup ();
-
     }
 
     current_view_changed ();
@@ -2492,32 +2379,28 @@ MainWindow::select_view (int index)
   }
 }
 
-void
-MainWindow::cm_open_too ()
+void MainWindow::cm_open_too ()
 {
   open (2);
 }
 
-void
-MainWindow::cm_open_new_view ()
+void MainWindow::cm_open_new_view ()
 {
   open (1);
 }
 
-void
-MainWindow::cm_open ()
+void MainWindow::cm_open ()
 {
   open (0);
 }
 
-void
-MainWindow::cm_pull_in ()
+void MainWindow::cm_pull_in ()
 {
-  std::vector <std::string> names;
+  std::vector<std::string> names;
   lay::LayoutHandle::get_names (names);
 
   QStringList layouts;
-  for (std::vector <std::string>::const_iterator n = names.begin (); n != names.end (); ++n) {
+  for (std::vector<std::string>::const_iterator n = names.begin (); n != names.end (); ++n) {
     layouts << tl::to_qstring (*n);
   }
 
@@ -2566,30 +2449,23 @@ MainWindow::cm_pull_in ()
           }
 
           current_view ()->merge_layer_props (other_props);
-
         }
-
       }
-
     }
-
   }
 }
 
-void
-MainWindow::cm_reader_options ()
+void MainWindow::cm_reader_options ()
 {
   mp_layout_load_options->edit_global_options (dispatcher (), db::Technologies::instance ());
 }
 
-void
-MainWindow::cm_writer_options ()
+void MainWindow::cm_writer_options ()
 {
   mp_layout_save_options->edit_global_options (dispatcher (), db::Technologies::instance ());
 }
 
-void
-MainWindow::cm_refresh ()
+void MainWindow::cm_refresh ()
 {
   if (lay::LibraryController::instance ()) {
     lay::LibraryController::instance ()->sync_files (false);
@@ -2598,14 +2474,12 @@ MainWindow::cm_refresh ()
   db::LibraryManager::instance ().refresh_all ();
 }
 
-void
-MainWindow::cm_new_panel ()
+void MainWindow::cm_new_panel ()
 {
   create_view ();
 }
 
-void
-MainWindow::cm_new_layout ()
+void MainWindow::cm_new_layout ()
 {
   std::string technology = m_initial_technology;
   static std::string s_new_cell_cell_name ("TOP");
@@ -2617,7 +2491,7 @@ MainWindow::cm_new_layout ()
   lay::NewLayoutPropertiesDialog dialog (this);
   if (dialog.exec_dialog (technology, s_new_cell_cell_name, dbu, s_new_cell_window_size, s_layers, m_new_layout_current_panel)) {
 
-    std::unique_ptr <lay::LayoutHandle> handle (new lay::LayoutHandle (new db::Layout (& manager ()), std::string ()));
+    std::unique_ptr<lay::LayoutHandle> handle (new lay::LayoutHandle (new db::Layout (&manager ()), std::string ()));
     handle->layout ().set_technology_name (technology);
     handle->rename ("new");
 
@@ -2635,18 +2509,15 @@ MainWindow::cm_new_layout ()
     unsigned int ci = mp_view->add_layout (handle.release (), true);
     mp_view->cellview_ref (ci).set_cell (new_ci);
     mp_view->zoom_box_and_set_hier_levels (db::DBox (-0.5 * s_new_cell_window_size, -0.5 * s_new_cell_window_size, 0.5 * s_new_cell_window_size, 0.5 * s_new_cell_window_size), std::make_pair (0, 1));
-
   }
 }
 
-void
-MainWindow::cm_clone ()
+void MainWindow::cm_clone ()
 {
   clone_current_view ();
 }
 
-void
-MainWindow::clone_current_view ()
+void MainWindow::clone_current_view ()
 {
   lay::LayoutViewWidget *view_widget = 0;
   lay::LayoutView *curr = current_view ();
@@ -2698,14 +2569,12 @@ MainWindow::clone_current_view ()
   update_dock_widget_state ();
 }
 
-void
-MainWindow::cm_close_all ()
+void MainWindow::cm_close_all ()
 {
   interactive_close_view (0, views (), false, false);
 }
 
-void
-MainWindow::cm_close ()
+void MainWindow::cm_close ()
 {
   int current_index = index_of (lay::LayoutView::current ());
   if (current_index >= 0) {
@@ -2713,14 +2582,12 @@ MainWindow::cm_close ()
   }
 }
 
-void
-MainWindow::tab_close_requested (int index)
+void MainWindow::tab_close_requested (int index)
 {
   interactive_close_view (index, index + 1, false, true);
 }
 
-void
-MainWindow::interactive_close_view (int from, int to, bool invert_range, bool all_cellviews)
+void MainWindow::interactive_close_view (int from, int to, bool invert_range, bool all_cellviews)
 {
   //  closes views in range [from, to[ (invert_range=false) or outside this range (invert_range=true)
   if (invert_range || from + 1 != to) {
@@ -2759,31 +2626,27 @@ MainWindow::interactive_close_view (int from, int to, bool invert_range, bool al
             }
             dirty_files += name;
           }
-
         }
-
       }
-
     }
 
     if (dirty_layouts != 0) {
 
       QMessageBox mbox (this);
       mbox.setText (tl::to_qstring (tl::to_string (QObject::tr ("The following layouts need saving:\n\n")) + dirty_files + tl::to_string (QObject::tr ("\n\nPress 'Close Without Saving' to close them anyway and discard changes\n")))),
-      mbox.setWindowTitle (QObject::tr ("Save Needed"));
+        mbox.setWindowTitle (QObject::tr ("Save Needed"));
       mbox.setIcon (QMessageBox::Warning);
       QAbstractButton *can_close_button = mbox.addButton (QObject::tr ("Close Without Saving"), QMessageBox::YesRole);
       mbox.addButton (QMessageBox::Cancel);
 
       mbox.exec ();
 
-      can_close = (mbox.clickedButton() == can_close_button);
-
+      can_close = (mbox.clickedButton () == can_close_button);
     }
 
     if (can_close) {
       BEGIN_PROTECTED
-      for (int index = int (views ()); index > 0; ) {
+      for (int index = int (views ()); index > 0;) {
         --index;
         if ((index >= from && index < to) != invert_range) {
           close_view (index);
@@ -2794,7 +2657,7 @@ MainWindow::interactive_close_view (int from, int to, bool invert_range, bool al
 
   } else if (view (from)) {
 
-    std::vector <int> selected;
+    std::vector<int> selected;
 
     if (view (from)->cellviews () > 1) {
 
@@ -2817,7 +2680,6 @@ MainWindow::interactive_close_view (int from, int to, bool invert_range, bool al
         if (selected.empty ()) {
           return;
         }
-
       }
 
     } else if (view (from)->cellviews () > 0) {
@@ -2829,7 +2691,7 @@ MainWindow::interactive_close_view (int from, int to, bool invert_range, bool al
       int dirty_layouts = 0;
       std::string dirty_files;
 
-      for (std::vector <int>::const_iterator i = selected.begin (); i != selected.end (); ++i) {
+      for (std::vector<int>::const_iterator i = selected.begin (); i != selected.end (); ++i) {
 
         const lay::CellView &cv = view (from)->cellview (*i);
 
@@ -2839,7 +2701,7 @@ MainWindow::interactive_close_view (int from, int to, bool invert_range, bool al
 
           int count = 0;
 
-          for (std::vector <lay::LayoutViewWidget *>::const_iterator v = mp_views.begin (); v != mp_views.end (); ++v) {
+          for (std::vector<lay::LayoutViewWidget *>::const_iterator v = mp_views.begin (); v != mp_views.end (); ++v) {
             for (unsigned int cvi = 0; cvi < (*v)->view ()->cellviews (); ++cvi) {
               if ((*v)->view ()->cellview (cvi)->name () == name) {
                 ++count;
@@ -2847,7 +2709,7 @@ MainWindow::interactive_close_view (int from, int to, bool invert_range, bool al
             }
           }
 
-          for (std::vector <int>::const_iterator ii = selected.begin (); ii != selected.end (); ++ii) {
+          for (std::vector<int>::const_iterator ii = selected.begin (); ii != selected.end (); ++ii) {
             if (view (from)->cellview (*ii)->name () == name) {
               --count;
             }
@@ -2865,9 +2727,7 @@ MainWindow::interactive_close_view (int from, int to, bool invert_range, bool al
               dirty_files += name;
             }
           }
-
         }
-
       }
 
       bool can_close = true;
@@ -2875,15 +2735,14 @@ MainWindow::interactive_close_view (int from, int to, bool invert_range, bool al
 
         QMessageBox mbox (this);
         mbox.setText (tl::to_qstring (tl::to_string (QObject::tr ("The following layouts need saving:\n\n")) + dirty_files + tl::to_string (QObject::tr ("\n\nPress 'Close Without Saving' to close them anyway and discard changes\n")))),
-        mbox.setWindowTitle (QObject::tr ("Save Needed"));
+          mbox.setWindowTitle (QObject::tr ("Save Needed"));
         mbox.setIcon (QMessageBox::Warning);
         QAbstractButton *can_close_button = mbox.addButton (QObject::tr ("Close Without Saving"), QMessageBox::YesRole);
         mbox.addButton (QMessageBox::Cancel);
 
         mbox.exec ();
 
-        can_close = (mbox.clickedButton() == can_close_button);
-
+        can_close = (mbox.clickedButton () == can_close_button);
       }
 
       if (can_close) {
@@ -2897,44 +2756,37 @@ MainWindow::interactive_close_view (int from, int to, bool invert_range, bool al
         } else {
           std::sort (selected.begin (), selected.end ());
           int offset = 0;
-          for (std::vector <int>::const_iterator i = selected.begin (); i != selected.end (); ++i) {
-            view (from)->erase_cellview ((unsigned int)(*i - offset));
+          for (std::vector<int>::const_iterator i = selected.begin (); i != selected.end (); ++i) {
+            view (from)->erase_cellview ((unsigned int) (*i - offset));
             ++offset;
           }
         }
 
         END_PROTECTED
-
       }
 
     } else {
       close_view (from);
     }
-
   }
-
 }
 
-void
-MainWindow::clone ()
+void MainWindow::clone ()
 {
   clone_current_view ();
 }
 
-void
-MainWindow::close_current_view ()
+void MainWindow::close_current_view ()
 {
   close_view (index_of (lay::LayoutView::current ()));
 }
 
-void
-MainWindow::close_all_views ()
+void MainWindow::close_all_views ()
 {
   cm_close_all ();
 }
 
-void
-MainWindow::close_all_except_this ()
+void MainWindow::close_all_except_this ()
 {
   int index = mp_tab_bar->tabAt (m_mouse_pos);
   if (index >= 0) {
@@ -2942,8 +2794,7 @@ MainWindow::close_all_except_this ()
   }
 }
 
-void
-MainWindow::close_all_views_left ()
+void MainWindow::close_all_views_left ()
 {
   int index = mp_tab_bar->tabAt (m_mouse_pos);
   if (index >= 0) {
@@ -2951,8 +2802,7 @@ MainWindow::close_all_views_left ()
   }
 }
 
-void
-MainWindow::close_all_views_right ()
+void MainWindow::close_all_views_right ()
 {
   int index = mp_tab_bar->tabAt (m_mouse_pos);
   if (index >= 0) {
@@ -2960,8 +2810,7 @@ MainWindow::close_all_views_right ()
   }
 }
 
-void
-MainWindow::close_view (int index)
+void MainWindow::close_view (int index)
 {
   if (view (index)) {
 
@@ -2973,70 +2822,66 @@ MainWindow::close_view (int index)
 
     BEGIN_PROTECTED
 
-      db::DBox box;
-      if (m_synchronized_views) {
-        box = view (index)->viewport ().box ();
-      }
+    db::DBox box;
+    if (m_synchronized_views) {
+      box = view (index)->viewport ().box ();
+    }
 
-      mp_tab_bar->removeTab (index);
-      mp_view_stack->remove_widget (index);
-      mp_lp_stack->remove_widget (index);
-      mp_layer_toolbox_stack->remove_widget (index);
-      mp_hp_stack->remove_widget (index);
-      mp_libs_stack->remove_widget (index);
-      mp_eo_stack->remove_widget (index);
-      mp_bm_stack->remove_widget (index);
+    mp_tab_bar->removeTab (index);
+    mp_view_stack->remove_widget (index);
+    mp_lp_stack->remove_widget (index);
+    mp_layer_toolbox_stack->remove_widget (index);
+    mp_hp_stack->remove_widget (index);
+    mp_libs_stack->remove_widget (index);
+    mp_eo_stack->remove_widget (index);
+    mp_bm_stack->remove_widget (index);
 
-      view_closed_event (int (index));
+    view_closed_event (int (index));
 
-      //  delete the view later as it may still be needed by event handlers or similar
-      std::unique_ptr<lay::LayoutViewWidget> old_view (mp_views [index]);
+    //  delete the view later as it may still be needed by event handlers or similar
+    std::unique_ptr<lay::LayoutViewWidget> old_view (mp_views [index]);
 
-      mp_views.erase (mp_views.begin () + index, mp_views.begin () + index + 1);
+    mp_views.erase (mp_views.begin () + index, mp_views.begin () + index + 1);
 
-      if (index >= int (mp_views.size ())) {
-        --index;
-      }
+    if (index >= int (mp_views.size ())) {
+      --index;
+    }
 
-      if (index >= 0) {
+    if (index >= 0) {
 
-        select_view (index);
+      select_view (index);
 
-      } else {
+    } else {
 
-        //  last view closed
+      //  last view closed
 
-        lay::LayoutView::set_current (0);
-        current_view_changed ();
+      lay::LayoutView::set_current (0);
+      current_view_changed ();
 
-        clear_current_pos ();
-        edits_enabled_changed ();
-        menu_needs_update ();
-        clear_messages ();
+      clear_current_pos ();
+      edits_enabled_changed ();
+      menu_needs_update ();
+      clear_messages ();
 
-        update_dock_widget_state ();
-
-      }
+      update_dock_widget_state ();
+    }
 
     END_PROTECTED
 
     m_disable_tab_selected = f;
-
   }
 }
 
-void
-MainWindow::add_mru (const std::string &fn_rel)
+void MainWindow::add_mru (const std::string &fn_rel)
 {
   add_mru (fn_rel, m_initial_technology);
 }
 
 const size_t max_mru = 16; //  TODO: make configurable?
 
-void
-MainWindow::add_mru (const std::string &fn_rel, const std::string &tech)
+void MainWindow::add_mru (const std::string &fn_rel, const std::string &tech)
 {
-  std::vector <std::pair<std::string, std::string> > new_mru;
+  std::vector<std::pair<std::string, std::string>> new_mru;
   std::string fn (tl::InputStream::absolute_file_path (fn_rel));
 
   for (auto mru = m_mru.begin (); mru != m_mru.end (); ++mru) {
@@ -3066,10 +2911,9 @@ MainWindow::add_mru (const std::string &fn_rel, const std::string &tech)
   dispatcher ()->config_set (cfg_mru, config_str);
 }
 
-void
-MainWindow::add_to_other_mru (const std::string &fn_rel, const std::string &cfg)
+void MainWindow::add_to_other_mru (const std::string &fn_rel, const std::string &cfg)
 {
-  std::vector <std::string> *mru_ptr;
+  std::vector<std::string> *mru_ptr;
   if (cfg == cfg_mru_sessions) {
     mru_ptr = &m_mru_sessions;
   } else if (cfg == cfg_mru_layer_properties) {
@@ -3080,7 +2924,7 @@ MainWindow::add_to_other_mru (const std::string &fn_rel, const std::string &cfg)
     tl_assert (false);
   }
 
-  std::vector <std::string> new_mru;
+  std::vector<std::string> new_mru;
   std::string fn (tl::InputStream::absolute_file_path (fn_rel));
 
   for (auto mru = mru_ptr->begin (); mru != mru_ptr->end (); ++mru) {
@@ -3115,7 +2959,8 @@ class OpenRecentAction
 public:
   OpenRecentAction (lay::MainWindow *mw, size_t n, void (lay::MainWindow::*open_meth) (size_t), bool (lay::MainWindow::*avail_meth) (size_t))
     : lay::Action (), mp_mw (mw), m_n (n), m_open_meth (open_meth), m_avail_meth (avail_meth)
-  { }
+  {
+  }
 
   void triggered ()
   {
@@ -3156,8 +3001,7 @@ private:
 
 }
 
-void
-MainWindow::do_update_mru_menus ()
+void MainWindow::do_update_mru_menus ()
 {
   std::string mru_menu = "file_menu.open_recent_menu";
 
@@ -3171,7 +3015,7 @@ MainWindow::do_update_mru_menus ()
       //  rebuild MRU menu
       menu ()->clear_menu (mru_menu);
 
-      for (std::vector<std::pair<std::string, std::string> >::iterator mru = m_mru.end (); mru != m_mru.begin (); ) {
+      for (std::vector<std::pair<std::string, std::string>>::iterator mru = m_mru.end (); mru != m_mru.begin ();) {
         --mru;
         size_t i = std::distance (m_mru.begin (), mru);
         Action *action = new OpenRecentAction (this, i, &lay::MainWindow::open_recent, &lay::MainWindow::is_available_recent);
@@ -3185,7 +3029,6 @@ MainWindow::do_update_mru_menus ()
     } else {
       open_recent_action->set_enabled (false);
     }
-
   }
 
   mru_menu = "file_menu.open_recent_menu_sessions";
@@ -3200,7 +3043,7 @@ MainWindow::do_update_mru_menus ()
       //  rebuild MRU menu
       menu ()->clear_menu (mru_menu);
 
-      for (std::vector<std::string>::iterator mru = m_mru_sessions.end (); mru != m_mru_sessions.begin (); ) {
+      for (std::vector<std::string>::iterator mru = m_mru_sessions.end (); mru != m_mru_sessions.begin ();) {
         --mru;
         size_t i = std::distance (m_mru_sessions.begin (), mru);
         Action *action = new OpenRecentAction (this, i, &lay::MainWindow::open_recent_session, &lay::MainWindow::is_available_recent_session);
@@ -3214,7 +3057,6 @@ MainWindow::do_update_mru_menus ()
     } else {
       open_recent_action->set_enabled (false);
     }
-
   }
 
   mru_menu = "file_menu.open_recent_menu_layer_props";
@@ -3229,7 +3071,7 @@ MainWindow::do_update_mru_menus ()
       //  rebuild MRU menu
       menu ()->clear_menu (mru_menu);
 
-      for (std::vector<std::string>::iterator mru = m_mru_layer_properties.end (); mru != m_mru_layer_properties.begin (); ) {
+      for (std::vector<std::string>::iterator mru = m_mru_layer_properties.end (); mru != m_mru_layer_properties.begin ();) {
         --mru;
         size_t i = std::distance (m_mru_layer_properties.begin (), mru);
         Action *action = new OpenRecentAction (this, i, &lay::MainWindow::open_recent_layer_properties, &lay::MainWindow::is_available_recent_layer_properties);
@@ -3243,7 +3085,6 @@ MainWindow::do_update_mru_menus ()
     } else {
       open_recent_action->set_enabled (false);
     }
-
   }
 
   mru_menu = "bookmark_menu.open_recent_menu_bookmarks";
@@ -3258,7 +3099,7 @@ MainWindow::do_update_mru_menus ()
       //  rebuild MRU menu
       menu ()->clear_menu (mru_menu);
 
-      for (std::vector<std::string>::iterator mru = m_mru_bookmarks.end (); mru != m_mru_bookmarks.begin (); ) {
+      for (std::vector<std::string>::iterator mru = m_mru_bookmarks.end (); mru != m_mru_bookmarks.begin ();) {
         --mru;
         size_t i = std::distance (m_mru_bookmarks.begin (), mru);
         Action *action = new OpenRecentAction (this, i, &lay::MainWindow::open_recent_bookmarks, &lay::MainWindow::is_available_recent_bookmarks);
@@ -3272,12 +3113,10 @@ MainWindow::do_update_mru_menus ()
     } else {
       open_recent_action->set_enabled (false);
     }
-
   }
 }
 
-void
-MainWindow::open_recent (size_t n)
+void MainWindow::open_recent (size_t n)
 {
   BEGIN_PROTECTED
 
@@ -3291,11 +3130,11 @@ MainWindow::open_recent (size_t n)
     return;
   }
 
-  if (mp_layout_load_options->show_always () && !mp_layout_load_options->edit_global_options (dispatcher (), db::Technologies::instance ())) {
+  if (mp_layout_load_options->show_always () && ! mp_layout_load_options->edit_global_options (dispatcher (), db::Technologies::instance ())) {
     return;
   }
 
-  std::string fn (m_mru [n].first);  //  create a copy since we change m_mru later
+  std::string fn (m_mru [n].first); //  create a copy since we change m_mru later
   std::string tech (m_mru [n].second);
 
   bool can_open = true;
@@ -3316,15 +3155,13 @@ MainWindow::open_recent (size_t n)
 
       mbox.exec ();
 
-      can_open = (mbox.clickedButton() == yes_button);
-
+      can_open = (mbox.clickedButton () == yes_button);
     }
-
   }
 
   if (can_open) {
     load_layout (fn, tech, m_open_mode);
-    add_mru (fn, tech);  //  make it the latest
+    add_mru (fn, tech); //  make it the latest
   }
 
   END_PROTECTED
@@ -3343,54 +3180,48 @@ is_file_available (const std::string &fn)
   }
 }
 
-bool
-MainWindow::is_available_recent (size_t n)
+bool MainWindow::is_available_recent (size_t n)
 {
   return (n < m_mru.size () && is_file_available (m_mru [n].first));
 }
 
-void
-MainWindow::open_recent_session (size_t n)
+void MainWindow::open_recent_session (size_t n)
 {
   BEGIN_PROTECTED
 
   if (n < m_mru_sessions.size ()) {
     std::string fn = m_mru_sessions [n];
     restore_session (fn);
-    add_to_other_mru (fn, cfg_mru_sessions);  //  make it the latest
+    add_to_other_mru (fn, cfg_mru_sessions); //  make it the latest
   }
 
   END_PROTECTED
 }
 
-bool
-MainWindow::is_available_recent_session (size_t n)
+bool MainWindow::is_available_recent_session (size_t n)
 {
   return (n < m_mru_sessions.size () && is_file_available (m_mru_sessions [n]));
 }
 
-void
-MainWindow::open_recent_layer_properties (size_t n)
+void MainWindow::open_recent_layer_properties (size_t n)
 {
   BEGIN_PROTECTED
 
   if (n < m_mru_layer_properties.size ()) {
     std::string fn = m_mru_layer_properties [n];
     load_layer_props_from_file (fn);
-    add_to_other_mru (fn, cfg_mru_layer_properties);  //  make it the latest
+    add_to_other_mru (fn, cfg_mru_layer_properties); //  make it the latest
   }
 
   END_PROTECTED
 }
 
-bool
-MainWindow::is_available_recent_layer_properties (size_t n)
+bool MainWindow::is_available_recent_layer_properties (size_t n)
 {
   return (n < m_mru_layer_properties.size () && is_file_available (m_mru_layer_properties [n]));
 }
 
-void
-MainWindow::open_recent_bookmarks (size_t n)
+void MainWindow::open_recent_bookmarks (size_t n)
 {
   BEGIN_PROTECTED
 
@@ -3407,14 +3238,12 @@ MainWindow::open_recent_bookmarks (size_t n)
   END_PROTECTED
 }
 
-bool
-MainWindow::is_available_recent_bookmarks (size_t n)
+bool MainWindow::is_available_recent_bookmarks (size_t n)
 {
   return (n < m_mru_bookmarks.size () && is_file_available (m_mru_bookmarks [n]));
 }
 
-void
-MainWindow::open (int mode)
+void MainWindow::open (int mode)
 {
   BEGIN_PROTECTED
 
@@ -3423,7 +3252,7 @@ MainWindow::open (int mode)
     return;
   }
 
-  if (mp_layout_load_options->show_always () && !mp_layout_load_options->edit_global_options (dispatcher (), db::Technologies::instance ())) {
+  if (mp_layout_load_options->show_always () && ! mp_layout_load_options->edit_global_options (dispatcher (), db::Technologies::instance ())) {
     return;
   }
 
@@ -3445,10 +3274,8 @@ MainWindow::open (int mode)
 
       mbox.exec ();
 
-      can_open = (mbox.clickedButton() == yes_button);
-
+      can_open = (mbox.clickedButton () == yes_button);
     }
-
   }
 
   if (can_open) {
@@ -3462,14 +3289,12 @@ MainWindow::open (int mode)
       }
       add_mru (*fn, m_initial_technology);
     }
-
   }
 
   END_PROTECTED
 }
 
-void
-MainWindow::reload_layout (unsigned int cv_index)
+void MainWindow::reload_layout (unsigned int cv_index)
 {
   lay::LayoutView *view = current_view ();
 
@@ -3490,8 +3315,7 @@ MainWindow::create_layout (const std::string &technology, int mode)
   return create_or_load_layout (0, 0, technology, mode);
 }
 
-void
-MainWindow::add_view (lay::LayoutViewWidget *view)
+void MainWindow::add_view (lay::LayoutViewWidget *view)
 {
   connect (view, SIGNAL (title_changed (lay::LayoutView *)), this, SLOT (view_title_changed (lay::LayoutView *)));
   connect (view, SIGNAL (dirty_changed (lay::LayoutView *)), this, SLOT (view_title_changed (lay::LayoutView *)));
@@ -3510,8 +3334,7 @@ MainWindow::add_view (lay::LayoutViewWidget *view)
   view->show ();
 }
 
-int
-MainWindow::do_create_view ()
+int MainWindow::do_create_view ()
 {
   //  create a new view
   lay::LayoutViewWidget *view_widget = new lay::LayoutViewWidget (&m_manager, lay::ApplicationBase::instance ()->is_editable (), dispatcher (), mp_view_stack);
@@ -3536,8 +3359,7 @@ MainWindow::do_create_view ()
   return int (mp_views.size () - 1);
 }
 
-int
-MainWindow::create_view ()
+int MainWindow::create_view ()
 {
   //  create a new view
   int view_index = do_create_view ();
@@ -3639,14 +3461,12 @@ MainWindow::create_or_load_layout (const std::string *filename, const db::LoadLa
     }
 
     throw;
-
   }
 
   return vw->cellview_ref (cv_index);
 }
 
-void
-MainWindow::update_tab_title (int i)
+void MainWindow::update_tab_title (int i)
 {
   std::string title;
 
@@ -3680,8 +3500,7 @@ MainWindow::update_tab_title (int i)
   }
 }
 
-void
-MainWindow::view_title_changed (lay::LayoutView *view)
+void MainWindow::view_title_changed (lay::LayoutView *view)
 {
   int i = index_of (view);
   if (i >= 0) {
@@ -3693,8 +3512,7 @@ MainWindow::view_title_changed (lay::LayoutView *view)
   }
 }
 
-void
-MainWindow::set_title (const std::string &title)
+void MainWindow::set_title (const std::string &title)
 {
   if (title != m_title) {
     m_title = title;
@@ -3702,8 +3520,7 @@ MainWindow::set_title (const std::string &title)
   }
 }
 
-void
-MainWindow::update_window_title ()
+void MainWindow::update_window_title ()
 {
   std::string title = m_title;
 
@@ -3724,8 +3541,7 @@ MainWindow::update_window_title ()
   setWindowTitle (tl::to_qstring (title));
 }
 
-void
-MainWindow::current_view_changed ()
+void MainWindow::current_view_changed ()
 {
   update_window_title ();
   current_view_changed_event ();
@@ -3737,8 +3553,7 @@ MainWindow::grid_micron () const
   return m_grid_micron;
 }
 
-void
-MainWindow::set_hier_levels (std::pair<int, int> l)
+void MainWindow::set_hier_levels (std::pair<int, int> l)
 {
   if (current_view () && l != get_hier_levels ()) {
     current_view ()->set_hier_levels (l);
@@ -3757,8 +3572,7 @@ MainWindow::get_hier_levels () const
   }
 }
 
-bool
-MainWindow::has_prev_display_state ()
+bool MainWindow::has_prev_display_state ()
 {
   if (current_view ()) {
     return current_view ()->has_prev_display_state ();
@@ -3767,8 +3581,7 @@ MainWindow::has_prev_display_state ()
   }
 }
 
-bool
-MainWindow::has_next_display_state ()
+bool MainWindow::has_next_display_state ()
 {
   if (current_view ()) {
     return current_view ()->has_next_display_state ();
@@ -3777,24 +3590,21 @@ MainWindow::has_next_display_state ()
   }
 }
 
-void
-MainWindow::set_synchronous (bool sync_mode)
+void MainWindow::set_synchronous (bool sync_mode)
 {
   m_synchronous = sync_mode;
-  for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+  for (std::vector<lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
     (*vp)->view ()->set_synchronous (sync_mode);
   }
 }
 
-void
-MainWindow::current_pos (double x, double y, bool dbu_units)
+void MainWindow::current_pos (double x, double y, bool dbu_units)
 {
   mp_cpx_label->setText (tl::to_qstring (dbu_units ? tl::db_to_string (x) : tl::micron_to_string (x)));
   mp_cpy_label->setText (tl::to_qstring (dbu_units ? tl::db_to_string (y) : tl::micron_to_string (y)));
 }
 
-void
-MainWindow::clear_current_pos ()
+void MainWindow::clear_current_pos ()
 {
   mp_cpx_label->setText (QString ());
   mp_cpy_label->setText (QString ());
@@ -3805,15 +3615,14 @@ MainWindow::progress_get_widget () const
 {
   if (mp_progress_dialog) {
     return mp_progress_dialog->get_widget ();
-  } else if ( mp_progress_widget) {
+  } else if (mp_progress_widget) {
     return mp_progress_widget->get_widget ();
   } else {
     return 0;
   }
 }
 
-bool
-MainWindow::update_progress (tl::Progress *progress)
+bool MainWindow::update_progress (tl::Progress *progress)
 {
   if (mp_progress_dialog) {
 
@@ -3830,14 +3639,12 @@ MainWindow::update_progress (tl::Progress *progress)
   }
 }
 
-bool
-MainWindow::progress_wants_widget () const
+bool MainWindow::progress_wants_widget () const
 {
   return true;
 }
 
-void
-MainWindow::progress_add_widget (QWidget *widget)
+void MainWindow::progress_add_widget (QWidget *widget)
 {
   if (mp_progress_dialog) {
     mp_progress_dialog->add_widget (widget);
@@ -3846,8 +3653,7 @@ MainWindow::progress_add_widget (QWidget *widget)
   }
 }
 
-void
-MainWindow::progress_remove_widget ()
+void MainWindow::progress_remove_widget ()
 {
   if (mp_progress_dialog) {
     mp_progress_dialog->remove_widget ();
@@ -3856,10 +3662,9 @@ MainWindow::progress_remove_widget ()
   }
 }
 
-bool
-MainWindow::show_progress_bar (bool show)
+bool MainWindow::show_progress_bar (bool show)
 {
-  if (!isVisible ()) {
+  if (! isVisible ()) {
 
     mp_progress_dialog.reset (0);
 
@@ -3881,12 +3686,10 @@ MainWindow::show_progress_bar (bool show)
       clear_current_pos ();
     }
     return true;
-
   }
 }
 
-void
-MainWindow::cm_packages ()
+void MainWindow::cm_packages ()
 {
   lay::SaltController *sc = lay::SaltController::instance ();
   if (sc) {
@@ -3894,8 +3697,7 @@ MainWindow::cm_packages ()
   }
 }
 
-void
-MainWindow::cm_technologies ()
+void MainWindow::cm_technologies ()
 {
   lay::TechnologyController *tc = lay::TechnologyController::instance ();
   if (tc) {
@@ -3903,8 +3705,7 @@ MainWindow::cm_technologies ()
   }
 }
 
-void
-MainWindow::show_macro_editor (const std::string &cat, bool add)
+void MainWindow::show_macro_editor (const std::string &cat, bool add)
 {
   lay::MacroController *mc = lay::MacroController::instance ();
   if (mc) {
@@ -3912,15 +3713,13 @@ MainWindow::show_macro_editor (const std::string &cat, bool add)
   }
 }
 
-void
-MainWindow::cm_macro_editor ()
+void MainWindow::cm_macro_editor ()
 {
   //  TODO: implement this as generic menu provided by the plugin declaration
   show_macro_editor ();
 }
 
-void
-MainWindow::cm_show_assistant ()
+void MainWindow::cm_show_assistant ()
 {
   if (! mp_assistant) {
     mp_assistant = new lay::HelpDialog (this);
@@ -3935,27 +3734,24 @@ MainWindow::cm_show_assistant ()
   mp_assistant->raise ();
 }
 
-void
-MainWindow::show_help (const QString &url)
+void MainWindow::show_help (const QString &url)
 {
   //  NOTE: from inside a modal widget we show the help dialog modal too
   //  (otherwise it's not usable)
   show_assistant_url (tl::to_string (url), QApplication::activeModalWidget () != 0);
 }
 
-void
-MainWindow::show_modal_help (const QString &url)
+void MainWindow::show_modal_help (const QString &url)
 {
   show_assistant_url (tl::to_string (url), true);
 }
 
-void
-MainWindow::show_assistant_url (const std::string &url, bool modal)
+void MainWindow::show_assistant_url (const std::string &url, bool modal)
 {
   if (modal) {
 
     lay::HelpDialog dialog (QApplication::activeWindow () ? QApplication::activeWindow () : this, true);
-    dialog.show ();   //  TODO: this is required to establish a proper geometry. Without this, the splitter is not set up correctly.
+    dialog.show (); //  TODO: this is required to establish a proper geometry. Without this, the splitter is not set up correctly.
     dialog.load (url);
     dialog.exec ();
 
@@ -3963,12 +3759,10 @@ MainWindow::show_assistant_url (const std::string &url, bool modal)
 
     cm_show_assistant ();
     mp_assistant->load (url);
-
   }
 }
 
-void
-MainWindow::show_assistant_topic (const std::string &s, bool modal)
+void MainWindow::show_assistant_topic (const std::string &s, bool modal)
 {
   if (modal) {
 
@@ -3980,25 +3774,21 @@ MainWindow::show_assistant_topic (const std::string &s, bool modal)
 
     cm_show_assistant ();
     mp_assistant->search (s);
-
   }
 }
 
-void
-MainWindow::cm_show_all_tips ()
+void MainWindow::cm_show_all_tips ()
 {
   dispatcher ()->config_set (cfg_tip_window_hidden, "");
 }
 
-void
-MainWindow::cm_help_about ()
+void MainWindow::cm_help_about ()
 {
   HelpAboutDialog help_about_dialog (this);
   help_about_dialog.exec ();
 }
 
-void
-MainWindow::cm_help_about_qt ()
+void MainWindow::cm_help_about_qt ()
 {
   QApplication::aboutQt ();
 }
@@ -4010,8 +3800,7 @@ MainWindow::menu_symbols ()
   return lay::PluginDeclaration::menu_symbols ();
 }
 
-void
-MainWindow::menu_activated (const std::string &symbol)
+void MainWindow::menu_activated (const std::string &symbol)
 {
   if (symbol == "cm_navigator_freeze") {
     cm_navigator_freeze ();
@@ -4056,7 +3845,7 @@ MainWindow::menu_activated (const std::string &symbol)
   } else if (symbol == "cm_screenshot") {
     cm_screenshot ();
   } else if (symbol == "cm_screenshot_to_clipboard") {
-      cm_screenshot_to_clipboard ();
+    cm_screenshot_to_clipboard ();
   } else if (symbol == "cm_save_current_cell_as") {
     cm_save_current_cell_as ();
   } else if (symbol == "cm_save") {
@@ -4126,19 +3915,16 @@ MainWindow::menu_activated (const std::string &symbol)
     } else {
       throw tl::Exception (tl::to_string (QObject::tr ("This function needs a layout but none was available")));
     }
-
   }
 }
 
-void
-MainWindow::menu_changed ()
+void MainWindow::menu_changed ()
 {
   //  delay actual rebuilding of the menu to collect multiple change events.
   dm_do_update_menu ();
 }
 
-void
-MainWindow::do_update_grids ()
+void MainWindow::do_update_grids ()
 {
   const std::vector<double> *grids = &m_default_grids;
   double default_grid = m_default_grid;
@@ -4169,8 +3955,7 @@ MainWindow::do_update_grids ()
   do_update_menu ();
 }
 
-void
-MainWindow::do_update_menu ()
+void MainWindow::do_update_menu ()
 {
   if (m_default_grids_updated) {
 
@@ -4215,12 +4000,10 @@ MainWindow::do_update_menu ()
       for (std::vector<std::string>::const_iterator t = group.begin (); t != group.end (); ++t) {
         menu ()->insert_item (*t + ".end", name, ga);
       }
-
     }
 
     //  re-apply key bindings for the default grids
     apply_key_bindings ();
-
   }
 
   menu ()->build (menuBar (), mp_tool_bar);
@@ -4230,16 +4013,14 @@ MainWindow::do_update_menu ()
   }
 }
 
-void
-MainWindow::dragEnterEvent(QDragEnterEvent *event)
+void MainWindow::dragEnterEvent (QDragEnterEvent *event)
 {
   if (event->mimeData () && event->mimeData ()->hasUrls () && event->mimeData ()->urls ().size () >= 1) {
     event->acceptProposedAction ();
   }
 }
 
-bool
-MainWindow::eventFilter (QObject *watched, QEvent *event)
+bool MainWindow::eventFilter (QObject *watched, QEvent *event)
 {
   //  spy on the mouse events of the tab bar so we can tell which tab the menu was issued on
   if (watched == mp_tab_bar && dynamic_cast<QMouseEvent *> (event) != 0) {
@@ -4249,8 +4030,7 @@ MainWindow::eventFilter (QObject *watched, QEvent *event)
   return QMainWindow::eventFilter (watched, event);
 }
 
-void
-MainWindow::dropEvent(QDropEvent *event)
+void MainWindow::dropEvent (QDropEvent *event)
 {
   BEGIN_PROTECTED
 
@@ -4287,42 +4067,38 @@ MainWindow::dropEvent(QDropEvent *event)
         // This bug has been fixed in Qt 5.4.1.
         // When KLayout 0.25 is built with Qt 5.8.0 or later, this workaround is not required.
         //----------------------------------------------------------------------------------------
-        QString keystring = QString::fromUtf8("/.file/id=");
+        QString keystring = QString::fromUtf8 ("/.file/id=");
 
-        if ( path.startsWith(keystring) ) {
-          CFStringRef relCFStringRef = CFStringCreateWithCString(
-                                          kCFAllocatorDefault,
-                                          path.toUtf8().constData(),
-                                          kCFStringEncodingUTF8
-                                        );
-          CFURLRef relCFURL = CFURLCreateWithFileSystemPath(
-                                          kCFAllocatorDefault,
-                                          relCFStringRef,
-                                          kCFURLPOSIXPathStyle,
-                                          false // isDirectory
-                                        );
-          CFErrorRef error  = 0;
-          CFURLRef absCFURL = CFURLCreateFilePathURL(
-                                          kCFAllocatorDefault,
-                                          relCFURL,
-                                          &error
-                                        );
-          if ( !error ) {
+        if (path.startsWith (keystring)) {
+          CFStringRef relCFStringRef = CFStringCreateWithCString (
+            kCFAllocatorDefault,
+            path.toUtf8 ().constData (),
+            kCFStringEncodingUTF8);
+          CFURLRef relCFURL = CFURLCreateWithFileSystemPath (
+            kCFAllocatorDefault,
+            relCFStringRef,
+            kCFURLPOSIXPathStyle,
+            false // isDirectory
+          );
+          CFErrorRef error = 0;
+          CFURLRef absCFURL = CFURLCreateFilePathURL (
+            kCFAllocatorDefault,
+            relCFURL,
+            &error);
+          if (! error) {
             static const CFIndex maxAbsPathCStrBufLen = 4096;
-            char absPathCStr[maxAbsPathCStrBufLen];
-            if ( CFURLGetFileSystemRepresentation(
-                    absCFURL,
-                    true, // resolveAgainstBase
-                    reinterpret_cast<UInt8 *>( &absPathCStr[0] ),
-                    maxAbsPathCStrBufLen
-                  )
-                ) {
-              path = QString::fromUtf8( absPathCStr );
+            char absPathCStr [maxAbsPathCStrBufLen];
+            if (CFURLGetFileSystemRepresentation (
+                  absCFURL,
+                  true, // resolveAgainstBase
+                  reinterpret_cast<UInt8 *> (&absPathCStr [0]),
+                  maxAbsPathCStrBufLen)) {
+              path = QString::fromUtf8 (absPathCStr);
             }
           }
-          CFRelease( absCFURL );
-          CFRelease( relCFURL );
-          CFRelease( relCFStringRef );
+          CFRelease (absCFURL);
+          CFRelease (relCFURL);
+          CFRelease (relCFStringRef);
         }
 
         eff_url = QUrl::fromLocalFile (path);
@@ -4396,33 +4172,26 @@ MainWindow::dropEvent(QDropEvent *event)
 
               mbox.exec ();
 
-              can_open = (mbox.clickedButton() == yes_button);
-
+              can_open = (mbox.clickedButton () == yes_button);
             }
 
             if (! can_open) {
               return;
             }
-
           }
 
           load_layout (tl::to_string (path), m_initial_technology, m_open_mode);
 
           add_mru (tl::to_string (path), m_initial_technology);
-
         }
-
       }
-
     }
-
   }
 
   END_PROTECTED
 }
 
-void
-MainWindow::plugin_registered (lay::PluginDeclaration *cls)
+void MainWindow::plugin_registered (lay::PluginDeclaration *cls)
 {
   //  store current state in configuration
   save_state_to_config ();
@@ -4430,7 +4199,7 @@ MainWindow::plugin_registered (lay::PluginDeclaration *cls)
   cls->init_menu (dispatcher ());
 
   //  recreate all plugins
-  for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+  for (std::vector<lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
     (*vp)->view ()->create_plugins ();
   }
 
@@ -4440,13 +4209,12 @@ MainWindow::plugin_registered (lay::PluginDeclaration *cls)
   mp_setup_form->setup ();
 }
 
-void
-MainWindow::plugin_removed (lay::PluginDeclaration *cls)
+void MainWindow::plugin_removed (lay::PluginDeclaration *cls)
 {
   cls->remove_menu_items (dispatcher ());
 
   //  recreate all plugins except the one that got removed
-  for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+  for (std::vector<lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
     (*vp)->view ()->create_plugins (cls);
   }
 }
@@ -4529,7 +4297,7 @@ public:
 
     at = "view_menu.end";
     menu_entries.push_back (lay::config_menu_item ("show_grid", at, tl::to_string (QObject::tr ("Show Grid")), cfg_grid_visible, "?")),
-    menu_entries.push_back (lay::submenu ("default_grid:default_grids_group", at, tl::to_string (QObject::tr ("Grid"))));
+      menu_entries.push_back (lay::submenu ("default_grid:default_grids_group", at, tl::to_string (QObject::tr ("Grid"))));
     menu_entries.push_back (lay::separator ("layout_group", at));
     menu_entries.push_back (lay::config_menu_item ("show_markers", at, tl::to_string (QObject::tr ("Show Markers")), cfg_markers_visible, "?"));
     menu_entries.push_back (lay::config_menu_item ("show_texts", at, tl::to_string (QObject::tr ("Show Texts")), cfg_text_visible, "?"));
@@ -4548,7 +4316,7 @@ public:
     menu_entries.push_back (lay::config_menu_item ("show_bookmarks_view", at, tl::to_string (QObject::tr ("Bookmarks")), cfg_show_bookmarks_view, "?"));
     menu_entries.push_back (lay::config_menu_item ("show_tool_options", at, tl::to_string (QObject::tr ("Tool Options(F3)")), cfg_show_tool_options, "?"));
     menu_entries.push_back (lay::menu_item ("cm_reset_window_state", "reset_window_state", at, tl::to_string (QObject::tr ("Restore Window")))),
-    menu_entries.push_back (lay::separator ("selection_group", at));
+      menu_entries.push_back (lay::separator ("selection_group", at));
     menu_entries.push_back (lay::config_menu_item ("transient_selection", at, tl::to_string (QObject::tr ("Highlight Object Under Mouse")), cfg_sel_transient_mode, "?"));
     menu_entries.push_back (lay::config_menu_item ("mouse_tracking", at, tl::to_string (QObject::tr ("Mouse Tracking")), cfg_tracking_cursor_enabled, "?"));
     menu_entries.push_back (lay::config_menu_item ("crosshair_cursor", at, tl::to_string (QObject::tr ("Crosshair Cursor")), cfg_crosshair_cursor_enabled, "?"));
@@ -4580,4 +4348,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new MainWindowPluginDeclaration (), -100, "MainWindowPlugin");
 
 } // namespace lay
-

@@ -78,8 +78,8 @@ public:
     if (! db::coord_traits<coord_type>::equal (ca, cb)) {
       return db::coord_traits<coord_type>::less (ca, cb);
     } else {
-      coord_type ca2 = box_position<Box, !horizontally> (a.first, m_ref);
-      coord_type cb2 = box_position<Box, !horizontally> (b.first, m_ref);
+      coord_type ca2 = box_position<Box, ! horizontally> (a.first, m_ref);
+      coord_type cb2 = box_position<Box, ! horizontally> (b.first, m_ref);
       return db::coord_traits<coord_type>::less (ca2, cb2);
     }
   }
@@ -92,14 +92,14 @@ private:
  *  @brief Does some heuristic binning of coordinates
  */
 template <class Box, bool horizontally>
-void do_bin (typename std::vector<std::pair<Box, size_t> >::const_iterator b, typename std::vector<std::pair<Box, size_t> >::const_iterator e, int ref, std::vector<std::vector<size_t> > &bins)
+void do_bin (typename std::vector<std::pair<Box, size_t>>::const_iterator b, typename std::vector<std::pair<Box, size_t>>::const_iterator e, int ref, std::vector<std::vector<size_t>> &bins)
 {
   typedef typename Box::coord_type coord_type;
 
   //  determine maximum distance between adjacent coordinates
 
   coord_type max_dist = 0;
-  for (typename std::vector<std::pair<Box, size_t> >::const_iterator i = b + 1; i != e; ++i) {
+  for (typename std::vector<std::pair<Box, size_t>>::const_iterator i = b + 1; i != e; ++i) {
     max_dist = std::max (max_dist, box_position<Box, horizontally> (i->first, ref) - box_position<Box, horizontally> ((i - 1)->first, ref));
   }
 
@@ -111,7 +111,7 @@ void do_bin (typename std::vector<std::pair<Box, size_t> >::const_iterator b, ty
 
   coord_type thr = max_dist / 3;
 
-  for (typename std::vector<std::pair<Box, size_t> >::const_iterator i = b + 1; i != e; ++i) {
+  for (typename std::vector<std::pair<Box, size_t>>::const_iterator i = b + 1; i != e; ++i) {
     coord_type c = box_position<Box, horizontally> (i->first, ref);
     if (c - bin_start > thr) {
       //  start a new bin
@@ -138,8 +138,7 @@ inline typename Box::coord_type eff_dim (const Box &box, typename Box::coord_typ
 }
 
 template <class Coord>
-struct max_coord_join_op
-{
+struct max_coord_join_op {
   void operator() (Coord &a, const Coord &b) const
   {
     a = std::max (a, b);
@@ -154,7 +153,7 @@ class distributed_placer
 {
 public:
   typedef typename Box::coord_type coord_type;
-  typedef std::vector<std::pair<Box, Value> > objects;
+  typedef std::vector<std::pair<Box, Value>> objects;
   typedef typename objects::const_iterator iterator;
 
   /**
@@ -246,7 +245,7 @@ public:
     //  2.) Compute the row and column widths and heights as the maximum of their content
     //  3.) position the objects inside these cells
 
-    std::vector<std::pair<Box, size_t> > indexed_boxes;
+    std::vector<std::pair<Box, size_t>> indexed_boxes;
     indexed_boxes.reserve (m_objects.size ());
 
     Box all;
@@ -259,7 +258,7 @@ public:
       indexed_boxes.push_back (std::make_pair (i->first, n));
     }
 
-    std::vector<std::vector<size_t> > hbins, vbins;
+    std::vector<std::vector<size_t>> hbins, vbins;
 
     std::sort (indexed_boxes.begin (), indexed_boxes.end (), box_compare<Box, size_t, true> (href));
     do_bin<Box, true> (indexed_boxes.begin (), indexed_boxes.end (), href, hbins);
@@ -269,7 +268,7 @@ public:
 
     //  rewrite the bins to cell occupation lists
 
-    std::vector<std::vector<std::vector<size_t> > > cells;
+    std::vector<std::vector<std::vector<size_t>>> cells;
 
     cells.resize (hbins.size ());
     for (size_t i = 0; i < hbins.size (); ++i) {
@@ -280,18 +279,17 @@ public:
 
       std::vector<size_t> hbin_for_index;
       hbin_for_index.resize (indexed_boxes.size (), size_t (0));
-      for (std::vector<std::vector<size_t> >::const_iterator i = hbins.begin (); i != hbins.end (); ++i) {
+      for (std::vector<std::vector<size_t>>::const_iterator i = hbins.begin (); i != hbins.end (); ++i) {
         for (std::vector<size_t>::const_iterator j = i->begin (); j != i->end (); ++j) {
           hbin_for_index [*j] = i - hbins.begin ();
         }
       }
 
-      for (std::vector<std::vector<size_t> >::const_iterator i = vbins.begin (); i != vbins.end (); ++i) {
+      for (std::vector<std::vector<size_t>>::const_iterator i = vbins.begin (); i != vbins.end (); ++i) {
         for (std::vector<size_t>::const_iterator j = i->begin (); j != i->end (); ++j) {
           cells [hbin_for_index [*j]][i - vbins.begin ()].push_back (*j);
         }
       }
-
     }
 
     //  initialize the cell widths
@@ -302,9 +300,9 @@ public:
 
     //  compute the cell widths as the maximum of the content
 
-    for (std::vector<std::vector<std::vector<size_t> > >::const_iterator i = cells.begin (); i != cells.end (); ++i) {
+    for (std::vector<std::vector<std::vector<size_t>>>::const_iterator i = cells.begin (); i != cells.end (); ++i) {
 
-      for (std::vector<std::vector<size_t> >::const_iterator j = i->begin (); j != i->end (); ++j) {
+      for (std::vector<std::vector<size_t>>::const_iterator j = i->begin (); j != i->end (); ++j) {
 
         coord_type wcell = 0, hcell = 0;
         for (std::vector<size_t>::const_iterator k = j->begin (); k != j->end (); ++k) {
@@ -315,9 +313,7 @@ public:
 
         cell_widths [i - cells.begin ()] = std::max (cell_widths [i - cells.begin ()], wcell);
         cell_heights [j - i->begin ()] = std::max (cell_heights [j - i->begin ()], hcell);
-
       }
-
     }
 
     //  Compute the columns and row positions
@@ -338,9 +334,9 @@ public:
 
     //  Compute the actual coordinates of the objects inside the cells
 
-    for (std::vector<std::vector<std::vector<size_t> > >::const_iterator i = cells.begin (); i != cells.end (); ++i) {
+    for (std::vector<std::vector<std::vector<size_t>>>::const_iterator i = cells.begin (); i != cells.end (); ++i) {
 
-      for (std::vector<std::vector<size_t> >::const_iterator j = i->begin (); j != i->end (); ++j) {
+      for (std::vector<std::vector<size_t>>::const_iterator j = i->begin (); j != i->end (); ++j) {
 
         coord_type wcell = 0;
         for (std::vector<size_t>::const_iterator k = j->begin (); k != j->end (); ++k) {
@@ -371,11 +367,8 @@ public:
 
           //  NOTE: intra-cell objects are distributed horizontally
           x += w;
-
         }
-
       }
-
     }
 
     //  Final adjustments - align the whole matrix with the original bounding box
@@ -433,7 +426,6 @@ private:
 
       i->first.move (mv);
       current = i->first;
-
     }
 
     //  final adjustment
@@ -463,9 +455,7 @@ private:
         }
 
         i->first.move (mvp);
-
       }
-
     }
   }
 };
@@ -473,4 +463,3 @@ private:
 }
 
 #endif
-

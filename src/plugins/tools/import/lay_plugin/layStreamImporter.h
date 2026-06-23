@@ -37,12 +37,12 @@
 
 namespace db
 {
-  class Manager;
+class Manager;
 }
 
 namespace lay
 {
-  class LayoutView;
+class LayoutView;
 }
 
 namespace lay
@@ -64,7 +64,7 @@ public:
    *
    *  This method reads the layout specified into the given layout and cell.
    */
-  void read (db::Layout &layout, db::cell_index_type cell_index, std::vector <unsigned int> &new_layers);
+  void read (db::Layout &layout, db::cell_index_type cell_index, std::vector<unsigned int> &new_layers);
 
   /**
    *  @brief Specifies the global transformation
@@ -87,7 +87,7 @@ public:
   /**
    *  @brief Set the reference points
    */
-  void set_reference_points (const std::vector<std::pair <db::DPoint, db::DPoint> > &pts)
+  void set_reference_points (const std::vector<std::pair<db::DPoint, db::DPoint>> &pts)
   {
     m_reference_points = pts;
   }
@@ -195,7 +195,7 @@ private:
   std::vector<std::string> m_files;
   std::string m_topcell;
   db::DCplxTrans m_global_trans;
-  std::vector <std::pair <db::DPoint, db::DPoint> > m_reference_points;
+  std::vector<std::pair<db::DPoint, db::DPoint>> m_reference_points;
   StreamImportData::mode_type m_cell_mapping;
   StreamImportData::layer_mode_type m_layer_mapping;
   db::LayerOffset m_layer_offset;
@@ -205,4 +205,3 @@ private:
 }
 
 #endif
-

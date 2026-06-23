@@ -29,14 +29,14 @@
 #include "dbStream.h"
 
 #if defined(HAVE_QT)
-#  include "tlFileSystemWatcher.h"
+#include "tlFileSystemWatcher.h"
 #endif
 
 #include <string>
 #include <vector>
 #include <map>
 
-namespace lay 
+namespace lay
 {
 
 class LayoutViewBase;
@@ -55,12 +55,12 @@ public:
   /**
    *  @brief Creates a layout handle to the given object
    *
-   *  This constructor creates a new handle to the given 
+   *  This constructor creates a new handle to the given
    *  layout object. The handle takes over the ownership over the
    *  layout object.
    *  The initial reference count is zero (see remove_ref).
    *  The filename is a string that is supposed to identify
-   *  the layout further. It can be retrieved with the filename 
+   *  the layout further. It can be retrieved with the filename
    *  method.
    */
   LayoutHandle (db::Layout *layout, const std::string &filename);
@@ -148,7 +148,7 @@ public:
   /**
    *  @brief Gets the names of all registered layout objects
    */
-  static void get_names (std::vector <std::string> &names);
+  static void get_names (std::vector<std::string> &names);
 
   /**
    *  @brief Gets the reference count
@@ -160,7 +160,7 @@ public:
 
   /**
    *  @brief Adds a reference to the layout handle
-   * 
+   *
    *  This method will increment the reference counter of this handle
    */
   void add_ref ();
@@ -168,7 +168,7 @@ public:
   /**
    *  @brief Removes a reference to the layout handle
    *
-   *  This method will decrement the reference counter. Once the 
+   *  This method will decrement the reference counter. Once the
    *  reference count reaches zero, the layout object and the
    *  handle is deleted.
    *  Upon initialization, the reference count is zero.
@@ -180,7 +180,7 @@ public:
   /**
    *  @brief Returns true, if the layout is "dirty"
    *
-   *  A layout is "dirty", if it needs to be saved. 
+   *  A layout is "dirty", if it needs to be saved.
    *  It is set dirty if one of the signal handlers is triggered.
    */
   bool is_dirty () const
@@ -311,7 +311,7 @@ private:
 
   void on_technology_changed ();
 
-  static std::map <std::string, LayoutHandle *> ms_dict;
+  static std::map<std::string, LayoutHandle *> ms_dict;
 #if defined(HAVE_QT)
   static tl::FileSystemWatcher *mp_file_watcher;
 #endif
@@ -324,7 +324,7 @@ private:
  *  The main purpose for this class is to automate the reference
  *  counting on the handle.
  */
-class LAYBASIC_PUBLIC LayoutHandleRef 
+class LAYBASIC_PUBLIC LayoutHandleRef
 {
 public:
   LayoutHandleRef ();
@@ -333,15 +333,15 @@ public:
   ~LayoutHandleRef ();
 
   LayoutHandleRef &operator= (const LayoutHandleRef &r);
-  
+
   bool operator== (const LayoutHandleRef &r) const;
 
   bool operator!= (const LayoutHandleRef &r) const
   {
-    return !operator== (r);
+    return ! operator== (r);
   }
 
-  LayoutHandle *operator-> () const;
+  LayoutHandle *operator->() const;
 
   LayoutHandle *get () const;
   void set (LayoutHandle *h);
@@ -353,4 +353,3 @@ private:
 }
 
 #endif
-

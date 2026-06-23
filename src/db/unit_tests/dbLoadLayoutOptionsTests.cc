@@ -70,16 +70,15 @@ static void set_myreader_lm (db::LoadLayoutOptions *options, const db::LayerMap 
 }
 
 
-static
-gsi::ClassExt<db::LoadLayoutOptions> myreaderoptions_cls (
+static gsi::ClassExt<db::LoadLayoutOptions> myreaderoptions_cls (
   gsi::method_ext ("myreader_value", &get_myreader_value) +
-  gsi::method_ext ("myreader_value=", &set_myreader_value) +
-  gsi::method_ext ("myreader_lm", &get_myreader_lm) +
-  gsi::method_ext ("myreader_lm=", &set_myreader_lm),
+    gsi::method_ext ("myreader_value=", &set_myreader_value) +
+    gsi::method_ext ("myreader_lm", &get_myreader_lm) +
+    gsi::method_ext ("myreader_lm=", &set_myreader_lm),
   "@hide");
 
 
-TEST(1)
+TEST (1)
 {
   db::LoadLayoutOptions opt;
   MyReaderOptions myopt;
@@ -101,4 +100,3 @@ TEST(1)
   EXPECT_EQ (opt.get_options<MyReaderOptions> ().value, "17");
   EXPECT_EQ (opt.get_option_by_name ("myreader_value").to_string (), "17");
 }
-

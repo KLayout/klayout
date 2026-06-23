@@ -56,12 +56,12 @@ public:
   virtual std::string format_title () const { return "MAG (Magic layout format)"; }
   virtual std::string file_format () const { return "Magic files (*.mag *.MAG *.mag.gz *.MAG.gz)"; }
 
-  virtual bool detect (tl::InputStream &s) const 
+  virtual bool detect (tl::InputStream &s) const
   {
     return s.read_all (5) == "magic";
   }
 
-  virtual ReaderBase *create_reader (tl::InputStream &s) const 
+  virtual ReaderBase *create_reader (tl::InputStream &s) const
   {
     return new db::MAGReader (s);
   }
@@ -89,25 +89,22 @@ public:
   virtual tl::XMLElementBase *xml_reader_options_element () const
   {
     return new db::ReaderOptionsXMLElement<db::MAGReaderOptions> ("mag",
-      tl::make_member (&db::MAGReaderOptions::lambda, "lambda") +
-      tl::make_member (&db::MAGReaderOptions::dbu, "dbu") +
-      tl::make_member (&db::MAGReaderOptions::layer_map, "layer-map") +
-      tl::make_member (&db::MAGReaderOptions::create_other_layers, "create-other-layers") +
-      tl::make_member (&db::MAGReaderOptions::keep_layer_names, "keep-layer-names") +
-      tl::make_member (&db::MAGReaderOptions::merge, "merge") +
-      tl::make_element<std::vector<std::string>, db::MAGReaderOptions> (&db::MAGReaderOptions::lib_paths, "lib-paths",
-        tl::make_member<std::string, std::vector<std::string>::const_iterator, std::vector<std::string> > (&std::vector<std::string>::begin, &std::vector<std::string>::end, &std::vector<std::string>::push_back, "lib-path")
-      )
-    );
+                                                                  tl::make_member (&db::MAGReaderOptions::lambda, "lambda") +
+                                                                    tl::make_member (&db::MAGReaderOptions::dbu, "dbu") +
+                                                                    tl::make_member (&db::MAGReaderOptions::layer_map, "layer-map") +
+                                                                    tl::make_member (&db::MAGReaderOptions::create_other_layers, "create-other-layers") +
+                                                                    tl::make_member (&db::MAGReaderOptions::keep_layer_names, "keep-layer-names") +
+                                                                    tl::make_member (&db::MAGReaderOptions::merge, "merge") +
+                                                                    tl::make_element<std::vector<std::string>, db::MAGReaderOptions> (&db::MAGReaderOptions::lib_paths, "lib-paths",
+                                                                                                                                      tl::make_member<std::string, std::vector<std::string>::const_iterator, std::vector<std::string>> (&std::vector<std::string>::begin, &std::vector<std::string>::end, &std::vector<std::string>::push_back, "lib-path")));
   }
 
   virtual tl::XMLElementBase *xml_writer_options_element () const
   {
     return new db::WriterOptionsXMLElement<db::MAGWriterOptions> ("mag",
-      tl::make_member (&db::MAGWriterOptions::lambda, "lambda") +
-      tl::make_member (&db::MAGWriterOptions::tech, "tech") +
-      tl::make_member (&db::MAGWriterOptions::write_timestamp, "write-timestamp")
-    );
+                                                                  tl::make_member (&db::MAGWriterOptions::lambda, "lambda") +
+                                                                    tl::make_member (&db::MAGWriterOptions::tech, "tech") +
+                                                                    tl::make_member (&db::MAGWriterOptions::write_timestamp, "write-timestamp"));
   }
 };
 
@@ -119,5 +116,3 @@ static tl::RegisteredClass<db::StreamFormatDeclaration> reader_decl (new MAGForm
 int force_link_MAG = 0;
 
 }
-
-

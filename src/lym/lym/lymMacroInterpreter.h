@@ -47,7 +47,7 @@ namespace lym
  *  a method "execute" which receives the text of the DSL script that this
  *  interpreter is understanding.
  *
- *  An interpreter is registered using the class registration mechanism of 
+ *  An interpreter is registered using the class registration mechanism of
  *  tl::RegisteredClass.
  */
 
@@ -84,8 +84,8 @@ public:
   /**
    *  @brief Returns the syntax scheme
    *
-   *  The return value specifies the syntax highlighter scheme for this 
-   *  DSL. Return an empty string for no highlighting and "ruby" to use 
+   *  The return value specifies the syntax highlighter scheme for this
+   *  DSL. Return an empty string for no highlighting and "ruby" to use
    *  Ruby highlighting.
    */
   virtual std::string syntax_scheme () const
@@ -96,7 +96,7 @@ public:
   /**
    *  @brief Returns the debugging scheme
    *
-   *  The return value specifies the debugger used for this 
+   *  The return value specifies the debugger used for this
    *  DSL. The value DSLInterpreter does not make much sense and is ignored.
    */
   virtual Macro::Interpreter debugger_scheme () const
@@ -105,7 +105,7 @@ public:
   }
 
   /**
-   *  @brief Returns the description string 
+   *  @brief Returns the description string
    *
    *  The description string is used in the file selection dialog for example.
    *  If the suffix is empty, no description needs to be provided.
@@ -154,7 +154,7 @@ public:
   /**
    *  @brief Runs the script for the DSL interpreter with the given name
    *
-   *  This method locates the DSL interpreter with the given name and 
+   *  This method locates the DSL interpreter with the given name and
    *  runs the script on it.
    */
   static void execute_macro (const lym::Macro *macro);
@@ -193,5 +193,3 @@ public:
 }
 
 #endif
-
-

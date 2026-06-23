@@ -36,9 +36,10 @@ class LayoutCanvas;
 class RubberBox;
 
 class LAYBASIC_PUBLIC ZoomService
-  : public lay::ViewService, public lay::Plugin
+  : public lay::ViewService,
+    public lay::Plugin
 {
-public: 
+public:
   ZoomService (lay::LayoutViewBase *view);
   ~ZoomService ();
 
@@ -69,5 +70,3 @@ private:
 }
 
 #endif
-
-

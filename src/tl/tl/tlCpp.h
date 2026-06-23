@@ -26,13 +26,13 @@
 
 //  A subsitute for C++11 [[noreturn]]
 #ifdef __GNUC__
-#define NO_RETURN __attribute__((noreturn))
+#define NO_RETURN __attribute__ ((noreturn))
 #elif __MINGW32__
-#define NO_RETURN __attribute__((noreturn))
+#define NO_RETURN __attribute__ ((noreturn))
 #elif __clang__
-#define NO_RETURN __attribute__((noreturn))
+#define NO_RETURN __attribute__ ((noreturn))
 #elif _MSC_VER
-#define NO_RETURN __declspec(noreturn)
+#define NO_RETURN __declspec (noreturn)
 #endif
 
 namespace tl
@@ -43,4 +43,3 @@ namespace tl
 }
 
 #endif
-

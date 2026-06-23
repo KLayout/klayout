@@ -34,15 +34,15 @@ class TestCollectorConsole
   : public gsi::Console
 {
 public:
-  TestCollectorConsole () { }
-  ~TestCollectorConsole () { }
+  TestCollectorConsole () {}
+  ~TestCollectorConsole () {}
 
   virtual void write_str (const char *text, output_stream)
   {
     m_text += text;
   }
 
-  virtual void flush () { }
+  virtual void flush () {}
   virtual bool is_tty () { return false; }
   virtual int columns () { return 80; }
   virtual int rows () { return 50; }
@@ -60,7 +60,7 @@ static std::string np (const std::string &s)
   return tl::replaced (s, "\\", "/");
 }
 
-TEST(1_BasicRuby)
+TEST (1_BasicRuby)
 {
   tl_assert (rba::RubyInterpreter::instance () != 0);
 
@@ -83,7 +83,7 @@ TEST(1_BasicRuby)
   EXPECT_EQ (console.text (), "Hello, world!\n");
 }
 
-TEST(2_RubyInclude)
+TEST (2_RubyInclude)
 {
   tl_assert (rba::RubyInterpreter::instance () != 0);
 
@@ -106,7 +106,7 @@ TEST(2_RubyInclude)
   EXPECT_EQ (console.text (), "Stop 1: m2.rb:2\nf: a_inc.rb:3\nStop 2: m2.rb:8\n");
 }
 
-TEST(3_RubyInclude)
+TEST (3_RubyInclude)
 {
   tl_assert (rba::RubyInterpreter::instance () != 0);
 
@@ -129,7 +129,7 @@ TEST(3_RubyInclude)
   EXPECT_EQ (np (console.text ()), np ("An error in " + tl::testsrc () + "/testdata/lym/b_inc.rb:3\n"));
 }
 
-TEST(4_RubyIncludeFromXML)
+TEST (4_RubyIncludeFromXML)
 {
   tl_assert (rba::RubyInterpreter::instance () != 0);
 
@@ -152,7 +152,7 @@ TEST(4_RubyIncludeFromXML)
   EXPECT_EQ (np (console.text ()), np ("An error in " + tl::testsrc () + "/testdata/lym/b_inc.lym:3\n"));
 }
 
-TEST(11_DRCBasic)
+TEST (11_DRCBasic)
 {
   tl_assert (rba::RubyInterpreter::instance () != 0);
 
@@ -176,7 +176,7 @@ TEST(11_DRCBasic)
   EXPECT_EQ (console.text (), "Result: (500,500;500,2000;1000,2000;1000,500) in m1.drc:20\n");
 }
 
-TEST(12_DRCBasic)
+TEST (12_DRCBasic)
 {
   tl_assert (rba::RubyInterpreter::instance () != 0);
 
@@ -204,7 +204,7 @@ TEST(12_DRCBasic)
 
 #if defined(HAVE_PYTHON)
 
-TEST(101_BasicPython)
+TEST (101_BasicPython)
 {
   tl_assert (pya::PythonInterpreter::instance () != 0);
 
@@ -227,7 +227,7 @@ TEST(101_BasicPython)
   EXPECT_EQ (console.text (), "Hello, world!\n");
 }
 
-TEST(102_PythonInclude)
+TEST (102_PythonInclude)
 {
   tl_assert (pya::PythonInterpreter::instance () != 0);
 

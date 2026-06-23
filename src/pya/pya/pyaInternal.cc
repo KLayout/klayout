@@ -38,7 +38,8 @@ namespace pya
 
 MethodTableEntry::MethodTableEntry (const std::string &name, bool st, bool prot)
   : m_name (name), m_is_static (st), m_is_protected (prot), m_is_enabled (true), m_is_init (false), m_fallback_not_implemented (false)
-{ }
+{
+}
 
 const std::string &
 MethodTableEntry::name () const
@@ -46,72 +47,61 @@ MethodTableEntry::name () const
   return m_name;
 }
 
-void
-MethodTableEntry::set_name (const std::string &n)
+void MethodTableEntry::set_name (const std::string &n)
 {
   m_name = n;
 }
 
-void
-MethodTableEntry::set_enabled (bool en)
+void MethodTableEntry::set_enabled (bool en)
 {
   m_is_enabled = en;
 }
 
-bool
-MethodTableEntry::is_enabled () const
+bool MethodTableEntry::is_enabled () const
 {
   return m_is_enabled;
 }
 
-void
-MethodTableEntry::set_fallback_not_implemented (bool f)
+void MethodTableEntry::set_fallback_not_implemented (bool f)
 {
   m_fallback_not_implemented = f;
 }
 
-bool
-MethodTableEntry::fallback_not_implemented () const
+bool MethodTableEntry::fallback_not_implemented () const
 {
   return m_fallback_not_implemented;
 }
 
-void
-MethodTableEntry::set_init (bool f)
+void MethodTableEntry::set_init (bool f)
 {
   m_is_init = f;
 }
 
-bool
-MethodTableEntry::is_init () const
+bool MethodTableEntry::is_init () const
 {
   return m_is_init;
 }
 
-bool
-MethodTableEntry::is_static () const
+bool MethodTableEntry::is_static () const
 {
   return m_is_static;
 }
 
-bool
-MethodTableEntry::is_protected () const
+bool MethodTableEntry::is_protected () const
 {
   return m_is_protected;
 }
 
-void
-MethodTableEntry::add (const gsi::MethodBase *m)
+void MethodTableEntry::add (const gsi::MethodBase *m)
 {
   m_methods.push_back (m);
 }
 
-void
-MethodTableEntry::finish ()
+void MethodTableEntry::finish ()
 {
   //  remove duplicate entries in the method list
   std::vector<const gsi::MethodBase *> m = m_methods;
-  std::sort(m.begin (), m.end ());
+  std::sort (m.begin (), m.end ());
   m_methods.assign (m.begin (), std::unique (m.begin (), m.end ()));
 }
 
@@ -183,7 +173,6 @@ MethodTable::MethodTable (const gsi::ClassBase *cls_decl, PythonModule *module)
           }
         }
       }
-
     }
   }
 
@@ -203,9 +192,7 @@ MethodTable::MethodTable (const gsi::ClassBase *cls_decl, PythonModule *module)
           }
         }
       }
-
     }
-
   }
 }
 
@@ -236,7 +223,7 @@ MethodTable::top_property_mid () const
 std::pair<bool, size_t>
 MethodTable::find_method (bool st, const std::string &name) const
 {
-  std::map <std::pair<bool, std::string>, size_t>::const_iterator t = m_name_map.find (std::make_pair (st, name));
+  std::map<std::pair<bool, std::string>, size_t>::const_iterator t = m_name_map.find (std::make_pair (st, name));
   if (t != m_name_map.end ()) {
     return std::make_pair (true, t->second + m_method_offset);
   } else {
@@ -247,7 +234,7 @@ MethodTable::find_method (bool st, const std::string &name) const
 std::pair<bool, size_t>
 MethodTable::find_property (bool st, const std::string &name) const
 {
-  std::map <std::pair<bool, std::string>, size_t>::const_iterator t = m_property_name_map.find (std::make_pair (st, name));
+  std::map<std::pair<bool, std::string>, size_t>::const_iterator t = m_property_name_map.find (std::make_pair (st, name));
   if (t != m_property_name_map.end ()) {
     return std::make_pair (true, t->second + m_property_offset);
   } else {
@@ -255,8 +242,7 @@ MethodTable::find_property (bool st, const std::string &name) const
   }
 }
 
-bool
-MethodTable::is_property_setter (bool st, const std::string &name)
+bool MethodTable::is_property_setter (bool st, const std::string &name)
 {
   std::pair<bool, size_t> p = find_property (st, name);
   if (! p.first) {
@@ -265,8 +251,7 @@ MethodTable::is_property_setter (bool st, const std::string &name)
   return (begin_setters (p.second) != end_setters (p.second));
 }
 
-bool
-MethodTable::is_property_getter (bool st, const std::string &name)
+bool MethodTable::is_property_getter (bool st, const std::string &name)
 {
   std::pair<bool, size_t> p = find_property (st, name);
   if (! p.first) {
@@ -353,11 +338,11 @@ static std::string extract_python_name (const std::string &name)
   } else if (name == "-@") {
     return "__neg__";
   } else if (name == "/") {
-    #if PY_MAJOR_VERSION < 3
+#if PY_MAJOR_VERSION < 3
     return "__div__";
-    #else
+#else
     return "__truediv__";
-    #endif
+#endif
   } else if (name == "*" || name == "*!") {
     return "__mul__";
   } else if (name == "%") {
@@ -379,11 +364,11 @@ static std::string extract_python_name (const std::string &name)
   } else if (name == "-=") {
     return "__isub__";
   } else if (name == "/=") {
-    #if PY_MAJOR_VERSION < 3
+#if PY_MAJOR_VERSION < 3
     return "__idiv__";
-    #else
+#else
     return "__itruediv__";
-    #endif
+#endif
   } else if (name == "*=") {
     return "__imul__";
   } else if (name == "%=") {
@@ -411,9 +396,9 @@ static std::string extract_python_name (const std::string &name)
 
     //  question-mark symbol and trailing = are removed.
     size_t n = 0;
-    for ( ; *c; ++c) {
+    for (; *c; ++c) {
       if (*c == '=' || *c == '?') {
-        if (! c[1]) {
+        if (! c [1]) {
           if (*c == '=') {
             //  Normally, this method is replaced by an attribute.
             //  If that fails, we prepend a "set_" to make the name unique.
@@ -432,7 +417,6 @@ static std::string extract_python_name (const std::string &name)
     }
 
     return name;
-
   }
 }
 
@@ -446,11 +430,11 @@ static bool is_method_with_fallback (const std::string &name)
   } else if (name == "-") {
     return true;
   } else if (name == "/") {
-    #if PY_MAJOR_VERSION < 3
+#if PY_MAJOR_VERSION < 3
     return false;
-    #else
+#else
     return true;
-    #endif
+#endif
   } else if (name == "*") {
     return true;
   } else if (name == "%") {
@@ -470,8 +454,7 @@ static bool is_method_with_fallback (const std::string &name)
   }
 }
 
-void
-MethodTable::add_method (const std::string &name, const gsi::MethodBase *mb)
+void MethodTable::add_method (const std::string &name, const gsi::MethodBase *mb)
 {
   if (is_reserved_word (name)) {
 
@@ -603,14 +586,11 @@ MethodTable::add_method (const std::string &name, const gsi::MethodBase *mb)
         add_method_basic ("__rmul__", mb);
         mp_module->add_python_doc (mb, tl::to_string (tr ("This method also implements '__rmul__'")));
       }
-
     }
-
   }
 }
 
-void
-MethodTable::add_setter (const std::string &name, const gsi::MethodBase *setter)
+void MethodTable::add_setter (const std::string &name, const gsi::MethodBase *setter)
 {
   if (is_reserved_word (name)) {
 
@@ -624,27 +604,24 @@ MethodTable::add_setter (const std::string &name, const gsi::MethodBase *setter)
   }
 }
 
-void
-MethodTable::add_setter_basic (const std::string &name, const gsi::MethodBase *setter)
+void MethodTable::add_setter_basic (const std::string &name, const gsi::MethodBase *setter)
 {
   bool st = setter->is_static ();
 
   std::map<std::pair<bool, std::string>, size_t>::iterator n = m_property_name_map.find (std::make_pair (st, name));
   if (n == m_property_name_map.end ()) {
 
-    m_property_name_map.insert (std::make_pair (std::make_pair(st, name), m_property_table.size ()));
+    m_property_name_map.insert (std::make_pair (std::make_pair (st, name), m_property_table.size ()));
     m_property_table.push_back (std::make_pair (MethodTableEntry (name, st, false), MethodTableEntry (name, st, false)));
     m_property_table.back ().first.add (setter);
 
   } else {
 
     m_property_table [n->second].first.add (setter);
-
   }
 }
 
-void
-MethodTable::add_getter (const std::string &name, const gsi::MethodBase *getter)
+void MethodTable::add_getter (const std::string &name, const gsi::MethodBase *getter)
 {
   if (is_reserved_word (name)) {
 
@@ -658,75 +635,64 @@ MethodTable::add_getter (const std::string &name, const gsi::MethodBase *getter)
   }
 }
 
-void
-MethodTable::add_getter_basic (const std::string &name, const gsi::MethodBase *getter)
+void MethodTable::add_getter_basic (const std::string &name, const gsi::MethodBase *getter)
 {
   bool st = getter->is_static ();
 
   std::map<std::pair<bool, std::string>, size_t>::iterator n = m_property_name_map.find (std::make_pair (st, name));
   if (n == m_property_name_map.end ()) {
 
-    m_property_name_map.insert (std::make_pair (std::make_pair(st, name), m_property_table.size ()));
+    m_property_name_map.insert (std::make_pair (std::make_pair (st, name), m_property_table.size ()));
     m_property_table.push_back (std::make_pair (MethodTableEntry (name, st, false), MethodTableEntry (name, st, false)));
     m_property_table.back ().second.add (getter);
 
   } else {
 
     m_property_table [n->second].second.add (getter);
-
   }
 }
 
-bool
-MethodTable::is_enabled (size_t mid) const
+bool MethodTable::is_enabled (size_t mid) const
 {
   return m_table [mid - m_method_offset].is_enabled ();
 }
 
-void
-MethodTable::set_enabled (size_t mid, bool en)
+void MethodTable::set_enabled (size_t mid, bool en)
 {
   m_table [mid - m_method_offset].set_enabled (en);
 }
 
-bool
-MethodTable::fallback_not_implemented (size_t mid) const
+bool MethodTable::fallback_not_implemented (size_t mid) const
 {
   return m_table [mid - m_method_offset].fallback_not_implemented ();
 }
 
-void
-MethodTable::set_fallback_not_implemented (size_t mid, bool f)
+void MethodTable::set_fallback_not_implemented (size_t mid, bool f)
 {
   m_table [mid - m_method_offset].set_fallback_not_implemented (f);
 }
 
-bool
-MethodTable::is_init(size_t mid) const
+bool MethodTable::is_init (size_t mid) const
 {
   return m_table [mid - m_method_offset].is_init ();
 }
 
-void
-MethodTable::set_init (size_t mid, bool f)
+void MethodTable::set_init (size_t mid, bool f)
 {
   m_table [mid - m_method_offset].set_init (f);
 }
 
-bool
-MethodTable::is_static (size_t mid) const
+bool MethodTable::is_static (size_t mid) const
 {
   return m_table [mid - m_method_offset].is_static ();
 }
 
-bool
-MethodTable::is_protected (size_t mid) const
+bool MethodTable::is_protected (size_t mid) const
 {
   return m_table [mid - m_method_offset].is_protected ();
 }
 
-void
-MethodTable::alias (size_t mid, const std::string &new_name)
+void MethodTable::alias (size_t mid, const std::string &new_name)
 {
   bool st = is_static (mid);
   auto nm = m_name_map.find (std::make_pair (st, new_name));
@@ -737,8 +703,7 @@ MethodTable::alias (size_t mid, const std::string &new_name)
   m_name_map.insert (std::make_pair (std::make_pair (st, new_name), m_table.size () - 1 - m_method_offset));
 }
 
-void
-MethodTable::rename (size_t mid, const std::string &new_name)
+void MethodTable::rename (size_t mid, const std::string &new_name)
 {
   std::string old_name = name (mid);
   bool st = is_static (mid);
@@ -767,41 +732,40 @@ MethodTable::property_name (size_t mid) const
 MethodTableEntry::method_iterator
 MethodTable::begin_setters (size_t mid) const
 {
-  return m_property_table[mid - m_property_offset].first.begin ();
+  return m_property_table [mid - m_property_offset].first.begin ();
 }
 
 MethodTableEntry::method_iterator
 MethodTable::end_setters (size_t mid) const
 {
-  return m_property_table[mid - m_property_offset].first.end ();
+  return m_property_table [mid - m_property_offset].first.end ();
 }
 
 MethodTableEntry::method_iterator
 MethodTable::begin_getters (size_t mid) const
 {
-  return m_property_table[mid - m_property_offset].second.begin ();
+  return m_property_table [mid - m_property_offset].second.begin ();
 }
 
 MethodTableEntry::method_iterator
 MethodTable::end_getters (size_t mid) const
 {
-  return m_property_table[mid - m_property_offset].second.end ();
+  return m_property_table [mid - m_property_offset].second.end ();
 }
 
 MethodTableEntry::method_iterator
 MethodTable::begin (size_t mid) const
 {
-  return m_table[mid - m_method_offset].begin ();
+  return m_table [mid - m_method_offset].begin ();
 }
 
 MethodTableEntry::method_iterator
 MethodTable::end (size_t mid) const
 {
-  return m_table[mid - m_method_offset].end ();
+  return m_table [mid - m_method_offset].end ();
 }
 
-void
-MethodTable::finish ()
+void MethodTable::finish ()
 {
   for (std::vector<MethodTableEntry>::iterator m = m_table.begin (); m != m_table.end (); ++m) {
     m->finish ();
@@ -812,14 +776,13 @@ MethodTable::finish ()
       }
     }
   }
-  for (std::vector<std::pair<MethodTableEntry, MethodTableEntry> >::iterator m = m_property_table.begin (); m != m_property_table.end (); ++m) {
+  for (std::vector<std::pair<MethodTableEntry, MethodTableEntry>>::iterator m = m_property_table.begin (); m != m_property_table.end (); ++m) {
     m->first.finish ();
     m->second.finish ();
   }
 }
 
-void
-MethodTable::add_method_basic (const std::string &name, const gsi::MethodBase *mb, bool enabled, bool init, bool fallback_not_implemented)
+void MethodTable::add_method_basic (const std::string &name, const gsi::MethodBase *mb, bool enabled, bool init, bool fallback_not_implemented)
 {
   bool st = mb->is_static () && ! init;
 
@@ -855,14 +818,13 @@ MethodTable::add_method_basic (const std::string &name, const gsi::MethodBase *m
     if (fallback_not_implemented) {
       m_table.back ().set_fallback_not_implemented (true);
     }
-
   }
 }
 
 MethodTable *
 MethodTable::method_table_by_class (const gsi::ClassBase *cls_decl)
 {
-  PythonClassClientData *cd = dynamic_cast<PythonClassClientData *>(cls_decl->data (gsi::ClientIndex::Python));
+  PythonClassClientData *cd = dynamic_cast<PythonClassClientData *> (cls_decl->data (gsi::ClientIndex::Python));
   return cd ? &cd->method_table : 0;
 }
 
@@ -893,7 +855,7 @@ PythonClassClientData::~PythonClassClientData ()
 PyTypeObject *
 PythonClassClientData::py_type (const gsi::ClassBase &cls_decl, bool as_static)
 {
-  PythonClassClientData *cd = dynamic_cast<PythonClassClientData *>(cls_decl.data (gsi::ClientIndex::Python));
+  PythonClassClientData *cd = dynamic_cast<PythonClassClientData *> (cls_decl.data (gsi::ClientIndex::Python));
   return (PyTypeObject *) (cd ? (as_static ? cd->py_type_object_static.get () : cd->py_type_object.get ()) : 0);
 }
 
@@ -911,10 +873,9 @@ PythonClassClientData::cls_for_type (PyTypeObject *type)
   return 0;
 }
 
-void
-PythonClassClientData::initialize (const gsi::ClassBase &cls_decl, PyTypeObject *py_type, bool as_static, PythonModule *module)
+void PythonClassClientData::initialize (const gsi::ClassBase &cls_decl, PyTypeObject *py_type, bool as_static, PythonModule *module)
 {
-  PythonClassClientData *cd = dynamic_cast<PythonClassClientData *>(cls_decl.data (gsi::ClientIndex::Python));
+  PythonClassClientData *cd = dynamic_cast<PythonClassClientData *> (cls_decl.data (gsi::ClientIndex::Python));
   if (cd) {
     s_type2cls.insert (std::make_pair (py_type, &cls_decl));
     if (as_static) {
@@ -928,4 +889,3 @@ PythonClassClientData::initialize (const gsi::ClassBase &cls_decl, PyTypeObject 
 }
 
 }
-

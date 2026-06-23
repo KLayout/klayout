@@ -107,16 +107,16 @@ void run_test1 (tl::TestBase *_this, bool deep)
   unsigned int l1003 = ly.get_layer (db::LayerProperties (1003, 0));
   res.insert_into (&ly, *ly.begin_top_down (), l1003);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, make_au ("1", deep));
 }
 
-TEST(1_Basic)
+TEST (1_Basic)
 {
   run_test1 (_this, false);
 }
 
-TEST(1d_Basic)
+TEST (1d_Basic)
 {
   run_test1 (_this, true);
 }
@@ -161,16 +161,16 @@ void run_test2 (tl::TestBase *_this, bool deep)
   unsigned int l1002 = ly.get_layer (db::LayerProperties (1002, 0));
   eres.insert_into (&ly, *ly.begin_top_down (), l1002);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, make_au ("2", deep));
 }
 
-TEST(2_ChainedOperations)
+TEST (2_ChainedOperations)
 {
   run_test2 (_this, false);
 }
 
-TEST(2d_ChainedOperations)
+TEST (2d_ChainedOperations)
 {
   run_test2 (_this, true);
 }
@@ -208,16 +208,16 @@ void run_test3 (tl::TestBase *_this, bool deep)
   unsigned int l1001 = ly.get_layer (db::LayerProperties (1001, 0));
   res.insert_into (&ly, *ly.begin_top_down (), l1001);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, make_au ("3", deep));
 }
 
-TEST(3_BooleanOperations)
+TEST (3_BooleanOperations)
 {
   run_test3 (_this, false);
 }
 
-TEST(3d_BooleanOperations)
+TEST (3d_BooleanOperations)
 {
   run_test3 (_this, true);
 }
@@ -255,16 +255,16 @@ void run_test4 (tl::TestBase *_this, bool deep)
   unsigned int l1001 = ly.get_layer (db::LayerProperties (1001, 0));
   res.insert_into (&ly, *ly.begin_top_down (), l1001);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, make_au ("4", deep));
 }
 
-TEST(4_SizeOperation)
+TEST (4_SizeOperation)
 {
   run_test4 (_this, false);
 }
 
-TEST(4d_SizeOperation)
+TEST (4d_SizeOperation)
 {
   run_test4 (_this, true);
 }
@@ -298,16 +298,16 @@ void run_test5 (tl::TestBase *_this, bool deep)
   unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
   res.insert_into (&ly, *ly.begin_top_down (), l1000);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, make_au ("5", deep));
 }
 
-TEST(5_InteractOperation)
+TEST (5_InteractOperation)
 {
   run_test5 (_this, false);
 }
 
-TEST(5d_InteractOperation)
+TEST (5d_InteractOperation)
 {
   run_test5 (_this, true);
 }
@@ -343,16 +343,16 @@ void run_test6 (tl::TestBase *_this, bool deep)
   unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
   res.insert_into (&ly, *ly.begin_top_down (), l1000);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, make_au ("6", deep));
 }
 
-TEST(6_InteractWithEdgeOperation)
+TEST (6_InteractWithEdgeOperation)
 {
   run_test6 (_this, false);
 }
 
-TEST(6d_InteractWithEdgeOperation)
+TEST (6d_InteractWithEdgeOperation)
 {
   run_test6 (_this, true);
 }
@@ -387,16 +387,16 @@ void run_test7 (tl::TestBase *_this, bool deep)
   unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
   res.insert_into (&ly, *ly.begin_top_down (), l1000);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, make_au ("7", deep));
 }
 
-TEST(7_PullOperation)
+TEST (7_PullOperation)
 {
   run_test7 (_this, false);
 }
 
-TEST(7d_PullOperation)
+TEST (7d_PullOperation)
 {
   run_test7 (_this, true);
 }
@@ -432,16 +432,16 @@ void run_test8 (tl::TestBase *_this, bool deep)
   unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
   res.insert_into (&ly, *ly.begin_top_down (), l1000);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, make_au ("8", deep));
 }
 
-TEST(8_PullWithEdgeOperation)
+TEST (8_PullWithEdgeOperation)
 {
   run_test8 (_this, false);
 }
 
-TEST(8d_PullWithEdgeOperation)
+TEST (8d_PullWithEdgeOperation)
 {
   run_test8 (_this, true);
 }
@@ -498,16 +498,16 @@ void run_test9 (tl::TestBase *_this, bool deep)
   unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
   res.insert_into (&ly, *ly.begin_top_down (), l1000);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, make_au ("9", deep));
 }
 
-TEST(9_LogicalSelectOperation)
+TEST (9_LogicalSelectOperation)
 {
   run_test9 (_this, false);
 }
 
-TEST(9d_LogicalSelectOperation)
+TEST (9d_LogicalSelectOperation)
 {
   run_test9 (_this, true);
 }
@@ -574,16 +574,16 @@ void run_test10 (tl::TestBase *_this, bool deep)
   unsigned int l1003 = ly.get_layer (db::LayerProperties (1003, 0));
   res.insert_into (&ly, *ly.begin_top_down (), l1003);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, make_au ("10", deep));
 }
 
-TEST(10_LogicalAndNotOperation)
+TEST (10_LogicalAndNotOperation)
 {
   run_test10 (_this, false);
 }
 
-TEST(10d_LogicalAndNotOperation)
+TEST (10d_LogicalAndNotOperation)
 {
   run_test10 (_this, true);
 }
@@ -624,16 +624,16 @@ void run_test11 (tl::TestBase *_this, bool deep)
   unsigned int l1001 = ly.get_layer (db::LayerProperties (1001, 0));
   res.insert_into (&ly, *ly.begin_top_down (), l1001);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, make_au ("11", deep));
 }
 
-TEST(11_EdgeFilterOperation)
+TEST (11_EdgeFilterOperation)
 {
   run_test11 (_this, false);
 }
 
-TEST(11d_EdgeFilterOperation)
+TEST (11d_EdgeFilterOperation)
 {
   run_test11 (_this, true);
 }
@@ -699,16 +699,16 @@ void run_test12 (tl::TestBase *_this, bool deep)
   unsigned int l1005 = ly.get_layer (db::LayerProperties (1005, 0));
   res.insert_into (&ly, *ly.begin_top_down (), l1005);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, make_au ("12", deep));
 }
 
-TEST(12_EdgeBooleanOperations)
+TEST (12_EdgeBooleanOperations)
 {
   run_test12 (_this, false);
 }
 
-TEST(12d_EdgeBooleanOperations)
+TEST (12d_EdgeBooleanOperations)
 {
   run_test12 (_this, true);
 }
@@ -743,16 +743,16 @@ void run_test13 (tl::TestBase *_this, bool deep)
   unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
   res.insert_into (&ly, *ly.begin_top_down (), l1000);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, make_au ("13", deep));
 }
 
-TEST(13_EdgeProcessor)
+TEST (13_EdgeProcessor)
 {
   run_test13 (_this, false);
 }
 
-TEST(13d_EdgeProcessor)
+TEST (13d_EdgeProcessor)
 {
   run_test13 (_this, true);
 }
@@ -800,16 +800,16 @@ void run_test14 (tl::TestBase *_this, bool deep)
   unsigned int l1001 = ly.get_layer (db::LayerProperties (1001, 0));
   res2.insert_into (&ly, *ly.begin_top_down (), l1001);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, make_au ("14", deep));
 }
 
-TEST(14_JoinAndMerged)
+TEST (14_JoinAndMerged)
 {
   run_test14 (_this, false);
 }
 
-TEST(14d_JoinAndMerged)
+TEST (14d_JoinAndMerged)
 {
   run_test14 (_this, true);
 }
@@ -855,16 +855,16 @@ void run_test15 (tl::TestBase *_this, bool deep)
   unsigned int l1001 = ly.get_layer (db::LayerProperties (1001, 0));
   res2.insert_into (&ly, *ly.begin_top_down (), l1001);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, make_au ("15", deep));
 }
 
-TEST(15_JoinAndMerged)
+TEST (15_JoinAndMerged)
 {
   run_test15 (_this, false);
 }
 
-TEST(15d_JoinAndMerged)
+TEST (15d_JoinAndMerged)
 {
   run_test15 (_this, true);
 }
@@ -901,16 +901,16 @@ void run_test16 (tl::TestBase *_this, bool deep)
   unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
   res1.insert_into (&ly, *ly.begin_top_down (), l1000);
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, make_au ("16", deep));
 }
 
-TEST(16_JoinAndMerged)
+TEST (16_JoinAndMerged)
 {
   run_test16 (_this, false);
 }
 
-TEST(16d_JoinAndMerged)
+TEST (16d_JoinAndMerged)
 {
   run_test16 (_this, true);
 }

@@ -50,8 +50,8 @@ class reuse_vector_iterator
 public:
   typedef size_t size_type;
   typedef Value value_type;
-  typedef value_type *pointer; 
-  typedef value_type &reference;   //  operator* returns a value
+  typedef value_type *pointer;
+  typedef value_type &reference; //  operator* returns a value
   typedef std::forward_iterator_tag iterator_category;
   typedef size_type difference_type;
 
@@ -60,14 +60,16 @@ public:
    */
   reuse_vector_iterator ()
     : mp_v (0), m_n (0)
-  { }
+  {
+  }
 
   /**
    *  @brief The constructor
    */
   reuse_vector_iterator (reuse_vector<Value, trivial_relocate> *v, size_type n)
     : mp_v (v), m_n (n)
-  { }
+  {
+  }
 
   /**
    *  @brief Equality with const iterator
@@ -124,14 +126,14 @@ public:
   /**
    *  @brief Access operator
    */
-  value_type *operator-> () const
+  value_type *operator->() const
   {
     tl_assert (mp_v->is_used (m_n));
     return &mp_v->item (m_n);
   }
 
   /**
-   *  @brief Validity 
+   *  @brief Validity
    *
    *  An iterator is valid if the object is still available
    *  This does not take care about the container, but just about elements inside it.
@@ -161,7 +163,7 @@ public:
     return index () >= mp_v->last ();
   }
 
-  /** 
+  /**
    *  @brief The index of the element pointed to
    */
   size_t index () const
@@ -169,7 +171,7 @@ public:
     return m_n;
   }
 
-  /** 
+  /**
    *  @brief The pointer to the vector that this iterator points into
    */
   reuse_vector<Value, trivial_relocate> *vector () const
@@ -209,8 +211,8 @@ class reuse_vector_const_iterator
 public:
   typedef size_t size_type;
   typedef Value value_type;
-  typedef const value_type *pointer; 
-  typedef const value_type &reference;   //  operator* returns a value
+  typedef const value_type *pointer;
+  typedef const value_type &reference; //  operator* returns a value
   typedef std::forward_iterator_tag iterator_category;
   typedef size_type difference_type;
 
@@ -219,21 +221,24 @@ public:
    */
   reuse_vector_const_iterator ()
     : mp_v (0), m_n (0)
-  { }
+  {
+  }
 
   /**
    *  @brief The constructor
    */
   reuse_vector_const_iterator (const reuse_vector<Value, trivial_relocate> *v, size_type n)
     : mp_v (v), m_n (n)
-  { }
+  {
+  }
 
   /**
    *  @brief The conversion of a non-const iterator to a const iterator
    */
   reuse_vector_const_iterator (const reuse_vector_iterator<Value, trivial_relocate> &d)
     : mp_v (d.mp_v), m_n (d.m_n)
-  { }
+  {
+  }
 
   /**
    *  @brief cast to non-const iterator
@@ -282,7 +287,7 @@ public:
   /**
    *  @brief Access operator
    */
-  const value_type *operator-> () const
+  const value_type *operator->() const
   {
     tl_assert (mp_v->is_used (m_n));
     return &mp_v->item (m_n);
@@ -291,7 +296,7 @@ public:
   /**
    *  @brief Unsafe access to the target address
    *
-   *  This method is intended for special use cases such as the cached box picker in 
+   *  This method is intended for special use cases such as the cached box picker in
    *  the box tree
    */
   const value_type *unsafe_target_addr () const
@@ -300,7 +305,7 @@ public:
   }
 
   /**
-   *  @brief Validity 
+   *  @brief Validity
    *
    *  An iterator is valid if the object is still available
    *  This does not take care about the container, but just about elements inside it.
@@ -330,7 +335,7 @@ public:
     return index () >= mp_v->last ();
   }
 
-  /** 
+  /**
    *  @brief The index of the element pointed to
    */
   size_t index () const
@@ -338,7 +343,7 @@ public:
     return m_n;
   }
 
-  /** 
+  /**
    *  @brief The pointer to the vector that this iterator points into
    */
   const reuse_vector<Value, trivial_relocate> *vector () const
@@ -379,11 +384,12 @@ public:
 
   ReuseData ()
     : m_first_used (0), m_last_used (0), m_next_free (0), m_size (0)
-  { }
+  {
+  }
 
   ReuseData (size_type n)
     : m_first_used (0), m_last_used (n), m_next_free (n), m_size (n)
-  { 
+  {
     m_used.resize (n, true);
   }
 
@@ -402,7 +408,7 @@ public:
     return m_size;
   }
 
-  size_type allocate () 
+  size_type allocate ()
   {
     tl_assert (can_allocate ());
 
@@ -430,7 +436,7 @@ public:
     return (m_next_free < m_used.size ());
   }
 
-  void deallocate (size_type n) 
+  void deallocate (size_type n)
   {
     m_used [n] = false;
 
@@ -453,7 +459,7 @@ public:
     --m_size;
   }
 
-  void reserve (size_type n) 
+  void reserve (size_type n)
   {
     m_used.reserve (n);
   }
@@ -477,7 +483,7 @@ private:
   std::vector<bool> m_used;
   size_type m_first_used, m_last_used, m_next_free, m_size;
 };
-   
+
 /**
  *  @brief A vector that maintains the order of elements but allows one to reference elements in a stable way
  *
@@ -488,7 +494,7 @@ private:
  *  even after delete and insert (and potentially reallocation) actions.
  *
  *  The memory requirements of this container are the same than that of a std::vector.
- *  
+ *
  *  One requirement is that sizeof(C) >= sizeof(void *).
  */
 
@@ -548,10 +554,14 @@ public:
    */
   reuse_vector (reuse_vector &&d)
   {
-    mp_start = d.mp_start; d.mp_start = 0;
-    mp_finish = d.mp_finish; d.mp_finish = 0;
-    mp_capacity = d.mp_capacity; d.mp_capacity = 0;
-    mp_rdata = d.mp_rdata; d.mp_rdata = 0;
+    mp_start = d.mp_start;
+    d.mp_start = 0;
+    mp_finish = d.mp_finish;
+    d.mp_finish = 0;
+    mp_capacity = d.mp_capacity;
+    d.mp_capacity = 0;
+    mp_rdata = d.mp_rdata;
+    d.mp_rdata = 0;
   }
 
   /**
@@ -587,10 +597,14 @@ public:
   reuse_vector &operator= (reuse_vector &&d)
   {
     if (&d != this) {
-      mp_start = d.mp_start; d.mp_start = 0;
-      mp_finish = d.mp_finish; d.mp_finish = 0;
-      mp_capacity = d.mp_capacity; d.mp_capacity = 0;
-      mp_rdata = d.mp_rdata; d.mp_rdata = 0;
+      mp_start = d.mp_start;
+      d.mp_start = 0;
+      mp_finish = d.mp_finish;
+      d.mp_finish = 0;
+      mp_capacity = d.mp_capacity;
+      d.mp_capacity = 0;
+      mp_rdata = d.mp_rdata;
+      d.mp_rdata = 0;
     }
     return *this;
   }
@@ -673,7 +687,7 @@ public:
   /**
    *  @brief Deliver the iterator for a certain element (given by pointer)
    */
-  iterator iterator_from_pointer (Value *ptr) 
+  iterator iterator_from_pointer (Value *ptr)
   {
     return iterator (this, ptr - mp_start);
   }
@@ -693,7 +707,7 @@ public:
   {
     return iterator (this, last ());
   }
-  
+
   /**
    *  @brief Deliver the iterator for a certain element (given by pointer)
    */
@@ -718,17 +732,17 @@ public:
     return const_iterator (this, last ());
   }
 
-  /** 
+  /**
    *  @brief Access by the basic index
    *
    *  The basic index is the internal index reported from the iterator's index() method
    */
-  value_type &item (size_type n) 
+  value_type &item (size_type n)
   {
     return mp_start [n];
   }
-  
-  /** 
+
+  /**
    *  @brief Access by the basic index
    *
    *  The basic index is the internal index reported from the iterator's index() method
@@ -737,7 +751,7 @@ public:
   {
     return mp_start [n];
   }
-  
+
   /**
    *  @brief Insert one element into the container
    */
@@ -747,7 +761,7 @@ public:
 
     if (mp_rdata) {
       n = mp_rdata->allocate ();
-      //  when the last unused member is allocated, we can remove the 
+      //  when the last unused member is allocated, we can remove the
       //  ReuseData pointer and add to the end
       if (! mp_rdata->can_allocate ()) {
         delete mp_rdata;
@@ -755,7 +769,7 @@ public:
       }
     } else {
       if (mp_finish == mp_capacity) {
-        //  Special case: we are inserting an element from our own space - since reserve will first 
+        //  Special case: we are inserting an element from our own space - since reserve will first
         //  release the element we have to create a copy before we insert it.
         if (&item >= mp_start && &item < mp_finish) {
           value_type copy (item);
@@ -961,8 +975,8 @@ private:
   value_type *mp_start, *mp_finish, *mp_capacity;
   ReuseData *mp_rdata;
 
-  template<class, bool> friend class reuse_vector_iterator;
-  template<class, bool> friend class reuse_vector_const_iterator;
+  template <class, bool> friend class reuse_vector_iterator;
+  template <class, bool> friend class reuse_vector_const_iterator;
 
   void init ()
   {
@@ -1015,7 +1029,6 @@ private:
       mp_start = new_start;
       mp_finish = mp_start + e;
       mp_capacity = mp_start + n;
-
     }
   }
 
@@ -1033,10 +1046,9 @@ private:
 
         size_type l = last ();
         size_type i = first ();
-        memcpy ((void *)(new_start + i), (void *)(mp_start + i), (l - i) * sizeof (Value));
+        memcpy ((void *) (new_start + i), (void *) (mp_start + i), (l - i) * sizeof (Value));
 
         delete [] ((char *) mp_start);
-
       }
 
       if (mp_rdata) {
@@ -1046,7 +1058,6 @@ private:
       mp_start = new_start;
       mp_finish = mp_start + e;
       mp_capacity = mp_start + n;
-
     }
   }
 };
@@ -1054,4 +1065,3 @@ private:
 }
 
 #endif
-

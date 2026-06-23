@@ -33,19 +33,19 @@ namespace pya
 
 PythonRef::PythonRef ()
   : mp_obj (NULL), m_owns_pointer (true)
-{ 
+{
   //  .. nothing yet ..
 }
 
 PythonRef::PythonRef (const PythonPtr &ptr)
   : mp_obj (ptr.get ()), m_owns_pointer (true)
-{ 
+{
   Py_XINCREF (mp_obj);
 }
 
 PythonRef::PythonRef (PyObject *obj, bool new_ref)
   : mp_obj (obj), m_owns_pointer (true)
-{ 
+{
   if (! new_ref) {
     Py_XINCREF (mp_obj);
   }
@@ -103,7 +103,7 @@ PythonRef::operator bool () const
   return mp_obj != NULL;
 }
 
-PyObject *PythonRef::operator-> () const
+PyObject *PythonRef::operator->() const
 {
   return mp_obj;
 }
@@ -180,7 +180,7 @@ PythonPtr::operator bool () const
   return mp_obj != NULL;
 }
 
-PyObject *PythonPtr::operator-> () const
+PyObject *PythonPtr::operator->() const
 {
   return mp_obj;
 }
@@ -191,4 +191,3 @@ PyObject *PythonPtr::get () const
 }
 
 }
-

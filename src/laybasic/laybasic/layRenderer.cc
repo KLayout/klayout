@@ -30,7 +30,7 @@
 
 #include <algorithm>
 
-namespace lay 
+namespace lay
 {
 
 // ----------------------------------------------------------------------------------------------
@@ -53,8 +53,7 @@ Renderer::Renderer (unsigned int width, unsigned int height, double resolution, 
   // .. nothing else ..
 }
 
-void 
-Renderer::draw_propstring (const db::Shape &shape, lay::CanvasPlane *text, const db::CplxTrans &trans)
+void Renderer::draw_propstring (const db::Shape &shape, lay::CanvasPlane *text, const db::CplxTrans &trans)
 {
   if (! shape.has_prop_id ()) {
     return;
@@ -69,7 +68,7 @@ Renderer::draw_propstring (const db::Shape &shape, lay::CanvasPlane *text, const
   } else if (shape.is_point ()) {
     dp = trans (shape.point ());
   } else if (shape.is_polygon ()) {
-    db::Shape::polygon_edge_iterator e = shape.begin_edge (); 
+    db::Shape::polygon_edge_iterator e = shape.begin_edge ();
     dp = trans ((*e).p1 ());
   } else if (shape.is_edge ()) {
     dp = trans (shape.edge ().p1 ());
@@ -89,9 +88,8 @@ Renderer::draw_propstring (const db::Shape &shape, lay::CanvasPlane *text, const
   }
 }
 
-void 
-Renderer::draw_propstring (db::properties_id_type id, const db::DPoint &pref,
-                           lay::CanvasPlane *text, const db::CplxTrans &trans)
+void Renderer::draw_propstring (db::properties_id_type id, const db::DPoint &pref,
+                                lay::CanvasPlane *text, const db::CplxTrans &trans)
 {
   db::DPoint tp1 (pref + db::DVector (2.0, -2.0));
   db::DPoint tp2 (pref + db::DVector (2.0, -2.0 - trans.mag () * m_default_text_size));
@@ -109,13 +107,12 @@ Renderer::draw_propstring (db::properties_id_type id, const db::DPoint &pref,
   }
 
   draw (db::DBox (tp1, tp2), ptext, m_font,
-          db::HAlignLeft, db::VAlignTop, 
-          db::DFTrans (db::DFTrans::r0), 0, 0, 0, text);
+        db::HAlignLeft, db::VAlignTop,
+        db::DFTrans (db::DFTrans::r0), 0, 0, 0, text);
 }
 
-void 
-Renderer::draw_description_propstring (db::properties_id_type id, const db::DPoint &pref,
-                                       lay::CanvasPlane *text, const db::CplxTrans &trans)
+void Renderer::draw_description_propstring (db::properties_id_type id, const db::DPoint &pref,
+                                            lay::CanvasPlane *text, const db::CplxTrans &trans)
 {
   db::DPoint tp1 (pref + db::DVector (5.0, -5.0));
   db::DPoint tp2 (pref + db::DVector (5.0, -5.0 - trans.mag () * m_default_text_size));
@@ -125,12 +122,9 @@ Renderer::draw_description_propstring (db::properties_id_type id, const db::DPoi
   if (! description.is_nil ()) {
 
     draw (db::DBox (tp1, tp2), description.to_string (), m_font,
-            db::HAlignLeft, db::VAlignTop, 
-            db::DFTrans (db::DFTrans::r0), 0, 0, 0, text);
-
+          db::HAlignLeft, db::VAlignTop,
+          db::DFTrans (db::DFTrans::r0), 0, 0, 0, text);
   }
 }
 
 }
-
-

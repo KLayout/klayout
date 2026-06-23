@@ -41,16 +41,16 @@ public:
   static const char *connection_function_name ();
 
   ShapeEditService (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type shape_types);
-  
+
 protected:
   void get_edit_layer ();
   void change_edit_layer (const db::LayerProperties &lp);
 
   const db::VCplxTrans &trans () const { return m_trans; }
-  unsigned int layer () const          { return m_layer; }
-  unsigned int cv_index () const       { return m_cv_index; }
-  db::Cell &cell () const              { return *mp_cell; }
-  db::Layout &layout () const          { return *mp_layout; }
+  unsigned int layer () const { return m_layer; }
+  unsigned int cv_index () const { return m_cv_index; }
+  db::Cell &cell () const { return *mp_cell; }
+  db::Layout &layout () const { return *mp_layout; }
 
   virtual void do_mouse_move_inactive (const db::DPoint &p);
   virtual void tap (const db::DPoint &initial);
@@ -59,7 +59,7 @@ protected:
   virtual void activated ();
 
 protected:
-  std::pair <bool, db::DPoint> interpolate (const db::DPoint &m, const db::DPoint &o, const db::DPoint &p) const;
+  std::pair<bool, db::DPoint> interpolate (const db::DPoint &m, const db::DPoint &o, const db::DPoint &p) const;
   void deliver_shape (const db::Polygon &poly);
   void deliver_shape (const db::Path &path);
   void deliver_shape (const db::Box &box);
@@ -93,4 +93,3 @@ private:
 }
 
 #endif
-

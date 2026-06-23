@@ -37,11 +37,10 @@ const int full_size = 40;
 const int full_height = 9;
 
 struct StyleStorageOp
-  : public db::Op
-{
+  : public db::Op {
   StyleStorageOp (uint32_t s, unsigned int w, bool b)
     : db::Op (), width (w), before (b)
-  { 
+  {
     style = s;
   }
 
@@ -61,20 +60,17 @@ EditLineStyleWidget::EditLineStyleWidget (QWidget *parent)
   setBackgroundRole (QPalette::NoRole);
 }
 
-QSize 
-EditLineStyleWidget::sizeHint () const
+QSize EditLineStyleWidget::sizeHint () const
 {
   return QSize (stipple_pixel_size * full_size + 1, stipple_pixel_size * full_height + 1);
 }
 
-QSize 
-EditLineStyleWidget::minimumSize () const
+QSize EditLineStyleWidget::minimumSize () const
 {
   return QSize (stipple_pixel_size * full_size + 1, stipple_pixel_size + 1);
 }
 
-void
-EditLineStyleWidget::expand_style ()
+void EditLineStyleWidget::expand_style ()
 {
   if (m_sx == 0) {
     m_style = 0xffffffff;
@@ -88,8 +84,7 @@ EditLineStyleWidget::expand_style ()
   }
 }
 
-bool
-EditLineStyleWidget::get_pixel (int x)
+bool EditLineStyleWidget::get_pixel (int x)
 {
   if (m_sx == 0) {
     return true;
@@ -103,11 +98,10 @@ EditLineStyleWidget::get_pixel (int x)
   return (m_style & (1 << x)) != 0;
 }
 
-void
-EditLineStyleWidget::set_pixel (unsigned int xx, bool value)
+void EditLineStyleWidget::set_pixel (unsigned int xx, bool value)
 {
   if (xx >= 32 || m_sx < 1) {
-    return; 
+    return;
   }
 
   for (int x = xx; x < 32; x += m_sx) {
@@ -119,12 +113,10 @@ EditLineStyleWidget::set_pixel (unsigned int xx, bool value)
       w &= ~(1 << x);
     }
     m_style = w;
-
   }
 }
 
-bool 
-EditLineStyleWidget::mouse_to_pixel (const QPoint &pt, unsigned int &x)
+bool EditLineStyleWidget::mouse_to_pixel (const QPoint &pt, unsigned int &x)
 {
   int ix = pt.x () / stipple_pixel_size;
   ix -= (full_size - 32) / 2;
@@ -138,8 +130,7 @@ EditLineStyleWidget::mouse_to_pixel (const QPoint &pt, unsigned int &x)
   }
 }
 
-void 
-EditLineStyleWidget::mouseMoveEvent (QMouseEvent *event)
+void EditLineStyleWidget::mouseMoveEvent (QMouseEvent *event)
 {
   if ((event->buttons () & Qt::LeftButton) != 0 && ! m_readonly) {
 
@@ -157,14 +148,11 @@ EditLineStyleWidget::mouseMoveEvent (QMouseEvent *event)
         emit changed ();
         update ();
       }
-
     }
-
   }
 }
 
-void 
-EditLineStyleWidget::mousePressEvent (QMouseEvent *event)
+void EditLineStyleWidget::mousePressEvent (QMouseEvent *event)
 {
   if ((event->buttons () & Qt::LeftButton) != 0 && ! m_readonly) {
 
@@ -186,12 +174,10 @@ EditLineStyleWidget::mousePressEvent (QMouseEvent *event)
       emit changed ();
       update ();
     }
-
   }
 }
 
-void 
-EditLineStyleWidget::mouseReleaseEvent (QMouseEvent *)
+void EditLineStyleWidget::mouseReleaseEvent (QMouseEvent *)
 {
   if (m_last_style_saved) {
     m_last_style_saved = false;
@@ -204,8 +190,7 @@ EditLineStyleWidget::mouseReleaseEvent (QMouseEvent *)
   }
 }
 
-void 
-EditLineStyleWidget::paintEvent (QPaintEvent *)
+void EditLineStyleWidget::paintEvent (QPaintEvent *)
 {
   QPainter painter (this);
 
@@ -249,7 +234,6 @@ EditLineStyleWidget::paintEvent (QPaintEvent *)
         painter.fillRect (r, bf);
       }
     }
-
   }
 
   painter.drawLine (full_size * stipple_pixel_size, 0, full_size * stipple_pixel_size, full_height * stipple_pixel_size);
@@ -268,8 +252,7 @@ EditLineStyleWidget::paintEvent (QPaintEvent *)
   painter.drawLine (fl - 2, fb + 2, fl - 2, ft - 2);
 }
 
-void 
-EditLineStyleWidget::set_style (uint32_t pattern, unsigned int w)
+void EditLineStyleWidget::set_style (uint32_t pattern, unsigned int w)
 {
   if (w != m_sx) {
     m_sx = w;
@@ -280,8 +263,7 @@ EditLineStyleWidget::set_style (uint32_t pattern, unsigned int w)
   update ();
 }
 
-void
-EditLineStyleWidget::set_readonly (bool readonly)
+void EditLineStyleWidget::set_readonly (bool readonly)
 {
   if (m_readonly != readonly) {
     m_readonly = readonly;
@@ -289,8 +271,7 @@ EditLineStyleWidget::set_readonly (bool readonly)
   }
 }
 
-void 
-EditLineStyleWidget::clear ()
+void EditLineStyleWidget::clear ()
 {
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new StyleStorageOp (m_style, m_sx, true));
@@ -299,14 +280,13 @@ EditLineStyleWidget::clear ()
   m_style = 0;
   update ();
   emit changed ();
-  
+
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new StyleStorageOp (m_style, m_sx, false));
   }
 }
 
-void 
-EditLineStyleWidget::invert ()
+void EditLineStyleWidget::invert ()
 {
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new StyleStorageOp (m_style, m_sx, true));
@@ -315,14 +295,13 @@ EditLineStyleWidget::invert ()
   m_style = ~m_style;
   update ();
   emit changed ();
-  
+
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new StyleStorageOp (m_style, m_sx, false));
   }
 }
 
-void
-EditLineStyleWidget::set_size (unsigned int sx)
+void EditLineStyleWidget::set_size (unsigned int sx)
 {
   if (sx != m_sx) {
 
@@ -340,12 +319,10 @@ EditLineStyleWidget::set_size (unsigned int sx)
     if (manager () && manager ()->transacting ()) {
       manager ()->queue (this, new StyleStorageOp (m_style, m_sx, true));
     }
-
   }
 }
 
-void
-EditLineStyleWidget::fliph ()
+void EditLineStyleWidget::fliph ()
 {
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new StyleStorageOp (m_style, m_sx, true));
@@ -361,14 +338,13 @@ EditLineStyleWidget::fliph ()
   expand_style ();
   update ();
   emit changed ();
-  
+
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new StyleStorageOp (m_style, m_sx, false));
   }
 }
 
-void 
-EditLineStyleWidget::shift (int dx)
+void EditLineStyleWidget::shift (int dx)
 {
   if (m_sx == 0) {
     return;
@@ -395,26 +371,24 @@ EditLineStyleWidget::shift (int dx)
   expand_style ();
   update ();
   emit changed ();
-  
+
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new StyleStorageOp (m_style, m_sx, false));
   }
 }
 
-void 
-EditLineStyleWidget::undo (db::Op *op)
+void EditLineStyleWidget::undo (db::Op *op)
 {
-  StyleStorageOp *pop = dynamic_cast <StyleStorageOp *> (op);
+  StyleStorageOp *pop = dynamic_cast<StyleStorageOp *> (op);
   if (pop && pop->before) {
     set_style (pop->style, pop->width);
     emit changed ();
   }
 }
 
-void 
-EditLineStyleWidget::redo (db::Op *op)
+void EditLineStyleWidget::redo (db::Op *op)
 {
-  StyleStorageOp *pop = dynamic_cast <StyleStorageOp *> (op);
+  StyleStorageOp *pop = dynamic_cast<StyleStorageOp *> (op);
   if (pop && ! pop->before) {
     set_style (pop->style, pop->width);
     emit changed ();

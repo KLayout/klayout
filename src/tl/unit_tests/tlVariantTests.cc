@@ -34,26 +34,23 @@
 #define _USE_MATH_DEFINES // for MSVC
 #include <math.h>
 
-struct A 
-{
+struct A {
   std::string a;
   const std::string &to_string () const { return a; }
 };
 
 struct AA
-  : public tl::Object
-{
+  : public tl::Object {
   std::string a;
   static int ac;
-  AA() { ac += 1; }
-  ~AA() { ac -= 1; }
+  AA () { ac += 1; }
+  ~AA () { ac -= 1; }
   const std::string &to_string () const { return a; }
 };
 
 int AA::ac = 0;
 
-struct B 
-{
+struct B {
   int bb;
   std::string b;
   bool operator== (const B &d) const { return bb == d.bb; }
@@ -66,702 +63,701 @@ static tl::VariantUserClassImpl<AA> aa_class_instance;
 static tl::VariantUserClassImpl<B> b_class_instance;
 
 //  This namespace separates the test structs from other objects
-namespace 
+namespace
 {
 
-TEST(1) 
+TEST (1)
 {
   tl::Variant vv;
 
   {
-  tl::Variant v;
+    tl::Variant v;
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::to_string (v.to_qvariant ().toString ()), "");
+    EXPECT_EQ (tl::to_string (v.to_qvariant ().toString ()), "");
 #endif
-  EXPECT_EQ (v.is_nil (), true);
-  EXPECT_EQ (v.is_list (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_id (), false);
-  EXPECT_EQ (v.is<short> (), false);
-  EXPECT_EQ (v.is<unsigned short> (), false);
-  EXPECT_EQ (v.is<int> (), false);
-  EXPECT_EQ (v.is<unsigned int> (), false);
-  EXPECT_EQ (v.is<short> (), false);
-  EXPECT_EQ (v.is<unsigned short> (), false);
-  EXPECT_EQ (v.is<unsigned char> (), false);
-  EXPECT_EQ (v.is<signed char> (), false);
-  EXPECT_EQ (v.is<long> (), false);
-  EXPECT_EQ (v.is_char (), false);
-  EXPECT_EQ (v.is_long (), false);
-  EXPECT_EQ (v.is_longlong (), false);
-  EXPECT_EQ (v.is_ulong (), false);
-  EXPECT_EQ (v.is_ulonglong (), false);
-  EXPECT_EQ (v.is_double (), false);
-  EXPECT_EQ (v.to_string (), "nil");
-  EXPECT_EQ (v.to_parsable_string (), "nil");
-  vv = v;
-  EXPECT_EQ (vv == v, true);
-  EXPECT_EQ (vv != v, false);
-  tl::Variant vx;
-  std::string s (v.to_parsable_string ());
-  tl::Extractor ex (s.c_str ());
-  ex.read (vx);
-  ex.expect_end ();
-  EXPECT_EQ (vx == v, true);
+    EXPECT_EQ (v.is_nil (), true);
+    EXPECT_EQ (v.is_list (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_id (), false);
+    EXPECT_EQ (v.is<short> (), false);
+    EXPECT_EQ (v.is<unsigned short> (), false);
+    EXPECT_EQ (v.is<int> (), false);
+    EXPECT_EQ (v.is<unsigned int> (), false);
+    EXPECT_EQ (v.is<short> (), false);
+    EXPECT_EQ (v.is<unsigned short> (), false);
+    EXPECT_EQ (v.is<unsigned char> (), false);
+    EXPECT_EQ (v.is<signed char> (), false);
+    EXPECT_EQ (v.is<long> (), false);
+    EXPECT_EQ (v.is_char (), false);
+    EXPECT_EQ (v.is_long (), false);
+    EXPECT_EQ (v.is_longlong (), false);
+    EXPECT_EQ (v.is_ulong (), false);
+    EXPECT_EQ (v.is_ulonglong (), false);
+    EXPECT_EQ (v.is_double (), false);
+    EXPECT_EQ (v.to_string (), "nil");
+    EXPECT_EQ (v.to_parsable_string (), "nil");
+    vv = v;
+    EXPECT_EQ (vv == v, true);
+    EXPECT_EQ (vv != v, false);
+    tl::Variant vx;
+    std::string s (v.to_parsable_string ());
+    tl::Extractor ex (s.c_str ());
+    ex.read (vx);
+    ex.expect_end ();
+    EXPECT_EQ (vx == v, true);
   }
 
   {
-  tl::Variant v ((char) '\033');
+    tl::Variant v ((char) '\033');
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::to_string (v.to_qvariant ().toString ()), "27");
+    EXPECT_EQ (tl::to_string (v.to_qvariant ().toString ()), "27");
 #endif
-  EXPECT_EQ (v.is_nil (), false);
-  EXPECT_EQ (v.is_list (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_id (), false);
-  EXPECT_EQ (v.is<short> (), false);
-  EXPECT_EQ (v.is<unsigned short> (), false);
-  EXPECT_EQ (v.is<int> (), false);
-  EXPECT_EQ (v.is<unsigned int> (), false);
-  EXPECT_EQ (v.is<short> (), false);
-  EXPECT_EQ (v.is<unsigned short> (), false);
-  EXPECT_EQ (v.is<unsigned char> (), false);
-  EXPECT_EQ (v.is<signed char> (), false);
-  EXPECT_EQ (v.is<long> (), false);
-  EXPECT_EQ (v.is_char (), true);
-  EXPECT_EQ (v.is_long (), false);
-  EXPECT_EQ (v.is_longlong (), false);
-  EXPECT_EQ (v.is_ulong (), false);
-  EXPECT_EQ (v.is_ulonglong (), false);
-  EXPECT_EQ (v.is_double (), false);
-  EXPECT_EQ (v.to_string (), "\033");
-  EXPECT_EQ (v.to_parsable_string (), "'\\033'c");
-  vv = v;
-  EXPECT_EQ (vv == v, true);
-  EXPECT_EQ (vv != v, false);
-  tl::Variant vx;
-  std::string s (v.to_parsable_string ());
-  tl::Extractor ex (s.c_str ());
-  ex.read (vx);
-  ex.expect_end ();
-  EXPECT_EQ (vx == v, true);
+    EXPECT_EQ (v.is_nil (), false);
+    EXPECT_EQ (v.is_list (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_id (), false);
+    EXPECT_EQ (v.is<short> (), false);
+    EXPECT_EQ (v.is<unsigned short> (), false);
+    EXPECT_EQ (v.is<int> (), false);
+    EXPECT_EQ (v.is<unsigned int> (), false);
+    EXPECT_EQ (v.is<short> (), false);
+    EXPECT_EQ (v.is<unsigned short> (), false);
+    EXPECT_EQ (v.is<unsigned char> (), false);
+    EXPECT_EQ (v.is<signed char> (), false);
+    EXPECT_EQ (v.is<long> (), false);
+    EXPECT_EQ (v.is_char (), true);
+    EXPECT_EQ (v.is_long (), false);
+    EXPECT_EQ (v.is_longlong (), false);
+    EXPECT_EQ (v.is_ulong (), false);
+    EXPECT_EQ (v.is_ulonglong (), false);
+    EXPECT_EQ (v.is_double (), false);
+    EXPECT_EQ (v.to_string (), "\033");
+    EXPECT_EQ (v.to_parsable_string (), "'\\033'c");
+    vv = v;
+    EXPECT_EQ (vv == v, true);
+    EXPECT_EQ (vv != v, false);
+    tl::Variant vx;
+    std::string s (v.to_parsable_string ());
+    tl::Extractor ex (s.c_str ());
+    ex.read (vx);
+    ex.expect_end ();
+    EXPECT_EQ (vx == v, true);
   }
 
   {
-  tl::Variant v (1ul);
+    tl::Variant v (1ul);
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#u1");
+    EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#u1");
 #endif
-  EXPECT_EQ (v.is_nil (), false);
-  EXPECT_EQ (v.is_list (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_id (), false);
-  EXPECT_EQ (v.is_ulong (), true);
-  EXPECT_EQ (v.is_ulonglong (), false);
-  EXPECT_EQ (v.is_long (), false);
-  EXPECT_EQ (v.is_longlong (), false);
-  EXPECT_EQ (v.is_double (), false);
-  EXPECT_EQ (v.to_string (), "1");
-  EXPECT_EQ (v.to_parsable_string (), "#u1");
-  EXPECT_EQ (v.to_long (), 1l);
-  EXPECT_EQ (v.to_longlong (), 1l);
-  EXPECT_EQ (v.is<unsigned long> (), true);
-  EXPECT_EQ (v.is<long> (), false);
-  EXPECT_EQ (vv == v, false);
-  EXPECT_EQ (vv != v, true);
-  vv = v;
-  EXPECT_EQ (vv == v, true);
-  EXPECT_EQ (vv != v, false);
-  tl::Variant vx;
-  std::string s (v.to_parsable_string ());
-  tl::Extractor ex (s.c_str ());
-  ex.read (vx);
-  ex.expect_end ();
-  EXPECT_EQ (vx == v, true);
+    EXPECT_EQ (v.is_nil (), false);
+    EXPECT_EQ (v.is_list (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_id (), false);
+    EXPECT_EQ (v.is_ulong (), true);
+    EXPECT_EQ (v.is_ulonglong (), false);
+    EXPECT_EQ (v.is_long (), false);
+    EXPECT_EQ (v.is_longlong (), false);
+    EXPECT_EQ (v.is_double (), false);
+    EXPECT_EQ (v.to_string (), "1");
+    EXPECT_EQ (v.to_parsable_string (), "#u1");
+    EXPECT_EQ (v.to_long (), 1l);
+    EXPECT_EQ (v.to_longlong (), 1l);
+    EXPECT_EQ (v.is<unsigned long> (), true);
+    EXPECT_EQ (v.is<long> (), false);
+    EXPECT_EQ (vv == v, false);
+    EXPECT_EQ (vv != v, true);
+    vv = v;
+    EXPECT_EQ (vv == v, true);
+    EXPECT_EQ (vv != v, false);
+    tl::Variant vx;
+    std::string s (v.to_parsable_string ());
+    tl::Extractor ex (s.c_str ());
+    ex.read (vx);
+    ex.expect_end ();
+    EXPECT_EQ (vx == v, true);
   }
 
   {
-  tl::Variant v (2u);
+    tl::Variant v (2u);
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#u2");
+    EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#u2");
 #endif
-  EXPECT_EQ (v.is_nil (), false);
-  EXPECT_EQ (v.is_list (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is<unsigned int> (), true);
-  EXPECT_EQ (v.is<int> (), false);
-  EXPECT_EQ (v.is<long> (), false);
-  EXPECT_EQ (v.is<unsigned long> (), false);
-  EXPECT_EQ (v.is<unsigned long> (), false);
-  EXPECT_EQ (v.is<long> (), false);
-  EXPECT_EQ (v.is_ulong (), true);
-  EXPECT_EQ (v.is_ulonglong (), false);
-  EXPECT_EQ (v.is_long (), false);
-  EXPECT_EQ (v.is_longlong (), false);
-  EXPECT_EQ (v.is_id (), false);
-  EXPECT_EQ (v.is_double (), false);
-  EXPECT_EQ (v.to_string (), "2");
-  EXPECT_EQ (v.to_parsable_string (), "#u2");
-  EXPECT_EQ (v.to_long (), 2l);
-  EXPECT_EQ (v.to_longlong (), 2l);
-  EXPECT_EQ (vv == v, false);
-  EXPECT_EQ (vv != v, true);
-  vv = v;
-  EXPECT_EQ (vv == v, true);
-  EXPECT_EQ (vv != v, false);
-  tl::Variant vx;
-  std::string s (v.to_parsable_string ());
-  tl::Extractor ex (s.c_str ());
-  ex.read (vx);
-  ex.expect_end ();
-  EXPECT_EQ (vx == v, true);
-  v.morph<unsigned long> ();
-  EXPECT_EQ (vx == v, true);
+    EXPECT_EQ (v.is_nil (), false);
+    EXPECT_EQ (v.is_list (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is<unsigned int> (), true);
+    EXPECT_EQ (v.is<int> (), false);
+    EXPECT_EQ (v.is<long> (), false);
+    EXPECT_EQ (v.is<unsigned long> (), false);
+    EXPECT_EQ (v.is<unsigned long> (), false);
+    EXPECT_EQ (v.is<long> (), false);
+    EXPECT_EQ (v.is_ulong (), true);
+    EXPECT_EQ (v.is_ulonglong (), false);
+    EXPECT_EQ (v.is_long (), false);
+    EXPECT_EQ (v.is_longlong (), false);
+    EXPECT_EQ (v.is_id (), false);
+    EXPECT_EQ (v.is_double (), false);
+    EXPECT_EQ (v.to_string (), "2");
+    EXPECT_EQ (v.to_parsable_string (), "#u2");
+    EXPECT_EQ (v.to_long (), 2l);
+    EXPECT_EQ (v.to_longlong (), 2l);
+    EXPECT_EQ (vv == v, false);
+    EXPECT_EQ (vv != v, true);
+    vv = v;
+    EXPECT_EQ (vv == v, true);
+    EXPECT_EQ (vv != v, false);
+    tl::Variant vx;
+    std::string s (v.to_parsable_string ());
+    tl::Extractor ex (s.c_str ());
+    ex.read (vx);
+    ex.expect_end ();
+    EXPECT_EQ (vx == v, true);
+    v.morph<unsigned long> ();
+    EXPECT_EQ (vx == v, true);
   }
 
   {
-  tl::Variant v (1);
+    tl::Variant v (1);
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#1");
+    EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#1");
 #endif
-  EXPECT_EQ (v.is_nil (), false);
-  EXPECT_EQ (v.is_list (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_long (), true);
-  EXPECT_EQ (v.is_longlong (), false);
-  EXPECT_EQ (v.is_ulong (), false);
-  EXPECT_EQ (v.is_ulonglong (), false);
-  EXPECT_EQ (v.is<long> (), false);
-  EXPECT_EQ (v.is<unsigned long> (), false);
-  EXPECT_EQ (v.is<int> (), true);
-  EXPECT_EQ (v.is<unsigned int> (), false);
-  EXPECT_EQ (v.is_double (), false);
-  EXPECT_EQ (v.to_string (), "1");
-  EXPECT_EQ (v.to_parsable_string (), "#1");
-  EXPECT_EQ (v.to_long (), 1l);
-  EXPECT_EQ (v.to_longlong (), 1l);
-  EXPECT_EQ (vv == v, false);
-  EXPECT_EQ (vv != v, true);
-  vv = v;
-  EXPECT_EQ (vv == v, true);
-  EXPECT_EQ (vv != v, false);
-  tl::Variant vx;
-  std::string s (v.to_parsable_string ());
-  tl::Extractor ex (s.c_str ());
-  ex.read (vx);
-  ex.expect_end ();
-  EXPECT_EQ (vx == v, true);
-  v.morph<long> ();
-  EXPECT_EQ (vx == v, true);
+    EXPECT_EQ (v.is_nil (), false);
+    EXPECT_EQ (v.is_list (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_long (), true);
+    EXPECT_EQ (v.is_longlong (), false);
+    EXPECT_EQ (v.is_ulong (), false);
+    EXPECT_EQ (v.is_ulonglong (), false);
+    EXPECT_EQ (v.is<long> (), false);
+    EXPECT_EQ (v.is<unsigned long> (), false);
+    EXPECT_EQ (v.is<int> (), true);
+    EXPECT_EQ (v.is<unsigned int> (), false);
+    EXPECT_EQ (v.is_double (), false);
+    EXPECT_EQ (v.to_string (), "1");
+    EXPECT_EQ (v.to_parsable_string (), "#1");
+    EXPECT_EQ (v.to_long (), 1l);
+    EXPECT_EQ (v.to_longlong (), 1l);
+    EXPECT_EQ (vv == v, false);
+    EXPECT_EQ (vv != v, true);
+    vv = v;
+    EXPECT_EQ (vv == v, true);
+    EXPECT_EQ (vv != v, false);
+    tl::Variant vx;
+    std::string s (v.to_parsable_string ());
+    tl::Extractor ex (s.c_str ());
+    ex.read (vx);
+    ex.expect_end ();
+    EXPECT_EQ (vx == v, true);
+    v.morph<long> ();
+    EXPECT_EQ (vx == v, true);
   }
 
   {
-  tl::Variant v (2l);
+    tl::Variant v (2l);
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#2");
+    EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#2");
 #endif
-  EXPECT_EQ (v.is_nil (), false);
-  EXPECT_EQ (v.is_list (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_long (), true);
-  EXPECT_EQ (v.is_ulong (), false);
-  EXPECT_EQ (v.is_id (), false);
-  EXPECT_EQ (v.is_double (), false);
-  EXPECT_EQ (v.is_char (), false);
-  EXPECT_EQ (v.is<long> (), true);
-  EXPECT_EQ (v.is<unsigned long> (), false);
-  EXPECT_EQ (v.is<float> (), false);
-  EXPECT_EQ (v.is<short> (), false);
-  EXPECT_EQ (v.is<unsigned short> (), false);
-  EXPECT_EQ (v.is<int> (), false);
-  EXPECT_EQ (v.is<unsigned int> (), false);
-  EXPECT_EQ (v.is<unsigned char> (), false);
-  EXPECT_EQ (v.is<signed char> (), false);
-  EXPECT_EQ (v.to_string (), "2");
-  EXPECT_EQ (v.to_parsable_string (), "#2");
-  EXPECT_EQ (v.to_long (), 2l);
-  EXPECT_EQ (v.to_longlong (), 2l);
-  EXPECT_EQ (v.to_double (), 2.0);
-  EXPECT_EQ (v.to_float (), 2.0);
-  EXPECT_EQ (vv == v, false);
-  EXPECT_EQ (vv != v, true);
-  vv = v;
-  EXPECT_EQ (vv == v, true);
-  EXPECT_EQ (vv != v, false);
-  tl::Variant vx;
-  std::string s (v.to_parsable_string ());
-  tl::Extractor ex (s.c_str ());
-  ex.read (vx);
-  ex.expect_end ();
-  EXPECT_EQ (vx == v, true);
+    EXPECT_EQ (v.is_nil (), false);
+    EXPECT_EQ (v.is_list (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_long (), true);
+    EXPECT_EQ (v.is_ulong (), false);
+    EXPECT_EQ (v.is_id (), false);
+    EXPECT_EQ (v.is_double (), false);
+    EXPECT_EQ (v.is_char (), false);
+    EXPECT_EQ (v.is<long> (), true);
+    EXPECT_EQ (v.is<unsigned long> (), false);
+    EXPECT_EQ (v.is<float> (), false);
+    EXPECT_EQ (v.is<short> (), false);
+    EXPECT_EQ (v.is<unsigned short> (), false);
+    EXPECT_EQ (v.is<int> (), false);
+    EXPECT_EQ (v.is<unsigned int> (), false);
+    EXPECT_EQ (v.is<unsigned char> (), false);
+    EXPECT_EQ (v.is<signed char> (), false);
+    EXPECT_EQ (v.to_string (), "2");
+    EXPECT_EQ (v.to_parsable_string (), "#2");
+    EXPECT_EQ (v.to_long (), 2l);
+    EXPECT_EQ (v.to_longlong (), 2l);
+    EXPECT_EQ (v.to_double (), 2.0);
+    EXPECT_EQ (v.to_float (), 2.0);
+    EXPECT_EQ (vv == v, false);
+    EXPECT_EQ (vv != v, true);
+    vv = v;
+    EXPECT_EQ (vv == v, true);
+    EXPECT_EQ (vv != v, false);
+    tl::Variant vx;
+    std::string s (v.to_parsable_string ());
+    tl::Extractor ex (s.c_str ());
+    ex.read (vx);
+    ex.expect_end ();
+    EXPECT_EQ (vx == v, true);
   }
 
   {
-  tl::Variant v ((float)5.0);
+    tl::Variant v ((float) 5.0);
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "##5");
+    EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "##5");
 #endif
-  EXPECT_EQ (v.is_nil (), false);
-  EXPECT_EQ (v.is_list (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_long (), false);
-  EXPECT_EQ (v.is_longlong (), false);
-  EXPECT_EQ (v.is_ulong (), false);
-  EXPECT_EQ (v.is_ulonglong (), false);
-  EXPECT_EQ (v.is_char (), false);
-  EXPECT_EQ (v.is_double (), true);
-  EXPECT_EQ (v.is<long> (), false);
-  EXPECT_EQ (v.is<unsigned long> (), false);
-  EXPECT_EQ (v.is<double> (), false);
-  EXPECT_EQ (v.is<float> (), true);
-  EXPECT_EQ (v.is<short> (), false);
-  EXPECT_EQ (v.is<unsigned short> (), false);
-  EXPECT_EQ (v.is<int> (), false);
-  EXPECT_EQ (v.is<unsigned int> (), false);
-  EXPECT_EQ (v.is<unsigned char> (), false);
-  EXPECT_EQ (v.is<signed char> (), false);
-  EXPECT_EQ (v.is_id (), false);
-  EXPECT_EQ (v.to_string (), "5");
-  EXPECT_EQ (v.to_parsable_string (), "##5");
-  EXPECT_EQ (v.to_double (), 5.0);
-  EXPECT_EQ (v.to_float (), 5.0);
-  EXPECT_EQ (v.to_long (), 5);
-  EXPECT_EQ (v.to_ulong (), 5u);
-  EXPECT_EQ (v.to_longlong (), 5);
-  EXPECT_EQ (v.to_ulonglong (), 5u);
-  EXPECT_EQ (vv == v, false);
-  EXPECT_EQ (vv != v, true);
-  vv = v;
-  EXPECT_EQ (vv == v, true);
-  EXPECT_EQ (vv != v, false);
-  tl::Variant vx;
-  std::string s (v.to_parsable_string ());
-  tl::Extractor ex (s.c_str ());
-  ex.read (vx);
-  ex.expect_end ();
-  EXPECT_EQ (vx == v, true);
-  v.morph<double>();
-  EXPECT_EQ (vx == v, true);
+    EXPECT_EQ (v.is_nil (), false);
+    EXPECT_EQ (v.is_list (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_long (), false);
+    EXPECT_EQ (v.is_longlong (), false);
+    EXPECT_EQ (v.is_ulong (), false);
+    EXPECT_EQ (v.is_ulonglong (), false);
+    EXPECT_EQ (v.is_char (), false);
+    EXPECT_EQ (v.is_double (), true);
+    EXPECT_EQ (v.is<long> (), false);
+    EXPECT_EQ (v.is<unsigned long> (), false);
+    EXPECT_EQ (v.is<double> (), false);
+    EXPECT_EQ (v.is<float> (), true);
+    EXPECT_EQ (v.is<short> (), false);
+    EXPECT_EQ (v.is<unsigned short> (), false);
+    EXPECT_EQ (v.is<int> (), false);
+    EXPECT_EQ (v.is<unsigned int> (), false);
+    EXPECT_EQ (v.is<unsigned char> (), false);
+    EXPECT_EQ (v.is<signed char> (), false);
+    EXPECT_EQ (v.is_id (), false);
+    EXPECT_EQ (v.to_string (), "5");
+    EXPECT_EQ (v.to_parsable_string (), "##5");
+    EXPECT_EQ (v.to_double (), 5.0);
+    EXPECT_EQ (v.to_float (), 5.0);
+    EXPECT_EQ (v.to_long (), 5);
+    EXPECT_EQ (v.to_ulong (), 5u);
+    EXPECT_EQ (v.to_longlong (), 5);
+    EXPECT_EQ (v.to_ulonglong (), 5u);
+    EXPECT_EQ (vv == v, false);
+    EXPECT_EQ (vv != v, true);
+    vv = v;
+    EXPECT_EQ (vv == v, true);
+    EXPECT_EQ (vv != v, false);
+    tl::Variant vx;
+    std::string s (v.to_parsable_string ());
+    tl::Extractor ex (s.c_str ());
+    ex.read (vx);
+    ex.expect_end ();
+    EXPECT_EQ (vx == v, true);
+    v.morph<double> ();
+    EXPECT_EQ (vx == v, true);
   }
 
   {
-  tl::Variant v (5.0);
+    tl::Variant v (5.0);
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "##5");
+    EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "##5");
 #endif
-  EXPECT_EQ (v.is_nil (), false);
-  EXPECT_EQ (v.is_list (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_long (), false);
-  EXPECT_EQ (v.is_longlong (), false);
-  EXPECT_EQ (v.is_ulong (), false);
-  EXPECT_EQ (v.is_ulonglong (), false);
-  EXPECT_EQ (v.is_double (), true);
-  EXPECT_EQ (v.is<long> (), false);
-  EXPECT_EQ (v.is<unsigned long> (), false);
-  EXPECT_EQ (v.is<float> (), false);
-  EXPECT_EQ (v.is<short> (), false);
-  EXPECT_EQ (v.is<unsigned short> (), false);
-  EXPECT_EQ (v.is<int> (), false);
-  EXPECT_EQ (v.is<unsigned int> (), false);
-  EXPECT_EQ (v.is<short> (), false);
-  EXPECT_EQ (v.is<unsigned short> (), false);
-  EXPECT_EQ (v.is_char (), false);
-  EXPECT_EQ (v.is<unsigned char> (), false);
-  EXPECT_EQ (v.is<signed char> (), false);
-  EXPECT_EQ (v.is_id (), false);
-  EXPECT_EQ (v.to_string (), "5");
-  EXPECT_EQ (v.to_parsable_string (), "##5");
-  EXPECT_EQ (v.to_double (), 5.0);
-  EXPECT_EQ (v.to_long (), 5);
-  EXPECT_EQ (v.to_longlong (), 5);
-  EXPECT_EQ (v.to_ulong (), 5u);
-  EXPECT_EQ (v.to_ulonglong (), 5u);
-  EXPECT_EQ (*(double *)v.native_ptr (), 5.0);
-  EXPECT_EQ (vv == v, true);
-  EXPECT_EQ (vv != v, false);
-  vv = v;
-  EXPECT_EQ (vv == v, true);
-  EXPECT_EQ (vv != v, false);
-  tl::Variant vx;
-  std::string s (v.to_parsable_string ());
-  tl::Extractor ex (s.c_str ());
-  ex.read (vx);
-  ex.expect_end ();
-  EXPECT_EQ (vx == v, true);
-  v.morph<float> ();
-  EXPECT_EQ (*(float *)v.native_ptr (), 5.0);
-  v.morph<int> ();
-  EXPECT_EQ (*(int *)v.native_ptr (), 5);
-  v.morph<long> ();
-  EXPECT_EQ (*(long *)v.native_ptr (), 5);
-  v.morph<long long> ();
-  EXPECT_EQ (*(long long *)v.native_ptr (), 5);
-  v.morph<unsigned long> ();
-  EXPECT_EQ (*(unsigned long *)v.native_ptr (), (unsigned long) 5);
-  v.morph<unsigned int> ();
-  EXPECT_EQ (*(unsigned int *)v.native_ptr (), (unsigned int) 5);
-  v.morph<unsigned short> ();
-  EXPECT_EQ (*(unsigned short *)v.native_ptr (), 5);
-  v.morph<unsigned char> ();
-  EXPECT_EQ (*(unsigned char *)v.native_ptr (), 5);
+    EXPECT_EQ (v.is_nil (), false);
+    EXPECT_EQ (v.is_list (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_long (), false);
+    EXPECT_EQ (v.is_longlong (), false);
+    EXPECT_EQ (v.is_ulong (), false);
+    EXPECT_EQ (v.is_ulonglong (), false);
+    EXPECT_EQ (v.is_double (), true);
+    EXPECT_EQ (v.is<long> (), false);
+    EXPECT_EQ (v.is<unsigned long> (), false);
+    EXPECT_EQ (v.is<float> (), false);
+    EXPECT_EQ (v.is<short> (), false);
+    EXPECT_EQ (v.is<unsigned short> (), false);
+    EXPECT_EQ (v.is<int> (), false);
+    EXPECT_EQ (v.is<unsigned int> (), false);
+    EXPECT_EQ (v.is<short> (), false);
+    EXPECT_EQ (v.is<unsigned short> (), false);
+    EXPECT_EQ (v.is_char (), false);
+    EXPECT_EQ (v.is<unsigned char> (), false);
+    EXPECT_EQ (v.is<signed char> (), false);
+    EXPECT_EQ (v.is_id (), false);
+    EXPECT_EQ (v.to_string (), "5");
+    EXPECT_EQ (v.to_parsable_string (), "##5");
+    EXPECT_EQ (v.to_double (), 5.0);
+    EXPECT_EQ (v.to_long (), 5);
+    EXPECT_EQ (v.to_longlong (), 5);
+    EXPECT_EQ (v.to_ulong (), 5u);
+    EXPECT_EQ (v.to_ulonglong (), 5u);
+    EXPECT_EQ (*(double *) v.native_ptr (), 5.0);
+    EXPECT_EQ (vv == v, true);
+    EXPECT_EQ (vv != v, false);
+    vv = v;
+    EXPECT_EQ (vv == v, true);
+    EXPECT_EQ (vv != v, false);
+    tl::Variant vx;
+    std::string s (v.to_parsable_string ());
+    tl::Extractor ex (s.c_str ());
+    ex.read (vx);
+    ex.expect_end ();
+    EXPECT_EQ (vx == v, true);
+    v.morph<float> ();
+    EXPECT_EQ (*(float *) v.native_ptr (), 5.0);
+    v.morph<int> ();
+    EXPECT_EQ (*(int *) v.native_ptr (), 5);
+    v.morph<long> ();
+    EXPECT_EQ (*(long *) v.native_ptr (), 5);
+    v.morph<long long> ();
+    EXPECT_EQ (*(long long *) v.native_ptr (), 5);
+    v.morph<unsigned long> ();
+    EXPECT_EQ (*(unsigned long *) v.native_ptr (), (unsigned long) 5);
+    v.morph<unsigned int> ();
+    EXPECT_EQ (*(unsigned int *) v.native_ptr (), (unsigned int) 5);
+    v.morph<unsigned short> ();
+    EXPECT_EQ (*(unsigned short *) v.native_ptr (), 5);
+    v.morph<unsigned char> ();
+    EXPECT_EQ (*(unsigned char *) v.native_ptr (), 5);
   }
 
   {
-  tl::Variant v((short)2);
+    tl::Variant v ((short) 2);
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#2");
+    EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#2");
 #endif
-  EXPECT_EQ (v.is_nil (), false);
-  EXPECT_EQ (v.is_list (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_id (), false);
-  EXPECT_EQ (v.is<short> (), true);
-  EXPECT_EQ (v.is<unsigned short> (), false);
-  EXPECT_EQ (v.is<int> (), false);
-  EXPECT_EQ (v.is<unsigned int> (), false);
-  EXPECT_EQ (v.is<unsigned char> (), false);
-  EXPECT_EQ (v.is<signed char> (), false);
-  EXPECT_EQ (v.is<long> (), false);
-  EXPECT_EQ (v.is<unsigned long> (), false);
-  EXPECT_EQ (v.is_char (), false);
-  EXPECT_EQ (v.is_long (), true);
-  EXPECT_EQ (v.is_ulong (), false);
-  EXPECT_EQ (v.is_longlong (), false);
-  EXPECT_EQ (v.is_ulonglong (), false);
-  EXPECT_EQ (v.is_double (), false);
-  EXPECT_EQ (v.to_string (), "2");
-  EXPECT_EQ (v.to_parsable_string (), "#2");
-  vv = v;
-  EXPECT_EQ (vv == v, true);
-  EXPECT_EQ (vv != v, false);
-  tl::Variant vx;
-  std::string s (v.to_parsable_string ());
-  tl::Extractor ex (s.c_str ());
-  ex.read (vx);
-  ex.expect_end ();
-  EXPECT_EQ (vx == v, true);
-  EXPECT_EQ (vx.is_long (), true);
-  EXPECT_EQ (vx.is_ulong (), false);
-  EXPECT_EQ (vx.is<long> (), true);
-  EXPECT_EQ (vx.is<unsigned long> (), false);
-  EXPECT_EQ (v.is<short> (), true);
-  EXPECT_EQ (*(long *)vx.native_ptr(), 2);
-  EXPECT_EQ (*(short *)v.native_ptr(), 2);
-  v.morph<long>();
-  EXPECT_EQ (vx == v, true);
-  EXPECT_EQ (vx.is_long (), true);
-  EXPECT_EQ (v.is_long (), true);
-  EXPECT_EQ (*(long *)vx.native_ptr(), 2);
-  EXPECT_EQ (*(long *)v.native_ptr(), 2);
+    EXPECT_EQ (v.is_nil (), false);
+    EXPECT_EQ (v.is_list (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_id (), false);
+    EXPECT_EQ (v.is<short> (), true);
+    EXPECT_EQ (v.is<unsigned short> (), false);
+    EXPECT_EQ (v.is<int> (), false);
+    EXPECT_EQ (v.is<unsigned int> (), false);
+    EXPECT_EQ (v.is<unsigned char> (), false);
+    EXPECT_EQ (v.is<signed char> (), false);
+    EXPECT_EQ (v.is<long> (), false);
+    EXPECT_EQ (v.is<unsigned long> (), false);
+    EXPECT_EQ (v.is_char (), false);
+    EXPECT_EQ (v.is_long (), true);
+    EXPECT_EQ (v.is_ulong (), false);
+    EXPECT_EQ (v.is_longlong (), false);
+    EXPECT_EQ (v.is_ulonglong (), false);
+    EXPECT_EQ (v.is_double (), false);
+    EXPECT_EQ (v.to_string (), "2");
+    EXPECT_EQ (v.to_parsable_string (), "#2");
+    vv = v;
+    EXPECT_EQ (vv == v, true);
+    EXPECT_EQ (vv != v, false);
+    tl::Variant vx;
+    std::string s (v.to_parsable_string ());
+    tl::Extractor ex (s.c_str ());
+    ex.read (vx);
+    ex.expect_end ();
+    EXPECT_EQ (vx == v, true);
+    EXPECT_EQ (vx.is_long (), true);
+    EXPECT_EQ (vx.is_ulong (), false);
+    EXPECT_EQ (vx.is<long> (), true);
+    EXPECT_EQ (vx.is<unsigned long> (), false);
+    EXPECT_EQ (v.is<short> (), true);
+    EXPECT_EQ (*(long *) vx.native_ptr (), 2);
+    EXPECT_EQ (*(short *) v.native_ptr (), 2);
+    v.morph<long> ();
+    EXPECT_EQ (vx == v, true);
+    EXPECT_EQ (vx.is_long (), true);
+    EXPECT_EQ (v.is_long (), true);
+    EXPECT_EQ (*(long *) vx.native_ptr (), 2);
+    EXPECT_EQ (*(long *) v.native_ptr (), 2);
   }
 
   {
-  tl::Variant v((unsigned short)2);
+    tl::Variant v ((unsigned short) 2);
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#u2");
+    EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#u2");
 #endif
-  EXPECT_EQ (v.is_nil (), false);
-  EXPECT_EQ (v.is_list (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_bytearray (), false);
-  EXPECT_EQ (v.is_a_bytearray (), false);
-  EXPECT_EQ (v.is_id (), false);
-  EXPECT_EQ (v.is_char (), false);
-  EXPECT_EQ (v.is_long (), false);
-  EXPECT_EQ (v.is_ulong (), true);
-  EXPECT_EQ (v.is_double (), false);
-  EXPECT_EQ (v.is<short> (), false);
-  EXPECT_EQ (v.is<unsigned short> (), true);
-  EXPECT_EQ (v.is<int> (), false);
-  EXPECT_EQ (v.is<unsigned int> (), false);
-  EXPECT_EQ (v.is<unsigned char> (), false);
-  EXPECT_EQ (v.is<signed char> (), false);
-  EXPECT_EQ (v.is<long> (), false);
-  EXPECT_EQ (v.is<unsigned long> (), false);
-  EXPECT_EQ (v.to_string (), "2");
-  EXPECT_EQ (v.to_parsable_string (), "#u2");
-  vv = v;
-  EXPECT_EQ (vv == v, true);
-  EXPECT_EQ (vv != v, false);
-  tl::Variant vx;
-  std::string s (v.to_parsable_string ());
-  tl::Extractor ex (s.c_str ());
-  ex.read (vx);
-  ex.expect_end ();
-  EXPECT_EQ (vx == v, true);
-  EXPECT_EQ (vx.is_ulong (), true);
-  EXPECT_EQ (v.is<unsigned short> (), true);
-  EXPECT_EQ (*(unsigned long *)vx.native_ptr(), (unsigned long) 2);
-  EXPECT_EQ (*(unsigned short *)v.native_ptr(), 2);
-  v.morph<unsigned long>();
-  EXPECT_EQ (vx == v, true);
-  EXPECT_EQ (vx.is_ulong (), true);
-  EXPECT_EQ (v.is_ulong (), true);
-  EXPECT_EQ (*(long *)vx.native_ptr(), 2);
-  EXPECT_EQ (*(long *)v.native_ptr(), 2);
+    EXPECT_EQ (v.is_nil (), false);
+    EXPECT_EQ (v.is_list (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_bytearray (), false);
+    EXPECT_EQ (v.is_a_bytearray (), false);
+    EXPECT_EQ (v.is_id (), false);
+    EXPECT_EQ (v.is_char (), false);
+    EXPECT_EQ (v.is_long (), false);
+    EXPECT_EQ (v.is_ulong (), true);
+    EXPECT_EQ (v.is_double (), false);
+    EXPECT_EQ (v.is<short> (), false);
+    EXPECT_EQ (v.is<unsigned short> (), true);
+    EXPECT_EQ (v.is<int> (), false);
+    EXPECT_EQ (v.is<unsigned int> (), false);
+    EXPECT_EQ (v.is<unsigned char> (), false);
+    EXPECT_EQ (v.is<signed char> (), false);
+    EXPECT_EQ (v.is<long> (), false);
+    EXPECT_EQ (v.is<unsigned long> (), false);
+    EXPECT_EQ (v.to_string (), "2");
+    EXPECT_EQ (v.to_parsable_string (), "#u2");
+    vv = v;
+    EXPECT_EQ (vv == v, true);
+    EXPECT_EQ (vv != v, false);
+    tl::Variant vx;
+    std::string s (v.to_parsable_string ());
+    tl::Extractor ex (s.c_str ());
+    ex.read (vx);
+    ex.expect_end ();
+    EXPECT_EQ (vx == v, true);
+    EXPECT_EQ (vx.is_ulong (), true);
+    EXPECT_EQ (v.is<unsigned short> (), true);
+    EXPECT_EQ (*(unsigned long *) vx.native_ptr (), (unsigned long) 2);
+    EXPECT_EQ (*(unsigned short *) v.native_ptr (), 2);
+    v.morph<unsigned long> ();
+    EXPECT_EQ (vx == v, true);
+    EXPECT_EQ (vx.is_ulong (), true);
+    EXPECT_EQ (v.is_ulong (), true);
+    EXPECT_EQ (*(long *) vx.native_ptr (), 2);
+    EXPECT_EQ (*(long *) v.native_ptr (), 2);
   }
 
   {
-  std::vector<char> bytes = { '"', 'h', 0, '\033', 'a', 'l', 'l', 'O', '"' };
-  tl::Variant v (std::move (bytes));
+    std::vector<char> bytes = {'"', 'h', 0, '\033', 'a', 'l', 'l', 'O', '"'};
+    tl::Variant v (std::move (bytes));
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "'\"h\\000\\033allO\"'b");
+    EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "'\"h\\000\\033allO\"'b");
 #endif
-  EXPECT_EQ (v.is_nil (), false);
-  EXPECT_EQ (v.is_list (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_bytearray (), true);
-  EXPECT_EQ (v.is_a_bytearray (), true);
-  EXPECT_EQ (v.is_long (), false);
-  EXPECT_EQ (v.is_ulong (), false);
-  EXPECT_EQ (v.is_longlong (), false);
-  EXPECT_EQ (v.is_ulonglong (), false);
-  EXPECT_EQ (v.is_double (), false);
-  EXPECT_EQ (v.is_id (), false);
-  EXPECT_EQ (v.to_parsable_string (), "'\"h\\000\\033allO\"'b");
-  EXPECT_EQ (v.to_stdstring (), std::string ("\"h\000\033allO\"", 9));
-  EXPECT_EQ (vv == v, false);
-  EXPECT_EQ (vv != v, true);
-  vv = v;
-  EXPECT_EQ (vv == v, true);
-  EXPECT_EQ (vv != v, false);
-  tl::Variant vx;
-  std::string s (v.to_parsable_string ());
-  tl::Extractor ex (s.c_str ());
-  ex.read (vx);
-  ex.expect_end ();
-  EXPECT_EQ (vx.is_bytearray (), true);
-  EXPECT_EQ (vx == v, true);
+    EXPECT_EQ (v.is_nil (), false);
+    EXPECT_EQ (v.is_list (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_bytearray (), true);
+    EXPECT_EQ (v.is_a_bytearray (), true);
+    EXPECT_EQ (v.is_long (), false);
+    EXPECT_EQ (v.is_ulong (), false);
+    EXPECT_EQ (v.is_longlong (), false);
+    EXPECT_EQ (v.is_ulonglong (), false);
+    EXPECT_EQ (v.is_double (), false);
+    EXPECT_EQ (v.is_id (), false);
+    EXPECT_EQ (v.to_parsable_string (), "'\"h\\000\\033allO\"'b");
+    EXPECT_EQ (v.to_stdstring (), std::string ("\"h\000\033allO\"", 9));
+    EXPECT_EQ (vv == v, false);
+    EXPECT_EQ (vv != v, true);
+    vv = v;
+    EXPECT_EQ (vv == v, true);
+    EXPECT_EQ (vv != v, false);
+    tl::Variant vx;
+    std::string s (v.to_parsable_string ());
+    tl::Extractor ex (s.c_str ());
+    ex.read (vx);
+    ex.expect_end ();
+    EXPECT_EQ (vx.is_bytearray (), true);
+    EXPECT_EQ (vx == v, true);
   }
 
   {
-  tl::Variant v ("hal'l\"o");
+    tl::Variant v ("hal'l\"o");
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "'hal\\'l\"o'");
+    EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "'hal\\'l\"o'");
 #endif
-  EXPECT_EQ (v.is_nil (), false);
-  EXPECT_EQ (v.is_list (), false);
-  EXPECT_EQ (v.is_cstring (), true);
-  EXPECT_EQ (v.is_long (), false);
-  EXPECT_EQ (v.is_ulong (), false);
-  EXPECT_EQ (v.is_longlong (), false);
-  EXPECT_EQ (v.is_ulonglong (), false);
-  EXPECT_EQ (v.is_double (), false);
-  EXPECT_EQ (v.is_id (), false);
-  EXPECT_EQ (v.to_parsable_string (), "'hal\\'l\"o'");
-  EXPECT_EQ (std::string (v.to_string ()), "hal'l\"o");
-  EXPECT_EQ (vv == v, false);
-  EXPECT_EQ (vv != v, true);
-  vv = v;
-  EXPECT_EQ (vv == v, true);
-  EXPECT_EQ (vv != v, false);
-  tl::Variant vx;
-  std::string s (v.to_parsable_string ());
-  tl::Extractor ex (s.c_str ());
-  ex.read (vx);
-  ex.expect_end ();
-  EXPECT_EQ (vx.is_stdstring (), true);
-  EXPECT_EQ (vx == v, true);
-  vx.morph<const char *>();
-  EXPECT_EQ (vx == v, true);
+    EXPECT_EQ (v.is_nil (), false);
+    EXPECT_EQ (v.is_list (), false);
+    EXPECT_EQ (v.is_cstring (), true);
+    EXPECT_EQ (v.is_long (), false);
+    EXPECT_EQ (v.is_ulong (), false);
+    EXPECT_EQ (v.is_longlong (), false);
+    EXPECT_EQ (v.is_ulonglong (), false);
+    EXPECT_EQ (v.is_double (), false);
+    EXPECT_EQ (v.is_id (), false);
+    EXPECT_EQ (v.to_parsable_string (), "'hal\\'l\"o'");
+    EXPECT_EQ (std::string (v.to_string ()), "hal'l\"o");
+    EXPECT_EQ (vv == v, false);
+    EXPECT_EQ (vv != v, true);
+    vv = v;
+    EXPECT_EQ (vv == v, true);
+    EXPECT_EQ (vv != v, false);
+    tl::Variant vx;
+    std::string s (v.to_parsable_string ());
+    tl::Extractor ex (s.c_str ());
+    ex.read (vx);
+    ex.expect_end ();
+    EXPECT_EQ (vx.is_stdstring (), true);
+    EXPECT_EQ (vx == v, true);
+    vx.morph<const char *> ();
+    EXPECT_EQ (vx == v, true);
   }
 
   {
 #if defined(HAVE_QT)
-  tl::Variant v (tl::to_qstring ("hal'l\"o"));
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "'hal\\'l\"o'");
-  EXPECT_EQ (v.is_qstring (), true);
-  EXPECT_EQ (v.is_nil (), false);
-  EXPECT_EQ (v.is_list (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_stdstring (), false);
-  EXPECT_EQ (v.is_long (), false);
-  EXPECT_EQ (v.is_ulong (), false);
-  EXPECT_EQ (v.is_longlong (), false);
-  EXPECT_EQ (v.is_ulonglong (), false);
-  EXPECT_EQ (v.is_double (), false);
-  EXPECT_EQ (v.is_id (), false);
-  EXPECT_EQ (std::string (v.to_string ()), "hal'l\"o");
-  EXPECT_EQ (tl::to_string (*(QString *)v.native_ptr ()), "hal'l\"o");
-  v.morph<std::string> ();
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_qstring (), false);
-  EXPECT_EQ (v.is_stdstring (), true);
-  EXPECT_EQ (std::string (v.to_string ()), "hal'l\"o");
-  EXPECT_EQ (*(std::string *)v.native_ptr (), "hal'l\"o");
-  v.morph<const char *> ();
-  EXPECT_EQ (v.is_cstring (), true);
-  EXPECT_EQ (v.is_qstring (), false);
-  EXPECT_EQ (v.is_stdstring (), false);
-  EXPECT_EQ (std::string (v.to_string ()), "hal'l\"o");
-  EXPECT_EQ (std::string ((const char *)v.native_ptr ()), "hal'l\"o");
+    tl::Variant v (tl::to_qstring ("hal'l\"o"));
+    EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "'hal\\'l\"o'");
+    EXPECT_EQ (v.is_qstring (), true);
+    EXPECT_EQ (v.is_nil (), false);
+    EXPECT_EQ (v.is_list (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_stdstring (), false);
+    EXPECT_EQ (v.is_long (), false);
+    EXPECT_EQ (v.is_ulong (), false);
+    EXPECT_EQ (v.is_longlong (), false);
+    EXPECT_EQ (v.is_ulonglong (), false);
+    EXPECT_EQ (v.is_double (), false);
+    EXPECT_EQ (v.is_id (), false);
+    EXPECT_EQ (std::string (v.to_string ()), "hal'l\"o");
+    EXPECT_EQ (tl::to_string (*(QString *) v.native_ptr ()), "hal'l\"o");
+    v.morph<std::string> ();
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_qstring (), false);
+    EXPECT_EQ (v.is_stdstring (), true);
+    EXPECT_EQ (std::string (v.to_string ()), "hal'l\"o");
+    EXPECT_EQ (*(std::string *) v.native_ptr (), "hal'l\"o");
+    v.morph<const char *> ();
+    EXPECT_EQ (v.is_cstring (), true);
+    EXPECT_EQ (v.is_qstring (), false);
+    EXPECT_EQ (v.is_stdstring (), false);
+    EXPECT_EQ (std::string (v.to_string ()), "hal'l\"o");
+    EXPECT_EQ (std::string ((const char *) v.native_ptr ()), "hal'l\"o");
 #endif
   }
 
   {
-  long a[3] = { 1, 5, 25 };
-  tl::Variant v (a, a + 3);
+    long a [3] = {1, 5, 25};
+    tl::Variant v (a, a + 3);
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "(#1,#5,#25)");
+    EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "(#1,#5,#25)");
 #endif
-  EXPECT_EQ (v.is_nil (), false);
-  EXPECT_EQ (v.is_list (), true);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_long (), false);
-  EXPECT_EQ (v.is_ulong (), false);
-  EXPECT_EQ (v.is_longlong (), false);
-  EXPECT_EQ (v.is_ulonglong (), false);
-  EXPECT_EQ (v.is_id (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_double (), false);
-  EXPECT_EQ (v.to_string (), "(1,5,25)");
-  EXPECT_EQ (v.to_parsable_string (), "(#1,#5,#25)");
-  EXPECT_EQ (v.get_list ().size (), size_t (3));
-  EXPECT_EQ (v.begin ()->is_long (), true);
-  EXPECT_EQ (v.begin ()->to_long (), 1);
-  EXPECT_EQ (v.begin ()[1].is_long (), true);
-  EXPECT_EQ (v.begin ()[1].to_long (), 5);
-  EXPECT_EQ (v.begin ()[2].is_long (), true);
-  EXPECT_EQ (v.begin ()[2].to_long (), 25);
-  EXPECT_EQ (v.begin () + 3 == v.end (), true);
-  EXPECT_EQ (vv == v, false);
-  EXPECT_EQ (vv != v, true);
-  vv = v;
-  EXPECT_EQ (vv == v, true);
-  EXPECT_EQ (vv != v, false);
-  tl::Variant vx;
-  std::string s (v.to_parsable_string ());
-  tl::Extractor ex (s.c_str ());
-  ex.read (vx);
-  ex.expect_end ();
-  EXPECT_EQ (vx == v, true);
+    EXPECT_EQ (v.is_nil (), false);
+    EXPECT_EQ (v.is_list (), true);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_long (), false);
+    EXPECT_EQ (v.is_ulong (), false);
+    EXPECT_EQ (v.is_longlong (), false);
+    EXPECT_EQ (v.is_ulonglong (), false);
+    EXPECT_EQ (v.is_id (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_double (), false);
+    EXPECT_EQ (v.to_string (), "(1,5,25)");
+    EXPECT_EQ (v.to_parsable_string (), "(#1,#5,#25)");
+    EXPECT_EQ (v.get_list ().size (), size_t (3));
+    EXPECT_EQ (v.begin ()->is_long (), true);
+    EXPECT_EQ (v.begin ()->to_long (), 1);
+    EXPECT_EQ (v.begin () [1].is_long (), true);
+    EXPECT_EQ (v.begin () [1].to_long (), 5);
+    EXPECT_EQ (v.begin () [2].is_long (), true);
+    EXPECT_EQ (v.begin () [2].to_long (), 25);
+    EXPECT_EQ (v.begin () + 3 == v.end (), true);
+    EXPECT_EQ (vv == v, false);
+    EXPECT_EQ (vv != v, true);
+    vv = v;
+    EXPECT_EQ (vv == v, true);
+    EXPECT_EQ (vv != v, false);
+    tl::Variant vx;
+    std::string s (v.to_parsable_string ());
+    tl::Extractor ex (s.c_str ());
+    ex.read (vx);
+    ex.expect_end ();
+    EXPECT_EQ (vx == v, true);
   }
 
   {
-  tl::Variant v ((long long) 17);
+    tl::Variant v ((long long) 17);
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#l17");
+    EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#l17");
 #endif
-  EXPECT_EQ (v.is_nil (), false);
-  EXPECT_EQ (v.is_list (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_id (), false);
-  EXPECT_EQ (v.is_long (), false);
-  EXPECT_EQ (v.is_ulong (), false);
-  EXPECT_EQ (v.is_longlong (), true);
-  EXPECT_EQ (v.is_ulonglong (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_double (), false);
-  EXPECT_EQ (v.to_string (), "17");
-  EXPECT_EQ (v.to_parsable_string (), "#l17");
-  tl::Variant vx;
-  std::string s (v.to_parsable_string ());
-  tl::Extractor ex (s.c_str ());
-  ex.read (vx);
-  ex.expect_end ();
-  EXPECT_EQ (vx == v, true);
+    EXPECT_EQ (v.is_nil (), false);
+    EXPECT_EQ (v.is_list (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_id (), false);
+    EXPECT_EQ (v.is_long (), false);
+    EXPECT_EQ (v.is_ulong (), false);
+    EXPECT_EQ (v.is_longlong (), true);
+    EXPECT_EQ (v.is_ulonglong (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_double (), false);
+    EXPECT_EQ (v.to_string (), "17");
+    EXPECT_EQ (v.to_parsable_string (), "#l17");
+    tl::Variant vx;
+    std::string s (v.to_parsable_string ());
+    tl::Extractor ex (s.c_str ());
+    ex.read (vx);
+    ex.expect_end ();
+    EXPECT_EQ (vx == v, true);
   }
 
   {
-  tl::Variant v ((unsigned long long) 17);
+    tl::Variant v ((unsigned long long) 17);
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#lu17");
+    EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#lu17");
 #endif
-  EXPECT_EQ (v.is_nil (), false);
-  EXPECT_EQ (v.is_list (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_id (), false);
-  EXPECT_EQ (v.is_long (), false);
-  EXPECT_EQ (v.is_ulong (), false);
-  EXPECT_EQ (v.is_ulonglong (), true);
-  EXPECT_EQ (v.is_longlong (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_double (), false);
-  EXPECT_EQ (v.to_string (), "17");
-  EXPECT_EQ (v.to_parsable_string (), "#lu17");
-  tl::Variant vx;
-  std::string s (v.to_parsable_string ());
-  tl::Extractor ex (s.c_str ());
-  ex.read (vx);
-  ex.expect_end ();
-  EXPECT_EQ (vx == v, true);
+    EXPECT_EQ (v.is_nil (), false);
+    EXPECT_EQ (v.is_list (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_id (), false);
+    EXPECT_EQ (v.is_long (), false);
+    EXPECT_EQ (v.is_ulong (), false);
+    EXPECT_EQ (v.is_ulonglong (), true);
+    EXPECT_EQ (v.is_longlong (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_double (), false);
+    EXPECT_EQ (v.to_string (), "17");
+    EXPECT_EQ (v.to_parsable_string (), "#lu17");
+    tl::Variant vx;
+    std::string s (v.to_parsable_string ());
+    tl::Extractor ex (s.c_str ());
+    ex.read (vx);
+    ex.expect_end ();
+    EXPECT_EQ (vx == v, true);
   }
 
   {
-  tl::Variant v (17, true);
+    tl::Variant v (17, true);
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#u17");
+    EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#u17");
 #endif
-  EXPECT_EQ (v.is_nil (), false);
-  EXPECT_EQ (v.is_list (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_id (), true);
-  EXPECT_EQ (v.is_long (), false);
-  EXPECT_EQ (v.is_ulong (), false);
-  EXPECT_EQ (v.is_ulonglong (), false);
-  EXPECT_EQ (v.is_longlong (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_double (), false);
-  EXPECT_EQ (v.to_string (), "[id17]");
-  EXPECT_EQ (v.to_parsable_string (), "[id17]");
+    EXPECT_EQ (v.is_nil (), false);
+    EXPECT_EQ (v.is_list (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_id (), true);
+    EXPECT_EQ (v.is_long (), false);
+    EXPECT_EQ (v.is_ulong (), false);
+    EXPECT_EQ (v.is_ulonglong (), false);
+    EXPECT_EQ (v.is_longlong (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_double (), false);
+    EXPECT_EQ (v.to_string (), "[id17]");
+    EXPECT_EQ (v.to_parsable_string (), "[id17]");
   }
 
   {
-  tl::Variant v = tl::Variant::empty_array ();
+    tl::Variant v = tl::Variant::empty_array ();
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "{}");
+    EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "{}");
 #endif
-  EXPECT_EQ (v.is_nil (), false);
-  EXPECT_EQ (v.is_list (), false);
-  EXPECT_EQ (v.is_array (), true);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_id (), false);
-  EXPECT_EQ (v.is_long (), false);
-  EXPECT_EQ (v.is_ulong (), false);
-  EXPECT_EQ (v.is_ulonglong (), false);
-  EXPECT_EQ (v.is_longlong (), false);
-  EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_double (), false);
-  EXPECT_EQ (v.to_parsable_string (), "{}");
-  v.insert (tl::Variant (1), tl::Variant ("A"));
-  EXPECT_EQ (v.to_parsable_string (), "{#1=>\'A\'}");
-  v.insert (tl::Variant ("B"), tl::Variant (17));
-  EXPECT_EQ (v.to_string (), "{1=>A,B=>17}");
-  EXPECT_EQ (v.to_parsable_string (), "{#1=>\'A\',\'B\'=>#17}");
+    EXPECT_EQ (v.is_nil (), false);
+    EXPECT_EQ (v.is_list (), false);
+    EXPECT_EQ (v.is_array (), true);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_id (), false);
+    EXPECT_EQ (v.is_long (), false);
+    EXPECT_EQ (v.is_ulong (), false);
+    EXPECT_EQ (v.is_ulonglong (), false);
+    EXPECT_EQ (v.is_longlong (), false);
+    EXPECT_EQ (v.is_cstring (), false);
+    EXPECT_EQ (v.is_double (), false);
+    EXPECT_EQ (v.to_parsable_string (), "{}");
+    v.insert (tl::Variant (1), tl::Variant ("A"));
+    EXPECT_EQ (v.to_parsable_string (), "{#1=>\'A\'}");
+    v.insert (tl::Variant ("B"), tl::Variant (17));
+    EXPECT_EQ (v.to_string (), "{1=>A,B=>17}");
+    EXPECT_EQ (v.to_parsable_string (), "{#1=>\'A\',\'B\'=>#17}");
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "{\'1\'=>\'A\',\'B\'=>#17}");
+    EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "{\'1\'=>\'A\',\'B\'=>#17}");
 #endif
-  tl::Variant *x;
-  x = v.find (tl::Variant ("B"));
-  EXPECT_EQ (x != 0, true);
-  EXPECT_EQ (x->to_parsable_string (), "#17");
-  x = v.find (tl::Variant (1l));
-  EXPECT_EQ (x != 0, true);
-  EXPECT_EQ (x->to_parsable_string (), "\'A\'");
-  x = v.find (tl::Variant ("C"));
-  EXPECT_EQ (x == 0, true);
-  x = v.find (tl::Variant (1));
-  EXPECT_EQ (x != 0, true);
-  EXPECT_EQ (x->to_parsable_string (), "\'A\'");
-  x = v.find (tl::Variant ("C"));
-  EXPECT_EQ (x == 0, true);
-  x = v.find (tl::Variant ());
-  EXPECT_EQ (x == 0, true);
-  x = v.find (tl::Variant (17l));
-  EXPECT_EQ (x == 0, true);
-  tl::Variant vx;
-  std::string s (v.to_parsable_string ());
-  tl::Extractor ex (s.c_str ());
-  ex.read (vx);
-  ex.expect_end ();
-  EXPECT_EQ (vx.to_parsable_string (), "{#1=>\'A\',\'B\'=>#17}");
-  EXPECT_EQ (vx == v, true);
+    tl::Variant *x;
+    x = v.find (tl::Variant ("B"));
+    EXPECT_EQ (x != 0, true);
+    EXPECT_EQ (x->to_parsable_string (), "#17");
+    x = v.find (tl::Variant (1l));
+    EXPECT_EQ (x != 0, true);
+    EXPECT_EQ (x->to_parsable_string (), "\'A\'");
+    x = v.find (tl::Variant ("C"));
+    EXPECT_EQ (x == 0, true);
+    x = v.find (tl::Variant (1));
+    EXPECT_EQ (x != 0, true);
+    EXPECT_EQ (x->to_parsable_string (), "\'A\'");
+    x = v.find (tl::Variant ("C"));
+    EXPECT_EQ (x == 0, true);
+    x = v.find (tl::Variant ());
+    EXPECT_EQ (x == 0, true);
+    x = v.find (tl::Variant (17l));
+    EXPECT_EQ (x == 0, true);
+    tl::Variant vx;
+    std::string s (v.to_parsable_string ());
+    tl::Extractor ex (s.c_str ());
+    ex.read (vx);
+    ex.expect_end ();
+    EXPECT_EQ (vx.to_parsable_string (), "{#1=>\'A\',\'B\'=>#17}");
+    EXPECT_EQ (vx == v, true);
   }
-
 }
 
-TEST(2)
+TEST (2)
 {
   bool err = false;
 
@@ -805,8 +801,8 @@ TEST(2)
   }
   EXPECT_EQ (err, true);
 
-  v = tl::Variant (new B(b), &b_class_instance, true);
-  v2 = tl::Variant (new B(b2), &b_class_instance, true);
+  v = tl::Variant (new B (b), &b_class_instance, true);
+  v2 = tl::Variant (new B (b2), &b_class_instance, true);
   EXPECT_EQ (vv == v, false);
   EXPECT_EQ (vv != v, true);
   vv = v;
@@ -830,7 +826,7 @@ TEST(2)
   EXPECT_EQ (vv.to_user<B> ().bb, b.bb);
 
   //  deep copy for owned objects
-  v = tl::Variant (new B(), &b_class_instance, true);
+  v = tl::Variant (new B (), &b_class_instance, true);
   v.to_user<B> ().bb = 42;
   v2 = v;
 
@@ -847,7 +843,7 @@ TEST(2)
   B *b1 = 0;
 
   v = tl::Variant ();
-  v.set_user (b1 = new B(b), &b_class_instance, true);
+  v.set_user (b1 = new B (b), &b_class_instance, true);
   v2 = v;
 
   EXPECT_EQ (v.to_user<B> ().bb, b1->bb);
@@ -918,7 +914,7 @@ TEST(2)
   EXPECT_EQ (v2.to_user (), 0);
 }
 
-TEST(3)
+TEST (3)
 {
   std::string s = "'1',#1";
   tl::Variant v1;
@@ -939,7 +935,7 @@ TEST(3)
 }
 
 //  can_convert_to
-TEST(4)
+TEST (4)
 {
   tl::Variant v;
   v = tl::Variant (1);
@@ -1103,7 +1099,7 @@ TEST(4)
 }
 
 //  Variants as key maps
-TEST(5)
+TEST (5)
 {
   std::map<tl::Variant, int> m;
 
@@ -1150,7 +1146,7 @@ TEST(5)
 }
 
 //  fuzzy compare of doubles
-TEST(6)
+TEST (6)
 {
   volatile double a = 10.0;
   EXPECT_EQ (tl::Variant (0.0) == tl::Variant (0.0), true);
@@ -1181,7 +1177,7 @@ TEST(6)
 }
 
 //  precision of double serialization
-TEST(7a)
+TEST (7a)
 {
   tl::Variant v (M_PI);
   tl::Variant vx;
@@ -1192,7 +1188,7 @@ TEST(7a)
   EXPECT_EQ (fabs (M_PI - vx.to_double ()) < 4e-15, true);
 }
 
-TEST(7b)
+TEST (7b)
 {
   tl::Variant v ((float) M_PI);
   tl::Variant vx;
@@ -1204,7 +1200,7 @@ TEST(7b)
 }
 
 //  null strings
-TEST(8)
+TEST (8)
 {
   tl::Variant v ((const char *) 0);
   EXPECT_EQ (v.to_parsable_string (), "nil");
@@ -1231,7 +1227,7 @@ TEST(8)
 }
 
 //  create from STL containers
-TEST(9)
+TEST (9)
 {
   tl::Variant v;
 
@@ -1246,8 +1242,8 @@ TEST(9)
   si.insert (63);
   std::pair<int, int> pi (1, 3);
   std::map<int, int> mi;
-  mi[17] = 42;
-  mi[-1] = 31;
+  mi [17] = 42;
+  mi [-1] = 31;
 
   EXPECT_EQ (tl::Variant (vi).to_parsable_string (), "(#17,#1)");
   EXPECT_EQ (tl::Variant (vi).to_string (), "(17,1)");
@@ -1262,7 +1258,7 @@ TEST(9)
 }
 
 //  special numeric values
-TEST(10)
+TEST (10)
 {
   std::string s;
   tl::Extractor ex;
@@ -1368,7 +1364,7 @@ TEST(10)
 }
 
 //  some tests originally from PropertiesRepositoryTests
-TEST(11)
+TEST (11)
 {
   tl::Variant v;
 
@@ -1438,7 +1434,7 @@ TEST(11)
 }
 
 //  some tests originally from PropertiesRepositoryTests
-TEST(12)
+TEST (12)
 {
   tl::Variant v;
   tl::Extractor ex ("  #10 a");
@@ -1464,7 +1460,7 @@ TEST(12)
 }
 
 //  tl::Variant sorting with different numericals
-TEST(13)
+TEST (13)
 {
   tl::Variant v1 ((long) 2);
   tl::Variant v2 ((int) 2);
@@ -1478,7 +1474,7 @@ TEST(13)
   EXPECT_EQ (v1 < v2, false);
   EXPECT_EQ (v2 < v1, false);
 
-  EXPECT_EQ (v1 == v3, true);  //  signed compares to unsigned
+  EXPECT_EQ (v1 == v3, true); //  signed compares to unsigned
   EXPECT_EQ (v3 == v1, true);
   EXPECT_EQ (v3 < v1, false);
   EXPECT_EQ (v1 < v3, false);
@@ -1488,7 +1484,7 @@ TEST(13)
   EXPECT_EQ (v1 < v2, false);
   EXPECT_EQ (v2 < v1, false);
 
-  EXPECT_EQ (v1 == v5, false);  //  string != value
+  EXPECT_EQ (v1 == v5, false); //  string != value
   EXPECT_EQ (v5 == v1, false);
   EXPECT_EQ (v1 < v5, true);
   EXPECT_EQ (v5 < v1, false);
@@ -1503,33 +1499,33 @@ TEST(13)
   std::map<tl::Variant, int> vm;
 
   vm.insert (std::make_pair (tl::Variant (2), 1));
-  EXPECT_EQ (vm[tl::Variant (2)], 1);
+  EXPECT_EQ (vm [tl::Variant (2)], 1);
 
   vm.insert (std::make_pair (tl::Variant (2.0), 2));
-  EXPECT_EQ (vm[tl::Variant (2)], 1);
-  EXPECT_EQ (vm[tl::Variant (2.0)], 1);
+  EXPECT_EQ (vm [tl::Variant (2)], 1);
+  EXPECT_EQ (vm [tl::Variant (2.0)], 1);
 
   vm.insert (std::make_pair (tl::Variant (2, true), 3));
-  EXPECT_EQ (vm[tl::Variant (2)], 1);
-  EXPECT_EQ (vm[tl::Variant (2.0)], 1);
-  EXPECT_EQ (vm[tl::Variant (2, true)], 3);
+  EXPECT_EQ (vm [tl::Variant (2)], 1);
+  EXPECT_EQ (vm [tl::Variant (2.0)], 1);
+  EXPECT_EQ (vm [tl::Variant (2, true)], 3);
 
   vm.insert (std::make_pair (tl::Variant ("2"), 4));
-  EXPECT_EQ (vm[tl::Variant (2)], 1);
-  EXPECT_EQ (vm[tl::Variant (2.0)], 1);
-  EXPECT_EQ (vm[tl::Variant (2, true)], 3);
-  EXPECT_EQ (vm[tl::Variant ("2")], 4);
+  EXPECT_EQ (vm [tl::Variant (2)], 1);
+  EXPECT_EQ (vm [tl::Variant (2.0)], 1);
+  EXPECT_EQ (vm [tl::Variant (2, true)], 3);
+  EXPECT_EQ (vm [tl::Variant ("2")], 4);
 }
 
 //  tl::Variant byte arrays vs. strings
-TEST(14)
+TEST (14)
 {
   std::vector<char> ba1;
-  const char ba1_str[] = { 'A', 'B', 0, 'D' };
+  const char ba1_str [] = {'A', 'B', 0, 'D'};
   ba1.insert (ba1.end (), ba1_str, ba1_str + sizeof (ba1_str) / sizeof (ba1_str [0]));
 
   std::vector<char> ba2;
-  const char ba2_str[] = { 'A', 'B', 'C', 'D' };
+  const char ba2_str [] = {'A', 'B', 'C', 'D'};
   ba2.insert (ba2.end (), ba2_str, ba2_str + sizeof (ba2_str) / sizeof (ba2_str [0]));
 
   tl::Variant ba1_var (ba1), ba2_var (ba2);

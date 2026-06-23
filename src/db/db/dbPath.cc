@@ -26,13 +26,13 @@
 namespace db
 {
 
-template <class C> 
-typename path<C>::distance_type 
-path<C>::length () const 
+template <class C>
+typename path<C>::distance_type
+path<C>::length () const
 {
   double l = m_bgn_ext + m_end_ext;
 
-  typename pointlist_type::const_iterator p = m_points.begin (); 
+  typename pointlist_type::const_iterator p = m_points.begin ();
   if (p != m_points.end ()) {
     typename pointlist_type::const_iterator pp = p;
     ++p;
@@ -46,9 +46,9 @@ path<C>::length () const
   return coord_traits::rounded (l);
 }
 
-template <class C> 
-typename path<C>::perimeter_type 
-path<C>::perimeter () const 
+template <class C>
+typename path<C>::perimeter_type
+path<C>::perimeter () const
 {
   double l;
   if (m_width < 0) {
@@ -58,7 +58,7 @@ path<C>::perimeter () const
     l = m_bgn_ext + m_end_ext + m_width;
   }
 
-  typename pointlist_type::const_iterator p = m_points.begin (); 
+  typename pointlist_type::const_iterator p = m_points.begin ();
   if (p != m_points.end ()) {
     typename pointlist_type::const_iterator pp = p;
     ++p;
@@ -72,9 +72,9 @@ path<C>::perimeter () const
   return coord_traits::rounded_perimeter (2 * l);
 }
 
-template <class C> 
-typename path<C>::area_type 
-path<C>::area () const 
+template <class C>
+typename path<C>::area_type
+path<C>::area () const
 {
   area_type l = m_bgn_ext + m_end_ext;
   if (m_width < 0) {
@@ -82,7 +82,7 @@ path<C>::area () const
     l = area_type (l * (4.0 - M_PI));
   }
 
-  typename pointlist_type::const_iterator p = m_points.begin (); 
+  typename pointlist_type::const_iterator p = m_points.begin ();
   if (p != m_points.end ()) {
     typename pointlist_type::const_iterator pp = p;
     ++p;
@@ -96,13 +96,13 @@ path<C>::area () const
   return l * std::abs (m_width);
 }
 
-template <class C> 
+template <class C>
 std::string
 path<C>::to_string () const
 {
   std::string s = "(";
 
-  //  the point list 
+  //  the point list
   for (iterator p = begin (); p != end (); ++p) {
     if (p != begin ()) {
       s += ";";
@@ -121,7 +121,7 @@ path<C>::to_string () const
   return s;
 }
 
-template <class C> 
+template <class C>
 void path<C>::update_bbox () const
 {
   if (m_bbox.empty () && ! m_points.empty ()) {
@@ -142,11 +142,11 @@ void path<C>::update_bbox () const
   }
 }
 
-template <class C> 
+template <class C>
 void path<C>::real_points (typename path<C>::pointlist_type &real_pts) const
 {
   real_pts.reserve (m_points.size ());
-  for (typename pointlist_type::const_iterator p = m_points.begin (); p != m_points.end (); ) {
+  for (typename pointlist_type::const_iterator p = m_points.begin (); p != m_points.end ();) {
 
     real_pts.push_back (*p);
     ++p;
@@ -172,9 +172,7 @@ void path<C>::real_points (typename path<C>::pointlist_type &real_pts) const
       }
 
       --p;
-
     }
-
   }
 }
 
@@ -224,18 +222,18 @@ void path<C>::create_shifted_points (C start, C end, C width, bool forward, Iter
     db::DVector edd, ndd;
 
     //  The first point is taken as being simply shifted normally and pulled back by start_ext
-    //  or, in round mode, approximated by a set of segments 
+    //  or, in round mode, approximated by a set of segments
     if (ncircle > 2) {
 
       double a0 = M_PI / (2.0 * ncircle);
 
-      double cd = cos(a0);
-      double sd = sin(a0);
+      double cd = cos (a0);
+      double sd = sin (a0);
       double c2d = cd * cd - sd * sd;
       double s2d = 2 * cd * sd;
       double c, s;
 
-      edd = ed * (double(-start) / cd);
+      edd = ed * (double (-start) / cd);
       ndd = nd * (disp / cd);
 
       c = cd;
@@ -249,11 +247,11 @@ void path<C>::create_shifted_points (C start, C end, C width, bool forward, Iter
         s = ss;
       }
 
-      edd = ed * (double(end) / cd);
+      edd = ed * (double (end) / cd);
       ndd = nd * (disp / cd);
 
-      c = cos(a0 * (ncircle - 1));
-      s = sin(a0 * (ncircle - 1));
+      c = cos (a0 * (ncircle - 1));
+      s = sin (a0 * (ncircle - 1));
 
       for (int i = 0; i < ncircle / 2; ++i) {
         *pts++ = *p + vector<C> (edd * c + ndd * s);
@@ -264,10 +262,9 @@ void path<C>::create_shifted_points (C start, C end, C width, bool forward, Iter
       }
 
     } else {
-      *pts++ = (*p + vector<C> (ed * double(-start) + nd * disp));
-      *pts++ = (*p + vector<C> (ed * double(end) + nd * disp));
+      *pts++ = (*p + vector<C> (ed * double (-start) + nd * disp));
+      *pts++ = (*p + vector<C> (ed * double (end) + nd * disp));
     }
-
   }
 
   bool first = true;
@@ -289,18 +286,18 @@ void path<C>::create_shifted_points (C start, C end, C width, bool forward, Iter
       first = false;
 
       //  The first point is taken as being simply shifted normally and pulled back by start_ext
-      //  or, in round mode, approximated by a set of segments 
+      //  or, in round mode, approximated by a set of segments
       if (ncircle > 2) {
 
         double a0 = M_PI / (2.0 * ncircle);
 
-        double cd = cos(a0);
-        double sd = sin(a0);
+        double cd = cos (a0);
+        double sd = sin (a0);
         double c2d = cd * cd - sd * sd;
         double s2d = 2 * cd * sd;
         double c = cd, s = sd;
 
-        db::DVector edd = ed * (double(-start) / cd);
+        db::DVector edd = ed * (double (-start) / cd);
         db::DVector ndd = nd * (1.0 / cd);
 
         for (int i = 0; i < ncircle / 2; ++i) {
@@ -314,25 +311,24 @@ void path<C>::create_shifted_points (C start, C end, C width, bool forward, Iter
       } else {
         *pts++ = (*p + vector<C> (dpx<C> (ed, -start) + nd));
       }
-
     }
 
     if (ppp == to) {
 
       //  The last point is taken as being simply shifted normally and pulled forward by end_ext
-      //  or, in round mode, approximated by a set of segments 
+      //  or, in round mode, approximated by a set of segments
       if (ncircle > 2) {
 
         double a0 = M_PI / (2.0 * ncircle);
 
-        double cd = cos(a0);
-        double sd = sin(a0);
+        double cd = cos (a0);
+        double sd = sin (a0);
         double c2d = cd * cd - sd * sd;
         double s2d = 2 * cd * sd;
-        double c = cos(a0 * (ncircle - 1));
-        double s = sin(a0 * (ncircle - 1));
+        double c = cos (a0 * (ncircle - 1));
+        double s = sin (a0 * (ncircle - 1));
 
-        db::DVector edd = ed * (double(end) / cd);
+        db::DVector edd = ed * (double (end) / cd);
         db::DVector ndd = nd * (1.0 / cd);
 
         for (int i = 0; i < ncircle / 2; ++i) {
@@ -349,7 +345,7 @@ void path<C>::create_shifted_points (C start, C end, C width, bool forward, Iter
 
     } else {
 
-      //  Points in between are determined from taking two 
+      //  Points in between are determined from taking two
       //  edges being shifted perpendicular from the original
       //  and being slightly extended. The intersection point
       //  of both gives the new vertex. If there is no intersection,
@@ -374,10 +370,10 @@ void path<C>::create_shifted_points (C start, C end, C width, bool forward, Iter
 
         if (l1 < l1min - db::epsilon || l2 < l2min - db::epsilon) {
 
-          //  Segments are too short - the won't intersect: In this case we create a loop of three 
+          //  Segments are too short - the won't intersect: In this case we create a loop of three
           //  points which define the area in self-overlapping way but confined to the path within
           //  the limits of its width.
-          //  HINT: the execution of this code is a pretty strong evidence for the existence to loops 
+          //  HINT: the execution of this code is a pretty strong evidence for the existence to loops
           //  in the contour delivered. A proof however is missing ..
           *pts++ = *pp + vector<C> (nd);
           *pts++ = *pp;
@@ -390,10 +386,9 @@ void path<C>::create_shifted_points (C start, C end, C width, bool forward, Iter
 
         } else {
 
-          //  cut-off corner: produce two points connecting the edges 
+          //  cut-off corner: produce two points connecting the edges
           *pts++ = *pp + vector<C> (nd + ed * std::min (l1max, l1));
           *pts++ = *pp + vector<C> (nnd - eed * std::min (l2max, l2));
-
         }
 
         p = pp;
@@ -405,19 +400,14 @@ void path<C>::create_shifted_points (C start, C end, C width, bool forward, Iter
         *pts++ = *pp + vector<C> (nnd - dpx<C> (eed, disp));
 
         p = pp;
-
       }
-
     }
 
     pp = ppp;
-
   }
-  
 }
 
-DPath
-round_path_corners (const db::DPath &input, double r, int n, double accuracy)
+DPath round_path_corners (const db::DPath &input, double r, int n, double accuracy)
 {
   std::vector<db::DPoint> path_points;
 
@@ -443,17 +433,13 @@ round_path_corners (const db::DPath &input, double r, int n, double accuracy)
           ++p;
           ++pp;
           ++ppp;
-
         }
 
         if (path_points.back ().distance (*pp) > accuracy) {
           path_points.push_back (*pp);
         }
-
       }
-
     }
-
   }
 
   std::vector<db::DPoint> new_points;
@@ -534,7 +520,6 @@ round_path_corners (const db::DPath &input, double r, int n, double accuracy)
             if (new_points.back ().distance (dp) > accuracy) {
               new_points.push_back (dp);
             }
-
           }
 
           x = xc + ract * s1.y () * cos (ac) - fabs (ract) * s1.x () * sin (ac);
@@ -544,21 +529,17 @@ round_path_corners (const db::DPath &input, double r, int n, double accuracy)
           if (new_points.back ().distance (dp) > accuracy) {
             new_points.push_back (dp);
           }
-
         }
 
         ++p;
         ++pp;
         ++ppp;
-
       }
 
       if (new_points.back ().distance (*pp) > accuracy) {
         new_points.push_back (*pp);
       }
-
     }
-
   }
 
   //  Create a new path (use double for accuracy)
@@ -577,30 +558,30 @@ template class path<DCoord>;
 
 //  explicit instantiations
 template DB_PUBLIC void path<Coord>::create_shifted_points (Coord, Coord, Coord, bool, path<Coord>::pointlist_type::iterator, path<Coord>::pointlist_type::iterator, int, box_inserter<path<Coord>::box_type>) const;
-template DB_PUBLIC void path<Coord>::create_shifted_points (Coord, Coord, Coord, bool, path<Coord>::pointlist_type::iterator, path<Coord>::pointlist_type::iterator, int, std::back_insert_iterator<tl::vector<path<Coord>::point_type> >) const;
-template DB_PUBLIC void path<Coord>::create_shifted_points (Coord, Coord, Coord, bool, path<Coord>::pointlist_type::iterator, path<Coord>::pointlist_type::iterator, int, std::back_insert_iterator<std::vector<path<Coord>::point_type> >) const;
-template DB_PUBLIC void path<Coord>::create_shifted_points (Coord, Coord, Coord, bool, path<Coord>::pointlist_type::reverse_iterator, path<Coord>::pointlist_type::reverse_iterator, int, std::back_insert_iterator<tl::vector<path<Coord>::point_type> >) const;
-template DB_PUBLIC void path<Coord>::create_shifted_points (Coord, Coord, Coord, bool, path<Coord>::pointlist_type::reverse_iterator, path<Coord>::pointlist_type::reverse_iterator, int, std::back_insert_iterator<std::vector<path<Coord>::point_type> >) const;
+template DB_PUBLIC void path<Coord>::create_shifted_points (Coord, Coord, Coord, bool, path<Coord>::pointlist_type::iterator, path<Coord>::pointlist_type::iterator, int, std::back_insert_iterator<tl::vector<path<Coord>::point_type>>) const;
+template DB_PUBLIC void path<Coord>::create_shifted_points (Coord, Coord, Coord, bool, path<Coord>::pointlist_type::iterator, path<Coord>::pointlist_type::iterator, int, std::back_insert_iterator<std::vector<path<Coord>::point_type>>) const;
+template DB_PUBLIC void path<Coord>::create_shifted_points (Coord, Coord, Coord, bool, path<Coord>::pointlist_type::reverse_iterator, path<Coord>::pointlist_type::reverse_iterator, int, std::back_insert_iterator<tl::vector<path<Coord>::point_type>>) const;
+template DB_PUBLIC void path<Coord>::create_shifted_points (Coord, Coord, Coord, bool, path<Coord>::pointlist_type::reverse_iterator, path<Coord>::pointlist_type::reverse_iterator, int, std::back_insert_iterator<std::vector<path<Coord>::point_type>>) const;
 
 template DB_PUBLIC void path<DCoord>::create_shifted_points (DCoord, DCoord, DCoord, bool, path<DCoord>::pointlist_type::iterator, path<DCoord>::pointlist_type::iterator, int, box_inserter<path<DCoord>::box_type>) const;
-template DB_PUBLIC void path<DCoord>::create_shifted_points (DCoord, DCoord, DCoord, bool, path<DCoord>::pointlist_type::iterator, path<DCoord>::pointlist_type::iterator, int, std::back_insert_iterator<tl::vector<path<DCoord>::point_type> >) const;
-template DB_PUBLIC void path<DCoord>::create_shifted_points (DCoord, DCoord, DCoord, bool, path<DCoord>::pointlist_type::iterator, path<DCoord>::pointlist_type::iterator, int, std::back_insert_iterator<std::vector<path<DCoord>::point_type> >) const;
-template DB_PUBLIC void path<DCoord>::create_shifted_points (DCoord, DCoord, DCoord, bool, path<DCoord>::pointlist_type::reverse_iterator, path<DCoord>::pointlist_type::reverse_iterator, int, std::back_insert_iterator<tl::vector<path<DCoord>::point_type> >) const;
-template DB_PUBLIC void path<DCoord>::create_shifted_points (DCoord, DCoord, DCoord, bool, path<DCoord>::pointlist_type::reverse_iterator, path<DCoord>::pointlist_type::reverse_iterator, int, std::back_insert_iterator<std::vector<path<DCoord>::point_type> >) const;
+template DB_PUBLIC void path<DCoord>::create_shifted_points (DCoord, DCoord, DCoord, bool, path<DCoord>::pointlist_type::iterator, path<DCoord>::pointlist_type::iterator, int, std::back_insert_iterator<tl::vector<path<DCoord>::point_type>>) const;
+template DB_PUBLIC void path<DCoord>::create_shifted_points (DCoord, DCoord, DCoord, bool, path<DCoord>::pointlist_type::iterator, path<DCoord>::pointlist_type::iterator, int, std::back_insert_iterator<std::vector<path<DCoord>::point_type>>) const;
+template DB_PUBLIC void path<DCoord>::create_shifted_points (DCoord, DCoord, DCoord, bool, path<DCoord>::pointlist_type::reverse_iterator, path<DCoord>::pointlist_type::reverse_iterator, int, std::back_insert_iterator<tl::vector<path<DCoord>::point_type>>) const;
+template DB_PUBLIC void path<DCoord>::create_shifted_points (DCoord, DCoord, DCoord, bool, path<DCoord>::pointlist_type::reverse_iterator, path<DCoord>::pointlist_type::reverse_iterator, int, std::back_insert_iterator<std::vector<path<DCoord>::point_type>>) const;
 
 }
 
 namespace tl
 {
 
-template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Path &p)
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Path &p)
 {
   if (! test_extractor_impl (ex, p)) {
     ex.error (tl::to_string (tr ("Expected a path specification")));
   }
 }
 
-template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DPath &p)
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DPath &p)
 {
   if (! test_extractor_impl (ex, p)) {
     ex.error (tl::to_string (tr ("Expected a path specification")));
@@ -608,10 +589,10 @@ template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DPath &p)
 }
 
 
-template<class C> bool _test_extractor_impl (tl::Extractor &ex, db::path<C> &p)
+template <class C> bool _test_extractor_impl (tl::Extractor &ex, db::path<C> &p)
 {
   typedef db::point<C> point_type;
-  std::vector <point_type> points;
+  std::vector<point_type> points;
 
   if (ex.test ("(")) {
 
@@ -629,25 +610,25 @@ template<class C> bool _test_extractor_impl (tl::Extractor &ex, db::path<C> &p)
       C w = 0;
       ex.read (w);
       p.width (w);
-    } 
+    }
 
     if (ex.test ("bx=")) {
       C e = 0;
       ex.read (e);
       p.extensions (e, p.extensions ().second);
-    } 
+    }
 
     if (ex.test ("ex=")) {
       C e = 0;
       ex.read (e);
       p.extensions (p.extensions ().first, e);
-    } 
+    }
 
     if (ex.test ("r=")) {
       bool r = false;
       ex.read (r);
       p.round (r);
-    } 
+    }
 
     return true;
 
@@ -656,15 +637,14 @@ template<class C> bool _test_extractor_impl (tl::Extractor &ex, db::path<C> &p)
   }
 }
 
-template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Path &p)
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Path &p)
 {
   return _test_extractor_impl (ex, p);
 }
 
-template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DPath &p)
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DPath &p)
 {
   return _test_extractor_impl (ex, p);
 }
 
 }
-

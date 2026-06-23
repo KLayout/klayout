@@ -56,7 +56,8 @@ class DB_PLUGIN_PUBLIC MAGReaderException
 public:
   MAGReaderException (const std::string &msg, size_t l, const std::string &file)
     : ReaderException (tl::sprintf (tl::to_string (tr ("%s (line=%ld, file=%s)")), msg, l, file))
-  { }
+  {
+  }
 };
 
 /**
@@ -66,7 +67,7 @@ class DB_PLUGIN_PUBLIC MAGReader
   : public NamedLayerReader,
     public MAGDiagnostics
 {
-public: 
+public:
   typedef std::vector<tl::Variant> property_value_list;
 
   /**
@@ -76,13 +77,13 @@ public:
    */
   MAGReader (tl::InputStream &s);
 
-  /**  
+  /**
    *  @brief Destructor
    */
   ~MAGReader ();
 
-  /** 
-   *  @brief The basic read method 
+  /**
+   *  @brief The basic read method
    *
    *  This method will read the stream data and translate this to
    *  insert calls into the layout object. This will not do much
@@ -99,7 +100,7 @@ public:
    */
   virtual const LayerMap &read (db::Layout &layout, const LoadLayoutOptions &options);
 
-  /** 
+  /**
    *  @brief The basic read method (without mapping)
    *
    *  This method will read the stream data and translate this to
@@ -141,7 +142,7 @@ private:
   std::vector<std::string> m_lib_paths;
   bool m_merge;
   std::map<std::string, db::cell_index_type> m_cells_read;
-  std::map<std::string, std::pair<std::string, db::cell_index_type> > m_cells_to_read;
+  std::map<std::string, std::pair<std::string, db::cell_index_type>> m_cells_to_read;
   std::map<std::string, std::string> m_use_lib_paths;
   db::VCplxTrans m_dbu_trans_inv;
   std::string m_tech;
@@ -150,7 +151,7 @@ private:
   void do_read (db::Layout &layout, db::cell_index_type to_cell, tl::TextInputStream &stream);
   void do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl::TextInputStream &stream);
   void do_merge_part (db::Layout &layout, db::cell_index_type cell_index);
-  bool resolve_path(const std::string &path, const Layout &layout, std::string &real_path);
+  bool resolve_path (const std::string &path, const Layout &layout, std::string &real_path);
   std::string cell_name_from_path (const std::string &path);
   db::cell_index_type cell_from_path (const std::string &path, Layout &layout);
   void read_rect (tl::Extractor &ex, Layout &layout, cell_index_type cell_index, unsigned int layer, double scale);
@@ -162,4 +163,3 @@ private:
 }
 
 #endif
-

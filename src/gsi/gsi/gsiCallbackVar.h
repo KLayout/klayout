@@ -65,4 +65,3 @@ R issue (R (X::*) (_FUNCARGLIST) const _COMMA _CALLARGLIST) const
   call_int (args, ret);
   return ret.template read<R> (heap);
 }
-

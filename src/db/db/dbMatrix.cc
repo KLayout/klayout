@@ -38,7 +38,7 @@ inline double mnorm (double x)
 }
 
 template <class C>
-std::string 
+std::string
 matrix_2d<C>::to_string () const
 {
   return tl::sprintf ("(%.12g,%.12g) (%.12g,%.12g)", mnorm (m_m11), mnorm (m_m12), mnorm (m_m21), mnorm (m_m22));
@@ -55,8 +55,7 @@ matrix_2d<C>::mag2 () const
 }
 
 template <class C>
-bool
-matrix_2d<C>::has_rotation () const
+bool matrix_2d<C>::has_rotation () const
 {
   return fabs (m_m11 - 1.0) > 1e-10 || fabs (m_m12) > 1e-10 || fabs (m_m21) > 1e-10 || fabs (m_m22 - 1.0) > 1e-10;
 }
@@ -65,7 +64,7 @@ template <class C>
 double
 matrix_2d<C>::angle () const
 {
-  std::pair <double, double> m = mag2 ();
+  std::pair<double, double> m = mag2 ();
   double u1 = m.first;
   double u2 = is_mirror () ? -m.second : m.second;
   double n11 = m_m11 / u1;
@@ -95,10 +94,9 @@ matrix_2d<C>::rotation (double a)
 }
 
 template <class C>
-bool
-matrix_2d<C>::has_shear () const
+bool matrix_2d<C>::has_shear () const
 {
-  std::pair <double, double> m = mag2 ();
+  std::pair<double, double> m = mag2 ();
   double u1 = m.first;
   double u2 = is_mirror () ? -m.second : m.second;
   double n11 = m_m11 / u1;
@@ -114,7 +112,7 @@ template <class C>
 double
 matrix_2d<C>::shear_angle () const
 {
-  std::pair <double, double> m = mag2 ();
+  std::pair<double, double> m = mag2 ();
   double u1 = m.first;
   double u2 = is_mirror () ? -m.second : m.second;
   double n11 = m_m11 / u1;
@@ -143,31 +141,27 @@ matrix_2d<C>::shear (double a)
 }
 
 template <class C>
-bool
-matrix_2d<C>::is_ortho () const
+bool matrix_2d<C>::is_ortho () const
 {
-  return fabs (m_m11 * m_m12 + m_m21 * m_m22) < 1e-10 && fabs (m_m11 * m_m12) < 1e-10 && fabs (m_m21 * m_m22) < 1e-10; 
+  return fabs (m_m11 * m_m12 + m_m21 * m_m22) < 1e-10 && fabs (m_m11 * m_m12) < 1e-10 && fabs (m_m21 * m_m22) < 1e-10;
 }
 
 template <class C>
-bool
-matrix_2d<C>::is_unity () const
+bool matrix_2d<C>::is_unity () const
 {
   static matrix_2d<C> u;
   return equal (u);
 }
 
 template <class C>
-bool
-matrix_2d<C>::equal (const matrix_2d<C> &d) const
+bool matrix_2d<C>::equal (const matrix_2d<C> &d) const
 {
-  return fabs (m_m11 - d.m_m11) < 1e-10 && fabs (m_m12 - d.m_m12) < 1e-10 && 
+  return fabs (m_m11 - d.m_m11) < 1e-10 && fabs (m_m12 - d.m_m12) < 1e-10 &&
          fabs (m_m21 - d.m_m21) < 1e-10 && fabs (m_m22 - d.m_m22) < 1e-10;
 }
 
 template <class C>
-bool
-matrix_2d<C>::less (const matrix_2d<C> &d) const
+bool matrix_2d<C>::less (const matrix_2d<C> &d) const
 {
   if (fabs (m_m11 - d.m_m11) > 1e-10) {
     return m_m11 < d.m_m11;
@@ -209,60 +203,59 @@ template <class C>
 db::vector<C>
 matrix_3d<C>::trans (const db::point<C> &p, const db::vector<C> &v) const
 {
-  double t[2][2];
+  double t [2][2];
   for (int i = 0; i < 2; ++i) {
     for (int j = 0; j < 2; ++j) {
-      t[i][j] = (m_m[i][j] * m_m[2][1 - j] - m_m[i][1 - j] * m_m[2][j]) * (j == 0 ? p.y() : p.x()) + (m_m[2][2] * m_m[i][j] - m_m[i][2] * m_m[2][j]);
+      t [i][j] = (m_m [i][j] * m_m [2][1 - j] - m_m [i][1 - j] * m_m [2][j]) * (j == 0 ? p.y () : p.x ()) + (m_m [2][2] * m_m [i][j] - m_m [i][2] * m_m [2][j]);
     }
   }
-  return db::vector<C>(v.x() * t[0][0] + v.y() * t[0][1], v.x() * t[1][0] + v.y() * t[1][1]);
+  return db::vector<C> (v.x () * t [0][0] + v.y () * t [0][1], v.x () * t [1][0] + v.y () * t [1][1]);
 }
 
 template <class C>
-bool
-matrix_3d<C>::can_transform (const db::point<C> &p) const
+bool matrix_3d<C>::can_transform (const db::point<C> &p) const
 {
-  double r[3] = { 0, 0, 0 };
+  double r [3] = {0, 0, 0};
   for (int i = 0; i < 3; ++i) {
-    r[i] = m_m[i][0] * p.x() + m_m[i][1] * p.y() + m_m[i][2];
+    r [i] = m_m [i][0] * p.x () + m_m [i][1] * p.y () + m_m [i][2];
   }
 
-  return (r[2] > (std::abs (r[0]) + std::abs (r[1])) * 1e-10);
+  return (r [2] > (std::abs (r [0]) + std::abs (r [1])) * 1e-10);
 }
 
 template <class C>
 db::point<C>
 matrix_3d<C>::trans (const db::point<C> &p) const
 {
-  double r[3] = { 0, 0, 0 };
+  double r [3] = {0, 0, 0};
   for (int i = 0; i < 3; ++i) {
-    r[i] = m_m[i][0] * p.x() + m_m[i][1] * p.y() + m_m[i][2];
+    r [i] = m_m [i][0] * p.x () + m_m [i][1] * p.y () + m_m [i][2];
   }
 
   //  safe approximation to the forbidden area where z <= 0
-  double z = std::max (r [2], (std::abs (r[0]) + std::abs (r[1])) * 1e-10);
-  return db::point<C> (r[0] / z, r[1] / z);
+  double z = std::max (r [2], (std::abs (r [0]) + std::abs (r [1])) * 1e-10);
+  return db::point<C> (r [0] / z, r [1] / z);
 }
 
 template <class C>
 matrix_3d<C>
 matrix_3d<C>::inverted () const
 {
-  double m[3][3];
+  double m [3][3];
   matrix_3d<C> r (1.0);
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      m[i][j] = m_m[i][j];
+      m [i][j] = m_m [i][j];
     }
   }
 
   for (int i = 0; i < 2; ++i) {
     for (int j = 2; j > i; --j) {
-      if (std::abs (m[j][i]) > std::abs (m[j - 1][i])) {
+      if (std::abs (m [j][i]) > std::abs (m [j - 1][i])) {
         for (int k = 0; k < 3; ++k) {
-          std::swap (m[j][k], m[j - 1][k]);
-          std::swap (r.m_m[j][k], r.m_m[j - 1][k]);
+          std::swap (m [j][k], m [j - 1][k]);
+          std::swap (r.m_m [j][k], r.m_m [j - 1][k]);
         }
       }
     }
@@ -270,24 +263,24 @@ matrix_3d<C>::inverted () const
 
   for (int i = 0; i < 3; ++i) {
     for (int j = i + 1; j < 3; ++j) {
-      double f = m[j][i] / m[i][i];
+      double f = m [j][i] / m [i][i];
       for (int k = 0; k < 3; ++k) {
-        m[j][k] -= f * m[i][k];
-        r.m_m[j][k] -= f * r.m_m[i][k];
+        m [j][k] -= f * m [i][k];
+        r.m_m [j][k] -= f * r.m_m [i][k];
       }
     }
-    double f = 1.0 / m[i][i];
+    double f = 1.0 / m [i][i];
     for (int k = 0; k < 3; ++k) {
-      m[i][k] *= f;
-      r.m_m[i][k] *= f;
+      m [i][k] *= f;
+      r.m_m [i][k] *= f;
     }
   }
 
   for (int i = 2; i > 0; --i) {
     for (int j = 0; j < i; ++j) {
-      double f = m[j][i];
+      double f = m [j][i];
       for (int k = 0; k < 3; ++k) {
-        r.m_m[j][k] -= f * r.m_m[i][k];
+        r.m_m [j][k] -= f * r.m_m [i][k];
       }
     }
   }
@@ -299,7 +292,7 @@ template <class C>
 db::vector<C>
 matrix_3d<C>::disp () const
 {
-  return db::vector<C> (m_m[0][2] / m_m[2][2], m_m[1][2] / m_m[2][2]);
+  return db::vector<C> (m_m [0][2] / m_m [2][2], m_m [1][2] / m_m [2][2]);
 }
 
 template <class C>
@@ -308,7 +301,7 @@ matrix_3d<C>::perspective_tilt_x (double z) const
 {
   db::vector<C> d = disp ();
   db::matrix_3d<C> m = db::matrix_3d<C>::disp (-d) * *this;
-  return 180 * atan (z * (m.m ()[2][0] * m.m ()[1][1] - m.m ()[2][1] * m.m ()[1][0]) / (m.m ()[0][0] * m.m ()[1][1] - m.m ()[0][1] * m.m ()[1][0])) / M_PI;
+  return 180 * atan (z * (m.m () [2][0] * m.m () [1][1] - m.m () [2][1] * m.m () [1][0]) / (m.m () [0][0] * m.m () [1][1] - m.m () [0][1] * m.m () [1][0])) / M_PI;
 }
 
 template <class C>
@@ -317,14 +310,13 @@ matrix_3d<C>::perspective_tilt_y (double z) const
 {
   db::vector<C> d = disp ();
   db::matrix_3d<C> m = db::matrix_3d<C>::disp (-d) * *this;
-  return 180 * atan (z * (m.m ()[2][1] * m.m ()[0][0] - m.m ()[2][0] * m.m ()[0][1]) / (m.m ()[0][0] * m.m ()[1][1] - m.m ()[0][1] * m.m ()[1][0])) / M_PI;
+  return 180 * atan (z * (m.m () [2][1] * m.m () [0][0] - m.m () [2][0] * m.m () [0][1]) / (m.m () [0][0] * m.m () [1][1] - m.m () [0][1] * m.m () [1][0])) / M_PI;
 }
 
 template <class C>
-bool
-matrix_3d<C>::has_perspective () const
+bool matrix_3d<C>::has_perspective () const
 {
-  return fabs (m_m[2][0]) + fabs (m_m[2][1]) > 1e-10;
+  return fabs (m_m [2][0]) + fabs (m_m [2][1]) > 1e-10;
 }
 
 template <class C>
@@ -347,40 +339,35 @@ matrix_3d<C>::m2d () const
     m = matrix_3d<C>::perspective (-perspective_tilt_x (1.0), -perspective_tilt_y (1.0), 1.0) * m;
   }
 
-  return matrix_2d<C> (m.m_m[0][0] / m.m_m[2][2], m.m_m[0][1] / m.m_m[2][2], m.m_m[1][0] / m.m_m[2][2], m.m_m[1][1] / m.m_m[2][2]);
+  return matrix_2d<C> (m.m_m [0][0] / m.m_m [2][2], m.m_m [0][1] / m.m_m [2][2], m.m_m [1][0] / m.m_m [2][2], m.m_m [1][1] / m.m_m [2][2]);
 }
 
 template <class C>
 std::string
 matrix_3d<C>::to_string () const
 {
-  return tl::sprintf ("(%.12g,%.12g,%.12g)", mnorm (m_m[0][0]), mnorm (m_m[0][1]), mnorm (m_m[0][2])) + " " 
-       + tl::sprintf ("(%.12g,%.12g,%.12g)", mnorm (m_m[1][0]), mnorm (m_m[1][1]), mnorm (m_m[1][2])) + " "
-       + tl::sprintf ("(%.12g,%.12g,%.12g)", mnorm (m_m[2][0]), mnorm (m_m[2][1]), mnorm (m_m[2][2]));
+  return tl::sprintf ("(%.12g,%.12g,%.12g)", mnorm (m_m [0][0]), mnorm (m_m [0][1]), mnorm (m_m [0][2])) + " " + tl::sprintf ("(%.12g,%.12g,%.12g)", mnorm (m_m [1][0]), mnorm (m_m [1][1]), mnorm (m_m [1][2])) + " " + tl::sprintf ("(%.12g,%.12g,%.12g)", mnorm (m_m [2][0]), mnorm (m_m [2][1]), mnorm (m_m [2][2]));
 }
 
 template <class C>
-bool
-matrix_3d<C>::is_ortho () const
+bool matrix_3d<C>::is_ortho () const
 {
   return ! has_perspective () && m2d ().is_ortho ();
 }
 
 template <class C>
-bool
-matrix_3d<C>::is_unity () const
+bool matrix_3d<C>::is_unity () const
 {
   static matrix_3d<C> u;
   return equal (u);
 }
 
 template <class C>
-bool
-matrix_3d<C>::equal (const matrix_3d<C> &d) const
+bool matrix_3d<C>::equal (const matrix_3d<C> &d) const
 {
   for (unsigned int i = 0; i < 3; ++i) {
     for (unsigned int j = 0; j < 3; ++j) {
-      if (fabs (m_m[i][j] - d.m_m[i][j]) > 1e-10) {
+      if (fabs (m_m [i][j] - d.m_m [i][j]) > 1e-10) {
         return false;
       }
     }
@@ -389,13 +376,12 @@ matrix_3d<C>::equal (const matrix_3d<C> &d) const
 }
 
 template <class C>
-bool
-matrix_3d<C>::less (const matrix_3d<C> &d) const
+bool matrix_3d<C>::less (const matrix_3d<C> &d) const
 {
   for (unsigned int i = 0; i < 3; ++i) {
     for (unsigned int j = 0; j < 3; ++j) {
-      if (fabs (m_m[i][j] - d.m_m[i][j]) > 1e-10) {
-        return m_m[i][j] < d.m_m[i][j];
+      if (fabs (m_m [i][j] - d.m_m [i][j]) > 1e-10) {
+        return m_m [i][j] < d.m_m [i][j];
       }
     }
   }
@@ -410,11 +396,11 @@ template class matrix_3d<db::DCoord>;
 /**
  *  @brief Fits a vector set to another using a linear transformation that is a linear combination of two: M = a*A + b*B
  *
- *  It returns the best-fit parameters a and b. 
+ *  It returns the best-fit parameters a and b.
  *
  *  @param am The matrix A
  *  @param bm The matrix B
- *  @param p The initial vector set 
+ *  @param p The initial vector set
  *  @param q The vector set to fit M*p[i] to
  */
 static bool
@@ -424,15 +410,14 @@ fit_point_set_with_linear_combination (double &a, double &b, const Matrix2d &am,
 
   for (size_t i = 0; i < p.size (); ++i) {
 
-    db::DVector ap = am * p[i];
-    db::DVector bp = bm * p[i];
+    db::DVector ap = am * p [i];
+    db::DVector bp = bm * p [i];
 
     maa += ap.sq_double_length ();
     mbaab += db::sprod (bp, ap);
     mbb += bp.sq_double_length ();
     ca += db::sprod (q [i], ap);
     cb += db::sprod (q [i], bp);
-
   }
 
   Matrix2d m (maa, mbaab, mbaab, mbb);
@@ -445,7 +430,6 @@ fit_point_set_with_linear_combination (double &a, double &b, const Matrix2d &am,
     a = r.x ();
     b = r.y ();
     return true;
-
   }
 }
 
@@ -453,7 +437,7 @@ fit_point_set_with_linear_combination (double &a, double &b, const Matrix2d &am,
  *  @brief Computes the cost value for a given matrix (sum over the square distances)
  *
  *  @param m The matrix
- *  @param p The initial vector set 
+ *  @param p The initial vector set
  *  @param q The vector set to fit M*p[i] to
  */
 static double
@@ -461,13 +445,12 @@ compute_distance (const Matrix2d &m, const std::vector<db::DVector> &q, const st
 {
   double d = 0.0;
   for (size_t i = 0; i < p.size (); ++i) {
-    d += (q[i] - m * p[i]).sq_double_length ();
+    d += (q [i] - m * p [i]).sq_double_length ();
   }
   return d;
 }
 
-void 
-adjust_matrix (Matrix2d &matrix, db::DVector &disp, const std::vector <db::DPoint> &landmarks_before, const std::vector <db::DPoint> &landmarks_after, MatrixAdjustFlags::Flags flags, int fixed_point)
+void adjust_matrix (Matrix2d &matrix, db::DVector &disp, const std::vector<db::DPoint> &landmarks_before, const std::vector<db::DPoint> &landmarks_after, MatrixAdjustFlags::Flags flags, int fixed_point)
 {
   tl_assert (landmarks_before.size () == landmarks_after.size ());
 
@@ -527,8 +510,8 @@ adjust_matrix (Matrix2d &matrix, db::DVector &disp, const std::vector <db::DPoin
     q.push_back (*qq - dq);
   }
 
-  //  In the special case of RotationMirror and exactly 3 points with a fixed point adjust the 
-  //  other so they form normal vectors to the fixed point. In that case, the intention is very likely to 
+  //  In the special case of RotationMirror and exactly 3 points with a fixed point adjust the
+  //  other so they form normal vectors to the fixed point. In that case, the intention is very likely to
   //  define two axes with their length being not important.
   if (flags == MatrixAdjustFlags::RotationMirror && landmarks_after.size () == 3 && fixed_point >= 0 && fixed_point < 3) {
     for (int i = 0; i < 3; ++i) {
@@ -572,7 +555,6 @@ adjust_matrix (Matrix2d &matrix, db::DVector &disp, const std::vector <db::DPoin
     } else {
       m = qm * pm.inverted ();
     }
-
   }
 
   if (flags == MatrixAdjustFlags::Displacement) {
@@ -591,7 +573,7 @@ adjust_matrix (Matrix2d &matrix, db::DVector &disp, const std::vector <db::DPoin
 
   } else if (flags == MatrixAdjustFlags::RotationMirror || flags == MatrixAdjustFlags::MagnificationMirror) {
 
-    //  Same as before but perform two tries (with and without mirror) and don't drop the magnification part 
+    //  Same as before but perform two tries (with and without mirror) and don't drop the magnification part
     //  if magnification adjustment is requested.
 
     Matrix2d am1 (1.0, 0.0, 0.0, 1.0), bm1 (0.0, -1.0, 1.0, 0.0);
@@ -617,7 +599,6 @@ adjust_matrix (Matrix2d &matrix, db::DVector &disp, const std::vector <db::DPoin
         m = am2 * (a2 * n) + bm2 * (b2 * n);
       }
     }
-
   }
 
   //  compute the final transformation
@@ -625,8 +606,7 @@ adjust_matrix (Matrix2d &matrix, db::DVector &disp, const std::vector <db::DPoin
   matrix = m * matrix;
 }
 
-void 
-adjust_matrix (Matrix3d &matrix, const std::vector <db::DPoint> &landmarks_before, const std::vector <db::DPoint> &landmarks_after, MatrixAdjustFlags::Flags flags, int fixed_point)
+void adjust_matrix (Matrix3d &matrix, const std::vector<db::DPoint> &landmarks_before, const std::vector<db::DPoint> &landmarks_after, MatrixAdjustFlags::Flags flags, int fixed_point)
 {
   tl_assert (landmarks_before.size () == landmarks_after.size ());
 
@@ -667,7 +647,6 @@ adjust_matrix (Matrix3d &matrix, const std::vector <db::DPoint> &landmarks_befor
       adjust_matrix (m2d, d2d, landmarks_before, landmarks_after, flags, fixed_point);
 
       matrix = Matrix3d::disp (d2d) * Matrix3d (m2d);
-
     }
 
   } else {
@@ -702,294 +681,289 @@ adjust_matrix (Matrix3d &matrix, const std::vector <db::DPoint> &landmarks_befor
     //  Perform the fit of m11, m12, m13, m21, m22, m23, m31, m32.
     //  We needs to solve a set of 8 linear equations whose coefficients we collect in l and whose right side we collect in r.
 
-    double l[8][8];
-    double r[8];
+    double l [8][8];
+    double r [8];
 
     for (int i = 0; i < 8; ++i) {
-      r[i] = 0.0;
+      r [i] = 0.0;
       for (int j = 0; j < 8; ++j) {
-        l[i][j] = 0.0;
+        l [i][j] = 0.0;
       }
     }
 
     for (size_t n = 0; n < landmarks_after.size (); ++n) {
 
-      l[0][0] += p[n].x() * p[n].x();
-      l[0][1] += p[n].x() * p[n].y();
-      l[0][2] += p[n].x();
-      l[0][6] -= q[n].x() * p[n].x() * p[n].x();
-      l[0][7] -= q[n].x() * p[n].x() * p[n].y();
-      r[0] += q[n].x() * p[n].x();
+      l [0][0] += p [n].x () * p [n].x ();
+      l [0][1] += p [n].x () * p [n].y ();
+      l [0][2] += p [n].x ();
+      l [0][6] -= q [n].x () * p [n].x () * p [n].x ();
+      l [0][7] -= q [n].x () * p [n].x () * p [n].y ();
+      r [0] += q [n].x () * p [n].x ();
 
-      l[1][0] += p[n].y() * p[n].x();
-      l[1][1] += p[n].y() * p[n].y();
-      l[1][2] += p[n].y();
-      l[1][6] -= q[n].x() * p[n].y() * p[n].x();
-      l[1][7] -= q[n].x() * p[n].y() * p[n].y();
-      r[1] += q[n].x() * p[n].y();
+      l [1][0] += p [n].y () * p [n].x ();
+      l [1][1] += p [n].y () * p [n].y ();
+      l [1][2] += p [n].y ();
+      l [1][6] -= q [n].x () * p [n].y () * p [n].x ();
+      l [1][7] -= q [n].x () * p [n].y () * p [n].y ();
+      r [1] += q [n].x () * p [n].y ();
 
-      l[2][0] += p[n].x();
-      l[2][1] += p[n].y();
-      l[2][2] += 1.0;
-      l[2][6] -= q[n].x() * p[n].x();
-      l[2][7] -= q[n].x() * p[n].y();
-      r[2] += q[n].x();
+      l [2][0] += p [n].x ();
+      l [2][1] += p [n].y ();
+      l [2][2] += 1.0;
+      l [2][6] -= q [n].x () * p [n].x ();
+      l [2][7] -= q [n].x () * p [n].y ();
+      r [2] += q [n].x ();
 
-      l[3][3] += p[n].x() * p[n].x();
-      l[3][4] += p[n].x() * p[n].y();
-      l[3][5] += p[n].x();
-      l[3][6] -= q[n].y() * p[n].x() * p[n].x();
-      l[3][7] -= q[n].y() * p[n].x() * p[n].y();
-      r[3] += q[n].y() * p[n].x();
+      l [3][3] += p [n].x () * p [n].x ();
+      l [3][4] += p [n].x () * p [n].y ();
+      l [3][5] += p [n].x ();
+      l [3][6] -= q [n].y () * p [n].x () * p [n].x ();
+      l [3][7] -= q [n].y () * p [n].x () * p [n].y ();
+      r [3] += q [n].y () * p [n].x ();
 
-      l[4][3] += p[n].y() * p[n].x();
-      l[4][4] += p[n].y() * p[n].y();
-      l[4][5] += p[n].y();
-      l[4][6] -= q[n].y() * p[n].y() * p[n].x();
-      l[4][7] -= q[n].y() * p[n].y() * p[n].y();
-      r[4] += q[n].y() * p[n].y();
+      l [4][3] += p [n].y () * p [n].x ();
+      l [4][4] += p [n].y () * p [n].y ();
+      l [4][5] += p [n].y ();
+      l [4][6] -= q [n].y () * p [n].y () * p [n].x ();
+      l [4][7] -= q [n].y () * p [n].y () * p [n].y ();
+      r [4] += q [n].y () * p [n].y ();
 
-      l[5][3] += p[n].x();
-      l[5][4] += p[n].y();
-      l[5][5] += 1.0;
-      l[5][6] -= q[n].y() * p[n].x();
-      l[5][7] -= q[n].y() * p[n].y();
-      r[5] += q[n].y();
+      l [5][3] += p [n].x ();
+      l [5][4] += p [n].y ();
+      l [5][5] += 1.0;
+      l [5][6] -= q [n].y () * p [n].x ();
+      l [5][7] -= q [n].y () * p [n].y ();
+      r [5] += q [n].y ();
 
-      l[6][0] += q[n].x() * p[n].x() * p[n].x();
-      l[6][1] += q[n].x() * p[n].x() * p[n].y();
-      l[6][2] += q[n].x() * p[n].x();
-      l[6][3] += q[n].y() * p[n].x() * p[n].x();
-      l[6][4] += q[n].y() * p[n].x() * p[n].y();
-      l[6][5] += q[n].y() * p[n].x();
-      l[6][6] -= q[n].sq_double_length () * p[n].x() * p[n].x();
-      l[6][7] -= q[n].sq_double_length () * p[n].x() * p[n].y();
-      r[6] += q[n].sq_double_length () * p[n].x();
+      l [6][0] += q [n].x () * p [n].x () * p [n].x ();
+      l [6][1] += q [n].x () * p [n].x () * p [n].y ();
+      l [6][2] += q [n].x () * p [n].x ();
+      l [6][3] += q [n].y () * p [n].x () * p [n].x ();
+      l [6][4] += q [n].y () * p [n].x () * p [n].y ();
+      l [6][5] += q [n].y () * p [n].x ();
+      l [6][6] -= q [n].sq_double_length () * p [n].x () * p [n].x ();
+      l [6][7] -= q [n].sq_double_length () * p [n].x () * p [n].y ();
+      r [6] += q [n].sq_double_length () * p [n].x ();
 
-      l[7][0] += q[n].x() * p[n].y() * p[n].x();
-      l[7][1] += q[n].x() * p[n].y() * p[n].y();
-      l[7][2] += q[n].x() * p[n].y();
-      l[7][3] += q[n].y() * p[n].y() * p[n].x();
-      l[7][4] += q[n].y() * p[n].y() * p[n].y();
-      l[7][5] += q[n].y() * p[n].y();
-      l[7][6] -= q[n].sq_double_length () * p[n].y() * p[n].x();
-      l[7][7] -= q[n].sq_double_length () * p[n].y() * p[n].y();
-      r[7] += q[n].sq_double_length () * p[n].y();
-
+      l [7][0] += q [n].x () * p [n].y () * p [n].x ();
+      l [7][1] += q [n].x () * p [n].y () * p [n].y ();
+      l [7][2] += q [n].x () * p [n].y ();
+      l [7][3] += q [n].y () * p [n].y () * p [n].x ();
+      l [7][4] += q [n].y () * p [n].y () * p [n].y ();
+      l [7][5] += q [n].y () * p [n].y ();
+      l [7][6] -= q [n].sq_double_length () * p [n].y () * p [n].x ();
+      l [7][7] -= q [n].sq_double_length () * p [n].y () * p [n].y ();
+      r [7] += q [n].sq_double_length () * p [n].y ();
     }
 
     //  Now solve the equation system
 
     for (int i = 0; i < 7; ++i) {
       for (int j = 7; j > i; --j) {
-        if (std::abs (l[j][i]) > std::abs (l[j - 1][i])) {
+        if (std::abs (l [j][i]) > std::abs (l [j - 1][i])) {
           for (int k = 0; k < 8; ++k) {
-            std::swap (l[j][k], l[j - 1][k]);
+            std::swap (l [j][k], l [j - 1][k]);
           }
-          std::swap (r[j], r[j - 1]);
+          std::swap (r [j], r [j - 1]);
         }
       }
     }
 
     for (int i = 0; i < 8; ++i) {
       for (int j = i + 1; j < 8; ++j) {
-        double f = l[j][i] / l[i][i];
+        double f = l [j][i] / l [i][i];
         for (int k = 0; k < 8; ++k) {
-          l[j][k] -= f * l[i][k];
+          l [j][k] -= f * l [i][k];
         }
-        r[j] -= f * r[i];
+        r [j] -= f * r [i];
       }
-      double f = 1.0 / l[i][i];
+      double f = 1.0 / l [i][i];
       for (int k = 0; k < 8; ++k) {
-        l[i][k] *= f;
+        l [i][k] *= f;
       }
-      r[i] *= f;
+      r [i] *= f;
     }
 
     for (int i = 7; i > 0; --i) {
       for (int j = 0; j < i; ++j) {
-        r[j] -= l[j][i] * r[i];
+        r [j] -= l [j][i] * r [i];
       }
     }
 
     //  compute the final transformation
-    matrix = Matrix3d::disp (dq - db::DPoint ()) * Matrix3d (r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], 1.0) * Matrix3d::disp (db::DPoint () - dp) * matrix;
-
+    matrix = Matrix3d::disp (dq - db::DPoint ()) * Matrix3d (r [0], r [1], r [2], r [3], r [4], r [5], r [6], r [7], 1.0) * Matrix3d::disp (db::DPoint () - dp) * matrix;
   }
-
 }
 
 }
 
 namespace tl
 {
-  template<class C> bool test_extractor_impl_matrix2d (tl::Extractor &ex, db::matrix_2d<C> &m)
-  {
-    double m11 = 0.0, m12 = 0.0, m21 = 0.0, m22 = 0.0;
+template <class C> bool test_extractor_impl_matrix2d (tl::Extractor &ex, db::matrix_2d<C> &m)
+{
+  double m11 = 0.0, m12 = 0.0, m21 = 0.0, m22 = 0.0;
 
-    if (! ex.test ("(")) {
-      return false;
-    }
-    if (! ex.try_read (m11)) {
-      return false;
-    }
-    if (! ex.test (",")) {
-      return false;
-    }
-    if (! ex.try_read (m12)) {
-      return false;
-    }
-    if (! ex.test (")")) {
-      return false;
-    }
-
-    if (! ex.test ("(")) {
-      return false;
-    }
-    if (! ex.try_read (m21)) {
-      return false;
-    }
-    if (! ex.test (",")) {
-      return false;
-    }
-    if (! ex.try_read (m22)) {
-      return false;
-    }
-    if (! ex.test (")")) {
-      return false;
-    }
-
-    m = db::matrix_2d<C> (m11, m12, m21, m22);
-    return true;
+  if (! ex.test ("(")) {
+    return false;
+  }
+  if (! ex.try_read (m11)) {
+    return false;
+  }
+  if (! ex.test (",")) {
+    return false;
+  }
+  if (! ex.try_read (m12)) {
+    return false;
+  }
+  if (! ex.test (")")) {
+    return false;
   }
 
-  template<class C> void extractor_impl_matrix2d (tl::Extractor &ex, db::matrix_2d<C> &m)
-  {
-    if (! test_extractor_impl (ex, m)) {
-      ex.error (tl::to_string (tr ("Expected a 2d matrix specification")));
-    }
+  if (! ex.test ("(")) {
+    return false;
+  }
+  if (! ex.try_read (m21)) {
+    return false;
+  }
+  if (! ex.test (",")) {
+    return false;
+  }
+  if (! ex.try_read (m22)) {
+    return false;
+  }
+  if (! ex.test (")")) {
+    return false;
   }
 
-  template<class C> bool test_extractor_impl_matrix3d (tl::Extractor &ex, db::matrix_3d<C> &m)
-  {
-    double m11 = 0.0, m12 = 0.0, m13 = 0.0, m21 = 0.0, m22 = 0.0, m23 = 0.0, m31 = 0.0, m32 = 0.0, m33 = 0.0;
+  m = db::matrix_2d<C> (m11, m12, m21, m22);
+  return true;
+}
 
-    if (! ex.test ("(")) {
-      return false;
-    }
-    if (! ex.try_read (m11)) {
-      return false;
-    }
-    if (! ex.test (",")) {
-      return false;
-    }
-    if (! ex.try_read (m12)) {
-      return false;
-    }
-    if (! ex.test (",")) {
-      return false;
-    }
-    if (! ex.try_read (m13)) {
-      return false;
-    }
-    if (! ex.test (")")) {
-      return false;
-    }
-
-    if (! ex.test ("(")) {
-      return false;
-    }
-    if (! ex.try_read (m21)) {
-      return false;
-    }
-    if (! ex.test (",")) {
-      return false;
-    }
-    if (! ex.try_read (m22)) {
-      return false;
-    }
-    if (! ex.test (",")) {
-      return false;
-    }
-    if (! ex.try_read (m23)) {
-      return false;
-    }
-    if (! ex.test (")")) {
-      return false;
-    }
-
-    if (! ex.test ("(")) {
-      return false;
-    }
-    if (! ex.try_read (m31)) {
-      return false;
-    }
-    if (! ex.test (",")) {
-      return false;
-    }
-    if (! ex.try_read (m32)) {
-      return false;
-    }
-    if (! ex.test (",")) {
-      return false;
-    }
-    if (! ex.try_read (m33)) {
-      return false;
-    }
-    if (! ex.test (")")) {
-      return false;
-    }
-
-    m = db::matrix_3d<C> (m11, m12, m13, m21, m22, m23, m31, m32, m33);
-    return true;
-  }
-
-  template<class C> void extractor_impl_matrix3d (tl::Extractor &ex, db::matrix_3d<C> &m)
-  {
-    if (! test_extractor_impl (ex, m)) {
-      ex.error (tl::to_string (tr ("Expected a 3d matrix specification")));
-    }
-  }
-
-  template<> void extractor_impl<db::matrix_2d<db::Coord> > (tl::Extractor &ex, db::matrix_2d<db::Coord> &m)
-  {
-    extractor_impl_matrix2d (ex, m);
-  }
-
-  template<> void extractor_impl<db::matrix_2d<db::DCoord> > (tl::Extractor &ex, db::matrix_2d<db::DCoord> &m)
-  {
-    extractor_impl_matrix2d (ex, m);
-  }
-
-  template<> void extractor_impl<db::matrix_3d<db::Coord> > (tl::Extractor &ex, db::matrix_3d<db::Coord> &m)
-  {
-    extractor_impl_matrix3d (ex, m);
-  }
-
-  template<> void extractor_impl<db::matrix_3d<db::DCoord> > (tl::Extractor &ex, db::matrix_3d<db::DCoord> &m)
-  {
-    extractor_impl_matrix3d (ex, m);
-  }
-
-  template<> bool test_extractor_impl<db::matrix_2d<db::Coord> > (tl::Extractor &ex, db::matrix_2d<db::Coord> &m)
-  {
-    return test_extractor_impl_matrix2d (ex, m);
-  }
-
-  template<> bool test_extractor_impl<db::matrix_2d<db::DCoord> > (tl::Extractor &ex, db::matrix_2d<db::DCoord> &m)
-  {
-    return test_extractor_impl_matrix2d (ex, m);
-  }
-
-  template<> bool test_extractor_impl<db::matrix_3d<db::Coord> > (tl::Extractor &ex, db::matrix_3d<db::Coord> &m)
-  {
-    return test_extractor_impl_matrix3d (ex, m);
-  }
-
-  template<> bool test_extractor_impl<db::matrix_3d<db::DCoord> > (tl::Extractor &ex, db::matrix_3d<db::DCoord> &m)
-  {
-    return test_extractor_impl_matrix3d (ex, m);
+template <class C> void extractor_impl_matrix2d (tl::Extractor &ex, db::matrix_2d<C> &m)
+{
+  if (! test_extractor_impl (ex, m)) {
+    ex.error (tl::to_string (tr ("Expected a 2d matrix specification")));
   }
 }
 
+template <class C> bool test_extractor_impl_matrix3d (tl::Extractor &ex, db::matrix_3d<C> &m)
+{
+  double m11 = 0.0, m12 = 0.0, m13 = 0.0, m21 = 0.0, m22 = 0.0, m23 = 0.0, m31 = 0.0, m32 = 0.0, m33 = 0.0;
 
+  if (! ex.test ("(")) {
+    return false;
+  }
+  if (! ex.try_read (m11)) {
+    return false;
+  }
+  if (! ex.test (",")) {
+    return false;
+  }
+  if (! ex.try_read (m12)) {
+    return false;
+  }
+  if (! ex.test (",")) {
+    return false;
+  }
+  if (! ex.try_read (m13)) {
+    return false;
+  }
+  if (! ex.test (")")) {
+    return false;
+  }
+
+  if (! ex.test ("(")) {
+    return false;
+  }
+  if (! ex.try_read (m21)) {
+    return false;
+  }
+  if (! ex.test (",")) {
+    return false;
+  }
+  if (! ex.try_read (m22)) {
+    return false;
+  }
+  if (! ex.test (",")) {
+    return false;
+  }
+  if (! ex.try_read (m23)) {
+    return false;
+  }
+  if (! ex.test (")")) {
+    return false;
+  }
+
+  if (! ex.test ("(")) {
+    return false;
+  }
+  if (! ex.try_read (m31)) {
+    return false;
+  }
+  if (! ex.test (",")) {
+    return false;
+  }
+  if (! ex.try_read (m32)) {
+    return false;
+  }
+  if (! ex.test (",")) {
+    return false;
+  }
+  if (! ex.try_read (m33)) {
+    return false;
+  }
+  if (! ex.test (")")) {
+    return false;
+  }
+
+  m = db::matrix_3d<C> (m11, m12, m13, m21, m22, m23, m31, m32, m33);
+  return true;
+}
+
+template <class C> void extractor_impl_matrix3d (tl::Extractor &ex, db::matrix_3d<C> &m)
+{
+  if (! test_extractor_impl (ex, m)) {
+    ex.error (tl::to_string (tr ("Expected a 3d matrix specification")));
+  }
+}
+
+template <> void extractor_impl<db::matrix_2d<db::Coord>> (tl::Extractor &ex, db::matrix_2d<db::Coord> &m)
+{
+  extractor_impl_matrix2d (ex, m);
+}
+
+template <> void extractor_impl<db::matrix_2d<db::DCoord>> (tl::Extractor &ex, db::matrix_2d<db::DCoord> &m)
+{
+  extractor_impl_matrix2d (ex, m);
+}
+
+template <> void extractor_impl<db::matrix_3d<db::Coord>> (tl::Extractor &ex, db::matrix_3d<db::Coord> &m)
+{
+  extractor_impl_matrix3d (ex, m);
+}
+
+template <> void extractor_impl<db::matrix_3d<db::DCoord>> (tl::Extractor &ex, db::matrix_3d<db::DCoord> &m)
+{
+  extractor_impl_matrix3d (ex, m);
+}
+
+template <> bool test_extractor_impl<db::matrix_2d<db::Coord>> (tl::Extractor &ex, db::matrix_2d<db::Coord> &m)
+{
+  return test_extractor_impl_matrix2d (ex, m);
+}
+
+template <> bool test_extractor_impl<db::matrix_2d<db::DCoord>> (tl::Extractor &ex, db::matrix_2d<db::DCoord> &m)
+{
+  return test_extractor_impl_matrix2d (ex, m);
+}
+
+template <> bool test_extractor_impl<db::matrix_3d<db::Coord>> (tl::Extractor &ex, db::matrix_3d<db::Coord> &m)
+{
+  return test_extractor_impl_matrix3d (ex, m);
+}
+
+template <> bool test_extractor_impl<db::matrix_3d<db::DCoord>> (tl::Extractor &ex, db::matrix_3d<db::DCoord> &m)
+{
+  return test_extractor_impl_matrix3d (ex, m);
+}
+}

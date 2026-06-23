@@ -35,11 +35,11 @@
 #include "layFixedFont.h"
 #include "layEditorOptionsPage.h"
 #if defined(HAVE_QT)
-#  include "layProperties.h"
+#include "layProperties.h"
 #endif
 #include "antService.h"
 #if defined(HAVE_QT)
-#  include "antPropertiesPage.h"
+#include "antPropertiesPage.h"
 #endif
 #include "antConfig.h"
 
@@ -53,7 +53,7 @@ double ruler_arrow_width = 8.0;
 // -------------------------------------------------------------
 //  Convert buttons to an angle constraint
 
-static lay::angle_constraint_type 
+static lay::angle_constraint_type
 ac_from_buttons (unsigned int buttons)
 {
   if ((buttons & lay::ShiftButton) != 0) {
@@ -102,7 +102,6 @@ tick_spacings (double d, double min_d, int &minor_ticks, double &ticks)
     }
 
     ticks = exp (log10 * l0) * 10.0;
-
   }
 }
 
@@ -122,19 +121,18 @@ tick_spacings (double d, double min_d, int &minor_ticks, double &ticks)
  *  @param first_segment True, if we're drawing the first segment
  *  @param last_segment True, if we're drawing the last segment
  */
-void 
-draw_ruler (const db::DPoint &q1,
-            const db::DPoint &q2,
-            double length_u,
-            double min_spc_u,
-            bool sel,
-            bool right,
-            ant::Object::style_type style,
-            lay::CanvasPlane *bitmap,
-            lay::Renderer &renderer,
-            bool first_segment,
-            bool last_segment,
-            bool no_line = false)
+void draw_ruler (const db::DPoint &q1,
+                 const db::DPoint &q2,
+                 double length_u,
+                 double min_spc_u,
+                 bool sel,
+                 bool right,
+                 ant::Object::style_type style,
+                 lay::CanvasPlane *bitmap,
+                 lay::Renderer &renderer,
+                 bool first_segment,
+                 bool last_segment,
+                 bool no_line = false)
 {
   double arrow_width = ruler_arrow_width / renderer.resolution ();
   double arrow_length = 1.5 * arrow_width;
@@ -143,12 +141,12 @@ draw_ruler (const db::DPoint &q1,
   if (length_u < 1e-5 /*micron*/ && style != ant::Object::STY_cross_both && style != ant::Object::STY_cross_end && style != ant::Object::STY_cross_start) {
 
     if (sel) {
-      
+
       db::DBox b (q1 - db::DVector (sel_width * 0.5, sel_width * 0.5),
                   q2 + db::DVector (sel_width * 0.5, sel_width * 0.5));
 
       renderer.draw (b, bitmap, bitmap, 0, 0);
-      
+
     } else {
       renderer.draw (db::DEdge (q1, q1), 0, bitmap, 0, 0);
     }
@@ -160,13 +158,13 @@ draw_ruler (const db::DPoint &q1,
 
     double ticks = -1.0;
     int minor_ticks = -1;
-    
+
     if (tick_length > 0) {
       tick_spacings (length_u, min_spc_u, minor_ticks, ticks);
     }
 
     //  normal and unit vector
-    
+
     double len = q1.double_distance (q2);
     if (! no_line && len < double (arrow_length) * 2.4) {
       if ((style == ant::Object::STY_arrow_end || style == ant::Object::STY_arrow_start)) {
@@ -177,14 +175,14 @@ draw_ruler (const db::DPoint &q1,
         arrow_width = arrow_length * 2.0 / 3.0;
       }
     }
-    
+
     db::DVector qq (q2.y () - q1.y (), q1.x () - q2.x ());
     if (len > 1e-10) {
       qq *= 1.0 / len;
     } else {
       qq = db::DVector (0.0, 1.0);
     }
-    if (!right) {
+    if (! right) {
       qq = -qq;
     }
 
@@ -194,9 +192,9 @@ draw_ruler (const db::DPoint &q1,
     } else {
       qu = db::DVector (1.0, 0.0);
     }
-      
+
     //  produce line in selected and unselected mode
-      
+
     if (! no_line && style != ant::Object::STY_none) {
 
       if (sel) {
@@ -220,7 +218,7 @@ draw_ruler (const db::DPoint &q1,
         }
 
         db::DPolygon p;
-        db::DPoint points[] = {
+        db::DPoint points [] = {
           db::DPoint (q1 + dq1 + qw),
           db::DPoint (q2 + dq2 + qw),
           db::DPoint (q2 + dq2 - qw),
@@ -232,9 +230,7 @@ draw_ruler (const db::DPoint &q1,
       } else {
 
         renderer.draw (db::DEdge (q1, q2), 0, bitmap, 0, 0);
-
       }
-
     }
 
     if (! last_segment) {
@@ -244,7 +240,7 @@ draw_ruler (const db::DPoint &q1,
     } else if (style == ant::Object::STY_arrow_end || style == ant::Object::STY_arrow_both) {
 
       db::DPolygon p;
-      db::DPoint points[] = {
+      db::DPoint points [] = {
         db::DPoint (q2),
         db::DPoint (q2 + qq * double (arrow_width * 0.5) - qu * double (arrow_length)),
         db::DPoint (q2 - qq * double (arrow_width * 0.5) - qu * double (arrow_length)),
@@ -255,7 +251,7 @@ draw_ruler (const db::DPoint &q1,
     } else if (style == ant::Object::STY_cross_end || style == ant::Object::STY_cross_both) {
 
       db::DPolygon p;
-      db::DPoint points[] = {
+      db::DPoint points [] = {
         db::DPoint (q2),
         db::DPoint (q2 + qq * double (arrow_width)),
         db::DPoint (q2 - qq * double (arrow_width)),
@@ -265,9 +261,8 @@ draw_ruler (const db::DPoint &q1,
       };
       p.assign_hull (points, points + sizeof (points) / sizeof (points [0]), false /*don't compress*/);
       renderer.draw (p, bitmap, bitmap, 0, 0);
-
     }
-    
+
     if (! first_segment) {
 
       //  no start indicator if not first segment
@@ -275,18 +270,17 @@ draw_ruler (const db::DPoint &q1,
     } else if (style == ant::Object::STY_arrow_start || style == ant::Object::STY_arrow_both) {
 
       db::DPolygon p;
-      db::DPoint points[] = {
+      db::DPoint points [] = {
         db::DPoint (q1),
         db::DPoint (q1 + qq * double (arrow_width * 0.5) + qu * double (arrow_length)),
-        db::DPoint (q1 - qq * double (arrow_width * 0.5) + qu * double (arrow_length))
-      };
+        db::DPoint (q1 - qq * double (arrow_width * 0.5) + qu * double (arrow_length))};
       p.assign_hull (points, points + sizeof (points) / sizeof (points [0]));
       renderer.draw (p, bitmap, bitmap, 0, 0);
 
     } else if (style == ant::Object::STY_cross_start || style == ant::Object::STY_cross_both) {
 
       db::DPolygon p;
-      db::DPoint points[] = {
+      db::DPoint points [] = {
         db::DPoint (q1),
         db::DPoint (q1 + qq * double (arrow_width)),
         db::DPoint (q1 - qq * double (arrow_width)),
@@ -296,20 +290,19 @@ draw_ruler (const db::DPoint &q1,
       };
       p.assign_hull (points, points + sizeof (points) / sizeof (points [0]), false /*don't compress*/);
       renderer.draw (p, bitmap, bitmap, 0, 0);
-
     }
 
     //  create three tick vectors in tv_text, tv_short and tv_long
 
     double tf = tick_length;
     db::DVector tv_short = qq * tf * 0.5;
-    db::DVector tv_long  = qq * tf;
+    db::DVector tv_long = qq * tf;
 
     if (tick_length > 0) {
       renderer.draw (db::DEdge (q1, q1 + tv_long), 0, bitmap, 0, 0);
       renderer.draw (db::DEdge (q2, q2 + tv_long), 0, bitmap, 0, 0);
     }
-    
+
     if (minor_ticks > 0 && ticks > 0.0) {
 
       db::DVector q = q2 - q1;
@@ -327,11 +320,8 @@ draw_ruler (const db::DPoint &q1,
         } else {
           renderer.draw (db::DEdge (qq, qq + tv_short), 0, bitmap, 0, 0);
         }
-
       }
-
     }
-
   }
 }
 
@@ -350,18 +340,17 @@ draw_ruler (const db::DPoint &q1,
  *  @param bitmap The bitmap to draw the ruler on
  *  @param renderer The renderer object
  */
-void
-draw_text (const db::DPoint &q1,
-           const db::DPoint &q2,
-           double length_u,
-           const std::string &label,
-           bool right,
-           ant::Object::style_type style,
-           ant::Object::position_type pos,
-           ant::Object::alignment_type halign,
-           ant::Object::alignment_type valign,
-           lay::CanvasPlane *bitmap,
-           lay::Renderer &renderer)
+void draw_text (const db::DPoint &q1,
+                const db::DPoint &q2,
+                double length_u,
+                const std::string &label,
+                bool right,
+                ant::Object::style_type style,
+                ant::Object::position_type pos,
+                ant::Object::alignment_type halign,
+                ant::Object::alignment_type valign,
+                lay::CanvasPlane *bitmap,
+                lay::Renderer &renderer)
 {
   if (label.empty ()) {
     return;
@@ -378,11 +367,11 @@ draw_text (const db::DPoint &q1,
   if (length_u < 1e-5 /*micron*/ && style != ant::Object::STY_cross_both && style != ant::Object::STY_cross_end && style != ant::Object::STY_cross_start) {
 
     renderer.draw (db::DBox (q1, q1),
-                     label,
-                     db::DefaultFont,
-                     db::HAlignLeft,
-                     db::VAlignBottom,
-                     db::DFTrans (db::DFTrans::r0), 0, 0, 0, bitmap);
+                   label,
+                   db::DefaultFont,
+                   db::HAlignLeft,
+                   db::VAlignBottom,
+                   db::DFTrans (db::DFTrans::r0), 0, 0, 0, bitmap);
 
   } else {
 
@@ -406,7 +395,7 @@ draw_text (const db::DPoint &q1,
     } else {
       qq = db::DVector (0.0, 1.0);
     }
-    if (!right) {
+    if (! right) {
       qq = -qq;
     }
 
@@ -480,7 +469,7 @@ draw_text (const db::DPoint &q1,
       tv_text.set_x (0);
     } else if (text_halign == db::HAlignRight) {
       tv_text.set_x (std::min (tv_text.x (), 0.0));
-    } else if (text_halign == db::HAlignLeft){
+    } else if (text_halign == db::HAlignLeft) {
       tv_text.set_x (std::max (tv_text.x (), 0.0));
     }
 
@@ -488,7 +477,7 @@ draw_text (const db::DPoint &q1,
       tv_text.set_y (0);
     } else if (text_valign == db::VAlignTop) {
       tv_text.set_y (std::min (tv_text.y (), 0.0));
-    } else if (text_valign == db::VAlignBottom){
+    } else if (text_valign == db::VAlignBottom) {
       tv_text.set_y (std::max (tv_text.y (), 0.0));
     }
 
@@ -505,7 +494,6 @@ draw_text (const db::DPoint &q1,
                    text_halign,
                    text_valign,
                    db::DFTrans (db::DFTrans::r0), 0, 0, 0, bitmap);
-
   }
 }
 
@@ -521,15 +509,14 @@ draw_text (const db::DPoint &q1,
  *  @param start_angle The starting angle (in radians)
  *  @param stop_angle The stop angle (in radians)
  */
-void
-draw_ellipse (const db::DPoint &q1,
-              const db::DPoint &q2,
-              double length_u,
-              bool sel,
-              lay::CanvasPlane *bitmap,
-              lay::Renderer &renderer,
-              double start_angle = 0.0,
-              double stop_angle = 2.0 * M_PI)
+void draw_ellipse (const db::DPoint &q1,
+                   const db::DPoint &q2,
+                   double length_u,
+                   bool sel,
+                   lay::CanvasPlane *bitmap,
+                   lay::Renderer &renderer,
+                   double start_angle = 0.0,
+                   double stop_angle = 2.0 * M_PI)
 {
   double sel_width = 2 / renderer.resolution ();
 
@@ -573,29 +560,25 @@ draw_ellipse (const db::DPoint &q1,
       for (size_t i = 0; i + 1 < pts.size (); ++i) {
         renderer.draw (db::DEdge (pts [i], pts [i + 1]), 0, bitmap, 0, 0);
       }
-
     }
-
   }
-
 }
 
-void
-draw_ruler_segment (const ant::Object &ruler, size_t index, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
+void draw_ruler_segment (const ant::Object &ruler, size_t index, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
 {
   bool last_segment = (index == ruler.segments () - 1 || index == std::numeric_limits<size_t>::max ());
   bool first_segment = (index == 0 || index == std::numeric_limits<size_t>::max ());
 
   db::DPoint p1 = ruler.seg_p1 (index), p2 = ruler.seg_p2 (index);
 
-  //  round the starting point, shift both, and round the end point 
-  std::pair <db::DPoint, db::DPoint> v = lay::snap (trans * p1, trans * p2);
+  //  round the starting point, shift both, and round the end point
+  std::pair<db::DPoint, db::DPoint> v = lay::snap (trans * p1, trans * p2);
   db::DPoint q1 = v.first;
   db::DPoint q2 = v.second;
-  
+
   bool xy_swapped = ((trans.rot () % 2) != 0);
   double lu = p1.double_distance (p2);
-  int min_tick_spc = int (0.5 + 20 / renderer.resolution ());  //  min tick spacing in canvas units
+  int min_tick_spc = int (0.5 + 20 / renderer.resolution ()); //  min tick spacing in canvas units
   double mu = double (min_tick_spc) / trans.ctrans (1.0);
 
   if (ruler.outline () == Object::OL_diag) {
@@ -603,51 +586,48 @@ draw_ruler_segment (const ant::Object &ruler, size_t index, const db::DCplxTrans
     draw_text (q1, q2, lu, ruler.text (index), q2.x () < q1.x (), ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
   }
 
-  if ((!xy_swapped && (ruler.outline () == Object::OL_xy || ruler.outline () == Object::OL_diag_xy)) ||
-      ( xy_swapped && (ruler.outline () == Object::OL_yx || ruler.outline () == Object::OL_diag_yx))) {
+  if ((! xy_swapped && (ruler.outline () == Object::OL_xy || ruler.outline () == Object::OL_diag_xy)) ||
+      (xy_swapped && (ruler.outline () == Object::OL_yx || ruler.outline () == Object::OL_diag_yx))) {
 
     bool r = (q2.x () > q1.x ()) ^ (q2.y () < q1.y ());
 
     if (ruler.outline () == Object::OL_diag_xy || ruler.outline () == Object::OL_diag_yx) {
-      draw_ruler (q1, q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer, first_segment, last_segment);
-      draw_text (q1, q2, lu, ruler.text (index), !r, ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+      draw_ruler (q1, q2, lu, mu, sel, ! r, ruler.style (), bitmap, renderer, first_segment, last_segment);
+      draw_text (q1, q2, lu, ruler.text (index), ! r, ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
     }
     draw_ruler (q1, db::DPoint (q2.x (), q1.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer, false, false);
     draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
     draw_ruler (db::DPoint (q2.x (), q1.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer, false, false);
     draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
-
   }
 
-  if ((!xy_swapped && (ruler.outline () == Object::OL_yx || ruler.outline () == Object::OL_diag_yx)) ||
-      ( xy_swapped && (ruler.outline () == Object::OL_xy || ruler.outline () == Object::OL_diag_xy))) {
+  if ((! xy_swapped && (ruler.outline () == Object::OL_yx || ruler.outline () == Object::OL_diag_yx)) ||
+      (xy_swapped && (ruler.outline () == Object::OL_xy || ruler.outline () == Object::OL_diag_xy))) {
 
     bool r = (q2.x () > q1.x ()) ^ (q2.y () > q1.y ());
 
     if (ruler.outline () == Object::OL_diag_xy || ruler.outline () == Object::OL_diag_yx) {
-      draw_ruler (q1, q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer, first_segment, last_segment);
-      draw_text (q1, q2, lu, ruler.text (index), !r, ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+      draw_ruler (q1, q2, lu, mu, sel, ! r, ruler.style (), bitmap, renderer, first_segment, last_segment);
+      draw_text (q1, q2, lu, ruler.text (index), ! r, ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
     }
     draw_ruler (q1, db::DPoint (q1.x (), q2.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer, false, false);
     draw_text (q1, db::DPoint (q1.x (), q2.y ()), lu, ruler.text_y (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
     draw_ruler (db::DPoint (q1.x (), q2.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer, false, false);
     draw_text (db::DPoint (q1.x (), q2.y ()), q2, lu, ruler.text_x (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
-
   }
 }
 
-void
-draw_ruler_box (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
+void draw_ruler_box (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
 {
   db::DPoint p1 = ruler.p1 (), p2 = ruler.p2 ();
 
   //  round the starting point, shift both, and round the end point
-  std::pair <db::DPoint, db::DPoint> v = lay::snap (trans * p1, trans * p2);
+  std::pair<db::DPoint, db::DPoint> v = lay::snap (trans * p1, trans * p2);
   db::DPoint q1 = v.first;
   db::DPoint q2 = v.second;
 
   double lu = p1.double_distance (p2);
-  int min_tick_spc = int (0.5 + 20 / renderer.resolution ());  //  min tick spacing in canvas units
+  int min_tick_spc = int (0.5 + 20 / renderer.resolution ()); //  min tick spacing in canvas units
   double mu = double (min_tick_spc) / trans.ctrans (1.0);
 
   bool r = (q2.x () > q1.x ()) ^ (q2.y () < q1.y ());
@@ -657,18 +637,17 @@ draw_ruler_box (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel,
   draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
   draw_ruler (db::DPoint (q2.x (), q1.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer, true, true);
   draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
-  draw_ruler (q1, db::DPoint (q1.x (), q2.y ()), lu, mu, sel, !r, ruler.style (), bitmap, renderer, true, true);
-  draw_ruler (db::DPoint (q1.x (), q2.y ()), q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer, true, true);
-  draw_text (q1, q2, lu, ruler.text (index), !r, ant::Object::STY_none, ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+  draw_ruler (q1, db::DPoint (q1.x (), q2.y ()), lu, mu, sel, ! r, ruler.style (), bitmap, renderer, true, true);
+  draw_ruler (db::DPoint (q1.x (), q2.y ()), q2, lu, mu, sel, ! r, ruler.style (), bitmap, renderer, true, true);
+  draw_text (q1, q2, lu, ruler.text (index), ! r, ant::Object::STY_none, ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
 }
 
-void
-draw_ruler_ellipse (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
+void draw_ruler_ellipse (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
 {
   db::DPoint p1 = ruler.p1 (), p2 = ruler.p2 ();
 
   //  round the starting point, shift both, and round the end point
-  std::pair <db::DPoint, db::DPoint> v = lay::snap (trans * p1, trans * p2);
+  std::pair<db::DPoint, db::DPoint> v = lay::snap (trans * p1, trans * p2);
   db::DPoint q1 = v.first;
   db::DPoint q2 = v.second;
 
@@ -679,13 +658,12 @@ draw_ruler_ellipse (const ant::Object &ruler, const db::DCplxTrans &trans, bool 
   size_t index = std::numeric_limits<size_t>::max ();
   draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (index, trans.fp_trans ()), r, ant::Object::STY_none, ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
   draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (index, trans.fp_trans ()), r, ant::Object::STY_none, ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
-  draw_text (q1, q2, lu, ruler.text (index), !r, ant::Object::STY_none, ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+  draw_text (q1, q2, lu, ruler.text (index), ! r, ant::Object::STY_none, ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
 
   draw_ellipse (q1, q2, lu, sel, bitmap, renderer);
 }
 
-void
-draw_ruler_radius (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
+void draw_ruler_radius (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
 {
   //  draw crosses for the support points
   for (auto p = ruler.points ().begin (); p != ruler.points ().end (); ++p) {
@@ -702,7 +680,7 @@ draw_ruler_radius (const ant::Object &ruler, const db::DCplxTrans &trans, bool s
 
     //  draw circle segment
     db::DVector rr (radius, radius);
-    std::pair <db::DPoint, db::DPoint> v = lay::snap (trans * (center - rr), trans * (center + rr));
+    std::pair<db::DPoint, db::DPoint> v = lay::snap (trans * (center - rr), trans * (center + rr));
     draw_ellipse (v.first, v.second, radius * 2.0, sel, bitmap, renderer, start_angle, stop_angle);
 
     double a = 0.5 * (start_angle + stop_angle);
@@ -722,12 +700,10 @@ draw_ruler_radius (const ant::Object &ruler, const db::DCplxTrans &trans, bool s
     pts.push_back (rc);
     radius.set_points (pts);
     draw_ruler_segment (radius, 0, trans, sel, bitmap, renderer);
-
   }
 }
 
-void
-draw_ruler_angle (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
+void draw_ruler_angle (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
 {
   //  draw guiding segments in diag/plain line mode
 
@@ -743,7 +719,6 @@ draw_ruler_angle (const ant::Object &ruler, const db::DCplxTrans &trans, bool se
     double lu = p1.double_distance (p2);
 
     draw_ruler (q1, q2, lu, 0.0, sel, false, ant::Object::STY_line, bitmap, renderer, true, true);
-
   }
 
   double radius = 0.0, start_angle = 0.0, stop_angle = 0.0;
@@ -771,11 +746,10 @@ draw_ruler_angle (const ant::Object &ruler, const db::DCplxTrans &trans, bool se
     double lu = abs (circle_radius * (stop_angle - start_angle));
 
     draw_ruler (q1, q2, lu, 0.0, sel, false, ruler.style (), bitmap, renderer, p == 0, p != 0, true);
-
   }
 
   db::DVector rr (circle_radius, circle_radius);
-  std::pair <db::DPoint, db::DPoint> v = lay::snap (trans * (center - rr), trans * (center + rr));
+  std::pair<db::DPoint, db::DPoint> v = lay::snap (trans * (center - rr), trans * (center + rr));
   draw_ellipse (v.first, v.second, radius * 2.0, sel, bitmap, renderer, start_angle, stop_angle);
 
   if (ruler.style () == ant::Object::STY_ruler) {
@@ -803,9 +777,7 @@ draw_ruler_angle (const ant::Object &ruler, const db::DCplxTrans &trans, bool se
       auto q2 = v.second + tv * l;
 
       renderer.draw (db::DEdge (q1, q2), 0, bitmap, 0, 0);
-
     }
-
   }
 
   {
@@ -821,12 +793,10 @@ draw_ruler_angle (const ant::Object &ruler, const db::DCplxTrans &trans, bool se
     double lu = abs (circle_radius * (stop_angle - start_angle));
 
     draw_text (q1, q2, lu, ruler.text (0), false, ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
-
   }
 }
 
-void
-draw_ruler (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
+void draw_ruler (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
 {
   if (ruler.outline () == Object::OL_box) {
     draw_ruler_box (ruler, trans, sel, bitmap, renderer);
@@ -867,7 +837,6 @@ is_selected_by_circle_segment (const ant::Object &ruler, const db::DPoint &pos, 
       distance = std::min (distance, fabs (pos.distance (c) - r));
       return true;
     }
-
   }
 
   return false;
@@ -901,9 +870,7 @@ is_selected (const ant::Object &ruler, size_t index, const db::DPoint &pos, doub
       }
 
       return false;
-
     }
-
   }
 
   //  enlarge this box by some pixels
@@ -913,7 +880,7 @@ is_selected (const ant::Object &ruler, size_t index, const db::DPoint &pos, doub
     return false;
   }
 
-  db::DEdge edges[4];
+  db::DEdge edges [4];
   unsigned int nedges = 0;
 
   if (outline == ant::Object::OL_diag ||
@@ -980,7 +947,7 @@ is_selected (const ant::Object &ruler, const db::DBox &box, double /*enl*/)
 // -------------------------------------------------------------
 
 View::View (ant::Service *rulers, const ant::Object *ruler, bool selected)
-  : lay::ViewObject (rulers->ui ()), 
+  : lay::ViewObject (rulers->ui ()),
     mp_rulers (rulers), m_selected (selected), mp_ruler (ruler)
 {
   //  .. nothing else ..
@@ -991,8 +958,7 @@ View::~View ()
   //  .. nothing else ..
 }
 
-void 
-View::transform_by (const db::DCplxTrans &t)
+void View::transform_by (const db::DCplxTrans &t)
 {
   if (m_trans != t) {
     m_trans = t;
@@ -1000,22 +966,20 @@ View::transform_by (const db::DCplxTrans &t)
   }
 }
 
-void 
-View::ruler (const ant::Object *r)
+void View::ruler (const ant::Object *r)
 {
   mp_ruler = r;
   redraw ();
 }
 
-void 
-View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas) 
-{ 
+void View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
+{
   //  .. nothing yet ..
   if (! mp_ruler) {
     return;
   }
 
-  int basic_width = int(0.5 + 1.0 / canvas.resolution ());
+  int basic_width = int (0.5 + 1.0 / canvas.resolution ());
 
   tl::Color c (mp_rulers->color ());
   if (! c.is_valid ()) {
@@ -1025,7 +989,7 @@ View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
   //  obtain bitmap to render on
   lay::CanvasPlane *plane;
   if (mp_rulers->with_halo ()) {
-    std::vector <lay::ViewOp> ops;
+    std::vector<lay::ViewOp> ops;
     ops.reserve (2);
     //  we use 2 and 3 for the bitmap index. Since selection markers are using 0 and 1, rulers
     //  that are dragged appear in front of them.
@@ -1050,7 +1014,7 @@ const char *Service::d_function_name () { return "ant-toolkit-widget-d-commit"; 
 
 Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
   : lay::EditorServiceBase (view),
-    lay::Drawing (1/*number of planes*/, view->drawings ()),
+    lay::Drawing (1 /*number of planes*/, view->drawings ()),
     db::Object (manager),
     m_halo (true),
     m_snap_mode (lay::AC_Any),
@@ -1090,8 +1054,7 @@ Service::~Service ()
   clear_transient_selection ();
 }
 
-bool 
-Service::configure (const std::string &name, const std::string &value)
+bool Service::configure (const std::string &name, const std::string &value)
 {
   bool taken = true;
 
@@ -1148,9 +1111,9 @@ Service::configure (const std::string &name, const std::string &value)
     m_snap_mode = sm;
 
   } else if (name == cfg_ruler_templates) {
-    m_ruler_templates = ant::Template::from_string (value); 
+    m_ruler_templates = ant::Template::from_string (value);
   } else if (name == cfg_current_ruler_template) {
-    
+
     int n = 0;
     tl::from_string (value, n);
     m_current_template = n;
@@ -1160,7 +1123,6 @@ Service::configure (const std::string &name, const std::string &value)
   }
 
   return taken;
-
 }
 
 const ant::Template &
@@ -1174,13 +1136,11 @@ Service::current_template () const
   }
 }
 
-void 
-Service::config_finalize ()
+void Service::config_finalize ()
 {
 }
 
-void
-Service::show_toolbox (bool visible)
+void Service::show_toolbox (bool visible)
 {
   lay::EditorOptionsPage *tb = toolbox_widget ();
   if (tb) {
@@ -1194,22 +1154,21 @@ Service::toolbox_widget ()
   return mp_view->editor_options_pages () ? mp_view->editor_options_pages ()->page_with_name (editor_options_name ()) : 0;
 }
 
-void
-Service::annotations_changed ()
+void Service::annotations_changed ()
 {
   //  NOTE: right now, we don't differentiate: every annotation change may be a change in an image too.
   //  We just forward this event as a potential image changed event
   annotations_changed_event ();
 }
 
-std::vector <lay::ViewOp>
+std::vector<lay::ViewOp>
 Service::get_view_ops (lay::RedrawThreadCanvas &canvas, tl::Color background, tl::Color foreground, tl::Color /*active*/) const
 {
-  int basic_width = int(0.5 + 1.0 / canvas.resolution ());
+  int basic_width = int (0.5 + 1.0 / canvas.resolution ());
 
-  //  the changing of the view ops is done here since it may depend on the 
+  //  the changing of the view ops is done here since it may depend on the
   //  background color which might be changed by another configure call later.
-  std::vector <lay::ViewOp> view_ops;
+  std::vector<lay::ViewOp> view_ops;
   if (m_halo) {
     view_ops.push_back (lay::ViewOp (background.rgb (), lay::ViewOp::Copy, 0, 0, 0, lay::ViewOp::Rect, 3 * basic_width, 0));
   }
@@ -1222,32 +1181,28 @@ Service::get_view_ops (lay::RedrawThreadCanvas &canvas, tl::Color background, tl
   return view_ops;
 }
 
-void 
-Service::clear_highlights ()
+void Service::clear_highlights ()
 {
   for (std::vector<ant::View *>::iterator r = m_rulers.begin (); r != m_rulers.end (); ++r) {
     (*r)->visible (false);
   }
 }
 
-void 
-Service::restore_highlights ()
+void Service::restore_highlights ()
 {
   for (std::vector<ant::View *>::iterator r = m_rulers.begin (); r != m_rulers.end (); ++r) {
     (*r)->visible (true);
   }
 }
 
-void 
-Service::highlight (unsigned int n)
+void Service::highlight (unsigned int n)
 {
   for (std::vector<ant::View *>::iterator r = m_rulers.begin (); r != m_rulers.end (); ++r) {
     (*r)->visible (n-- == 0);
   }
 }
 
-void 
-Service::clear_rulers ()
+void Service::clear_rulers ()
 {
   drag_cancel ();
   reduce_rulers (0);
@@ -1265,8 +1220,7 @@ Service::catch_distance_box ()
   return double (view ()->search_range_box ()) / ui ()->mouse_event_trans ().mag ();
 }
 
-void
-Service::drag_cancel () 
+void Service::drag_cancel ()
 {
   if (m_drawing) {
     show_toolbox (false);
@@ -1280,13 +1234,12 @@ Service::drag_cancel ()
   }
 }
 
-int
-Service::insert_ruler (const ant::Object &ruler, bool limit_number)
+int Service::insert_ruler (const ant::Object &ruler, bool limit_number)
 {
   //  determine the last id
   int idmax = -1;
   for (lay::AnnotationShapes::iterator r = mp_view->annotation_shapes ().begin (); r != mp_view->annotation_shapes ().end (); ++r) {
-    const ant::Object *robj = dynamic_cast <const ant::Object *> (r->ptr ());
+    const ant::Object *robj = dynamic_cast<const ant::Object *> (r->ptr ());
     if (robj) {
       if (robj->id () > idmax) {
         idmax = robj->id ();
@@ -1319,7 +1272,7 @@ dragging_what_seg (const ant::Object *robj, const db::DBox &search_dbox, ant::Se
   db::DPoint p11 = robj->seg_p1 (index), p22 = robj->seg_p2 (index);
   db::DPoint c = p11 + (p22 - p11) * 0.5;
 
-  if (outline == ant::Object::OL_xy || outline== ant::Object::OL_diag_xy || outline == ant::Object::OL_box) {
+  if (outline == ant::Object::OL_xy || outline == ant::Object::OL_diag_xy || outline == ant::Object::OL_box) {
     p12 = db::DPoint (p22.x (), p11.y ());
     has_p12 = true;
   }
@@ -1405,8 +1358,7 @@ dragging_what (const ant::Object *robj, const db::DBox &search_dbox, ant::Servic
   return false;
 }
 
-bool 
-Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::angle_constraint_type /*ac*/)
+bool Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::angle_constraint_type /*ac*/)
 {
   clear_transient_selection ();
 
@@ -1417,13 +1369,13 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
     m_p1 = p;
     m_trans = db::DTrans (db::DPoint () - m_p1);
 
-    for (std::vector <ant::View *>::iterator r = m_rulers.begin (); r != m_rulers.end (); ++r) {
+    for (std::vector<ant::View *>::iterator r = m_rulers.begin (); r != m_rulers.end (); ++r) {
       (*r)->thaw ();
     }
     return false;
 
   } else if (mode == lay::Editable::Partial) {
-  
+
     m_move_mode = MoveNone;
     m_seg_index = 0;
 
@@ -1433,7 +1385,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
 
     //  point selection: look for the "closest" ruler
 
-    double dmin = std::numeric_limits <double>::max ();
+    double dmin = std::numeric_limits<double>::max ();
 
     const ant::Object *robj_min = 0;
     for (auto r = m_selected.begin (); r != m_selected.end (); ++r) {
@@ -1454,31 +1406,28 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
     for (auto r = m_selected.begin (); r != m_selected.end (); ++r) {
 
       obj_iterator ri = *r;
-      const ant::Object *robj = dynamic_cast <const ant::Object *> ((*ri).ptr ());
+      const ant::Object *robj = dynamic_cast<const ant::Object *> ((*ri).ptr ());
       if (robj && (! robj_min || robj == robj_min)) {
-        
+
         if (dragging_what (robj, search_dbox, m_move_mode, m_p1, m_seg_index)) {
-          
+
           //  found anything: make the moved ruler the selection
           clear_selection ();
           m_selected.insert (ri);
           m_current = *robj;
-          m_original = m_current; 
+          m_original = m_current;
           m_rulers.push_back (new ant::View (this, &m_current, true));
           m_rulers.back ()->thaw ();
           return true;
-          
         }
-
       }
-      
     }
 
     //  nothing was found
     return false;
 
   } else if (mode == lay::Editable::Any) {
-  
+
     m_move_mode = MoveNone;
 
     //  compute search box
@@ -1487,7 +1436,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
 
     //  point selection: look for the "closest" ruler
 
-    double dmin = std::numeric_limits <double>::max ();
+    double dmin = std::numeric_limits<double>::max ();
 
     lay::AnnotationShapes::touching_iterator r = mp_view->annotation_shapes ().begin_touching (search_dbox);
     const ant::Object *robj_min = 0;
@@ -1511,7 +1460,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
 
     while (m_move_mode == MoveNone && ! r.at_end ()) {
 
-      const ant::Object *robj = dynamic_cast <const ant::Object *> ((*r).ptr ());
+      const ant::Object *robj = dynamic_cast<const ant::Object *> ((*r).ptr ());
       if (robj && (! robj_min || robj == robj_min)) {
 
         if (dragging_what (robj, search_dbox, m_move_mode, m_p1, m_seg_index)) {
@@ -1524,13 +1473,10 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
           m_rulers.push_back (new ant::View (this, &m_current, true));
           m_rulers.back ()->thaw ();
           return true;
-
         }
-
       }
 
       ++r;
-
     }
 
     //  nothing was found
@@ -1554,8 +1500,7 @@ static int snap_prio (lay::PointSnapToObjectResult::ObjectSnap os)
   }
 }
 
-void
-Service::snap_rulers (lay::angle_constraint_type ac)
+void Service::snap_rulers (lay::angle_constraint_type ac)
 {
   if (m_rulers.empty ()) {
     return;
@@ -1593,7 +1538,6 @@ Service::snap_rulers (lay::angle_constraint_type ac)
       min_dist = dist;
       min_delta = snp.snapped_point - p2;
     }
-
   }
 
   if (min_snp.object_snap != lay::PointSnapToObjectResult::NoObject) {
@@ -1603,8 +1547,7 @@ Service::snap_rulers (lay::angle_constraint_type ac)
   m_trans = db::DTrans (min_delta) * m_trans;
 }
 
-void
-Service::move_transform (const db::DPoint & /*p*/, db::DFTrans tr, lay::angle_constraint_type ac)
+void Service::move_transform (const db::DPoint & /*p*/, db::DFTrans tr, lay::angle_constraint_type ac)
 {
   if (m_rulers.empty () || m_selected.empty ()) {
     return;
@@ -1622,13 +1565,10 @@ Service::move_transform (const db::DPoint & /*p*/, db::DFTrans tr, lay::angle_co
     for (std::vector<ant::View *>::iterator r = m_rulers.begin (); r != m_rulers.end (); ++r) {
       (*r)->transform_by (db::DCplxTrans (m_trans));
     }
-
   }
-
 }
 
-void 
-Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
+void Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
 {
   if (m_rulers.empty () || m_selected.empty ()) {
     return;
@@ -1676,7 +1616,6 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
       //  other move modes use the angle constraint imposed by the modifier buttons
       //  and the start point for reference
       ps = snap2_visual (m_p1, p, &m_current, ac == lay::AC_Global ? lay::AC_Any : ac);
-
     }
 
     m_trans = db::DTrans (ps - m_p1);
@@ -1686,15 +1625,12 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
     propose_move_transformation (db::DTrans (ps - m_p1), 1);
 
     //  display current move distance
-    std::string pos = std::string ("dx: ") + tl::micron_to_string (ps.x () - m_p1.x ()) + "  "
-                                 + "dy: "  + tl::micron_to_string (ps.y () - m_p1.y ());
+    std::string pos = std::string ("dx: ") + tl::micron_to_string (ps.x () - m_p1.x ()) + "  " + "dy: " + tl::micron_to_string (ps.y () - m_p1.y ());
     view ()->message (pos);
-
   }
 }
 
-void
-Service::apply_partial_move (db::DPoint &ps)
+void Service::apply_partial_move (db::DPoint &ps)
 {
   if (m_move_mode == MoveP1) {
 
@@ -1706,13 +1642,13 @@ Service::apply_partial_move (db::DPoint &ps)
 
   } else if (m_move_mode == MoveP12) {
 
-    m_current.seg_p1 (m_seg_index, db::DPoint (m_current.seg_p1 (m_seg_index).x(), ps.y ()));
+    m_current.seg_p1 (m_seg_index, db::DPoint (m_current.seg_p1 (m_seg_index).x (), ps.y ()));
     m_current.seg_p2 (m_seg_index, db::DPoint (ps.x (), m_current.seg_p2 (m_seg_index).y ()));
 
   } else if (m_move_mode == MoveP21) {
 
     m_current.seg_p1 (m_seg_index, db::DPoint (ps.x (), m_current.seg_p1 (m_seg_index).y ()));
-    m_current.seg_p2 (m_seg_index, db::DPoint (m_current.seg_p2 (m_seg_index).x(), ps.y ()));
+    m_current.seg_p2 (m_seg_index, db::DPoint (m_current.seg_p2 (m_seg_index).x (), ps.y ()));
 
   } else if (m_move_mode == MoveP1X) {
 
@@ -1733,31 +1669,25 @@ Service::apply_partial_move (db::DPoint &ps)
 
     ps.set_x (m_p1.x ());
     m_current.seg_p2 (m_seg_index, db::DPoint (m_current.seg_p2 (m_seg_index).x (), ps.y ()));
-
   }
 
   m_rulers [0]->redraw ();
 }
 
-void 
-Service::show_message ()
+void Service::show_message ()
 {
   //  display current rulers' parameters
-  std::string pos = std::string ("lx: ") + tl::micron_to_string (m_current.p2 ().x () - m_current.p1 ().x ()) 
-                      + "  ly: " + tl::micron_to_string (m_current.p2 ().y () - m_current.p1 ().y ()) 
-                      + "  l: " + tl::micron_to_string (m_current.p2 ().distance (m_current.p1 ()));
+  std::string pos = std::string ("lx: ") + tl::micron_to_string (m_current.p2 ().x () - m_current.p1 ().x ()) + "  ly: " + tl::micron_to_string (m_current.p2 ().y () - m_current.p1 ().y ()) + "  l: " + tl::micron_to_string (m_current.p2 ().distance (m_current.p1 ()));
   view ()->message (pos);
 }
 
-void
-Service::end_move (const db::DVector &v)
+void Service::end_move (const db::DVector &v)
 {
   m_trans = db::DTrans (v) * db::DTrans (m_trans.fp_trans ());
   end_move (db::DPoint (), lay::AC_Any);
 }
 
-void 
-Service::end_move (const db::DPoint &, lay::angle_constraint_type)
+void Service::end_move (const db::DPoint &, lay::angle_constraint_type)
 {
   if (! m_rulers.empty () && ! m_selected.empty ()) {
 
@@ -1775,9 +1705,7 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
           int new_id = rnew->id ();
           mp_view->annotation_shapes ().replace (*s, db::DUserObject (rnew));
           annotation_changed_event (new_id);
-
         }
-
       }
 
       //  and make selection "visible"
@@ -1795,9 +1723,7 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
 
       //  clear the selection (that was artifically created before)
       clear_selection ();
-
     }
-
   }
 
   //  termine the operation
@@ -1806,8 +1732,7 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
   clear_mouse_cursors ();
 }
 
-void
-Service::selection_to_view ()
+void Service::selection_to_view ()
 {
   clear_transient_selection ();
   annotation_selection_changed_event ();
@@ -1824,7 +1749,7 @@ Service::selection_to_view ()
   }
 }
 
-db::DBox 
+db::DBox
 Service::selection_bbox ()
 {
   db::DBox box;
@@ -1837,8 +1762,7 @@ Service::selection_bbox ()
   return box;
 }
 
-void 
-Service::transform (const db::DCplxTrans &trans)
+void Service::transform (const db::DCplxTrans &trans)
 {
   //  replace the rulers that were transformed:
   for (auto s = m_selected.begin (); s != m_selected.end (); ++s) {
@@ -1852,16 +1776,13 @@ Service::transform (const db::DCplxTrans &trans)
       rnew->transform (trans);
       mp_view->annotation_shapes ().replace (*s, db::DUserObject (rnew));
       annotation_changed_event (id);
-
     }
-
   }
 
   selection_to_view ();
 }
 
-void 
-Service::edit_cancel () 
+void Service::edit_cancel ()
 {
   //  Cancel any move operation
   if (m_move_mode != MoveNone) {
@@ -1870,18 +1791,15 @@ Service::edit_cancel ()
     m_selected.clear ();
     selection_to_view ();
     clear_mouse_cursors ();
-
   }
 }
 
-bool 
-Service::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio) 
+bool Service::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   return mouse_click_event (p, buttons, prio);
 }
 
-void
-Service::finish_drawing ()
+void Service::finish_drawing ()
 {
   //  create the ruler object
 
@@ -1905,8 +1823,7 @@ Service::finish_drawing ()
   }
 }
 
-bool
-Service::mouse_double_click_event (const db::DPoint & /*p*/, unsigned int buttons, bool prio)
+bool Service::mouse_double_click_event (const db::DPoint & /*p*/, unsigned int buttons, bool prio)
 {
   if (m_drawing && prio && (buttons & lay::LeftButton) != 0) {
 
@@ -1919,8 +1836,7 @@ Service::mouse_double_click_event (const db::DPoint & /*p*/, unsigned int button
   }
 }
 
-bool
-Service::key_event (unsigned int key, unsigned int buttons)
+bool Service::key_event (unsigned int key, unsigned int buttons)
 {
   if (m_drawing && buttons == 0 && (key == lay::KeyEnter || key == lay::KeyReturn)) {
 
@@ -1958,8 +1874,7 @@ Service::auto_measure (const db::DPoint &p, lay::angle_constraint_type ac, const
   return lay::obj_snap2 (mp_view, p, g, ac, snap_range, snap_range * 1000.0);
 }
 
-bool
-Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio) 
+bool Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   hover_reset ();
 
@@ -1975,13 +1890,13 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
       //  reset selection
       clear_selection ();
-         
+
       //  set the maximum number of rulers minus 1 to account for the new ruler
       //  and clear surplus rulers
       reduce_rulers (m_max_number_of_rulers - 1);
 
       //  create and start dragging the ruler
-      
+
       if (tpl.mode () == ant::Template::RulerSingleClick) {
 
         db::DPoint pt = snap1 (p, m_obj_snap && tpl.snap ()).second;
@@ -2022,7 +1937,6 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
           if (manager ()) {
             manager ()->commit ();
           }
-
         }
 
       } else if (tpl.mode () == ant::Template::RulerAutoMetricEdge) {
@@ -2045,7 +1959,6 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
           if (manager ()) {
             manager ()->commit ();
           }
-
         }
 
       } else {
@@ -2070,7 +1983,6 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
         show_toolbox (true);
         ui ()->grab_mouse (this, false);
-
       }
 
     } else if (tpl.mode () == ant::Template::RulerMultiSegment || tpl.mode () == ant::Template::RulerThreeClicks) {
@@ -2090,17 +2002,14 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
         pts.push_back (m_p1);
         m_current.set_points_exact (pts);
         m_length_confined = false;
-
       }
 
     } else {
 
       finish_drawing ();
-
     }
 
     return true;
-
   }
 
   return false;
@@ -2122,8 +2031,7 @@ Service::create_measure_ruler (const db::DPoint &pt, lay::angle_constraint_type 
   }
 }
 
-void
-Service::function (const std::string &name, const std::string &value)
+void Service::function (const std::string &name, const std::string &value)
 {
   if (name == xy_function_name ()) {
 
@@ -2144,7 +2052,6 @@ Service::function (const std::string &name, const std::string &value)
 
           pts.back () = pts [pts.size () - 2] + s;
           m_current.set_points_exact (pts);
-
         }
 
         const ant::Template &tpl = current_template ();
@@ -2162,15 +2069,12 @@ Service::function (const std::string &name, const std::string &value)
 
             pts.push_back (m_p1);
             m_current.set_points_exact (pts);
-
           }
 
         } else {
 
           finish_drawing ();
-
         }
-
       }
 
     } catch (...) {
@@ -2191,17 +2095,14 @@ Service::function (const std::string &name, const std::string &value)
         ant::Object::point_list pts = m_current.points ();
         confine_length (pts);
         m_current.set_points_exact (pts);
-
       }
 
     } catch (...) {
     }
-
   }
 }
 
-void
-Service::confine_length (ant::Object::point_list &pts)
+void Service::confine_length (ant::Object::point_list &pts)
 {
   if (m_length_confined && pts.size () >= 2) {
 
@@ -2228,12 +2129,10 @@ Service::confine_length (ant::Object::point_list &pts)
     }
 
     pts.back () = p1 + s;
-
   }
 }
 
-bool
-Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio) 
+bool Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (! prio) {
     return false;
@@ -2248,7 +2147,6 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 #endif
     m_hover_point = p;
     m_hover_buttons = buttons;
-
   }
 
   const ant::Template &tpl = current_template ();
@@ -2296,14 +2194,13 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
           pts.front () = m_p1;
         }
       }
-
     }
 
     m_current.set_points_exact (pts);
 
     db::DVector delta;
     if (pts.size () >= 2) {
-      delta = pts.back () - pts[pts.size () - 2];
+      delta = pts.back () - pts [pts.size () - 2];
       delta = db::DVector (fabs (delta.x ()), fabs (delta.y ()));
     }
 
@@ -2316,14 +2213,12 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 
     mp_active_ruler->redraw ();
     show_message ();
-
   }
 
   return false;
 }
 
-void 
-Service::deactivated ()
+void Service::deactivated ()
 {
   lay::EditorServiceBase::deactivated ();
 
@@ -2378,20 +2273,18 @@ Service::snap2_visual (const db::DPoint &p1, const db::DPoint &p2, const ant::Ob
 }
 
 
-struct RulerIdComp 
-{
+struct RulerIdComp {
   bool operator() (const lay::AnnotationShapes::iterator &a, const lay::AnnotationShapes::iterator &b) const
   {
-    return dynamic_cast<const ant::Object &>(*a->ptr ()).id () < dynamic_cast<const ant::Object &>(*b->ptr ()).id ();
+    return dynamic_cast<const ant::Object &> (*a->ptr ()).id () < dynamic_cast<const ant::Object &> (*b->ptr ()).id ();
   }
 };
 
-void
-Service::reduce_rulers (int num)
+void Service::reduce_rulers (int num)
 {
   clear_transient_selection ();
 
-  lay::AnnotationShapes::iterator rfrom = mp_view->annotation_shapes ().begin (); 
+  lay::AnnotationShapes::iterator rfrom = mp_view->annotation_shapes ().begin ();
   lay::AnnotationShapes::iterator rto = mp_view->annotation_shapes ().end ();
 
   size_t n = std::distance (rfrom, rto);
@@ -2402,50 +2295,44 @@ Service::reduce_rulers (int num)
 
     //  extract all rulers and other objects
 
-    std::vector <lay::AnnotationShapes::iterator> positions;
+    std::vector<lay::AnnotationShapes::iterator> positions;
     positions.reserve (n);
 
     for (lay::AnnotationShapes::iterator r = rfrom; r != rto; ++r) {
-      const ant::Object *robj = dynamic_cast <const ant::Object *> (r->ptr ());
+      const ant::Object *robj = dynamic_cast<const ant::Object *> (r->ptr ());
       if (robj) {
         positions.push_back (r);
       }
     }
 
-    //  sort so we find the ones that are too old, remove them and sort the 
+    //  sort so we find the ones that are too old, remove them and sort the
     //  remaining positions
-    tl::sort (positions.begin (), positions.end (), RulerIdComp ());  // HINT: must be tl::sort, not std::sort because gcc 3.2.3 has some strange namespace resolution problems ..
+    tl::sort (positions.begin (), positions.end (), RulerIdComp ()); // HINT: must be tl::sort, not std::sort because gcc 3.2.3 has some strange namespace resolution problems ..
     positions.erase (positions.begin () + (positions.size () - num), positions.end ());
-    tl::sort (positions.begin (), positions.end ());  // HINT: must be tl::sort, not std::sort because gcc 3.2.3 has some strange namespace resolution problems ..
+    tl::sort (positions.begin (), positions.end ()); // HINT: must be tl::sort, not std::sort because gcc 3.2.3 has some strange namespace resolution problems ..
 
     //  now we can erase these positions
     mp_view->annotation_shapes ().erase_positions (positions.begin (), positions.end ());
-
   }
-
 }
 
-void 
-Service::cut ()
+void Service::cut ()
 {
   if (has_selection ()) {
 
     //  copy & delete the selected rulers
     copy_selected ();
     del_selected ();
-
   }
 }
 
-void 
-Service::copy ()
+void Service::copy ()
 {
   //  copy the selected rulers
   copy_selected ();
 }
 
-void
-Service::copy_selected ()
+void Service::copy_selected ()
 {
   //  extract all selected rulers and paste in "micron" space
   for (auto r = m_selected.begin (); r != m_selected.end (); ++r) {
@@ -2456,15 +2343,14 @@ Service::copy_selected ()
   }
 }
 
-void 
-Service::paste ()
+void Service::paste ()
 {
   if (db::Clipboard::instance ().begin () != db::Clipboard::instance ().end ()) {
 
     //  determine the last id
     int idmax = -1;
     for (lay::AnnotationShapes::iterator r = mp_view->annotation_shapes ().begin (); r != mp_view->annotation_shapes ().end (); ++r) {
-      const ant::Object *robj = dynamic_cast <const ant::Object *> (r->ptr ());
+      const ant::Object *robj = dynamic_cast<const ant::Object *> (r->ptr ());
       if (robj && robj->id () > idmax) {
         idmax = robj->id ();
       }
@@ -2490,29 +2376,23 @@ Service::paste ()
       }
 
       selection_to_view ();
-
     }
-
   }
-
 }
 
-void 
-Service::del ()
+void Service::del ()
 {
   if (has_selection ()) {
 
     //  delete the selected rulers
     del_selected ();
-
   }
 }
 
-void
-Service::del_selected ()
+void Service::del_selected ()
 {
   //  positions will hold a set of iterators that are to be erased
-  std::vector <lay::AnnotationShapes::iterator> positions;
+  std::vector<lay::AnnotationShapes::iterator> positions;
   positions.reserve (m_selected.size ());
   for (auto r = m_selected.begin (); r != m_selected.end (); ++r) {
     positions.push_back (*r);
@@ -2521,13 +2401,12 @@ Service::del_selected ()
   //  clear selection
   clear_selection ();
 
-  //  erase all and insert the ones that we want to keep 
-  tl::sort (positions.begin (), positions.end ());  // HINT: must be tl::sort, not std::sort because gcc 3.2.3 has some strange namespace resolution problems ..
+  //  erase all and insert the ones that we want to keep
+  tl::sort (positions.begin (), positions.end ()); // HINT: must be tl::sort, not std::sort because gcc 3.2.3 has some strange namespace resolution problems ..
   mp_view->annotation_shapes ().erase_positions (positions.begin (), positions.end ());
 }
 
-bool
-Service::has_selection ()
+bool Service::has_selection ()
 {
   return ! m_selected.empty ();
 }
@@ -2538,14 +2417,12 @@ Service::selection_size ()
   return m_selected.size ();
 }
 
-bool
-Service::has_transient_selection ()
+bool Service::has_transient_selection ()
 {
   return mp_transient_ruler != 0;
 }
 
-bool 
-Service::select (obj_iterator obj, lay::Editable::SelectionMode mode)
+bool Service::select (obj_iterator obj, lay::Editable::SelectionMode mode)
 {
   if (mode == lay::Editable::Replace || mode == lay::Editable::Add) {
     //  select
@@ -2571,8 +2448,7 @@ Service::select (obj_iterator obj, lay::Editable::SelectionMode mode)
   return false;
 }
 
-void
-Service::clear_selection ()
+void Service::clear_selection ()
 {
   select (db::DBox (), lay::Editable::Reset);
 }
@@ -2596,7 +2472,7 @@ Service::click_proximity (const db::DPoint &pos, lay::Editable::SelectionMode mo
   }
 
   //  point selection: look for the "closest" ruler
-  double dmin = std::numeric_limits <double>::max ();
+  double dmin = std::numeric_limits<double>::max ();
   bool any_found = false;
 
   lay::AnnotationShapes::touching_iterator r = mp_view->annotation_shapes ().begin_touching (search_dbox);
@@ -2618,27 +2494,24 @@ Service::click_proximity (const db::DPoint &pos, lay::Editable::SelectionMode mo
   if (any_found) {
     return dmin;
   } else {
-    return lay::Editable::click_proximity (pos, mode); 
-  } 
+    return lay::Editable::click_proximity (pos, mode);
+  }
 }
 
-bool
-Service::enter_event (bool /*prio*/)
+bool Service::enter_event (bool /*prio*/)
 {
   m_mouse_in_window = true;
   return false;
 }
 
-bool
-Service::leave_event (bool)
+bool Service::leave_event (bool)
 {
   m_mouse_in_window = false;
   hover_reset ();
   return false;
 }
 
-void
-Service::hover_reset ()
+void Service::hover_reset ()
 {
   if (m_hover_wait) {
 #if defined(HAVE_QT)
@@ -2654,8 +2527,7 @@ Service::hover_reset ()
 }
 
 #if defined(HAVE_QT)
-void
-Service::timeout ()
+void Service::timeout ()
 {
   m_hover_wait = false;
   m_hover = true;
@@ -2683,7 +2555,6 @@ Service::timeout ()
       m_current = ant::Object (snap_details.object_ref.p1 (), snap_details.object_ref.p2 (), 0, tpl);
       ruler = &m_current;
     }
-
   }
 
   if (ruler) {
@@ -2694,14 +2565,11 @@ Service::timeout ()
     if (! editables ()->has_selection ()) {
       display_status (true);
     }
-
   }
-
 }
 #endif
 
-bool
-Service::transient_select (const db::DPoint &pos)
+bool Service::transient_select (const db::DPoint &pos)
 {
   clear_transient_selection ();
 
@@ -2718,7 +2586,7 @@ Service::transient_select (const db::DPoint &pos)
   db::DBox search_dbox = db::DBox (pos, pos).enlarged (db::DVector (l, l));
 
   //  point selection: look for the "closest" ruler
-  double dmin = std::numeric_limits <double>::max ();
+  double dmin = std::numeric_limits<double>::max ();
 
   lay::AnnotationShapes::touching_iterator r = mp_view->annotation_shapes ().begin_touching (search_dbox);
   lay::AnnotationShapes::touching_iterator rmin (r);
@@ -2737,7 +2605,7 @@ Service::transient_select (const db::DPoint &pos)
     ++r;
   }
 
-  //  create the transient marker for the object found 
+  //  create the transient marker for the object found
   if (any_selected) {
     const ant::Object *robj = dynamic_cast<const ant::Object *> ((*rmin).ptr ());
     //  HINT: there is no special style for "transient selection on rulers"
@@ -2751,8 +2619,7 @@ Service::transient_select (const db::DPoint &pos)
   return any_selected;
 }
 
-void
-Service::clear_transient_selection ()
+void Service::clear_transient_selection ()
 {
   if (mp_transient_ruler) {
     delete mp_transient_ruler;
@@ -2760,12 +2627,11 @@ Service::clear_transient_selection ()
   }
 }
 
-void
-Service::transient_to_selection ()
+void Service::transient_to_selection ()
 {
   if (mp_transient_ruler) {
     for (lay::AnnotationShapes::iterator r = mp_view->annotation_shapes ().begin (); r != mp_view->annotation_shapes ().end (); ++r) {
-      const ant::Object *robj = dynamic_cast <const ant::Object *> (r->ptr ());
+      const ant::Object *robj = dynamic_cast<const ant::Object *> (r->ptr ());
       if (robj == mp_transient_ruler->ruler ()) {
         m_selected.insert (r);
         selection_to_view ();
@@ -2775,14 +2641,12 @@ Service::transient_to_selection ()
   }
 }
 
-void
-Service::clear_previous_selection ()
+void Service::clear_previous_selection ()
 {
   m_previous_selection.clear ();
 }
 
-bool
-Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
+bool Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
 {
   bool needs_update = false;
   bool any_selected = false;
@@ -2816,7 +2680,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
       }
     } else {
 
-      lay::AnnotationShapes::iterator rfrom = mp_view->annotation_shapes ().begin (); 
+      lay::AnnotationShapes::iterator rfrom = mp_view->annotation_shapes ().begin ();
       lay::AnnotationShapes::iterator rto = mp_view->annotation_shapes ().end ();
 
       //  extract all rulers
@@ -2857,7 +2721,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
     } else {
 
       //  point selection: look for the "closest" ruler
-      double dmin = std::numeric_limits <double>::max ();
+      double dmin = std::numeric_limits<double>::max ();
 
       lay::AnnotationShapes::touching_iterator r = mp_view->annotation_shapes ().begin_touching (search_dbox);
       lay::AnnotationShapes::touching_iterator rmin (r);
@@ -2882,9 +2746,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
         m_previous_selection.insert (mp_view->annotation_shapes ().iterator_from_pointer (&*rmin));
         needs_update = true;
       }
-
     }
-
   }
 
   //  if required, update the list of ruler objects to display the selection
@@ -2900,8 +2762,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
   return any_selected;
 }
 
-void 
-Service::display_status (bool transient)
+void Service::display_status (bool transient)
 {
   View *selected_view = transient ? mp_transient_ruler : (m_rulers.size () == 1 ? m_rulers [0] : 0);
   if (! selected_view) {
@@ -2920,7 +2781,6 @@ Service::display_status (bool transient)
       msg += tl::sprintf (tl::to_string (tr ("annotation(d=%s x=%s y=%s)")), ruler->text (0), ruler->text_x (0), ruler->text_y (0));
     }
     view ()->message (msg);
-
   }
 }
 
@@ -2934,8 +2794,7 @@ Service::properties_pages (db::Manager *manager, QWidget *parent)
 }
 #endif
 
-void 
-Service::get_selection (std::vector <obj_iterator> &sel) const
+void Service::get_selection (std::vector<obj_iterator> &sel) const
 {
   sel.clear ();
   sel.reserve (m_selected.size ());
@@ -2946,8 +2805,7 @@ Service::get_selection (std::vector <obj_iterator> &sel) const
   }
 }
 
-void
-Service::set_selection (const std::vector<obj_iterator> &selection)
+void Service::set_selection (const std::vector<obj_iterator> &selection)
 {
   m_selected.clear ();
   for (auto i = selection.begin (); i != selection.end (); ++i) {
@@ -2957,8 +2815,7 @@ Service::set_selection (const std::vector<obj_iterator> &selection)
   selection_to_view ();
 }
 
-void
-Service::delete_ruler (obj_iterator pos)
+void Service::delete_ruler (obj_iterator pos)
 {
   //  delete the object
   m_selected.erase (pos);
@@ -2968,12 +2825,11 @@ Service::delete_ruler (obj_iterator pos)
   selection_to_view ();
 }
 
-void
-Service::change_ruler (obj_iterator pos, const ant::Object &to)
+void Service::change_ruler (obj_iterator pos, const ant::Object &to)
 {
   //  replace the object, keep the ID:
   ant::Object *new_ruler = new ant::Object (to);
-  const ant::Object *current_ruler = dynamic_cast <const ant::Object *> (pos->ptr ());
+  const ant::Object *current_ruler = dynamic_cast<const ant::Object *> (pos->ptr ());
   tl_assert (current_ruler != 0);
 
   int new_id = current_ruler->id ();
@@ -2986,10 +2842,9 @@ Service::change_ruler (obj_iterator pos, const ant::Object &to)
   selection_to_view ();
 }
 
-void 
-Service::paint_on_planes (const db::DCplxTrans &trans,
-                          const std::vector <lay::CanvasPlane *> &planes,
-                          lay::Renderer &renderer)
+void Service::paint_on_planes (const db::DCplxTrans &trans,
+                               const std::vector<lay::CanvasPlane *> &planes,
+                               lay::Renderer &renderer)
 {
   if (planes.empty ()) {
     return;
@@ -2999,7 +2854,7 @@ Service::paint_on_planes (const db::DCplxTrans &trans,
 
   lay::AnnotationShapes::touching_iterator user_object = mp_view->annotation_shapes ().begin_touching (vp);
   while (! user_object.at_end ()) {
-    const ant::Object *ruler = dynamic_cast <const ant::Object *> ((*user_object).ptr ());
+    const ant::Object *ruler = dynamic_cast<const ant::Object *> ((*user_object).ptr ());
     if (ruler) {
       draw_ruler (*ruler, trans, false /*not selected*/, planes.front (), renderer);
     }
@@ -3013,8 +2868,7 @@ Service::begin_annotations () const
   return AnnotationIterator (mp_view->annotation_shapes ().begin (), mp_view->annotation_shapes ().end ());
 }
 
-void 
-Service::menu_activated (const std::string &symbol)
+void Service::menu_activated (const std::string &symbol)
 {
   if (symbol == "ant::clear_all_rulers_internal") {
     clear_rulers ();
@@ -3034,5 +2888,3 @@ Service::menu_activated (const std::string &symbol)
 // -------------------------------------------------------------
 
 } // namespace ant
-
-

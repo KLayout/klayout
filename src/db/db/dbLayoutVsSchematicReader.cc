@@ -108,7 +108,6 @@ void LayoutVsSchematicStandardReader::read_netlist (db::LayoutVsSchematic *lvs)
     } else {
       skip_element ();
     }
-
   }
 
   if (version > 1) {
@@ -172,7 +171,6 @@ void LayoutVsSchematicStandardReader::read_logs (db::NetlistCrossReference *xref
     } else {
       skip_element ();
     }
-
   }
   br.done ();
 }
@@ -195,7 +193,6 @@ void LayoutVsSchematicStandardReader::read_xrefs_for_circuits (db::NetlistCrossR
     } else {
       skip_element ();
     }
-
   }
   br.done ();
 }
@@ -249,7 +246,6 @@ void LayoutVsSchematicStandardReader::read_xref (db::NetlistCrossReference *xref
         } else {
           skip_element ();
         }
-
       }
 
       xref->gen_end_circuit (circuit_a, circuit_b, status, msg);
@@ -261,7 +257,6 @@ void LayoutVsSchematicStandardReader::read_xref (db::NetlistCrossReference *xref
     } else {
       skip_element ();
     }
-
   }
   br.done ();
 }
@@ -300,11 +295,9 @@ static const db::Net *net_by_numerical_id (const db::Circuit *circuit, const std
       if (j != i->second.id2net.end ()) {
         return j->second;
       }
-
     }
 
     throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (ion.first));
-
   }
 
   return 0;
@@ -321,11 +314,9 @@ static const db::Device *device_by_numerical_id (const db::Circuit *circuit, con
       if (j != i->second.id2device.end ()) {
         return j->second;
       }
-
     }
 
     throw tl::Exception (tl::to_string (tr ("Not a valid device ID: ")) + tl::to_string (ion.first));
-
   }
 
   return 0;
@@ -342,11 +333,9 @@ static const db::SubCircuit *subcircuit_by_numerical_id (const db::Circuit *circ
       if (j != i->second.id2subcircuit.end ()) {
         return j->second;
       }
-
     }
 
     throw tl::Exception (tl::to_string (tr ("Not a subcircuit device ID: ")) + tl::to_string (ion.first));
-
   }
 
   return 0;

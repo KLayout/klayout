@@ -34,13 +34,13 @@
 
 #include <cstdlib>
 
-unsigned int get_rand()
+unsigned int get_rand ()
 {
   //  provide a 32bit random number also for MSVC's 16bit rand():
   return (((unsigned int) rand ()) << 16) ^ ((unsigned int) rand ());
 }
 
-TEST(1a) 
+TEST (1a)
 {
   db::Layout out;
   unsigned int o1 = out.insert_layer ();
@@ -59,7 +59,7 @@ TEST(1a)
   EXPECT_EQ (sstream.string (), "begin_lib 0.001\nbegin_cell {TOP}\nend_cell\nend_lib\n");
 }
 
-TEST(1b) 
+TEST (1b)
 {
   db::Layout out;
   unsigned int o1 = out.insert_layer ();
@@ -82,7 +82,7 @@ TEST(1b)
   EXPECT_EQ (sstream.string (), "begin_lib 0.001\nbegin_cell {TOP}\nbox -1 -1 {0 0} {1000 2000}\nend_cell\nend_lib\n");
 }
 
-TEST(1c) 
+TEST (1c)
 {
   db::Layout out;
   unsigned int o1 = out.insert_layer ();
@@ -117,7 +117,7 @@ static std::string to_s (const db::Layout &ly, db::cell_index_type top, unsigned
   return r;
 }
 
-TEST(2)
+TEST (2)
 {
   db::Layout ly;
   unsigned int l1 = ly.insert_layer (db::LayerProperties (1, 0));
@@ -207,7 +207,7 @@ TEST(2)
   }
 }
 
-TEST(3)
+TEST (3)
 {
   db::Layout ly;
   unsigned int l1 = ly.insert_layer (db::LayerProperties (1, 0));
@@ -279,9 +279,9 @@ TEST(3)
   }
 
   EXPECT_EQ (or2.has_valid_polygons (), true);
-  EXPECT_EQ (or2.count () / 2000, size_t (50));  //  because we use rand () the value may vary - it's only accurate to 2%
+  EXPECT_EQ (or2.count () / 2000, size_t (50)); //  because we use rand () the value may vary - it's only accurate to 2%
   EXPECT_EQ (or2_copy.has_valid_polygons (), true);
-  EXPECT_EQ (or2_copy.count () / 2000, size_t (40));  //  because we use rand () the value may vary - it's only accurate to 2%
+  EXPECT_EQ (or2_copy.count () / 2000, size_t (40)); //  because we use rand () the value may vary - it's only accurate to 2%
   EXPECT_EQ ((or2 ^ or2_copy).empty (), true);
 
 #if 0
@@ -314,7 +314,7 @@ TEST(3)
   EXPECT_EQ (x3.empty (), true);
 }
 
-TEST(4)
+TEST (4)
 {
   //  different DBU's
 
@@ -385,9 +385,7 @@ TEST(4)
     EXPECT_EQ (to_s (o, topo, l1o), "box (100,200;300,400);box (1000,2000;3010,4010)");
     EXPECT_EQ (to_s (o, topo, l2o), "box (100,200;300,400)");
     EXPECT_EQ (to_s (o, topo, l3o), "box (1000,2000;3010,4010)");
-
   }
-
 }
 
 class MyTilingOutputReceiver
@@ -396,11 +394,13 @@ class MyTilingOutputReceiver
 public:
   MyTilingOutputReceiver (double *sum, int *n)
     : mp_sum (sum), mp_n (n)
-  { }
+  {
+  }
 
   MyTilingOutputReceiver ()
     : mp_sum (0), mp_n (0)
-  { }
+  {
+  }
 
   void add (double x) const
   {
@@ -421,13 +421,12 @@ DB_PUBLIC gsi::Class<db::TileOutputReceiver> &dbdecl_TileOutputReceiverBase ();
 }
 
 gsi::Class<MyTilingOutputReceiver> decl_MyTilingOutputReceiver (gsi::dbdecl_TileOutputReceiverBase (), "db", "MyTileOutputReceiver",
-  gsi::method ("add", &MyTilingOutputReceiver::add)
-);
+                                                                gsi::method ("add", &MyTilingOutputReceiver::add));
 
 //  Multithreaded, access to _rec()
 //  This will mainly test the ability of gsi::Proxy to manage references
 //  in a multithreaded case.
-TEST(5)
+TEST (5)
 {
   db::Layout ly1;
   ly1.dbu (0.001);

@@ -127,23 +127,23 @@ GenericReaderOptions::GenericReaderOptions ()
 
   //  Don't take the default, as in practice, it's more common to substitute LEF macros by layouts
   //  m_lefdef_macro_resolution_mode = load_options.get_option_by_name ("lefdef_config.macro_resolution_mode").to_int ();
-  m_lefdef_macro_resolution_mode = 2;  // "assume FOREIGN always"
+  m_lefdef_macro_resolution_mode = 2; // "assume FOREIGN always"
 }
 
-void
-GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
+void GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
 {
   {
     std::string group ("[" + m_group_prefix + " options - General]");
 
     cmd << tl::arg (group +
-                    "!-" + m_prefix + "s|--" + m_long_prefix + "skip-unknown-layers", &m_create_other_layers, "Skips unknown layers",
+                      "!-" + m_prefix + "s|--" + m_long_prefix + "skip-unknown-layers",
+                    &m_create_other_layers, "Skips unknown layers",
                     "This option is effective with the the --layer-map option. If combined with "
                     "--skip-unknown-layers, layers not listed in the layer map will not be read. "
-                    "By default, corresponding entries are created also for unknown layers."
-                   )
+                    "By default, corresponding entries are created also for unknown layers.")
         << tl::arg (group +
-                    "-" + m_prefix + "m|--" + m_long_prefix + "layer-map=map", this, &GenericReaderOptions::set_layer_map, "Specifies the layer mapping for the input",
+                      "-" + m_prefix + "m|--" + m_long_prefix + "layer-map=map",
+                    this, &GenericReaderOptions::set_layer_map, "Specifies the layer mapping for the input",
                     "This option specifies a layer selection or mapping. The selection or mapping is a sequence of source and optional "
                     "target specifications. The specifications are separated by blanks or double-slash sequences (//).\n"
                     "\n"
@@ -191,17 +191,18 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "\n"
                     "* [*/*] -(10/*)\n"
                     "  Includes all layers, but drops all datatypes from layer 10 through 'unmapping'.\n"
-                    "  Please note, that this specification requires -" + m_prefix + "s (skip unknown layers) because otherwise the "
-                    "  unmapped layers are still created through the unknown layer fallback path.\n"
-                   )
+                    "  Please note, that this specification requires -" +
+                      m_prefix + "s (skip unknown layers) because otherwise the "
+                                 "  unmapped layers are still created through the unknown layer fallback path.\n")
         << tl::arg (group +
-                    "--" + m_long_prefix + "layer-map-file=map", this, &GenericReaderOptions::set_layer_map_file, "Specifies the layer mapping for the input as a file",
+                      "--" + m_long_prefix + "layer-map-file=map",
+                    this, &GenericReaderOptions::set_layer_map_file, "Specifies the layer mapping for the input as a file",
                     "This option specifies the layer selection or mapping like -" + m_prefix + "m, but takes the mapping from the given file. "
-                    "Each line in this file is read as one layer mapping expression. "
-                    "Empty lines or lines starting with a hash (#) character or with double slashes (//) are ignored."
-                   )
+                                                                                               "Each line in this file is read as one layer mapping expression. "
+                                                                                               "Empty lines or lines starting with a hash (#) character or with double slashes (//) are ignored.")
         << tl::arg (group +
-                    "--" + m_long_prefix + "blend-mode=mode", &m_cell_conflict_resolution, "Specifies how cell conflicts are resolved when using file concatenation",
+                      "--" + m_long_prefix + "blend-mode=mode",
+                    &m_cell_conflict_resolution, "Specifies how cell conflicts are resolved when using file concatenation",
                     "When concatenating files with '+', the reader will handle cells with identical names according to this mode:\n"
                     "\n"
                     "* 0: joins everything (usually unsafe)\n"
@@ -210,133 +211,127 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "* 3: rename cell (safe, default)\n"
                     "\n"
                     "Mode 0 is a safe solution for the 'same hierarchy, different layers' case. Mode 3 is a safe solution for "
-                    "joining multiple files into one and combining the hierarchy tree of all files as distinct separate trees.\n"
-                   )
-      ;
+                    "joining multiple files into one and combining the hierarchy tree of all files as distinct separate trees.\n");
   }
 
   {
     std::string group ("[" + m_group_prefix + " options - GDS2 and OASIS specific]");
 
     cmd << tl::arg (group +
-                    "#!--" + m_long_prefix + "no-texts", &m_common_enable_text_objects, "Skips text objects",
-                    "With this option set, text objects won't be read."
-                   )
+                      "#!--" + m_long_prefix + "no-texts",
+                    &m_common_enable_text_objects, "Skips text objects",
+                    "With this option set, text objects won't be read.")
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "no-properties", &m_common_enable_properties, "Skips properties",
-                    "With this option set, properties won't be read."
-                   )
-      ;
+                      "#!--" + m_long_prefix + "no-properties",
+                    &m_common_enable_properties, "Skips properties",
+                    "With this option set, properties won't be read.");
   }
 
   {
     std::string group ("[" + m_group_prefix + " options - GDS2 specific]");
 
     cmd << tl::arg (group +
-                    "#!--" + m_long_prefix + "no-multi-xy-records", &m_gds2_allow_multi_xy_records, "Gives an error on multi-XY records",
+                      "#!--" + m_long_prefix + "no-multi-xy-records",
+                    &m_gds2_allow_multi_xy_records, "Gives an error on multi-XY records",
                     "This option disables an advanced interpretation of GDS2 which allows unlimited polygon and path "
                     "complexity. For compatibility with other readers, this option restores the standard behavior and "
-                    "disables this feature."
-                   )
+                    "disables this feature.")
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "no-big-records", &m_gds2_allow_big_records, "Gives an error on big (>32767 bytes) records",
+                      "#!--" + m_long_prefix + "no-big-records",
+                    &m_gds2_allow_big_records, "Gives an error on big (>32767 bytes) records",
                     "The GDS2 specification claims the record length to be a signed 16 bit value. So a record "
                     "can be 32767 bytes max. To allow bigger records (i.e. bigger polygons), the usual approach "
                     "is to take the length as a unsigned 16 bit value, so the length is up to 65535 bytes. "
-                    "This option restores the original behavior and reports big (>32767 bytes) records are errors."
-                   )
+                    "This option restores the original behavior and reports big (>32767 bytes) records are errors.")
         << tl::arg (group +
-                    "-" + m_prefix + "b|--" + m_long_prefix + "box-mode=mode", &m_gds2_box_mode, "Specifies how BOX records are read",
+                      "-" + m_prefix + "b|--" + m_long_prefix + "box-mode=mode",
+                    &m_gds2_box_mode, "Specifies how BOX records are read",
                     "This an option provided for compatibility with other readers. The mode value specifies how "
                     "BOX records are read:\n"
                     "\n"
                     "* 0: ignore BOX records\n"
                     "* 1: treat as rectangles (the default)\n"
                     "* 2: treat as boundaries\n"
-                    "* 3: treat as errors"
-                   )
-      ;
+                    "* 3: treat as errors");
   }
 
   {
     std::string group ("[" + m_group_prefix + " options - OASIS specific]");
 
     cmd << tl::arg (group +
-                    "#--" + m_long_prefix + "expect-strict-mode=mode", &m_oasis_expect_strict_mode, "Makes the reader expect strict or non-strict mode",
+                      "#--" + m_long_prefix + "expect-strict-mode=mode",
+                    &m_oasis_expect_strict_mode, "Makes the reader expect strict or non-strict mode",
                     "With this option, the OASIS reader will expect strict mode (mode is 1) or expect non-strict mode "
                     "(mode is 0). By default, both modes are allowed. This is a diagnostic feature and does not "
-                    "have any other effect than checking the mode."
-                   )
-      ;
+                    "have any other effect than checking the mode.");
   }
 
   {
     std::string group ("[" + m_group_prefix + " options - generic]");
 
     cmd << tl::arg (group +
-                    "-" + m_prefix + "d|--" + m_long_prefix + "dbu-in=dbu", this, &GenericReaderOptions::set_dbu, "Specifies the database unit to use",
+                      "-" + m_prefix + "d|--" + m_long_prefix + "dbu-in=dbu",
+                    this, &GenericReaderOptions::set_dbu, "Specifies the database unit to use",
                     "This option specifies the database unit the resulting layout will have. "
                     "The value is given in micrometer units. The default value is 1nm (0.001). "
                     "Note that for DEF, UNITS is not taken for the database unit, but this value is used instead.\n"
                     "\n"
                     "CAUTION: for GDS2 and OASIS, this value is ignored and the database unit of the first file "
-                    "is used instead. Beware of trouble when blending multiple GDS or OASIS files with different database units."
-                   )
+                    "is used instead. Beware of trouble when blending multiple GDS or OASIS files with different database units.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "keep-layer-names", this, &GenericReaderOptions::set_read_named_layers, "Keeps layer names",
+                      "#--" + m_long_prefix + "keep-layer-names",
+                    this, &GenericReaderOptions::set_read_named_layers, "Keeps layer names",
                     "If this option is used, layers names are kept as pure names and no attempt is made to\n"
                     "translate them into GDS layer/datatypes.\n"
                     "\n"
-                    "This option does not apply to GDS2 and OASIS files."
-                   )
-      ;
+                    "This option does not apply to GDS2 and OASIS files.");
   }
 
   {
     std::string group ("[" + m_group_prefix + " options - CIF specific]");
 
     cmd << tl::arg (group +
-                    "-" + m_prefix + "w|--" + m_long_prefix + "wire-mode=mode", &m_cif_wire_mode, "Specifies how wires (W) are read",
+                      "-" + m_prefix + "w|--" + m_long_prefix + "wire-mode=mode",
+                    &m_cif_wire_mode, "Specifies how wires (W) are read",
                     "This option specifies how wire objects (W) are read:\n"
                     "\n"
                     "* 0: as square ended paths (the default)\n"
                     "* 1: as flush ended paths\n"
-                    "* 2: as round paths"
-                   )
-      ;
+                    "* 2: as round paths");
   }
 
   {
     std::string group ("[" + m_group_prefix + " options - DXF specific]");
 
     cmd << tl::arg (group +
-                    "-" + m_prefix + "u|--" + m_long_prefix + "dxf-unit=unit", &m_dxf_unit, "Specifies the DXF drawing units",
+                      "-" + m_prefix + "u|--" + m_long_prefix + "dxf-unit=unit",
+                    &m_dxf_unit, "Specifies the DXF drawing units",
                     "Since DXF is unitless, this value needs to be given to specify the drawing units. "
-                    "By default, a drawing unit of micrometers is assumed."
-                   )
+                    "By default, a drawing unit of micrometers is assumed.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "dxf-text-scaling=factor", &m_dxf_text_scaling, "Specifies text scaling",
+                      "#--" + m_long_prefix + "dxf-text-scaling=factor",
+                    &m_dxf_text_scaling, "Specifies text scaling",
                     "This value specifies text scaling in percent. A value of 100 roughly means that the letter "
                     "pitch of the font will be 92% of the specified text height. That value applies for ROMANS fonts. "
                     "When generating GDS texts, a value of 100 generates TEXT objects with "
-                    "the specified size. Smaller values generate smaller sizes."
-                   )
+                    "the specified size. Smaller values generate smaller sizes.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "dxf-polyline-mode=mode", &m_dxf_polyline_mode, "Specifies how POLYLINE records are handled",
+                      "#--" + m_long_prefix + "dxf-polyline-mode=mode",
+                    &m_dxf_polyline_mode, "Specifies how POLYLINE records are handled",
                     "This value specifies how POLYLINE records are handled:\n"
                     "\n"
                     "* 0: automatic mode (default)\n"
                     "* 1: keep lines\n"
                     "* 2: create polygons from closed POLYLINE/LWPOLYLINE with width == 0\n"
                     "* 3: merge all lines (width width 0)\n"
-                    "* 4: as 3 and auto-close contours"
-                   )
+                    "* 4: as 3 and auto-close contours")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "dxf-circle-points=points", &m_dxf_circle_points, "Specifies the number of points for a full circle for arc interpolation",
-                    "See --" + m_long_prefix + "dxf-circle-accuracy for another way of specifying the number of points per circle."
-                   )
+                      "#--" + m_long_prefix + "dxf-circle-points=points",
+                    &m_dxf_circle_points, "Specifies the number of points for a full circle for arc interpolation",
+                    "See --" + m_long_prefix + "dxf-circle-accuracy for another way of specifying the number of points per circle.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "dxf-circle-accuracy=value", &m_dxf_circle_accuracy, "Specifies the accuracy of circle approximation",
+                      "#--" + m_long_prefix + "dxf-circle-accuracy=value",
+                    &m_dxf_circle_accuracy, "Specifies the accuracy of circle approximation",
                     "This value specifies the approximation accuracy of the circle and other\n"
                     "\"round\" structures. If this value is a positive number bigger than the\n"
                     "database unit (see dbu), it will control the number of points the\n"
@@ -346,44 +341,41 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "The actual number of points used for the circle approximation is\n"
                     "not larger than circle_points.\n"
                     "\n"
-                    "The value is given in the units of the DXF file."
-                   )
+                    "The value is given in the units of the DXF file.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "dxf-contour-accuracy=value", &m_dxf_contour_accuracy, "Specifies the point accuracy for contour closing",
+                      "#--" + m_long_prefix + "dxf-contour-accuracy=value",
+                    &m_dxf_contour_accuracy, "Specifies the point accuracy for contour closing",
                     "This value specifies the distance (in units of the DXF file) by which points can be separated and still\n"
-                    "be considered to be connected. This value is effective in polyline mode 3 and 4.\n"
-                   )
+                    "be considered to be connected. This value is effective in polyline mode 3 and 4.\n")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "dxf-render-texts-as-polygons", &m_dxf_render_texts_as_polygons, "Renders texts as polygons",
-                    "If this option is used, texts are converted to polygons instead of being converted to labels."
-                   )
+                      "#--" + m_long_prefix + "dxf-render-texts-as-polygons",
+                    &m_dxf_render_texts_as_polygons, "Renders texts as polygons",
+                    "If this option is used, texts are converted to polygons instead of being converted to labels.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "dxf-keep-other-cells", &m_dxf_keep_other_cells, "Keeps cells which are not instantiated by the top cell",
+                      "#--" + m_long_prefix + "dxf-keep-other-cells",
+                    &m_dxf_keep_other_cells, "Keeps cells which are not instantiated by the top cell",
                     "With this option, all cells not found to be instantiated are kept as additional top cells. "
-                    "By default, such cells are removed."
-                   )
-      ;
+                    "By default, such cells are removed.");
   }
 
   {
     std::string group ("[" + m_group_prefix + " options - MAG (Magic) specific]");
 
     cmd << tl::arg (group +
-                    "--" + m_long_prefix + "magic-lambda=lambda", &m_magic_lambda, "Specifies the lambda value",
+                      "--" + m_long_prefix + "magic-lambda=lambda",
+                    &m_magic_lambda, "Specifies the lambda value",
                     "The lambda value is used as a scaling factor to turn the dimensionless Magic drawings into "
-                    "physical layout."
-                   )
+                    "physical layout.")
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "magic-dont-merge", &m_magic_merge, "Disables polygon merging",
-                    "With this option, the rectangles and triangles of the Magic file are not merged into polygons."
-                   )
+                      "#!--" + m_long_prefix + "magic-dont-merge",
+                    &m_magic_merge, "Disables polygon merging",
+                    "With this option, the rectangles and triangles of the Magic file are not merged into polygons.")
         << tl::arg (group +
-                    "--" + m_long_prefix + "magic-lib-path=path", &m_magic_lib_path, "Specifies the library search path for Magic file loading",
+                      "--" + m_long_prefix + "magic-lib-path=path",
+                    &m_magic_lib_path, "Specifies the library search path for Magic file loading",
                     "The library search path gives the locations where the reader looks up files for child cells. "
                     "This option either specifies a comma-separated list of paths to search or it can be present multiple times "
-                    "for multiple search locations."
-                   )
-      ;
+                    "for multiple search locations.");
   }
 
 
@@ -391,264 +383,292 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
     std::string group ("[" + m_group_prefix + " options - LEF/DEF specific]");
 
     cmd << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-net-property-name=spec", &m_lefdef_net_property_name, "Specifies which property name to use for net names",
+                      "#--" + m_long_prefix + "lefdef-net-property-name=spec",
+                    &m_lefdef_net_property_name, "Specifies which property name to use for net names",
                     "This option gives the name of the shape property used to annotate net names. For 'spec' use:\n"
                     "\n"
                     "* \"#n\" for property number \"n\" (compatible with GDS2)\n"
                     "* A plain word for a named property (not compatible with GDS2)\n"
                     "\n"
-                    "By default, net names are not produced."
-                   )
+                    "By default, net names are not produced.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-instance-property-name=spec", &m_lefdef_inst_property_name, "Specifies which property name to use for DEF macro instance names",
+                      "#--" + m_long_prefix + "lefdef-instance-property-name=spec",
+                    &m_lefdef_inst_property_name, "Specifies which property name to use for DEF macro instance names",
                     "This option gives the name of the instance property used to annotate DEF macro instance names. "
-                    "For the 'spec' format see '--" + m_long_prefix + "lefdef-net-property-name'."
-                    "\n"
-                    "By default, instance names are not produced."
-                   )
+                    "For the 'spec' format see '--" +
+                      m_long_prefix + "lefdef-net-property-name'."
+                                      "\n"
+                                      "By default, instance names are not produced.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-pin-property-name=spec", &m_lefdef_pin_property_name, "Specifies which property name to use for pin names",
+                      "#--" + m_long_prefix + "lefdef-pin-property-name=spec",
+                    &m_lefdef_pin_property_name, "Specifies which property name to use for pin names",
                     "This option gives the name of the shape or instance property used to annotate pin names. "
-                    "For the 'spec' format see '--" + m_long_prefix + "lefdef-net-property-name'."
-                    "\n"
-                    "By default, pin names are not produced."
-                   )
+                    "For the 'spec' format see '--" +
+                      m_long_prefix + "lefdef-net-property-name'."
+                                      "\n"
+                                      "By default, pin names are not produced.")
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "lefdef-dont-produce-cell-outlines", &m_lefdef_produce_cell_outlines, "Disables producing cell outlines",
-                    "If this option is present, cell outlines will be skipped. Otherwise the cell outlines will be written to a layer given with '--" + m_long_prefix + "lefdef-cell-outline-layer'."
-                   )
+                      "#!--" + m_long_prefix + "lefdef-dont-produce-cell-outlines",
+                    &m_lefdef_produce_cell_outlines, "Disables producing cell outlines",
+                    "If this option is present, cell outlines will be skipped. Otherwise the cell outlines will be written to a layer given with '--" + m_long_prefix + "lefdef-cell-outline-layer'.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-cell-outline-layer=spec", &m_lefdef_cell_outline_layer, "Specifies which layer to use for the cell outlines",
+                      "#--" + m_long_prefix + "lefdef-cell-outline-layer=spec",
+                    &m_lefdef_cell_outline_layer, "Specifies which layer to use for the cell outlines",
                     "This option specifies the layer to use for the cell outline polygons. For 'spec' use:\n"
                     "\n"
                     "* \"l\" or \"l/d\" for a numerical layer or layer/datatype combination.\n"
                     "* A plain word for a named layer\n"
                     "* A name followed by a layer or layer/datatype combination in round brackets for a combined specification\n"
                     "\n"
-                    "Producing cell outline markers can be turned off with '--" + m_long_prefix + "lefdef-dont-produce-cell-outlines'."
-                   )
+                    "Producing cell outline markers can be turned off with '--" +
+                      m_long_prefix + "lefdef-dont-produce-cell-outlines'.")
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "lefdef-dont-produce-placement-blockages", &m_lefdef_produce_placement_blockages, "Disables producing blockage markers",
-                    "If this option is present, blockages will be skipped. Otherwise the blockage markers will be written to a layer given with '--" + m_long_prefix + "lefdef-placement-blockage-layer'."
-                   )
+                      "#!--" + m_long_prefix + "lefdef-dont-produce-placement-blockages",
+                    &m_lefdef_produce_placement_blockages, "Disables producing blockage markers",
+                    "If this option is present, blockages will be skipped. Otherwise the blockage markers will be written to a layer given with '--" + m_long_prefix + "lefdef-placement-blockage-layer'.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-placement-blockage-layer=spec", &m_lefdef_placement_blockage_layer, "Specifies which layer to use for the placement blockage markers",
+                      "#--" + m_long_prefix + "lefdef-placement-blockage-layer=spec",
+                    &m_lefdef_placement_blockage_layer, "Specifies which layer to use for the placement blockage markers",
                     "For the 'spec' format see '--" + m_long_prefix + "lefdef-cell-outline-layer'.\n"
-                    "\n"
-                    "Producing cell placement blockage markers can be turned off with '--" + m_long_prefix + "lefdef-dont-produce-placement-blockages'."
-                   )
+                                                                      "\n"
+                                                                      "Producing cell placement blockage markers can be turned off with '--" +
+                      m_long_prefix + "lefdef-dont-produce-placement-blockages'.")
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "lefdef-dont-produce-regions", &m_lefdef_produce_regions, "Disables producing regions",
-                    "If this option is present, regions will be skipped. Otherwise the regions will be written to a layer given with '--" + m_long_prefix + "lefdef-region-layer'."
-                   )
+                      "#!--" + m_long_prefix + "lefdef-dont-produce-regions",
+                    &m_lefdef_produce_regions, "Disables producing regions",
+                    "If this option is present, regions will be skipped. Otherwise the regions will be written to a layer given with '--" + m_long_prefix + "lefdef-region-layer'.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-region-layer=spec", &m_lefdef_region_layer, "Specifies which layer to use for the regions",
+                      "#--" + m_long_prefix + "lefdef-region-layer=spec",
+                    &m_lefdef_region_layer, "Specifies which layer to use for the regions",
                     "For the 'spec' format see '--" + m_long_prefix + "lefdef-cell-outline-layer'.\n"
-                    "\n"
-                    "Producing regions can be turned off with '--" + m_long_prefix + "lefdef-dont-produce-regions'."
-                   )
+                                                                      "\n"
+                                                                      "Producing regions can be turned off with '--" +
+                      m_long_prefix + "lefdef-dont-produce-regions'.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-separate-groups", &m_lefdef_separate_groups, "Specifies to separate groups of regions into a hierarchy",
+                      "#--" + m_long_prefix + "lefdef-separate-groups",
+                    &m_lefdef_separate_groups, "Specifies to separate groups of regions into a hierarchy",
                     "This option is used together with '--" + m_long_prefix + "lefdef-produce-regions'. If given, the region polygons will be put "
-                    "into a cell hierarchy where the cells indicate the region groups.\n"
-                   )
+                                                                              "into a cell hierarchy where the cells indicate the region groups.\n")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-joined-paths", &m_lefdef_joined_paths, "Specifies to produce joined paths for wires",
+                      "#--" + m_long_prefix + "lefdef-joined-paths",
+                    &m_lefdef_joined_paths, "Specifies to produce joined paths for wires",
                     "If given, multi-segment paths are created for wires if possible (this will fail for 45 degree segments for example). "
-                    "By default, individual straight segments will be produced."
-                   )
+                    "By default, individual straight segments will be produced.")
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "lefdef-dont-produce-via-geometry", &m_lefdef_produce_via_geometry, "Skips vias when producing geometry",
-                    "If this option is given, no via geometry will be produced."
-                   )
+                      "#!--" + m_long_prefix + "lefdef-dont-produce-via-geometry",
+                    &m_lefdef_produce_via_geometry, "Skips vias when producing geometry",
+                    "If this option is given, no via geometry will be produced.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-via-geometry-suffix", &m_lefdef_via_geometry_suffix, "Specifies the via geometry layer suffix in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-via-geometry-suffix",
+                    &m_lefdef_via_geometry_suffix, "Specifies the via geometry layer suffix in pattern-based mode",
                     "Use '" + m_long_prefix + "lefdef-via-geometry-suffix' and '--" + m_long_prefix + "lefdef-via-geometry-datatype' together with "
-                    "a layer map (see '-" + m_prefix + "m') to customize where the via geometry will be put.\n"
-                    "\n"
-                    "This option is part of the 'pattern-based' LEF/DEF layer mapping scheme.\n"
-                    "\n"
-                    "The mechanism is this: from the geometry's layer name and the suffix an effective layer name is produced. For example if the "
-                    "geometry is on layer 'M1' and the suffix is '_VIA', the effective layer name will be 'M1_VIA'. This layer is looked up in the "
-                    "layer map. If no such layer is found, the geometry layer name without suffix is looked up. If this layer is found, the datatype "
-                    "is substituted by the datatype specified with the '--" + m_long_prefix + "lefdef-via-geometry-datatype'. So eventually it's "
-                    "possible to use a detailed mapping by layer name + suffix or a generic mapping by layer name + datatype.\n"
-                    "\n"
-                    "Suffix and datatype can be made MASK specific by giving a list of values in the form: \"<generic>,1:<for-mask1>,2:<for-mask2>...\". "
-                    "For example, a datatype specification of \"6,1:61,2:62\" will use datatype 6 for via geometry without a mask assignment, "
-                    "datatype 61 for via geometry assigned to MASK 1 and datatype 62 for via geometry assigned to MASK 2.\n"
-                    "\n"
-                    "An alternative way to provide a layer mapping is through a map file (see '--" + m_long_prefix + "lefdef-map')."
-                   )
+                                                                                                      "a layer map (see '-" +
+                      m_prefix + "m') to customize where the via geometry will be put.\n"
+                                 "\n"
+                                 "This option is part of the 'pattern-based' LEF/DEF layer mapping scheme.\n"
+                                 "\n"
+                                 "The mechanism is this: from the geometry's layer name and the suffix an effective layer name is produced. For example if the "
+                                 "geometry is on layer 'M1' and the suffix is '_VIA', the effective layer name will be 'M1_VIA'. This layer is looked up in the "
+                                 "layer map. If no such layer is found, the geometry layer name without suffix is looked up. If this layer is found, the datatype "
+                                 "is substituted by the datatype specified with the '--" +
+                      m_long_prefix + "lefdef-via-geometry-datatype'. So eventually it's "
+                                      "possible to use a detailed mapping by layer name + suffix or a generic mapping by layer name + datatype.\n"
+                                      "\n"
+                                      "Suffix and datatype can be made MASK specific by giving a list of values in the form: \"<generic>,1:<for-mask1>,2:<for-mask2>...\". "
+                                      "For example, a datatype specification of \"6,1:61,2:62\" will use datatype 6 for via geometry without a mask assignment, "
+                                      "datatype 61 for via geometry assigned to MASK 1 and datatype 62 for via geometry assigned to MASK 2.\n"
+                                      "\n"
+                                      "An alternative way to provide a layer mapping is through a map file (see '--" +
+                      m_long_prefix + "lefdef-map').")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-via-geometry-datatype", &m_lefdef_via_geometry_datatype, "Specifies the via geometry layer datatype in pattern-based mode",
-                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of this option.\n"
-                   )
+                      "#--" + m_long_prefix + "lefdef-via-geometry-datatype",
+                    &m_lefdef_via_geometry_datatype, "Specifies the via geometry layer datatype in pattern-based mode",
+                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of this option.\n")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-via-cell-prefix", &m_lefdef_via_cellname_prefix, "Specifies the prefix for the cell names generated for vias",
+                      "#--" + m_long_prefix + "lefdef-via-cell-prefix",
+                    &m_lefdef_via_cellname_prefix, "Specifies the prefix for the cell names generated for vias",
                     "Vias will be put into their own cells by the LEF/DEF reader. This option gives a prefix that is used to form the name of "
-                    "these cells. The name is built from the prefix plus the via name.\n"
-                   )
+                    "these cells. The name is built from the prefix plus the via name.\n")
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "lefdef-dont-produce-pins", &m_lefdef_produce_pins, "Skips pins when producing geometry",
-                    "If this option is given, no pin geometry will be produced."
-                   )
+                      "#!--" + m_long_prefix + "lefdef-dont-produce-pins",
+                    &m_lefdef_produce_pins, "Skips pins when producing geometry",
+                    "If this option is given, no pin geometry will be produced.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-pins-suffix", &m_lefdef_pins_suffix, "Specifies the pin geometry layer suffix in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-pins-suffix",
+                    &m_lefdef_pins_suffix, "Specifies the pin geometry layer suffix in pattern-based mode",
                     "The pin geometry generation and layer mapping is designed in the same way than via geometry mapping. "
-                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-pins-datatype", &m_lefdef_pins_datatype, "Specifies the pin geometry layer datatype in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-pins-datatype",
+                    &m_lefdef_pins_datatype, "Specifies the pin geometry layer datatype in pattern-based mode",
                     "The pin geometry generation and layer mapping is designed in the same way than via geometry mapping. "
-                    "See '--" + m_long_prefix + "lefdef-produce-via-geometry' for a description of the mapping scheme.\n"
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-produce-via-geometry' for a description of the mapping scheme.\n")
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "lefdef-dont-produce-lef-pins", &m_lefdef_produce_lef_pins, "Skips LEF pins when producing geometry",
-                    "If this option is given, no LEF pin geometry will be produced."
-                   )
+                      "#!--" + m_long_prefix + "lefdef-dont-produce-lef-pins",
+                    &m_lefdef_produce_lef_pins, "Skips LEF pins when producing geometry",
+                    "If this option is given, no LEF pin geometry will be produced.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-lef-pins-suffix", &m_lefdef_lef_pins_suffix, "Specifies the LEF pin geometry layer suffix in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-lef-pins-suffix",
+                    &m_lefdef_lef_pins_suffix, "Specifies the LEF pin geometry layer suffix in pattern-based mode",
                     "The LEF pin geometry generation and layer mapping is designed in the same way than via geometry mapping. "
-                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-lef-pins-datatype", &m_lefdef_lef_pins_datatype, "Specifies the LEF pin geometry layer datatype in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-lef-pins-datatype",
+                    &m_lefdef_lef_pins_datatype, "Specifies the LEF pin geometry layer datatype in pattern-based mode",
                     "The LEF pin geometry generation and layer mapping is designed in the same way than via geometry mapping. "
-                    "See '--" + m_long_prefix + "lefdef-produce-via-geometry' for a description of the mapping scheme.\n"
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-produce-via-geometry' for a description of the mapping scheme.\n")
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "lefdef-dont-produce-fills", &m_lefdef_produce_fills, "Skips fills when producing geometry",
-                    "If this option is given, no fill geometry will be produced."
-                   )
+                      "#!--" + m_long_prefix + "lefdef-dont-produce-fills",
+                    &m_lefdef_produce_fills, "Skips fills when producing geometry",
+                    "If this option is given, no fill geometry will be produced.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-fills-suffix", &m_lefdef_fills_suffix, "Specifies the fill geometry layer suffix in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-fills-suffix",
+                    &m_lefdef_fills_suffix, "Specifies the fill geometry layer suffix in pattern-based mode",
                     "The fill geometry generation and layer mapfillg is designed in the same way than via geometry mapfillg. "
-                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapfillg scheme.\n"
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapfillg scheme.\n")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-fills-datatype", &m_lefdef_fills_datatype, "Specifies the fill geometry layer datatype in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-fills-datatype",
+                    &m_lefdef_fills_datatype, "Specifies the fill geometry layer datatype in pattern-based mode",
                     "The fill geometry generation and layer mapfillg is designed in the same way than via geometry mapfillg. "
-                    "See '--" + m_long_prefix + "lefdef-produce-via-geometry' for a description of the mapfillg scheme.\n"
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-produce-via-geometry' for a description of the mapfillg scheme.\n")
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "lefdef-dont-produce-routing", &m_lefdef_produce_routing, "Skips routing when producing geometry",
-                    "If this option is given, no routing geometry will be produced."
-                   )
+                      "#!--" + m_long_prefix + "lefdef-dont-produce-routing",
+                    &m_lefdef_produce_routing, "Skips routing when producing geometry",
+                    "If this option is given, no routing geometry will be produced.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-routing-suffix", &m_lefdef_routing_suffix, "Specifies the routing geometry layer suffix in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-routing-suffix",
+                    &m_lefdef_routing_suffix, "Specifies the routing geometry layer suffix in pattern-based mode",
                     "The routing geometry generation and layer mapping is designed in the same way than via geometry mapping. "
-                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-routing-datatype", &m_lefdef_routing_datatype, "Specifies the routing geometry layer datatype in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-routing-datatype",
+                    &m_lefdef_routing_datatype, "Specifies the routing geometry layer datatype in pattern-based mode",
                     "The routing geometry generation and layer mapping is designed in the same way than via geometry mapping. "
-                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n")
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "lefdef-dont-produce-special-routing", &m_lefdef_produce_special_routing, "Skips special routing when producing geometry",
-                    "If this option is given, no special routing geometry will be produced."
-                   )
+                      "#!--" + m_long_prefix + "lefdef-dont-produce-special-routing",
+                    &m_lefdef_produce_special_routing, "Skips special routing when producing geometry",
+                    "If this option is given, no special routing geometry will be produced.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-special-routing-suffix", &m_lefdef_special_routing_suffix, "Specifies the special routing geometry layer suffix in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-special-routing-suffix",
+                    &m_lefdef_special_routing_suffix, "Specifies the special routing geometry layer suffix in pattern-based mode",
                     "The special routing geometry generation and layer mapping is designed in the same way than via geometry mapping. "
-                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-special-routing-datatype", &m_lefdef_special_routing_datatype, "Specifies the special routing geometry layer datatype in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-special-routing-datatype",
+                    &m_lefdef_special_routing_datatype, "Specifies the special routing geometry layer datatype in pattern-based mode",
                     "The special routing geometry generation and layer mapping is designed in the same way than via geometry mapping. "
-                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n")
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "lefdef-dont-produce-obstructions", &m_lefdef_produce_obstructions, "Skips obstructions when producing geometry",
-                    "If this option is given, no obstruction marker geometry will be produced."
-                   )
+                      "#!--" + m_long_prefix + "lefdef-dont-produce-obstructions",
+                    &m_lefdef_produce_obstructions, "Skips obstructions when producing geometry",
+                    "If this option is given, no obstruction marker geometry will be produced.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-obstruction-suffix", &m_lefdef_obstruction_suffix, "Specifies the obstruction markers layer suffix in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-obstruction-suffix",
+                    &m_lefdef_obstruction_suffix, "Specifies the obstruction markers layer suffix in pattern-based mode",
                     "The obstruction marker generation and layer mapping is designed in the same way than via geometry mapping, except the option to use mask specific target layers. "
-                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-obstruction-datatype", &m_lefdef_obstruction_datatype, "Specifies the obstruction markers layer datatype in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-obstruction-datatype",
+                    &m_lefdef_obstruction_datatype, "Specifies the obstruction markers layer datatype in pattern-based mode",
                     "The obstruction marker generation and layer mapping is designed in the same way than via geometry mapping, except the option to use mask specific target layers. "
-                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n")
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "lefdef-dont-produce-blockages", &m_lefdef_produce_blockages, "Skips blockages when producing geometry",
-                    "If this option is given, no blockage geometry will be produced."
-                   )
+                      "#!--" + m_long_prefix + "lefdef-dont-produce-blockages",
+                    &m_lefdef_produce_blockages, "Skips blockages when producing geometry",
+                    "If this option is given, no blockage geometry will be produced.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-blockage-suffix", &m_lefdef_blockage_suffix, "Specifies the blockage markers layer suffix in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-blockage-suffix",
+                    &m_lefdef_blockage_suffix, "Specifies the blockage markers layer suffix in pattern-based mode",
                     "The blockage marker generation and layer mapping is designed in the same way than via geometry mapping, except the option to use mask specific target layers. "
-                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-blockage-datatype", &m_lefdef_blockage_datatype, "Specifies the blockage markers layer datatype in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-blockage-datatype",
+                    &m_lefdef_blockage_datatype, "Specifies the blockage markers layer datatype in pattern-based mode",
                     "The blockage marker generation and layer mapping is designed in the same way than via geometry mapping, except the option to use mask specific target layers. "
-                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n")
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "lefdef-dont-produce-labels", &m_lefdef_produce_labels, "Skips DEF pin label when producing geometry",
-                    "If this option is given, no DEF pin label will be produced."
-                   )
+                      "#!--" + m_long_prefix + "lefdef-dont-produce-labels",
+                    &m_lefdef_produce_labels, "Skips DEF pin label when producing geometry",
+                    "If this option is given, no DEF pin label will be produced.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-label-suffix", &m_lefdef_label_suffix, "Specifies the DEF pin label layer suffix in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-label-suffix",
+                    &m_lefdef_label_suffix, "Specifies the DEF pin label layer suffix in pattern-based mode",
                     "The label marker generation and layer mapping is designed in the same way than via geometry mapping, except the option to use mask specific target layers. "
-                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-label-datatype", &m_lefdef_label_datatype, "Specifies the DEF pin label layer datatype in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-label-datatype",
+                    &m_lefdef_label_datatype, "Specifies the DEF pin label layer datatype in pattern-based mode",
                     "The label marker generation and layer mapping is designed in the same way than via geometry mapping, except the option to use mask specific target layers. "
-                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n")
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "lefdef-dont-produce-lef-labels", &m_lefdef_produce_lef_labels, "Skips LEF pin label when producing geometry",
-                    "If this option is given, no LEF pin label will be produced."
-                   )
+                      "#!--" + m_long_prefix + "lefdef-dont-produce-lef-labels",
+                    &m_lefdef_produce_lef_labels, "Skips LEF pin label when producing geometry",
+                    "If this option is given, no LEF pin label will be produced.")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-lef-label-suffix", &m_lefdef_lef_label_suffix, "Specifies the LEF pin label layer suffix in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-lef-label-suffix",
+                    &m_lefdef_lef_label_suffix, "Specifies the LEF pin label layer suffix in pattern-based mode",
                     "The label marker generation and layer mapping is designed in the same way than via geometry mapping, except the option to use mask specific target layers. "
-                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n")
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-lef-label-datatype", &m_lefdef_lef_label_datatype, "Specifies the LEF pin label layer datatype in pattern-based mode",
+                      "#--" + m_long_prefix + "lefdef-lef-label-datatype",
+                    &m_lefdef_lef_label_datatype, "Specifies the LEF pin label layer datatype in pattern-based mode",
                     "The label marker generation and layer mapping is designed in the same way than via geometry mapping, except the option to use mask specific target layers. "
-                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n")
         << tl::arg (group +
-                    "--" + m_long_prefix + "lefdef-map", &m_lefdef_map_files, "Specifies to use a layer map file",
+                      "--" + m_long_prefix + "lefdef-map",
+                    &m_lefdef_map_files, "Specifies to use a layer map file",
                     "Use this option to turn off pattern-based layer mapping and to use an explicit mapping file instead. "
-                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the pattern-based mapping scheme.\n"
-                    "\n"
-                    "Using a map file is an alternative way to specify layer mapping. With a layer mapping file, the individual target "
-                    "layers need to specified individually for different layer/purpose combinations.\n"
-                    "\n"
-                    "The mapping file is one layer mapping entry per line. Each line is a layer name, followed by a list of purposes (VIA, PIN ...) "
-                    "and a layer and datatype number. In addition, 'DIEAREA', 'REGION' and 'BLOCKAGE' can be used to map the design outline, regions and blockages to a layer. "
-                    "'REGION' can have a detailed specifier which is 'FENCE', 'GUIDE' or 'NONE' for fence, guide or other type regions (e.g. 'REGION FENCE 99/0').\n"
-                    "\n"
-                    "'NAME' in place of the "
-                    "layer name and using layer/purpose in the purpose column allows mapping labels to specific layers.\n"
-                    "\n"
-                    "This is an example for a layer map file:\n"
-                    "\n"
-                    "DIEAREA ALL                       100      0\n"
-                    "M1      LEFPIN                    12       0\n"
-                    "M1      PIN                       12       2\n"
-                    "M1      NET                       12       3\n"
-                    "M1      SPNET                     12       4\n"
-                    "M1      VIA                       12       5\n"
-                    "M1      BLOCKAGE                  12       10\n"
-                    "NAME    M1/PIN                    12       10\n"
-                    "VIA1    LEFPIN,VIA,PIN,NET,SPNET  13       0\n"
-                    "M2      LEFPIN,PIN,NET,SPNET,VIA  14       0\n"
-                    "\n"
-                    "If a map file is used, only the layers present in the map file are generated. No other layers are produced.\n"
-                    "\n"
-                    "This option can be given multiple times. The corresponing map files are merged."
-                   )
+                    "See '--" +
+                      m_long_prefix + "lefdef-via-geometry-suffix' for a description of the pattern-based mapping scheme.\n"
+                                      "\n"
+                                      "Using a map file is an alternative way to specify layer mapping. With a layer mapping file, the individual target "
+                                      "layers need to specified individually for different layer/purpose combinations.\n"
+                                      "\n"
+                                      "The mapping file is one layer mapping entry per line. Each line is a layer name, followed by a list of purposes (VIA, PIN ...) "
+                                      "and a layer and datatype number. In addition, 'DIEAREA', 'REGION' and 'BLOCKAGE' can be used to map the design outline, regions and blockages to a layer. "
+                                      "'REGION' can have a detailed specifier which is 'FENCE', 'GUIDE' or 'NONE' for fence, guide or other type regions (e.g. 'REGION FENCE 99/0').\n"
+                                      "\n"
+                                      "'NAME' in place of the "
+                                      "layer name and using layer/purpose in the purpose column allows mapping labels to specific layers.\n"
+                                      "\n"
+                                      "This is an example for a layer map file:\n"
+                                      "\n"
+                                      "DIEAREA ALL                       100      0\n"
+                                      "M1      LEFPIN                    12       0\n"
+                                      "M1      PIN                       12       2\n"
+                                      "M1      NET                       12       3\n"
+                                      "M1      SPNET                     12       4\n"
+                                      "M1      VIA                       12       5\n"
+                                      "M1      BLOCKAGE                  12       10\n"
+                                      "NAME    M1/PIN                    12       10\n"
+                                      "VIA1    LEFPIN,VIA,PIN,NET,SPNET  13       0\n"
+                                      "M2      LEFPIN,PIN,NET,SPNET,VIA  14       0\n"
+                                      "\n"
+                                      "If a map file is used, only the layers present in the map file are generated. No other layers are produced.\n"
+                                      "\n"
+                                      "This option can be given multiple times. The corresponing map files are merged.")
         << tl::arg (group +
-                    "!--" + m_long_prefix + "lefdef-macro-resolution-mode", &m_lefdef_macro_resolution_mode, "Specify how to generate layout from LEF macros",
+                      "!--" + m_long_prefix + "lefdef-macro-resolution-mode",
+                    &m_lefdef_macro_resolution_mode, "Specify how to generate layout from LEF macros",
                     "This option applies when reading DEF files.\n"
                     "\n"
                     "The following values are accepted for this option:\n"
@@ -657,37 +677,39 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "* 1: produce LEF geometry always and ignore FOREIGN\n"
                     "* 2: Never produce LEF geometry and assume FOREIGN always\n"
                     "\n"
-                    "In case of FOREIGN macros in mode 0 or always in mode 2, the '--" + m_long_prefix + "lefdef-lef-layouts' option is available to specify "
-                    "external layout files for providing the LEF macro layouts.\n"
-                   )
+                    "In case of FOREIGN macros in mode 0 or always in mode 2, the '--" +
+                      m_long_prefix + "lefdef-lef-layouts' option is available to specify "
+                                      "external layout files for providing the LEF macro layouts.\n")
         << tl::arg (group +
-                    "--" + m_long_prefix + "lefdef-lef-layouts", &m_lefdef_lef_layout_files, "Layout files for resolving FOREIGN LEF cells from",
+                      "--" + m_long_prefix + "lefdef-lef-layouts",
+                    &m_lefdef_lef_layout_files, "Layout files for resolving FOREIGN LEF cells from",
                     "This option applies when reading DEF files.\n"
                     "\n"
                     "Use a comma-separated list of file names here to specify which layout files to use for resolving LEF macros. "
-                    "This applies when LEF macros are specified with FOREIGN. By using '--" + m_long_prefix + "lefdef-macro-resolution-mode' you "
-                    "can force external resolution (assume FOREIGN always) or turn it off (ignore FOREIGN).\n"
-                   )
+                    "This applies when LEF macros are specified with FOREIGN. By using '--" +
+                      m_long_prefix + "lefdef-macro-resolution-mode' you "
+                                      "can force external resolution (assume FOREIGN always) or turn it off (ignore FOREIGN).\n")
         << tl::arg (group +
-                    "!--" + m_long_prefix + "lefdef-no-implicit-lef", &m_lefdef_read_lef_with_def, "Disables reading all LEF files together with DEF files",
+                      "!--" + m_long_prefix + "lefdef-no-implicit-lef",
+                    &m_lefdef_read_lef_with_def, "Disables reading all LEF files together with DEF files",
                     "This option applies when reading DEF files.\n"
                     "\n"
-                    "If this option is given, only the LEF files specified with '--" + m_long_prefix + "lefdef-lef-files' will be read."
-                    "\n"
-                    "If this option is not present, the DEF reader will look for all files with 'LEF' or related extensions "
-                    "in the same place than the DEF file and read these files before the DEF file is read. In addition, it will read the "
-                    "LEF files specified with '--" + m_long_prefix + "lefdef-lef-files'."
-                   )
+                    "If this option is given, only the LEF files specified with '--" +
+                      m_long_prefix + "lefdef-lef-files' will be read."
+                                      "\n"
+                                      "If this option is not present, the DEF reader will look for all files with 'LEF' or related extensions "
+                                      "in the same place than the DEF file and read these files before the DEF file is read. In addition, it will read the "
+                                      "LEF files specified with '--" +
+                      m_long_prefix + "lefdef-lef-files'.")
         << tl::arg (group +
-                    "--" + m_long_prefix + "lefdef-lefs", &m_lefdef_lef_files, "Specifies which additional LEF files to read",
+                      "--" + m_long_prefix + "lefdef-lefs",
+                    &m_lefdef_lef_files, "Specifies which additional LEF files to read",
                     "This option applies when reading DEF files.\n"
                     "\n"
                     "Use a comma-separated list of file names here to specify which LEF files to read. "
-                    "See also '--" + m_long_prefix + "lefdef-read-lef-with-def' for an option to implicitly read all LEF files in the same "
-                    "place than the DEF file.\n"
-                   )
-      ;
-
+                    "See also '--" +
+                      m_long_prefix + "lefdef-read-lef-with-def' for an option to implicitly read all LEF files in the same "
+                                      "place than the DEF file.\n");
   }
 }
 
@@ -720,8 +742,7 @@ void GenericReaderOptions::set_dbu (double dbu)
   m_dbu = dbu;
 }
 
-void
-GenericReaderOptions::configure (db::LoadLayoutOptions &load_options)
+void GenericReaderOptions::configure (db::LoadLayoutOptions &load_options)
 {
   load_options.set_option_by_name ("layer_map", tl::Variant::make_variant (m_layer_map));
   load_options.set_option_by_name ("create_other_layers", m_create_other_layers);
@@ -766,9 +787,9 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options)
   load_options.set_option_by_name ("lefdef_config.layer_map", tl::Variant::make_variant (m_layer_map));
   load_options.set_option_by_name ("lefdef_config.create_other_layers", m_create_other_layers);
   load_options.set_option_by_name ("lefdef_config.dbu", m_dbu);
-  load_options.set_option_by_name ("lefdef_config.net_property_name", !m_lefdef_net_property_name.empty () ? tl::Variant (m_lefdef_net_property_name) : tl::Variant ());
-  load_options.set_option_by_name ("lefdef_config.instance_property_name", !m_lefdef_inst_property_name.empty () ? tl::Variant (m_lefdef_inst_property_name) : tl::Variant ());
-  load_options.set_option_by_name ("lefdef_config.pin_property_name", !m_lefdef_pin_property_name.empty () ? tl::Variant (m_lefdef_pin_property_name) : tl::Variant ());
+  load_options.set_option_by_name ("lefdef_config.net_property_name", ! m_lefdef_net_property_name.empty () ? tl::Variant (m_lefdef_net_property_name) : tl::Variant ());
+  load_options.set_option_by_name ("lefdef_config.instance_property_name", ! m_lefdef_inst_property_name.empty () ? tl::Variant (m_lefdef_inst_property_name) : tl::Variant ());
+  load_options.set_option_by_name ("lefdef_config.pin_property_name", ! m_lefdef_pin_property_name.empty () ? tl::Variant (m_lefdef_pin_property_name) : tl::Variant ());
   load_options.set_option_by_name ("lefdef_config.produce_cell_outlines", m_lefdef_produce_cell_outlines);
   load_options.set_option_by_name ("lefdef_config.cell_outline_layer", m_lefdef_cell_outline_layer);
   load_options.set_option_by_name ("lefdef_config.produce_placement_blockages", m_lefdef_produce_placement_blockages);
@@ -836,9 +857,9 @@ static std::string::size_type find_file_sep (const std::string &s, std::string::
   }
 }
 
-static std::vector<std::vector<std::string> > split_file_list (const std::string &infile)
+static std::vector<std::vector<std::string>> split_file_list (const std::string &infile)
 {
-  std::vector<std::vector<std::string> > files;
+  std::vector<std::vector<std::string>> files;
   files.push_back (std::vector<std::string> ());
 
   size_t p = 0;
@@ -856,7 +877,6 @@ static std::vector<std::vector<std::string> > split_file_list (const std::string
     }
 
     p = sep + 1;
-
   }
 
   return files;
@@ -868,7 +888,7 @@ void read_files (db::Layout &layout, const std::string &infile, const db::LoadLa
   //    db::LayoutLocker locker (&layout);
   //  but there are yet unknown side effects
 
-  std::vector<std::vector<std::string> > files = split_file_list (infile);
+  std::vector<std::vector<std::string>> files = split_file_list (infile);
 
   for (auto ff = files.begin (); ff != files.end (); ++ff) {
 
@@ -908,7 +928,6 @@ void read_files (db::Layout &layout, const std::string &infile, const db::LoadLa
         } else {
           cells_target.push_back (layout.add_cell (tmp.cell_name (*c)));
         }
-
       }
 
       //  ghost cell joining also works the other way around: a top cell of destination
@@ -922,7 +941,6 @@ void read_files (db::Layout &layout, const std::string &infile, const db::LoadLa
           cells_source.push_back (*c);
           cells_target.push_back (cell_target.second);
         }
-
       }
 
       db::CellMapping cm;
@@ -932,9 +950,7 @@ void read_files (db::Layout &layout, const std::string &infile, const db::LoadLa
       lm.create_full (layout, tmp);
 
       layout.move_tree_shapes (tmp, cm, lm);
-
     }
-
   }
 }
 

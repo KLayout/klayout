@@ -36,11 +36,13 @@
 #include <iostream>
 #include <math.h>
 
-namespace tl {
-  class Extractor;
+namespace tl
+{
+class Extractor;
 }
 
-namespace db {
+namespace db
+{
 
 template <class I, class F, class R = double> class DB_PUBLIC_TEMPLATE complex_trans;
 template <class C> class DB_PUBLIC_TEMPLATE simple_trans;
@@ -52,8 +54,7 @@ template <class C> class DB_PUBLIC_TEMPLATE fixpoint_trans;
  */
 
 template <class C>
-struct default_trans
-{
+struct default_trans {
   typedef C coord_type;
   typedef C target_coord_type;
   typedef vector<C> displacement_type;
@@ -80,7 +81,7 @@ struct default_trans
   /**
    *  @brief Orthogonal predicate
    *
-   *  This predicate tells if the transformation is orthogonal, i.e. does only provide rotations by 
+   *  This predicate tells if the transformation is orthogonal, i.e. does only provide rotations by
    *  multiple of 90 degree.
    */
   bool is_ortho () const
@@ -134,8 +135,7 @@ struct default_trans
 
 template <class C>
 struct unit_trans
-  : public default_trans<C>
-{
+  : public default_trans<C> {
   typedef C coord_type;
   typedef C target_coord_type;
   typedef typename coord_traits<C>::distance_type distance_type;
@@ -243,7 +243,7 @@ struct unit_trans
   /**
    *  @brief Assignment (which basically does nothing)
    */
-  unit_trans &operator= (const unit_trans &) 
+  unit_trans &operator= (const unit_trans &)
   {
     return *this;
   }
@@ -252,7 +252,7 @@ struct unit_trans
    *  @brief Assignment (which basically does nothing)
    */
   template <class D>
-  unit_trans &operator= (const unit_trans<D> &) 
+  unit_trans &operator= (const unit_trans<D> &)
   {
     return *this;
   }
@@ -265,7 +265,7 @@ struct unit_trans
     return *this;
   }
 
-  /** 
+  /**
    *  @brief In-place inversion
    */
   unit_trans invert ()
@@ -274,7 +274,7 @@ struct unit_trans
   }
 
   /**
-   *  @brief The transformation of a point 
+   *  @brief The transformation of a point
    */
   point<C> operator() (const point<C> &p) const
   {
@@ -282,7 +282,7 @@ struct unit_trans
   }
 
   /**
-   *  @brief The transformation of a vector 
+   *  @brief The transformation of a vector
    */
   vector<C> operator() (const vector<C> &p) const
   {
@@ -342,10 +342,10 @@ struct unit_trans
  *  @brief Dummy Multiplication (concatenation) of unit transformations
  */
 template <class C>
-inline unit_trans<C> 
+inline unit_trans<C>
 operator* (const unit_trans<C> & /*t1*/, const unit_trans<C> & /*t2*/)
 {
-  return unit_trans<C>();
+  return unit_trans<C> ();
 }
 
 /**
@@ -415,7 +415,7 @@ public:
    *
    *  The sequence of operations is: mirroring at x axis,
    *  rotation, application of displacement.
-   *  
+   *
    *  @param rot The rotation in units of 90 degree
    *  @param mirrx True, if mirrored at x axis
    */
@@ -424,20 +424,21 @@ public:
   {
     // .. nothing else ..
   }
-  
+
   /**
-   *  @brief The copy constructor 
+   *  @brief The copy constructor
    *
    *  @param d The source from which to copy
    */
   template <class D>
   explicit fixpoint_trans (const fixpoint_trans<D> &d)
     : m_f (d.rot ())
-  { }
+  {
+  }
 
   /**
    *  @brief The standard constructor using a code rather than angle and mirror and no displacement
-   *  
+   *
    *  @param f The rotation/mirror code (r0 .. m135 constants)
    */
   explicit fixpoint_trans (int f)
@@ -460,14 +461,14 @@ public:
   /**
    *  @brief The rotation/mirror codes
    */
-  static const int r0   = 0;  //  No rotation
-  static const int r90  = 1;  //  Rotation by 90 degree counterclockwise
-  static const int r180 = 2;  //  Rotation by 180 degree counterclockwise
-  static const int r270 = 3;  //  Rotation by 270 degree counterclockwise
-  static const int m0   = 4;  //  Mirroring at x-axis
-  static const int m45  = 5;  //  Mirroring at 45-degree axis
-  static const int m90  = 6;  //  Mirroring at y-axis
-  static const int m135 = 7;  //  Mirroring at 135-degree axis
+  static const int r0 = 0;   //  No rotation
+  static const int r90 = 1;  //  Rotation by 90 degree counterclockwise
+  static const int r180 = 2; //  Rotation by 180 degree counterclockwise
+  static const int r270 = 3; //  Rotation by 270 degree counterclockwise
+  static const int m0 = 4;   //  Mirroring at x-axis
+  static const int m45 = 5;  //  Mirroring at 45-degree axis
+  static const int m90 = 6;  //  Mirroring at y-axis
+  static const int m135 = 7; //  Mirroring at 135-degree axis
 
   /**
    *  @brief Inversion
@@ -483,7 +484,7 @@ public:
     return t;
   }
 
-  /** 
+  /**
    *  @brief In-place inversion
    *
    *  Inverts the transformation and replaces *this by the
@@ -504,8 +505,8 @@ public:
    */
   Matrix2d to_matrix2d () const
   {
-    vector<C> tx = operator () (vector<C> (1, 0));
-    vector<C> ty = operator () (vector<C> (0, 1));
+    vector<C> tx = operator() (vector<C> (1, 0));
+    vector<C> ty = operator() (vector<C> (0, 1));
     return Matrix2d (tx.x (), ty.x (), tx.y (), ty.y ());
   }
 
@@ -518,11 +519,11 @@ public:
   }
 
   /**
-   *  @brief The transformation of a point 
+   *  @brief The transformation of a point
    *
    *  The operator() method transforms the given point.
    *  q = t(p)
-   *  
+   *
    *  @param p The point to transform
    *  @return The transformed point
    */
@@ -557,11 +558,11 @@ public:
   }
 
   /**
-   *  @brief The transformation of a vector 
+   *  @brief The transformation of a vector
    *
    *  The operator() method transforms the given vector.
    *  q = t(p)
-   *  
+   *
    *  @param p The point to transform
    *  @return The transformed point
    */
@@ -605,7 +606,7 @@ public:
     return tt;
   }
 
-  /** 
+  /**
    *  @brief Extract the fixpoint transformation part (this is identical to *this in this case)
    */
   const fixpoint_trans &fp_trans () const
@@ -624,7 +625,7 @@ public:
   /**
    *  @brief Multiplication (concatenation) of transformations
    *
-   *  The *= operator modifies the transformation by 
+   *  The *= operator modifies the transformation by
    *  replacing *this with *this * t (t is applied before *this).
    *
    *  @param t The transformation to apply before
@@ -665,7 +666,7 @@ public:
    */
   bool operator!= (const fixpoint_trans &t) const
   {
-    return !operator== (t);
+    return ! operator== (t);
   }
 
   /**
@@ -689,8 +690,8 @@ public:
    */
   std::string to_string () const
   {
-    const char *ms [] = { "r0", "r90", "r180", "r270", 
-                          "m0", "m45", "m90",  "m135" };
+    const char *ms [] = {"r0", "r90", "r180", "r270",
+                         "m0", "m45", "m90", "m135"};
 
     return std::string ((m_f < 0 || m_f >= 8) ? "*" : ms [m_f]);
   }
@@ -698,7 +699,7 @@ public:
   /**
    *  @brief Accessor to the rotation/mirror code
    */
-  int rot () const 
+  int rot () const
   {
     return m_f;
   }
@@ -706,7 +707,7 @@ public:
   /**
    *  @brief Accessor to the angle (in units of 90 degree)
    */
-  int angle () const 
+  int angle () const
   {
     return m_f & 3;
   }
@@ -737,7 +738,7 @@ private:
  *  @return t1 * t2
  */
 template <class C>
-inline fixpoint_trans<C> 
+inline fixpoint_trans<C>
 operator* (const fixpoint_trans<C> &t1, const fixpoint_trans<C> &t2)
 {
   fixpoint_trans<C> t (t1);
@@ -791,13 +792,14 @@ public:
   }
 
   /**
-   *  @brief The copy constructor 
+   *  @brief The copy constructor
    *
    *  @param d The source from which to copy
    */
   disp_trans (const disp_trans<C> &d)
     : m_u (d.disp ())
-  { }
+  {
+  }
 
   /**
    *  @brief The copy constructor that converts also
@@ -810,11 +812,12 @@ public:
   template <class D>
   disp_trans (const disp_trans<D> &d)
     : m_u (d.disp ())
-  { }
+  {
+  }
 
   /**
    *  @brief The standard constructor using a displacement only (as vector)
-   *  
+   *
    *  @param u The displacement
    */
   explicit disp_trans (const displacement_type &u)
@@ -883,7 +886,7 @@ public:
     return t;
   }
 
-  /** 
+  /**
    *  @brief In-place inversion
    *
    *  Inverts the transformation and replaces *this by the
@@ -920,7 +923,7 @@ public:
    *  e = t(d). For the displacement transformations, there
    *  is no magnification and no modification of the distance
    *  therefore.
-   *  
+   *
    *  @param d The distance to transform
    *  @return The transformed distance
    */
@@ -928,13 +931,13 @@ public:
   {
     return d;
   }
-  
+
   /**
-   *  @brief The transformation of a point 
+   *  @brief The transformation of a point
    *
    *  The operator() method transforms the given point.
    *  q = t(p)
-   *  
+   *
    *  @param p The point to transform
    *  @return The transformed point
    */
@@ -952,11 +955,11 @@ public:
   }
 
   /**
-   *  @brief The transformation of a vector 
+   *  @brief The transformation of a vector
    *
    *  The operator() method transforms the given vector.
    *  q = t(p)
-   *  
+   *
    *  @param p The vector to transform
    *  @return The transformed vector
    */
@@ -976,7 +979,7 @@ public:
   /**
    *  @brief Multiplication (concatenation) of transformations
    *
-   *  The *= operator modifies the transformation by 
+   *  The *= operator modifies the transformation by
    *  replacing *this with *this * t (t is applied before *this).
    *
    *  @param t The transformation to apply before
@@ -987,7 +990,7 @@ public:
     m_u += t.m_u;
     return *this;
   }
-  
+
   /**
    *  @brief A sorting criterion
    */
@@ -1017,7 +1020,7 @@ public:
    */
   bool operator!= (const disp_trans<C> &t) const
   {
-    return !operator== (t);
+    return ! operator== (t);
   }
 
   /**
@@ -1044,7 +1047,7 @@ public:
     return m_u.to_string ();
   }
 
-  /** 
+  /**
    *  @brief Gets the displacement
    */
   const displacement_type &disp () const
@@ -1052,10 +1055,10 @@ public:
     return m_u;
   }
 
-  /** 
+  /**
    *  @brief Sets the displacement
    */
-  void disp (const displacement_type &u) 
+  void disp (const displacement_type &u)
   {
     m_u = u;
   }
@@ -1068,7 +1071,7 @@ public:
     return false;
   }
 
-  /** 
+  /**
    *  @brief Extract the fixpoint transformation part (this is a r0 contribution in this case)
    */
   fixpoint_trans<C> fp_trans () const
@@ -1091,7 +1094,7 @@ private:
  *  @return t1 * t2
  */
 template <class C>
-inline disp_trans<C> 
+inline disp_trans<C>
 operator* (const disp_trans<C> &t1, const disp_trans<C> &t2)
 {
   disp_trans<C> t (t1);
@@ -1113,7 +1116,7 @@ operator<< (std::ostream &os, const disp_trans<C> &t)
  *  @brief A simple transformation
  *
  *  The simple transformation applies a displacement vector
- *  and a simple fixpoint transformation. 
+ *  and a simple fixpoint transformation.
  */
 
 template <class C>
@@ -1170,7 +1173,8 @@ public:
    */
   simple_trans (const simple_trans<C> &d)
     : fixpoint_trans<C> (d.rot ()), m_u (d.disp ())
-  { }
+  {
+  }
 
   /**
    *  @brief Assignment
@@ -1178,7 +1182,7 @@ public:
    *  @param d The source from which to take the data
    */
   simple_trans &operator= (const simple_trans<C> &d)
-  { 
+  {
     fixpoint_trans<C>::operator= (d);
     m_u = d.disp ();
     return *this;
@@ -1195,7 +1199,8 @@ public:
   template <class D>
   explicit simple_trans (const simple_trans<D> &d)
     : fixpoint_trans<C> (d.rot ()), m_u (d.disp ())
-  { }
+  {
+  }
 
   /**
    *  @brief Assignment which also converts
@@ -1207,7 +1212,7 @@ public:
    */
   template <class D>
   simple_trans &operator= (const simple_trans<D> &d)
-  { 
+  {
     fixpoint_trans<C>::operator= (d);
     m_u = d.disp ();
     return *this;
@@ -1218,7 +1223,7 @@ public:
    *
    *  The sequence of operations is: mirroring at x axis,
    *  rotation, application of displacement.
-   *  
+   *
    *  @param rot The rotation in units of 90 degree
    *  @param mirrx True, if mirrored at x axis
    *  @param u The displacement
@@ -1228,10 +1233,10 @@ public:
   {
     // .. nothing else ..
   }
-  
+
   /**
    *  @brief The standard constructor for a displacement-only transformation
-   *  
+   *
    *  @param u The displacement
    */
   explicit simple_trans (const vector<C> &u)
@@ -1264,7 +1269,7 @@ public:
 
   /**
    *  @brief The standard constructor using a code rather than angle and mirror and no displacement
-   *  
+   *
    *  @param f The rotation/mirror code (r0 .. m135 constants)
    */
   explicit simple_trans (int f)
@@ -1287,7 +1292,7 @@ public:
     return t;
   }
 
-  /** 
+  /**
    *  @brief In-place inversion
    *
    *  Inverts the transformation and replaces *this by the
@@ -1318,7 +1323,7 @@ public:
    *  e = t(d). For the simple transformations, there
    *  is no magnification and no modification of the distance
    *  therefore.
-   *  
+   *
    *  @param d The distance to transform
    *  @return The transformed distance
    */
@@ -1326,13 +1331,13 @@ public:
   {
     return d;
   }
-  
+
   /**
-   *  @brief The transformation of a point 
+   *  @brief The transformation of a point
    *
    *  The operator() method transforms the given point.
    *  q = t(p)
-   *  
+   *
    *  @param p The point to transform
    *  @return The transformed point
    */
@@ -1350,11 +1355,11 @@ public:
   }
 
   /**
-   *  @brief The transformation of a vector 
+   *  @brief The transformation of a vector
    *
    *  The operator() method transforms the given vector.
    *  q = t(p)
-   *  
+   *
    *  @param p The point to transform
    *  @return The transformed vector
    */
@@ -1398,7 +1403,7 @@ public:
   /**
    *  @brief Multiplication (concatenation) of transformations
    *
-   *  The *= operator modifies the transformation by 
+   *  The *= operator modifies the transformation by
    *  replacing *this with *this * t (t is applied before *this).
    *
    *  @param t The transformation to apply before
@@ -1450,7 +1455,7 @@ public:
    */
   bool operator!= (const simple_trans<C> &t) const
   {
-    return !operator== (t);
+    return ! operator== (t);
   }
 
   /**
@@ -1483,7 +1488,7 @@ public:
     }
   }
 
-  /** 
+  /**
    *  @brief Gets the displacement
    */
   const displacement_type &disp () const
@@ -1491,7 +1496,7 @@ public:
     return m_u;
   }
 
-  /** 
+  /**
    *  @brief Sets the displacement
    */
   void disp (const displacement_type &u)
@@ -1499,7 +1504,7 @@ public:
     m_u = u;
   }
 
-  /** 
+  /**
    *  @brief Accessor to the fp_trans
    */
   const fixpoint_trans<C> &fp_trans () const
@@ -1522,7 +1527,7 @@ private:
  *  @return t1 * t2
  */
 template <class C>
-inline simple_trans<C> 
+inline simple_trans<C>
 operator* (const simple_trans<C> &t1, const simple_trans<C> &t2)
 {
   simple_trans<C> t (t1);
@@ -1640,7 +1645,7 @@ public:
    *  @brief Migration constructor from a simple transformation to a complex transformation
    *
    *  This constructor is supposed to support migration from a simple to a complex transformation
-   *  in an incremental fashion. Basically that means, that everything that is missing in the 
+   *  in an incremental fashion. Basically that means, that everything that is missing in the
    *  simple transformation is added by additional parameters.
    *  Specifically this added information is the magnification and the incremental rotation angle
    *  to fill up the 90 degree multiples of the simple transformation to the desired rotation.
@@ -1686,7 +1691,7 @@ public:
     m_sin = sin (rot);
     m_cos = cos (rot);
   }
-  
+
   /**
    *  @brief The standard constructor using a Matrix3d object
    *
@@ -1706,13 +1711,13 @@ public:
     m_sin = sin (rot);
     m_cos = cos (rot);
   }
-  
+
   /**
    *  @brief The standard constructor using a Matrix2d object
    *
    *  The sequence of operations is: magnification, mirroring at x axis,
    *  rotation, application of displacement.
-   *  
+   *
    *  @param mag The magnification
    *  @param rot The rotation angle in units of degree
    *  @param mirrx True, if mirrored at x axis
@@ -1729,7 +1734,7 @@ public:
     m_sin = sin (rot);
     m_cos = cos (rot);
   }
-  
+
   /**
    *  @brief The standard constructor using magnification only
    *
@@ -1742,7 +1747,7 @@ public:
     m_sin = 0.0;
     m_cos = 1.0;
   }
-  
+
   /**
    *  @brief The copy constructor that converts also
    *
@@ -1754,11 +1759,12 @@ public:
   template <class II, class FF, class RR>
   explicit complex_trans (const complex_trans<II, FF, RR> &d)
     : m_u (d.m_u), m_sin (d.m_sin), m_cos (d.m_cos), m_mag (d.m_mag)
-  { }
+  {
+  }
 
   /**
    *  @brief The standard constructor using a displacement only
-   *  
+   *
    *  @param u The displacement
    */
   explicit complex_trans (const displacement_type &u)
@@ -1782,7 +1788,7 @@ public:
     inv.m_mag = 1.0 / m_mag;
     inv.m_sin = -m_sin * (m_mag < 0.0 ? -1.0 : 1.0);
     inv.m_cos = m_cos;
-    inv.m_u = inv.operator () (-m_u);
+    inv.m_u = inv.operator() (-m_u);
 
     return inverse_trans (inv);
   }
@@ -1801,7 +1807,7 @@ public:
     inv.m_mag = 1.0 / m_mag;
     inv.m_sin = -m_sin * (m_mag < 0.0 ? -1.0 : 1.0);
     inv.m_cos = m_cos;
-    inv.m_u = inv.operator () (-m_u);
+    inv.m_u = inv.operator() (-m_u);
 
     *this = complex_trans (inv);
     return *this;
@@ -1811,7 +1817,7 @@ public:
    *  @brief The transformation of a distance
    *
    *  The ctrans method transforms the given distance.
-   *  
+   *
    *  @param d The distance to transform
    *  @return The transformed distance
    */
@@ -1819,7 +1825,7 @@ public:
   {
     return coord_traits<F>::rounded_distance (d * fabs (m_mag));
   }
-  
+
   /**
    *  @brief Conversion to a 2d matrix
    */
@@ -1837,11 +1843,11 @@ public:
   }
 
   /**
-   *  @brief The transformation of a point 
+   *  @brief The transformation of a point
    *
    *  The operator() method transforms the given point.
    *  q = t(p)
-   *  
+   *
    *  @param p The point to transform
    *  @return The transformed point
    */
@@ -1861,11 +1867,11 @@ public:
   }
 
   /**
-   *  @brief The transformation of a vector 
+   *  @brief The transformation of a vector
    *
    *  The operator() method transforms the given vector.
    *  q = t(p)
-   *  
+   *
    *  @param p The vector to transform
    *  @return The transformed vector
    */
@@ -1917,7 +1923,7 @@ public:
    *  If this transformation is orthogonal (is_ortho () == true), then this method
    *  will return the corresponding fixpoint transformation, not taking into account
    *  magnification and displacement. If the transformation is not orthogonal, the result
-   *  reflects the quadrant the rotation goes into with the guarantee to reproduce the 
+   *  reflects the quadrant the rotation goes into with the guarantee to reproduce the
    *  correct quadrant in the exact case.
    */
   int rot () const
@@ -1926,12 +1932,12 @@ public:
   }
 
   /**
-   *  @brief Return the respective fixpoint trans if possible 
+   *  @brief Return the respective fixpoint trans if possible
    *
    *  If this transformation is orthogonal (is_ortho () == true), then this method
    *  will return the corresponding fixpoint transformation, not taking into account
    *  magnification and displacement. If the transformation is not orthogonal, the result
-   *  reflects the quadrant the rotation goes into with the guarantee to reproduce the 
+   *  reflects the quadrant the rotation goes into with the guarantee to reproduce the
    *  correct quadrant in the exact case.
    */
   fixpoint_trans<I> fp_trans () const
@@ -1994,7 +2000,7 @@ public:
     return m_sin;
   }
 
-  /** 
+  /**
    *  @brief Read accessor to the magnification
    */
   double mag () const
@@ -2002,7 +2008,7 @@ public:
     return fabs (m_mag);
   }
 
-  /** 
+  /**
    *  @brief Test, if the transformation is a magnifying one
    *
    *  This is the recommended test for checking if the transformation represents
@@ -2013,7 +2019,7 @@ public:
     return fabs (fabs (m_mag) - 1.0) > eps_f ();
   }
 
-  /** 
+  /**
    *  @brief Write accessor to the magnification
    */
   void mag (double m)
@@ -2031,7 +2037,7 @@ public:
     return is_mag () || ! is_ortho ();
   }
 
-  /** 
+  /**
    *  @brief Test, if the transformation is mirroring
    */
   bool is_mirror () const
@@ -2039,7 +2045,7 @@ public:
     return m_mag < 0.0;
   }
 
-  /** 
+  /**
    *  @brief Write accessor to the mirror flag
    */
   void mirror (bool m)
@@ -2047,7 +2053,7 @@ public:
     m_mag = m ? -fabs (m_mag) : fabs (m_mag);
   }
 
-  /** 
+  /**
    *  @brief Read accessor to the displacement
    */
   displacement_type disp () const
@@ -2055,7 +2061,7 @@ public:
     return displacement_type (m_u);
   }
 
-  /** 
+  /**
    *  @brief Write accessor to the displacement
    */
   void disp (const displacement_type &u)
@@ -2066,7 +2072,7 @@ public:
   /**
    *  @brief Multiplication (concatenation) of transformations - in-place version
    *
-   *  The *= operator modifies the transformation by 
+   *  The *= operator modifies the transformation by
    *  replacing *this with *this * t (t is applied before *this).
    *
    *  @param t The transformation to apply before
@@ -2123,7 +2129,7 @@ public:
   {
     //  The concatenation is done with double as the intermediate type to avoid
     //  rounding issues as far as possible.
-    return complex_trans<double, F, R> (*this).concat (complex_trans<I, double, R>(t));
+    return complex_trans<double, F, R> (*this).concat (complex_trans<I, double, R> (t));
   }
 
   /**
@@ -2156,9 +2162,9 @@ public:
   }
 
   /**
-   *  @brief Retrieve the residual part of the angle 
+   *  @brief Retrieve the residual part of the angle
    *
-   *  The residual part is the cosine of the angle difference to the 
+   *  The residual part is the cosine of the angle difference to the
    *  lower next multiple of 90 degree. I.e. the residual part of 135 degree
    *  would be cos(45 deg).
    */
@@ -2220,7 +2226,7 @@ public:
    */
   bool operator== (const complex_trans &t) const
   {
-    return m_u == t.m_u && 
+    return m_u == t.m_u &&
            fabs (m_sin - t.m_sin) <= eps_f () &&
            fabs (m_cos - t.m_cos) <= eps_f () &&
            fabs (m_mag - t.m_mag) <= eps_f ();
@@ -2231,7 +2237,7 @@ public:
    */
   bool operator!= (const complex_trans &t) const
   {
-    return !operator== (t);
+    return ! operator== (t);
   }
 
   /**
@@ -2239,7 +2245,7 @@ public:
    */
   bool equal (const complex_trans &t) const
   {
-    return m_u.equal (t.m_u) && 
+    return m_u.equal (t.m_u) &&
            fabs (m_sin - t.m_sin) <= eps_f () &&
            fabs (m_cos - t.m_cos) <= eps_f () &&
            fabs (m_mag - t.m_mag) <= eps_f ();
@@ -2314,7 +2320,7 @@ operator* (const complex_trans<I, F, R> &t1, const complex_trans<II, I, R> &t2)
  *  @return t1 * m
  */
 template <class I, class F, class R>
-inline complex_trans<I, F, R> 
+inline complex_trans<I, F, R>
 operator* (const complex_trans<I, F, R> &t1, double m)
 {
   complex_trans<I, F, R> t (t1);
@@ -2334,8 +2340,8 @@ operator<< (std::ostream &os, const complex_trans<I, F, R> &t)
 
 /**
  *  @brief A combined transformation
- *  
- *  A combined transformation is the combination of two 
+ *
+ *  A combined transformation is the combination of two
  *  transformations T1 and T2 (T=T1*T2). Although the multiplication
  *  of two transformations may render the same result, but
  *  usually is more efficient. To combine two different
@@ -2344,8 +2350,7 @@ operator<< (std::ostream &os, const complex_trans<I, F, R> &t)
  */
 
 template <class T1, class T2>
-struct combined_trans
-{
+struct combined_trans {
   typedef typename T2::coord_type coord_type;
   typedef typename T1::target_coord_type target_coord_type;
   typedef combined_trans<typename T2::inverse_trans, typename T1::inverse_trans> inverse_trans;
@@ -2372,7 +2377,7 @@ struct combined_trans
     // .. nothing else ..
   }
 
-  /** 
+  /**
    *  @brief Inversion
    *
    *  Inverts the transformation and returns the inverted
@@ -2386,11 +2391,11 @@ struct combined_trans
   }
 
   /**
-   *  @brief The transformation of a point 
+   *  @brief The transformation of a point
    *
    *  The operator() method transforms the given point.
    *  q = t(p)
-   *  
+   *
    *  @param p The point to transform
    *  @return The transformed point
    */
@@ -2420,11 +2425,11 @@ struct combined_trans
   }
 
   /**
-   *  @brief The transformation of a distance 
+   *  @brief The transformation of a distance
    *
    *  The ctrans method transforms the given distance.
    *  s = t(d)
-   *  
+   *
    *  @param d The distance to transform
    *  @return The transformed distance
    */
@@ -2437,11 +2442,11 @@ struct combined_trans
   }
 
   /**
-   *  @brief The transformation of a fixpoint transformation 
+   *  @brief The transformation of a fixpoint transformation
    *
    *  The ftrans method transforms the given fixpoint transformation.
    *  f = t(f)
-   *  
+   *
    *  @param f The fixpoint transformation to transform
    *  @return The transformed fixpoint transformation
    */
@@ -2472,7 +2477,7 @@ struct combined_trans
    */
   bool operator!= (const combined_trans<T1, T2> &t) const
   {
-    return !operator== (t);
+    return ! operator== (t);
   }
 
   /**
@@ -2613,8 +2618,8 @@ typedef complex_trans<db::DCoord, db::DCoord> DCplxTrans;
  *  @param p The point to transform
  *  @return The transformed point
  */
-template <class C, class Tr> 
-inline point<typename Tr::target_coord_type> 
+template <class C, class Tr>
+inline point<typename Tr::target_coord_type>
 operator* (const Tr &t, const point<C> &p)
 {
   return t.operator() (point<typename Tr::coord_type> (p));
@@ -2630,8 +2635,8 @@ operator* (const Tr &t, const point<C> &p)
  *  @param p The vector to transform
  *  @return The transformed vector
  */
-template <class C, class Tr> 
-inline vector<typename Tr::target_coord_type> 
+template <class C, class Tr>
+inline vector<typename Tr::target_coord_type>
 operator* (const Tr &t, const vector<C> &p)
 {
   return t.operator() (vector<typename Tr::coord_type> (p));
@@ -2641,7 +2646,7 @@ operator* (const Tr &t, const vector<C> &p)
  *  @brief Fuzzy compare function for transformation objects
  */
 template <class T>
-class trans_less_func 
+class trans_less_func
 {
 public:
   bool operator() (const T &a, const T &b) const
@@ -2654,7 +2659,7 @@ public:
  *  @brief Fuzzy compare function for transformation objects
  */
 template <class T>
-class trans_equal_func 
+class trans_equal_func
 {
 public:
   bool operator() (const T &a, const T &b) const
@@ -2669,36 +2674,34 @@ public:
  *  @brief Special extractors for the transformations
  */
 
-namespace tl 
+namespace tl
 {
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::UnitTrans &t);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DUnitTrans &t);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::FTrans &t);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DFTrans &t);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Trans &t);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DTrans &t);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Disp &t);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DDisp &t);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::CplxTrans &t);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::VCplxTrans &t);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DCplxTrans &t);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::ICplxTrans &t);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::UnitTrans &t);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DUnitTrans &t);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::FTrans &t);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DFTrans &t);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Trans &t);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DTrans &t);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Disp &t);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DDisp &t);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::CplxTrans &t);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::VCplxTrans &t);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DCplxTrans &t);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::ICplxTrans &t);
 
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::UnitTrans &t);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DUnitTrans &t);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::FTrans &t);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DFTrans &t);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Trans &t);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DTrans &t);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Disp &t);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DDisp &t);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::CplxTrans &t);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::VCplxTrans &t);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DCplxTrans &t);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::ICplxTrans &t);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::UnitTrans &t);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DUnitTrans &t);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::FTrans &t);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DFTrans &t);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Trans &t);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DTrans &t);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Disp &t);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DDisp &t);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::CplxTrans &t);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::VCplxTrans &t);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DCplxTrans &t);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::ICplxTrans &t);
 
 } // namespace tl
 
 #endif
-
-

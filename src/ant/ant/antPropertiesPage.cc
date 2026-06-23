@@ -75,10 +75,10 @@ PropertiesPage::PropertiesPage (ant::Service *rulers, db::Manager *manager, QWid
   connect (p2_to_layout, SIGNAL (clicked ()), this, SLOT (snap_to_layout_clicked ()));
   connect (both_to_layout, SIGNAL (clicked ()), this, SLOT (snap_to_layout_clicked ()));
 
-  swap_points->setEnabled (! readonly());
-  p1_to_layout->setEnabled (! readonly());
-  p2_to_layout->setEnabled (! readonly());
-  both_to_layout->setEnabled (! readonly());
+  swap_points->setEnabled (! readonly ());
+  p1_to_layout->setEnabled (! readonly ());
+  p2_to_layout->setEnabled (! readonly ());
+  both_to_layout->setEnabled (! readonly ());
 
   if (! readonly ()) {
 
@@ -113,7 +113,6 @@ PropertiesPage::PropertiesPage (ant::Service *rulers, db::Manager *manager, QWid
     x2->setReadOnly (true);
     y1->setReadOnly (true);
     y2->setReadOnly (true);
-
   }
 
   lay::activate_help_links (help_label);
@@ -126,8 +125,7 @@ PropertiesPage::~PropertiesPage ()
   mp_rulers->restore_highlights ();
 }
 
-void
-PropertiesPage::swap_points_clicked ()
+void PropertiesPage::swap_points_clicked ()
 {
   if (readonly ()) {
     return;
@@ -147,8 +145,7 @@ PropertiesPage::swap_points_clicked ()
   emit edited ();
 }
 
-void
-PropertiesPage::get_points (db::DPoint &p1, db::DPoint &p2)
+void PropertiesPage::get_points (db::DPoint &p1, db::DPoint &p2)
 {
   double dx1 = 0.0, dy1 = 0.0, dx2 = 0.0, dy2 = 0.0;
   bool has_error = false;
@@ -193,8 +190,7 @@ PropertiesPage::get_points (db::DPoint &p1, db::DPoint &p2)
   p2 = db::DPoint (dx2, dy2);
 }
 
-void
-PropertiesPage::get_point (db::DPoint &p)
+void PropertiesPage::get_point (db::DPoint &p)
 {
   double dx = 0.0, dy = 0.0;
   bool has_error = false;
@@ -222,8 +218,7 @@ PropertiesPage::get_point (db::DPoint &p)
   p = db::DPoint (dx, dy);
 }
 
-void
-PropertiesPage::get_points (ant::Object::point_list &points)
+void PropertiesPage::get_points (ant::Object::point_list &points)
 {
   std::string coordinates = tl::to_string (points_edit->toPlainText ());
   points.clear ();
@@ -249,8 +244,7 @@ PropertiesPage::get_points (ant::Object::point_list &points)
   }
 }
 
-void
-PropertiesPage::something_changed ()
+void PropertiesPage::something_changed ()
 {
   if (m_in_something_changed) {
     return;
@@ -276,8 +270,7 @@ PropertiesPage::something_changed ()
   }
 }
 
-void
-PropertiesPage::snap_to_layout_clicked ()
+void PropertiesPage::snap_to_layout_clicked ()
 {
   if (readonly ()) {
     return;
@@ -331,12 +324,10 @@ PropertiesPage::snap_to_layout_clicked ()
         emit edited ();
 
         break;
-
       }
 
       //  no point found -> one more iteration with increased range
       snap_range *= 2.0;
-
     }
 
   } else {
@@ -353,16 +344,14 @@ PropertiesPage::snap_to_layout_clicked ()
       y2->setText (tl::to_qstring (tl::micron_to_string (ee.second.y ())));
 
       emit edited ();
-
     }
-
   }
 }
 
 const ant::Object &
 PropertiesPage::current () const
 {
-  const ant::Object *ruler = dynamic_cast <const ant::Object *> (m_selection [m_index]->ptr ());
+  const ant::Object *ruler = dynamic_cast<const ant::Object *> (m_selection [m_index]->ptr ());
   return *ruler;
 }
 
@@ -372,8 +361,7 @@ PropertiesPage::count () const
   return m_selection.size ();
 }
 
-void
-PropertiesPage::select_entries (const std::vector<size_t> &entries)
+void PropertiesPage::select_entries (const std::vector<size_t> &entries)
 {
   if (! entries.empty ()) {
     m_index = entries.front ();
@@ -383,7 +371,7 @@ PropertiesPage::select_entries (const std::vector<size_t> &entries)
 std::string
 PropertiesPage::description (size_t entry) const
 {
-  const ant::Object *obj = dynamic_cast <const ant::Object *> (m_selection [entry]->ptr ());
+  const ant::Object *obj = dynamic_cast<const ant::Object *> (m_selection [entry]->ptr ());
   if (! obj) {
     return std::string ("nil");
   }
@@ -420,10 +408,9 @@ PropertiesPage::description () const
   return tl::to_string (tr ("Rulers and Annotations"));
 }
 
-void
-PropertiesPage::confine_selection (const std::vector<size_t> &remaining_entries)
+void PropertiesPage::confine_selection (const std::vector<size_t> &remaining_entries)
 {
-  std::vector <ant::Service::obj_iterator> org_selection;
+  std::vector<ant::Service::obj_iterator> org_selection;
   m_selection.swap (org_selection);
   for (auto i = remaining_entries.begin (); i != remaining_entries.end (); ++i) {
     m_selection.push_back (org_selection [*i]);
@@ -433,21 +420,18 @@ PropertiesPage::confine_selection (const std::vector<size_t> &remaining_entries)
   mp_rulers->clear_highlights ();
 }
 
-void
-PropertiesPage::leave ()
+void PropertiesPage::leave ()
 {
   mp_rulers->clear_highlights ();
 }
 
-void 
-PropertiesPage::update ()
+void PropertiesPage::update ()
 {
   mp_rulers->highlight (m_index);
   update_with (current ());
 }
 
-void
-PropertiesPage::update_with (const ant::Object &obj)
+void PropertiesPage::update_with (const ant::Object &obj)
 {
   fmt_le->setText (tl::to_qstring (obj.fmt ()));
   fmt_x_le->setText (tl::to_qstring (obj.fmt_x ()));
@@ -497,7 +481,6 @@ PropertiesPage::update_with (const ant::Object &obj)
 
     lay::SignalBlocker blocker (points_edit);
     points_edit->setPlainText (tl::to_qstring (text));
-
   }
 
   x0->setText (tl::to_qstring (tl::micron_to_string (obj.p1 ().x ())));
@@ -524,21 +507,19 @@ PropertiesPage::update_with (const ant::Object &obj)
   dd->setCursorPosition (0);
 }
 
-bool 
-PropertiesPage::readonly ()
+bool PropertiesPage::readonly ()
 {
   return false;
 }
 
-void 
-PropertiesPage::apply (bool /*commit*/)
+void PropertiesPage::apply (bool /*commit*/)
 {
   ant::Object obj;
   get_object (obj);
   mp_rulers->change_ruler (m_selection [m_index], obj);
 }
 
-void PropertiesPage::get_object(ant::Object &obj)
+void PropertiesPage::get_object (ant::Object &obj)
 {
   std::string fmt = tl::to_string (fmt_le->text ());
   std::string fmt_x = tl::to_string (fmt_x_le->text ());
@@ -564,7 +545,6 @@ void PropertiesPage::get_object(ant::Object &obj)
     get_points (points);
 
     obj = ant::Object (points, current ().id (), fmt_x, fmt_y, fmt, style, outline, current ().snap (), current ().angle_constraint ());
-
   }
 
   obj.set_main_position (Object::position_type (main_position->currentIndex ()));

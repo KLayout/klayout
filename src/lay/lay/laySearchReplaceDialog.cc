@@ -61,14 +61,12 @@ SearchReplaceResults::SearchReplaceResults ()
   //  .. nothing yet ..
 }
 
-void
-SearchReplaceResults::has_more (bool hm)
+void SearchReplaceResults::has_more (bool hm)
 {
   m_has_more = hm;
 }
 
-void 
-SearchReplaceResults::clear ()
+void SearchReplaceResults::clear ()
 {
   m_data_result.clear ();
   m_shape_result.clear ();
@@ -78,8 +76,7 @@ SearchReplaceResults::clear ()
   m_has_more = false;
 }
 
-void
-SearchReplaceResults::set_data_column_headers (const tl::Variant &v)
+void SearchReplaceResults::set_data_column_headers (const tl::Variant &v)
 {
   m_data_column_headers = v;
   if (v.is_list ()) {
@@ -87,8 +84,7 @@ SearchReplaceResults::set_data_column_headers (const tl::Variant &v)
   }
 }
 
-void 
-SearchReplaceResults::push_back (const tl::Variant &v)
+void SearchReplaceResults::push_back (const tl::Variant &v)
 {
   m_data_result.push_back (v);
   if (v.is_list ()) {
@@ -96,26 +92,22 @@ SearchReplaceResults::push_back (const tl::Variant &v)
   }
 }
 
-void 
-SearchReplaceResults::push_back (const QueryShapeResult &v)
+void SearchReplaceResults::push_back (const QueryShapeResult &v)
 {
   m_shape_result.push_back (v);
 }
 
-void 
-SearchReplaceResults::push_back (const QueryInstResult &v)
+void SearchReplaceResults::push_back (const QueryInstResult &v)
 {
   m_inst_result.push_back (v);
 }
 
-void 
-SearchReplaceResults::push_back (const QueryCellResult &v)
+void SearchReplaceResults::push_back (const QueryCellResult &v)
 {
   m_cell_result.push_back (v);
 }
 
-void 
-SearchReplaceResults::begin_changes (const db::Layout *layout)
+void SearchReplaceResults::begin_changes (const db::Layout *layout)
 {
 #if QT_VERSION >= 0x040600
   beginResetModel ();
@@ -136,12 +128,10 @@ SearchReplaceResults::begin_changes (const db::Layout *layout)
     for (db::Layout::layer_iterator l = layout->begin_layers (); l != layout->end_layers (); ++l) {
       m_lp_map.insert (std::make_pair ((*l).first, *(*l).second));
     }
-
   }
 }
 
-void 
-SearchReplaceResults::end_changes ()
+void SearchReplaceResults::end_changes ()
 {
 #if QT_VERSION >= 0x040600
   endResetModel ();
@@ -156,8 +146,7 @@ SearchReplaceResults::size () const
   return std::max (std::max (m_cell_result.size (), m_data_result.size ()), std::max (m_shape_result.size (), m_inst_result.size ())) + (m_has_more ? 1 : 0);
 }
 
-int 
-SearchReplaceResults::columnCount (const QModelIndex & /*parent*/) const
+int SearchReplaceResults::columnCount (const QModelIndex & /*parent*/) const
 {
   //  Note: keep last column count for empty model to avoid resize events for the header
   if (! m_data_result.empty ()) {
@@ -291,7 +280,7 @@ static std::string shape_to_string (const db::Shape &shape, const db::ICplxTrans
   }
 }
 
-QVariant 
+QVariant
 SearchReplaceResults::data (const QModelIndex &index, int role) const
 {
   if (role == Qt::DisplayRole) {
@@ -306,8 +295,7 @@ SearchReplaceResults::data (const QModelIndex &index, int role) const
       } else if (index.column () < int (v.get_list ().size ())) {
 
         return QVariant (tl::to_qstring (v.get_list () [index.column ()].to_string ()));
-
-      } 
+      }
 
     } else if (index.row () < int (m_shape_result.size ())) {
 
@@ -348,8 +336,7 @@ SearchReplaceResults::data (const QModelIndex &index, int role) const
             return QVariant (tl::to_qstring (cn->second));
           }
         }
-
-      } 
+      }
 
     } else if (index.row () < int (m_inst_result.size ())) {
 
@@ -382,8 +369,7 @@ SearchReplaceResults::data (const QModelIndex &index, int role) const
             return QVariant (tl::to_qstring (cn->second));
           }
         }
-
-      } 
+      }
 
     } else if (index.row () < int (m_cell_result.size ())) {
 
@@ -400,41 +386,36 @@ SearchReplaceResults::data (const QModelIndex &index, int role) const
         if (cn != m_cellname_map.end ()) {
           return QVariant (tl::to_qstring (cn->second));
         }
-
-      } 
+      }
 
     } else if (m_has_more) {
 
       if (index.column () == 0) {
         return QVariant (tl::to_qstring ("..."));
       }
-
     }
-
   }
 
   return QVariant ();
 }
 
-Qt::ItemFlags 
+Qt::ItemFlags
 SearchReplaceResults::flags (const QModelIndex & /*index*/) const
 {
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 }
 
-bool
-SearchReplaceResults::hasChildren (const QModelIndex &parent) const
+bool SearchReplaceResults::hasChildren (const QModelIndex &parent) const
 {
   return ! parent.isValid ();
 }
 
-bool
-SearchReplaceResults::hasIndex (int row, int /*column*/, const QModelIndex &parent) const
+bool SearchReplaceResults::hasIndex (int row, int /*column*/, const QModelIndex &parent) const
 {
   return ! parent.isValid () && row < int (size ());
 }
 
-QModelIndex 
+QModelIndex
 SearchReplaceResults::index (int row, int column, const QModelIndex &parent) const
 {
   if (! parent.isValid ()) {
@@ -444,19 +425,18 @@ SearchReplaceResults::index (int row, int column, const QModelIndex &parent) con
   }
 }
 
-QModelIndex 
+QModelIndex
 SearchReplaceResults::parent (const QModelIndex & /*index*/) const
 {
   return QModelIndex ();
 }
 
-int 
-SearchReplaceResults::rowCount (const QModelIndex &parent) const
+int SearchReplaceResults::rowCount (const QModelIndex &parent) const
 {
   return parent.isValid () ? 0 : int (size ());
 }
 
-static std::string 
+static std::string
 escape_csv (const std::string &s)
 {
   if (s.find (",") != std::string::npos) {
@@ -475,8 +455,7 @@ escape_csv (const std::string &s)
   }
 }
 
-void
-SearchReplaceResults::select_items (lay::LayoutViewBase *view, int cv_index, const std::set<int> *rows)
+void SearchReplaceResults::select_items (lay::LayoutViewBase *view, int cv_index, const std::set<int> *rows)
 {
   const lay::CellView &cv = view->cellview (cv_index);
   const db::Layout &layout = cv->layout ();
@@ -507,9 +486,7 @@ SearchReplaceResults::select_items (lay::LayoutViewBase *view, int cv_index, con
           if (sr.inst_elements.has_value ()) {
             sel.back ().add_path (sr.inst_elements->begin (), sr.inst_elements->end ());
           }
-
         }
-
       }
 
     } else if (r < int (instances ().size ())) {
@@ -527,20 +504,15 @@ SearchReplaceResults::select_items (lay::LayoutViewBase *view, int cv_index, con
           if (ir.inst_elements.has_value ()) {
             sel.back ().add_path (ir.inst_elements->begin (), ir.inst_elements->end ());
           }
-
         }
-
       }
-
     }
-
   }
 
   edt::set_object_selection (view, sel);
 }
 
-void
-SearchReplaceResults::export_csv_to_clipboard (const std::set<int> *rows)
+void SearchReplaceResults::export_csv_to_clipboard (const std::set<int> *rows)
 {
   tl::OutputMemoryStream buffer;
 
@@ -550,9 +522,9 @@ SearchReplaceResults::export_csv_to_clipboard (const std::set<int> *rows)
   }
 
 #if QT_VERSION >= 0x050000
-  QClipboard *clipboard = QGuiApplication::clipboard();
+  QClipboard *clipboard = QGuiApplication::clipboard ();
 #else
-  QClipboard *clipboard = QApplication::clipboard();
+  QClipboard *clipboard = QApplication::clipboard ();
 #endif
   QMimeData *data = new QMimeData ();
   data->setData (QString::fromUtf8 ("text/csv"), QByteArray (buffer.data (), buffer.size ()));
@@ -560,15 +532,13 @@ SearchReplaceResults::export_csv_to_clipboard (const std::set<int> *rows)
   clipboard->setMimeData (data);
 }
 
-void
-SearchReplaceResults::export_csv (const std::string &file, const std::set<int> *rows)
+void SearchReplaceResults::export_csv (const std::string &file, const std::set<int> *rows)
 {
   tl::OutputStream os (file, tl::OutputStream::OM_Auto, true /* as text */);
   export_csv (os, rows);
 }
 
-void
-SearchReplaceResults::export_csv (tl::OutputStream &os, const std::set<int> *rows)
+void SearchReplaceResults::export_csv (tl::OutputStream &os, const std::set<int> *rows)
 {
   QModelIndex parent;
 
@@ -596,14 +566,11 @@ SearchReplaceResults::export_csv (tl::OutputStream &os, const std::set<int> *row
       }
 
       os << "\n";
-
     }
-
   }
 }
 
-void  
-SearchReplaceResults::export_layout (db::Layout &layout, const std::set<int> *rows)
+void SearchReplaceResults::export_layout (db::Layout &layout, const std::set<int> *rows)
 {
   if (! m_data_result.empty () || ! m_cell_result.empty () || ! m_inst_result.empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Query produces something other than shapes - such results cannot be converted to layout currently.")));
@@ -633,14 +600,11 @@ SearchReplaceResults::export_layout (db::Layout &layout, const std::set<int> *ro
 
       tl::ident_map<db::Layout::properties_id_type> pm;
       top_cell.shapes (layer).insert (s->shape, db::ICplxTrans (s->trans), pm);
-
     }
-
   }
 }
 
-void  
-SearchReplaceResults::export_rdb (rdb::Database &rdb, double dbu, const std::set<int> *rows)
+void SearchReplaceResults::export_rdb (rdb::Database &rdb, double dbu, const std::set<int> *rows)
 {
   if (! m_cell_result.empty ()) {
 
@@ -666,8 +630,7 @@ SearchReplaceResults::export_rdb (rdb::Database &rdb, double dbu, const std::set
         for (std::vector<tl::Variant>::const_iterator i = v->get_list ().begin (); i != v->get_list ().end (); ++i) {
           rdb::add_item_value (item, *i, dbu);
         }
-      } 
-
+      }
     }
 
   } else if (! m_inst_result.empty ()) {
@@ -697,16 +660,14 @@ SearchReplaceResults::export_rdb (rdb::Database &rdb, double dbu, const std::set
           v->second->references ().insert (rdb::Reference (db::CplxTrans (dbu) * i->trans * db::VCplxTrans (1.0 / dbu), rdb_top_cell->id ()));
         }
       }
-       
+
       if (v != cells_by_variant.end ()) {
 
         db::Box inst_bbox = i->inst.bbox ();
         rdb::Item *item = rdb.create_item (v->second->id (), cat->id ());
         item->add_value (inst_bbox.transformed (db::CplxTrans (dbu)));
         item->add_value (i->inst.to_string (true));
-
       }
-
     }
 
   } else if (! m_shape_result.empty ()) {
@@ -728,11 +689,10 @@ SearchReplaceResults::export_rdb (rdb::Database &rdb, double dbu, const std::set
       if (lm != m_lp_map.end ()) {
         std::map<unsigned int, rdb::Category *>::const_iterator cm = categories.find (layer);
         if (cm == categories.end ()) {
-          rdb::Category *cat = rdb.create_category (lm->second.to_string ()); 
+          rdb::Category *cat = rdb.create_category (lm->second.to_string ());
           categories.insert (std::make_pair (layer, cat));
         }
       }
-
     }
 
     std::map<std::pair<db::cell_index_type, db::CplxTrans>, rdb::Cell *> cells_by_variant;
@@ -761,7 +721,7 @@ SearchReplaceResults::export_rdb (rdb::Database &rdb, double dbu, const std::set
             v->second->references ().insert (rdb::Reference (db::CplxTrans (dbu) * s->trans * db::VCplxTrans (1.0 / dbu), rdb_top_cell->id ()));
           }
         }
-         
+
         if (v != cells_by_variant.end ()) {
 
           if (s->shape.is_polygon ()) {
@@ -769,44 +729,39 @@ SearchReplaceResults::export_rdb (rdb::Database &rdb, double dbu, const std::set
             db::Polygon poly;
             s->shape.polygon (poly);
             rdb::Item *item = rdb.create_item (v->second->id (), cm->second->id ());
-            item->values ().add (new rdb::Value <db::DPolygon> (poly.transformed (db::CplxTrans (dbu))));
+            item->values ().add (new rdb::Value<db::DPolygon> (poly.transformed (db::CplxTrans (dbu))));
 
           } else if (s->shape.is_path ()) {
 
             db::Path path;
             s->shape.path (path);
             rdb::Item *item = rdb.create_item (v->second->id (), cm->second->id ());
-            item->values ().add (new rdb::Value <db::DPath> (path.transformed (db::CplxTrans (dbu))));
+            item->values ().add (new rdb::Value<db::DPath> (path.transformed (db::CplxTrans (dbu))));
 
           } else if (s->shape.is_box ()) {
 
             db::Box box;
             s->shape.box (box);
             rdb::Item *item = rdb.create_item (v->second->id (), cm->second->id ());
-            item->values ().add (new rdb::Value <db::DBox> (box.transformed (db::CplxTrans (dbu))));
+            item->values ().add (new rdb::Value<db::DBox> (box.transformed (db::CplxTrans (dbu))));
 
           } else if (s->shape.is_text ()) {
 
             db::Text text;
             s->shape.text (text);
             rdb::Item *item = rdb.create_item (v->second->id (), cm->second->id ());
-            item->values ().add (new rdb::Value <db::DText> (text.transformed (db::CplxTrans (dbu))));
+            item->values ().add (new rdb::Value<db::DText> (text.transformed (db::CplxTrans (dbu))));
 
           } else if (s->shape.is_edge ()) {
 
             db::Edge edge;
             s->shape.edge (edge);
             rdb::Item *item = rdb.create_item (v->second->id (), cm->second->id ());
-            item->values ().add (new rdb::Value <db::DEdge> (edge.transformed (db::CplxTrans (dbu))));
-
+            item->values ().add (new rdb::Value<db::DEdge> (edge.transformed (db::CplxTrans (dbu))));
           }
-
         }
-
       }
-
     }
-
   }
 }
 
@@ -819,13 +774,13 @@ static const char *cfg_sr_mode = "sr-mode";
 static const char *cfg_sr_object = "sr-object";
 static const char *cfg_sr_ctx = "sr-ctx";
 
-static const char *mode_values[] = { "find", "delete", "replace", "custom" };
+static const char *mode_values [] = {"find", "delete", "replace", "custom"};
 static const int find_mode_index = 0;
 static const int delete_mode_index = 1;
 static const int replace_mode_index = 2;
 static const int custom_mode_index = 3;
 
-static const char *ctx_values[] = { "current-cell", "current-cell-hierarchy", "all-cells" };
+static const char *ctx_values [] = {"current-cell", "current-cell-hierarchy", "all-cells"};
 
 static void
 fill_ctx_cbx (QComboBox *cbx)
@@ -851,19 +806,19 @@ SearchReplaceDialog::SearchReplaceDialog (lay::Dispatcher *root, LayoutViewBase 
 
   Ui::SearchReplaceDialog::setupUi (this);
 
-  connect (find_all_button, SIGNAL (clicked ()), this, SLOT (find_all_button_clicked ())); 
-  connect (delete_button, SIGNAL (clicked ()), this, SLOT (delete_button_clicked ())); 
-  connect (delete_all_button, SIGNAL (clicked ()), this, SLOT (delete_all_button_clicked ())); 
-  connect (replace_button, SIGNAL (clicked ()), this, SLOT (replace_button_clicked ())); 
-  connect (replace_all_button, SIGNAL (clicked ()), this, SLOT (replace_all_button_clicked ())); 
-  connect (execute_all_button, SIGNAL (clicked ()), this, SLOT (execute_all_button_clicked ())); 
-  connect (add_saved_button, SIGNAL (clicked ()), this, SLOT (add_saved_button_clicked ())); 
-  connect (replace_saved_button, SIGNAL (clicked ()), this, SLOT (replace_saved_button_clicked ())); 
-  connect (delete_saved_button, SIGNAL (clicked ()), this, SLOT (delete_saved_button_clicked ())); 
-  connect (rename_saved_button, SIGNAL (clicked ()), this, SLOT (rename_saved_button_clicked ())); 
-  connect (configure_button, SIGNAL (clicked ()), this, SLOT (configure_button_clicked ())); 
-  connect (mode_tab, SIGNAL (currentChanged (int)), this, SLOT (tab_index_changed (int))); 
-  connect (saved_queries, SIGNAL (itemDoubleClicked (QListWidgetItem *)), this, SLOT (saved_query_double_clicked ())); 
+  connect (find_all_button, SIGNAL (clicked ()), this, SLOT (find_all_button_clicked ()));
+  connect (delete_button, SIGNAL (clicked ()), this, SLOT (delete_button_clicked ()));
+  connect (delete_all_button, SIGNAL (clicked ()), this, SLOT (delete_all_button_clicked ()));
+  connect (replace_button, SIGNAL (clicked ()), this, SLOT (replace_button_clicked ()));
+  connect (replace_all_button, SIGNAL (clicked ()), this, SLOT (replace_all_button_clicked ()));
+  connect (execute_all_button, SIGNAL (clicked ()), this, SLOT (execute_all_button_clicked ()));
+  connect (add_saved_button, SIGNAL (clicked ()), this, SLOT (add_saved_button_clicked ()));
+  connect (replace_saved_button, SIGNAL (clicked ()), this, SLOT (replace_saved_button_clicked ()));
+  connect (delete_saved_button, SIGNAL (clicked ()), this, SLOT (delete_saved_button_clicked ()));
+  connect (rename_saved_button, SIGNAL (clicked ()), this, SLOT (rename_saved_button_clicked ()));
+  connect (configure_button, SIGNAL (clicked ()), this, SLOT (configure_button_clicked ()));
+  connect (mode_tab, SIGNAL (currentChanged (int)), this, SLOT (tab_index_changed (int)));
+  connect (saved_queries, SIGNAL (itemDoubleClicked (QListWidgetItem *)), this, SLOT (saved_query_double_clicked ()));
   connect (recent_queries, SIGNAL (activated (int)), this, SLOT (recent_query_index_changed (int)));
   connect (cancel_button, SIGNAL (clicked ()), this, SLOT (cancel_exec ()));
   connect (delete_selected_button, SIGNAL (clicked ()), this, SLOT (execute_selected_button_clicked ()));
@@ -933,7 +888,7 @@ SearchReplaceDialog::~SearchReplaceDialog ()
   remove_markers ();
 }
 
-static void 
+static void
 save_states (QStackedWidget *sw, const std::string &pfx, lay::Dispatcher *config_root)
 {
   for (int i = 0; i < sw->count (); ++i) {
@@ -944,7 +899,7 @@ save_states (QStackedWidget *sw, const std::string &pfx, lay::Dispatcher *config
   }
 }
 
-static void 
+static void
 restore_states (QStackedWidget *sw, const std::string &pfx, lay::Dispatcher *config_root)
 {
   for (int i = 0; i < sw->count (); ++i) {
@@ -955,7 +910,7 @@ restore_states (QStackedWidget *sw, const std::string &pfx, lay::Dispatcher *con
   }
 }
 
-static int 
+static int
 ctx_to_index (const std::string &ctx)
 {
   for (int i = 0; i < int (sizeof (ctx_values) / sizeof (ctx_values [0])); ++i) {
@@ -966,7 +921,7 @@ ctx_to_index (const std::string &ctx)
   return -1;
 }
 
-static std::string 
+static std::string
 ctx_from_index (int index)
 {
   if (index >= 0 && index < int (sizeof (ctx_values) / sizeof (ctx_values [0]))) {
@@ -976,8 +931,7 @@ ctx_from_index (int index)
   }
 }
 
-void 
-SearchReplaceDialog::restore_state ()
+void SearchReplaceDialog::restore_state ()
 {
   lay::Dispatcher *config_root = root ();
 
@@ -1044,8 +998,7 @@ SearchReplaceDialog::restore_state ()
   update_saved_list ();
 }
 
-void
-SearchReplaceDialog::save_state ()
+void SearchReplaceDialog::save_state ()
 {
   lay::Dispatcher *config_root = root ();
 
@@ -1097,10 +1050,9 @@ SearchReplaceDialog::save_state ()
   }
 }
 
-void
-SearchReplaceDialog::sel_select_items ()
+void SearchReplaceDialog::sel_select_items ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   int cv_index = m_last_query_cv_index;
   const lay::CellView &cv = mp_view->cellview (cv_index);
@@ -1116,13 +1068,12 @@ BEGIN_PROTECTED
 
   m_model.select_items (view (), cv_index, &rows);
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-SearchReplaceDialog::select_items ()
+void SearchReplaceDialog::select_items ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   int cv_index = m_last_query_cv_index;
   const lay::CellView &cv = mp_view->cellview (cv_index);
@@ -1143,18 +1094,17 @@ BEGIN_PROTECTED
   }
 
   SearchReplaceResults model;
-  model.begin_changes (& cv->layout ());
+  model.begin_changes (&cv->layout ());
   query_to_model (model, lq, iq, std::numeric_limits<size_t>::max (), true, true /*with paths*/);
   model.end_changes ();
   model.select_items (view (), cv_index);
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-SearchReplaceDialog::sel_export_csv ()
+void SearchReplaceDialog::sel_export_csv ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   std::set<int> rows;
   QModelIndexList sel = results->selectionModel ()->selectedRows (0);
@@ -1171,13 +1121,12 @@ BEGIN_PROTECTED
 
   m_model.export_csv (fn, &rows);
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-SearchReplaceDialog::export_csv ()
+void SearchReplaceDialog::export_csv ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   int cv_index = m_last_query_cv_index;
   const lay::CellView &cv = mp_view->cellview (cv_index);
@@ -1205,18 +1154,17 @@ BEGIN_PROTECTED
   }
 
   SearchReplaceResults model;
-  model.begin_changes (& cv->layout ());
+  model.begin_changes (&cv->layout ());
   query_to_model (model, lq, iq, std::numeric_limits<size_t>::max (), true);
   model.end_changes ();
   model.export_csv (fn);
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-SearchReplaceDialog::sel_export_csv_to_clipboard ()
+void SearchReplaceDialog::sel_export_csv_to_clipboard ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   std::set<int> rows;
   QModelIndexList sel = results->selectionModel ()->selectedRows (0);
@@ -1226,13 +1174,12 @@ BEGIN_PROTECTED
 
   m_model.export_csv_to_clipboard (&rows);
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-SearchReplaceDialog::export_csv_to_clipboard ()
+void SearchReplaceDialog::export_csv_to_clipboard ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   int cv_index = m_last_query_cv_index;
   const lay::CellView &cv = mp_view->cellview (cv_index);
@@ -1253,18 +1200,17 @@ BEGIN_PROTECTED
   }
 
   SearchReplaceResults model;
-  model.begin_changes (& cv->layout ());
+  model.begin_changes (&cv->layout ());
   query_to_model (model, lq, iq, std::numeric_limits<size_t>::max (), true);
   model.end_changes ();
   model.export_csv_to_clipboard ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-SearchReplaceDialog::sel_export_rdb ()
+void SearchReplaceDialog::sel_export_rdb ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   int cv_index = m_last_query_cv_index;
   const lay::CellView &cv = mp_view->cellview (cv_index);
@@ -1290,13 +1236,12 @@ BEGIN_PROTECTED
   int rdb_index = mp_view->add_rdb (rdb.release ());
   mp_view->open_rdb_browser (rdb_index, cv_index);
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-SearchReplaceDialog::export_rdb ()
+void SearchReplaceDialog::export_rdb ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   int cv_index = m_last_query_cv_index;
   const lay::CellView &cv = mp_view->cellview (cv_index);
@@ -1324,7 +1269,7 @@ BEGIN_PROTECTED
   }
 
   SearchReplaceResults model;
-  model.begin_changes (& cv->layout ());
+  model.begin_changes (&cv->layout ());
   query_to_model (model, lq, iq, std::numeric_limits<size_t>::max (), true);
   model.end_changes ();
   model.export_rdb (*rdb, cv->layout ().dbu ());
@@ -1332,13 +1277,12 @@ BEGIN_PROTECTED
   int rdb_index = mp_view->add_rdb (rdb.release ());
   mp_view->open_rdb_browser (rdb_index, cv_index);
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-SearchReplaceDialog::sel_export_layout ()
+void SearchReplaceDialog::sel_export_layout ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   std::set<int> rows;
   QModelIndexList sel = results->selectionModel ()->selectedRows (0);
@@ -1346,18 +1290,17 @@ BEGIN_PROTECTED
     rows.insert (s->row ());
   }
 
-  std::unique_ptr <lay::LayoutHandle> handle (new lay::LayoutHandle (new db::Layout (mp_view->manager ()), std::string ()));
+  std::unique_ptr<lay::LayoutHandle> handle (new lay::LayoutHandle (new db::Layout (mp_view->manager ()), std::string ()));
   handle->rename ("query_results");
   m_model.export_layout (handle->layout (), &rows);
   mp_view->add_layout (handle.release (), true);
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-SearchReplaceDialog::export_layout ()
+void SearchReplaceDialog::export_layout ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   int cv_index = m_last_query_cv_index;
   const lay::CellView &cv = mp_view->cellview (cv_index);
@@ -1378,19 +1321,19 @@ BEGIN_PROTECTED
   }
 
   SearchReplaceResults model;
-  model.begin_changes (& cv->layout ());
+  model.begin_changes (&cv->layout ());
   query_to_model (model, lq, iq, std::numeric_limits<size_t>::max (), true);
   model.end_changes ();
 
-  std::unique_ptr <lay::LayoutHandle> handle (new lay::LayoutHandle (new db::Layout (mp_view->manager ()), std::string ()));
+  std::unique_ptr<lay::LayoutHandle> handle (new lay::LayoutHandle (new db::Layout (mp_view->manager ()), std::string ()));
   handle->rename ("query_results");
   model.export_layout (handle->layout ());
   mp_view->add_layout (handle.release (), true);
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-static void 
+static void
 sync_cbx (QComboBox *cbx, QStackedWidget *sw)
 {
   cbx->clear ();
@@ -1401,8 +1344,7 @@ sync_cbx (QComboBox *cbx, QStackedWidget *sw)
   }
 }
 
-void 
-SearchReplaceDialog::activated ()
+void SearchReplaceDialog::activated ()
 {
   cancel ();
 
@@ -1431,12 +1373,10 @@ SearchReplaceDialog::activated ()
     replace_objects->setCurrentIndex (0);
 
     restore_state ();
-
   }
 }
 
-void 
-SearchReplaceDialog::deactivated ()
+void SearchReplaceDialog::deactivated ()
 {
   cancel ();
   save_state ();
@@ -1447,8 +1387,7 @@ SearchReplaceDialog::deactivated ()
   m_model.end_changes ();
 }
 
-bool 
-SearchReplaceDialog::configure (const std::string &name, const std::string &value)
+bool SearchReplaceDialog::configure (const std::string &name, const std::string &value)
 {
   bool need_update = false;
   bool taken = true;
@@ -1484,13 +1423,14 @@ SearchReplaceDialog::configure (const std::string &name, const std::string &valu
   if (isVisible () && need_update && ! m_find_query.empty ()) {
     try {
       update_results (m_find_query);
-    } catch (...) { }
+    } catch (...) {
+    }
   }
 
   return taken;
 }
 
-static std::string 
+static std::string
 cell_expr (int ctx, const lay::CellView &cv)
 {
   std::string ce;
@@ -1571,8 +1511,7 @@ SearchReplaceDialog::build_replace_expression ()
   return expr;
 }
 
-void
-SearchReplaceDialog::update_saved_list ()
+void SearchReplaceDialog::update_saved_list ()
 {
   saved_queries->clear ();
 
@@ -1581,8 +1520,7 @@ SearchReplaceDialog::update_saved_list ()
   }
 }
 
-void
-SearchReplaceDialog::update_mru_list ()
+void SearchReplaceDialog::update_mru_list ()
 {
   recent_queries->blockSignals (true);
   recent_queries->clear ();
@@ -1601,18 +1539,16 @@ SearchReplaceDialog::update_mru_list ()
   recent_queries->blockSignals (false);
 }
 
-void
-SearchReplaceDialog::recent_query_index_changed (int index)
+void SearchReplaceDialog::recent_query_index_changed (int index)
 {
   if (index >= 0 && index < int (recent_queries->count ())) {
     custom_query->setText (recent_queries->itemData (index).toString ());
   }
 }
 
-void
-SearchReplaceDialog::issue_query (const std::string &q, const std::set<size_t> *selected_items, bool with_results)
+void SearchReplaceDialog::issue_query (const std::string &q, const std::set<size_t> *selected_items, bool with_results)
 {
-  detach_from_all_events ();  //  don't listen to layout events any longer
+  detach_from_all_events (); //  don't listen to layout events any longer
 
   remove_markers ();
   results->clearSelection ();
@@ -1636,7 +1572,7 @@ SearchReplaceDialog::issue_query (const std::string &q, const std::set<size_t> *
 
   //  put the query into the MRU list
   for (int i = 0; i < int (m_mru.size ()); ++i) {
-    if (m_mru[i] == q) {
+    if (m_mru [i] == q) {
       m_mru.erase (m_mru.begin () + i);
       --i;
     }
@@ -1663,7 +1599,7 @@ SearchReplaceDialog::issue_query (const std::string &q, const std::set<size_t> *
     m_model.begin_changes (0);
     m_model.clear ();
     m_model.end_changes ();
-  
+
     tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Running query")));
     progress.set_unit (100000);
     progress.set_format ("Processing ..");
@@ -1674,7 +1610,7 @@ SearchReplaceDialog::issue_query (const std::string &q, const std::set<size_t> *
     }
 
   } else {
-    
+
     db::LayoutQuery lq (q + " pass");
 
     if (tl::verbosity () >= 10) {
@@ -1684,7 +1620,7 @@ SearchReplaceDialog::issue_query (const std::string &q, const std::set<size_t> *
     m_model.begin_changes (0);
     m_model.clear ();
     m_model.end_changes ();
-  
+
     tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Running query")));
     progress.set_unit (100000);
     progress.set_format ("Processing ..");
@@ -1693,12 +1629,10 @@ SearchReplaceDialog::issue_query (const std::string &q, const std::set<size_t> *
     for (db::LayoutQueryIterator iq (lq, &cv->layout (), cv.cell (), 0, &progress); ! iq.at_end (); ++n) {
       iq.next (selected_items->find (n) == selected_items->end ());
     }
-
   }
 }
 
-void
-SearchReplaceDialog::cancel_exec ()
+void SearchReplaceDialog::cancel_exec ()
 {
   execute_panel->hide ();
   remove_markers ();
@@ -1708,10 +1642,9 @@ SearchReplaceDialog::cancel_exec ()
   m_find_query.clear ();
 }
 
-void
-SearchReplaceDialog::cancel ()
+void SearchReplaceDialog::cancel ()
 {
-  detach_from_all_events ();  //  don't listen to layout events any longer
+  detach_from_all_events (); //  don't listen to layout events any longer
 
   execute_panel->hide ();
   remove_markers ();
@@ -1721,22 +1654,20 @@ SearchReplaceDialog::cancel ()
   m_model.clear ();
   m_model.end_changes ();
 
-  results_stack->setCurrentIndex (mode_tab->currentIndex () + 1);  //  show hint
+  results_stack->setCurrentIndex (mode_tab->currentIndex () + 1); //  show hint
   export_b->setEnabled (false);
 
   m_execute_query.clear ();
   m_find_query.clear ();
 }
 
-void
-SearchReplaceDialog::layout_changed ()
+void SearchReplaceDialog::layout_changed ()
 {
   //  cannot call detach_all inside signal handler currently
   cancel ();
 }
 
-void
-SearchReplaceDialog::attach_layout (db::Layout *layout)
+void SearchReplaceDialog::attach_layout (db::Layout *layout)
 {
   layout->hier_changed_event.add (this, &SearchReplaceDialog::layout_changed);
   layout->bboxes_changed_any_event.add (this, &SearchReplaceDialog::layout_changed);
@@ -1744,10 +1675,9 @@ SearchReplaceDialog::attach_layout (db::Layout *layout)
   layout->layer_properties_changed_event.add (this, &SearchReplaceDialog::layout_changed);
 }
 
-void
-SearchReplaceDialog::update_results (const std::string &q)
+void SearchReplaceDialog::update_results (const std::string &q)
 {
-  detach_from_all_events ();  //  don't listen to layout events any longer
+  detach_from_all_events (); //  don't listen to layout events any longer
 
   remove_markers ();
   results->clearSelection ();
@@ -1780,12 +1710,10 @@ SearchReplaceDialog::update_results (const std::string &q)
       attach_layout (&cv->layout ());
       throw;
     }
-
   }
 }
 
-bool
-SearchReplaceDialog::query_to_model (SearchReplaceResults &model, const db::LayoutQuery &lq, db::LayoutQueryIterator &iq, size_t max_item_count, bool all, bool with_path)
+bool SearchReplaceDialog::query_to_model (SearchReplaceResults &model, const db::LayoutQuery &lq, db::LayoutQueryIterator &iq, size_t max_item_count, bool all, bool with_path)
 {
   tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (QObject::tr ("Query run")));
 
@@ -1920,17 +1848,15 @@ SearchReplaceDialog::query_to_model (SearchReplaceResults &model, const db::Layo
 
     if (! all) {
       break;
-    } 
+    }
 
     ++iq;
-
   }
 
   return res;
 }
 
-bool
-SearchReplaceDialog::fill_model (const db::LayoutQuery &lq, db::LayoutQueryIterator &iq, const db::Layout *layout, bool all, bool with_paths)
+bool SearchReplaceDialog::fill_model (const db::LayoutQuery &lq, db::LayoutQueryIterator &iq, const db::Layout *layout, bool all, bool with_paths)
 {
   bool res = false;
 
@@ -1952,20 +1878,17 @@ SearchReplaceDialog::fill_model (const db::LayoutQuery &lq, db::LayoutQueryItera
     export_b->setEnabled (true);
 
     throw;
-
   }
 
   return res;
 }
 
-void
-SearchReplaceDialog::header_columns_changed (int /*from*/, int /*to*/)
+void SearchReplaceDialog::header_columns_changed (int /*from*/, int /*to*/)
 {
   results->header ()->resizeSections (QHeaderView::ResizeToContents);
 }
 
-void
-SearchReplaceDialog::remove_markers ()
+void SearchReplaceDialog::remove_markers ()
 {
   for (std::vector<lay::MarkerBase *>::const_iterator m = mp_markers.begin (); m != mp_markers.end (); ++m) {
     delete *m;
@@ -1973,8 +1896,7 @@ SearchReplaceDialog::remove_markers ()
   mp_markers.clear ();
 }
 
-void
-SearchReplaceDialog::result_selection_changed ()
+void SearchReplaceDialog::result_selection_changed ()
 {
   try {
 
@@ -1991,7 +1913,7 @@ SearchReplaceDialog::result_selection_changed ()
     //  collect the transformation variants for this cellview - this way we can paint
     //  the cell boxes for each global transformation
     std::vector<db::DCplxTrans> global_trans = view ()->cv_transform_variants (cv_index);
-    std::map<unsigned int, std::vector<db::DCplxTrans> > tv_map = view ()->cv_transform_variants_by_layer (cv_index);
+    std::map<unsigned int, std::vector<db::DCplxTrans>> tv_map = view ()->cv_transform_variants_by_layer (cv_index);
 
     db::DBox dbox;
 
@@ -2022,7 +1944,7 @@ SearchReplaceDialog::result_selection_changed ()
           lay::ShapeMarker *marker = new lay::ShapeMarker (view (), cv_index);
           mp_markers.push_back (marker);
 
-          std::map<unsigned int, std::vector<db::DCplxTrans> >::const_iterator tv = tv_map.find (sr.layer_index);
+          std::map<unsigned int, std::vector<db::DCplxTrans>>::const_iterator tv = tv_map.find (sr.layer_index);
           if (tv != tv_map.end ()) {
             marker->set (sr.shape, tr_context * sr.trans, tv->second);
           } else {
@@ -2030,7 +1952,6 @@ SearchReplaceDialog::result_selection_changed ()
           }
 
           dbox += marker->bbox ();
-
         }
 
       } else if (index < int (m_model.instances ().size ())) {
@@ -2049,7 +1970,6 @@ SearchReplaceDialog::result_selection_changed ()
           mp_markers.push_back (marker);
 
           dbox += marker->bbox ();
-
         }
 
       } else if (index < int (m_model.cells ().size ())) {
@@ -2066,7 +1986,6 @@ SearchReplaceDialog::result_selection_changed ()
           mp_markers.push_back (marker);
 
           dbox += marker->bbox ();
-
         }
 
       } else if (index < int (m_model.data ().size ())) {
@@ -2115,11 +2034,8 @@ SearchReplaceDialog::result_selection_changed ()
             mp_markers.push_back (marker);
             dbox += marker->bbox ();
           }
-
         }
-
       }
-
     }
 
     if (! dbox.empty ()) {
@@ -2139,7 +2055,6 @@ SearchReplaceDialog::result_selection_changed ()
         db::DVector d (w * 0.5, h * 0.5);
         view ()->zoom_box (db::DBox (center - d, center + d));
       }
-
     }
 
   } catch (...) {
@@ -2147,23 +2062,21 @@ SearchReplaceDialog::result_selection_changed ()
   }
 }
 
-void  
-SearchReplaceDialog::find_all_button_clicked ()
+void SearchReplaceDialog::find_all_button_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   cancel_exec ();
 
   m_find_query = build_find_expression (find_properties, find_context);
   issue_query (m_find_query, 0, true);
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void  
-SearchReplaceDialog::delete_button_clicked ()
+void SearchReplaceDialog::delete_button_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   cancel_exec ();
 
@@ -2176,13 +2089,12 @@ BEGIN_PROTECTED
   replace_selected_button->hide ();
   execute_panel->show ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void  
-SearchReplaceDialog::delete_all_button_clicked ()
+void SearchReplaceDialog::delete_all_button_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   cancel_exec ();
 
@@ -2195,13 +2107,12 @@ BEGIN_PROTECTED
     mp_view->manager ()->commit ();
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void  
-SearchReplaceDialog::replace_button_clicked ()
+void SearchReplaceDialog::replace_button_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   cancel_exec ();
 
@@ -2214,13 +2125,12 @@ BEGIN_PROTECTED
   replace_selected_button->setEnabled (false);
   execute_panel->show ();
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void
-SearchReplaceDialog::execute_selected_button_clicked ()
+void SearchReplaceDialog::execute_selected_button_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   if (m_execute_query.empty ()) {
     return;
@@ -2253,16 +2163,14 @@ BEGIN_PROTECTED
     }
 
     issue_query (m_find_query, 0, true);
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void  
-SearchReplaceDialog::replace_all_button_clicked ()
+void SearchReplaceDialog::replace_all_button_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   cancel_exec ();
 
@@ -2278,13 +2186,12 @@ BEGIN_PROTECTED
     mp_view->manager ()->commit ();
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void  
-SearchReplaceDialog::execute_all_button_clicked ()
+void SearchReplaceDialog::execute_all_button_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   cancel_exec ();
 
@@ -2300,18 +2207,16 @@ BEGIN_PROTECTED
     mp_view->manager ()->commit ();
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void  
-SearchReplaceDialog::configure_button_clicked ()
+void SearchReplaceDialog::configure_button_clicked ()
 {
   lay::ConfigurationDialog config_dialog (this, root (), "SearchReplacePlugin");
   config_dialog.exec ();
 }
 
-void
-SearchReplaceDialog::tab_index_changed (int index)
+void SearchReplaceDialog::tab_index_changed (int index)
 {
   cancel ();
 
@@ -2337,7 +2242,6 @@ SearchReplaceDialog::tab_index_changed (int index)
     save_states (find_replace_properties, "sr-find", config_root);
     config_root->config_set (cfg_sr_object, index_to_find_object_id (replace_objects->currentIndex ()));
     config_root->config_set (cfg_sr_ctx, ctx_from_index (replace_context->currentIndex ()));
-
   }
 
   if (index == find_mode_index) {
@@ -2400,16 +2304,13 @@ SearchReplaceDialog::tab_index_changed (int index)
         //  ignore errors
         custom_query->setText (tl::to_qstring (""));
       }
-
     }
-
   }
 
   m_current_mode = index;
 }
 
-void  
-SearchReplaceDialog::replace_saved_button_clicked ()
+void SearchReplaceDialog::replace_saved_button_clicked ()
 {
   int index = saved_queries->currentRow ();
   if (index >= 0 && index < int (m_saved.size ())) {
@@ -2417,15 +2318,14 @@ SearchReplaceDialog::replace_saved_button_clicked ()
   }
 }
 
-void  
-SearchReplaceDialog::add_saved_button_clicked ()
+void SearchReplaceDialog::add_saved_button_clicked ()
 {
-BEGIN_PROTECTED
+  BEGIN_PROTECTED
 
   bool ok = false;
-  QString desc = QInputDialog::getText (this, QObject::tr ("Enter Description"), 
-                                              QObject::tr ("Enter a description text for the current query.\nThat text will be shown in the selection box."),
-                                              QLineEdit::Normal, QString (), &ok);
+  QString desc = QInputDialog::getText (this, QObject::tr ("Enter Description"),
+                                        QObject::tr ("Enter a description text for the current query.\nThat text will be shown in the selection box."),
+                                        QLineEdit::Normal, QString (), &ok);
   if (ok) {
 
     m_saved.push_back (SavedQuery ());
@@ -2435,14 +2335,12 @@ BEGIN_PROTECTED
     update_saved_list ();
 
     saved_queries->setCurrentRow (saved_queries->count () - 1);
-
   }
 
-END_PROTECTED
+  END_PROTECTED
 }
 
-void  
-SearchReplaceDialog::delete_saved_button_clicked ()
+void SearchReplaceDialog::delete_saved_button_clicked ()
 {
   int index = saved_queries->currentRow ();
   if (index >= 0 && index < int (m_saved.size ())) {
@@ -2452,28 +2350,25 @@ SearchReplaceDialog::delete_saved_button_clicked ()
   }
 }
 
-void  
-SearchReplaceDialog::rename_saved_button_clicked ()
+void SearchReplaceDialog::rename_saved_button_clicked ()
 {
   int index = saved_queries->currentRow ();
   if (index >= 0 && index < int (m_saved.size ())) {
 
     bool ok = false;
-    QString desc = QInputDialog::getText (this, QObject::tr ("Enter Description"), 
-                                                QObject::tr ("Enter a description text for the current query.\nThat text will be shown in the selection box."),
-                                                QLineEdit::Normal, 
-                                                tl::to_qstring (m_saved [index].description), 
-                                                &ok);
+    QString desc = QInputDialog::getText (this, QObject::tr ("Enter Description"),
+                                          QObject::tr ("Enter a description text for the current query.\nThat text will be shown in the selection box."),
+                                          QLineEdit::Normal,
+                                          tl::to_qstring (m_saved [index].description),
+                                          &ok);
     if (ok) {
       m_saved [index].description = tl::to_string (desc);
       update_saved_list ();
     }
-
   }
 }
 
-void
-SearchReplaceDialog::saved_query_double_clicked ()
+void SearchReplaceDialog::saved_query_double_clicked ()
 {
   int index = saved_queries->currentRow ();
   if (index >= 0 && index < int (m_saved.size ())) {
@@ -2481,8 +2376,7 @@ SearchReplaceDialog::saved_query_double_clicked ()
   }
 }
 
-void 
-SearchReplaceDialog::menu_activated (const std::string &symbol)
+void SearchReplaceDialog::menu_activated (const std::string &symbol)
 {
   if (symbol == "search_replace::show") {
     view ()->deactivate_all_browsers ();
@@ -2493,4 +2387,3 @@ SearchReplaceDialog::menu_activated (const std::string &symbol)
 }
 
 }
-

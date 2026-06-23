@@ -29,7 +29,7 @@
 #include "tlFileUtils.h"
 #include "tlWebDAV.h"
 #if defined(HAVE_GIT2)
-#  include "tlGit.h"
+#include "tlGit.h"
 #endif
 
 #include <memory>
@@ -50,8 +50,7 @@ SaltGrain::SaltGrain ()
   //  .. nothing yet ..
 }
 
-bool
-SaltGrain::operator== (const SaltGrain &other) const
+bool SaltGrain::operator== (const SaltGrain &other) const
 {
   return m_name == other.m_name &&
          m_path == other.m_path &&
@@ -69,66 +68,55 @@ SaltGrain::operator== (const SaltGrain &other) const
          m_license == other.m_license &&
          m_hidden == other.m_hidden &&
          m_authored_time == other.m_authored_time &&
-         m_installed_time == other.m_installed_time
-      ;
+         m_installed_time == other.m_installed_time;
 }
 
-void
-SaltGrain::set_name (const std::string &n)
+void SaltGrain::set_name (const std::string &n)
 {
   m_name = n;
 }
 
-void
-SaltGrain::set_token (const std::string &t)
+void SaltGrain::set_token (const std::string &t)
 {
   m_token = t;
 }
 
-void
-SaltGrain::set_hidden (bool f)
+void SaltGrain::set_hidden (bool f)
 {
   m_hidden = f;
 }
 
-void
-SaltGrain::set_version (const std::string &v)
+void SaltGrain::set_version (const std::string &v)
 {
   m_version = v;
 }
 
-void
-SaltGrain::set_api_version (const std::string &v)
+void SaltGrain::set_api_version (const std::string &v)
 {
   m_api_version = v;
 }
 
-void
-SaltGrain::set_path (const std::string &p)
+void SaltGrain::set_path (const std::string &p)
 {
   m_path = p;
 }
 
-void
-SaltGrain::set_url (const std::string &u)
+void SaltGrain::set_url (const std::string &u)
 {
   m_url = u;
 }
 
-void
-SaltGrain::set_title (const std::string &t)
+void SaltGrain::set_title (const std::string &t)
 {
   m_title = t;
 }
 
-void
-SaltGrain::set_doc (const std::string &t)
+void SaltGrain::set_doc (const std::string &t)
 {
   m_doc = t;
 }
 
-void
-SaltGrain::set_doc_url (const std::string &u)
+void SaltGrain::set_doc_url (const std::string &u)
 {
   m_doc_url = u;
 }
@@ -159,12 +147,11 @@ SaltGrain::eff_doc_url () const
 
     //  if the resulting path is inside the downloaded package, use this path
     QString dp = fi.canonicalFilePath ();
-    if (!dp.isEmpty () && tl::is_parent_path (tl::to_string (p), tl::to_string (dp))) {
+    if (! dp.isEmpty () && tl::is_parent_path (tl::to_string (p), tl::to_string (dp))) {
       url = QUrl::fromLocalFile (dp);
       url.setScheme (tl::to_qstring ("file"));
       return tl::to_string (url.toString ());
     }
-
   }
 
   //  base the documentation URL on the download URL
@@ -173,50 +160,42 @@ SaltGrain::eff_doc_url () const
   return tl::to_string (eff_url.toString ());
 }
 
-void
-SaltGrain::set_author (const std::string &a)
+void SaltGrain::set_author (const std::string &a)
 {
   m_author = a;
 }
 
-void
-SaltGrain::set_author_contact (const std::string &a)
+void SaltGrain::set_author_contact (const std::string &a)
 {
   m_author_contact = a;
 }
 
-void
-SaltGrain::set_license (const std::string &l)
+void SaltGrain::set_license (const std::string &l)
 {
   m_license = l;
 }
 
-void
-SaltGrain::set_authored_time (const QDateTime &t)
+void SaltGrain::set_authored_time (const QDateTime &t)
 {
   m_authored_time = t;
 }
 
-void
-SaltGrain::set_installed_time (const QDateTime &t)
+void SaltGrain::set_installed_time (const QDateTime &t)
 {
   m_installed_time = t;
 }
 
-void
-SaltGrain::set_screenshot (const QImage &i)
+void SaltGrain::set_screenshot (const QImage &i)
 {
   m_screenshot = i;
 }
 
-void
-SaltGrain::set_icon (const QImage &i)
+void SaltGrain::set_icon (const QImage &i)
 {
   m_icon = i;
 }
 
-int
-SaltGrain::compare_versions (const std::string &v1, const std::string &v2)
+int SaltGrain::compare_versions (const std::string &v1, const std::string &v2)
 {
   tl::Extractor ex1 (v1.c_str ());
   tl::Extractor ex2 (v2.c_str ());
@@ -254,7 +233,6 @@ SaltGrain::compare_versions (const std::string &v1, const std::string &v2)
         break;
       }
     }
-
   }
 }
 
@@ -264,8 +242,7 @@ SaltGrain::spec_file ()
   return grain_filename;
 }
 
-bool
-SaltGrain::valid_name (const std::string &n)
+bool SaltGrain::valid_name (const std::string &n)
 {
   std::string res;
 
@@ -302,8 +279,7 @@ SaltGrain::valid_name (const std::string &n)
   return res == n;
 }
 
-bool
-SaltGrain::valid_api_version (const std::string &v)
+bool SaltGrain::valid_api_version (const std::string &v)
 {
   tl::Extractor ex (v.c_str ());
 
@@ -323,14 +299,12 @@ SaltGrain::valid_api_version (const std::string &v)
       }
       first = false;
     }
-
   }
 
   return true;
 }
 
-bool
-SaltGrain::valid_version (const std::string &v)
+bool SaltGrain::valid_version (const std::string &v)
 {
   tl::Extractor ex (v.c_str ());
 
@@ -351,8 +325,7 @@ SaltGrain::valid_version (const std::string &v)
   return true;
 }
 
-struct TimeConverter
-{
+struct TimeConverter {
   std::string to_string (const QDateTime &time) const
   {
     if (time.isNull ()) {
@@ -372,8 +345,7 @@ struct TimeConverter
   }
 };
 
-struct ImageConverter
-{
+struct ImageConverter {
   std::string to_string (const QImage &image) const
   {
     if (image.isNull ()) {
@@ -421,37 +393,32 @@ SaltGrain::xml_elements ()
       tl::make_member (&SaltGrain::icon, &SaltGrain::set_icon, "icon", ImageConverter ()) +
       tl::make_member (&SaltGrain::screenshot, &SaltGrain::set_screenshot, "screenshot", ImageConverter ()) +
       tl::make_element (&SaltGrain::begin_dependencies, &SaltGrain::end_dependencies, &SaltGrain::add_dependency, "depends",
-        tl::make_member (&SaltGrainDependency::name, "name") +
-        tl::make_member (&SaltGrainDependency::url, "url") +
-        tl::make_member (&SaltGrainDependency::version, "version")
-      )
-    );
+                        tl::make_member (&SaltGrainDependency::name, "name") +
+                          tl::make_member (&SaltGrainDependency::url, "url") +
+                          tl::make_member (&SaltGrainDependency::version, "version")));
   }
 
   return *sp_xml_elements;
 }
 
-static
-tl::XMLStruct<lay::SaltGrain>
+static tl::XMLStruct<lay::SaltGrain>
 xml_struct ()
 {
   return tl::XMLStruct<lay::SaltGrain> ("salt-grain", SaltGrain::xml_elements ());
 }
 
-bool
-SaltGrain::is_readonly () const
+bool SaltGrain::is_readonly () const
 {
   //  A grain is readonly if the directory is not writable or there is a download URL
   //  (this means the grain has been installed from an URL).
-  return !QFileInfo (tl::to_qstring (path ())).isWritable () || !m_url.empty ();
+  return ! QFileInfo (tl::to_qstring (path ())).isWritable () || ! m_url.empty ();
 }
 
-void
-SaltGrain::load (const std::string &p)
+void SaltGrain::load (const std::string &p)
 {
-  tl_assert (!p.empty ());
+  tl_assert (! p.empty ());
 
-  if (p[0] != ':') {
+  if (p [0] != ':') {
 
     tl::XMLFileSource source (p);
     xml_struct ().parse (source, *this);
@@ -465,33 +432,29 @@ SaltGrain::load (const std::string &p)
 #else
     if (res.isCompressed ()) {
 #endif
-      data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
+      data = qUncompress ((const unsigned char *) res.data (), (int) res.size ());
     } else {
-      data = QByteArray ((const char *)res.data (), (int)res.size ());
+      data = QByteArray ((const char *) res.data (), (int) res.size ());
     }
 
     std::string str_data (data.constData (), data.size ());
     tl::XMLStringSource source (str_data);
     xml_struct ().parse (source, *this);
-
   }
 }
 
-void
-SaltGrain::load (tl::InputStream &p)
+void SaltGrain::load (tl::InputStream &p)
 {
   tl::XMLStreamSource source (p);
   xml_struct ().parse (source, *this);
 }
 
-void
-SaltGrain::save () const
+void SaltGrain::save () const
 {
   save (tl::to_string (QDir (tl::to_qstring (path ())).filePath (tl::to_qstring (SaltGrain::spec_file ()))));
 }
 
-void
-SaltGrain::save (const std::string &p) const
+void SaltGrain::save (const std::string &p) const
 {
   tl::OutputStream os (p, tl::OutputStream::OM_Plain);
   xml_struct ().write (os, *this);
@@ -523,19 +486,18 @@ SaltGrain::stream_from_url (std::string &generic_url, double timeout, tl::InputH
   const std::string &url = purl.url ();
 
   //  base relative URL's on the salt mine URL
-  if (purl.protocol () == lay::DefaultProtocol && url.find ("http:") != 0 && url.find ("https:") != 0 && url.find ("file:") != 0 && !url.empty() && url[0] != '/' && url[0] != '\\' && lay::SaltController::instance ()) {
+  if (purl.protocol () == lay::DefaultProtocol && url.find ("http:") != 0 && url.find ("https:") != 0 && url.find ("file:") != 0 && ! url.empty () && url [0] != '/' && url [0] != '\\' && lay::SaltController::instance ()) {
 
     //  replace the last component ("repository.xml") by the given path
     QUrl sami_url (tl::to_qstring (lay::SaltController::instance ()->salt_mine_url ()));
     QStringList path_comp = sami_url.path ().split (QString::fromUtf8 ("/"));
-    if (!path_comp.isEmpty ()) {
+    if (! path_comp.isEmpty ()) {
       path_comp.back () = tl::to_qstring (url);
     }
     sami_url.setPath (path_comp.join (QString::fromUtf8 ("/")));
 
     //  return the full path as a file path, not an URL
     generic_url = tl::to_string (sami_url.toString ());
-
   }
 
   if (url.find ("http:") == 0 || url.find ("https:") == 0) {
@@ -553,7 +515,6 @@ SaltGrain::stream_from_url (std::string &generic_url, double timeout, tl::InputH
   } else {
 
     return new tl::InputStream (url + "/" + SaltGrain::spec_file ());
-
   }
 }
 
@@ -569,12 +530,11 @@ SaltGrain::from_url (const std::string &url_in, double timeout, tl::InputHttpStr
   return g;
 }
 
-bool
-SaltGrain::is_grain (const std::string &path)
+bool SaltGrain::is_grain (const std::string &path)
 {
   tl_assert (! path.empty ());
 
-  if (path[0] != ':') {
+  if (path [0] != ':') {
     QDir dir (tl::to_qstring (path));
     QString gf = dir.filePath (tl::to_qstring (SaltGrain::spec_file ()));
     return QFileInfo (gf).exists ();

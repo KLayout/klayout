@@ -28,8 +28,9 @@
 
 #include <QDialog>
 
-namespace Ui {
-  class HelpAboutDialog;
+namespace Ui
+{
+class HelpAboutDialog;
 }
 
 namespace lay
@@ -52,4 +53,3 @@ private:
 }
 
 #endif
-

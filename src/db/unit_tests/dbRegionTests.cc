@@ -36,7 +36,7 @@
 
 #include <cstdio>
 
-TEST(1)
+TEST (1)
 {
   db::Region r;
   EXPECT_EQ (r.to_string (), "");
@@ -147,7 +147,7 @@ TEST(1)
   EXPECT_EQ (db::compare (r, "(-10,-20;-10,70;60,70;60,-20);(40,30;40,120;110,120;110,30)"), true);
 }
 
-TEST(1b)
+TEST (1b)
 {
   //  special perimeter bug
   db::Region r;
@@ -157,7 +157,7 @@ TEST(1b)
   EXPECT_EQ (r.perimeter (db::Box (db::Point (55200, 20000), db::Point (59300, 21000))), db::Region::perimeter_type (0));
 }
 
-TEST(2) 
+TEST (2)
 {
   db::Region r;
   r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
@@ -185,7 +185,7 @@ TEST(2)
   EXPECT_EQ (db::compare (r, "(10,20;10,200;100,200;100,20);(10,20;10,50;50,50;50,20)"), true);
 }
 
-TEST(3) 
+TEST (3)
 {
   db::Region r;
   r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
@@ -205,12 +205,12 @@ TEST(3)
   EXPECT_EQ ((db::Region () & r).to_string (), "");
   EXPECT_EQ ((db::Region () & r).empty (), true);
 
-  EXPECT_EQ (r.andnot(rr).first.to_string (), "(10,20;10,220;110,220;110,20)");
-  EXPECT_EQ (rr.andnot(r).first.to_string (), "(10,20;10,220;110,220;110,20)");
-  EXPECT_EQ (r.andnot(db::Region ()).first.to_string (), "");
-  EXPECT_EQ (r.andnot(db::Region ()).first.empty (), true);
-  EXPECT_EQ (db::Region ().andnot(r).first.to_string (), "");
-  EXPECT_EQ (db::Region ().andnot(r).first.empty (), true);
+  EXPECT_EQ (r.andnot (rr).first.to_string (), "(10,20;10,220;110,220;110,20)");
+  EXPECT_EQ (rr.andnot (r).first.to_string (), "(10,20;10,220;110,220;110,20)");
+  EXPECT_EQ (r.andnot (db::Region ()).first.to_string (), "");
+  EXPECT_EQ (r.andnot (db::Region ()).first.empty (), true);
+  EXPECT_EQ (db::Region ().andnot (r).first.to_string (), "");
+  EXPECT_EQ (db::Region ().andnot (r).first.empty (), true);
 
   r &= rr;
   EXPECT_EQ (r.is_box (), true);
@@ -219,7 +219,7 @@ TEST(3)
   EXPECT_EQ (r.to_string (), "(10,20;10,220;110,220;110,20)");
 }
 
-TEST(4) 
+TEST (4)
 {
   db::Region r;
   r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
@@ -238,7 +238,7 @@ TEST(4)
   EXPECT_EQ (db::compare (r, "(0,0;0,200;10,200;10,20;100,20;100,0);(100,20;100,200;10,200;10,220;110,220;110,20)"), true);
 }
 
-TEST(5) 
+TEST (5)
 {
   db::Region r;
   r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
@@ -269,7 +269,7 @@ TEST(5)
   EXPECT_EQ (r.hulls ().to_string (), "(-100,-100;-100,400;200,400;200,-100)");
 }
 
-TEST(6) 
+TEST (6)
 {
   db::Region r;
   r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
@@ -284,7 +284,7 @@ TEST(6)
   EXPECT_EQ (r.to_string (), "(0,0;0,200;10,200;10,20;100,20;100,0)");
 }
 
-TEST(7) 
+TEST (7)
 {
   db::Region r;
   r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
@@ -299,13 +299,13 @@ TEST(7)
   EXPECT_EQ ((db::Region () - r).empty (), true);
   EXPECT_EQ ((db::Region () - r).is_merged (), true);
 
-  EXPECT_EQ (r.andnot(db::Region (db::Box (db::Point (10, 20), db::Point (110, 220)))).second.to_string (), "(-100,-100;-100,400;200,400;200,-100/10,20;110,20;110,220;10,220)");
-  EXPECT_EQ (db::compare (r.andnot(db::Region ()).second, "(0,0;0,200;100,200;100,0);(-100,-100;-100,400;200,400;200,-100)"), true);
-  EXPECT_EQ (r.andnot(db::Region ()).second.empty (), false);
-  EXPECT_EQ (r.andnot(db::Region ()).second.is_merged (), false);
-  EXPECT_EQ (db::Region ().andnot(r).second.to_string (), "");
-  EXPECT_EQ (db::Region ().andnot(r).second.empty (), true);
-  EXPECT_EQ (db::Region ().andnot(r).second.is_merged (), true);
+  EXPECT_EQ (r.andnot (db::Region (db::Box (db::Point (10, 20), db::Point (110, 220)))).second.to_string (), "(-100,-100;-100,400;200,400;200,-100/10,20;110,20;110,220;10,220)");
+  EXPECT_EQ (db::compare (r.andnot (db::Region ()).second, "(0,0;0,200;100,200;100,0);(-100,-100;-100,400;200,400;200,-100)"), true);
+  EXPECT_EQ (r.andnot (db::Region ()).second.empty (), false);
+  EXPECT_EQ (r.andnot (db::Region ()).second.is_merged (), false);
+  EXPECT_EQ (db::Region ().andnot (r).second.to_string (), "");
+  EXPECT_EQ (db::Region ().andnot (r).second.empty (), true);
+  EXPECT_EQ (db::Region ().andnot (r).second.is_merged (), true);
 
   r -= db::Region (db::Box (db::Point (10, 20), db::Point (110, 220)));
   EXPECT_EQ (r.is_box (), false);
@@ -314,7 +314,7 @@ TEST(7)
   EXPECT_EQ (r.to_string (), "(-100,-100;-100,400;200,400;200,-100/10,20;110,20;110,220;10,220)");
 }
 
-TEST(8) 
+TEST (8)
 {
   db::Region r;
   r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
@@ -333,7 +333,7 @@ TEST(8)
   EXPECT_EQ (r.to_string (), "(-20,-30;-20,230;120,230;120,-30)");
 }
 
-TEST(9) 
+TEST (9)
 {
   db::Region r;
   r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
@@ -346,7 +346,7 @@ TEST(9)
   EXPECT_EQ (r.sized (db::Coord (10), db::Coord (20)).is_merged (), false);
 }
 
-TEST(10a) 
+TEST (10a)
 {
   db::Region r;
   EXPECT_EQ (r.selected_interacting (db::Region (db::Box (db::Point (20, 20), db::Point (30, 30)))).to_string (), "");
@@ -366,7 +366,7 @@ TEST(10a)
   EXPECT_EQ (rr.to_string (), "(0,0;0,200;100,200;100,0)");
 
   r.clear ();
-  r.insert(db::Box (db::Point (1000, 0), db::Point (6000, 4000)));
+  r.insert (db::Box (db::Point (1000, 0), db::Point (6000, 4000)));
   EXPECT_EQ (r.selected_interacting (db::Region (db::Box (db::Point (0, 4000), db::Point (2000, 6000)))).to_string (), "(1000,0;1000,4000;6000,4000;6000,0)");
   EXPECT_EQ (db::Region (db::Box (db::Point (0, 4000), db::Point (2000, 6000))).selected_interacting (r).to_string (), "(0,4000;0,6000;2000,6000;2000,4000)");
   EXPECT_EQ (r.selected_interacting (db::Region (db::Box (db::Point (0, 4000), db::Point (1000, 6000)))).to_string (), "(1000,0;1000,4000;6000,4000;6000,0)");
@@ -385,7 +385,7 @@ TEST(10a)
   EXPECT_EQ (db::Region (db::Box (db::Point (0, 3999), db::Point (1001, 6000))).selected_overlapping (r).to_string (), "(0,3999;0,6000;1001,6000;1001,3999)");
 }
 
-TEST(10b) 
+TEST (10b)
 {
   db::Region r;
   EXPECT_EQ (r.selected_interacting (db::Region (db::Box (db::Point (20, 20), db::Point (30, 30)))).to_string (), "");
@@ -400,7 +400,7 @@ TEST(10b)
   EXPECT_EQ (r.to_string (), "(-100,-100;-100,0;0,0;0,-100)");
 }
 
-TEST(10c) 
+TEST (10c)
 {
   db::Region r;
   EXPECT_EQ (r.selected_interacting (db::Region (db::Box (db::Point (20, 20), db::Point (30, 30)))).to_string (), "");
@@ -415,21 +415,21 @@ TEST(10c)
   EXPECT_EQ (r.to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
 }
 
-TEST(11)
+TEST (11)
 {
-  db::Box bb[3] = { db::Box (db::Point (0, 0), db::Point (10, 10)), db::Box (), db::Box (db::Point (20, 20), db::Point (40, 50)) };
+  db::Box bb [3] = {db::Box (db::Point (0, 0), db::Point (10, 10)), db::Box (), db::Box (db::Point (20, 20), db::Point (40, 50))};
   EXPECT_EQ (db::compare (db::Region (bb + 0, bb + 3), "(0,0;0,10;10,10;10,0);(20,20;20,50;40,50;40,20)"), true);
   EXPECT_EQ (db::Region (db::Polygon (db::Box (db::Point (0, 0), db::Point (10, 10)))).to_string (), "(0,0;0,10;10,10;10,0)");
   EXPECT_EQ (db::Region (db::Polygon ()).to_string (), "");
   EXPECT_EQ (db::Region (db::Box ()).to_string (), "");
 
-  db::Point pts[2] = { db::Point (0, 0), db::Point (0, 20) };
+  db::Point pts [2] = {db::Point (0, 0), db::Point (0, 20)};
   EXPECT_EQ (db::Region (db::Path (pts + 0, pts + 2, 10)).to_string (), "(-5,0;-5,20;5,20;5,0)");
 }
 
-TEST(12) 
+TEST (12)
 {
-  db::Box bb[3] = { db::Box (db::Point (0, 0), db::Point (10, 10)), db::Box (), db::Box (db::Point (20, 20), db::Point (40, 50)) };
+  db::Box bb [3] = {db::Box (db::Point (0, 0), db::Point (10, 10)), db::Box (), db::Box (db::Point (20, 20), db::Point (40, 50))};
   db::Region r (bb + 0, bb + 3);
 
   EXPECT_EQ (db::compare (r, "(0,0;0,10;10,10;10,0);(20,20;20,50;40,50;40,20)"), true);
@@ -448,9 +448,9 @@ TEST(12)
   EXPECT_EQ (r.to_string (), "(20,20;20,50;40,50;40,20)");
 }
 
-TEST(13) 
+TEST (13)
 {
-  db::Box bb[3] = { db::Box (db::Point (0, 0), db::Point (10, 10)), db::Box (), db::Box (db::Point (20, 20), db::Point (40, 50)) };
+  db::Box bb [3] = {db::Box (db::Point (0, 0), db::Point (10, 10)), db::Box (), db::Box (db::Point (20, 20), db::Point (40, 50))};
   db::Region r (bb + 0, bb + 3);
 
   EXPECT_EQ (db::compare (r, "(0,0;0,10;10,10;10,0);(20,20;20,50;40,50;40,20)"), true);
@@ -468,9 +468,9 @@ TEST(13)
   EXPECT_EQ (r.to_string (), "(20,20;20,50;40,50;40,20)");
 }
 
-TEST(14) 
+TEST (14)
 {
-  db::Box bb[3] = { db::Box (db::Point (0, 0), db::Point (10, 10)), db::Box (), db::Box (db::Point (20, 20), db::Point (40, 50)) };
+  db::Box bb [3] = {db::Box (db::Point (0, 0), db::Point (10, 10)), db::Box (), db::Box (db::Point (20, 20), db::Point (40, 50))};
   db::Region r (bb + 0, bb + 3);
 
   EXPECT_EQ (db::compare (r, "(0,0;0,10;10,10;10,0);(20,20;20,50;40,50;40,20)"), true);
@@ -503,9 +503,9 @@ TEST(14)
   EXPECT_EQ (rr.to_string (), "(20,20;20,50;40,50;40,20)");
 }
 
-TEST(15a) 
+TEST (15a)
 {
-  db::Box bb[3] = { db::Box (db::Point (0, 0), db::Point (10, 10)), db::Box (), db::Box (db::Point (20, 20), db::Point (40, 50)) };
+  db::Box bb [3] = {db::Box (db::Point (0, 0), db::Point (10, 10)), db::Box (), db::Box (db::Point (20, 20), db::Point (40, 50))};
   db::Region r (bb + 0, bb + 3);
 
   EXPECT_EQ (db::compare (r.width_check (15), "(0,0;0,10)|(10,10;10,0);(10,0;0,0)|(0,10;10,10)"), true);
@@ -518,7 +518,7 @@ TEST(15a)
   EXPECT_EQ (db::compare (r.space_check (15, db::RegionCheckOptions (false, db::Square)), "(10,10;10,5)|(20,20;20,25);(5,10;10,10)|(25,20;20,20)"), true);
 
   r.clear ();
-  db::Point pts[] = {
+  db::Point pts [] = {
     db::Point (20550000, -18950000),
     db::Point (20550000, -18920000),
     db::Point (20530000, -18920000),
@@ -530,16 +530,15 @@ TEST(15a)
     db::Point (20570000, -18880000),
     db::Point (20570000, -18890000),
     db::Point (20650000, -18890000),
-    db::Point (20650000, -18950000)
-  };
+    db::Point (20650000, -18950000)};
   db::Polygon poly;
-  poly.assign_hull(pts + 0, pts + sizeof(pts)/sizeof(pts[0]));
+  poly.assign_hull (pts + 0, pts + sizeof (pts) / sizeof (pts [0]));
 
   r.insert (poly);
   EXPECT_EQ (db::compare (r.width_check (70000), "(20550000,-18950000;20550000,-18920000)|(20570000,-18880000;20570000,-18890000);(20550000,-18920000;20530000,-18920000)|(20550000,-18880000;20570000,-18880000);(20550000,-18920000;20530000,-18920000)|(20570000,-18890000;20613246,-18890000);(20530000,-18920000;20530000,-18910000)|(20550000,-18850000;20550000,-18880000);(20530000,-18920000;20530000,-18910000)|(20570000,-18880000;20570000,-18890000);(20530000,-18910000;20450000,-18910000)|(20450000,-18850000;20550000,-18850000);(20530000,-18910000;20486754,-18910000)|(20550000,-18880000;20570000,-18880000);(20530000,-18910000;20502918,-18910000)|(20570000,-18890000;20597082,-18890000);(20650000,-18950000;20550000,-18950000)|(20570000,-18890000;20650000,-18890000)"), true);
 }
 
-TEST(15b) 
+TEST (15b)
 {
   db::Region r;
   r.insert (db::Box (db::Point (0, 0), db::Point (200, 500)));
@@ -553,7 +552,7 @@ TEST(15b)
   EXPECT_EQ (db::compare (r.isolated_check (120, db::RegionCheckOptions (false, db::Projection)), "(300,0;300,200)|(200,200;200,0);(300,300;300,500)|(200,500;200,300)"), true);
 }
 
-TEST(15c) 
+TEST (15c)
 {
   db::Region r;
   r.insert (db::Box (db::Point (0, 0), db::Point (200, 300)));
@@ -571,7 +570,7 @@ TEST(15c)
   EXPECT_EQ (db::compare (r.isolated_check (120, db::RegionCheckOptions (false, db::Projection)), "(300,0;300,200)|(200,200;200,0);(300,300;300,500)|(200,500;200,300)"), true);
 }
 
-TEST(15d) 
+TEST (15d)
 {
   //  shielding
   db::Region r;
@@ -583,36 +582,34 @@ TEST(15d)
   r.insert (db::Box (db::Point (600, 200), db::Point (700, 300)));
   r.insert (db::Box (db::Point (0, 140), db::Point (350, 160)));
 
-  EXPECT_EQ (db::compare(r.space_check (120, db::RegionCheckOptions (false, db::Projection)),
-    "(0,100;100,100)|(100,140;0,140);"
-    "(300,160;350,160)|(350,200;300,200);"
-    "(300,100;350,100)|(350,140;300,140);"
-    "(300,100;400,100)|(400,200;300,200);"
-    "(0,160;100,160)|(100,200;0,200);"
-    "(600,100;700,100)|(700,200;600,200)"
-    ), true
-  );
+  EXPECT_EQ (db::compare (r.space_check (120, db::RegionCheckOptions (false, db::Projection)),
+                          "(0,100;100,100)|(100,140;0,140);"
+                          "(300,160;350,160)|(350,200;300,200);"
+                          "(300,100;350,100)|(350,140;300,140);"
+                          "(300,100;400,100)|(400,200;300,200);"
+                          "(0,160;100,160)|(100,200;0,200);"
+                          "(600,100;700,100)|(700,200;600,200)"),
+             true);
 }
 
-TEST(15e)
+TEST (15e)
 {
   //  #650
   db::Region r;
 
   for (int i = 0; i < 5; ++i) {
-    db::Point pts[] = {
+    db::Point pts [] = {
       db::Point (342800 + i * 2000, 29000),
       db::Point (342800 + i * 2000, 40600),
       db::Point (342801 + i * 2000, 40600),
-      db::Point (342801 + i * 2000, 29000)
-    };
+      db::Point (342801 + i * 2000, 29000)};
     db::Polygon poly;
-    poly.assign_hull(pts + 0, pts + sizeof(pts)/sizeof(pts[0]));
+    poly.assign_hull (pts + 0, pts + sizeof (pts) / sizeof (pts [0]));
     r.insert (poly);
   }
 
   {
-    db::Point pts[] = {
+    db::Point pts [] = {
       db::Point (0, 0),
       db::Point (0, 69600),
       db::Point (501154, 69600),
@@ -632,17 +629,16 @@ TEST(15e)
       db::Point (248457, 66000),
       db::Point (248457, 3600),
       db::Point (501154, 3600),
-      db::Point (501154, 0)
-    };
+      db::Point (501154, 0)};
     db::Polygon poly;
-    poly.assign_hull(pts + 0, pts + sizeof(pts)/sizeof(pts[0]));
+    poly.assign_hull (pts + 0, pts + sizeof (pts) / sizeof (pts [0]));
     r.insert (poly);
   }
 
   EXPECT_EQ (r.space_check (1000).to_string (), "(20857,3600;20857,66000)|(19957,66000;19957,3600)");
 }
 
-TEST(15g)
+TEST (15g)
 {
   //  opposite_filter
 
@@ -657,18 +653,21 @@ TEST(15g)
   options.metrics = db::Projection;
   options.opposite_filter = db::NoOppositeFilter;
   EXPECT_EQ (db::compare (r1.separation_check (r2, 40, options),
-    "(100,0;100,300)/(90,300;90,0);(200,200;200,100)/(210,100;210,200)"), true);
+                          "(100,0;100,300)/(90,300;90,0);(200,200;200,100)/(210,100;210,200)"),
+             true);
 
   options.opposite_filter = db::NotOpposite;
   EXPECT_EQ (db::compare (r1.separation_check (r2, 40, options),
-    "(100,0;100,100)/(90,300;90,0);(100,200;100,300)/(90,300;90,0)"), true);
+                          "(100,0;100,100)/(90,300;90,0);(100,200;100,300)/(90,300;90,0)"),
+             true);
 
   options.opposite_filter = db::OnlyOpposite;
   EXPECT_EQ (db::compare (r1.separation_check (r2, 40, options),
-    "(200,200;200,100)/(210,100;210,200);(100,100;100,200)/(90,300;90,0)"), true);
+                          "(200,200;200,100)/(210,100;210,200);(100,100;100,200)/(90,300;90,0)"),
+             true);
 }
 
-TEST(15h)
+TEST (15h)
 {
   //  opposite_filter with internal shielding
 
@@ -688,19 +687,22 @@ TEST(15h)
   options.metrics = db::Projection;
 
   options.opposite_filter = db::NoOppositeFilter;
-  EXPECT_EQ (db::compare(r1.separation_check (r2, 40, options),
-    "(200,300;200,200)/(210,200;210,300);(100,200;100,300)/(90,300;90,200);(200,100;200,0)/(210,0;210,100);(100,0;100,100)/(90,100;90,0)"), true);
+  EXPECT_EQ (db::compare (r1.separation_check (r2, 40, options),
+                          "(200,300;200,200)/(210,200;210,300);(100,200;100,300)/(90,300;90,200);(200,100;200,0)/(210,0;210,100);(100,0;100,100)/(90,100;90,0)"),
+             true);
 
   options.opposite_filter = db::NotOpposite;
-  EXPECT_EQ (db::compare(r1.separation_check (r2, 40, options),
-    "(100,200;100,300)/(90,300;90,200);(200,300;200,200)/(210,200;210,300)"), true);
+  EXPECT_EQ (db::compare (r1.separation_check (r2, 40, options),
+                          "(100,200;100,300)/(90,300;90,200);(200,300;200,200)/(210,200;210,300)"),
+             true);
 
   options.opposite_filter = db::OnlyOpposite;
   EXPECT_EQ (db::compare (r1.separation_check (r2, 40, options),
-    "(100,0;100,100)/(90,100;90,0);(200,100;200,0)/(210,0;210,100)"), true);
+                          "(100,0;100,100)/(90,100;90,0);(200,100;200,0)/(210,0;210,100)"),
+             true);
 }
 
-TEST(15i)
+TEST (15i)
 {
   //  rectangle error filter
 
@@ -761,7 +763,7 @@ TEST(15i)
   EXPECT_EQ (r.separation_check (rt, 40, options).to_string (), "(-90,90;90,90)/(90,100;-90,100)");
   EXPECT_EQ (r.separation_check (rt + rr + rb, 40, options).to_string (), "");
 
-  options.rect_filter = db::RectFilter (0x9531);  //  one and two sides allowed
+  options.rect_filter = db::RectFilter (0x9531); //  one and two sides allowed
 
   EXPECT_EQ (r.separation_check (rl + rr, 40, options).to_string (), "");
   EXPECT_EQ (r.separation_check (rl + rt, 40, options).to_string (), "");
@@ -769,7 +771,7 @@ TEST(15i)
   EXPECT_EQ (r.separation_check (rt, 40, options).to_string (), "");
   EXPECT_EQ (db::compare (r.separation_check (rt + rr + rb, 40, options), "(-90,90;90,90)/(90,100;-90,100);(90,90;90,-90)/(100,-90;100,90);(90,-90;-90,-90)/(-90,-100;90,-100)"), true);
 
-  options.rect_filter = db::RectFilter (0x31);  //  one and two connected sides allowed
+  options.rect_filter = db::RectFilter (0x31); //  one and two connected sides allowed
 
   EXPECT_EQ (db::compare (r.separation_check (rl + rr, 40, options), "(90,90;90,-90)/(100,-90;100,90);(-90,-90;-90,90)/(-100,90;-100,-90)"), true);
   EXPECT_EQ (r.separation_check (rl + rt, 40, options).to_string (), "");
@@ -779,7 +781,7 @@ TEST(15i)
   EXPECT_EQ (db::compare (r.separation_check (rt + rr + rb, 40, options), "(-90,90;90,90)/(90,100;-90,100);(90,90;90,-90)/(100,-90;100,90);(90,-90;-90,-90)/(-90,-100;90,-100)"), true);
 }
 
-TEST(16)
+TEST (16)
 {
   db::Region a;
   a.insert (db::Box (db::Point (10, 20), db::Point (20, 30)));
@@ -807,9 +809,9 @@ TEST(16)
   EXPECT_EQ (db::compare (b.overlap_check (a, 15, db::RegionCheckOptions (false, db::Euclidian, 91)), "(15,15;15,30)/(15,30;20,30);(15,6;15,44)/(20,30;20,20);(15,20;15,35)/(20,20;15,20)"), true);
 }
 
-TEST(17) 
+TEST (17)
 {
-  db::Box bb[3] = { db::Box (db::Point (0, 0), db::Point (10, 10)), db::Box (), db::Box (db::Point (20, 20), db::Point (40, 50)) };
+  db::Box bb [3] = {db::Box (db::Point (0, 0), db::Point (10, 10)), db::Box (), db::Box (db::Point (20, 20), db::Point (40, 50))};
   db::Region r (bb + 0, bb + 3);
 
   EXPECT_EQ (db::compare (r.edges (), "(0,0;0,10);(0,10;10,10);(10,10;10,0);(10,0;0,0);(20,20;20,50);(20,50;40,50);(40,50;40,20);(40,20;20,20)"), true);
@@ -817,7 +819,7 @@ TEST(17)
   EXPECT_EQ (db::compare (r.edges (f), "(20,50;40,50);(40,20;20,20)"), true);
 }
 
-TEST(18a) 
+TEST (18a)
 {
   db::Region r;
   r.set_merged_semantics (false);
@@ -904,7 +906,7 @@ TEST(18a)
   }
 }
 
-TEST(18b) 
+TEST (18b)
 {
   //  complete test (#679)
 
@@ -912,22 +914,21 @@ TEST(18b)
     int i1, i2;
     bool inside;
     bool outside;
-  } intervals[] = {
-    { 10, 20, false, true },
-    { 20, 30, false, true },
-    { 20, 40, false, false },
-    { 30, 50, true, false },
-    { 30, 60, true, false },
-    { 40, 50, true, false },
-    { 50, 60, true, false },
-    { 50, 70, false, false },
-    { 60, 70, false, true },
-    { 70, 80, false, true }
-  };
+  } intervals [] = {
+    {10, 20, false, true},
+    {20, 30, false, true},
+    {20, 40, false, false},
+    {30, 50, true, false},
+    {30, 60, true, false},
+    {40, 50, true, false},
+    {50, 60, true, false},
+    {50, 70, false, false},
+    {60, 70, false, true},
+    {70, 80, false, true}};
 
-  for (int ix = 0; ix < int (sizeof (intervals) / sizeof (intervals[0])); ++ix) {
+  for (int ix = 0; ix < int (sizeof (intervals) / sizeof (intervals [0])); ++ix) {
 
-    for (int iy = 0; iy < int (sizeof (intervals) / sizeof (intervals[0])); ++iy) {
+    for (int iy = 0; iy < int (sizeof (intervals) / sizeof (intervals [0])); ++iy) {
 
       db::Region r;
       r.insert (db::Box (intervals [ix].i1, intervals [iy].i1, intervals [ix].i2, intervals [iy].i2));
@@ -949,13 +950,11 @@ TEST(18b)
       EXPECT_EQ (r.selected_not_outside (rr).empty (), intervals [ix].outside || intervals [iy].outside);
       EXPECT_EQ (r.selected_inside (rr).empty (), ! (intervals [ix].inside && intervals [iy].inside));
       EXPECT_EQ (r.selected_not_inside (rr).empty (), intervals [ix].inside && intervals [iy].inside);
-
     }
-
   }
 }
 
-TEST(18c)
+TEST (18c)
 {
   //  GitHub issue #69
 
@@ -1056,7 +1055,7 @@ TEST(18c)
   EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
 }
 
-TEST(18d)
+TEST (18d)
 {
   db::Region r;
   r.set_merged_semantics (false);
@@ -1082,7 +1081,7 @@ TEST(18d)
   EXPECT_EQ (db::compare (r.pull_overlapping (rr), "(10,110;10,120;20,120;20,110);(10,10;10,90;50,90;50,10)"), true);
 }
 
-TEST(19)
+TEST (19)
 {
   db::Region r1;
   r1.insert (db::Box (db::Point (0, 0), db::Point (10, 20)));
@@ -1117,7 +1116,7 @@ TEST(19)
   EXPECT_EQ (db::Region ().in (r1, true).to_string (), "");
 }
 
-TEST(20)
+TEST (20)
 {
   db::Layout ly;
   unsigned int l1 = ly.insert_layer (db::LayerProperties (1, 0));
@@ -1310,12 +1309,12 @@ TEST(20)
   }
 }
 
-TEST(21)
+TEST (21)
 {
   db::Region r;
   EXPECT_EQ (r.strange_polygon_check ().to_string (), "");
 
-  db::Point pts1[] = {
+  db::Point pts1 [] = {
     db::Point (0, 0),
     db::Point (0, 1000),
     db::Point (1000, 1000),
@@ -1323,21 +1322,19 @@ TEST(21)
     db::Point (500, 500),
     db::Point (500, 600),
     db::Point (600, 600),
-    db::Point (600, 0)
-  };
-  db::Point pts2[] = {
+    db::Point (600, 0)};
+  db::Point pts2 [] = {
     db::Point (2000, 0),
     db::Point (2000, 500),
     db::Point (3000, 500),
     db::Point (3000, 1000),
     db::Point (2500, 1000),
-    db::Point (2500, 0)
-  };
+    db::Point (2500, 0)};
 
   db::Polygon poly;
-  poly.assign_hull(pts1 + 0, pts1 + sizeof(pts1)/sizeof(pts1[0]));
+  poly.assign_hull (pts1 + 0, pts1 + sizeof (pts1) / sizeof (pts1 [0]));
   r.insert (poly);
-  poly.assign_hull(pts2 + 0, pts2 + sizeof(pts2)/sizeof(pts2[0]));
+  poly.assign_hull (pts2 + 0, pts2 + sizeof (pts2) / sizeof (pts2 [0]));
   r.insert (poly);
 
   EXPECT_EQ (db::compare (r.strange_polygon_check (), "(500,500;500,600;600,600;600,500);(2500,500;2500,1000;3000,1000;3000,500)"), true);
@@ -1345,21 +1342,20 @@ TEST(21)
   EXPECT_EQ (r.strange_polygon_check ().to_string (), "");
 }
 
-TEST(22)
+TEST (22)
 {
   db::Region r;
   EXPECT_EQ (r.angle_check (0, 180.0, false).to_string (), "");
   EXPECT_EQ (r.angle_check (0, 180.0, true).to_string (), "");
 
-  db::Point pts1[] = {
+  db::Point pts1 [] = {
     db::Point (0, 0),
     db::Point (0, 1000),
     db::Point (1000, 2000),
-    db::Point (1000, 0)
-  };
+    db::Point (1000, 0)};
 
   db::Polygon poly;
-  poly.assign_hull(pts1 + 0, pts1 + sizeof(pts1)/sizeof(pts1[0]));
+  poly.assign_hull (pts1 + 0, pts1 + sizeof (pts1) / sizeof (pts1 [0]));
   r.insert (poly);
 
   EXPECT_EQ (db::compare (r.angle_check (0, 180.0, false), "(0,0;0,1000)/(0,1000;1000,2000);(0,1000;1000,2000)/(1000,2000;1000,0);(1000,2000;1000,0)/(1000,0;0,0);(1000,0;0,0)/(0,0;0,1000)"), true);
@@ -1371,21 +1367,20 @@ TEST(22)
   EXPECT_EQ (db::compare (r.angle_check (90.1, 180.0, true), "(0,1000;1000,2000)/(1000,2000;1000,0);(1000,2000;1000,0)/(1000,0;0,0);(1000,0;0,0)/(0,0;0,1000)"), true);
 }
 
-TEST(22b)
+TEST (22b)
 {
   db::Region r;
 
-  db::Point pts1[] = {
+  db::Point pts1 [] = {
     db::Point (0, 0),
     db::Point (1000, 1000),
     db::Point (1000, 800),
     db::Point (200, 800),
     db::Point (800, 200),
-    db::Point (800, 0)
-  };
+    db::Point (800, 0)};
 
   db::Polygon poly;
-  poly.assign_hull(pts1 + 0, pts1 + sizeof(pts1)/sizeof(pts1[0]));
+  poly.assign_hull (pts1 + 0, pts1 + sizeof (pts1) / sizeof (pts1 [0]));
   r.insert (poly);
   r.set_merged_semantics (false);
 
@@ -1396,7 +1391,7 @@ TEST(22b)
   EXPECT_EQ (db::compare (r.angle_check (45.1, 315.0, true), "(0,0;1000,1000)/(1000,1000;1000,800);(1000,800;200,800)/(200,800;800,200);(800,0;0,0)/(0,0;1000,1000)"), true);
 }
 
-TEST(23)
+TEST (23)
 {
   db::Region r;
   EXPECT_EQ (r.grid_check (10, 20).to_string (), "");
@@ -1413,7 +1408,7 @@ TEST(23)
   EXPECT_EQ (db::compare (r.grid_check (10, 20), "(105,100;105,100)/(105,100;105,100);(910,290;910,290)/(910,290;910,290);(105,290;105,290)/(105,290;105,290)"), true);
 }
 
-TEST(24)
+TEST (24)
 {
   db::Region r;
   EXPECT_EQ (r.snapped (10, 20).to_string (), "");
@@ -1430,7 +1425,7 @@ TEST(24)
   EXPECT_EQ (r.snapped (10, 20).to_string (), "(0,0;0,500;1000,500;1000,0/110,100;910,100;910,300;110,300)");
 }
 
-TEST(24b)
+TEST (24b)
 {
   db::Region r;
   EXPECT_EQ (r.snapped (10, 20).to_string (), "");
@@ -1440,7 +1435,7 @@ TEST(24b)
   EXPECT_EQ (r.snapped (10, 10).to_string (), "(-10,-10;-10,20;20,20;20,-10)");
 }
 
-TEST(25)
+TEST (25)
 {
   db::Region r;
 
@@ -1453,7 +1448,7 @@ TEST(25)
   EXPECT_EQ (r.rounded_corners (50, 100, 16).to_string (), rr.to_string ());
 }
 
-TEST(26) 
+TEST (26)
 {
   //  strict mode
   db::Region r;
@@ -1486,7 +1481,7 @@ TEST(26)
   EXPECT_EQ (db::compare ((r & db::Region (db::Box (db::Point (20, 20), db::Point (120, 220)))), "(20,20;20,200;100,200;100,20);(50,50;50,220;120,220;120,50)"), true);
 }
 
-TEST(27) 
+TEST (27)
 {
   //  single box sizing
   db::Region r;
@@ -1500,7 +1495,7 @@ TEST(27)
   EXPECT_EQ (r.sized (db::Coord (-55), db::Coord (-105)).to_string (), "");
 }
 
-TEST(28) 
+TEST (28)
 {
   //  single box intersections
   db::Region r1;
@@ -1513,14 +1508,14 @@ TEST(28)
   EXPECT_EQ ((r1 & r2.sized (db::Coord (5), db::Coord (5))).to_string (), "(95,95;95,200;100,200;100,95)");
 }
 
-TEST(29) 
+TEST (29)
 {
   //  32bit overflow for perimeter
   db::Region b (db::Box (-1000000000, -1000000000, 1000000000, 1000000000));
   EXPECT_EQ (b.perimeter (), 8000000000.0);
 }
 
-TEST(30a)
+TEST (30a)
 {
   db::Region r;
   EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (20, 20), db::Point (30, 30)))).to_string (), "");
@@ -1540,7 +1535,7 @@ TEST(30a)
   EXPECT_EQ (rr.to_string (), "(0,0;0,200;100,200;100,0)");
 
   r.clear ();
-  r.insert(db::Box (db::Point (1000, 0), db::Point (6000, 4000)));
+  r.insert (db::Box (db::Point (1000, 0), db::Point (6000, 4000)));
   EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (0, 4000), db::Point (2000, 6000)))).to_string (), "");
   EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (1000, 4000), db::Point (2000, 6000)))).to_string (), "(1000,0;1000,4000;6000,4000;6000,0)");
   EXPECT_EQ (db::Edges (db::Edge (db::Point (0, 4000), db::Point (2000, 6000))).selected_interacting (r).to_string (), "");
@@ -1551,7 +1546,7 @@ TEST(30a)
   EXPECT_EQ (db::Edges (db::Edge (db::Point (1000, 3999), db::Point (1000, 6000))).selected_interacting (r).to_string (), "(1000,3999;1000,6000)");
 }
 
-TEST(30b)
+TEST (30b)
 {
   db::Region r;
   EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (20, 20), db::Point (30, 30)))).to_string (), "");
@@ -1566,7 +1561,7 @@ TEST(30b)
   EXPECT_EQ (r.to_string (), "(-100,-100;-100,0;0,0;0,-100)");
 }
 
-TEST(30c)
+TEST (30c)
 {
   db::Region r;
   EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (20, 20), db::Point (30, 30)))).to_string (), "");
@@ -1581,7 +1576,7 @@ TEST(30c)
   EXPECT_EQ (r.to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
 }
 
-TEST(31)
+TEST (31)
 {
   db::Region r;
   EXPECT_EQ (r.pull_interacting (db::Region (db::Box (db::Point (20, 20), db::Point (30, 30)))).to_string (), "");
@@ -1594,7 +1589,7 @@ TEST(31)
   EXPECT_EQ (r.pull_interacting (db::Region (db::Box (db::Point (-200, -200), db::Point (-190, -190)))).to_string (), "");
 
   r.clear ();
-  r.insert(db::Box (db::Point (1000, 0), db::Point (6000, 4000)));
+  r.insert (db::Box (db::Point (1000, 0), db::Point (6000, 4000)));
   EXPECT_EQ (r.pull_overlapping (db::Region (db::Box (db::Point (0, 4000), db::Point (2000, 6000)))).to_string (), "");
   EXPECT_EQ (db::Region (db::Box (db::Point (0, 4000), db::Point (2000, 6000))).pull_overlapping (r).to_string (), "");
   EXPECT_EQ (r.pull_overlapping (db::Region (db::Box (db::Point (0, 4000), db::Point (1000, 6000)))).to_string (), "");
@@ -1605,7 +1600,7 @@ TEST(31)
   EXPECT_EQ (db::Region (db::Box (db::Point (0, 3999), db::Point (1001, 6000))).pull_overlapping (r).to_string (), "(1000,0;1000,4000;6000,4000;6000,0)");
 }
 
-TEST(32a_snap)
+TEST (32a_snap)
 {
   db::Layout ly;
   {
@@ -1626,11 +1621,11 @@ TEST(32a_snap)
 
   r2.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/region_au32.gds");
 }
 
-TEST(32b_snap)
+TEST (32b_snap)
 {
   db::Layout ly;
   {
@@ -1651,11 +1646,11 @@ TEST(32b_snap)
 
   r1.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/region_au32.gds");
 }
 
-TEST(33a_snap)
+TEST (33a_snap)
 {
   db::Layout ly;
   {
@@ -1676,11 +1671,11 @@ TEST(33a_snap)
 
   r2.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/region_au33.gds");
 }
 
-TEST(33b_snap)
+TEST (33b_snap)
 {
   db::Layout ly;
   {
@@ -1701,11 +1696,11 @@ TEST(33b_snap)
 
   r1.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
 
-  CHECKPOINT();
+  CHECKPOINT ();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/region_au33.gds");
 }
 
-TEST(34a)
+TEST (34a)
 {
   db::Region r;
   EXPECT_EQ (r.selected_interacting (db::Texts (db::Text ("abc", db::Trans (db::Vector (30, 30))))).to_string (), "");
@@ -1728,7 +1723,7 @@ TEST(34a)
   EXPECT_EQ (rr.to_string (), "(0,0;0,200;100,200;100,0)");
 
   r.clear ();
-  r.insert(db::Box (db::Point (1000, 0), db::Point (6000, 4000)));
+  r.insert (db::Box (db::Point (1000, 0), db::Point (6000, 4000)));
   EXPECT_EQ (r.selected_interacting (db::Texts (db::Text ("abc", db::Trans (db::Vector (2000, 6000))))).to_string (), "");
   EXPECT_EQ (r.selected_interacting (db::Texts (db::Text ("abc", db::Trans (db::Vector (2000, 2000))))).to_string (), "(1000,0;1000,4000;6000,4000;6000,0)");
   EXPECT_EQ (db::Texts (db::Text ("abc", db::Trans (db::Vector (2000, 6000)))).selected_interacting (r).to_string (), "");
@@ -1739,7 +1734,7 @@ TEST(34a)
   EXPECT_EQ (db::Texts (db::Text ("abc", db::Trans (db::Vector (1000, 2000)))).selected_interacting (r).to_string (), "('abc',r0 1000,2000)");
 }
 
-TEST(34b)
+TEST (34b)
 {
   db::Region r;
   EXPECT_EQ (r.selected_interacting (db::Texts (db::Text ("abc", db::Trans (db::Vector (30, 30))))).to_string (), "");
@@ -1757,7 +1752,7 @@ TEST(34b)
   EXPECT_EQ (r.to_string (), "(-100,-100;-100,0;0,0;0,-100)");
 }
 
-TEST(34c)
+TEST (34c)
 {
   db::Region r;
   EXPECT_EQ (r.selected_interacting (db::Texts (db::Text ("abc", db::Trans (db::Vector (30, 30))))).to_string (), "");
@@ -1772,7 +1767,7 @@ TEST(34c)
   EXPECT_EQ (r.to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
 }
 
-TEST(34d)
+TEST (34d)
 {
   db::Region r;
   EXPECT_EQ (r.pull_interacting (db::Texts (db::Text ("abc", db::Trans (db::Vector (30, 30))))).to_string (), "");
@@ -1785,7 +1780,7 @@ TEST(34d)
   EXPECT_EQ (r.pull_interacting (db::Texts (db::Text ("abc", db::Trans (db::Vector (-190, -190))))).to_string (), "");
 }
 
-TEST(35a_interact_with_count_region)
+TEST (35a_interact_with_count_region)
 {
   db::Region r;
   r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
@@ -1859,7 +1854,7 @@ TEST(35a_interact_with_count_region)
   EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "(0,0;0,200;100,200;100,0)");
 }
 
-TEST(35b_interact_with_count_edge)
+TEST (35b_interact_with_count_edge)
 {
   db::Region r;
   r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
@@ -1933,7 +1928,7 @@ TEST(35b_interact_with_count_edge)
   EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "(0,0;0,200;100,200;100,0)");
 }
 
-TEST(35c_interact_with_count_text)
+TEST (35c_interact_with_count_text)
 {
   db::Region r;
   r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
@@ -2006,7 +2001,7 @@ TEST(35c_interact_with_count_text)
   EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "(0,0;0,200;100,200;100,0)");
 }
 
-TEST(40_with_holes)
+TEST (40_with_holes)
 {
   db::Region r;
   r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
@@ -2040,7 +2035,7 @@ static std::string sip2s (const Iter &si)
   return tl::join (pmap, "\n");
 }
 
-TEST(50_PropertiesFlat)
+TEST (50_PropertiesFlat)
 {
   db::Region r;
 
@@ -2063,27 +2058,24 @@ TEST(50_PropertiesFlat)
   EXPECT_EQ (r.count (), size_t (4));
 
   EXPECT_EQ (sip2s (r.begin ()),
-    "{id=>1}:(1,2;1,202;101,202;101,2)\n"
-    "{id=>42}:(11,12;11,212;111,212;111,12)\n"
-    "{}:(0,0;0,200;100,200;100,0)\n"
-    "{}:(10,20;10,220;110,220;110,20)"
-  );
+             "{id=>1}:(1,2;1,202;101,202;101,2)\n"
+             "{id=>42}:(11,12;11,212;111,212;111,12)\n"
+             "{}:(0,0;0,200;100,200;100,0)\n"
+             "{}:(10,20;10,220;110,220;110,20)");
 
   r.set_join_properties_on_merge (false);
   EXPECT_EQ (sip2s (r.begin_merged ()),
-    "{id=>1}:(1,2;1,202;101,202;101,2)\n"
-    "{id=>42}:(11,12;11,212;111,212;111,12)\n"
-    "{}:(0,0;0,200;10,200;10,220;110,220;110,20;100,20;100,0)"
-  );
+             "{id=>1}:(1,2;1,202;101,202;101,2)\n"
+             "{id=>42}:(11,12;11,212;111,212;111,12)\n"
+             "{}:(0,0;0,200;10,200;10,220;110,220;110,20;100,20;100,0)");
 
   r.set_join_properties_on_merge (true);
   EXPECT_EQ (sip2s (r.begin_merged ()),
-    "{id=>42}:(0,0;0,200;1,200;1,202;10,202;10,220;110,220;110,212;111,212;111,12;101,12;101,2;100,2;100,0)"
-  );
+             "{id=>42}:(0,0;0,200;1,200;1,202;10,202;10,220;110,220;110,212;111,212;111,12;101,12;101,2;100,2;100,0)");
 }
 
 //  "+" operator with properties (issue #1373)
-TEST(50b_PropertiesFlat)
+TEST (50b_PropertiesFlat)
 {
   db::Region r, rr;
 
@@ -2105,7 +2097,7 @@ TEST(50b_PropertiesFlat)
   EXPECT_EQ (r.to_string (), "(0,0;0,20;10,20;10,0);(0,0;0,200;100,200;100,0);(1,2;1,202;101,202;101,2){id=>1}");
 }
 
-TEST(51_PropertiesFlatFromLayout)
+TEST (51_PropertiesFlatFromLayout)
 {
   db::PropertiesSet ps;
 
@@ -2133,15 +2125,13 @@ TEST(51_PropertiesFlatFromLayout)
   EXPECT_EQ (r.count (), size_t (4));
 
   EXPECT_EQ (sip2s (r.begin ()),
-    "{}:(0,0;0,200;100,200;100,0)\n"
-    "{}:(1,2;1,202;101,202;101,2)\n"
-    "{}:(10,20;10,220;110,220;110,20)\n"
-    "{}:(11,12;11,212;111,212;111,12)"
-  );
+             "{}:(0,0;0,200;100,200;100,0)\n"
+             "{}:(1,2;1,202;101,202;101,2)\n"
+             "{}:(10,20;10,220;110,220;110,20)\n"
+             "{}:(11,12;11,212;111,212;111,12)");
 
   EXPECT_EQ (sip2s (r.begin_merged ()),
-    "{}:(0,0;0,200;1,200;1,202;10,202;10,220;110,220;110,212;111,212;111,12;101,12;101,2;100,2;100,0)"
-  );
+             "{}:(0,0;0,200;1,200;1,202;10,202;10,220;110,220;110,212;111,212;111,12;101,12;101,2;100,2;100,0)");
 
   //  NOTE: now with explicit propertly-only source
   db::RecursiveShapeIterator rsi (ly, top, li);
@@ -2149,13 +2139,11 @@ TEST(51_PropertiesFlatFromLayout)
   r = db::Region (rsi);
 
   EXPECT_EQ (sip2s (r.begin ()),
-    "{}:(1,2;1,202;101,202;101,2)\n"
-    "{}:(11,12;11,212;111,212;111,12)"
-  );
+             "{}:(1,2;1,202;101,202;101,2)\n"
+             "{}:(11,12;11,212;111,212;111,12)");
 
   EXPECT_EQ (sip2s (r.begin_merged ()),
-    "{}:(1,2;1,202;11,202;11,212;111,212;111,12;101,12;101,2)"
-  );
+             "{}:(1,2;1,202;11,202;11,212;111,212;111,12;101,12;101,2)");
 
   //  NOTE: now with regarding properties
   rsi = db::RecursiveShapeIterator (ly, top, li);
@@ -2165,26 +2153,23 @@ TEST(51_PropertiesFlatFromLayout)
   EXPECT_EQ (r.count (), size_t (4));
 
   EXPECT_EQ (sip2s (r.begin ()),
-    "{id=>1}:(1,2;1,202;101,202;101,2)\n"
-    "{id=>42}:(11,12;11,212;111,212;111,12)\n"
-    "{}:(0,0;0,200;100,200;100,0)\n"
-    "{}:(10,20;10,220;110,220;110,20)"
-  );
+             "{id=>1}:(1,2;1,202;101,202;101,2)\n"
+             "{id=>42}:(11,12;11,212;111,212;111,12)\n"
+             "{}:(0,0;0,200;100,200;100,0)\n"
+             "{}:(10,20;10,220;110,220;110,20)");
 
   r.set_join_properties_on_merge (false);
   EXPECT_EQ (sip2s (r.begin_merged ()),
-    "{id=>1}:(1,2;1,202;101,202;101,2)\n"
-    "{id=>42}:(11,12;11,212;111,212;111,12)\n"
-    "{}:(0,0;0,200;10,200;10,220;110,220;110,20;100,20;100,0)"
-  );
+             "{id=>1}:(1,2;1,202;101,202;101,2)\n"
+             "{id=>42}:(11,12;11,212;111,212;111,12)\n"
+             "{}:(0,0;0,200;10,200;10,220;110,220;110,20;100,20;100,0)");
 
   r.set_join_properties_on_merge (true);
   EXPECT_EQ (sip2s (r.begin_merged ()),
-    "{id=>42}:(0,0;0,200;1,200;1,202;10,202;10,220;110,220;110,212;111,212;111,12;101,12;101,2;100,2;100,0)"
-  );
+             "{id=>42}:(0,0;0,200;1,200;1,202;10,202;10,220;110,220;110,212;111,212;111,12;101,12;101,2;100,2;100,0)");
 }
 
-TEST(52_PropertiesDeep)
+TEST (52_PropertiesDeep)
 {
   db::PropertiesSet ps;
 
@@ -2259,7 +2244,7 @@ TEST(52_PropertiesDeep)
   EXPECT_EQ (s.at_end (), true);
 }
 
-TEST(53_PropertiesDeepFromLayout)
+TEST (53_PropertiesDeepFromLayout)
 {
   db::DeepShapeStore dss;
 
@@ -2401,7 +2386,7 @@ TEST(53_PropertiesDeepFromLayout)
   EXPECT_EQ (s.at_end (), true);
 }
 
-TEST(54_PropertiesFilterDeep)
+TEST (54_PropertiesFilterDeep)
 {
   db::DeepShapeStore dss ("TOP", 0.001);
   db::Region r (dss);
@@ -2462,7 +2447,7 @@ TEST(54_PropertiesFilterDeep)
   EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
 }
 
-TEST(55_PropertiesFilterFlat)
+TEST (55_PropertiesFilterFlat)
 {
   //  NOTE: we have to force flat as otherwise no properties repo is available
   db::Region r (new db::FlatRegion ());
@@ -2523,7 +2508,7 @@ TEST(55_PropertiesFilterFlat)
   EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
 }
 
-TEST(56_RegionsFromShapes)
+TEST (56_RegionsFromShapes)
 {
   db::Shapes shapes;
 
@@ -2552,7 +2537,7 @@ TEST(56_RegionsFromShapes)
   EXPECT_EQ (db::Region (si, db::ICplxTrans (0.5), false).area (), 10000);
 }
 
-TEST(60_sized_inside)
+TEST (60_sized_inside)
 {
   db::Region r, inside;
   r.insert (db::Box (-10, 20, 20, 60));
@@ -2621,7 +2606,7 @@ TEST(60_sized_inside)
   }
 }
 
-TEST(61_sized_outside)
+TEST (61_sized_outside)
 {
   db::Region r, outside;
   r.insert (db::Box (-10, 20, 20, 60));
@@ -2681,7 +2666,7 @@ TEST(61_sized_outside)
   }
 }
 
-TEST(62_sized_inside_deep)
+TEST (62_sized_inside_deep)
 {
   db::DeepShapeStore dss ("TOP", 0.001);
   db::Region r (dss), inside (dss), empty (dss);
@@ -2759,7 +2744,7 @@ TEST(62_sized_inside_deep)
   }
 }
 
-TEST(63_sized_outside_deep)
+TEST (63_sized_outside_deep)
 {
   db::DeepShapeStore dss ("TOP", 0.001);
   db::Region r (dss), outside (dss), empty (dss);
@@ -2838,7 +2823,7 @@ TEST(63_sized_outside_deep)
   }
 }
 
-TEST(64_add_with_properties)
+TEST (64_add_with_properties)
 {
   db::DeepShapeStore dss ("TOP", 0.001);
   db::Region rd1 (dss), rd2 (dss);
@@ -2906,7 +2891,7 @@ TEST(64_add_with_properties)
   EXPECT_EQ ((ro1 + rf2).to_string (), "(10,20;10,60;40,60;40,20){net=>17};(-10,20;-10,60;20,60;20,20){net=>17}");
 }
 
-TEST(100_Processors)
+TEST (100_Processors)
 {
   db::Region r;
   r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
@@ -2938,23 +2923,22 @@ TEST(100_Processors)
   EXPECT_EQ (db::compare (r.processed (db::minkowski_sum_computation<db::Edge> (db::Edge (-10, 0, 30, 0))), "(-10,0;-10,200;130,200;130,0);(-10,300;-10,400;90,400;90,500;230,500;230,300)"), true);
 
   EXPECT_EQ (db::compare (r.processed (db::TrapezoidDecomposition (db::TD_htrapezoids)), "(0,0;0,200;100,200;100,0);(100,300;100,500;200,500;200,300);(0,300;0,400;100,400;100,300)"), true);
-  EXPECT_EQ (r.processed (db::ConvexDecomposition (db::PO_vertical)).to_string (),       "(0,0;0,200;100,200;100,0);(100,300;100,500;200,500;200,300);(0,300;0,400;100,400;100,300)");
-  EXPECT_EQ (r.processed (db::ConvexDecomposition (db::PO_horizontal)).to_string (),     "(0,0;0,200;100,200;100,0);(100,400;100,500;200,500;200,400);(0,300;0,400;200,400;200,300)");
+  EXPECT_EQ (r.processed (db::ConvexDecomposition (db::PO_vertical)).to_string (), "(0,0;0,200;100,200;100,0);(100,300;100,500;200,500;200,300);(0,300;0,400;100,400;100,300)");
+  EXPECT_EQ (r.processed (db::ConvexDecomposition (db::PO_horizontal)).to_string (), "(0,0;0,200;100,200;100,0);(100,400;100,500;200,500;200,400);(0,300;0,400;200,400;200,300)");
 }
 
-TEST(issue_228)
+TEST (issue_228)
 {
   db::Region r;
-  db::Point pts[] = {
+  db::Point pts [] = {
     db::Point (0, 10),
     db::Point (0, 290),
     db::Point (280, 290),
     db::Point (280, 230),
     db::Point (360, 230),
     db::Point (360, 70),
-    db::Point (280,70),
-    db::Point (280,10)
-  };
+    db::Point (280, 70),
+    db::Point (280, 10)};
 
   db::Polygon poly;
   poly.assign_hull (pts, pts + sizeof (pts) / sizeof (pts [0]));
@@ -2967,7 +2951,7 @@ TEST(issue_228)
   EXPECT_EQ (rr.selected_interacting (r).to_string (), rr.to_string ());
 }
 
-TEST(issue_277)
+TEST (issue_277)
 {
   db::Region r;
   r.insert (db::Box (0, 0, 400, 400));
@@ -2981,16 +2965,16 @@ TEST(issue_277)
   r.merge ();
   EXPECT_EQ (r.sized (1).merged (false, 1).to_string (), "(399,399;399,401;401,401;401,399)");
 
-  r.set_min_coherence (false);  //  needs to merge again
+  r.set_min_coherence (false); //  needs to merge again
   EXPECT_EQ (r.sized (1).merged (false, 1).to_string (), "");
 }
 
-TEST(issue_909)
+TEST (issue_909)
 {
   db::Shapes s1;
-  s1.insert(db::Box(0, 0, 100, 100));
+  s1.insert (db::Box (0, 0, 100, 100));
   db::Shapes s2;
-  s2.insert(db::Box(0, 0, 200, 300));
+  s2.insert (db::Box (0, 0, 200, 300));
   db::Region r1 = db::Region (db::RecursiveShapeIterator (s1));
   db::Region r2 = db::Region (db::RecursiveShapeIterator (s2));
 
@@ -2998,9 +2982,9 @@ TEST(issue_909)
   EXPECT_EQ (r.to_string (), "(0,0;0,100;100,100;100,0);(0,0;0,300;200,300;200,0)");
 }
 
-TEST(issue_2208)
+TEST (issue_2208)
 {
-  db::Point points[] = {
+  db::Point points [] = {
     db::Point (-36, -2698),
     db::Point (-3226, 492),
     db::Point (-2871, 847),
@@ -3008,8 +2992,7 @@ TEST(issue_2208)
     db::Point (-751, -1283),
     db::Point (-746, -1288),
     db::Point (-741, -1283),
-    db::Point (319, -2343)
-  };
+    db::Point (319, -2343)};
 
   db::Region r;
   db::Polygon p;

@@ -39,16 +39,14 @@ FontController::FontController ()
 {
 }
 
-void
-FontController::initialize (lay::Dispatcher * /*root*/)
+void FontController::initialize (lay::Dispatcher * /*root*/)
 {
   //  NOTE: we initialize the dirs in the stage once to have them available for the autorun
   //  macros. We'll do that later again in order to pull in the dirs from the packages.
   sync_dirs ();
 }
 
-void
-FontController::initialized (lay::Dispatcher * /*root*/)
+void FontController::initialized (lay::Dispatcher * /*root*/)
 {
   if (lay::SaltController::instance ()) {
     connect (lay::SaltController::instance (), SIGNAL (salt_changed ()), this, SLOT (sync_with_external_sources ()));
@@ -63,8 +61,7 @@ FontController::initialized (lay::Dispatcher * /*root*/)
   sync_dirs ();
 }
 
-void
-FontController::uninitialize (lay::Dispatcher * /*root*/)
+void FontController::uninitialize (lay::Dispatcher * /*root*/)
 {
   if (m_file_watcher) {
     disconnect (m_file_watcher, SIGNAL (fileChanged (const QString &)), this, SLOT (file_watcher_triggered ()));
@@ -78,39 +75,33 @@ FontController::uninitialize (lay::Dispatcher * /*root*/)
   }
 }
 
-void
-FontController::get_options (std::vector < std::pair<std::string, std::string> > & /*options*/) const
+void FontController::get_options (std::vector<std::pair<std::string, std::string>> & /*options*/) const
 {
   //  .. nothing yet ..
 }
 
-void
-FontController::get_menu_entries (std::vector<lay::MenuEntry> & /*menu_entries*/) const
+void FontController::get_menu_entries (std::vector<lay::MenuEntry> & /*menu_entries*/) const
 {
   //  .. nothing yet ..
 }
 
-bool
-FontController::configure (const std::string & /*name*/, const std::string & /*value*/)
+bool FontController::configure (const std::string & /*name*/, const std::string & /*value*/)
 {
   return false;
 }
 
-void
-FontController::config_finalize()
+void FontController::config_finalize ()
 {
   //  .. nothing yet ..
 }
 
-bool
-FontController::can_exit (lay::Dispatcher * /*root*/) const
+bool FontController::can_exit (lay::Dispatcher * /*root*/) const
 {
   //  .. nothing yet ..
   return true;
 }
 
-void
-FontController::sync_dirs ()
+void FontController::sync_dirs ()
 {
   if (m_file_watcher) {
     m_file_watcher->clear ();
@@ -132,7 +123,7 @@ FontController::sync_dirs ()
 
   std::vector<std::string> font_paths;
 
-  for (std::vector <std::string>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
+  for (std::vector<std::string>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
     QDir fp = QDir (tl::to_qstring (*p)).filePath (tl::to_qstring ("fonts"));
     if (fp.exists ()) {
       if (m_file_watcher) {
@@ -149,15 +140,13 @@ FontController::sync_dirs ()
   }
 }
 
-void
-FontController::sync_with_external_sources ()
+void FontController::sync_with_external_sources ()
 {
   tl::log << tl::to_string (tr ("Package updates - updating fonts"));
   dm_sync_dirs ();
 }
 
-void
-FontController::file_watcher_triggered ()
+void FontController::file_watcher_triggered ()
 {
   tl::log << tl::to_string (tr ("Detected file system change in fonts - updating"));
   dm_sync_dirs ();
@@ -167,7 +156,7 @@ FontController *
 FontController::instance ()
 {
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    FontController *sc = dynamic_cast <FontController *> (cls.operator-> ());
+    FontController *sc = dynamic_cast<FontController *> (cls.operator->());
     if (sc) {
       return sc;
     }
@@ -179,4 +168,3 @@ FontController::instance ()
 static tl::RegisteredClass<lay::PluginDeclaration> font_controller_decl (new lay::FontController (), 160, "FontController");
 
 }
-

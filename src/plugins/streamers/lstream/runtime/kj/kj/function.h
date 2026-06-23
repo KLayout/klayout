@@ -25,7 +25,8 @@
 
 KJ_BEGIN_HEADER
 
-namespace kj {
+namespace kj
+{
 
 template <typename Signature>
 class Function;
@@ -97,29 +98,32 @@ class FunctionParam;
 // but not if it is used as a local variable nor a class member variable.
 
 template <typename Return, typename... Params>
-class Function<Return(Params...)> {
+class Function<Return (Params...)>
+{
 public:
   template <typename F>
-  inline Function(F&& f): impl(heap<Impl<F>>(kj::fwd<F>(f))) {}
-  Function() = default;
+  inline Function (F &&f) : impl (heap<Impl<F>> (kj::fwd<F> (f))) {}
+  Function () = default;
 
   // Make sure people don't accidentally end up wrapping a reference when they meant to return
   // a function.
-  KJ_DISALLOW_COPY(Function);
-  Function(Function&) = delete;
-  Function& operator=(Function&) = delete;
-  template <typename T> Function(const Function<T>&) = delete;
-  template <typename T> Function& operator=(const Function<T>&) = delete;
-  template <typename T> Function(const ConstFunction<T>&) = delete;
-  template <typename T> Function& operator=(const ConstFunction<T>&) = delete;
-  Function(Function&&) = default;
-  Function& operator=(Function&&) = default;
+  KJ_DISALLOW_COPY (Function);
+  Function (Function &) = delete;
+  Function &operator= (Function &) = delete;
+  template <typename T> Function (const Function<T> &) = delete;
+  template <typename T> Function &operator= (const Function<T> &) = delete;
+  template <typename T> Function (const ConstFunction<T> &) = delete;
+  template <typename T> Function &operator= (const ConstFunction<T> &) = delete;
+  Function (Function &&) = default;
+  Function &operator= (Function &&) = default;
 
-  inline Return operator()(Params... params) {
-    return (*impl)(kj::fwd<Params>(params)...);
+  inline Return operator() (Params... params)
+  {
+    return (*impl) (kj::fwd<Params> (params)...);
   }
 
-  Function reference() {
+  Function reference ()
+  {
     // Forms a new Function of the same type that delegates to this Function by reference.
     // Therefore, this Function must outlive the returned Function, but otherwise they behave
     // exactly the same.
@@ -128,18 +132,21 @@ public:
   }
 
 private:
-  class Iface {
+  class Iface
+  {
   public:
-    virtual Return operator()(Params... params) = 0;
+    virtual Return operator() (Params... params) = 0;
   };
 
   template <typename F>
-  class Impl final: public Iface {
+  class Impl final : public Iface
+  {
   public:
-    explicit Impl(F&& f): f(kj::fwd<F>(f)) {}
+    explicit Impl (F &&f) : f (kj::fwd<F> (f)) {}
 
-    Return operator()(Params... params) override {
-      return f(kj::fwd<Params>(params)...);
+    Return operator() (Params... params) override
+    {
+      return f (kj::fwd<Params> (params)...);
     }
 
   private:
@@ -150,29 +157,32 @@ private:
 };
 
 template <typename Return, typename... Params>
-class ConstFunction<Return(Params...)> {
+class ConstFunction<Return (Params...)>
+{
 public:
   template <typename F>
-  inline ConstFunction(F&& f): impl(heap<Impl<F>>(kj::fwd<F>(f))) {}
-  ConstFunction() = default;
+  inline ConstFunction (F &&f) : impl (heap<Impl<F>> (kj::fwd<F> (f))) {}
+  ConstFunction () = default;
 
   // Make sure people don't accidentally end up wrapping a reference when they meant to return
   // a function.
-  KJ_DISALLOW_COPY(ConstFunction);
-  ConstFunction(ConstFunction&) = delete;
-  ConstFunction& operator=(ConstFunction&) = delete;
-  template <typename T> ConstFunction(const ConstFunction<T>&) = delete;
-  template <typename T> ConstFunction& operator=(const ConstFunction<T>&) = delete;
-  template <typename T> ConstFunction(const Function<T>&) = delete;
-  template <typename T> ConstFunction& operator=(const Function<T>&) = delete;
-  ConstFunction(ConstFunction&&) = default;
-  ConstFunction& operator=(ConstFunction&&) = default;
+  KJ_DISALLOW_COPY (ConstFunction);
+  ConstFunction (ConstFunction &) = delete;
+  ConstFunction &operator= (ConstFunction &) = delete;
+  template <typename T> ConstFunction (const ConstFunction<T> &) = delete;
+  template <typename T> ConstFunction &operator= (const ConstFunction<T> &) = delete;
+  template <typename T> ConstFunction (const Function<T> &) = delete;
+  template <typename T> ConstFunction &operator= (const Function<T> &) = delete;
+  ConstFunction (ConstFunction &&) = default;
+  ConstFunction &operator= (ConstFunction &&) = default;
 
-  inline Return operator()(Params... params) const {
-    return (*impl)(kj::fwd<Params>(params)...);
+  inline Return operator() (Params... params) const
+  {
+    return (*impl) (kj::fwd<Params> (params)...);
   }
 
-  ConstFunction reference() const {
+  ConstFunction reference () const
+  {
     // Forms a new ConstFunction of the same type that delegates to this ConstFunction by reference.
     // Therefore, this ConstFunction must outlive the returned ConstFunction, but otherwise they
     // behave exactly the same.
@@ -181,18 +191,21 @@ public:
   }
 
 private:
-  class Iface {
+  class Iface
+  {
   public:
-    virtual Return operator()(Params... params) const = 0;
+    virtual Return operator() (Params... params) const = 0;
   };
 
   template <typename F>
-  class Impl final: public Iface {
+  class Impl final : public Iface
+  {
   public:
-    explicit Impl(F&& f): f(kj::fwd<F>(f)) {}
+    explicit Impl (F &&f) : f (kj::fwd<F> (f)) {}
 
-    Return operator()(Params... params) const override {
-      return f(kj::fwd<Params>(params)...);
+    Return operator() (Params... params) const override
+    {
+      return f (kj::fwd<Params> (params)...);
     }
 
   private:
@@ -203,68 +216,78 @@ private:
 };
 
 template <typename Return, typename... Params>
-class FunctionParam<Return(Params...)> {
+class FunctionParam<Return (Params...)>
+{
 public:
   template <typename Func>
-  FunctionParam(Func&& func) {
+  FunctionParam (Func &&func)
+  {
     typedef Wrapper<Decay<Func>> WrapperType;
 
     // All instances of Wrapper<Func> are two pointers in size: a vtable, and a Func&. So if we
     // allocate space for two pointers, we can construct a Wrapper<Func> in it!
-    static_assert(sizeof(WrapperType) == sizeof(space),
-        "expected WrapperType to be two pointers");
+    static_assert (sizeof (WrapperType) == sizeof (space),
+                   "expected WrapperType to be two pointers");
 
     // Even if `func` is an rvalue reference, it's OK to use it as an lvalue here, because
     // FunctionParam is used strictly for parameters. If we captured a temporary, we know that
     // temporary will not be destroyed until after the function call completes.
-    ctor(*reinterpret_cast<WrapperType*>(space), func);
+    ctor (*reinterpret_cast<WrapperType *> (space), func);
   }
 
-  FunctionParam(const FunctionParam& other) = default;
-  FunctionParam(FunctionParam&& other) = default;
+  FunctionParam (const FunctionParam &other) = default;
+  FunctionParam (FunctionParam &&other) = default;
   // Magically, a plain copy works.
 
-  inline Return operator()(Params... params) {
-    return (*reinterpret_cast<WrapperBase*>(space))(kj::fwd<Params>(params)...);
+  inline Return operator() (Params... params)
+  {
+    return (*reinterpret_cast<WrapperBase *> (space)) (kj::fwd<Params> (params)...);
   }
 
 private:
-  alignas(void*) char space[2 * sizeof(void*)];
+  alignas (void *) char space [2 * sizeof (void *)];
 
-  class WrapperBase {
+  class WrapperBase
+  {
   public:
-    virtual Return operator()(Params... params) = 0;
+    virtual Return operator() (Params... params) = 0;
   };
 
   template <typename Func>
-  class Wrapper: public WrapperBase {
+  class Wrapper : public WrapperBase
+  {
   public:
-    Wrapper(Func& func): func(func) {}
+    Wrapper (Func &func) : func (func) {}
 
-    inline Return operator()(Params... params) override {
-      return func(kj::fwd<Params>(params)...);
+    inline Return operator() (Params... params) override
+    {
+      return func (kj::fwd<Params> (params)...);
     }
 
   private:
-    Func& func;
+    Func &func;
   };
 };
 
-namespace _ {  // private
+namespace _
+{ // private
 
 template <typename T, typename Func, typename ConstFunc>
-class BoundMethod {
+class BoundMethod
+{
 public:
-  BoundMethod(T&& t, Func&& func, ConstFunc&& constFunc)
-      : t(kj::fwd<T>(t)), func(kj::mv(func)), constFunc(kj::mv(constFunc)) {}
+  BoundMethod (T &&t, Func &&func, ConstFunc &&constFunc)
+    : t (kj::fwd<T> (t)), func (kj::mv (func)), constFunc (kj::mv (constFunc)) {}
 
   template <typename... Params>
-  auto operator()(Params&&... params) {
-    return func(t, kj::fwd<Params>(params)...);
+  auto operator() (Params &&...params)
+  {
+    return func (t, kj::fwd<Params> (params)...);
   }
   template <typename... Params>
-  auto operator()(Params&&... params) const {
-    return constFunc(t, kj::fwd<Params>(params)...);
+  auto operator() (Params &&...params) const
+  {
+    return constFunc (t, kj::fwd<Params> (params)...);
   }
 
 private:
@@ -274,20 +297,19 @@ private:
 };
 
 template <typename T, typename Func, typename ConstFunc>
-BoundMethod<T, Func, ConstFunc> boundMethod(T&& t, Func&& func, ConstFunc&& constFunc) {
-  return { kj::fwd<T>(t), kj::fwd<Func>(func), kj::fwd<ConstFunc>(constFunc) };
+BoundMethod<T, Func, ConstFunc> boundMethod (T &&t, Func &&func, ConstFunc &&constFunc)
+{
+  return {kj::fwd<T> (t), kj::fwd<Func> (func), kj::fwd<ConstFunc> (constFunc)};
 }
 
-}  // namespace _ (private)
+} // namespace _ (private)
 
 #define KJ_BIND_METHOD(obj, method) \
-  ::kj::_::boundMethod(obj, \
-      [](auto& s, auto&&... p) mutable { return s.method(kj::fwd<decltype(p)>(p)...); }, \
-      [](auto& s, auto&&... p) { return s.method(kj::fwd<decltype(p)>(p)...); })
+  ::kj::_::boundMethod (obj, [] (auto &s, auto &&...p) mutable { return s.method (kj::fwd<decltype (p)> (p)...); }, [] (auto &s, auto &&...p) { return s.method (kj::fwd<decltype (p)> (p)...); })
 // Macro that produces a functor object which forwards to the method `obj.name`.  If `obj` is an
 // lvalue, the functor will hold a reference to it.  If `obj` is an rvalue, the functor will
 // contain a copy (by move) of it. The method is allowed to be overloaded.
 
-}  // namespace kj
+} // namespace kj
 
 KJ_END_HEADER

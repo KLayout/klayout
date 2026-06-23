@@ -21,4 +21,3 @@
 */
 
 #include "dbEdgeBoolean.h"
-

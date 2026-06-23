@@ -28,16 +28,16 @@
 namespace lay
 {
 
-/** 
+/**
  *  @brief A pretty heuristic method to determine the "enclosing distance" of a polygon around a point
  */
-template<class Iter, class Point>
+template <class Iter, class Point>
 double poly_dist (Iter edge, const Point &pt)
 {
   double distance = std::numeric_limits<double>::max ();
 
   while (! edge.at_end ()) {
-    std::pair <bool, Point> ret = (*edge).projected (pt);
+    std::pair<bool, Point> ret = (*edge).projected (pt);
     if (ret.first) {
       double d (ret.second.distance (pt));
       if (d < distance) {
@@ -73,8 +73,7 @@ Finder::~Finder ()
   //  .. nothing yet ..
 }
 
-bool 
-Finder::closer (double d)
+bool Finder::closer (double d)
 {
   //  the proximity is checked and delivered in micron units.
   d *= mp_view->cellview (m_cv_index)->layout ().dbu ();
@@ -86,8 +85,7 @@ Finder::closer (double d)
   }
 }
 
-void 
-Finder::start (lay::LayoutViewBase *view, unsigned int cv_index, const std::vector<db::DCplxTrans> &trans, const db::DBox &region, const db::DBox &scan_region, int min_level, int max_level, const std::vector<unsigned int> &layers)
+void Finder::start (lay::LayoutViewBase *view, unsigned int cv_index, const std::vector<db::DCplxTrans> &trans, const db::DBox &region, const db::DBox &scan_region, int min_level, int max_level, const std::vector<unsigned int> &layers)
 {
   const lay::CellView &cv = view->cellview (cv_index);
 
@@ -102,14 +100,13 @@ Finder::start (lay::LayoutViewBase *view, unsigned int cv_index, const std::vect
 
   if (layers.size () == 1) {
 
-    m_box_convert = db::box_convert <db::CellInst, false> (*mp_layout, layers [0]);
-    m_cell_box_convert = db::box_convert <db::Cell, false> (layers [0]);
+    m_box_convert = db::box_convert<db::CellInst, false> (*mp_layout, layers [0]);
+    m_cell_box_convert = db::box_convert<db::Cell, false> (layers [0]);
 
   } else {
 
-    m_box_convert = db::box_convert <db::CellInst, false> (*mp_layout);
-    m_cell_box_convert = db::box_convert <db::Cell, false> ();
-
+    m_box_convert = db::box_convert<db::CellInst, false> (*mp_layout);
+    m_cell_box_convert = db::box_convert<db::Cell, false> ();
   }
 
   m_path.erase (m_path.begin (), m_path.end ());
@@ -121,12 +118,10 @@ Finder::start (lay::LayoutViewBase *view, unsigned int cv_index, const std::vect
     m_scan_region = it * scan_region;
 
     do_find (*cv.cell (), int (cv.specific_path ().size ()), view->viewport ().trans () * *t, cv.context_trans ());
-
   }
 }
 
-void
-Finder::test_edge (const db::ICplxTrans &trans, const db::Edge &edge, double &distance, bool &match)
+void Finder::test_edge (const db::ICplxTrans &trans, const db::Edge &edge, double &distance, bool &match)
 {
   if (test_edge (trans, edge, true, distance, match) == 0) {
     test_edge (trans, edge, false, distance, match);
@@ -173,11 +168,10 @@ Finder::test_edge (const db::ICplxTrans &trans, const db::Edge &edg, bool points
       }
 
       match = true;
-
     }
 
   } else {
-  
+
     //  if the edge cuts through the active region: test the
     //  edge as a whole
     db::Edge edg_trans (p1, p2);
@@ -190,21 +184,16 @@ Finder::test_edge (const db::ICplxTrans &trans, const db::Edge &edg, bool points
 
       ret = 3;
       match = true;
-
     }
-
   }
 
   return ret;
 }
 
-void
-Finder::do_find (const db::Cell &cell, int level, const db::DCplxTrans &vp, const db::ICplxTrans &t)
+void Finder::do_find (const db::Cell &cell, int level, const db::DCplxTrans &vp, const db::ICplxTrans &t)
 {
-  if (level <= m_max_level /*take level of cell itself*/ 
-      && cell.is_proxy () 
-      && m_layers.size () == 1 
-      && m_layers [0] == mp_layout->guiding_shape_layer ()) {
+  if (level <= m_max_level /*take level of cell itself*/
+      && cell.is_proxy () && m_layers.size () == 1 && m_layers [0] == mp_layout->guiding_shape_layer ()) {
 
     //  when looking at the guiding shape layer, we can visit this cell as well allowing to find the guiding shapes
 
@@ -216,11 +205,7 @@ Finder::do_find (const db::Cell &cell, int level, const db::DCplxTrans &vp, cons
       visit_cell (cell, hit_box, scan_box, vp, t, level);
     }
 
-  } else if (level < m_max_level 
-      && (t * m_cell_box_convert (cell)).touches (m_scan_region)
-      && (mp_view->select_inside_pcells_mode () || !cell.is_proxy ()) 
-      && !mp_view->is_cell_hidden (cell.cell_index (), m_cv_index)
-      && !cell.is_real_ghost_cell ()) {
+  } else if (level < m_max_level && (t * m_cell_box_convert (cell)).touches (m_scan_region) && (mp_view->select_inside_pcells_mode () || ! cell.is_proxy ()) && ! mp_view->is_cell_hidden (cell.cell_index (), m_cv_index) && ! cell.is_real_ghost_cell ()) {
 
     db::ICplxTrans it = t.inverted ();
     db::Box scan_box (it * m_scan_region);
@@ -240,19 +225,16 @@ Finder::do_find (const db::Cell &cell, int level, const db::DCplxTrans &vp, cons
 
         checkpoint ();
 
-        do_find (mp_layout->cell (cell_inst.object ().cell_index ()), 
+        do_find (mp_layout->cell (cell_inst.object ().cell_index ()),
                  level + 1,
                  vp,
                  t * cell_inst.complex_trans (*p));
 
         m_path.pop_back ();
-
       }
 
       ++inst;
-
     }
-
   }
 }
 
@@ -260,9 +242,9 @@ Finder::do_find (const db::Cell &cell, int level, const db::DCplxTrans &vp, cons
 //  ShapeFinder implementation
 
 ShapeFinder::ShapeFinder (bool point_mode, bool top_level_sel, db::ShapeIterator::flags_type flags, const std::set<lay::ObjectInstPath> *excludes, bool capture_all_shapes)
-  : Finder (point_mode, top_level_sel), 
-    mp_excludes ((excludes && !excludes->empty ()) ? excludes : 0),
-    m_flags (flags), m_cv_index (0), m_topcell (0), 
+  : Finder (point_mode, top_level_sel),
+    mp_excludes ((excludes && ! excludes->empty ()) ? excludes : 0),
+    m_flags (flags), m_cv_index (0), m_topcell (0),
     mp_text_info (0),
     mp_prop_sel (0), m_inv_prop_sel (false), mp_progress (0),
     m_capture_all_shapes (capture_all_shapes)
@@ -270,8 +252,7 @@ ShapeFinder::ShapeFinder (bool point_mode, bool top_level_sel, db::ShapeIterator
   m_try_counter = m_tries = point_sel_tests;
 }
 
-struct LPContextEqualOp
-{
+struct LPContextEqualOp {
   bool operator() (const lay::LayerPropertiesConstIterator &a, const lay::LayerPropertiesConstIterator &b)
   {
     if (a->cellview_index () != b->cellview_index ()) {
@@ -294,8 +275,7 @@ struct LPContextEqualOp
   }
 };
 
-struct LPContextCompareOp
-{
+struct LPContextCompareOp {
   bool operator() (const lay::LayerPropertiesConstIterator &a, const lay::LayerPropertiesConstIterator &b)
   {
     if (a->cellview_index () != b->cellview_index ()) {
@@ -318,8 +298,7 @@ struct LPContextCompareOp
   }
 };
 
-bool
-ShapeFinder::find (LayoutViewBase *view, const db::DBox &region_mu)
+bool ShapeFinder::find (LayoutViewBase *view, const db::DBox &region_mu)
 {
   tl::AbsoluteProgress progress (tl::to_string (tr ("Selecting ...")));
   progress.set_unit (1000);
@@ -342,7 +321,7 @@ ShapeFinder::find (LayoutViewBase *view, const db::DBox &region_mu)
   std::sort (lprops.begin (), lprops.end (), LPContextCompareOp ());
 
   std::vector<unsigned int> layers;
-  for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator llp = lprops.begin (); llp != lprops.end (); ) {
+  for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator llp = lprops.begin (); llp != lprops.end ();) {
 
     layers.clear ();
 
@@ -354,14 +333,13 @@ ShapeFinder::find (LayoutViewBase *view, const db::DBox &region_mu)
         layers.push_back ((unsigned int) li);
       }
       ++llp;
-    } while (llp != lprops.end () && eq(lp0, *llp));
+    } while (llp != lprops.end () && eq (lp0, *llp));
 
     find_internal (view, lp0->cellview_index (), &lp0->prop_sel (), lp0->inverse_prop_sel (), lp0->hier_levels (), lp0->trans (), layers, region_mu);
-
   }
 
-  //  search on the guiding shapes layer as well 
- 
+  //  search on the guiding shapes layer as well
+
   //  Use the visible layers for the context: the guiding shape is only looked up for cells
   //  having one of these layers
   m_context_layers.clear ();
@@ -369,8 +347,8 @@ ShapeFinder::find (LayoutViewBase *view, const db::DBox &region_mu)
     m_context_layers.push_back ((*llp)->layer_index ());
   }
 
-  std::set< std::pair<db::DCplxTrans, int> > variants = view->cv_transform_variants ();
-  for (std::set< std::pair<db::DCplxTrans, int> >::const_iterator v = variants.begin (); v != variants.end (); ++v) {
+  std::set<std::pair<db::DCplxTrans, int>> variants = view->cv_transform_variants ();
+  for (std::set<std::pair<db::DCplxTrans, int>>::const_iterator v = variants.begin (); v != variants.end (); ++v) {
 
     layers.clear ();
     layers.push_back (view->cellview (v->second)->layout ().guiding_shape_layer ());
@@ -379,7 +357,6 @@ ShapeFinder::find (LayoutViewBase *view, const db::DBox &region_mu)
     trans.push_back (v->first);
 
     find_internal (view, (unsigned int) v->second, 0, false, lay::HierarchyLevelSelection (), trans, layers, region_mu);
-
   }
 
   mp_progress = 0;
@@ -389,8 +366,7 @@ ShapeFinder::find (LayoutViewBase *view, const db::DBox &region_mu)
   return ! m_founds.empty ();
 }
 
-bool 
-ShapeFinder::find (lay::LayoutViewBase *view, const lay::LayerProperties &lprops, const db::DBox &region_mu)
+bool ShapeFinder::find (lay::LayoutViewBase *view, const lay::LayerProperties &lprops, const db::DBox &region_mu)
 {
   tl::AbsoluteProgress progress (tl::to_string (tr ("Selecting ...")));
   progress.set_unit (1000);
@@ -414,8 +390,7 @@ ShapeFinder::find (lay::LayoutViewBase *view, const lay::LayerProperties &lprops
   return result;
 }
 
-bool
-ShapeFinder::find_internal (lay::LayoutViewBase *view, unsigned int cv_index, const std::set<db::properties_id_type> *prop_sel, bool inv_prop_sel, const lay::HierarchyLevelSelection &hier_sel, const std::vector<db::DCplxTrans> &trans_mu, const std::vector<unsigned int> &layers, const db::DBox &region_mu)
+bool ShapeFinder::find_internal (lay::LayoutViewBase *view, unsigned int cv_index, const std::set<db::properties_id_type> *prop_sel, bool inv_prop_sel, const lay::HierarchyLevelSelection &hier_sel, const std::vector<db::DCplxTrans> &trans_mu, const std::vector<unsigned int> &layers, const db::DBox &region_mu)
 {
   m_cv_index = cv_index;
 
@@ -460,7 +435,6 @@ ShapeFinder::find_internal (lay::LayoutViewBase *view, unsigned int cv_index, co
     }
 
     m_flags = db::ShapeIterator::flags_type (flags_saved - db::ShapeIterator::Texts);
-
   }
 
   try {
@@ -481,8 +455,7 @@ ShapeFinder::find_internal (lay::LayoutViewBase *view, unsigned int cv_index, co
   return ! m_founds.empty ();
 }
 
-void
-ShapeFinder::checkpoint ()
+void ShapeFinder::checkpoint ()
 {
   if (! point_mode ()) {
     ++*mp_progress;
@@ -493,14 +466,12 @@ ShapeFinder::checkpoint ()
   }
 }
 
-void
-ShapeFinder::reset_counter ()
+void ShapeFinder::reset_counter ()
 {
   m_try_counter = m_tries;
 }
 
-void 
-ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int /*level*/)
+void ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int /*level*/)
 {
   checkpoint ();
 
@@ -523,13 +494,11 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
       }
 
       ctx = m_cells_with_context.insert (std::make_pair (cell.cell_index (), has_context)).first;
-
     }
 
     if (! ctx->second) {
       return;
     }
-
   }
 
   if (! point_mode ()) {
@@ -573,15 +542,11 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
             if (mp_excludes != 0 && mp_excludes->find (m_founds.back ()) != mp_excludes->end ()) {
               m_founds.pop_back ();
             }
-
           }
 
           ++shape;
-
-        } 
-
+        }
       }
-
     }
 
   } else {
@@ -617,7 +582,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
 
             //  test if inside the polygon
             if (! match && any_valid_edge && inside_poly (shape->begin_edge (), point) >= 0) {
-              d = t.ctrans (poly_dist (shape->begin_edge (), point)); 
+              d = t.ctrans (poly_dist (shape->begin_edge (), point));
               match = true;
             }
 
@@ -687,9 +652,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
                 d = t.ctrans (poly_dist (poly.begin_edge (), point));
                 match = true;
               }
-
             }
-
           }
 
           if (match) {
@@ -709,7 +672,6 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
               //  in point mode just store the found object that has the least "distance" and is
               //  not in the exclude set
               match = (mp_excludes->find (found) == mp_excludes->end ());
-
             }
 
             if (match && (catch_all () || closer (d))) {
@@ -720,51 +682,43 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
               }
 
               m_founds.back () = found;
-
             }
-
           }
 
           ++shape;
-
         }
-
       }
-
     }
-
   }
-
 }
 
 // -------------------------------------------------------------
 //  InstFinder implementation
 
 InstFinder::InstFinder (bool point_mode, bool top_level_sel, bool full_arrays, bool enclose_inst, const std::set<lay::ObjectInstPath> *excludes, bool visible_layers)
-  : Finder (point_mode, top_level_sel), 
-    m_cv_index (0), m_topcell (0), 
-    mp_excludes ((excludes && !excludes->empty ()) ? excludes : 0),
-    m_full_arrays (full_arrays), 
-    m_enclose_insts (enclose_inst), 
+  : Finder (point_mode, top_level_sel),
+    m_cv_index (0), m_topcell (0),
+    mp_excludes ((excludes && ! excludes->empty ()) ? excludes : 0),
+    m_full_arrays (full_arrays),
+    m_enclose_insts (enclose_inst),
     m_visible_layers (visible_layers),
     m_consider_ghost_cells (true),
     m_consider_normal_cells (true),
-    mp_view (0), 
+    mp_view (0),
     mp_progress (0)
 {
   m_tries = inst_point_sel_tests;
 }
 
-bool
-InstFinder::find (lay::LayoutViewBase *view, const db::DBox &region_mu)
+bool InstFinder::find (lay::LayoutViewBase *view, const db::DBox &region_mu)
 {
   tl::AbsoluteProgress progress (tl::to_string (tr ("Selecting ...")));
   progress.set_unit (1000);
   progress.set_format ("");
   mp_progress = &progress;
 
-  std::set< std::pair<db::DCplxTrans, int> > variants = view->cv_transform_variants_with_empty ();
-  for (std::set< std::pair<db::DCplxTrans, int> >::const_iterator v = variants.begin (); v != variants.end (); ++v) {
+  std::set<std::pair<db::DCplxTrans, int>> variants = view->cv_transform_variants_with_empty ();
+  for (std::set<std::pair<db::DCplxTrans, int>>::const_iterator v = variants.begin (); v != variants.end (); ++v) {
     find (view, v->second, v->first, region_mu);
   }
 
@@ -772,8 +726,7 @@ InstFinder::find (lay::LayoutViewBase *view, const db::DBox &region_mu)
   return ! m_founds.empty ();
 }
 
-bool 
-InstFinder::find (LayoutViewBase *view, unsigned int cv_index, const db::DCplxTrans &trans_mu, const db::DBox &region_mu)
+bool InstFinder::find (LayoutViewBase *view, unsigned int cv_index, const db::DCplxTrans &trans_mu, const db::DBox &region_mu)
 {
   tl::AbsoluteProgress progress (tl::to_string (tr ("Selecting ...")));
   progress.set_unit (1000);
@@ -786,8 +739,7 @@ InstFinder::find (LayoutViewBase *view, unsigned int cv_index, const db::DCplxTr
   return result;
 }
 
-bool 
-InstFinder::find_internal (LayoutViewBase *view, unsigned int cv_index, const db::DCplxTrans &trans_mu, const db::DBox &region_mu)
+bool InstFinder::find_internal (LayoutViewBase *view, unsigned int cv_index, const db::DCplxTrans &trans_mu, const db::DBox &region_mu)
 {
   const lay::CellView &cv = view->cellview (cv_index);
   if (! cv.is_valid ()) {
@@ -796,7 +748,7 @@ InstFinder::find_internal (LayoutViewBase *view, unsigned int cv_index, const db
 
   m_visible_layer_indexes.clear ();
   if (m_visible_layers) {
-    for (lay::LayerPropertiesConstIterator l = view->begin_layers (); !l.at_end (); ++l) {
+    for (lay::LayerPropertiesConstIterator l = view->begin_layers (); ! l.at_end (); ++l) {
       if (! l->has_children () && l->visible (true /*real*/) && l->valid (true /*real*/) && l->cellview_index () == int (cv_index)) {
         m_visible_layer_indexes.push_back (l->layer_index ());
       }
@@ -825,8 +777,7 @@ InstFinder::find_internal (LayoutViewBase *view, unsigned int cv_index, const db
   return ! m_founds.empty ();
 }
 
-void
-InstFinder::checkpoint ()
+void InstFinder::checkpoint ()
 {
   if (! point_mode ()) {
     ++*mp_progress;
@@ -837,20 +788,17 @@ InstFinder::checkpoint ()
   }
 }
 
-void
-InstFinder::reset_counter ()
+void InstFinder::reset_counter ()
 {
   m_try_counter = m_tries;
 }
 
-bool
-InstFinder::consider_cell (const db::Cell &cell) const
+bool InstFinder::consider_cell (const db::Cell &cell) const
 {
   return cell.is_real_ghost_cell () ? m_consider_ghost_cells : m_consider_normal_cells;
 }
 
-void 
-InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const db::Box & /*scan_box*/, const db::DCplxTrans &vp, const db::ICplxTrans &t, int level)
+void InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const db::Box & /*scan_box*/, const db::DCplxTrans &vp, const db::ICplxTrans &t, int level)
 {
   checkpoint ();
 
@@ -879,9 +827,9 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
       //  are hidden.
       if (level == max_level () - 1 || inst_cell.is_proxy () || inst_cell.is_real_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
 
-        db::box_convert <db::CellInst, false> bc (layout ());
+        db::box_convert<db::CellInst, false> bc (layout ());
         for (db::CellInstArray::iterator p = cell_inst.begin_touching (search_box, bc); ! p.at_end (); ++p) {
-        
+
           checkpoint ();
 
           db::Box ibox;
@@ -926,15 +874,10 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
               if (m_full_arrays) {
                 break;
               }
-
             }
-
           }
-
         }
-
       }
-
     }
 
   } else {
@@ -951,12 +894,12 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
         continue;
       }
 
-      //  just consider the instances exactly at the last level of 
+      //  just consider the instances exactly at the last level of
       //  hierarchy (this is where the boxes are drawn) or if of cells that
       //  are hidden.
       if (level == max_level () - 1 || inst_cell.is_proxy () || inst_cell.is_real_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
 
-        db::box_convert <db::CellInst, false> bc (layout ());
+        db::box_convert<db::CellInst, false> bc (layout ());
         for (db::CellInstArray::iterator p = cell_inst.begin_touching (search_box, bc); ! p.at_end (); ++p) {
 
           checkpoint ();
@@ -999,11 +942,9 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
                 d = t.ctrans (poly_dist (poly.begin_edge (), search_box.center ()));
                 match = true;
               }
-
             }
 
             d += 1; // the instance has a small penalty so that shapes win over instances
-
           }
 
           if (match) {
@@ -1029,7 +970,6 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
               //  in point mode just store the found object that has the least "distance" and is
               //  not in the exclude set
               match = (mp_excludes->find (found) == mp_excludes->end ());
-
             }
 
             if (match && (catch_all () || closer (d))) {
@@ -1040,20 +980,12 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
               }
 
               m_founds.back () = found;
-
             }
-
           }
-
         }
-
       }
-
     }
-
   }
-
 }
 
 } // namespace lay
-

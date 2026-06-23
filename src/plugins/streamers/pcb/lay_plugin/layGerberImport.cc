@@ -44,12 +44,12 @@ class GerberImportPluginDeclaration
   : public lay::PluginDeclaration
 {
 public:
-  GerberImportPluginDeclaration () 
+  GerberImportPluginDeclaration ()
   {
     //  .. nothing yet ..
   }
-  
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
+
+  virtual void get_options (std::vector<std::pair<std::string, std::string>> &options) const
   {
     options.push_back (std::pair<std::string, std::string> (cfg_pcb_import_spec, ""));
   }
@@ -122,7 +122,6 @@ public:
         QFileInfo fi (tl::to_qstring (fn));
         data.base_dir = tl::to_string (fi.absoluteDir ().path ());
         data.load (fn);
-
       }
 
       lay::Dispatcher *config_root = lay::Dispatcher::instance ();
@@ -137,7 +136,6 @@ public:
         data.setup_importer (&importer);
         ok = true;
         END_PROTECTED
-
       }
 
       if (ok) {
@@ -167,14 +165,12 @@ public:
 
           view->create_initial_layer_props (cv_index, lyp_file, true /*add missing*/);
           view->select_cell_fit (ci, view->active_cellview_index ());
-
         }
 
         view->update_content ();
 
         config_root->config_set (cfg_pcb_import_spec, data.to_string ());
         config_root->config_end ();
-
       }
 
       return true;
@@ -192,4 +188,3 @@ private:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new lay::GerberImportPluginDeclaration (), 1200, "db::GerberImportPlugin");
 
 }
-

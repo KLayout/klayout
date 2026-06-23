@@ -27,7 +27,7 @@
 #include <set>
 #include <unordered_set>
 
-TEST(1) 
+TEST (1)
 {
   db::EdgePair ep;
 
@@ -42,7 +42,7 @@ TEST(1)
   EXPECT_EQ (ep.to_string (), "(10,30;15,30)/(0,30;0,40)");
   EXPECT_EQ (ep.normalized ().to_string (), "(15,30;10,30)/(0,30;0,40)");
   EXPECT_EQ (ep.normalized ().normalized ().to_string (), "(15,30;10,30)/(0,30;0,40)");
-  EXPECT_EQ (ep.area (), db::EdgePair::area_type (50));  // weird orientation :(
+  EXPECT_EQ (ep.area (), db::EdgePair::area_type (50)); // weird orientation :(
   EXPECT_EQ (ep.perimeter (), db::EdgePair::perimeter_type (15));
 
   ep = db::EdgePair (db::Edge (db::Point (1, 2), db::Point (11, 12)), db::Edge (db::Point (-5, 5), db::Point (5, 15)));
@@ -110,7 +110,7 @@ TEST(1)
   EXPECT_EQ (ep.coincident (), true);
 }
 
-TEST(2) 
+TEST (2)
 {
   db::EdgePair ep;
   EXPECT_EQ (ep.to_polygon (0).to_string (), "()");
@@ -153,7 +153,7 @@ TEST(2)
   EXPECT_EQ (ep.normalized ().to_polygon (1).to_string (), "(1,-1;-1,19;-1,31;1,11)");
 }
 
-TEST(3_symmetric)
+TEST (3_symmetric)
 {
   db::Edge e1 (db::Point (0, 0), db::Point (0, 100));
   db::Edge e2 (db::Point (200, 100), db::Point (200, 0));
@@ -207,7 +207,7 @@ TEST(3_symmetric)
   EXPECT_EQ (int (eh.size ()), 1);
 }
 
-TEST(4_distance)
+TEST (4_distance)
 {
   db::Edge e1 (db::Point (0, 0), db::Point (0, 100));
   db::Edge e2 (db::Point (200, 100), db::Point (200, 0));

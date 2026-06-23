@@ -100,27 +100,23 @@ Callee::~Callee ()
   //  .. nothing yet ..
 }
 
-int 
-Callee::add_callback (const CallbackFunction &vf)
+int Callee::add_callback (const CallbackFunction &vf)
 {
   m_cbfuncs.push_back (vf);
   return int (m_cbfuncs.size () - 1);
 }
 
-void 
-Callee::clear_callbacks ()
+void Callee::clear_callbacks ()
 {
   m_cbfuncs.clear ();
 }
 
-bool
-Callee::can_call () const
+bool Callee::can_call () const
 {
   return pya::PythonInterpreter::instance () != 0;
 }
 
-void 
-Callee::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
+void Callee::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
 {
   const gsi::MethodBase *meth = m_cbfuncs [id].method ();
 
@@ -134,34 +130,33 @@ Callee::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
 
       PYTHON_BEGIN_EXEC
 
-        size_t arg4self = 1;
+      size_t arg4self = 1;
 
-        //  One argument for "self"
-        PythonRef argv (PyTuple_New (arg4self + std::distance (meth->begin_arguments (), meth->end_arguments ())));
+      //  One argument for "self"
+      PythonRef argv (PyTuple_New (arg4self + std::distance (meth->begin_arguments (), meth->end_arguments ())));
 
-        //  Put self into first argument
-        PyTuple_SetItem (argv.get (), 0, mp_obj->py_object ());
-        Py_INCREF (mp_obj->py_object ());
+      //  Put self into first argument
+      PyTuple_SetItem (argv.get (), 0, mp_obj->py_object ());
+      Py_INCREF (mp_obj->py_object ());
 
-        //  TODO: callbacks with default arguments?
-        for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); args && a != meth->end_arguments (); ++a) {
-          PyTuple_SetItem (argv.get (), arg4self + (a - meth->begin_arguments ()), pull_arg (*a, args, 0, heap).release ());
-        }
+      //  TODO: callbacks with default arguments?
+      for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); args && a != meth->end_arguments (); ++a) {
+        PyTuple_SetItem (argv.get (), arg4self + (a - meth->begin_arguments ()), pull_arg (*a, args, 0, heap).release ());
+      }
 
-        PythonRef result (PyObject_CallObject (callable.get (), argv.get ()));
-        if (! result) {
-          check_error ();
-        }
+      PythonRef result (PyObject_CallObject (callable.get (), argv.get ()));
+      if (! result) {
+        check_error ();
+      }
 
-        tl::Heap heap;
-        push_arg (meth->ret_type (), ret, meth->ret_type().pass_obj() ? result.release() : result.get (), heap);
+      tl::Heap heap;
+      push_arg (meth->ret_type (), ret, meth->ret_type ().pass_obj () ? result.release () : result.get (), heap);
 
-        
-        //  a Python callback must not leave temporary objects
-        tl_assert (heap.empty ());
+
+      //  a Python callback must not leave temporary objects
+      tl_assert (heap.empty ());
 
       PYTHON_END_EXEC
-
     }
 
   } catch (PythonError &err) {
@@ -180,7 +175,7 @@ Callee::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
 // --------------------------------------------------------------------------
 //  Implementation of PYAObjectBase
 
-PYAObjectBase::PYAObjectBase(const gsi::ClassBase *_cls_decl, PyObject *py_object)
+PYAObjectBase::PYAObjectBase (const gsi::ClassBase *_cls_decl, PyObject *py_object)
   : mp_py_object (py_object),
     mp_listener (new pya::StatusChangedListener (this)),
     mp_callee (new pya::Callee (this)),
@@ -224,8 +219,7 @@ PYAObjectBase::~PYAObjectBase ()
   m_destroyed = true;
 }
 
-void
-PYAObjectBase::object_destroyed ()
+void PYAObjectBase::object_destroyed ()
 {
   //  This may happen outside the Python interpreter, so we safeguard ourselves against this.
   //  In this case, we may encounter a memory leak, but there is little we can do
@@ -234,7 +228,7 @@ PYAObjectBase::object_destroyed ()
 
     bool prev_owner = m_owned;
 
-    m_destroyed = true;  // NOTE: must be set before detach!
+    m_destroyed = true; // NOTE: must be set before detach!
 
     detach ();
 
@@ -249,12 +243,10 @@ PYAObjectBase::object_destroyed ()
         return;
       }
     }
-
   }
 }
 
-void 
-PYAObjectBase::release ()
+void PYAObjectBase::release ()
 {
   //  "release" means to release ownership of the C++ object on the C++ side.
   //  In other words: to transfer ownership to the script side. Specifically to
@@ -283,8 +275,7 @@ PYAObjectBase::release ()
   m_owned = true;
 }
 
-void
-PYAObjectBase::keep_internal ()
+void PYAObjectBase::keep_internal ()
 {
   if (m_owned) {
     //  "keep" means to transfer ownership of the C++ object to C++ side, while
@@ -296,8 +287,7 @@ PYAObjectBase::keep_internal ()
   m_owned = false;
 }
 
-void 
-PYAObjectBase::keep ()
+void PYAObjectBase::keep ()
 {
   const gsi::ClassBase *cls = cls_decl ();
   if (cls) {
@@ -314,8 +304,7 @@ PYAObjectBase::keep ()
   }
 }
 
-void 
-PYAObjectBase::detach ()
+void PYAObjectBase::detach ()
 {
   if (m_obj) {
 
@@ -338,15 +327,13 @@ PYAObjectBase::detach ()
     m_const_ref = false;
     m_owned = false;
     m_can_destroy = false;
-
   }
 }
 
-void 
-PYAObjectBase::set (void *obj, bool owned, bool const_ref, bool can_destroy) 
+void PYAObjectBase::set (void *obj, bool owned, bool const_ref, bool can_destroy)
 {
   const gsi::ClassBase *cls = cls_decl ();
-  if (!cls) {
+  if (! cls) {
     return;
   }
 
@@ -383,7 +370,7 @@ PYAObjectBase::callbacks_cache PYAObjectBase::s_callbacks_cache;
 pya::SignalHandler *
 PYAObjectBase::signal_handler (const gsi::MethodBase *meth)
 {
-  std::map <const gsi::MethodBase *, pya::SignalHandler>::iterator st = m_signal_table.find (meth);
+  std::map<const gsi::MethodBase *, pya::SignalHandler>::iterator st = m_signal_table.find (meth);
   if (st == m_signal_table.end ()) {
     st = m_signal_table.insert (std::make_pair (meth, pya::SignalHandler ())).first;
     meth->add_handler (obj (), &st->second);
@@ -391,8 +378,7 @@ PYAObjectBase::signal_handler (const gsi::MethodBase *meth)
   return &st->second;
 }
 
-void
-PYAObjectBase::initialize_callbacks ()
+void PYAObjectBase::initialize_callbacks ()
 {
 //  1 to enable caching, 0 to disable it.
 //  TODO: caching appears to create some leaks ...
@@ -409,7 +395,7 @@ PYAObjectBase::initialize_callbacks ()
   if (cb == s_callbacks_cache.end ()) {
 
     cb = s_callbacks_cache.insert (std::make_pair (type_ref, callback_methods_type ())).first;
-    
+
     const gsi::ClassBase *cls = cls_decl ();
 
     //  TODO: cache this .. this is taking too much time if done on every instance
@@ -423,7 +409,7 @@ PYAObjectBase::initialize_callbacks ()
         if (m_owned) {
 
           //  NOTE: only Python-implemented classes can reimplement methods. Since we
-          //  take the attribute from the class object, only Python instances can overwrite 
+          //  take the attribute from the class object, only Python instances can overwrite
           //  the methods and owned indicates that. owned == true indicates that.
 
           //  NOTE: a callback may not have aliases nor overloads
@@ -431,10 +417,10 @@ PYAObjectBase::initialize_callbacks ()
 
           //  NOTE: we just take attributes from the class object. That implies that it's not
           //  possible to reimplement a method through instance attributes (rare case, I hope).
-          //  In addition, if we'd use instance attributes we create circular references 
+          //  In addition, if we'd use instance attributes we create circular references
           //  (self/callback to method, method to self).
           //  TODO: That may happen too often, i.e. if the Python class does not reimplement the virtual
-          //  method, but the C++ class defines a method hook that the reimplementation can call. 
+          //  method, but the C++ class defines a method hook that the reimplementation can call.
           //  We don't want to produce a lot of overhead for the Qt classes here.
           PythonRef py_attr = PyObject_GetAttrString ((PyObject *) Py_TYPE (py_object ()), nstr);
           if (! py_attr) {
@@ -444,24 +430,19 @@ PYAObjectBase::initialize_callbacks ()
 
           } else {
 
-            //  Only if a Python-level class defines that method we can link the virtual method call to the 
+            //  Only if a Python-level class defines that method we can link the virtual method call to the
             //  Python method. We should not create callbacks which we refer to C class implementations because that
             //  may create issues with callbacks during destruction (i.e. QWidget-destroyed signal)
             if (! PyCFunction_Check (py_attr.get ())) {
               cb->second.push_back (*m);
             }
-
           }
-
         }
-
       }
 
       //  consider base classes as well.
       cls = cls->base ();
-
     }
-
   }
 
   for (callback_methods_type::const_iterator m = cb->second.begin (); m != cb->second.end (); ++m) {
@@ -472,7 +453,6 @@ PYAObjectBase::initialize_callbacks ()
 
     int id = mp_callee->add_callback (CallbackFunction (py_attr, *m));
     (*m)->set_callback (m_obj, gsi::Callback (id, mp_callee, (*m)->argsize (), (*m)->retsize ()));
-
   }
 
 #else
@@ -490,7 +470,7 @@ PYAObjectBase::initialize_callbacks ()
       if ((*m)->is_callback () && m_owned) {
 
         //  NOTE: only Python-implemented classes can reimplement methods. Since we
-        //  take the attribute from the class object, only Python instances can overwrite 
+        //  take the attribute from the class object, only Python instances can overwrite
         //  the methods and owned indicates that. owned == true indicates that.
 
         //  NOTE: a callback may not have aliases nor overloads
@@ -498,10 +478,10 @@ PYAObjectBase::initialize_callbacks ()
 
         //  NOTE: we just take attributes from the class object. That implies that it's not
         //  possible to reimplement a method through instance attributes (rare case, I hope).
-        //  In addition, if we'd use instance attributes we create circular references 
+        //  In addition, if we'd use instance attributes we create circular references
         //  (self/callback to method, method to self).
         //  TODO: That may happen too often, i.e. if the Python class does not reimplement the virtual
-        //  method, but the C++ class defines a method hook that the reimplementation can call. 
+        //  method, but the C++ class defines a method hook that the reimplementation can call.
         //  We don't want to produce a lot of overhead for the Qt classes here.
         PythonRef py_attr = PyObject_GetAttrString ((PyObject *) Py_TYPE (py_object ()), nstr);
         if (! py_attr) {
@@ -511,7 +491,7 @@ PYAObjectBase::initialize_callbacks ()
 
         } else {
 
-          //  Only if a Python-level class defines that method we can link the virtual method call to the 
+          //  Only if a Python-level class defines that method we can link the virtual method call to the
           //  Python method. We should not create callbacks which we refer to C class implementations because that
           //  may create issues with callbacks during destruction (i.e. QWidget-destroyed signal)
           if (! PyCFunction_Check (py_attr.get ())) {
@@ -520,25 +500,19 @@ PYAObjectBase::initialize_callbacks ()
             tl_assert (py_attr != NULL);
             int id = mp_callee->add_callback (CallbackFunction (py_attr, *m));
             (*m)->set_callback (m_obj, gsi::Callback (id, mp_callee, (*m)->argsize (), (*m)->retsize ()));
-
           }
-
         }
-
       }
-
     }
 
     //  consider base classes as well.
     cls = cls->base ();
-
   }
 
 #endif
 }
 
-void 
-PYAObjectBase::clear_callbacks_cache (bool embedded)
+void PYAObjectBase::clear_callbacks_cache (bool embedded)
 {
   //  if not embedded, we cannot use the python API at this stage - do not try to
   //  reference count the objects there.
@@ -551,8 +525,7 @@ PYAObjectBase::clear_callbacks_cache (bool embedded)
   s_callbacks_cache.clear ();
 }
 
-void
-PYAObjectBase::detach_callbacks ()
+void PYAObjectBase::detach_callbacks ()
 {
   PythonRef type_ref ((PyObject *) Py_TYPE (py_object ()), false /*borrowed*/);
 
@@ -566,8 +539,7 @@ PYAObjectBase::detach_callbacks ()
   mp_callee->clear_callbacks ();
 }
 
-void 
-PYAObjectBase::destroy ()
+void PYAObjectBase::destroy ()
 {
   if (! m_cls_decl) {
     m_obj = 0;
@@ -578,7 +550,7 @@ PYAObjectBase::destroy ()
     throw tl::Exception (tl::to_string (tr ("Object cannot be destroyed explicitly")));
   }
 
-  //  first create the object if it was not created yet and check if it has not been 
+  //  first create the object if it was not created yet and check if it has not been
   //  destroyed already (the former is to ensure that the object is created at least)
   if (! m_obj) {
     if (m_destroyed) {
@@ -604,7 +576,7 @@ PYAObjectBase::destroy ()
 }
 
 void *
-PYAObjectBase::obj () 
+PYAObjectBase::obj ()
 {
   if (! m_obj) {
     if (m_destroyed) {
@@ -631,4 +603,3 @@ PYAObjectBase::from_pyobject (PyObject *py_object)
 }
 
 }
-

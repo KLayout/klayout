@@ -63,7 +63,7 @@ static std::string unescape (const std::string &s)
   std::string res;
   for (const char *cp = s.c_str (); *cp; ++cp) {
     if (*cp == '%' && is_hex (cp [1]) && is_hex (cp [2])) {
-      res += hex2int (cp[1]) * 16 + hex2int (cp[2]);
+      res += hex2int (cp [1]) * 16 + hex2int (cp [2]);
       cp += 2;
     } else {
       res += *cp;
@@ -151,7 +151,7 @@ URI::URI (const std::string &uri)
           ++ex;
         }
       }
-      m_query[unescape (k)] = unescape (v);
+      m_query [unescape (k)] = unescape (v);
       if (*ex == '&') {
         ++ex;
       }
@@ -216,8 +216,7 @@ URI::to_abstract_path () const
   }
 }
 
-URI
-URI::resolved (const URI &other) const
+URI URI::resolved (const URI &other) const
 {
   if (! other.scheme ().empty () && other.scheme () != scheme ()) {
     return other;
@@ -231,7 +230,7 @@ URI::resolved (const URI &other) const
   //  combine paths
   //  TODO: normalize? I.e. replace "x/y/../z" by "x/z"?
   if (! other.path ().empty ()) {
-    if (other.path ()[0] == '/') {
+    if (other.path () [0] == '/') {
       res.m_path = other.path ();
     } else {
       if (! res.m_path.empty ()) {
@@ -248,4 +247,3 @@ URI::resolved (const URI &other) const
 }
 
 }
-

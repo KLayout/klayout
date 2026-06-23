@@ -34,7 +34,7 @@ namespace lib
 /**
  *  @brief Implements the "CIRCLE" PCell of the basic library
  */
-class BasicCircle 
+class BasicCircle
   : public db::PCellDeclaration
 {
 public:
@@ -87,4 +87,3 @@ public:
 }
 
 #endif
-

@@ -29,21 +29,17 @@ namespace lay
 // -------------------------------------------------------------
 //  CellView implementation
 
-CellView::CellView () 
+CellView::CellView ()
   : mp_ctx_cell (0), m_ctx_cell_index (0), mp_cell (0), m_cell_index (cell_index_type (-1))
-{ }
-
-bool 
-CellView::operator== (const CellView &cv) const
 {
-  return m_layout_href == cv.m_layout_href 
-        && mp_ctx_cell == cv.mp_ctx_cell && m_ctx_cell_index == cv.m_ctx_cell_index 
-        && mp_cell == cv.mp_cell && m_cell_index == cv.m_cell_index 
-        && m_unspecific_path == cv.m_unspecific_path && m_specific_path == cv.m_specific_path;
 }
 
-bool 
-CellView::is_valid () const
+bool CellView::operator== (const CellView &cv) const
+{
+  return m_layout_href == cv.m_layout_href && mp_ctx_cell == cv.mp_ctx_cell && m_ctx_cell_index == cv.m_ctx_cell_index && mp_cell == cv.mp_cell && m_cell_index == cv.m_cell_index && m_unspecific_path == cv.m_unspecific_path && m_specific_path == cv.m_specific_path;
+}
+
+bool CellView::is_valid () const
 {
   if (m_layout_href.get () == 0 || mp_cell == 0) {
     return false;
@@ -64,8 +60,7 @@ CellView::is_valid () const
   return true;
 }
 
-void 
-CellView::set_unspecific_path (const unspecific_cell_path_type &p)
+void CellView::set_unspecific_path (const unspecific_cell_path_type &p)
 {
   tl_assert (m_layout_href.get () != 0);
 
@@ -83,14 +78,13 @@ CellView::set_unspecific_path (const unspecific_cell_path_type &p)
   m_ctx_cell_index = m_cell_index;
 }
 
-void 
-CellView::set_specific_path (const specific_cell_path_type &p)
+void CellView::set_specific_path (const specific_cell_path_type &p)
 {
   tl_assert (m_layout_href.get () != 0);
 
   m_specific_path = p;
   for (specific_cell_path_type::iterator pp = m_specific_path.begin (); pp != m_specific_path.end (); ++pp) {
-    //  fix elements of the path not associated with a certain array instance (this may happen if 
+    //  fix elements of the path not associated with a certain array instance (this may happen if
     //  unspecific selections are put into the path)
     if (pp->array_inst.at_end ()) {
       pp->array_inst = pp->inst_ptr.begin ();
@@ -108,7 +102,7 @@ CellView::set_specific_path (const specific_cell_path_type &p)
   }
 }
 
-CellView::unspecific_cell_path_type 
+CellView::unspecific_cell_path_type
 CellView::combined_unspecific_path () const
 {
   CellView::unspecific_cell_path_type path;
@@ -120,13 +114,12 @@ CellView::combined_unspecific_path () const
   return path;
 }
 
-void
-CellView::set_cell (cell_index_type index)
+void CellView::set_cell (cell_index_type index)
 {
   tl_assert (m_layout_href.get () != 0);
 
   db::Layout &layout = m_layout_href->layout ();
-  
+
   if (! layout.is_valid_cell_index (index)) {
 
     reset_cell ();
@@ -149,12 +142,10 @@ CellView::set_cell (cell_index_type index)
 
     mp_ctx_cell = mp_cell;
     m_ctx_cell_index = m_cell_index;
-
   }
 }
 
-void 
-CellView::set_cell (const std::string &name)
+void CellView::set_cell (const std::string &name)
 {
   tl_assert (m_layout_href.get () != 0);
 
@@ -166,8 +157,7 @@ CellView::set_cell (const std::string &name)
   }
 }
 
-void 
-CellView::reset_cell ()
+void CellView::reset_cell ()
 {
   mp_cell = 0;
   m_cell_index = cell_index_type (-1);
@@ -177,8 +167,7 @@ CellView::reset_cell ()
   m_specific_path.clear ();
 }
 
-void 
-CellView::set (lay::LayoutHandle *handle)
+void CellView::set (lay::LayoutHandle *handle)
 {
   reset_cell ();
   m_layout_href.set (handle);
@@ -199,7 +188,7 @@ db::ICplxTrans
 CellView::context_trans () const
 {
   db::ICplxTrans trans;
-  for (std::vector <db::InstElement>::const_iterator p = specific_path ().begin (); p != specific_path ().end (); ++p) {
+  for (std::vector<db::InstElement>::const_iterator p = specific_path ().begin (); p != specific_path ().end (); ++p) {
     trans = trans * p->complex_trans ();
   }
   return trans;
@@ -229,8 +218,7 @@ CellViewRef::CellViewRef (lay::CellView *cv, lay::LayoutViewBase *view)
   // .. nothing yet ..
 }
 
-bool
-CellViewRef::operator== (const CellView &cv) const
+bool CellViewRef::operator== (const CellView &cv) const
 {
   if (! is_valid ()) {
     return false;
@@ -239,16 +227,14 @@ CellViewRef::operator== (const CellView &cv) const
   }
 }
 
-bool
-CellViewRef::is_valid () const
+bool CellViewRef::is_valid () const
 {
   return mp_view && mp_cv;
 }
 
-int
-CellViewRef::index () const
+int CellViewRef::index () const
 {
-  if (!is_valid ()) {
+  if (! is_valid ()) {
     return -1;
   } else {
     return mp_view->index_of_cellview (mp_cv.get ());
@@ -262,7 +248,7 @@ CellViewRef::view ()
 }
 
 lay::LayoutHandle *
-CellViewRef::operator-> () const
+CellViewRef::operator->() const
 {
   if (mp_cv) {
     return mp_cv->handle ();
@@ -271,16 +257,14 @@ CellViewRef::operator-> () const
   }
 }
 
-void
-CellViewRef::set_name (const std::string &name)
+void CellViewRef::set_name (const std::string &name)
 {
   if (is_valid ()) {
     mp_view->rename_cellview (name, mp_view->index_of_cellview (mp_cv.get ()));
   }
 }
 
-void
-CellViewRef::set_unspecific_path (const CellViewRef::unspecific_cell_path_type &p)
+void CellViewRef::set_unspecific_path (const CellViewRef::unspecific_cell_path_type &p)
 {
   if (is_valid ()) {
     lay::CellView cv = *mp_cv;
@@ -289,8 +273,7 @@ CellViewRef::set_unspecific_path (const CellViewRef::unspecific_cell_path_type &
   }
 }
 
-void
-CellViewRef::set_specific_path (const CellViewRef::specific_cell_path_type &p)
+void CellViewRef::set_specific_path (const CellViewRef::specific_cell_path_type &p)
 {
   if (is_valid ()) {
     lay::CellView cv = *mp_cv;
@@ -299,8 +282,7 @@ CellViewRef::set_specific_path (const CellViewRef::specific_cell_path_type &p)
   }
 }
 
-void
-CellViewRef::set_cell (cell_index_type ci)
+void CellViewRef::set_cell (cell_index_type ci)
 {
   if (is_valid ()) {
     lay::CellView cv = *mp_cv;
@@ -309,8 +291,7 @@ CellViewRef::set_cell (cell_index_type ci)
   }
 }
 
-void
-CellViewRef::set_cell (const std::string &name)
+void CellViewRef::set_cell (const std::string &name)
 {
   if (is_valid ()) {
     lay::CellView cv = *mp_cv;
@@ -319,8 +300,7 @@ CellViewRef::set_cell (const std::string &name)
   }
 }
 
-void
-CellViewRef::reset_cell ()
+void CellViewRef::reset_cell ()
 {
   if (is_valid ()) {
     lay::CellView cv = *mp_cv;
@@ -394,4 +374,3 @@ CellViewRef::context_dtrans () const
 }
 
 }
-

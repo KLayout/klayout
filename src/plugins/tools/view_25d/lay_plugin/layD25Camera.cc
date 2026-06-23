@@ -40,16 +40,14 @@ D25Camera::~D25Camera ()
   //  .. nothing yet ..
 }
 
-void
-D25Camera::camera_init ()
+void D25Camera::camera_init ()
 {
   m_fov = 45.0;
   m_cam_azimuth = m_cam_elevation = 0.0;
   m_top_view = false;
 }
 
-void
-D25Camera::camera_reset ()
+void D25Camera::camera_reset ()
 {
   camera_init ();
   camera_changed ();
@@ -110,4 +108,3 @@ D25Camera::cam_trans () const
 }
 
 }
-

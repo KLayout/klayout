@@ -25,7 +25,7 @@
 #include "pexRNetwork.h"
 #include "tlUnitTest.h"
 
-TEST(network_basic)
+TEST (network_basic)
 {
   pex::RNetwork rn;
   EXPECT_EQ (rn.to_string (), "");
@@ -39,11 +39,10 @@ TEST(network_basic)
   /* pex::RElement *e12 = */ rn.create_element (0.5, n1, n2);
 
   EXPECT_EQ (rn.to_string (),
-    "R $1 $1.1 2"
-  );
+             "R $1 $1.1 2");
 }
 
-TEST(network_basic_vertex_nodes)
+TEST (network_basic_vertex_nodes)
 {
   pex::RNetwork rn;
   EXPECT_EQ (rn.to_string (), "");
@@ -59,11 +58,10 @@ TEST(network_basic_vertex_nodes)
   /* pex::RElement *e12 = */ rn.create_element (0.5, n1, n2);
 
   EXPECT_EQ (rn.to_string (),
-    "R V1 V1.1 2"
-  );
+             "R V1 V1.1 2");
 }
 
-TEST(network_basic_polygon_nodes)
+TEST (network_basic_polygon_nodes)
 {
   pex::RNetwork rn;
   EXPECT_EQ (rn.to_string (), "");
@@ -79,11 +77,10 @@ TEST(network_basic_polygon_nodes)
   /* pex::RElement *e12 = */ rn.create_element (0.5, n1, n2);
 
   EXPECT_EQ (rn.to_string (),
-    "R P1 P1.1 2"
-  );
+             "R P1 P1.1 2");
 }
 
-TEST(network_basic_elements)
+TEST (network_basic_elements)
 {
   pex::RNetwork rn;
   EXPECT_EQ (rn.to_string (), "");
@@ -94,56 +91,50 @@ TEST(network_basic_elements)
   /* pex::RElement *e12 = */ rn.create_element (0.5, n1, n2);
 
   EXPECT_EQ (rn.to_string (),
-    "R $1 $2 2"
-  );
+             "R $1 $2 2");
 
   pex::RNode *n3 = rn.create_node (pex::RNode::Internal, 3, 0);
   /* pex::RElement *e13 = */ rn.create_element (0.25, n1, n3);
   pex::RElement *e23 = rn.create_element (1.0, n2, n3);
 
   EXPECT_EQ (rn.to_string (),
-    "R $1 $2 2\n"
-    "R $1 $3 4\n"
-    "R $2 $3 1"
-  );
+             "R $1 $2 2\n"
+             "R $1 $3 4\n"
+             "R $2 $3 1");
 
   pex::RElement *e23b = rn.create_element (4.0, n2, n3);
   EXPECT_EQ (e23 == e23b, true);
 
   EXPECT_EQ (rn.to_string (),
-    "R $1 $2 2\n"
-    "R $1 $3 4\n"
-    "R $2 $3 0.2"
-  );
+             "R $1 $2 2\n"
+             "R $1 $3 4\n"
+             "R $2 $3 0.2");
 
   pex::RElement *e23c = rn.create_element (5.0, n3, n2);
   EXPECT_EQ (e23 == e23c, true);
 
   EXPECT_EQ (rn.to_string (),
-    "R $1 $2 2\n"
-    "R $1 $3 4\n"
-    "R $2 $3 0.1"
-  );
+             "R $1 $2 2\n"
+             "R $1 $3 4\n"
+             "R $2 $3 0.1");
 
   rn.remove_element (e23);
 
   EXPECT_EQ (rn.to_string (),
-    "R $1 $2 2\n"
-    "R $1 $3 4"
-  );
+             "R $1 $2 2\n"
+             "R $1 $3 4");
 
   rn.remove_node (n3);
 
   EXPECT_EQ (rn.to_string (),
-    "R $1 $2 2"
-  );
+             "R $1 $2 2");
 
   rn.clear ();
 
   EXPECT_EQ (rn.to_string (), "");
 }
 
-TEST(network_simplify1)
+TEST (network_simplify1)
 {
   pex::RNetwork rn;
   EXPECT_EQ (rn.to_string (), "");
@@ -157,19 +148,17 @@ TEST(network_simplify1)
   rn.create_element (1, n1, n3);
 
   EXPECT_EQ (rn.to_string (),
-    "R $2 V1 1\n"
-    "R $2 V3 0\n"
-    "R V1 V3 1"
-  );
+             "R $2 V1 1\n"
+             "R $2 V3 0\n"
+             "R V1 V3 1");
 
   rn.simplify ();
 
   EXPECT_EQ (rn.to_string (),
-    "R V1 V3 0.5"
-  );
+             "R V1 V3 0.5");
 }
 
-TEST(network_simplify2)
+TEST (network_simplify2)
 {
   pex::RNetwork rn;
   EXPECT_EQ (rn.to_string (), "");
@@ -186,22 +175,20 @@ TEST(network_simplify2)
   rn.create_element (1, n3, n5);
 
   EXPECT_EQ (rn.to_string (),
-    "R $2 V1 1\n"
-    "R $2 $3 0\n"
-    "R $3 V4 1\n"
-    "R $3 V5 1"
-  );
+             "R $2 V1 1\n"
+             "R $2 $3 0\n"
+             "R $3 V4 1\n"
+             "R $3 V5 1");
 
   rn.simplify ();
 
   EXPECT_EQ (rn.to_string (),
-    "R $2 V1 1\n"
-    "R $2 V4 1\n"
-    "R $2 V5 1"
-  );
+             "R $2 V1 1\n"
+             "R $2 V4 1\n"
+             "R $2 V5 1");
 }
 
-TEST(network_simplify3)
+TEST (network_simplify3)
 {
   pex::RNetwork rn;
   EXPECT_EQ (rn.to_string (), "");
@@ -216,19 +203,17 @@ TEST(network_simplify3)
   rn.create_element (1, n3, n4);
 
   EXPECT_EQ (rn.to_string (),
-    "R $2 V1 1\n"
-    "R $2 $3 0\n"
-    "R $3 V4 1"
-  );
+             "R $2 V1 1\n"
+             "R $2 $3 0\n"
+             "R $3 V4 1");
 
   rn.simplify ();
 
   EXPECT_EQ (rn.to_string (),
-    "R V1 V4 2"
-  );
+             "R V1 V4 2");
 }
 
-TEST(network_simplify4)
+TEST (network_simplify4)
 {
   pex::RNetwork rn;
   EXPECT_EQ (rn.to_string (), "");
@@ -243,14 +228,12 @@ TEST(network_simplify4)
   rn.create_element (1, n4, n3);
 
   EXPECT_EQ (rn.to_string (),
-    "R V1 V4 1\n"
-    "R $2 V1 1\n"
-    "R $3 V4 1"
-  );
+             "R V1 V4 1\n"
+             "R $2 V1 1\n"
+             "R $3 V4 1");
 
   rn.simplify ();
 
   EXPECT_EQ (rn.to_string (),
-    "R V1 V4 1"
-  );
+             "R V1 V4 1");
 }

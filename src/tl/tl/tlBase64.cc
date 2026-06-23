@@ -27,30 +27,31 @@
 namespace tl
 {
 
-namespace {
+namespace
+{
 
 class EncoderTable
 {
 public:
   EncoderTable ()
   {
-    char charset[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    char charset [] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
     for (unsigned int i = 0; i < 256; ++i) {
-      m_char2bin[i] = 0xff;
+      m_char2bin [i] = 0xff;
     }
     for (unsigned int i = 0; i < 64; ++i) {
-      m_bin2char[i] = charset[i];
-      m_char2bin[(unsigned int) charset[i]] = i;
+      m_bin2char [i] = charset [i];
+      m_char2bin [(unsigned int) charset [i]] = i;
     }
   }
 
-  inline char c (unsigned char b) const { return m_bin2char[b]; }
-  inline unsigned char b (char c) const { return m_char2bin[(unsigned char) c]; }
+  inline char c (unsigned char b) const { return m_bin2char [b]; }
+  inline unsigned char b (char c) const { return m_char2bin [(unsigned char) c]; }
 
 private:
-  char m_bin2char[64];
-  unsigned char m_char2bin[256];
+  char m_bin2char [64];
+  unsigned char m_char2bin [256];
 };
 
 }
@@ -102,9 +103,7 @@ std::vector<unsigned char> from_base64 (const char *s)
         data.back () |= (b >> (8 - sh));
         data.push_back (b << sh);
       }
-
     }
-
   }
 
   return data;

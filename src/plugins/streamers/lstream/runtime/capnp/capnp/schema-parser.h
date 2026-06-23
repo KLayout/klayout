@@ -27,23 +27,25 @@
 
 CAPNP_BEGIN_HEADER
 
-namespace capnp {
+namespace capnp
+{
 
 class ParsedSchema;
 class SchemaFile;
 
-class SchemaParser {
+class SchemaParser
+{
   // Parses `.capnp` files to produce `Schema` objects.
   //
   // This class is thread-safe, hence all its methods are const.
 
 public:
-  SchemaParser();
-  ~SchemaParser() noexcept(false);
+  SchemaParser ();
+  ~SchemaParser () noexcept (false);
 
-  ParsedSchema parseFromDirectory(
-      const kj::ReadableDirectory& baseDir, kj::Path path,
-      kj::ArrayPtr<const kj::ReadableDirectory* const> importPath) const;
+  ParsedSchema parseFromDirectory (
+    const kj::ReadableDirectory &baseDir, kj::Path path,
+    kj::ArrayPtr<const kj::ReadableDirectory *const> importPath) const;
   // Parse a file from the KJ filesystem API.  Throws an exception if the file doesn't exist.
   //
   // `baseDir` and `path` are used together to resolve relative imports. `path` is the source
@@ -98,9 +100,9 @@ public:
   //   In this example, note that any imports in the file will fail, since the in-memory directory
   //   you created contains no files except the specific one you linked in.
 
-  ParsedSchema parseDiskFile(kj::StringPtr displayName, kj::StringPtr diskPath,
-                             kj::ArrayPtr<const kj::StringPtr> importPath) const
-      CAPNP_DEPRECATED("Use parseFromDirectory() instead.");
+  ParsedSchema parseDiskFile (kj::StringPtr displayName, kj::StringPtr diskPath,
+                              kj::ArrayPtr<const kj::StringPtr> importPath) const
+    CAPNP_DEPRECATED ("Use parseFromDirectory() instead.");
   // Creates a private kj::Filesystem and uses it to parse files from the real disk.
   //
   // DO NOT USE in new code. Use parseFromDirectory() instead.
@@ -110,15 +112,15 @@ public:
   // using `parseFromDirectory()`, you can arrange so that imports are only allowed within a
   // particular directory, or even set up a dummy filesystem where other files are not visible.
 
-  void setDiskFilesystem(kj::Filesystem& fs)
-      CAPNP_DEPRECATED("Use parseFromDirectory() instead.");
+  void setDiskFilesystem (kj::Filesystem &fs)
+    CAPNP_DEPRECATED ("Use parseFromDirectory() instead.");
   // Call before calling parseDiskFile() to choose an alternative disk filesystem implementation.
   // This exists mostly for testing purposes; new code should use parseFromDirectory() instead.
   //
   // If parseDiskFile() is called without having called setDiskFilesystem(), then
   // kj::newDiskFilesystem() will be used instead.
 
-  ParsedSchema parseFile(kj::Own<SchemaFile>&& file) const;
+  ParsedSchema parseFile (kj::Own<SchemaFile> &&file) const;
   // Advanced interface for parsing a file that may or may not be located in any global namespace.
   // Most users will prefer `parseFromDirectory()`.
   //
@@ -130,23 +132,25 @@ public:
   // normally.  In this case, the result is a best-effort attempt to compile the schema, but it
   // may be invalid or corrupt, and using it for anything may cause exceptions to be thrown.
 
-  kj::Maybe<schema::Node::SourceInfo::Reader> getSourceInfo(Schema schema) const;
+  kj::Maybe<schema::Node::SourceInfo::Reader> getSourceInfo (Schema schema) const;
   // Look up source info (e.g. doc comments) for the given schema, which must have come from this
   // SchemaParser. Note that this will also work for implicit group and param types that don't have
   // a type name hence don't have a `ParsedSchema`.
 
   template <typename T>
-  inline void loadCompiledTypeAndDependencies() {
+  inline void loadCompiledTypeAndDependencies ()
+  {
     // See SchemaLoader::loadCompiledTypeAndDependencies().
-    getLoader().loadCompiledTypeAndDependencies<T>();
+    getLoader ().loadCompiledTypeAndDependencies<T> ();
   }
 
-  kj::Array<Schema> getAllLoaded() const {
+  kj::Array<Schema> getAllLoaded () const
+  {
     // Gets an array of all schema nodes that have been parsed so far.
-    return getLoader().getAllLoaded();
+    return getLoader ().getAllLoaded ();
   }
 
-  void setFileIdsRequired(bool value) { fileIdsRequired = value; }
+  void setFileIdsRequired (bool value) { fileIdsRequired = value; }
   // By befault, capnp files must declare a file-level type ID (like `@0xbe702824338d3f7f;`).
   // Use `setFileIdsReqired(false)` to lift this requirement.
   //
@@ -168,14 +172,15 @@ private:
   mutable bool hadErrors = false;
   bool fileIdsRequired = true;
 
-  ModuleImpl& getModuleImpl(kj::Own<SchemaFile>&& file) const;
-  const SchemaLoader& getLoader() const;
-  SchemaLoader& getLoader();
+  ModuleImpl &getModuleImpl (kj::Own<SchemaFile> &&file) const;
+  const SchemaLoader &getLoader () const;
+  SchemaLoader &getLoader ();
 
   friend class ParsedSchema;
 };
 
-class ParsedSchema: public Schema {
+class ParsedSchema : public Schema
+{
   // ParsedSchema is an extension of Schema which also has the ability to look up nested nodes
   // by name.  See `SchemaParser`.
 
@@ -183,46 +188,47 @@ class ParsedSchema: public Schema {
   friend class ParsedSchemaList;
 
 public:
-  inline ParsedSchema(): parser(nullptr) {}
+  inline ParsedSchema () : parser (nullptr) {}
 
-  kj::Maybe<ParsedSchema> findNested(kj::StringPtr name) const;
+  kj::Maybe<ParsedSchema> findNested (kj::StringPtr name) const;
   // Gets the nested node with the given name, or returns null if there is no such nested
   // declaration.
 
-  ParsedSchema getNested(kj::StringPtr name) const;
+  ParsedSchema getNested (kj::StringPtr name) const;
   // Gets the nested node with the given name, or throws an exception if there is no such nested
   // declaration.
 
-  ParsedSchemaList getAllNested() const;
+  ParsedSchemaList getAllNested () const;
   // Get all the nested nodes
 
-  schema::Node::SourceInfo::Reader getSourceInfo() const;
+  schema::Node::SourceInfo::Reader getSourceInfo () const;
   // Get the source info for this schema.
 
 private:
-  inline ParsedSchema(Schema inner, const SchemaParser& parser): Schema(inner), parser(&parser) {}
+  inline ParsedSchema (Schema inner, const SchemaParser &parser) : Schema (inner), parser (&parser) {}
 
-  const SchemaParser* parser;
+  const SchemaParser *parser;
   friend class SchemaParser;
 };
 
-class ParsedSchema::ParsedSchemaList {
+class ParsedSchema::ParsedSchemaList
+{
 public:
-  ParsedSchemaList() = default;  // empty list
+  ParsedSchemaList () = default; // empty list
 
-  inline uint size() const { return list.size(); }
-  ParsedSchema operator[](uint index) const;
+  inline uint size () const { return list.size (); }
+  ParsedSchema operator[] (uint index) const;
 
   typedef _::IndexingIterator<const ParsedSchemaList, ParsedSchema> Iterator;
-  inline Iterator begin() const { return Iterator(this, 0); }
-  inline Iterator end() const { return Iterator(this, size()); }
+  inline Iterator begin () const { return Iterator (this, 0); }
+  inline Iterator end () const { return Iterator (this, size ()); }
 
 private:
   ParsedSchema parent;
   List<schema::Node::NestedNode>::Reader list;
 
-  inline ParsedSchemaList(ParsedSchema parent, List<schema::Node::NestedNode>::Reader list)
-      : parent(parent), list(list) {}
+  inline ParsedSchemaList (ParsedSchema parent, List<schema::Node::NestedNode>::Reader list)
+    : parent (parent), list (list) {}
 
   friend class ParsedSchema;
 };
@@ -230,7 +236,8 @@ private:
 // =======================================================================================
 // Advanced API
 
-class SchemaFile {
+class SchemaFile
+{
   // Abstract interface representing a schema file.  You can implement this yourself in order to
   // gain more control over how the compiler resolves imports and reads files.  For the
   // common case of files on disk or other global filesystem-like namespaces, use
@@ -242,10 +249,10 @@ public:
   //   KJ filesystem API. You should be able to get the same effect by subclassing
   //   kj::ReadableDirectory, or using kj::newInMemoryDirectory().
 
-  static kj::Own<SchemaFile> newFromDirectory(
-      const kj::ReadableDirectory& baseDir, kj::Path path,
-      kj::ArrayPtr<const kj::ReadableDirectory* const> importPath,
-      kj::Maybe<kj::String> displayNameOverride = nullptr);
+  static kj::Own<SchemaFile> newFromDirectory (
+    const kj::ReadableDirectory &baseDir, kj::Path path,
+    kj::ArrayPtr<const kj::ReadableDirectory *const> importPath,
+    kj::Maybe<kj::String> displayNameOverride = nullptr);
   // Construct a SchemaFile representing a file in a kj::ReadableDirectory. This is used to
   // implement SchemaParser::parseFromDirectory(); see there for details.
   //
@@ -255,13 +262,13 @@ public:
   // -----------------------------------------------------------------
   // For more control, you can implement this interface.
 
-  virtual kj::StringPtr getDisplayName() const = 0;
+  virtual kj::StringPtr getDisplayName () const = 0;
   // Get the file's name, as it should appear in the schema.
 
-  virtual kj::Array<const char> readContent() const = 0;
+  virtual kj::Array<const char> readContent () const = 0;
   // Read the file's entire content and return it as a byte array.
 
-  virtual kj::Maybe<kj::Own<SchemaFile>> import(kj::StringPtr path) const = 0;
+  virtual kj::Maybe<kj::Own<SchemaFile>> import (kj::StringPtr path) const = 0;
   // Resolve an import, relative to this file.
   //
   // `path` is exactly what appears between quotes after the `import` keyword in the source code.
@@ -270,9 +277,9 @@ public:
   // schema file repositories.  On the other hand, a path that doesn't start with '/' is relative
   // to the importing file.
 
-  virtual bool operator==(const SchemaFile& other) const = 0;
-  virtual bool operator!=(const SchemaFile& other) const = 0;
-  virtual size_t hashCode() const = 0;
+  virtual bool operator== (const SchemaFile &other) const = 0;
+  virtual bool operator!= (const SchemaFile &other) const = 0;
+  virtual size_t hashCode () const = 0;
   // Compare two SchemaFiles to see if they refer to the same underlying file.  This is an
   // optimization used to avoid the need to re-parse a file to check its ID.
 
@@ -281,13 +288,13 @@ public:
     uint line;
     uint column;
   };
-  virtual void reportError(SourcePos start, SourcePos end, kj::StringPtr message) const = 0;
+  virtual void reportError (SourcePos start, SourcePos end, kj::StringPtr message) const = 0;
   // Report that the file contains an error at the given interval.
 
 private:
   class DiskSchemaFile;
 };
 
-}  // namespace capnp
+} // namespace capnp
 
 CAPNP_END_HEADER

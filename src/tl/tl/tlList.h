@@ -43,8 +43,8 @@ template <class C>
 class list_node
 {
 public:
-  list_node () : mp_next (0), mp_prev (0), m_owned (true) { }
-  list_node (const list_node &) : mp_next (0), mp_prev (0), m_owned (true) { }
+  list_node () : mp_next (0), mp_prev (0), m_owned (true) {}
+  list_node (const list_node &) : mp_next (0), mp_prev (0), m_owned (true) {}
   list_node &operator= (const list_node &) { return *this; }
 
   ~list_node ()
@@ -121,9 +121,17 @@ public:
   typedef C &reference;
   typedef C *pointer;
 
-  list_iterator (C *p = 0) : mp_p (p) { }
-  list_iterator operator++ () { mp_p = static_cast<C *> (mp_p->mp_next); return *this; }
-  list_iterator operator-- () { mp_p = static_cast<C *> (mp_p->mp_prev); return *this; }
+  list_iterator (C *p = 0) : mp_p (p) {}
+  list_iterator operator++ ()
+  {
+    mp_p = static_cast<C *> (mp_p->mp_next);
+    return *this;
+  }
+  list_iterator operator-- ()
+  {
+    mp_p = static_cast<C *> (mp_p->mp_prev);
+    return *this;
+  }
 
   list_iterator operator++ (int)
   {
@@ -139,7 +147,7 @@ public:
     return r;
   }
 
-  C *operator-> () const
+  C *operator->() const
   {
     return mp_p;
   }
@@ -153,7 +161,7 @@ public:
   bool operator!= (list_iterator other) const { return mp_p != other.mp_p; }
 
 private:
-   C *mp_p;
+  C *mp_p;
 };
 
 /**
@@ -168,9 +176,17 @@ public:
   typedef C &reference;
   typedef C *pointer;
 
-  reverse_list_iterator (C *p = 0) : mp_p (p) { }
-  reverse_list_iterator operator++ () { mp_p = static_cast<C *> (mp_p->mp_prev); return *this; }
-  reverse_list_iterator operator-- () { mp_p = static_cast<C *> (mp_p->mp_next); return *this; }
+  reverse_list_iterator (C *p = 0) : mp_p (p) {}
+  reverse_list_iterator operator++ ()
+  {
+    mp_p = static_cast<C *> (mp_p->mp_prev);
+    return *this;
+  }
+  reverse_list_iterator operator-- ()
+  {
+    mp_p = static_cast<C *> (mp_p->mp_next);
+    return *this;
+  }
 
   reverse_list_iterator operator++ (int)
   {
@@ -186,7 +202,7 @@ public:
     return r;
   }
 
-  C *operator-> () const
+  C *operator->() const
   {
     return mp_p;
   }
@@ -200,7 +216,7 @@ public:
   bool operator!= (reverse_list_iterator other) const { return mp_p != other.mp_p; }
 
 private:
-   C *mp_p;
+  C *mp_p;
 };
 
 template <class C>
@@ -234,7 +250,11 @@ public:
   }
 
   list_impl (const list_impl &) { tl_assert (false); }
-  list_impl &operator= (const list_impl &) { tl_assert (false); return *this; }
+  list_impl &operator= (const list_impl &)
+  {
+    tl_assert (false);
+    return *this;
+  }
 
   ~list_impl ()
   {
@@ -259,7 +279,7 @@ public:
 
   void erase (iterator i)
   {
-    erase (i.operator-> ());
+    erase (i.operator->());
   }
 
   void erase (iterator from, iterator to)
@@ -329,7 +349,7 @@ public:
 
   iterator insert (iterator after, C *new_obj)
   {
-    return iterator (insert (after.operator-> (), new_obj));
+    return iterator (insert (after.operator->(), new_obj));
   }
 
   C *insert_before (C *before, C *new_obj)
@@ -339,7 +359,7 @@ public:
 
   iterator insert_before (iterator before, C *new_obj)
   {
-    return iterator (insert_before_impl (before.operator-> (), new_obj, true));
+    return iterator (insert_before_impl (before.operator->(), new_obj, true));
   }
 
   void push_back (C *new_obj)
@@ -359,7 +379,7 @@ public:
 
   iterator insert (iterator after, C &new_obj)
   {
-    return iterator (insert_impl (after.operator-> (), &new_obj, false));
+    return iterator (insert_impl (after.operator->(), &new_obj, false));
   }
 
   C *insert_before (C *before, C &new_obj)
@@ -369,7 +389,7 @@ public:
 
   iterator insert_before (iterator before, C &new_obj)
   {
-    return iterator (insert_before_impl (before.operator-> (), &new_obj, false));
+    return iterator (insert_before_impl (before.operator->(), &new_obj, false));
   }
 
   void push_back (C &new_obj)
@@ -475,7 +495,7 @@ public:
   using list_impl<C, false>::push_front;
   using list_impl<C, false>::pop_front;
 
-  list_impl () { }
+  list_impl () {}
 
   list_impl (const list_impl &other)
     : list_impl<C, false> ()
@@ -585,8 +605,8 @@ public:
   using list_impl<C, CanCopy>::head;
   using list_impl<C, CanCopy>::back;
 
-  list () { }
-  list (const list &other) : list_impl<C, CanCopy> (other) { }
+  list () {}
+  list (const list &other) : list_impl<C, CanCopy> (other) {}
 
   list &operator= (const list &other)
   {
@@ -596,42 +616,42 @@ public:
 
   iterator begin ()
   {
-    return iterator (static_cast <C *> (head ().mp_next));
+    return iterator (static_cast<C *> (head ().mp_next));
   }
 
   iterator end ()
   {
-    return iterator (static_cast <C *> (&back ()));
+    return iterator (static_cast<C *> (&back ()));
   }
 
   const_iterator begin () const
   {
-    return const_iterator (static_cast <const C *> (head ().mp_next));
+    return const_iterator (static_cast<const C *> (head ().mp_next));
   }
 
   const_iterator end () const
   {
-    return const_iterator (static_cast <const C *> (&back ()));
+    return const_iterator (static_cast<const C *> (&back ()));
   }
 
   reverse_iterator rbegin ()
   {
-    return reverse_iterator (static_cast <C *> (back ().mp_prev));
+    return reverse_iterator (static_cast<C *> (back ().mp_prev));
   }
 
   reverse_iterator rend ()
   {
-    return reverse_iterator (static_cast <C *> (&head ()));
+    return reverse_iterator (static_cast<C *> (&head ()));
   }
 
   const_reverse_iterator rbegin () const
   {
-    return const_reverse_iterator (static_cast <const C *> (back ().mp_prev));
+    return const_reverse_iterator (static_cast<const C *> (back ().mp_prev));
   }
 
   const_reverse_iterator rend () const
   {
-    return const_reverse_iterator (static_cast <const C *> (&head ()));
+    return const_reverse_iterator (static_cast<const C *> (&head ()));
   }
 
   bool operator== (const list &other) const
@@ -650,7 +670,7 @@ public:
 
   bool operator!= (const list &other) const
   {
-    return !operator== (other);
+    return ! operator== (other);
   }
 
   bool operator< (const list &other) const

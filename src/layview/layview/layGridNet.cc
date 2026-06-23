@@ -32,7 +32,7 @@
 #include "dbTrans.h"
 
 #if defined(HAVE_QT)
-#  include "layGridNetConfigPage.h"
+#include "layGridNetConfigPage.h"
 #endif
 
 namespace lay
@@ -47,19 +47,17 @@ static struct {
   lay::GridNet::GridStyle style;
   const char *string;
 } grid_styles [] = {
-  { lay::GridNet::Invisible,         "invisible"           },
-  { lay::GridNet::Dots,              "dots"                },
-  { lay::GridNet::DottedLines,       "dotted-lines"        },
-  { lay::GridNet::LightDottedLines,  "light-dotted-lines"  },
-  { lay::GridNet::TenthDottedLines,  "tenths-dotted-lines" },
-  { lay::GridNet::Crosses,           "crosses"             },
-  { lay::GridNet::Lines,             "lines"               },
-  { lay::GridNet::TenthMarkedLines,  "tenth-marked-lines"  },
-  { lay::GridNet::CheckerBoard,      "checkerboard"        }
-};
+  {lay::GridNet::Invisible, "invisible"},
+  {lay::GridNet::Dots, "dots"},
+  {lay::GridNet::DottedLines, "dotted-lines"},
+  {lay::GridNet::LightDottedLines, "light-dotted-lines"},
+  {lay::GridNet::TenthDottedLines, "tenths-dotted-lines"},
+  {lay::GridNet::Crosses, "crosses"},
+  {lay::GridNet::Lines, "lines"},
+  {lay::GridNet::TenthMarkedLines, "tenth-marked-lines"},
+  {lay::GridNet::CheckerBoard, "checkerboard"}};
 
-void
-GridNetStyleConverter::from_string (const std::string &value, lay::GridNet::GridStyle &style)
+void GridNetStyleConverter::from_string (const std::string &value, lay::GridNet::GridStyle &style)
 {
   for (unsigned int i = 0; i < sizeof (grid_styles) / sizeof (grid_styles [0]); ++i) {
     if (value == grid_styles [i].string) {
@@ -81,10 +79,9 @@ GridNetStyleConverter::to_string (lay::GridNet::GridStyle style)
   return "";
 }
 
-void
-GridNetDensityConverter::from_string (const std::string &value, int &density)
+void GridNetDensityConverter::from_string (const std::string &value, int &density)
 {
-  density = default_density;  //  original default
+  density = default_density; //  original default
   tl::Extractor ex (value.c_str ());
   ex.try_read (density);
 }
@@ -96,10 +93,9 @@ GridNetDensityConverter::to_string (int density)
 }
 
 // ------------------------------------------------------------
-//  Implementation of the GridNetPluginDeclaration 
+//  Implementation of the GridNetPluginDeclaration
 
-void 
-GridNetPluginDeclaration::get_options (std::vector < std::pair<std::string, std::string> > &options) const
+void GridNetPluginDeclaration::get_options (std::vector<std::pair<std::string, std::string>> &options) const
 {
   options.push_back (std::pair<std::string, std::string> (cfg_grid_color, "auto"));
   options.push_back (std::pair<std::string, std::string> (cfg_grid_ruler_color, "auto"));
@@ -119,7 +115,7 @@ lay::ConfigPage *
 GridNetPluginDeclaration::config_page (QWidget *parent, std::string &title) const
 {
   title = tl::to_string (QObject::tr ("Display|Background"));
-  return new GridNetConfigPage (parent); 
+  return new GridNetConfigPage (parent);
 }
 #endif
 
@@ -135,18 +131,17 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new GridNetPlugi
 //  Implementation of the GridNet object
 
 GridNet::GridNet (LayoutViewBase *view)
-  : lay::BackgroundViewObject (view->canvas ()), 
+  : lay::BackgroundViewObject (view->canvas ()),
     lay::Plugin (view),
     mp_view (view),
     m_visible (false), m_show_ruler (true), m_grid (1.0),
     m_style0 (Invisible), m_style1 (Invisible), m_style2 (Invisible),
     m_density (default_density)
-{ 
+{
   // .. nothing yet ..
 }
 
-bool 
-GridNet::configure (const std::string &name, const std::string &value)
+bool GridNet::configure (const std::string &name, const std::string &value)
 {
   bool need_update = false;
   bool taken = true;
@@ -232,8 +227,7 @@ GridNet::configure (const std::string &name, const std::string &value)
   return taken;
 }
 
-void
-GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
+void GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
 {
   if (m_visible) {
 
@@ -305,7 +299,7 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
     int ny = int (dbworld.height () / grid + eps) + 2;
 
     //  draw grid
-    if (style == Dots || style == TenthDottedLines || 
+    if (style == Dots || style == TenthDottedLines ||
         style == DottedLines || style == LightDottedLines) {
 
       int n;
@@ -413,13 +407,12 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
           }
         }
       }
-
     }
 
     if (m_style0 != Invisible && (draw_xaxis || draw_yaxis)) {
 
       //  draw grid
-      if (m_style0 == Dots || m_style0 == TenthDottedLines || 
+      if (m_style0 == Dots || m_style0 == TenthDottedLines ||
           m_style0 == DottedLines || m_style0 == LightDottedLines) {
 
         int n;
@@ -519,9 +512,7 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
             painter.draw_line (p - db::Vector (0, 2), p + db::Vector (0, 2), axis_color);
           }
         }
-
       }
-
     }
 
     if (m_show_ruler && dgrid < vp.width () * 0.4) {
@@ -560,7 +551,7 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
       if (mp_view->global_trans ().fp_trans () != db::DFTrans ()) {
 
         //  draw a small "F" indicating any global transformation
-        db::Point pts[] = {
+        db::Point pts [] = {
           db::Point (-4, -5),
           db::Point (-4, 5),
           db::Point (4, 5),
@@ -571,26 +562,21 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
           db::Point (3, -1),
           db::Point (-2, -1),
           db::Point (-2, -5),
-          db::Point (-4, -5)
-        };
+          db::Point (-4, -5)};
 
         db::Polygon poly;
-        poly.assign_hull (&pts[0], &pts[0] + (sizeof (pts) / sizeof (pts[0])));
+        poly.assign_hull (&pts [0], &pts [0] + (sizeof (pts) / sizeof (pts [0])));
         poly.transform (db::FTrans (mp_view->global_trans ().fp_trans ()));
 
-        for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); !e.at_end (); ++e) {
+        for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
           db::Point p0 (xoffset + 2 * rh, vp.height () - yoffset - rh * 5);
           db::Point p1 = p0 + db::Vector (int (floor (0.5 + (*e).p1 ().x () * 0.1 * rh * 4)), -int (floor (0.5 + (*e).p1 ().y () * 0.1 * rh * 4)));
           db::Point p2 = p0 + db::Vector (int (floor (0.5 + (*e).p2 ().x () * 0.1 * rh * 4)), -int (floor (0.5 + (*e).p2 ().y () * 0.1 * rh * 4)));
           painter.draw_line (p1, p2, ruler_color);
         }
-
       }
-
     }
-
   }
 }
- 
-} // namespace lay
 
+} // namespace lay

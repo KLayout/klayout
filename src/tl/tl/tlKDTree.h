@@ -43,10 +43,10 @@ public:
   typedef typename Tree::difference_type difference_type;
   typedef typename Tree::size_type size_type;
 
-  kd_tree_it (const Tree &t, value_picker_type p, const Cmp &c) 
-    : m_j (1), m_n (t.size ()), m_l (0), 
-      m_tree (t), m_picker (p), m_compare (c) 
-  { 
+  kd_tree_it (const Tree &t, value_picker_type p, const Cmp &c)
+    : m_j (1), m_n (t.size ()), m_l (0),
+      m_tree (t), m_picker (p), m_compare (c)
+  {
     if (m_n > 0 && need_visit ()) {
       traverse ();
       while (! at_end ()) {
@@ -60,7 +60,7 @@ public:
     }
   }
 
-  kd_tree_it<Tree, Cmp> &operator++ () 
+  kd_tree_it<Tree, Cmp> &operator++ ()
   {
     while (true) {
       inc ();
@@ -71,11 +71,11 @@ public:
     return *this;
   }
 
-  const object_type &operator* () const 
+  const object_type &operator* () const
   {
     return m_tree.objects () [m_j - 1];
   }
-  
+
   operator difference_type () const
   {
     return index ();
@@ -89,12 +89,12 @@ public:
     return m_j - 1;
   }
 
-  bool operator== (const kd_tree_it<Tree, Cmp> &i) 
+  bool operator== (const kd_tree_it<Tree, Cmp> &i)
   {
     return m_j == i.m_j;
   }
 
-  bool operator!= (const kd_tree_it<Tree, Cmp> &i) 
+  bool operator!= (const kd_tree_it<Tree, Cmp> &i)
   {
     return m_j != i.m_j;
   }
@@ -120,7 +120,7 @@ public:
 private:
   size_type m_j;
   size_type m_n;
-  int m_l; 
+  int m_l;
   const Tree &m_tree;
   value_picker_type m_picker;
   Cmp m_compare;
@@ -130,9 +130,9 @@ private:
   {
     return m_compare (m_tree.objects () [m_j - 1]);
   }
-  
+
   //  one level up. Returns true if from right
-  bool up () 
+  bool up ()
   {
     size_type m = size_type (1) << m_l;
     size_type mm = m / 2;
@@ -147,13 +147,13 @@ private:
   {
     size_type m = 2 << m_l;
     m_j += m;
-    if (m_j > m_n) { 
+    if (m_j > m_n) {
       m_j -= m;
       return false;
     } else {
       ++m_l;
       return true;
-    }  
+    }
   }
 
   //  one level down (left). Returns false if not possible
@@ -161,22 +161,22 @@ private:
   {
     size_type m = size_type (1) << m_l;
     m_j += m;
-    if (m_j > m_n) { 
+    if (m_j > m_n) {
       m_j -= m;
       return false;
     } else {
       ++m_l;
       return true;
-    }  
+    }
   }
 
   //  place at end
-  void finish () 
+  void finish ()
   {
     m_j = 0;
     m_l = -1;
   }
-    
+
   //  return true if the current node needs a visit
   bool need_visit () const
   {
@@ -196,7 +196,7 @@ private:
         } else {
           up ();
         }
-      } 
+      }
       if (! next && down_left ()) {
         if (need_visit ()) {
           next = true;
@@ -204,14 +204,14 @@ private:
           up ();
         }
       }
-    } while (next);  
+    } while (next);
   }
 
   //  increment iterator
   void inc ()
   {
     if (! at_end ()) {
-      if (up ()) { 
+      if (up ()) {
         if (! down_left ()) {
           // no left node. just stay here.
         } else if (! need_visit ()) {
@@ -228,9 +228,10 @@ template <class Obj, class Val, class ValPicker, class Cmp>
 class kd_comp_f
 {
 public:
-  kd_comp_f (unsigned int l, ValPicker picker, Cmp comp) 
+  kd_comp_f (unsigned int l, ValPicker picker, Cmp comp)
     : m_level (l), m_picker (picker), m_comp (comp)
-  { }
+  {
+  }
 
   bool operator() (const Obj &o1, const Obj &o2) const
   {
@@ -258,22 +259,26 @@ public:
 
   kd_n_it (size_type step, const it_type &begin, difference_type index)
     : m_begin (begin), m_step (step), m_index (index)
-  { }
+  {
+  }
 
   kd_n_it (size_type step, const kd_n_it &i)
     : m_begin (i.m_begin), m_step (step), m_index (i.m_index)
-  { }
+  {
+  }
 
-  size_type step () const 
-  { return m_step; }
+  size_type step () const
+  {
+    return m_step;
+  }
 
-  kd_n_it &operator+= (difference_type n) 
+  kd_n_it &operator+= (difference_type n)
   {
     m_index += (n * m_step);
     return *this;
   }
 
-  kd_n_it &operator-= (difference_type n) 
+  kd_n_it &operator-= (difference_type n)
   {
     m_index -= (n * m_step);
     return *this;
@@ -294,19 +299,19 @@ public:
     return m_begin [m_index];
   }
 
-  kd_n_it &operator++ () 
+  kd_n_it &operator++ ()
   {
     m_index += m_step;
     return *this;
   }
 
-  kd_n_it &operator-- () 
+  kd_n_it &operator-- ()
   {
     m_index -= m_step;
     return *this;
   }
 
-  value_type &operator[] (difference_type n) const 
+  value_type &operator[] (difference_type n) const
   {
     return m_begin [m_index + n * m_step];
   }
@@ -318,7 +323,7 @@ public:
 
   bool operator!= (const kd_n_it &i) const
   {
-    return !operator== (i);
+    return ! operator== (i);
   }
 
   bool operator< (const kd_n_it &i) const
@@ -344,27 +349,27 @@ private:
 
 /**
  *  @brief A generic KD tree objects
- * 
+ *
  *  A KD tree is a tree in which each level describes
- *  a different dimension of values with repeating 
+ *  a different dimension of values with repeating
  *  permutations of dimensions. This way a n-dimensional
  *  space can be mapped and efficiently searched.
  *  This implementation is based on a special sorting
  *  scheme of a simple vector of elements with a single
  *  "boundary value" vector accompanying it.
- *  It takes four template arguments. 
+ *  It takes four template arguments.
  *  "Obj" is the type of the object, "Val" is the type
- *  of the value (a single dimension), "ValPicker" is 
- *  a converter class that gets a certain value of a 
+ *  of the value (a single dimension), "ValPicker" is
+ *  a converter class that gets a certain value of a
  *  given dimension from the object, "Cmp" is the compare
  *  function used to compare values in a special flavour
  *  that allows making the comparison dependent on the
  *  dimension. "ObjV" is the container used for storing the
  *  objects, "ValV" is the container used for storing values.
  */
- 
-template <class Obj, class Val, class ValPicker, class Cmp, class ObjV = std::vector<Obj>, class ValV = std::vector<Val> >
-class kd_tree 
+
+template <class Obj, class Val, class ValPicker, class Cmp, class ObjV = std::vector<Obj>, class ValV = std::vector<Val>>
+class kd_tree
 {
 public:
   typedef tl::kd_tree<Obj, Val, ValPicker, Cmp, ObjV, ValV> tree_type;
@@ -383,7 +388,7 @@ public:
   /**
    *  @brief Constructs an empty KD tree object
    */
-  kd_tree () { }
+  kd_tree () {}
 
   /**
    *  @brief Returns the number of elements in the KD tree
@@ -396,7 +401,7 @@ public:
   /**
    *  @brief Reserves space for a given number of elements
    */
-  void reserve (size_type n) 
+  void reserve (size_type n)
   {
     m_objs.reserve (n);
   }
@@ -404,7 +409,7 @@ public:
   /**
    *  @brief Resize the tree to a given number of elements inserting default elements
    */
-  void resize (size_type n) 
+  void resize (size_type n)
   {
     m_objs.resize (n);
   }
@@ -433,7 +438,7 @@ public:
 
   /**
    *  @brief Erase a given object from the KD tree at the given position
-   *    
+   *
    *  Erasing objects will required resorting.
    */
   void erase (iterator pos)
@@ -443,7 +448,7 @@ public:
 
   /**
    *  @brief Erase a sequence of objects from the KD tree at the given position
-   *    
+   *
    *  Erasing objects will required resorting.
    */
   void erase (iterator from, iterator to)
@@ -455,7 +460,7 @@ public:
    *  @brief Insert a range of objects into the KD tree
    *
    *  Inserts the objects [from,to) into the KD tree.
-   *  Inserting will destroy the "sorted" state of the tree. 
+   *  Inserting will destroy the "sorted" state of the tree.
    *  It will require resorting once an element is inserted.
    */
   template <class I>
@@ -466,8 +471,8 @@ public:
 
   /**
    *  @brief Restore the tree's sorted state.
-   *  
-   *  "sorting" the tree will make the tree accessible for 
+   *
+   *  "sorting" the tree will make the tree accessible for
    *  search accesses. Inserting destroys the sorted state.
    *  Complexity of the sorting is O(n*log(n)).
    */
@@ -507,34 +512,34 @@ public:
     return m_bounds;
   }
 
-  /** 
-   *  @brief Direct iterator access to the element vector without search 
+  /**
+   *  @brief Direct iterator access to the element vector without search
    */
   const_iterator begin () const
   {
     return m_objs.begin ();
   }
 
-  /** 
-   *  @brief Direct iterator access to the element vector without search 
+  /**
+   *  @brief Direct iterator access to the element vector without search
    */
   const_iterator end () const
   {
     return m_objs.end ();
   }
 
-  /** 
-   *  @brief Direct iterator access to the element vector without search 
+  /**
+   *  @brief Direct iterator access to the element vector without search
    */
-  iterator begin () 
+  iterator begin ()
   {
     return m_objs.begin ();
   }
 
-  /** 
-   *  @brief Direct iterator access to the element vector without search 
+  /**
+   *  @brief Direct iterator access to the element vector without search
    */
-  iterator end () 
+  iterator end ()
   {
     return m_objs.end ();
   }
@@ -542,13 +547,13 @@ public:
   /**
    *  @brief search initiation
    *
-   *  The model used in the search follows the usual begin..end 
+   *  The model used in the search follows the usual begin..end
    *  iterator semantics. However, begin and end are asymmetric:
    *  While "sel_begin" creates, initializes and delivers a iterator
    *  which walks through the tree skipping irrelevant items, the
    *  "sel_end" methods just delivers a "token" which is matched by
    *  the iterators comparison operator against the "done" state.
-   *  
+   *
    *  @param picker The value picker object that is used to fetch
    *                a value of a given dimension of an object.
    *  @param cmp The comparison function used in the search.
@@ -559,7 +564,7 @@ public:
     return kd_tree_it<tree_type, SelCmp> (*this, picker, cmp);
   }
 
-  size_type sel_end () const 
+  size_type sel_end () const
   {
     return 0;
   }
@@ -568,9 +573,9 @@ private:
   obj_vector_type m_objs;
   bound_vector_type m_bounds;
 
-  void partial_sort (typename bound_vector_type::difference_type bi, 
-                     unsigned int l, 
-                     const kd_n_it &from, const kd_n_it &to, 
+  void partial_sort (typename bound_vector_type::difference_type bi,
+                     unsigned int l,
+                     const kd_n_it &from, const kd_n_it &to,
                      ValPicker picker, Cmp comp)
   {
     typename kd_n_it::difference_type n = to - from;
@@ -592,7 +597,7 @@ private:
         }
       }
       m_bounds [bi] = bound;
-      
+
       bool even = ((n1 % 2) == 0);
 
       kd_n_it i1 (from);
@@ -608,7 +613,7 @@ private:
 
       kd_n_it s2 (from.step () * 2, from + 1);
       partial_sort (bi + from.step (), l + 1, s2, s2 + n1, picker, comp);
-      
+
       kd_n_it s1 (from.step () * 2, from + 2);
       partial_sort (bi + from.step () * 2, l + 1, s1, s1 + (n - n1 - 1), picker, comp);
 
@@ -629,7 +634,6 @@ private:
 
       //  some simple optimization for the trivial case 1
       m_bounds [bi] = picker (l, *from);
-
     }
   }
 };
@@ -637,4 +641,3 @@ private:
 } // namespace tl
 
 #endif
-

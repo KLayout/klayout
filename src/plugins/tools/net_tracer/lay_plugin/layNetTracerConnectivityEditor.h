@@ -42,7 +42,7 @@
 
 namespace db
 {
-  class NetTracerConnectivity;
+class NetTracerConnectivity;
 }
 
 namespace lay
@@ -52,7 +52,7 @@ class NetTracerConnectivityEditor
   : public QWidget,
     public Ui::NetTracerConnectivityEditor
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   NetTracerConnectivityEditor (QWidget *parent);
@@ -79,4 +79,3 @@ private:
 }
 
 #endif
-

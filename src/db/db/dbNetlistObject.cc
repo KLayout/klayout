@@ -57,7 +57,6 @@ NetlistObject &NetlistObject::operator= (const NetlistObject &other)
     if (other.mp_properties) {
       mp_properties = new std::map<tl::Variant, tl::Variant> (*other.mp_properties);
     }
-
   }
   return *this;
 }
@@ -76,8 +75,7 @@ tl::Variant NetlistObject::property (const tl::Variant &key) const
   }
 }
 
-void
-NetlistObject::set_property (const tl::Variant &key, const tl::Variant &value)
+void NetlistObject::set_property (const tl::Variant &key, const tl::Variant &value)
 {
   if (value.is_nil ()) {
 

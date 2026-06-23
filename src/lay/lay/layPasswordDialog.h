@@ -35,7 +35,9 @@ namespace lay
  * @brief A password dialog for registration with tl::HttpStream
  */
 class PasswordDialog
-  : public QDialog, public tl::HttpCredentialProvider, private Ui::PasswordDialog
+  : public QDialog,
+    public tl::HttpCredentialProvider,
+    private Ui::PasswordDialog
 {
 public:
   PasswordDialog (QWidget *parent);

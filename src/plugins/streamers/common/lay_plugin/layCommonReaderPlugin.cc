@@ -49,12 +49,11 @@ CommonReaderOptionPage::~CommonReaderOptionPage ()
   mp_ui = 0;
 }
 
-void
-CommonReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
+void CommonReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
 {
   static const db::CommonReaderOptions default_options;
   const db::CommonReaderOptions *options = dynamic_cast<const db::CommonReaderOptions *> (o);
-  if (!options) {
+  if (! options) {
     options = &default_options;
   }
 
@@ -64,8 +63,7 @@ CommonReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const d
   mp_ui->read_all_cbx->setChecked (options->create_other_layers);
 }
 
-void
-CommonReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
+void CommonReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
 {
   db::CommonReaderOptions *options = dynamic_cast<db::CommonReaderOptions *> (o);
   if (options) {
@@ -74,7 +72,6 @@ CommonReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Te
     options->enable_properties = mp_ui->enable_properties_cbx->isChecked ();
     options->layer_map = mp_ui->layer_map->get_layer_map ();
     options->create_other_layers = mp_ui->read_all_cbx->isChecked ();
-
   }
 }
 

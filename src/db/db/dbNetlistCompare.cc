@@ -1,4 +1,18 @@
 
+//  NOTE: <execution> must be included before any Qt header, otherwise TBB's
+//  emit() method collides with Qt's "emit" keyword macro.
+#if __cplusplus >= 201703L
+  #if __has_include(<execution>)
+    #include <execution>
+  #endif
+#endif
+
+#if defined(__cpp_lib_execution)
+#define PARALLEL_EXEC_POLICY std::execution::par,
+#else
+#define PARALLEL_EXEC_POLICY
+#endif
+
 /*
 
   KLayout Layout Viewer
@@ -33,6 +47,7 @@
 #include "tlInternational.h"
 
 #include <cstring>
+#include <algorithm>
 
 namespace db
 {
@@ -507,7 +522,7 @@ static std::vector<std::string> unverified_names (const db::Circuit *c, const st
     }
   }
 
-  std::sort (names.begin (), names.end ());
+  std::sort (PARALLEL_EXEC_POLICY names.begin (), names.end ());
   return names;
 }
 
@@ -563,7 +578,7 @@ compute_device_key_for_this (const db::Device &device, const db::NetGraph &g, bo
     }
   }
 
-  std::sort (k.begin (), k.end ());
+  std::sort (PARALLEL_EXEC_POLICY k.begin (), k.end ());
   return k;
 }
 
@@ -582,7 +597,7 @@ compute_device_key_for_other (const db::Device &device, const db::NetGraph &g, b
     }
   }
 
-  std::sort (k.begin (), k.end ());
+  std::sort (PARALLEL_EXEC_POLICY k.begin (), k.end ());
   return k;
 }
 
@@ -636,7 +651,7 @@ compute_subcircuit_key_for_this (const db::SubCircuit &subcircuit, const db::Net
     }
   }
 
-  std::sort (k.begin (), k.end ());
+  std::sort (PARALLEL_EXEC_POLICY k.begin (), k.end ());
   return k;
 }
 
@@ -658,7 +673,7 @@ compute_subcircuit_key_for_other (const db::SubCircuit &subcircuit, const db::Ne
     }
   }
 
-  std::sort (k.begin (), k.end ());
+  std::sort (PARALLEL_EXEC_POLICY k.begin (), k.end ());
   return k;
 }
 
@@ -1122,8 +1137,8 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
         break;
       }
 
-      std::sort (nodes.begin (), nodes.end (), CompareNodeEdgePair ());
-      std::sort (other_nodes.begin (), other_nodes.end (), CompareNodeEdgePair ());
+      std::sort (PARALLEL_EXEC_POLICY nodes.begin (), nodes.end (), CompareNodeEdgePair ());
+      std::sort (PARALLEL_EXEC_POLICY other_nodes.begin (), other_nodes.end (), CompareNodeEdgePair ());
 
       size_t ni = compare.derive_node_identities_from_node_set (nodes, other_nodes);
       if (ni > 0 && ni != failed_match) {
@@ -1624,8 +1639,8 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
 
       DeviceParametersCompare cmp;
 
-      std::sort (unmatched_a.begin (), unmatched_a.end (), cmp);
-      std::sort (unmatched_b.begin (), unmatched_b.end (), cmp);
+      std::sort (PARALLEL_EXEC_POLICY unmatched_a.begin (), unmatched_a.end (), cmp);
+      std::sort (PARALLEL_EXEC_POLICY unmatched_b.begin (), unmatched_b.end (), cmp);
 
       for (unmatched_list::iterator i = unmatched_a.begin (), j = unmatched_b.begin (); i != unmatched_a.end () || j != unmatched_b.end (); ) {
 
@@ -1846,8 +1861,8 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
 
     } else {
 
-      std::sort (unmatched_a.begin (), unmatched_a.end (), KeySize ());
-      std::sort (unmatched_b.begin (), unmatched_b.end (), KeySize ());
+      std::sort (PARALLEL_EXEC_POLICY unmatched_a.begin (), unmatched_a.end (), KeySize ());
+      std::sort (PARALLEL_EXEC_POLICY unmatched_b.begin (), unmatched_b.end (), KeySize ());
 
       for (unmatched_list::iterator i = unmatched_a.begin (), j = unmatched_b.begin (); i != unmatched_a.end () || j != unmatched_b.end (); ) {
 
@@ -1952,7 +1967,7 @@ static bool derive_symmetry_groups (const db::NetGraph &graph, const tl::equival
 
       //  all other edges need to have identical destinations for the symmetry group to be
       //  actually symmetric
-      std::sort (common_nodes.begin (), common_nodes.end ());
+      std::sort (PARALLEL_EXEC_POLICY common_nodes.begin (), common_nodes.end ());
       if (g == symmetry_group.begin ()) {
         common_nodes_first.swap (common_nodes);
       } else if (common_nodes_first != common_nodes) {
@@ -2020,7 +2035,7 @@ NetlistComparer::join_symmetric_nets (db::Circuit *circuit)
     }
   }
 
-  std::sort (nodes.begin (), nodes.end (), CompareNodeEdgePair ());
+  std::sort (PARALLEL_EXEC_POLICY nodes.begin (), nodes.end (), CompareNodeEdgePair ());
 
   //  Identical nodes leading to the same nodes on the other side are candidates for symmetry.
 
@@ -2054,7 +2069,7 @@ NetlistComparer::join_symmetric_nets (db::Circuit *circuit)
 
   }
 
-  std::sort (symmetry_groups.begin (), symmetry_groups.end ());
+  std::sort (PARALLEL_EXEC_POLICY symmetry_groups.begin (), symmetry_groups.end ());
   symmetry_groups.erase (std::unique (symmetry_groups.begin (), symmetry_groups.end ()), symmetry_groups.end ());
 
   if (! symmetry_groups.empty () && tl::verbosity () >= 30) {

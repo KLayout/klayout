@@ -1,4 +1,18 @@
 
+//  NOTE: <execution> must be included before any Qt header, otherwise TBB's
+//  emit() method collides with Qt's "emit" keyword macro.
+#if __cplusplus >= 201703L
+  #if __has_include(<execution>)
+    #include <execution>
+  #endif
+#endif
+
+#if defined(__cpp_lib_execution)
+#define PARALLEL_EXEC_POLICY std::execution::par,
+#else
+#define PARALLEL_EXEC_POLICY
+#endif
+
 /*
 
   KLayout Layout Viewer
@@ -32,6 +46,8 @@
 #include "tlAssert.h"
 #include "tlLog.h"
 #include "tlInternational.h"
+
+#include <algorithm>
 
 namespace db
 {
@@ -354,8 +370,8 @@ static bool edges_are_compatible (const NetGraphNode::edge_type &e, const NetGra
       ++t2;
     }
 
-    std::sort (p1.begin (), p1.end ());
-    std::sort (p2.begin (), p2.end ());
+    std::sort (PARALLEL_EXEC_POLICY p1.begin (), p1.end ());
+    std::sort (PARALLEL_EXEC_POLICY p2.begin (), p2.end ());
 
     if (p1 != p2) {
       return false;
@@ -464,8 +480,8 @@ NetlistCompareCore::derive_node_identities_for_edges (NetGraphNode::edge_iterato
 
   }
 
-  std::sort (nodes.begin (), nodes.end (), CompareNodeEdgePair ());
-  std::sort (other_nodes.begin (), other_nodes.end (), CompareNodeEdgePair ());
+  std::sort (PARALLEL_EXEC_POLICY nodes.begin (), nodes.end (), CompareNodeEdgePair ());
+  std::sort (PARALLEL_EXEC_POLICY other_nodes.begin (), other_nodes.end (), CompareNodeEdgePair ());
 
   if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
 
@@ -643,8 +659,8 @@ NetlistCompareCore::derive_node_identities (size_t net_index, size_t depth, size
         }
       }
 
-      std::sort (nodes.begin (), nodes.end ());
-      std::sort (other_nodes_translated.begin (), other_nodes_translated.end ());
+      std::sort (PARALLEL_EXEC_POLICY nodes.begin (), nodes.end ());
+      std::sort (PARALLEL_EXEC_POLICY other_nodes_translated.begin (), other_nodes_translated.end ());
 
       //  No fit, we can shortcut
       if (nodes != other_nodes_translated) {
@@ -1460,8 +1476,8 @@ NetlistCompareCore::analyze_failed_matches () const
     }
   }
 
-  std::sort (nodes.begin (), nodes.end (), CompareNodeEdgePair ());
-  std::sort (other_nodes.begin (), other_nodes.end (), CompareNodeEdgePair ());
+  std::sort (PARALLEL_EXEC_POLICY nodes.begin (), nodes.end (), CompareNodeEdgePair ());
+  std::sort (PARALLEL_EXEC_POLICY other_nodes.begin (), other_nodes.end (), CompareNodeEdgePair ());
 
   auto n1 = nodes.begin ();
   auto n2 = other_nodes.begin ();

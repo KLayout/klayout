@@ -125,6 +125,13 @@ public:
   static const tl::Variant &device_class_property_name ();
 
   /**
+   *  @brief Initializes the extractor and connects to a netlist
+   *
+   *  This method needs to be called before "extract"
+   */
+  void initialize (Netlist *netlist);
+
+  /**
    *  @brief Performs the extraction
    *
    *  layout and cell specify the layout and the top cell from which to perform the
@@ -140,7 +147,7 @@ public:
    *
    *  The definition of the input layers is device class specific.
    */
-  void extract (Layout &layout, Cell &cell, const std::vector<unsigned int> &layers, Netlist *netlist, hier_clusters_type &clusters, double device_scaling = 1.0, const std::set<cell_index_type> *breakout_cells = 0);
+  void extract (Layout &layout, Cell &cell, const std::vector<unsigned int> &layers, hier_clusters_type &clusters, double device_scaling = 1.0, const std::set<cell_index_type> *breakout_cells = 0);
 
   /**
    *  @brief Extracts the devices from a list of regions
@@ -149,7 +156,7 @@ public:
    *  named regions for input. These regions need to be of deep region type and
    *  originate from the same layout than the DeepShapeStore.
    */
-  void extract (DeepShapeStore &dss, unsigned int layout_index, const input_layers &layers, Netlist &netlist, hier_clusters_type &clusters, double device_scaling = 1.0);
+  void extract (DeepShapeStore &dss, unsigned int layout_index, const input_layers &layers, hier_clusters_type &clusters, double device_scaling = 1.0);
 
   /**
    *  @brief Clears the log entries
@@ -281,6 +288,23 @@ public:
   DeviceClass *device_class ()
   {
     return mp_device_class.get ();
+  }
+
+  /**
+   *  @brief Gets the default device class
+   *
+   *  The default device class is a fallback device class which is used when
+   *  1.) No device class is registered in the constructor
+   *  2.) No corresponding device class is present in the netlist on extraction
+   *  3.) No corresponding device class is registered in the LayoutToNetlist object
+   *  The object returned is a new object and must be deleted by the caller.
+   *
+   *  This method is mainly used by internal device extractors to link them
+   *  to a default class.
+   */
+  virtual DeviceClass *default_device_class ()
+  {
+    return 0;
   }
 
   /**
@@ -424,13 +448,6 @@ public:
    *  @brief Gets the name of the current cell
    */
   std::string cell_name () const;
-
-  /**
-   *  @brief Initializes the extractor
-   *  This method will produce the device classes required for the device extraction.
-   *  It is mainly provided for test purposes. Don't call it directly.
-   */
-  void initialize (db::Netlist *nl);
 
 private:
   struct DeviceCellKey

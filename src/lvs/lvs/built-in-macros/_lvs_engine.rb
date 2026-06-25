@@ -231,10 +231,20 @@ module LVS
     # @synopsis flag_missing_ports
     # See \Netter#flag_missing_ports for a description of that function.
 
+    # %LVS%
+    # @name register_device_class
+    # Registers a device class for extraction and netlist input and output.
+    # Registering a device class is optional. However, using registered
+    # device classed simplify SPICE netlist reading and writing, as device classes
+    # can be configured with SPICE profiles to customize SPICE input and output.
+    # See \Netter#register_device_class for a description of this function.
+    # Also see \Netter#extract_devices for how to use it with registered
+    # device classes.
+
     %w(schematic compare split_gates join_symmetric_nets tolerance ignore_parameter enable_parameter disable_parameter 
        blank_circuit align same_nets same_nets! same_circuits same_device_classes equivalent_pins 
        min_caps max_res max_depth max_branch_complexity consider_net_names lvs_data no_lvs_hints
-       flag_missing_ports).each do |f|
+       flag_missing_ports register_device_class).each do |f|
       eval <<"CODE"
         def #{f}(*args)
           _netter.#{f}(*args)

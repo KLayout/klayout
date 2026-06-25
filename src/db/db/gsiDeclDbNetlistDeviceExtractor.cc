@@ -321,101 +321,106 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
     "to the new devices.\n"
   ) +
   gsi::method ("register_device_class", &GenericDeviceExtractor::register_device_class, gsi::arg ("device_class"),
-   "@brief Registers a device class.\n"
-   "The device class object will become owned by the netlist and must not be deleted by\n"
-   "the caller. The name of the device class will be changed to the name given to\n"
-   "the device extractor.\n"
-   "This method shall be used inside the implementation of \\setup to register\n"
-   "the device classes.\n"
+    "@brief Registers a device class.\n"
+    "The device class object will become owned by the netlist and must not be deleted by\n"
+    "the caller. The name of the device class will be changed to the name given to\n"
+    "the device extractor.\n"
+    "This method shall be used inside the implementation of \\setup to register\n"
+    "the device classes.\n"
+    "\n"
+    "Registering a device class in the Extractor is optional. Alternatively, the device class can also "
+    "be registered inside the \\Netter object. In that case the device class corresponding to the "
+    "extractor's name will be used during \\Netter#extract_devices.\n"
   ) +
   gsi::method ("define_layer", (const db::NetlistDeviceExtractorLayerDefinition &(GenericDeviceExtractor::*) (const std::string &name, const std::string &)) &GenericDeviceExtractor::define_layer, gsi::arg ("name"), gsi::arg ("description"),
-   "@brief Defines a layer.\n"
-   "@return The layer descriptor object created for this layer (use 'index' to get the layer's index)\n"
-   "Each call will define one more layer for the device extraction.\n"
-   "This method shall be used inside the implementation of \\setup to define\n"
-   "the device layers. The actual geometries are later available to \\extract_devices\n"
-   "in the order the layers are defined.\n"
+    "@brief Defines a layer.\n"
+    "@return The layer descriptor object created for this layer (use 'index' to get the layer's index)\n"
+    "Each call will define one more layer for the device extraction.\n"
+    "This method shall be used inside the implementation of \\setup to define\n"
+    "the device layers. The actual geometries are later available to \\extract_devices\n"
+    "in the order the layers are defined.\n"
   ) +
   gsi::method ("define_opt_layer", (const db::NetlistDeviceExtractorLayerDefinition &(GenericDeviceExtractor::*) (const std::string &name, size_t fallback, const std::string &)) &GenericDeviceExtractor::define_layer, gsi::arg ("name"), gsi::arg ("fallback"), gsi::arg ("description"),
-   "@brief Defines a layer with a fallback layer.\n"
-   "@return The layer descriptor object created for this layer (use 'index' to get the layer's index)\n"
-   "As \\define_layer, this method allows specification of device extraction layer. In addition to \\define_layout, it features "
-   "a fallback layer. If in the device extraction statement, the primary layer is not given, "
-   "the fallback layer will be used. Hence, this layer is optional. The fallback layer is given by its "
-   "index and must be defined before the layer using the fallback layer is defined. "
-   "For the index, 0 is the first layer defined, 1 the second and so forth."
+    "@brief Defines a layer with a fallback layer.\n"
+    "@return The layer descriptor object created for this layer (use 'index' to get the layer's index)\n"
+    "As \\define_layer, this method allows specification of device extraction layer. In addition to \\define_layer, it features "
+    "a fallback layer. If in the device extraction statement, the primary layer is not given, "
+    "the fallback layer will be used. Hence, this layer is optional. The fallback layer is given by its "
+    "index and must be defined before the layer using the fallback layer is defined. "
+    "For the index, 0 is the first layer defined, 1 the second and so forth."
   ) +
   gsi::method ("create_device", &GenericDeviceExtractor::create_device,
-   "@brief Creates a device.\n"
-   "The device object returned can be configured by the caller, e.g. set parameters.\n"
-   "It will be owned by the netlist and must not be deleted by the caller.\n"
+    "@brief Creates a device.\n"
+    "The device object returned can be configured by the caller, e.g. set parameters.\n"
+    "It will be owned by the netlist and must not be deleted by the caller.\n"
+    "The device created will have the device class specified by \\register_device_class.\n"
   ) +
   gsi::method ("define_terminal", (void (GenericDeviceExtractor::*) (db::Device *, size_t, size_t, const db::Polygon &)) &GenericDeviceExtractor::define_terminal,
     gsi::arg ("device"), gsi::arg ("terminal_id"), gsi::arg ("layer_index"), gsi::arg ("shape"),
-   "@brief Defines a device terminal.\n"
-   "This method will define a terminal to the given device and the given terminal ID. \n"
-   "The terminal will be placed on the layer given by \"layer_index\". The layer index \n"
-   "is the index of the layer during layer definition. The first layer is 0, the second layer 1 etc.\n"
-   "\n"
-   "This version produces a terminal with a shape given by the polygon. Note that the polygon is\n"
-   "specified in database units.\n"
+    "@brief Defines a device terminal.\n"
+    "This method will define a terminal to the given device and the given terminal ID. \n"
+    "The terminal will be placed on the layer given by \"layer_index\". The layer index \n"
+    "is the index of the layer during layer definition. The first layer is 0, the second layer 1 etc.\n"
+    "\n"
+    "This version produces a terminal with a shape given by the polygon. Note that the polygon is\n"
+    "specified in database units.\n"
   ) +
   gsi::method ("define_terminal", (void (GenericDeviceExtractor::*) (db::Device *, size_t, size_t, const db::Box &)) &GenericDeviceExtractor::define_terminal,
     gsi::arg ("device"), gsi::arg ("terminal_id"), gsi::arg ("layer_index"), gsi::arg ("shape"),
-   "@brief Defines a device terminal.\n"
-   "This method will define a terminal to the given device and the given terminal ID. \n"
-   "The terminal will be placed on the layer given by \"layer_index\". The layer index \n"
-   "is the index of the layer during layer definition. The first layer is 0, the second layer 1 etc.\n"
-   "\n"
-   "This version produces a terminal with a shape given by the box. Note that the box is\n"
-   "specified in database units.\n"
+    "@brief Defines a device terminal.\n"
+    "This method will define a terminal to the given device and the given terminal ID. \n"
+    "The terminal will be placed on the layer given by \"layer_index\". The layer index \n"
+    "is the index of the layer during layer definition. The first layer is 0, the second layer 1 etc.\n"
+    "\n"
+    "This version produces a terminal with a shape given by the box. Note that the box is\n"
+    "specified in database units.\n"
   ) +
   gsi::method ("define_terminal", (void (GenericDeviceExtractor::*) (db::Device *, size_t, size_t, const db::Point &)) &GenericDeviceExtractor::define_terminal,
     gsi::arg ("device"), gsi::arg ("terminal_id"), gsi::arg ("layer_index"), gsi::arg ("point"),
-   "@brief Defines a device terminal.\n"
-   "This method will define a terminal to the given device and the given terminal ID. \n"
-   "The terminal will be placed on the layer given by \"layer_index\". The layer index \n"
-   "is the index of the layer during layer definition. The first layer is 0, the second layer 1 etc.\n"
-   "\n"
-   "This version produces a point-like terminal. Note that the point is\n"
-   "specified in database units.\n"
+    "@brief Defines a device terminal.\n"
+    "This method will define a terminal to the given device and the given terminal ID. \n"
+    "The terminal will be placed on the layer given by \"layer_index\". The layer index \n"
+    "is the index of the layer during layer definition. The first layer is 0, the second layer 1 etc.\n"
+    "\n"
+    "This version produces a point-like terminal. Note that the point is\n"
+    "specified in database units.\n"
   ) +
   gsi::method_ext ("define_terminal", &define_terminal_by_names<db::Polygon>,
     gsi::arg ("device"), gsi::arg ("terminal_name"), gsi::arg ("layer_name"), gsi::arg ("shape"),
-   "@brief Defines a device terminal using names for terminal and layer.\n"
-   "\n"
-   "This convenience version of the ID-based \\define_terminal methods allows using names for terminal and layer.\n"
-   "It has been introduced in version 0.28."
+    "@brief Defines a device terminal using names for terminal and layer.\n"
+    "\n"
+    "This convenience version of the ID-based \\define_terminal methods allows using names for terminal and layer.\n"
+    "It has been introduced in version 0.28."
   ) +
   gsi::method_ext ("define_terminal", &define_terminal_by_names<db::Box>,
     gsi::arg ("device"), gsi::arg ("terminal_name"), gsi::arg ("layer_name"), gsi::arg ("shape"),
-   "@brief Defines a device terminal using names for terminal and layer.\n"
-   "\n"
-   "This convenience version of the ID-based \\define_terminal methods allows using names for terminal and layer.\n"
-   "It has been introduced in version 0.28."
+    "@brief Defines a device terminal using names for terminal and layer.\n"
+    "\n"
+    "This convenience version of the ID-based \\define_terminal methods allows using names for terminal and layer.\n"
+    "It has been introduced in version 0.28."
   ) +
   gsi::method_ext ("define_terminal", &define_terminal_by_names<db::Point>,
     gsi::arg ("device"), gsi::arg ("terminal_name"), gsi::arg ("layer_name"), gsi::arg ("point"),
-   "@brief Defines a device terminal using names for terminal and layer.\n"
-   "\n"
-   "This convenience version of the ID-based \\define_terminal methods allows using names for terminal and layer.\n"
-   "It has been introduced in version 0.28."
+    "@brief Defines a device terminal using names for terminal and layer.\n"
+    "\n"
+    "This convenience version of the ID-based \\define_terminal methods allows using names for terminal and layer.\n"
+    "It has been introduced in version 0.28."
   ) +
   gsi::method ("dbu", &GenericDeviceExtractor::dbu,
-   "@brief Gets the database unit\n"
+    "@brief Gets the database unit\n"
   ) +
   gsi::method ("sdbu", &GenericDeviceExtractor::sdbu,
-   "@brief Gets the scaled database unit\n"
-   "Use this unit to compute device properties. It is the database unit multiplied with the\n"
-   "device scaling factor."
+    "@brief Gets the scaled database unit\n"
+    "Use this unit to compute device properties. It is the database unit multiplied with the\n"
+    "device scaling factor."
   ) +
   gsi::method ("error", (void (GenericDeviceExtractor::*) (const std::string &)) &GenericDeviceExtractor::error,
     gsi::arg ("message"),
-   "@brief Issues an error with the given message\n"
+    "@brief Issues an error with the given message\n"
   ) +
   gsi::method ("error", (void (GenericDeviceExtractor::*) (const std::string &, const db::DPolygon &)) &GenericDeviceExtractor::error,
     gsi::arg ("message"), gsi::arg ("geometry"),
-   "@brief Issues an error with the given message and micrometer-units polygon geometry\n"
+    "@brief Issues an error with the given message and micrometer-units polygon geometry\n"
   ) +
   gsi::method_ext ("error", &error1,
     gsi::arg ("message"), gsi::arg ("geometry"),

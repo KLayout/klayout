@@ -171,6 +171,13 @@ TEST(13_simple_ringo_device_subcircuits)
   run_test (_this, "ringo_device_subcircuits", "ringo.gds", false, true, std::string (), true);
 }
 
+TEST(13b_simple_ringo_device_subcircuits_devcls)
+{
+  run_test (_this, "ringo_device_subcircuits_devcls", "ringo.gds");
+  //  change case
+  run_test (_this, "ringo_device_subcircuits_devcls", "ringo.gds", false, true, std::string (), true);
+}
+
 TEST(14_simple_ringo_mixed_hierarchy)
 {
   run_test (_this, "ringo_mixed_hierarchy", "ringo_mixed_hierarchy.gds");

@@ -2550,6 +2550,18 @@ CODE
     # The netlist is a RBA::Netlist object. If no netlist is extracted 
     # yet, this method will trigger the extraction process.
     # See \Netter#netlist for a description of this function.
+
+    # %DRC%
+    # @name register_device_class
+    # Registers a device class for extraction and netlist output.
+    # Registering a device class is optional. However, using registered
+    # device classed simplify SPICE netlist writing, as device classes
+    # can be configured with SPICE profiles to customize SPICE output.
+    # In the LVS context, \register_device_class also controls the way
+    # schematic netlists are read from SPICE.
+    # See \Netter#register_device_class for a description of this function.
+    # Also see \Netter#extract_devices for how to use it with registered
+    # device classes.
  
     %w(
       antenna_check
@@ -2567,6 +2579,7 @@ CODE
       top_level
       ignore_extraction_errors
       extract_devices
+      register_device_class
       netlist
       l2n_data
       _l2n_object

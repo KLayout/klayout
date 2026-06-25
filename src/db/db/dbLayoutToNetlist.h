@@ -726,6 +726,25 @@ public:
   }
 
   /**
+   *  @brief Registers a device class
+   *
+   *  This method registers a device class for device extraction.
+   *  This way of registering device classes is provided alternatively to
+   *  the private device class provided by the device extractors.
+   *  This way, device class management is centralized, which is in
+   *  favor of device-class specific configurations such as SPICE
+   *  profiles.
+   */
+  void register_device_class (const DeviceClass &device_class);
+
+  /**
+   *  @brief Gets a device class by device class name
+   *
+   *  If there is no class with that name, a null pointer is returned.
+   */
+  const DeviceClass *device_class_by_name (const std::string &name) const;
+
+  /**
    *  @brief Gets the internal DeepShapeStore object
    *
    *  This method is intended for special cases, i.e. for the master
@@ -1226,6 +1245,7 @@ private:
   db::Connectivity m_conn;
   db::hier_clusters<db::NetShape> m_net_clusters;
   std::unique_ptr<db::Netlist> mp_netlist;
+  tl::shared_collection<db::DeviceClass> m_device_classes;
   std::set<db::DeepLayer> m_dlrefs;
   std::map<std::string, db::DeepLayer> m_named_dls;
   std::map<unsigned int, std::string> m_name_of_layer;

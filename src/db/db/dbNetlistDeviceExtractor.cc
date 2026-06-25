@@ -78,6 +78,10 @@ void NetlistDeviceExtractor::initialize (db::Netlist *nl)
   m_netlist.reset (nl);
 
   setup ();
+
+  if (! mp_device_class.get () && nl) {
+    mp_device_class.reset (nl->device_class_by_name (m_name));
+  }
 }
 
 static void insert_into_region (const db::NetShape &s, const db::ICplxTrans &tr, db::Region &region)
@@ -88,10 +92,8 @@ static void insert_into_region (const db::NetShape &s, const db::ICplxTrans &tr,
   }
 }
 
-void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layout_index, const NetlistDeviceExtractor::input_layers &layer_map, db::Netlist &nl, hier_clusters_type &clusters, double device_scaling)
+void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layout_index, const NetlistDeviceExtractor::input_layers &layer_map, hier_clusters_type &clusters, double device_scaling)
 {
-  initialize (&nl);
-
   std::vector<unsigned int> layers;
   layers.reserve (m_layer_definitions.size ());
 
@@ -153,9 +155,9 @@ void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layo
   extract_without_initialize (dss.layout (layout_index), dss.initial_cell (layout_index), clusters, layers, device_scaling, dss.breakout_cells (layout_index));
 }
 
-void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers, db::Netlist *nl, hier_clusters_type &clusters, double device_scaling, const std::set<db::cell_index_type> *breakout_cells)
+// @@@ needed?
+void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers, hier_clusters_type &clusters, double device_scaling, const std::set<db::cell_index_type> *breakout_cells)
 {
-  initialize (nl);
   extract_without_initialize (layout, cell, clusters, layers, device_scaling, breakout_cells);
 }
 

@@ -149,7 +149,8 @@ TEST(3_ClassFactoryTest)
   dl["tS"] = &o1;
   dl["tD"] = &o2;
   dl["tG"] = &o3;
-  ex.extract (dss, 0, dl, nl, cl);
+  ex.initialize (&nl);
+  ex.extract (dss, 0, dl, cl);
 
   //  the generated objects are of MyDeviceClassType
   EXPECT_EQ (dynamic_cast<const MyDeviceClass *> (ex.device_class ()) != 0, true);
@@ -199,7 +200,8 @@ TEST(10_MOS3DeviceExtractorTest)
   dl["tS"] = &o1;
   dl["tD"] = &o2;
   dl["tG"] = &o3;
-  ex.extract (dss, 0, dl, nl, cl);
+  ex.initialize (&nl);
+  ex.extract (dss, 0, dl, cl);
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ();\n"
@@ -254,7 +256,8 @@ TEST(11_MOS3DeviceExtractorTestNotRectangularGate)
   dl["tS"] = &o1;
   dl["tD"] = &o2;
   dl["tG"] = &o3;
-  ex.extract (dss, 0, dl, nl, cl);
+  ex.initialize (&nl);
+  ex.extract (dss, 0, dl, cl);
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ();\n"
@@ -309,7 +312,8 @@ TEST(12_MOS3DeviceExtractorTestCircular)
   dl["tS"] = &o1;
   dl["tD"] = &o2;
   dl["tG"] = &o3;
-  ex.extract (dss, 0, dl, nl, cl);
+  ex.initialize (&nl);
+  ex.extract (dss, 0, dl, cl);
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ();\n"
@@ -368,7 +372,8 @@ TEST(20_MOS4DeviceExtractorTest)
   dl["tD"] = &o2;
   dl["tG"] = &o3;
   dl["tB"] = &o4;
-  ex.extract (dss, 0, dl, nl, cl);
+  ex.initialize (&nl);
+  ex.extract (dss, 0, dl, cl);
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ();\n"
@@ -428,7 +433,8 @@ TEST(21_MOS4DeviceExtractorTestNotRectangularGate)
   dl["tD"] = &o2;
   dl["tG"] = &o3;
   dl["tB"] = &o4;
-  ex.extract (dss, 0, dl, nl, cl);
+  ex.initialize (&nl);
+  ex.extract (dss, 0, dl, cl);
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ();\n"
@@ -488,7 +494,8 @@ TEST(22_MOS4DeviceExtractorTestCircular)
   dl["tD"] = &o2;
   dl["tG"] = &o3;
   dl["tB"] = &o4;
-  ex.extract (dss, 0, dl, nl, cl);
+  ex.initialize (&nl);
+  ex.extract (dss, 0, dl, cl);
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ();\n"
@@ -546,7 +553,8 @@ TEST(30_DMOS3DeviceExtractorTest)
   dl["tS"] = &o1;
   dl["tD"] = &o2;
   dl["tG"] = &o3;
-  ex.extract (dss, 0, dl, nl, cl);
+  ex.initialize (&nl);
+  ex.extract (dss, 0, dl, cl);
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ();\n"
@@ -603,7 +611,8 @@ TEST(31_DMOS3DeviceExtractorTestNotRectangularGate)
   dl["tS"] = &o1;
   dl["tD"] = &o2;
   dl["tG"] = &o3;
-  ex.extract (dss, 0, dl, nl, cl);
+  ex.initialize (&nl);
+  ex.extract (dss, 0, dl, cl);
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ();\n"
@@ -660,7 +669,8 @@ TEST(32_DMOS3DeviceExtractorTestCircular)
   dl["tS"] = &o1;
   dl["tD"] = &o2;
   dl["tG"] = &o3;
-  ex.extract (dss, 0, dl, nl, cl);
+  ex.initialize (&nl);
+  ex.extract (dss, 0, dl, cl);
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ();\n"
@@ -721,7 +731,8 @@ TEST(40_DMOS4DeviceExtractorTest)
   dl["tD"] = &o2;
   dl["tG"] = &o3;
   dl["tB"] = &o4;
-  ex.extract (dss, 0, dl, nl, cl);
+  ex.initialize (&nl);
+  ex.extract (dss, 0, dl, cl);
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ();\n"
@@ -783,7 +794,8 @@ TEST(41_DMOS4DeviceExtractorTestNotRectangularGate)
   dl["tD"] = &o2;
   dl["tG"] = &o3;
   dl["tB"] = &o4;
-  ex.extract (dss, 0, dl, nl, cl);
+  ex.initialize (&nl);
+  ex.extract (dss, 0, dl, cl);
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ();\n"
@@ -845,7 +857,8 @@ TEST(42_DMOS4DeviceExtractorTestCircular)
   dl["tD"] = &o2;
   dl["tG"] = &o3;
   dl["tB"] = &o4;
-  ex.extract (dss, 0, dl, nl, cl);
+  ex.initialize (&nl);
+  ex.extract (dss, 0, dl, cl);
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ();\n"
@@ -903,7 +916,8 @@ TEST(50_BJT3DeviceExtractorTest)
   dl["tE"] = &o1;
   dl["tB"] = &o2;
   dl["tC"] = &o3;
-  ex.extract (dss, 0, dl, nl, cl);
+  ex.initialize (&nl);
+  ex.extract (dss, 0, dl, cl);
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ();\n"
@@ -960,7 +974,8 @@ TEST(51_BJT3DeviceExtractorTest)
   dl["tE"] = &o1;
   dl["tB"] = &o2;
   dl["tC"] = &o3;
-  ex.extract (dss, 0, dl, nl, cl);
+  ex.initialize (&nl);
+  ex.extract (dss, 0, dl, cl);
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ();\n"
@@ -1017,7 +1032,8 @@ TEST(52_BJT3DeviceExtractorTestLateral)
   dl["tE"] = &o1;
   dl["tB"] = &o2;
   dl["tC"] = &o3;
-  ex.extract (dss, 0, dl, nl, cl);
+  ex.initialize (&nl);
+  ex.extract (dss, 0, dl, cl);
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ();\n"
@@ -1074,7 +1090,8 @@ TEST(53_BJT3DeviceExtractorTestMultEmitter)
   dl["tE"] = &o1;
   dl["tB"] = &o2;
   dl["tC"] = &o3;
-  ex.extract (dss, 0, dl, nl, cl);
+  ex.initialize (&nl);
+  ex.extract (dss, 0, dl, cl);
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ();\n"
@@ -1136,7 +1153,8 @@ TEST(54_BJT4DeviceExtractorTest)
   dl["tB"] = &o2;
   dl["tC"] = &o3;
   dl["tS"] = &o4;
-  ex.extract (dss, 0, dl, nl, cl);
+  ex.initialize (&nl);
+  ex.extract (dss, 0, dl, cl);
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ();\n"

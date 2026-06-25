@@ -657,6 +657,30 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "This method has been introduced in version 0.27.1.\n"
   ) +
+  gsi::method ("register_device_class", &db::LayoutToNetlist::register_device_class, gsi::arg ("device_class"),
+    "@brief Registers a device class for device extraction\n"
+    "\n"
+    "There are two ways of defining the device class for the devices a specific device extractor "
+    "delivers: locally inside the device extractor, and globally inside the \\LayoutToNetlist object. "
+    "The global approach allows to centrally manage device classes outside the device extractors. "
+    "This enables reusing the same device class for SPICE reading and generation and is the key "
+    "for using SPICE profiles in LVS decks for example.\n"
+    "\n"
+    "When you use this method, the given device class is registered and associated with a device "
+    "extractor in \\extract_devices by name. In that case, the device extractor should not register "
+    "a local device class inside a reimplementation of \\GenericDeviceExtractor#setup.\n"
+    "\n"
+    "A corresponding method to query device classes is \\device_class_by_name.\n"
+    "\n"
+    "This method has been introduced in version 0.31.0.\n"
+  ) +
+  gsi::method ("device_class_by_name", &db::LayoutToNetlist::device_class_by_name, gsi::arg ("name"),
+    "@brief Gets a device class by name\n"
+    "\n"
+    "See \\register_device_class for details about this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.31.0.\n"
+  ) +
   gsi::method ("connect", (void (db::LayoutToNetlist::*) (const db::Region &)) &db::LayoutToNetlist::connect, gsi::arg ("l"),
     "@brief Defines an intra-layer connection for the given layer.\n"
     "The layer as a Region object, representing either an original layer created with \\make_layer and its variants or\n"

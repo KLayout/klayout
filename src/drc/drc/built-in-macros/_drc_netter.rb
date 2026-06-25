@@ -217,7 +217,6 @@ module DRC
     # @name extract_devices
     # @brief Extracts devices based on the given extractor class, name and device layer selection
     # @synopsis extract_devices(extractor, layer_hash)
-    # @synopsis extract_devices(extractor_class, name, layer_hash)
     # Runs the device extraction for given device extractor class. In the first
     # form, the extractor object is given. In the second form, the extractor's
     # class object and the new extractor's name is given.
@@ -1037,6 +1036,23 @@ module DRC
       @l2n.name = "DRC"
       @l2n.generator = @engine._generator
 
+    end
+
+    def _register_device_class(cls)
+      if @devcls_by_name && @devcls_by_name[cls]
+        raise("A device class with name '#{cls.name}' is already registered")
+      end
+      @devcls ||= []
+      @devcls_by_name ||= {}
+      @devcls << cls
+      @devcls_by_name[cls.name] = cls
+    end
+
+    def _devcls_by_name(name)
+      if ! @devcls_by_name || ! @devcls_by_name[name]
+        raise("No device class registered with name #{name}")
+      end
+      @devcls_by_name[name]
     end
 
   private

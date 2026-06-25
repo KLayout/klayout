@@ -49,7 +49,20 @@ class DB_PUBLIC_TEMPLATE device_class_factory
   : public DeviceClassFactory
 {
 public:
-  virtual db::DeviceClass *create_class () const { return new C (); }
+  device_class_factory () : m_strict (-1) { }
+  device_class_factory (bool strict) : m_strict (strict ? 1 : 0) { }
+
+  virtual db::DeviceClass *create_class () const
+  {
+    C *c = new C ();
+    if (m_strict >= 0) {
+      c->set_strict (m_strict != 0);
+    }
+    return c;
+  }
+
+private:
+  int m_strict;
 };
 
 /**
@@ -71,9 +84,9 @@ public:
   }
 
   /**
-   *  @brief Creates the device class object
+   *  @brief Creates the default device class object
    */
-  db::DeviceClass *make_class ()
+  db::DeviceClass *default_device_class ()
   {
     return mp_factory->create_class ();
   }
@@ -108,7 +121,7 @@ public:
   virtual db::Connectivity get_connectivity (const db::Layout &layout, const std::vector<unsigned int> &layers) const;
   virtual void extract_devices (const std::vector<db::Region> &layer_geometry);
 
-  bool is_strict () const
+  virtual bool is_strict () const
   {
     return m_strict;
   }

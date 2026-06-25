@@ -259,12 +259,14 @@ TEST(1_DeviceAndNetExtraction)
   dl["SD"] = &rpsd;
   dl["G"] = &rpgate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  pmos_ex.extract (dss, 0, dl, nl, cl);
+  pmos_ex.initialize (&nl);
+  pmos_ex.extract (dss, 0, dl, cl);
 
   dl["SD"] = &rnsd;
   dl["G"] = &rngate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  nmos_ex.extract (dss, 0, dl, nl, cl);
+  nmos_ex.initialize (&nl);
+  nmos_ex.extract (dss, 0, dl, cl);
 
   //  perform the net extraction
 
@@ -495,12 +497,14 @@ TEST(1a_DeviceAndNetExtractionWithTextsAsLabels)
   dl["SD"] = &rpsd;
   dl["G"] = &rpgate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  pmos_ex.extract (dss, 0, dl, nl, cl);
+  pmos_ex.initialize (&nl);
+  pmos_ex.extract (dss, 0, dl, cl);
 
   dl["SD"] = &rnsd;
   dl["G"] = &rngate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  nmos_ex.extract (dss, 0, dl, nl, cl);
+  nmos_ex.initialize (&nl);
+  nmos_ex.extract (dss, 0, dl, cl);
 
   //  perform the net extraction
 
@@ -693,12 +697,14 @@ TEST(2_DeviceAndNetExtractionFlat)
   dl["SD"] = &rpsd;
   dl["G"] = &rpgate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  pmos_ex.extract (dss, 0, dl, nl, cl);
+  pmos_ex.initialize (&nl);
+  pmos_ex.extract (dss, 0, dl, cl);
 
   dl["SD"] = &rnsd;
   dl["G"] = &rngate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  nmos_ex.extract (dss, 0, dl, nl, cl);
+  nmos_ex.initialize (&nl);
+  nmos_ex.extract (dss, 0, dl, cl);
 
   //  perform the net extraction
 
@@ -925,12 +931,14 @@ TEST(3_DeviceAndNetExtractionWithImplicitConnections)
   dl["SD"] = &rpsd;
   dl["G"] = &rpgate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  pmos_ex.extract (dss, 0, dl, nl, cl);
+  pmos_ex.initialize (&nl);
+  pmos_ex.extract (dss, 0, dl, cl);
 
   dl["SD"] = &rnsd;
   dl["G"] = &rngate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  nmos_ex.extract (dss, 0, dl, nl, cl);
+  nmos_ex.initialize (&nl);
+  nmos_ex.extract (dss, 0, dl, cl);
 
   //  perform the net extraction
 
@@ -1196,7 +1204,8 @@ TEST(4_ResAndCapExtraction)
   dl["tG"] = &rpoly;
   dl["tS"] = &rpsd;
   dl["tD"] = &rpsd;
-  pmos_ex.extract (dss, 0, dl, nl, cl);
+  pmos_ex.initialize (&nl);
+  pmos_ex.extract (dss, 0, dl, cl);
 
   dl.clear ();
   dl["SD"] = &rnsd;
@@ -1205,7 +1214,8 @@ TEST(4_ResAndCapExtraction)
   dl["tG"] = &rpoly;
   dl["tS"] = &rnsd;
   dl["tD"] = &rnsd;
-  nmos_ex.extract (dss, 0, dl, nl, cl);
+  nmos_ex.initialize (&nl);
+  nmos_ex.extract (dss, 0, dl, cl);
 
   dl.clear ();
   dl["R"] = &rpoly_res;
@@ -1213,7 +1223,8 @@ TEST(4_ResAndCapExtraction)
   //  terminal patches
   dl["tA"] = &rpoly;
   dl["tB"] = &rpoly;
-  res_ex.extract (dss, 0, dl, nl, cl);
+  res_ex.initialize (&nl);
+  res_ex.extract (dss, 0, dl, cl);
 
   dl.clear ();
   dl["P1"] = &rcap1;
@@ -1221,7 +1232,8 @@ TEST(4_ResAndCapExtraction)
   //  terminal patches
   dl["tA"] = &rmetal1;
   dl["tB"] = &rmetal2;
-  cap_ex.extract (dss, 0, dl, nl, cl);
+  cap_ex.initialize (&nl);
+  cap_ex.extract (dss, 0, dl, cl);
 
 
   //  perform the net extraction
@@ -1446,7 +1458,8 @@ TEST(5_ResAndCapWithBulkExtraction)
   dl["tG"] = &rpoly;
   dl["tS"] = &rpsd;
   dl["tD"] = &rpsd;
-  pmos_ex.extract (dss, 0, dl, nl, cl);
+  pmos_ex.initialize (&nl);
+  pmos_ex.extract (dss, 0, dl, cl);
 
   dl.clear ();
   dl["SD"] = &rnsd;
@@ -1456,7 +1469,8 @@ TEST(5_ResAndCapWithBulkExtraction)
   dl["tG"] = &rpoly;
   dl["tS"] = &rnsd;
   dl["tD"] = &rnsd;
-  nmos_ex.extract (dss, 0, dl, nl, cl);
+  nmos_ex.initialize (&nl);
+  nmos_ex.extract (dss, 0, dl, cl);
 
   dl.clear ();
   dl["R"] = &rpoly_res_sub;
@@ -1465,7 +1479,8 @@ TEST(5_ResAndCapWithBulkExtraction)
   //  terminal patches
   dl["tA"] = &rpoly;
   dl["tB"] = &rpoly;
-  res_substrate_ex.extract (dss, 0, dl, nl, cl);
+  res_substrate_ex.initialize (&nl);
+  res_substrate_ex.extract (dss, 0, dl, cl);
 
   dl.clear ();
   dl["R"] = &rpoly_res_nw;
@@ -1474,7 +1489,8 @@ TEST(5_ResAndCapWithBulkExtraction)
   //  terminal patches
   dl["tA"] = &rpoly;
   dl["tB"] = &rpoly;
-  res_nwell_ex.extract (dss, 0, dl, nl, cl);
+  res_nwell_ex.initialize (&nl);
+  res_nwell_ex.extract (dss, 0, dl, cl);
 
   dl.clear ();
   dl["P1"] = &rcap1_sub;
@@ -1483,7 +1499,8 @@ TEST(5_ResAndCapWithBulkExtraction)
   //  terminal patches
   dl["tA"] = &rmetal1;
   dl["tB"] = &rmetal2;
-  cap_substrate_ex.extract (dss, 0, dl, nl, cl);
+  cap_substrate_ex.initialize (&nl);
+  cap_substrate_ex.extract (dss, 0, dl, cl);
 
   dl.clear ();
   dl["P1"] = &rcap1_nw;
@@ -1492,7 +1509,8 @@ TEST(5_ResAndCapWithBulkExtraction)
   //  terminal patches
   dl["tA"] = &rmetal1;
   dl["tB"] = &rmetal2;
-  cap_nwell_ex.extract (dss, 0, dl, nl, cl);
+  cap_nwell_ex.initialize (&nl);
+  cap_nwell_ex.extract (dss, 0, dl, cl);
 
 
   //  perform the net extraction
@@ -1710,7 +1728,8 @@ TEST(6_BJT3TransistorExtraction)
   dl["tG"] = &rpoly;
   dl["tS"] = &rpsd;
   dl["tD"] = &rpsd;
-  pmos_ex.extract (dss, 0, dl, nl, cl);
+  pmos_ex.initialize (&nl);
+  pmos_ex.extract (dss, 0, dl, cl);
 
   dl.clear ();
   dl["SD"] = &rnsd;
@@ -1720,7 +1739,8 @@ TEST(6_BJT3TransistorExtraction)
   dl["tG"] = &rpoly;
   dl["tS"] = &rnsd;
   dl["tD"] = &rnsd;
-  nmos_ex.extract (dss, 0, dl, nl, cl);
+  nmos_ex.initialize (&nl);
+  nmos_ex.extract (dss, 0, dl, cl);
 
   dl.clear ();
   dl["E"] = &remitter;
@@ -1728,8 +1748,8 @@ TEST(6_BJT3TransistorExtraction)
   dl["C"] = &rbulk;
   //  terminal patches
   dl["tB"] = &rnwell;
-  bjt_ex.extract (dss, 0, dl, nl, cl);
-
+  bjt_ex.initialize (&nl);
+  bjt_ex.extract (dss, 0, dl, cl);
 
   //  perform the net extraction
 
@@ -1911,7 +1931,8 @@ TEST(7_DiodeExtraction)
   dl["N"] = &rn;
   dl["P"] = &rpplus;
   dl["tC"] = &rnwell;
-  diode_ex.extract (dss, 0, dl, nl, cl);
+  diode_ex.initialize (&nl);
+  diode_ex.extract (dss, 0, dl, cl);
 
 
   //  perform the net extraction
@@ -2045,7 +2066,8 @@ TEST(8_DiodeExtractionScaled)
   dl["N"] = &rn;
   dl["P"] = &rpplus;
   dl["tC"] = &rnwell;
-  diode_ex.extract (dss, 0, dl, nl, cl, 2.0);
+  diode_ex.initialize (&nl);
+  diode_ex.extract (dss, 0, dl, cl, 2.0);
 
   //  perform the net extraction
 
@@ -2208,13 +2230,15 @@ TEST(9_StrictDeviceExtraction)
   dl["D"] = &rpd;
   dl["G"] = &rpgate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  pmos_ex.extract (dss, 0, dl, nl, cl);
+  pmos_ex.initialize (&nl);
+  pmos_ex.extract (dss, 0, dl, cl);
 
   dl["S"] = &rns;
   dl["D"] = &rnd;
   dl["G"] = &rngate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  nmos_ex.extract (dss, 0, dl, nl, cl);
+  nmos_ex.initialize (&nl);
+  nmos_ex.extract (dss, 0, dl, cl);
 
   //  perform the net extraction
 
@@ -2443,12 +2467,14 @@ TEST(10_DeviceExtractionWithBreakoutCells)
   dl["SD"] = &rpsd;
   dl["G"] = &rpgate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  pmos_ex.extract (dss, 0, dl, nl, cl);
+  pmos_ex.initialize (&nl);
+  pmos_ex.extract (dss, 0, dl, cl);
 
   dl["SD"] = &rnsd;
   dl["G"] = &rngate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  nmos_ex.extract (dss, 0, dl, nl, cl);
+  nmos_ex.initialize (&nl);
+  nmos_ex.extract (dss, 0, dl, cl);
 
   dss.pop_state ();
 
@@ -2602,12 +2628,14 @@ TEST(11_DeviceExtractionWithSameClass)
   db::NetlistDeviceExtractor::input_layers dl;
   dl["R"] = &rpoly_res;
   dl["C"] = &rpoly_cap;
-  polyres_ex.extract (dss, 0, dl, nl, cl);
+  polyres_ex.initialize (&nl);
+  polyres_ex.extract (dss, 0, dl, cl);
 
   dl.clear ();
   dl["R"] = &rdiff_res;
   dl["C"] = &rdiff_cap;
-  diffres_ex.extract (dss, 0, dl, nl, cl);
+  diffres_ex.initialize (&nl);
+  diffres_ex.extract (dss, 0, dl, cl);
 
   //  perform the net extraction
 
@@ -2725,12 +2753,14 @@ TEST(12_FloatingSubcircuitExtraction)
   dl["SD"] = &rpsd;
   dl["G"] = &rpgate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  pmos_ex.extract (dss, 0, dl, nl, cl);
+  pmos_ex.initialize (&nl);
+  pmos_ex.extract (dss, 0, dl, cl);
 
   dl["SD"] = &rnsd;
   dl["G"] = &rngate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  nmos_ex.extract (dss, 0, dl, nl, cl);
+  nmos_ex.initialize (&nl);
+  nmos_ex.extract (dss, 0, dl, cl);
 
   //  perform the net extraction
 
@@ -2878,12 +2908,14 @@ TEST(13_RemoveDummyPins)
   dl["SD"] = &rpsd;
   dl["G"] = &rpgate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  pmos_ex.extract (dss, 0, dl, nl, cl);
+  pmos_ex.initialize (&nl);
+  pmos_ex.extract (dss, 0, dl, cl);
 
   dl["SD"] = &rnsd;
   dl["G"] = &rngate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  nmos_ex.extract (dss, 0, dl, nl, cl);
+  nmos_ex.initialize (&nl);
+  nmos_ex.extract (dss, 0, dl, cl);
 
   //  perform the net extraction
 
@@ -3027,13 +3059,15 @@ TEST(14_JoinNets)
   dl["G"] = &rpgate;
   dl["W"] = &rnwell;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  pmos_ex.extract (dss, 0, dl, nl, cl);
+  pmos_ex.initialize (&nl);
+  pmos_ex.extract (dss, 0, dl, cl);
 
   dl["SD"] = &rnsd;
   dl["G"] = &rngate;
   dl["W"] = &bulk;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  nmos_ex.extract (dss, 0, dl, nl, cl);
+  nmos_ex.initialize (&nl);
+  nmos_ex.extract (dss, 0, dl, cl);
 
   //  perform the net extraction
 
@@ -3315,13 +3349,15 @@ TEST(15_SoftConnections)
   dl["G"] = &rpgate;
   dl["W"] = &rnwell;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  pmos_ex.extract (dss, 0, dl, nl, cl);
+  pmos_ex.initialize (&nl);
+  pmos_ex.extract (dss, 0, dl, cl);
 
   dl["SD"] = &rnsd;
   dl["G"] = &rngate;
   dl["W"] = &bulk;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  nmos_ex.extract (dss, 0, dl, nl, cl);
+  nmos_ex.initialize (&nl);
+  nmos_ex.extract (dss, 0, dl, cl);
 
   //  perform the net extraction
 
@@ -3578,7 +3614,8 @@ TEST(100_issue954)
   dl["G"] = &rpgate;
   dl["W"] = &bulk;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  pmos_ex.extract (dss, 0, dl, nl, cl);
+  pmos_ex.initialize (&nl);
+  pmos_ex.extract (dss, 0, dl, cl);
 
   //  perform the net extraction
 

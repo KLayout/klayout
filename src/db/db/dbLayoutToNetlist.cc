@@ -262,6 +262,21 @@ void LayoutToNetlist::ensure_netlist ()
   }
 }
 
+void LayoutToNetlist::register_device_class (const DeviceClass &device_class)
+{
+  m_device_classes.push_back (device_class.clone ());
+}
+
+const DeviceClass *LayoutToNetlist::device_class_by_name (const std::string &name) const
+{
+  for (auto d = m_device_classes.begin (); d != m_device_classes.end (); ++d) {
+    if (d->name () == name) {
+      return d.operator-> ();
+    }
+  }
+  return 0;
+}
+
 void LayoutToNetlist::extract_devices (db::NetlistDeviceExtractor &extractor, const std::map<std::string, db::ShapeCollection *> &layers)
 {
   if (m_netlist_extracted) {
@@ -271,7 +286,34 @@ void LayoutToNetlist::extract_devices (db::NetlistDeviceExtractor &extractor, co
   ensure_netlist ();
 
   extractor.clear_log_entries ();
-  extractor.extract (dss (), m_layout_index, layers, *mp_netlist, m_net_clusters, m_device_scaling);
+
+  extractor.initialize (mp_netlist.get ());
+
+  //  Try finding the device class in the registered devices in the following order:
+  //  1.) Registered by the extractor during setup() (called by initialize())
+  //  2.) A corresponding device class already present in the netlist (done during initialize())
+  //  3.) Registered in LayoutToNetlist through register_device_class()
+  //  4.) The default class
+
+  if (! extractor.device_class ()) {
+    const db::DeviceClass *dc = device_class_by_name (extractor.name ());
+    if (dc) {
+      extractor.register_device_class (dc->clone ());
+    }
+  }
+
+  if (! extractor.device_class ()) {
+    db::DeviceClass *ddc = extractor.default_device_class ();
+    if (ddc) {
+      extractor.register_device_class (ddc);
+    }
+  }
+
+  if (! extractor.device_class ()) {
+    throw tl::Exception (tl::to_string (tr ("No device class registered for device extractor '%s' - cannot extract devices.")), extractor.name ());
+  }
+
+  extractor.extract (dss (), m_layout_index, layers, m_net_clusters, m_device_scaling);
 
   //  transfer errors to log entries
   m_log_entries.insert (m_log_entries.end (), extractor.begin_log_entries (), extractor.end_log_entries ());

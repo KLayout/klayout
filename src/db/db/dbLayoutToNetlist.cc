@@ -302,17 +302,6 @@ void LayoutToNetlist::extract_devices (db::NetlistDeviceExtractor &extractor, co
     }
   }
 
-  if (! extractor.device_class ()) {
-    db::DeviceClass *ddc = extractor.default_device_class ();
-    if (ddc) {
-      extractor.register_device_class (ddc);
-    }
-  }
-
-  if (! extractor.device_class ()) {
-    throw tl::Exception (tl::to_string (tr ("No device class registered for device extractor '%s' - cannot extract devices.")), extractor.name ());
-  }
-
   extractor.extract (dss (), m_layout_index, layers, m_net_clusters, m_device_scaling);
 
   //  transfer errors to log entries

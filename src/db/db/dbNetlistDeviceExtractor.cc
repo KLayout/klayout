@@ -94,6 +94,15 @@ static void insert_into_region (const db::NetShape &s, const db::ICplxTrans &tr,
 
 void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layout_index, const NetlistDeviceExtractor::input_layers &layer_map, hier_clusters_type &clusters, double device_scaling)
 {
+  //  If no device class is registered, use the default device class
+  if (! device_class ()) {
+    db::DeviceClass *ddc = default_device_class ();
+    if (! ddc) {
+      throw tl::Exception (tl::to_string (tr ("No device class registered for device extractor '%s' - cannot extract devices.")), name ());
+    }
+    register_device_class (ddc);
+  }
+
   std::vector<unsigned int> layers;
   layers.reserve (m_layer_definitions.size ());
 

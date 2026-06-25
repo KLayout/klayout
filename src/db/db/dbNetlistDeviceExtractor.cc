@@ -164,12 +164,6 @@ void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layo
   extract_without_initialize (dss.layout (layout_index), dss.initial_cell (layout_index), clusters, layers, device_scaling, dss.breakout_cells (layout_index));
 }
 
-// @@@ needed?
-void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers, hier_clusters_type &clusters, double device_scaling, const std::set<db::cell_index_type> *breakout_cells)
-{
-  extract_without_initialize (layout, cell, clusters, layers, device_scaling, breakout_cells);
-}
-
 namespace {
 
 struct ExtractorCacheValueType {

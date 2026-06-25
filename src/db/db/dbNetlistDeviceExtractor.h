@@ -132,10 +132,10 @@ public:
   void initialize (Netlist *netlist);
 
   /**
-   *  @brief Performs the extraction
+   *  @brief Extracts the devices from a list of regions
    *
-   *  layout and cell specify the layout and the top cell from which to perform the
-   *  extraction.
+   *  This method accepts named regions for input. These regions need to be of deep region type and
+   *  originate from the same layout than the DeepShapeStore.
    *
    *  The netlist will be filled with circuits (unless not present yet) to represent the
    *  cells from the layout.
@@ -146,15 +146,6 @@ public:
    *  the nets later to associate nets with device terminals.
    *
    *  The definition of the input layers is device class specific.
-   */
-  void extract (Layout &layout, Cell &cell, const std::vector<unsigned int> &layers, hier_clusters_type &clusters, double device_scaling = 1.0, const std::set<cell_index_type> *breakout_cells = 0);
-
-  /**
-   *  @brief Extracts the devices from a list of regions
-   *
-   *  This method behaves identical to the other "extract" method, but accepts
-   *  named regions for input. These regions need to be of deep region type and
-   *  originate from the same layout than the DeepShapeStore.
    */
   void extract (DeepShapeStore &dss, unsigned int layout_index, const input_layers &layers, hier_clusters_type &clusters, double device_scaling = 1.0);
 

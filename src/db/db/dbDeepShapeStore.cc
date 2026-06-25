@@ -1388,7 +1388,7 @@ namespace
     : public ShapesTransformer
   {
   public:
-    DeepShapeStoreToShapeTransformer (const DeepShapeStore &dss, const db::Layout &layout)
+    DeepShapeStoreToShapeTransformer (const DeepShapeStore &dss)
     {
       //  gets the text annotation property ID -
       //  this is how the texts are passed for annotating the net names
@@ -1473,7 +1473,7 @@ DeepShapeStore::insert (const DeepLayer &deep_layer, db::Layout *into_layout, db
   source_cells.push_back (*source_layout.begin_top_down());
 
   //  prepare a transformer to convert text-annotated markers back to texts (without transformation however)
-  DeepShapeStoreToShapeTransformer dsst (*this, source_layout);
+  DeepShapeStoreToShapeTransformer dsst (*this);
 
   //  actually copy the shapes
   db::copy_shapes (*into_layout, source_layout, trans, source_cells, cm.table (), lm, &dsst);

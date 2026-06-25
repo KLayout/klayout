@@ -948,6 +948,9 @@ CODE
         @engine.info("Reading netlist: #{netlist_file} ..")
 
         netlist = RBA::Netlist::new
+        @devcls.each do |dc|
+          netlist.add(dc.dup)
+        end
         netlist.read(netlist_file, reader)
 
         @schematic = netlist 

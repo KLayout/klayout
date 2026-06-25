@@ -233,7 +233,11 @@ module LVS
 
     # %LVS%
     # @name register_device_class
-    # Registers a device class for extraction and netlist input and output.
+    # @brief Registers a device class for device extraction and netlisting
+    # @synopsis register_device_class(dc)
+    # Registers the device class for extraction and netlist input and output.
+    # "dc" is an object of type RBA::DeviceClass.
+    #
     # Registering a device class is optional. However, using registered
     # device classed simplify SPICE netlist reading and writing, as device classes
     # can be configured with SPICE profiles to customize SPICE input and output.

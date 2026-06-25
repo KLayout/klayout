@@ -953,6 +953,42 @@ module DRC
     end
 
     # %DRC%
+    # @name register_device_class
+    # @brief Registers a device class for device extraction and netlisting
+    # @synopsis register_device_class(dc)
+    # Registers the given device class object ("dc" is of type RBA::DeviceClass)
+    # for use inside device extraction and for reading and writing netlists.
+    # Registering a device class allows utilizing SPICE profiles for reading and
+    # writing SPICE files. Device classes need to be registered before "schematic"
+    # or "extract_devices" is used.
+    #
+    # Registering device classes simplifies implementation of custom SPICE
+    # representations for devices. Usually it is not required then to provide
+    # SPICE reader or write delegates, as the SPICE format can be configured
+    # inside the device class through SPICE profiles.
+    #
+    # When creating custom device extractors, it is no longer required to 
+    # register a device class inside the device extractor. Instead, pre-registered device
+    # classes are identified with a device extractor class by name.
+
+    def register_device_class(cls)
+
+      if @devcls_by_name && @devcls_by_name[cls]
+        raise("A device class with name '#{cls.name}' is already registered")
+      end
+
+      @devcls ||= []
+      @devcls_by_name ||= {}
+      @devcls << cls
+      @devcls_by_name[cls.name] = cls
+
+      if @l2n
+        @l2n.register_device_class(cls)
+      end
+
+    end
+
+    # %DRC%
     # @name netlist
     # @brief Gets the extracted netlist or triggers extraction if not done yet
     # @synopsis netlist
@@ -1036,23 +1072,10 @@ module DRC
       @l2n.name = "DRC"
       @l2n.generator = @engine._generator
 
-    end
-
-    def _register_device_class(cls)
-      if @devcls_by_name && @devcls_by_name[cls]
-        raise("A device class with name '#{cls.name}' is already registered")
+      @devcls.each do |cls|
+        @l2n.register_device_class(cls)
       end
-      @devcls ||= []
-      @devcls_by_name ||= {}
-      @devcls << cls
-      @devcls_by_name[cls.name] = cls
-    end
 
-    def _devcls_by_name(name)
-      if ! @devcls_by_name || ! @devcls_by_name[name]
-        raise("No device class registered with name #{name}")
-      end
-      @devcls_by_name[name]
     end
 
   private

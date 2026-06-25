@@ -561,6 +561,11 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
   gsi::method ("name=", &db::DeviceClass::set_name, gsi::arg ("name"),
     "@brief Sets the name of the device class."
   ) +
+  gsi::method ("dup", &db::DeviceClass::clone,
+    "@brief Creates a deep copy of the device class object.\n"
+    "\n"
+    "This method has been introduced in version 0.31.0."
+  ) +
   gsi::method ("has_spice_profile?", &db::DeviceClass::has_spice_profile, gsi::arg ("name"),
     "@brief Gets a value indicating whether a device class supports a specific SPICE profile.\n"
     "See \\set_spice_profile for a description of the SPICE profile concept.\n"

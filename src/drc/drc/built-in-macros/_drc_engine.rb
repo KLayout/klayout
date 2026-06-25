@@ -728,6 +728,7 @@ module DRC
         writer
 
       end
+
     end
 
     def _make_factory(cls)
@@ -2553,6 +2554,11 @@ CODE
 
     # %DRC%
     # @name register_device_class
+    # @brief Registers a device class for device extraction and netlisting
+    # @synopsis register_device_class(dc)
+    # Registers the device class for extraction and netlist input and output.
+    # "dc" is an object of type RBA::DeviceClass.
+    #
     # Registers a device class for extraction and netlist output.
     # Registering a device class is optional. However, using registered
     # device classed simplify SPICE netlist writing, as device classes

@@ -126,6 +126,14 @@ static std::vector<char> pixel_buffer_to_png (const tl::PixelBuffer *pb)
 #endif
 }
 
+//  Returns the raw ARGB32 pixel data as a byte vector (no encoding overhead)
+static std::vector<char> pixel_buffer_to_bytes (const tl::PixelBuffer *pb)
+{
+  const char *p = (const char *) pb->data ();
+  size_t n = (size_t) pb->width () * (size_t) pb->height () * 4;
+  return std::vector<char> (p, p + n);
+}
+
 
 Class<tl::PixelBuffer> decl_PixelBuffer ("lay", "PixelBuffer",
   gsi::constructor ("new", &create_pixel_buffer, gsi::arg ("width"), gsi::arg ("height"),
@@ -187,6 +195,14 @@ Class<tl::PixelBuffer> decl_PixelBuffer ("lay", "PixelBuffer",
     "@brief Converts the pixel buffer to a PNG byte stream"
     "\n"
     "This method may not be available if PNG support is not compiled into KLayout."
+  ) +
+  gsi::method_ext ("to_bytes", &pixel_buffer_to_bytes,
+    "@brief Converts the pixel buffer to a raw byte stream\n"
+    "\n"
+    "Returns the raw ARGB32 pixel data with 4 bytes per pixel in row-major order, "
+    "top to bottom. Unlike \\to_png_data this method has zero encoding overhead.\n"
+    "\n"
+    "This method has been added in version 0.30.9."
   ) +
   gsi::method ("patch", &tl::PixelBuffer::patch, gsi::arg ("other"),
     "@brief Patches another pixel buffer into this one\n"

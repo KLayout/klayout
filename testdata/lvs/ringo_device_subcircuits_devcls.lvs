@@ -8,21 +8,18 @@ target_netlist($lvs_test_target_cir, write_spice, "Extracted by KLayout")
 # Register device class with a "X" element based SPICE profile
 
 # schematic only
-xpmos = RBA::DeviceClassMOS4Transistor::new
-xpmos.name = "XPMOS"
+xpmos = mos4_class("XPMOS")
 sp = xpmos.spice_profile
 sp.element = "X"
 xpmos.set_spice_profile(sp)
 
 # layout only
-pmos = RBA::DeviceClassMOS4Transistor::new
-pmos.name = "PMOS"
+pmos = mos4_class("PMOS")
 sp = pmos.spice_profile
 sp.element = "X"
 pmos.set_spice_profile(sp)
 
-nmos = RBA::DeviceClassMOS4Transistor::new
-nmos.name = "NMOS"
+nmos = mos4_class("NMOS")
 sp = nmos.spice_profile
 sp.element = "X"
 nmos.set_spice_profile(sp)
@@ -70,12 +67,12 @@ ptie                  = active_outside_nwell & pplus
 # Device extraction
 
 # PMOS transistor device extraction
-extract_devices(mos4("PMOS"), { "SD" => psd, "G" => pgate, "W" => nwell, 
-                                "tS" => psd, "tD" => psd, "tG" => poly, "tW" => nwell })
+extract_devices(mos4(pmos), { "SD" => psd, "G" => pgate, "W" => nwell, 
+                              "tS" => psd, "tD" => psd, "tG" => poly, "tW" => nwell })
 
 # NMOS transistor device extraction
-extract_devices(mos4("NMOS"), { "SD" => nsd, "G" => ngate, "W" => bulk, 
-                                "tS" => nsd, "tD" => nsd, "tG" => poly, "tW" => bulk })
+extract_devices(mos4(nmos), { "SD" => nsd, "G" => ngate, "W" => bulk, 
+                              "tS" => nsd, "tD" => nsd, "tG" => poly, "tW" => bulk })
 
 # Define connectivity for netlist extraction
 

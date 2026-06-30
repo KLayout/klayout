@@ -204,6 +204,12 @@ static void test_initialize (db::NetlistDeviceExtractor *ex, db::Netlist *nl)
   ex->initialize (nl);
 }
 
+//  for test only
+static db::DeviceClass *default_device_class (db::NetlistDeviceExtractor *ex)
+{
+  return ex->default_device_class ();
+}
+
 Class<db::NetlistDeviceExtractor> decl_dbNetlistDeviceExtractor ("db", "DeviceExtractorBase",
   gsi::method ("name", &db::NetlistDeviceExtractor::name,
     "@brief Gets the name of the device extractor and the device class."
@@ -219,6 +225,7 @@ Class<db::NetlistDeviceExtractor> decl_dbNetlistDeviceExtractor ("db", "DeviceEx
     "This method has been added in version 0.27.3.\n"
   ) +
   gsi::method_ext ("test_initialize", &test_initialize, gsi::arg ("netlist"), "@hide") +   //  for test only
+  gsi::factory_ext ("default_device_class", &default_device_class, "@hide") +   //  for test only
   gsi::iterator ("each_layer_definition", &db::NetlistDeviceExtractor::begin_layer_definitions, &db::NetlistDeviceExtractor::end_layer_definitions,
     "@brief Iterates over all layer definitions."
   ) +
@@ -592,7 +599,15 @@ static db::NetlistDeviceExtractorMOS4Transistor *make_mos4_extractor (const std:
 Class<db::NetlistDeviceExtractorMOS4Transistor> decl_NetlistDeviceExtractorMOS4Transistor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorMOS4Transistor",
   gsi::constructor ("new", &make_mos4_extractor, gsi::arg ("name"), gsi::arg ("strict", false), gsi::arg ("factory", (DeviceClassFactoryImpl *)0, "none"),
     "@brief Creates a new device extractor with the given name\n"
+    "If \\strict is true, the MOS device extraction will happen in strict mode. That is, source and drain "
+    "are not interchangeable.\n"
+    "\n"
     "For the 'factory' parameter see \\DeviceClassFactory. It has been added in version 0.27.3.\n"
+  ) +
+  gsi::method ("strict?", &db::NetlistDeviceExtractorMOS4Transistor::is_strict,
+    "@brief Returns a value indicating whether extraction happens in strict mode.\n"
+    "\n"
+    "This attribute has been added in version 0.31.0."
   ),
   "@brief A device extractor for a four-terminal MOS transistor\n"
   "\n"

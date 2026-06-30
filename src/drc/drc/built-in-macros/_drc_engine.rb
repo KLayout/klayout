@@ -476,6 +476,9 @@ module DRC
       DRCTransformationVariantHint::new(expression, nil)
     end
 
+    def spice_profile(name)
+      DRCSpiceProfile::new(name)
+    end
     
     # %DRC%
     # @brief Specifies "same properties" for operations supporting user properties constraints
@@ -801,7 +804,8 @@ module DRC
     # about this device class.
 
     def mos3_class(name)
-      cls = RBA::DeviceClassMOS3Transistor::new(false)
+      cls = RBA::DeviceClassMOS3Transistor::new
+      cls.strict = false
       cls.name = name
       cls
     end
@@ -841,7 +845,8 @@ module DRC
     # about this device class.
 
     def mos4_class(name)
-      cls = RBA::DeviceClassMOS4Transistor::new(false)
+      cls = RBA::DeviceClassMOS4Transistor::new
+      cls.strict = false
       cls.name = name
       cls
     end
@@ -883,7 +888,8 @@ module DRC
     # about this device class.
 
     def dmos3_class(name)
-      cls = RBA::DeviceClassMOS3Transistor::new(true)
+      cls = RBA::DeviceClassMOS3Transistor::new
+      cls.strict = true
       cls.name = name
       cls
     end
@@ -925,7 +931,8 @@ module DRC
     # about this device class.
 
     def dmos4_class(name)
-      cls = RBA::DeviceClassMOS4Transistor::new(true)
+      cls = RBA::DeviceClassMOS4Transistor::new
+      cls.strict = true
       cls.name = name
       cls
     end
@@ -1053,10 +1060,10 @@ module DRC
     # %DRC%
     # @brief Supplies the resistor extractor class.
     # @name resistor
-    # @synopsis resistor(name, area_cap)
-    # @synopsis resistor(device_class, area_cap)
+    # @synopsis resistor(name, rho)
+    # @synopsis resistor(device_class, rho)
     # Use this class with \extract_devices to specify extraction of a resistor.
-    # The sheet_rho value is the sheet resistance in ohms/square.
+    # "rho" is the sheet resistance in ohms/square.
     # If used with a name, the extractor will produce devices with device
     # class RBA::DeviceClassResistor. If used with a specific device
     # class object, the extractor will produce devices with this class.
@@ -1066,12 +1073,12 @@ module DRC
     # See RBA::DeviceExtractorResistor for more details
     # about this extractor.
 
-    def resistor(name_or_class, area_cap, cls = nil)
+    def resistor(name_or_class, rho, cls = nil)
       self._context("resistor") do
         if name_or_class.is_a?(RBA::DeviceClass)
-          RBA::DeviceExtractorResistor::new(name_or_class.name, area_cap, _make_dup_factory(name_or_class))
+          RBA::DeviceExtractorResistor::new(name_or_class.name, rho, _make_dup_factory(name_or_class))
         else
-          RBA::DeviceExtractorResistor::new(name_or_class.to_s, area_cap, _make_factory(cls))
+          RBA::DeviceExtractorResistor::new(name_or_class.to_s, rho, _make_factory(cls))
         end
       end
     end
@@ -1133,11 +1140,11 @@ module DRC
     # %DRC%
     # @brief Supplies the resistor extractor class that includes a bulk terminal
     # @name resistor_with_bulk
-    # @synopsis resistor_with_bulk(name, area_cap)
-    # @synopsis resistor_with_bulk(device_class, area_cap)
+    # @synopsis resistor_with_bulk(name, rho)
+    # @synopsis resistor_with_bulk(device_class, rho)
     # Use this class with \extract_devices to specify extraction of a resistor 
     # with a bulk terminal.
-    # The sheet_rho value is the sheet resistance in ohms/square.
+    # "rho" is the sheet resistance in ohms/square.
     # If used with a name, the extractor will produce devices with device
     # class RBA::DeviceClassResistorWithBulk. If used with a specific device
     # class object, the extractor will produce devices with this class.
@@ -1147,12 +1154,12 @@ module DRC
     # See RBA::DeviceExtractorResistorWithBulk for more details
     # about this extractor.
 
-    def resistor_with_bulk(name_or_class, area_cap, cls = nil)
+    def resistor_with_bulk(name_or_class, rho, cls = nil)
       self._context("resistor_with_bulk") do
         if name_or_class.is_a?(RBA::DeviceClass)
-          RBA::DeviceExtractorResistorWithBulk::new(name_or_class.name, area_cap, _make_dup_factory(name_or_class))
+          RBA::DeviceExtractorResistorWithBulk::new(name_or_class.name, rho, _make_dup_factory(name_or_class))
         else
-          RBA::DeviceExtractorResistorWithBulk::new(name_or_class.to_s, area_cap, _make_factory(cls))
+          RBA::DeviceExtractorResistorWithBulk::new(name_or_class.to_s, rho, _make_factory(cls))
         end
       end
     end

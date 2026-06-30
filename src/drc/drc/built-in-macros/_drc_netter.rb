@@ -1072,8 +1072,10 @@ module DRC
       @l2n.name = "DRC"
       @l2n.generator = @engine._generator
 
-      @devcls.each do |cls|
-        @l2n.register_device_class(cls)
+      if @devcls
+        @devcls.each do |cls|
+          @l2n.register_device_class(cls)
+        end
       end
 
     end

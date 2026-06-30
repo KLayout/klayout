@@ -1,0 +1,161 @@
+
+def assert_equal(a, b)
+  if a != b
+    raise RuntimeError::new("#{a.to_s} does not equal #{b.to_s}")
+  end
+end
+
+p = spice_profile("my_profile")
+assert_equal(p.name, "my_profile")
+
+# device extractors and classes
+
+
+ex = mos3("name")
+assert_equal(ex.is_a?(RBA::DeviceExtractorMOS3Transistor), true)
+assert_equal(ex.name, "name")
+assert_equal(ex.strict?, false)
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassMOS3Transistor), true)
+assert_equal(dc.strict?, false)
+
+ex = mos3(mos3_class("name"))
+assert_equal(ex.is_a?(RBA::DeviceExtractorMOS3Transistor), true)
+assert_equal(ex.name, "name")
+assert_equal(ex.strict?, false)
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassMOS3Transistor), true)
+assert_equal(dc.strict?, false)
+
+ex = dmos3("name")
+assert_equal(ex.is_a?(RBA::DeviceExtractorMOS3Transistor), true)
+assert_equal(ex.name, "name")
+assert_equal(ex.strict?, true)
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassMOS3Transistor), true)
+assert_equal(dc.strict?, true)
+
+ex = dmos3(dmos3_class("name"))
+assert_equal(ex.is_a?(RBA::DeviceExtractorMOS3Transistor), true)
+assert_equal(ex.name, "name")
+assert_equal(ex.strict?, true)
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassMOS3Transistor), true)
+assert_equal(dc.strict?, true)
+
+ex = mos4("name")
+assert_equal(ex.is_a?(RBA::DeviceExtractorMOS4Transistor), true)
+assert_equal(ex.name, "name")
+assert_equal(ex.strict?, false)
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassMOS4Transistor), true)
+assert_equal(dc.strict?, false)
+
+ex = mos4(mos4_class("name"))
+assert_equal(ex.is_a?(RBA::DeviceExtractorMOS4Transistor), true)
+assert_equal(ex.name, "name")
+assert_equal(ex.strict?, false)
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassMOS4Transistor), true)
+assert_equal(dc.strict?, false)
+
+ex = dmos4("name")
+assert_equal(ex.is_a?(RBA::DeviceExtractorMOS4Transistor), true)
+assert_equal(ex.name, "name")
+assert_equal(ex.strict?, true)
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassMOS4Transistor), true)
+assert_equal(dc.strict?, true)
+
+ex = dmos4(dmos4_class("name"))
+assert_equal(ex.is_a?(RBA::DeviceExtractorMOS4Transistor), true)
+assert_equal(ex.name, "name")
+assert_equal(ex.strict?, true)
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassMOS4Transistor), true)
+assert_equal(dc.strict?, true)
+
+ex = diode("name")
+assert_equal(ex.is_a?(RBA::DeviceExtractorDiode), true)
+assert_equal(ex.name, "name")
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassDiode), true)
+
+ex = diode(diode_class("name"))
+assert_equal(ex.is_a?(RBA::DeviceExtractorDiode), true)
+assert_equal(ex.name, "name")
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassDiode), true)
+
+ex = bjt3("name")
+assert_equal(ex.is_a?(RBA::DeviceExtractorBJT3Transistor), true)
+assert_equal(ex.name, "name")
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassBJT3Transistor), true)
+
+ex = bjt3(bjt3_class("name"))
+assert_equal(ex.is_a?(RBA::DeviceExtractorBJT3Transistor), true)
+assert_equal(ex.name, "name")
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassBJT3Transistor), true)
+
+ex = bjt4("name")
+assert_equal(ex.is_a?(RBA::DeviceExtractorBJT4Transistor), true)
+assert_equal(ex.name, "name")
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassBJT4Transistor), true)
+
+ex = bjt4(bjt4_class("name"))
+assert_equal(ex.is_a?(RBA::DeviceExtractorBJT4Transistor), true)
+assert_equal(ex.name, "name")
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassBJT4Transistor), true)
+
+ex = resistor("name", 1.0)
+assert_equal(ex.is_a?(RBA::DeviceExtractorResistor), true)
+assert_equal(ex.name, "name")
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassResistor), true)
+
+ex = resistor(resistor_class("name"), 1.0)
+assert_equal(ex.is_a?(RBA::DeviceExtractorResistor), true)
+assert_equal(ex.name, "name")
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassResistor), true)
+
+ex = resistor_with_bulk("name", 1.0)
+assert_equal(ex.is_a?(RBA::DeviceExtractorResistorWithBulk), true)
+assert_equal(ex.name, "name")
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassResistorWithBulk), true)
+
+ex = resistor_with_bulk(resistor_with_bulk_class("name"), 1.0)
+assert_equal(ex.is_a?(RBA::DeviceExtractorResistorWithBulk), true)
+assert_equal(ex.name, "name")
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassResistorWithBulk), true)
+
+ex = capacitor("name", 1.0)
+assert_equal(ex.is_a?(RBA::DeviceExtractorCapacitor), true)
+assert_equal(ex.name, "name")
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassCapacitor), true)
+
+ex = capacitor(capacitor_class("name"), 1.0)
+assert_equal(ex.is_a?(RBA::DeviceExtractorCapacitor), true)
+assert_equal(ex.name, "name")
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassCapacitor), true)
+
+ex = capacitor_with_bulk("name", 1.0)
+assert_equal(ex.is_a?(RBA::DeviceExtractorCapacitorWithBulk), true)
+assert_equal(ex.name, "name")
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassCapacitorWithBulk), true)
+
+ex = capacitor_with_bulk(capacitor_with_bulk_class("name"), 1.0)
+assert_equal(ex.is_a?(RBA::DeviceExtractorCapacitorWithBulk), true)
+assert_equal(ex.name, "name")
+dc = ex.default_device_class
+assert_equal(dc.is_a?(RBA::DeviceClassCapacitorWithBulk), true)
+

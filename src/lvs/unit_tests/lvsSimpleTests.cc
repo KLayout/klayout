@@ -28,7 +28,7 @@
 #include "lymMacro.h"
 #include "tlFileUtils.h"
 
-void run_test (tl::TestBase *_this, const std::string &suffix, const std::string &layout, bool with_l2n = false, bool with_lvs = true, const std::string &top = std::string (), bool change_case = false)
+void run_test (tl::TestBase *_this, const std::string &suffix, const std::string &layout, bool with_l2n = false, bool with_lvs = true, bool with_cir = true, const std::string &top = std::string (), bool change_case = false)
 {
   std::string rs = tl::testdata ();
   rs += "/lvs/" + suffix + ".lvs";
@@ -73,10 +73,17 @@ void run_test (tl::TestBase *_this, const std::string &suffix, const std::string
   if (with_lvs) {
     _this->compare_text_files (output_lvsdb, au_lvsdb);
   }
-  _this->compare_text_files (output_cir, au_cir);
+  if (with_cir) {
+    _this->compare_text_files (output_cir, au_cir);
+  }
   if (with_l2n) {
     _this->compare_text_files (output_l2n, au_l2n);
   }
+}
+
+TEST(0_basic)
+{
+  run_test (_this, "basic", "ringo.gds", false, false, false);
 }
 
 TEST(1_simple)
@@ -123,14 +130,14 @@ TEST(6_simple_pin_swapping)
 {
   run_test (_this, "ringo_simple_pin_swapping", "ringo.gds");
   //  change case
-  run_test (_this, "ringo_simple_pin_swapping", "ringo.gds", false, true, std::string (), true);
+  run_test (_this, "ringo_simple_pin_swapping", "ringo.gds", false, true, true, std::string (), true);
 }
 
 TEST(7_net_and_circuit_equivalence)
 {
   run_test (_this, "ringo_simple_net_and_circuit_equivalence", "ringo_renamed.gds");
   //  change case
-  run_test (_this, "ringo_simple_net_and_circuit_equivalence", "ringo_renamed.gds", false, true, std::string (), true);
+  run_test (_this, "ringo_simple_net_and_circuit_equivalence", "ringo_renamed.gds", false, true, true, std::string (), true);
 }
 
 TEST(8_simplification)
@@ -168,14 +175,14 @@ TEST(13_simple_ringo_device_subcircuits)
 {
   run_test (_this, "ringo_device_subcircuits", "ringo.gds");
   //  change case
-  run_test (_this, "ringo_device_subcircuits", "ringo.gds", false, true, std::string (), true);
+  run_test (_this, "ringo_device_subcircuits", "ringo.gds", false, true, true, std::string (), true);
 }
 
 TEST(13b_simple_ringo_device_subcircuits_devcls)
 {
   run_test (_this, "ringo_device_subcircuits_devcls", "ringo.gds");
   //  change case
-  run_test (_this, "ringo_device_subcircuits_devcls", "ringo.gds", false, true, std::string (), true);
+  run_test (_this, "ringo_device_subcircuits_devcls", "ringo.gds", false, true, true, std::string (), true);
 }
 
 TEST(14_simple_ringo_mixed_hierarchy)
@@ -190,7 +197,7 @@ TEST(15_simple_dummy_device)
 
 TEST(16_floating)
 {
-  run_test (_this, "floating", "floating.gds", false, true, "TOP");
+  run_test (_this, "floating", "floating.gds", false, true, true, "TOP");
 }
 
 TEST(17_layout_variants)
@@ -362,12 +369,12 @@ TEST(61_StrayTextsDoNotMakeNets)
 //  Issue #1719, part 3 (layer naming)
 TEST(62_LayerNames)
 {
-  run_test (_this, "layer_names", "layer_names.gds", false, true, "TOP");
+  run_test (_this, "layer_names", "layer_names.gds", false, true, true, "TOP");
 }
 
 TEST(63_FlagMissingPorts)
 {
-  run_test (_this, "flag_missing_ports", "flag_missing_ports.gds", false, true, "TOP");
+  run_test (_this, "flag_missing_ports", "flag_missing_ports.gds", false, true, true, "TOP");
 }
 
 //  Split substrate - marker and global connection (issue #2345)

@@ -13,6 +13,15 @@ module DRC
     end
   end
 
+  class CustomDeviceClassDupFactory < RBA::DeviceClassFactory
+    def initialize(device_class)
+      @device_class = device_class
+    end
+    def create_class
+      @device_class.dup
+    end
+  end
+
   class OutputChannel
     def initialize(engine)
       @engine = engine
@@ -687,6 +696,7 @@ module DRC
     # @name write_spice
     # @synopsis write_spice([ use_net_names [, with_comments ] ])
     # @synopsis write_spice(writer_delegate [, use_net_names [, with_comments ] ])
+    # @synopsis write_spice(spice_profile [, use_net_names [, with_comments ] ])
     # Use this option in \target_netlist for the format parameter to 
     # specify SPICE format.
     # "use_net_names" and "with_comments" are boolean parameters indicating
@@ -695,6 +705,13 @@ module DRC
     #
     # "writer_delegate" allows using a RBA::NetlistSpiceWriterDelegate object to 
     # control the actual writing.
+    #
+    # To provide the name of a SPICE profile to use, include it the following way:
+    #
+    # @code
+    # # write SPICE files using profile "my_profile"
+    # write_spice(spice_profile("my-profile"))
+    # @/code
 
     def write_spice(*args)
 
@@ -703,6 +720,8 @@ module DRC
         delegate = nil
         use_net_names = nil
         with_comments = nil
+        profile = ""
+
         args.each do |a|
           if (a == false || a == true) && (use_net_names == nil || with_comments == nil)
             if use_net_names == nil
@@ -712,12 +731,14 @@ module DRC
             end
           elsif a.is_a?(RBA::NetlistSpiceWriterDelegate)
             delegate = a
+          elsif a.is_a?(DRC::DRCSpiceProfile)
+            profile = a.name
           else
             raise("Too many arguments specified or argument is of wrong type: " + a.inspect)
           end
         end
             
-        writer = RBA::NetlistSpiceWriter::new(delegate)
+        writer = RBA::NetlistSpiceWriter::new(delegate, profile)
         if use_net_names != nil
           writer.use_net_names = use_net_names
         end
@@ -735,205 +756,460 @@ module DRC
       if !cls
         return nil
       elsif !cls.is_a?(Class)
-        raise("Expected a class object for the 'class' argument of device extractors")
+        raise("Expected a class object for the 'cls' argument of device extractors")
       else
         CustomDeviceClassFactory::new(cls)
       end
+    end
+
+    def _make_dup_factory(device_class)
+      return device_class ? CustomDeviceClassDupFactory::new(device_class) : nil
     end
 
     # %DRC%
     # @brief Supplies the MOS3 transistor extractor class
     # @name mos3
     # @synopsis mos3(name)
-    # @synopsis mos3(name, class)
+    # @synopsis mos3(device_class)
     # Use this class with \extract_devices to specify extraction of a 
     # three-terminal MOS transistor.
+    # If used with a name, the extractor will produce devices with device
+    # class RBA::DeviceClassMOS3Transistor. If used with a specific device
+    # class object, the extractor will produce devices with this class.
+    # It is the responsibility of the user that this class is compatible with
+    # the parameters and terminals the extractor will require.
     #
     # See RBA::DeviceExtractorMOS3Transistor for more details
     # about this extractor (non-strict mode applies for 'mos3').
 
-    def mos3(name, cls = nil)
+    def mos3(name_or_class, cls = nil)
       self._context("mos3") do
-        RBA::DeviceExtractorMOS3Transistor::new(name, false, _make_factory(cls))
+        if name_or_class.is_a?(RBA::DeviceClass)
+          RBA::DeviceExtractorMOS3Transistor::new(name_or_class.name, false, _make_dup_factory(name_or_class))
+        else
+          RBA::DeviceExtractorMOS3Transistor::new(name_or_class.to_s, false, _make_factory(cls))
+        end
       end
+    end
+
+    # %DRC%
+    # @brief Supplies the device class for a three-terminal symmetric MOS transistor
+    # @name mos3_class
+    # @synopsis mos3_class(name)
+    #
+    # See RBA::DeviceClassMOS3Transistor for more details
+    # about this device class.
+
+    def mos3_class(name)
+      cls = RBA::DeviceClassMOS3Transistor::new(false)
+      cls.name = name
+      cls
     end
 
     # %DRC%
     # @brief Supplies the MOS4 transistor extractor class
     # @name mos4
     # @synopsis mos4(name)
-    # @synopsis mos4(name, class)
+    # @synopsis mos4(device_class)
     # Use this class with \extract_devices to specify extraction of a 
     # four-terminal MOS transistor.
+    # If used with a name, the extractor will produce devices with device
+    # class RBA::DeviceClassMOS4Transistor. If used with a specific device
+    # class object, the extractor will produce devices with this class.
+    # It is the responsibility of the user that this class is compatible with
+    # the parameters and terminals the extractor will require.
     #
     # See RBA::DeviceExtractorMOS4Transistor for more details
     # about this extractor (non-strict mode applies for 'mos4').
 
-    def mos4(name, cls = nil)
+    def mos4(name_or_class, cls = nil)
       self._context("mos4") do
-        RBA::DeviceExtractorMOS4Transistor::new(name, false, _make_factory(cls))
+        if name_or_class.is_a?(RBA::DeviceClass)
+          RBA::DeviceExtractorMOS4Transistor::new(name_or_class.name, false, _make_dup_factory(name_or_class))
+        else
+          RBA::DeviceExtractorMOS4Transistor::new(name_or_class.to_s, false, _make_factory(cls))
+        end
       end
+    end
+
+    # %DRC%
+    # @brief Supplies the device class for a four-terminal symmetric MOS transistor
+    # @name mos4_class
+    # @synopsis mos4_class(name)
+    #
+    # See RBA::DeviceClassMOS4Transistor for more details
+    # about this device class.
+
+    def mos4_class(name)
+      cls = RBA::DeviceClassMOS4Transistor::new(false)
+      cls.name = name
+      cls
     end
 
     # %DRC%
     # @brief Supplies the DMOS3 transistor extractor class
     # @name dmos3
     # @synopsis dmos3(name)
-    # @synopsis dmos3(name, class)
+    # @synopsis dmos3(device_class)
     # Use this class with \extract_devices to specify extraction of a 
     # three-terminal DMOS transistor. A DMOS transistor is essentially
     # the same than a MOS transistor, but source and drain are 
     # separated.
+    # If used with a name, the extractor will produce devices with device
+    # class RBA::DeviceClassMOS3Transistor. If used with a specific device
+    # class object, the extractor will produce devices with this class.
+    # It is the responsibility of the user that this class is compatible with
+    # the parameters and terminals the extractor will require.
     #
     # See RBA::DeviceExtractorMOS3Transistor for more details
     # about this extractor (strict mode applies for 'dmos3').
 
-    def dmos3(name, cls = nil)
+    def dmos3(name_or_class, cls = nil)
       self._context("dmos3") do
-        RBA::DeviceExtractorMOS3Transistor::new(name, true, _make_factory(cls))
+        if name_or_class.is_a?(RBA::DeviceClass)
+          RBA::DeviceExtractorMOS3Transistor::new(name_or_class.name, true, _make_dup_factory(name_or_class))
+        else
+          RBA::DeviceExtractorMOS3Transistor::new(name_or_class.to_s, true, _make_factory(cls))
+        end
       end
+    end
+
+    # %DRC%
+    # @brief Supplies the device class for a three-terminal DMOS transistor
+    # @name dmos3_class
+    # @synopsis dmos3_class(name)
+    #
+    # See RBA::DeviceClassMOS3Transistor for more details
+    # about this device class.
+
+    def dmos3_class(name)
+      cls = RBA::DeviceClassMOS3Transistor::new(true)
+      cls.name = name
+      cls
     end
 
     # %DRC%
     # @brief Supplies the MOS4 transistor extractor class
     # @name dmos4
     # @synopsis dmos4(name)
-    # @synopsis dmos4(name, class)
+    # @synopsis dmos4(device_class)
     # Use this class with \extract_devices to specify extraction of a 
     # four-terminal DMOS transistor. A DMOS transistor is essentially
     # the same than a MOS transistor, but source and drain are 
     # separated.
+    # If used with a name, the extractor will produce devices with device
+    # class RBA::DeviceClassMOS4Transistor. If used with a specific device
+    # class object, the extractor will produce devices with this class.
+    # It is the responsibility of the user that this class is compatible with
+    # the parameters and terminals the extractor will require.
     #
     # See RBA::DeviceExtractorMOS4Transistor for more details
     # about this extractor (strict mode applies for 'dmos4').
 
-    def dmos4(name, cls = nil)
+    def dmos4(name_or_class, cls = nil)
       self._context("dmos4") do
-        RBA::DeviceExtractorMOS4Transistor::new(name, true, _make_factory(cls))
+        if name_or_class.is_a?(RBA::DeviceClass)
+          RBA::DeviceExtractorMOS4Transistor::new(name_or_class.name, true, _make_dup_factory(name_or_class))
+        else
+          RBA::DeviceExtractorMOS4Transistor::new(name_or_class.to_s, true, _make_factory(cls))
+        end
       end
+    end
+
+    # %DRC%
+    # @brief Supplies the device class for a four-terminal DMOS transistor
+    # @name dmos4_class
+    # @synopsis dmos4_class(name)
+    #
+    # See RBA::DeviceClassMOS4Transistor for more details
+    # about this device class.
+
+    def dmos4_class(name)
+      cls = RBA::DeviceClassMOS4Transistor::new(true)
+      cls.name = name
+      cls
     end
 
     # %DRC%
     # @brief Supplies the BJT3 transistor extractor class
     # @name bjt3
     # @synopsis bjt3(name)
-    # @synopsis bjt3(name, class)
+    # @synopsis bjt3(device_class)
     # Use this class with \extract_devices to specify extraction of a 
-    # bipolar junction transistor
+    # bipolar junction transistor without a substrate terminal.
+    # If used with a name, the extractor will produce devices with device
+    # class RBA::DeviceClassBJT3Transistor. If used with a specific device
+    # class object, the extractor will produce devices with this class.
+    # It is the responsibility of the user that this class is compatible with
+    # the parameters and terminals the extractor will require.
     #
     # See RBA::DeviceExtractorBJT3Transistor for more details
     # about this extractor.
 
-    def bjt3(name, cls = nil)
+    def bjt3(name_or_class, cls = nil)
       self._context("bjt3") do
-        RBA::DeviceExtractorBJT3Transistor::new(name, _make_factory(cls))
+        if name_or_class.is_a?(RBA::DeviceClass)
+          RBA::DeviceExtractorBJT3Transistor::new(name_or_class.name, _make_dup_factory(name_or_class))
+        else
+          RBA::DeviceExtractorBJT3Transistor::new(name_or_class.to_s, _make_factory(cls))
+        end
       end
+    end
+
+    # %DRC%
+    # @brief Supplies the device class for a 3-terminal bipolar junction transistor
+    # @name bjt3_class
+    # @synopsis bjt3_class(name)
+    #
+    # See RBA::DeviceClassBJT3Transistor for more details
+    # about this device class.
+
+    def bjt3_class(name)
+      cls = RBA::DeviceClassBJT3Transistor::new
+      cls.name = name
+      cls
     end
 
     # %DRC%
     # @brief Supplies the BJT4 transistor extractor class
     # @name bjt4
     # @synopsis bjt4(name)
-    # @synopsis bjt4(name, class)
+    # @synopsis bjt4(device_class)
     # Use this class with \extract_devices to specify extraction of a 
     # bipolar junction transistor with a substrate terminal
+    # If used with a name, the extractor will produce devices with device
+    # class RBA::DeviceClassBJT4Transistor. If used with a specific device
+    # class object, the extractor will produce devices with this class.
+    # It is the responsibility of the user that this class is compatible with
+    # the parameters and terminals the extractor will require.
     #
     # See RBA::DeviceExtractorBJT4Transistor for more details
     # about this extractor.
 
-    def bjt4(name, cls = nil)
+    def bjt4(name_or_class, cls = nil)
       self._context("bjt4") do
-        RBA::DeviceExtractorBJT4Transistor::new(name, _make_factory(cls))
+        if name_or_class.is_a?(RBA::DeviceClass)
+          RBA::DeviceExtractorBJT4Transistor::new(name_or_class.name, _make_dup_factory(name_or_class))
+        else
+          RBA::DeviceExtractorBJT4Transistor::new(name_or_class.to_s, _make_factory(cls))
+        end
       end
+    end
+
+    # %DRC%
+    # @brief Supplies the device class for a 4-terminal bipolar junction transistor
+    # @name bjt4_class
+    # @synopsis bjt4_class(name)
+    #
+    # See RBA::DeviceClassBJT4Transistor for more details
+    # about this device class.
+
+    def bjt4_class(name)
+      cls = RBA::DeviceClassBJT4Transistor::new
+      cls.name = name
+      cls
     end
 
     # %DRC%
     # @brief Supplies the diode extractor class
     # @name diode
     # @synopsis diode(name)
-    # @synopsis diode(name, class)
+    # @synopsis diode(device_class)
     # Use this class with \extract_devices to specify extraction of a 
     # planar diode 
+    # If used with a name, the extractor will produce devices with device
+    # class RBA::DeviceClassDiode. If used with a specific device
+    # class object, the extractor will produce devices with this class.
+    # It is the responsibility of the user that this class is compatible with
+    # the parameters and terminals the extractor will require.
     #
     # See RBA::DeviceExtractorDiode for more details
     # about this extractor.
 
-    def diode(name, cls = nil)
+    def diode(name_or_class, cls = nil)
       self._context("diode") do
-        RBA::DeviceExtractorDiode::new(name, _make_factory(cls))
+        if name_or_class.is_a?(RBA::DeviceClass)
+          RBA::DeviceExtractorDiode::new(name_or_class.name, _make_dup_factory(name_or_class))
+        else
+          RBA::DeviceExtractorDiode::new(name_or_class.to_s, _make_factory(cls))
+        end
       end
     end
 
     # %DRC%
-    # @brief Supplies the resistor extractor class
-    # @name resistor
-    # @synopsis resistor(name, sheet_rho)
-    # @synopsis resistor(name, sheet_rho, class)
-    # Use this class with \extract_devices to specify extraction of a resistor.
+    # @brief Supplies the device class for a diode
+    # @name diode_class
+    # @synopsis diode_class(name)
     #
-    # The sheet_rho value is the sheet resistance in ohms/square. It is used
-    # to compute the resistance from the geometry.
+    # See RBA::DeviceClassDiode for more details
+    # about this device class.
+
+    def diode_class(name)
+      cls = RBA::DeviceClassDiode::new
+      cls.name = name
+      cls
+    end
+
+    # %DRC%
+    # @brief Supplies the resistor extractor class.
+    # @name resistor
+    # @synopsis resistor(name, area_cap)
+    # @synopsis resistor(device_class, area_cap)
+    # Use this class with \extract_devices to specify extraction of a resistor.
+    # The sheet_rho value is the sheet resistance in ohms/square.
+    # If used with a name, the extractor will produce devices with device
+    # class RBA::DeviceClassResistor. If used with a specific device
+    # class object, the extractor will produce devices with this class.
+    # It is the responsibility of the user that this class is compatible with
+    # the parameters and terminals the extractor will require.
     #
     # See RBA::DeviceExtractorResistor for more details
     # about this extractor.
 
-    def resistor(name, sheet_rho, cls = nil)
+    def resistor(name_or_class, area_cap, cls = nil)
       self._context("resistor") do
-        RBA::DeviceExtractorResistor::new(name, sheet_rho, _make_factory(cls))
+        if name_or_class.is_a?(RBA::DeviceClass)
+          RBA::DeviceExtractorResistor::new(name_or_class.name, area_cap, _make_dup_factory(name_or_class))
+        else
+          RBA::DeviceExtractorResistor::new(name_or_class.to_s, area_cap, _make_factory(cls))
+        end
       end
     end
 
     # %DRC%
-    # @brief Supplies the resistor extractor class that includes a bulk terminal
-    # @name resistor_with_bulk
-    # @synopsis resistor_with_bulk(name, sheet_rho)
-    # @synopsis resistor_with_bulk(name, sheet_rho, class)
-    # Use this class with \extract_devices to specify extraction of a resistor 
-    # with a bulk terminal.
-    # The sheet_rho value is the sheet resistance in ohms/square.
+    # @brief Supplies the device class for a resistor
+    # @name resistor_class
+    # @synopsis resistor_class(name)
     #
-    # See RBA::DeviceExtractorResistorWithBulk for more details
-    # about this extractor.
+    # See RBA::DeviceClassResistor for more details
+    # about this device class.
 
-    def resistor_with_bulk(name, sheet_rho, cls = nil)
-      self._context("resistor_with_bulk") do
-        RBA::DeviceExtractorResistorWithBulk::new(name, sheet_rho, _make_factory(cls))
-      end
+    def resistor_class(name)
+      cls = RBA::DeviceClassResistor::new
+      cls.name = name
+      cls
     end
 
     # %DRC%
     # @brief Supplies the capacitor extractor class
     # @name capacitor
     # @synopsis capacitor(name, area_cap)
-    # @synopsis capacitor(name, area_cap, class)
+    # @synopsis capacitor(device_class, area_cap)
     # Use this class with \extract_devices to specify extraction of a capacitor.
     # The area_cap argument is the capacitance in Farad per square micrometer.
+    # If used with a name, the extractor will produce devices with device
+    # class RBA::DeviceClassCapacitor. If used with a specific device
+    # class object, the extractor will produce devices with this class.
+    # It is the responsibility of the user that this class is compatible with
+    # the parameters and terminals the extractor will require.
     #
     # See RBA::DeviceExtractorCapacitor for more details
     # about this extractor.
 
-    def capacitor(name, area_cap, cls = nil)
+    def capacitor(name_or_class, area_cap, cls = nil)
       self._context("capacitor") do
-        RBA::DeviceExtractorCapacitor::new(name, area_cap, _make_factory(cls))
+        if name_or_class.is_a?(RBA::DeviceClass)
+          RBA::DeviceExtractorCapacitor::new(name_or_class.name, area_cap, _make_dup_factory(name_or_class))
+        else
+          RBA::DeviceExtractorCapacitor::new(name_or_class.to_s, area_cap, _make_factory(cls))
+        end
       end
+    end
+
+    # %DRC%
+    # @brief Supplies the device class for a capacitor
+    # @name capacitor_class
+    # @synopsis capacitor_class(name)
+    #
+    # See RBA::DeviceClassCapacitor for more details
+    # about this device class.
+
+    def capacitor_class(name)
+      cls = RBA::DeviceClassCapacitor::new
+      cls.name = name
+      cls
+    end
+
+    # %DRC%
+    # @brief Supplies the resistor extractor class that includes a bulk terminal
+    # @name resistor_with_bulk
+    # @synopsis resistor_with_bulk(name, area_cap)
+    # @synopsis resistor_with_bulk(device_class, area_cap)
+    # Use this class with \extract_devices to specify extraction of a resistor 
+    # with a bulk terminal.
+    # The sheet_rho value is the sheet resistance in ohms/square.
+    # If used with a name, the extractor will produce devices with device
+    # class RBA::DeviceClassResistorWithBulk. If used with a specific device
+    # class object, the extractor will produce devices with this class.
+    # It is the responsibility of the user that this class is compatible with
+    # the parameters and terminals the extractor will require.
+    #
+    # See RBA::DeviceExtractorResistorWithBulk for more details
+    # about this extractor.
+
+    def resistor_with_bulk(name_or_class, area_cap, cls = nil)
+      self._context("resistor_with_bulk") do
+        if name_or_class.is_a?(RBA::DeviceClass)
+          RBA::DeviceExtractorResistorWithBulk::new(name_or_class.name, area_cap, _make_dup_factory(name_or_class))
+        else
+          RBA::DeviceExtractorResistorWithBulk::new(name_or_class.to_s, area_cap, _make_factory(cls))
+        end
+      end
+    end
+
+    # %DRC%
+    # @brief Supplies the device class for a resistor that includes a bulk terminal
+    # @name resistor_with_bulk_class
+    # @synopsis resistor_with_bulk_class(name)
+    #
+    # See RBA::DeviceClassResistorWithBulk for more details
+    # about this device class.
+
+    def resistor_with_bulk_class(name)
+      cls = RBA::DeviceClassResistorWithBulk::new
+      cls.name = name
+      cls
     end
 
     # %DRC%
     # @brief Supplies the capacitor extractor class that includes a bulk terminal
     # @name capacitor_with_bulk
     # @synopsis capacitor_with_bulk(name, area_cap)
-    # @synopsis capacitor_with_bulk(name, area_cap, class)
+    # @synopsis capacitor_with_bulk(device_class, area_cap)
     # Use this class with \extract_devices to specify extraction of a capacitor 
     # with a bulk terminal.
     # The area_cap argument is the capacitance in Farad per square micrometer.
+    # If used with a name, the extractor will produce devices with device
+    # class RBA::DeviceClassCapacitorWithBulk. If used with a specific device
+    # class object, the extractor will produce devices with this class.
+    # It is the responsibility of the user that this class is compatible with
+    # the parameters and terminals the extractor will require.
     #
     # See RBA::DeviceExtractorCapacitorWithBulk for more details
     # about this extractor.
 
-    def capacitor_with_bulk(name, area_cap, cls = nil)
+    def capacitor_with_bulk(name_or_class, area_cap, cls = nil)
       self._context("capacitor_with_bulk") do
-        RBA::DeviceExtractorCapacitorWithBulk::new(name, area_cap, _make_factory(cls))
+        if name_or_class.is_a?(RBA::DeviceClass)
+          RBA::DeviceExtractorCapacitorWithBulk::new(name_or_class.name, area_cap, _make_dup_factory(name_or_class))
+        else
+          RBA::DeviceExtractorCapacitorWithBulk::new(name_or_class.to_s, area_cap, _make_factory(cls))
+        end
       end
+    end
+
+    # %DRC%
+    # @brief Supplies the device class for a capacitor that includes a bulk terminal
+    # @name capacitor_with_bulk_class
+    # @synopsis capacitor_with_bulk_class(name)
+    #
+    # See RBA::DeviceClassCapacitorWithBulk for more details
+    # about this device class.
+
+    def capacitor_with_bulk_class(name)
+      cls = RBA::DeviceClassCapacitorWithBulk::new
+      cls.name = name
+      cls
     end
 
     # %DRC%

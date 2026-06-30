@@ -602,5 +602,14 @@ module DRC
     end
   end
 
+  class DRCSpiceProfile
+    def initialize(name)
+      @name = name
+    end
+    def name
+      @name
+    end
+  end
+
 end
 

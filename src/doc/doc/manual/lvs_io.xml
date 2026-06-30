@@ -37,7 +37,7 @@
   <h2>Writing netlists</h2>
 
   <p>
-  You can write a netlist file to supply netlists for (functional) simulators for example. 
+  You can write a netlist file to supply netlists for simulators for example. 
   Within LVS scripts, the global "target_netlist" statement triggers writing of a netlist
   (see <a href="/about/drc_ref_global.xml#target_netlist">target_netlist</a> for details).
   </p>
@@ -66,6 +66,8 @@
   "with_comments" will embed debug comments into the netlist showing instance
   locations, pin names etc.
   </p>
+
+  <h3>SPICE writer delegates</h3>
 
   <p>
   Further customization can be achieved by providing an explicit SPICE writer
@@ -142,6 +144,30 @@ X$2 VSS IN OUT SUBSTRATE NMOS PARAMS: L=0.25 W=0.9 AS=0.405 AD=0.405 PS=2.7
   write this netlist object then. Unlike "target_netlist", this method is executed immediately and
   this way, a single netlist can be written to multiple files in different flavours.
   </p>
+
+  <h3>SPICE profiles</h3>
+
+  <p>
+  An easier way to customize SPICE output is through "SPICE profiles". SPICE profiles are
+  pieces of data attached to "device class". Every device inside a netlist is associated with a 
+  device class. The device class is a named entity inside the netlist. In a SPICE netlist, the
+  model name is the name of that device class. Device classes are objects of type <class_doc href="DeviceClass"/>.
+  Device classes, among other properties, carry "SPICE profiles". A SPICE profile declares:
+  </p>
+
+  <ul>
+    <li>The element to use for the device (e.g. "M" or "X")</li>
+    <li>How the parameters are written</li>
+    <li>How the parameters are read</li>
+  </ul>
+
+  <p>
+  In most cases, the SPICE profiles will be enough to configure how devices are written
+  and read from SPICE files, so it is not required to implement a reader or writer delegate.
+  On the back side, it is required to declare and configure the device classes in the LVS 
+  scripts.
+  </p>
+
 
   <h2>Reading netlists</h2>
 

@@ -911,19 +911,36 @@ CODE
     # @brief Gets, sets or reads the reference netlist
     # @synopsis schematic(filename)
     # @synopsis schematic(filename, reader)
+    # @synopsis schematic(filename, spice_profile)
+    # @synopsis schematic(filename, spice_reader_delegate)
     # @synopsis schematic(netlist)
     # @synopsis schematic
     # If no argument is given, the current schematic netlist is returned. nil is 
     # returned if no schematic netlist is set yet.
     #
-    # If a filename is given (first two forms), the netlist is read from the given file.
+    # If a filename is given, the netlist is read from the given file.
+    #
     # If no reader is provided, Spice format will be assumed. The reader object is a
     # RBA::NetlistReader object and allows detailed customization of the reader process.
+    # Or you specify a RBA::NetlistSpiceReaderDelegate object to customize a SPICE reader
+    # with a delegate.
+    #
+    # Instead of a reader or delegate, a SPICE profile can be specified. In that case, the device
+    # classes need to be registered with \register_device_class before the schematic
+    # method is called. To use a SPICE profile with name "my-profile" use this code:
+    #
+    # @code
+    # # for a specific netter object
+    # netter.schematic("netlist.cir", spice_profile("my-profile"))
+    # 
+    # # or globally
+    # schematic("netlist.cir", spice_profile("my-profile"))
+    # @/code
     #
     # Alternatively, a RBA::Netlist object can be given which is obtained from any other
     # source.
       
-    def schematic(schematic = nil, reader = nil)
+    def schematic(schematic = nil, arg = nil)
 
       if !schematic
 
@@ -938,8 +955,13 @@ CODE
 
         schematic.is_a?(String) || raise("First argument must be string or netlist in 'schematic'")
 
-        if reader
-          reader.is_a?(RBA::NetlistReader) || raise("Second argument must be netlist reader object in 'schematic'")
+        if arg.is_a?(DRC::DRCSpiceProfile)
+          reader = RBA::NetlistSpiceReader::new(nil, arg.name)
+        elsif arg.is_a?(RBA::NetlistSpiceReaderDelegate)
+          reader = RBA::NetlistSpiceReader::new(arg)
+        elsif arg
+          arg.is_a?(RBA::NetlistReader) || raise("Second argument must be spice profile, a reader delegate or a netlist reader object in 'schematic'")
+          reader = arg
         else
           reader = RBA::NetlistSpiceReader::new
         end
@@ -948,8 +970,10 @@ CODE
         @engine.info("Reading netlist: #{netlist_file} ..")
 
         netlist = RBA::Netlist::new
-        @devcls.each do |dc|
-          netlist.add(dc.dup)
+        if @devcls
+          @devcls.each do |dc|
+            netlist.add(dc.dup)
+          end
         end
         netlist.read(netlist_file, reader)
 

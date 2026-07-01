@@ -3,26 +3,21 @@ source($lvs_test_source, "RINGO")
 
 report_lvs($lvs_test_target_lvsdb, true)
 
-target_netlist($lvs_test_target_cir, write_spice, "Extracted by KLayout")
+target_netlist($lvs_test_target_cir, write_spice(spice_profile("WRITE")), "Extracted by KLayout")
 
 # Register device class with a "X" element based SPICE profile
 
 # schematic only
 xpmos = mos4_class("XPMOS")
-sp = xpmos.spice_profile
-sp.element = "X"
-xpmos.set_spice_profile(sp)
+xpmos.spice_profile("READ").element = "X"
 
 # layout only
 pmos = mos4_class("PMOS")
-sp = pmos.spice_profile
-sp.element = "X"
-pmos.set_spice_profile(sp)
+pmos.spice_profile("WRITE").element = "X"
 
+# both layout and schematic
 nmos = mos4_class("NMOS")
-sp = nmos.spice_profile
-sp.element = "X"
-nmos.set_spice_profile(sp)
+nmos.spice_profile("*").element = "X"
 
 # NOTE: this needs to come before the schematic netlist is read
 register_device_class(xpmos)
@@ -30,7 +25,7 @@ register_device_class(nmos)
 
 # Read the schematic
 
-schematic("ringo_xdevice.cir")
+schematic("ringo_xdevice.cir", spice_profile("READ"))
 
 deep
 

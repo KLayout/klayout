@@ -743,7 +743,7 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
     "@brief Defines a SPICE profile.\n"
     "SPICE profiles are a way to declare SPICE representations for a specific device. "
     "Each device class can support multiple profiles. An empty name declares the default profile, "
-    "'*' is the fallback profile used when there is no profile with a requested name. Profiles "
+    "'*' is the fallback profile used when there is no profile with the requested name. Profiles "
     "are requested by the SPICE reader or writer, unless they use delegates to implement "
     "a customized SPICE representation.\n"
     "\n"

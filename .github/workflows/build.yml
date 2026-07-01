@@ -23,7 +23,7 @@ jobs:
     outputs:
       code: ${{ steps.filter.outputs.code == 'true' || github.event_name == 'release' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v4
         id: filter
         if: github.event_name != 'release'
@@ -78,7 +78,7 @@ jobs:
           haskell: true
           large-packages: true
       - uses: hmarr/debug-action@v3
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: ccache
         if: matrix.os != 'ubuntu-24.04-arm'
         uses: hendrikmuhs/ccache-action@v1.2
@@ -139,7 +139,7 @@ jobs:
     if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
 
     - name: Build SDist
       run: pipx run build --sdist

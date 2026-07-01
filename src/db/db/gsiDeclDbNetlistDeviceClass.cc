@@ -361,7 +361,6 @@ Class<db::DeviceClass::SpiceProfile> decl_dbDeviceClassSpiceProfile ("db", "Devi
     "term = sp.terminal_order\n"
     "term.append('B')\n"
     "sp.terminal_order = term\n"
-    "cls.set_spice_profile(sp)\n"
     "@/code\n"
     "\n"
     "For special cases, the terminal order can have optional elements. These optional terminals "
@@ -427,7 +426,6 @@ Class<db::DeviceClass::SpiceProfile> decl_dbDeviceClassSpiceProfile ("db", "Devi
     "par = sp.incoming_parameters\n"
     "par['P'] = 'P*2.0'\n"
     "sp.incoming_parameters = par\n"
-    "cls.set_spice_profile(sp)\n"
     "@/code\n"
   ) +
   gsi::method_ext ("incoming_parameters=", &set_incoming_parameters, gsi::arg ("par"),
@@ -465,7 +463,6 @@ Class<db::DeviceClass::SpiceProfile> decl_dbDeviceClassSpiceProfile ("db", "Devi
     "par = sp.outgoing_parameters\n"
     "par['P'] = 'P*2.0'\n"
     "sp.outgoing_parameters = par\n"
-    "cls.set_spice_profile(sp)\n"
     "@/code\n"
   ) +
   gsi::method_ext ("outgoing_parameters=", &set_outgoing_parameters, gsi::arg ("par"),
@@ -476,6 +473,139 @@ Class<db::DeviceClass::SpiceProfile> decl_dbDeviceClassSpiceProfile ("db", "Devi
   "Objects of this type are used inside the \\DeviceClass object to specify how the device "
   "is written to and read from SPICE files. See \\DeviceClass#set_spice_profile for a "
   "description of that concept.\n"
+  "\n"
+  "This class has been added in version 0.31.0."
+);
+
+namespace
+{
+
+class SpiceProfileReference
+{
+public:
+  SpiceProfileReference (db::DeviceClass *dc, const std::string &name, bool c)
+    : mp_device_class (dc), m_name (name), m_const (c)
+  {
+    //  .. nothing yet ..
+  }
+
+  const std::string &get_element ()
+  {
+    return dc ()->spice_profile (m_name).element;
+  }
+
+  void set_element (const std::string &element)
+  {
+    auto sp = get ();
+    sp.element = element;
+    check_writable ();
+    dc ()->set_spice_profile (m_name, sp);
+  }
+
+  const std::vector<std::string> &get_terminal_order ()
+  {
+    return dc ()->spice_profile (m_name).terminal_order;
+  }
+
+  void set_terminal_order (const std::vector<std::string> &terminal_order)
+  {
+    auto sp = get ();
+    sp.terminal_order = terminal_order;
+    check_writable ();
+    dc ()->set_spice_profile (m_name, sp);
+  }
+
+  const std::map<std::string, std::string> &get_incoming_parameters ()
+  {
+    return dc ()->spice_profile (m_name).incoming_parameters;
+  }
+
+  void set_incoming_parameters (const std::map<std::string, std::string> &pd)
+  {
+    auto sp = get ();
+    sp.incoming_parameters = pd;
+    check_writable ();
+    dc ()->set_spice_profile (m_name, sp);
+  }
+
+  const std::map<std::string, std::string> &get_outgoing_parameters ()
+  {
+    return dc ()->spice_profile (m_name).outgoing_parameters;
+  }
+
+  void set_outgoing_parameters (const std::map<std::string, std::string> &pd)
+  {
+    auto sp = get ();
+    sp.outgoing_parameters = pd;
+    check_writable ();
+    dc ()->set_spice_profile (m_name, sp);
+  }
+
+  db::DeviceClass::SpiceProfile get () const
+  {
+    return const_cast<SpiceProfileReference *> (this)->dc ()->spice_profile (m_name);
+  }
+
+private:
+  db::DeviceClass *dc ()
+  {
+    if (! mp_device_class) {
+      throw tl::Exception (tl::to_string (tr ("DeviceClass object does no longer exists - invalid SPICE profile reference")));
+    }
+    return mp_device_class.get ();
+  }
+
+  void check_writable ()
+  {
+    if (m_const) {
+      throw tl::Exception (tl::to_string (tr ("SPICE profile reference is immutable - cannot use a setter on this reference")));
+    }
+  }
+
+  tl::weak_ptr<db::DeviceClass> mp_device_class;
+  std::string m_name;
+  bool m_const;
+};
+
+}
+
+Class<SpiceProfileReference> decl_dbDeviceClassSpiceProfileReference ("db", "DeviceClassSpiceProfileReference",
+  gsi::method ("element", &SpiceProfileReference::get_element,
+    "@brief Gets the SPICE element to use for this device.\n"
+    "See \\DeviceClassSpiceProfile#element for a description of this attribute."
+  ) +
+  gsi::method ("element=", &SpiceProfileReference::set_element, gsi::arg ("e"),
+    "@brief Sets the SPICE element to use for this device.\n"
+    "See \\DeviceClassSpiceProfile#element= for a description of this attribute."
+  ) +
+  gsi::method ("terminal_order", &SpiceProfileReference::get_terminal_order,
+    "@brief Gets the terminal order to use for this device.\n"
+    "See \\DeviceClassSpiceProfile#terminal_order for a description of this attribute."
+  ) +
+  gsi::method ("terminal_order=", &SpiceProfileReference::set_terminal_order, gsi::arg ("to"),
+    "@brief Sets the terminal order to use for this device.\n"
+    "See \\DeviceClassSpiceProfile#terminal_order= for a description of this attribute."
+  ) +
+  gsi::method ("incoming_parameters", &SpiceProfileReference::get_incoming_parameters,
+    "@brief Gets the mapping of incoming parameters from SPICE files\n"
+    "See \\DeviceClassSpiceProfile#incoming_parameters for a description of this attribute."
+  ) +
+  gsi::method ("incoming_parameters=", &SpiceProfileReference::set_incoming_parameters, gsi::arg ("par"),
+    "@brief Sets the mapping of incoming parameters from SPICE files\n"
+    "See \\DeviceClassSpiceProfile#incoming_parameters= for a description of this attribute."
+  ) +
+  gsi::method ("outgoing_parameters", &SpiceProfileReference::get_outgoing_parameters,
+    "@brief Gets the mapping tables for outgoing parameters\n"
+    "See \\DeviceClassSpiceProfile#outgoing_parameters for a description of this attribute."
+  ) +
+  gsi::method ("outgoing_parameters=", &SpiceProfileReference::set_outgoing_parameters, gsi::arg ("par"),
+    "@brief Sets the mapping tables for outgoing parameters\n"
+    "See \\DeviceClassSpiceProfile#outgoing_parameters= for a description of this attribute."
+  ),
+  "@brief Represents a SPICE profile of a device\n"
+  "This class has the same interface than the SPICE profile object \\DeviceClassSpiceProfile, but\n"
+  "represents a reference to a SPICE profile inside a \\DeviceClass object. This reference\n"
+  "allows manipulating SPICE profiles inside DeviceClass objects.\n"
   "\n"
   "This class has been added in version 0.31.0."
 );
@@ -554,6 +684,31 @@ static void set_default_spice_profile (db::DeviceClass *cls, const db::DeviceCla
   cls->set_spice_profile (std::string (), profile);
 }
 
+static void set_named_spice_profile (db::DeviceClass *cls, const std::string &name, const db::DeviceClass::SpiceProfile &profile)
+{
+  cls->set_spice_profile (name, profile);
+}
+
+static void set_default_spice_profile_ref (db::DeviceClass *cls, const SpiceProfileReference &profile)
+{
+  cls->set_spice_profile (std::string (), profile.get ());
+}
+
+static void set_named_spice_profile_ref (db::DeviceClass *cls, const std::string &name, const SpiceProfileReference &profile)
+{
+  cls->set_spice_profile (name, profile.get ());
+}
+
+static SpiceProfileReference get_spice_profile (db::DeviceClass *cls, const std::string &name)
+{
+  return SpiceProfileReference (cls, name, false);
+}
+
+static SpiceProfileReference get_spice_profile_const (const db::DeviceClass *cls, const std::string &name)
+{
+  return SpiceProfileReference (const_cast<db::DeviceClass *> (cls), name, true);
+}
+
 Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
   gsi::method ("name", &db::DeviceClass::name,
     "@brief Gets the name of the device class."
@@ -584,7 +739,7 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
     "\n"
     "SPICE profiles have been introduced in version 0.31.0."
   ) +
-  gsi::method ("set_spice_profile", &db::DeviceClass::set_spice_profile, gsi::arg ("profile_name"), gsi::arg ("spice_profile"),
+  gsi::method_ext ("set_spice_profile", &set_named_spice_profile, gsi::arg ("profile_name"), gsi::arg ("spice_profile"),
     "@brief Defines a SPICE profile.\n"
     "SPICE profiles are a way to declare SPICE representations for a specific device. "
     "Each device class can support multiple profiles. An empty name declares the default profile, "
@@ -599,6 +754,13 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
     "\n"
     "SPICE profiles have been introduced in version 0.31.0."
   ) +
+  gsi::method_ext ("set_spice_profile", &set_named_spice_profile_ref, gsi::arg ("profile_name"), gsi::arg ("spice_profile_ref"),
+    "@brief Defines a SPICE profile from a reference to another profile.\n"
+    "Like the other versions of that method, this method defines a SPICE profile, but taking a reference to another "
+    "profile as the source.\n"
+    "\n"
+    "SPICE profiles have been introduced in version 0.31.0."
+  ) +
   gsi::method_ext ("set_spice_profile", &set_default_spice_profile, gsi::arg ("spice_profile"),
     "@brief Sets the default SPICE profile.\n"
     "This method is like the other \\set_spice_profile method, but uses an empty string for the profile name. "
@@ -606,21 +768,37 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
     "\n"
     "SPICE profiles have been introduced in version 0.31.0."
   ) +
-  gsi::method ("spice_profile", &db::DeviceClass::spice_profile, gsi::arg ("profile_name", std::string ()),
+  gsi::method_ext ("set_spice_profile", &set_default_spice_profile_ref, gsi::arg ("spice_profile_ref"),
+    "@brief Sets the default SPICE profile from a reference to another profile.\n"
+    "Like the other versions of that method, this method defines a SPICE profile, but taking a reference to another "
+    "profile as the source.\n"
+    "\n"
+    "SPICE profiles have been introduced in version 0.31.0."
+  ) +
+  gsi::method_ext ("spice_profile", &get_spice_profile, gsi::arg ("profile_name", std::string ()),
     "@brief Gets a SPICE profile with the given name.\n"
     "If the name is not corresponding to a valid profile and a fallback profile '*' exists, the latter is returned. "
     "Otherwise, a default profile is returned, which triggers the default serialization.\n"
     "See \\set_spice_profile for a description of the SPICE profile concept.\n"
     "\n"
-    "Note that this method returns a copy of the profile object. If you want to manipulate a SPICE profile, "
-    "you have to fetch the current profile, change it and store it again:\n"
+    "Note that this method returns a reference to a SPICE profile. You can manipulate the profile by changing attributes:\n"
     "\n"
     "@code\n"
     "dc = ... # some DeviceClass\n"
     "profile = dc.spice_profile(\"\")  # default profile\n"
     "profile.element = \"X\"\n"
-    "dc.set_spice_profile(\"\", profile)\n"
     "@/code\n"
+    "\n"
+    "Changing a SPICE profile may implicitly create new profiles in the device class, for example, if originally "
+    "the profile was obtained from the fallback profile. After changing the attributes, a copy of the profile will "
+    "be created in the device class, with the new, specific settings.\n"
+    "\n"
+    "SPICE profiles have been introduced in version 0.31.0."
+  ) +
+  gsi::method_ext ("spice_profile", &get_spice_profile_const, gsi::arg ("profile_name", std::string ()),
+    "@brief Gets an immutable SPICE profile with the given name.\n"
+    "Like the other method with the same name, this method returns a SPICE profile reference. When used on a "
+    "const DeviceClass object, this reference is immutable, i.e. you can't change attributes of the SPICE profile.\n"
     "\n"
     "SPICE profiles have been introduced in version 0.31.0."
   ) +

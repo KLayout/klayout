@@ -88,7 +88,9 @@ public:
    */
   db::DeviceClass *default_device_class ()
   {
-    return mp_factory->create_class ();
+    db::DeviceClass *dc = mp_factory->create_class ();
+    dc->set_name (name ());
+    return dc;
   }
 
 private:

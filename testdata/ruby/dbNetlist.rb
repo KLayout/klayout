@@ -1286,6 +1286,30 @@ END
     assert_equal(c.spice_profile("").element, "U")
     assert_equal(c.spice_profile("PROFILE").element, "Q")
 
+    # SPICE profile references
+
+    assert_equal(c.has_spice_profile("X"), false)
+
+    c.spice_profile("X").element = "K"
+    assert_equal(c.has_spice_profile("X"), true)
+    assert_equal(c.spice_profile().element, "U")
+    assert_equal(c.spice_profile("X").element, "K")
+
+    c.set_spice_profile("Y", c.spice_profile("X"))
+    c.spice_profile("X").element = "L"
+    assert_equal(c.has_spice_profile("Y"), true)
+    assert_equal(c.spice_profile("X").element, "L")
+    assert_equal(c.spice_profile("Y").element, "K")
+
+    c.spice_profile("X").terminal_order = [ "1", "2" ]
+    assert_equal(c.spice_profile("X").terminal_order, [ "1", "2" ])
+
+    c.spice_profile("X").incoming_parameters = { "P1" => "A", "P2" => "B" }
+    assert_equal(c.spice_profile("X").incoming_parameters, { "P1" => "A", "P2" => "B" })
+
+    c.spice_profile("X").outgoing_parameters = { "A" => "P1", "B" => "P2" }
+    assert_equal(c.spice_profile("X").outgoing_parameters, { "A" => "P1", "B" => "P2" })
+
   end
 
 end

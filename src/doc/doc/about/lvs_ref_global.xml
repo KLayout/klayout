@@ -172,6 +172,23 @@ See <a href="/about/lvs_ref_netter.xml">Netter</a> for more details
 <p>
 See <a href="/about/lvs_ref_netter.xml#no_lvs_hints">Netter#no_lvs_hints</a> for a description of that feature.
 </p>
+<a name="register_device_class"/><h2>"register_device_class" - Registers a device class for device extraction and netlisting</h2>
+<keyword name="register_device_class"/>
+<p>Usage:</p>
+<ul>
+<li><tt>register_device_class(dc)</tt></li>
+</ul>
+<p>
+Registers the device class for extraction and netlist input and output.
+"dc" is an object of type <class_doc href="DeviceClass">DeviceClass</class_doc>.
+</p><p>
+Registering a device class is optional. However, using registered
+device classed simplify SPICE netlist reading and writing, as device classes
+can be configured with SPICE profiles to customize SPICE input and output.
+See <a href="/about/lvs_ref_netter.xml#register_device_class">Netter#register_device_class</a> for a description of this function.
+Also see <a href="/about/lvs_ref_netter.xml#extract_devices">Netter#extract_devices</a> for how to use it with registered
+device classes.
+</p>
 <a name="report_lvs"/><h2>"report_lvs" - Specifies an LVS report for output</h2>
 <keyword name="report_lvs"/>
 <p>Usage:</p>

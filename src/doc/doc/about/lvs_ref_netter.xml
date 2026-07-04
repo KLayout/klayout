@@ -473,6 +473,8 @@ same_nets!("ND2", "A", "B")
 <ul>
 <li><tt>schematic(filename)</tt></li>
 <li><tt>schematic(filename, reader)</tt></li>
+<li><tt>schematic(filename, spice_profile)</tt></li>
+<li><tt>schematic(filename, spice_reader_delegate)</tt></li>
 <li><tt>schematic(netlist)</tt></li>
 <li><tt>schematic</tt></li>
 </ul>
@@ -480,9 +482,24 @@ same_nets!("ND2", "A", "B")
 If no argument is given, the current schematic netlist is returned. nil is 
 returned if no schematic netlist is set yet.
 </p><p>
-If a filename is given (first two forms), the netlist is read from the given file.
+If a filename is given, the netlist is read from the given file.
+</p><p>
 If no reader is provided, Spice format will be assumed. The reader object is a
 <class_doc href="NetlistReader">NetlistReader</class_doc> object and allows detailed customization of the reader process.
+Or you specify a <class_doc href="NetlistSpiceReaderDelegate">NetlistSpiceReaderDelegate</class_doc> object to customize a SPICE reader
+with a delegate.
+</p><p>
+Instead of a reader or delegate, a SPICE profile can be specified. In that case, the device
+classes need to be registered with <a href="#register_device_class">register_device_class</a> before the schematic
+method is called. To use a SPICE profile with name "my-profile" use this code:
+</p><p>
+<pre>
+# for a specific netter object
+netter.schematic("netlist.cir", spice_profile("my-profile"))
+
+# or globally
+schematic("netlist.cir", spice_profile("my-profile"))
+</pre>
 </p><p>
 Alternatively, a <class_doc href="Netlist">Netlist</class_doc> object can be given which is obtained from any other
 source.

@@ -7,6 +7,7 @@
   <keyword name="LVS"/>
   <keyword name="LVS Input Output"/>
   <keyword name="LVS SPICE"/>
+  <keyword name="SPICE delegates"/>
 
   <h2-index/>
 
@@ -40,6 +41,7 @@
   You can write a netlist file to supply netlists for simulators for example. 
   Within LVS scripts, the global "target_netlist" statement triggers writing of a netlist
   (see <a href="/about/drc_ref_global.xml#target_netlist">target_netlist</a> for details).
+  For example, this writes the extracted netlist to "output.cir" in SPICE format:
   </p>
 
   <pre>target_netlist("output.cir", write_spice, "Created by KLayout")</pre>
@@ -55,19 +57,33 @@
   </p>
 
   <p>
-  The "write_spice" configuration function has two options:
+  The "write_spice" configuration function has these options:
   </p>
 
-  <pre>write_spice(use_net_names, with_comments)</pre>
+  <pre>write_spice(use_net_names, with_comments)
+write_spice(spice_profile(profile_name), use_net_names, with_comments)</pre>
 
   <p>
-  Both options are boolean values. If true and present, the first option will make
+  "use_net_names" and "with_comments" are optional, boolean values. If true and present, the first option will make
   the writer use the real net's names instead of numerical IDs. If true and present,
   "with_comments" will embed debug comments into the netlist showing instance
   locations, pin names etc.
   </p>
 
+  <p>
+  For customizing SPICE output there are two possible 
+  implementation paths: SPICE profiles and SPICE writer delegates.
+  While SPICE writer delegates are the most flexible way, SPICE
+  profiles are easier to use, but require a certain structure
+  in the LVS scripts.
+  </p>
+
+  <p>
+  For documentation on SPICE profiles see the corresponding section below.
+  </p>
+
   <h3>SPICE writer delegates</h3>
+  <keyword name="SPICE writer delegates"/>
 
   <p>
   Further customization can be achieved by providing an explicit SPICE writer
@@ -145,30 +161,6 @@ X$2 VSS IN OUT SUBSTRATE NMOS PARAMS: L=0.25 W=0.9 AS=0.405 AD=0.405 PS=2.7
   this way, a single netlist can be written to multiple files in different flavours.
   </p>
 
-  <h3>SPICE profiles</h3>
-
-  <p>
-  An easier way to customize SPICE output is through "SPICE profiles". SPICE profiles are
-  pieces of data attached to "device class". Every device inside a netlist is associated with a 
-  device class. The device class is a named entity inside the netlist. In a SPICE netlist, the
-  model name is the name of that device class. Device classes are objects of type <class_doc href="DeviceClass"/>.
-  Device classes, among other properties, carry "SPICE profiles". A SPICE profile declares:
-  </p>
-
-  <ul>
-    <li>The element to use for the device (e.g. "M" or "X")</li>
-    <li>How the parameters are written</li>
-    <li>How the parameters are read</li>
-  </ul>
-
-  <p>
-  In most cases, the SPICE profiles will be enough to configure how devices are written
-  and read from SPICE files, so it is not required to implement a reader or writer delegate.
-  On the back side, it is required to declare and configure the device classes in the LVS 
-  scripts.
-  </p>
-
-
   <h2>Reading netlists</h2>
 
   <p>
@@ -186,6 +178,21 @@ X$2 VSS IN OUT SUBSTRATE NMOS PARAMS: L=0.25 W=0.9 AS=0.405 AD=0.405 PS=2.7
   classes), "R" (gives Resistor device classes), "C" (gives
   Capacitor device classes) and "D" (gives diode device classes).
   </p>
+
+  <p>
+  For customizing SPICE input there are two possible 
+  implementation paths: SPICE profiles and SPICE reader delegates.
+  While SPICE reader delegates are the most flexible way, SPICE
+  profiles are easier to use, but require a certain structure
+  in the LVS scripts.
+  </p>
+
+  <p>
+  For documentation on SPICE profiles see the corresponding section below.
+  </p>
+
+  <h3>SPICE reader delegates</h3>
+  <keyword name="SPICE reader delegates"/>
 
   <p>
   As for the SPICE reader, a delegate can be provided to customize the reader.
@@ -299,5 +306,134 @@ schematic("inv_xmodels.cir", reader)</pre>
   cross-reference table. LVS databases can be read into the netlist browser for example.
   Hence exchange of LVS reports is possible.
   </p>
+
+  <h2>SPICE profiles</h2>
+  <keyword name="SPICE profiles"/>
+
+  <p>
+  An easier way to customize SPICE output is through "SPICE profiles". SPICE profiles are
+  pieces of data attached to a "device class". Every device inside a netlist is associated with a 
+  device class. The device class is a named entity inside the netlist. In a SPICE netlist, the
+  model name is the name of that device class. Device classes are objects of type <class_doc href="DeviceClass"/>.
+  Device classes carry, among other properties, "SPICE profiles". A SPICE profile declares:
+  </p>
+
+  <ul>
+    <li>The element to use for the device (e.g. "M" or "X")</li>
+    <li>How the parameters are written</li>
+    <li>How the parameters are read</li>
+  </ul>
+
+  <p>
+  In most cases, the SPICE profiles will be enough to configure how devices are written
+  and read from SPICE files, so it is not required to implement a reader or writer delegate.
+  On the back side, it is required to declare and configure the device classes in the LVS 
+  scripts.
+  </p>
+
+  <p>
+  To declare devices, you have to include their definitions before you use "schematic" to 
+  read the schematic netlist and before you extract devices.
+  Definitions are made by creating a device class, either from the standard device classes
+  or using a custom one, and then configuring them. After you have configured them, they 
+  need to be registered, so the SPICE reader and writer code knows they exist.
+  </p>
+
+  <p>
+  Convenience helpers are provided to create an instance of the standard classes: 
+  <a href="/about/drc_ref_global.xml#mos4_class">mos4_class</a>,
+  <a href="/about/drc_ref_global.xml#dmos4_class">dmos4_class</a>,
+  <a href="/about/drc_ref_global.xml#mos3_class">mos3_class</a>, 
+  <a href="/about/drc_ref_global.xml#dmos3_class">dmos3_class</a>, 
+  <a href="/about/drc_ref_global.xml#diode_class">diode_class</a>, 
+  <a href="/about/drc_ref_global.xml#bjt3_class">bjt3_class</a>, 
+  <a href="/about/drc_ref_global.xml#bjt4_class">bjt4_class</a>, 
+  <a href="/about/drc_ref_global.xml#resistor_class">resistor_class</a>, 
+  <a href="/about/drc_ref_global.xml#resistor_with_bulk_class">resistor_with_bulk_class</a>, 
+  <a href="/about/drc_ref_global.xml#capacitor_class">capacitor_class</a> and
+  <a href="/about/drc_ref_global.xml#capacitor_with_bulk_class">capacitor_with_bulk_class</a>.
+  The helpers create device class objects which are pre-filled with the corresponding
+  parameters and terminals. Also, the device combination rules are configured already.
+  </p>
+
+  <p>
+  Here is an example how to register custom device classes derived from the MOS4 class
+  (<class_doc href="DeviceClassMOS4Transistor"/>) and which bind to SPICE "X" elements:
+  </p>
+
+  <pre>...
+
+# Creates a PMOS device derived from the MOS4 built-in type
+# and configure the default SPICE profile to use element type "X"
+pmos = mos4_class("PMOS")
+pmos.spice_profile().element = "X"
+
+# Same for NMOS
+nmos = mos4_class("NMOS")
+nmos.spice_profile().element = "X"
+
+# Registers the two new device classes
+# NOTE: this needs to come before the schematic netlist is read
+# or devices are extracted
+register_device_class(pmos)
+register_device_class(nmos)
+
+# Reads the schematic
+schematic("schematic.cir")
+
+...
+
+# PMOS transistor device extraction
+# NOTE: "mos4(pmos)" creates a device extractor for MOS4 devices which 
+# produces devices of "pmos" type.
+extract_devices(mos4(pmos), { "SD" => psd, "G" => pgate, "W" => nwell, 
+                              "tS" => psd, "tD" => psd, "tG" => poly, "tW" => nwell })
+
+# NMOS transistor device extraction
+extract_devices(mos4(nmos), { "SD" => nsd, "G" => ngate, "W" => bulk, 
+                              "tS" => nsd, "tD" => nsd, "tG" => poly, "tW" => bulk })
+
+...</pre>
+
+  <p>
+  For complete freedom of device configuration, you can also create
+  your own classes using the <class_doc href="DeviceClass"/> class. 
+  Instead using the factories for pre-defined classes (such as "mos4_class" above),
+  you instantiate your own class.
+  </p>
+
+  <p>
+  For more information about how SPICE reading and writing can be configured
+  with SPICE profiles, see here: <class_doc href="DeviceClassSpiceProfile"/>.
+  Note that currently you can't modify the model name through SPICE profiles.
+  </p>
+
+  <p>
+  There can be multiple SPICE profiles for different purposes (e.g.
+  SPICE reading and writing. SPICE profiles are named. For example, you
+  can declare two profiles - one for reading (called "READ") and one
+  for writing (called "WRITE") and use them separately:
+  </p>
+
+  <pre>...
+
+# Configures the target netlist to be written with SPICE profile "WRITE"
+target_netlist("extracted.cir", write_spice(spice_profile("WRITE")), "Extracted by KLayout")
+
+...
+
+# Creates a device class for "PMOS" with two SPICE
+# profiles. The one for reading uses the "X" element,
+# the one for writing uses the "M" element:
+pmos = mos4_class("PMOS")
+pmos.spice_profile("READ").element = "X"
+pmos.spice_profile("WRITE").element = "M"
+
+...
+
+# Reads the schematic using SPICE profile "READ"
+schematic("schematic.cir", spice_profile("READ"))
+
+...</pre>
 
 </doc>

@@ -107,28 +107,58 @@ See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#bbox_height"
 <p>Usage:</p>
 <ul>
 <li><tt>bjt3(name)</tt></li>
-<li><tt>bjt3(name, class)</tt></li>
+<li><tt>bjt3(device_class)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
-bipolar junction transistor
+bipolar junction transistor without a substrate terminal.
+If used with a name, the extractor will produce devices with device
+class <class_doc href="DeviceClassBJT3Transistor">DeviceClassBJT3Transistor</class_doc>. If used with a specific device
+class object, the extractor will produce devices with this class.
+It is the responsibility of the user that this class is compatible with
+the parameters and terminals the extractor will require.
 </p><p>
 See <class_doc href="DeviceExtractorBJT3Transistor">DeviceExtractorBJT3Transistor</class_doc> for more details
 about this extractor.
+</p>
+<a name="bjt3_class"/><h2>"bjt3_class" - Supplies the device class for a 3-terminal bipolar junction transistor</h2>
+<keyword name="bjt3_class"/>
+<p>Usage:</p>
+<ul>
+<li><tt>bjt3_class(name)</tt></li>
+</ul>
+<p>
+See <class_doc href="DeviceClassBJT3Transistor">DeviceClassBJT3Transistor</class_doc> for more details
+about this device class.
 </p>
 <a name="bjt4"/><h2>"bjt4" - Supplies the BJT4 transistor extractor class</h2>
 <keyword name="bjt4"/>
 <p>Usage:</p>
 <ul>
 <li><tt>bjt4(name)</tt></li>
-<li><tt>bjt4(name, class)</tt></li>
+<li><tt>bjt4(device_class)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
 bipolar junction transistor with a substrate terminal
+If used with a name, the extractor will produce devices with device
+class <class_doc href="DeviceClassBJT4Transistor">DeviceClassBJT4Transistor</class_doc>. If used with a specific device
+class object, the extractor will produce devices with this class.
+It is the responsibility of the user that this class is compatible with
+the parameters and terminals the extractor will require.
 </p><p>
 See <class_doc href="DeviceExtractorBJT4Transistor">DeviceExtractorBJT4Transistor</class_doc> for more details
 about this extractor.
+</p>
+<a name="bjt4_class"/><h2>"bjt4_class" - Supplies the device class for a 4-terminal bipolar junction transistor</h2>
+<keyword name="bjt4_class"/>
+<p>Usage:</p>
+<ul>
+<li><tt>bjt4_class(name)</tt></li>
+</ul>
+<p>
+See <class_doc href="DeviceClassBJT4Transistor">DeviceClassBJT4Transistor</class_doc> for more details
+about this device class.
 </p>
 <a name="box"/><h2>"box" - Creates a box object</h2>
 <keyword name="box"/>
@@ -145,29 +175,59 @@ This function creates a box object. The arguments are the same than for the
 <p>Usage:</p>
 <ul>
 <li><tt>capacitor(name, area_cap)</tt></li>
-<li><tt>capacitor(name, area_cap, class)</tt></li>
+<li><tt>capacitor(device_class, area_cap)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a capacitor.
 The area_cap argument is the capacitance in Farad per square micrometer.
+If used with a name, the extractor will produce devices with device
+class <class_doc href="DeviceClassCapacitor">DeviceClassCapacitor</class_doc>. If used with a specific device
+class object, the extractor will produce devices with this class.
+It is the responsibility of the user that this class is compatible with
+the parameters and terminals the extractor will require.
 </p><p>
 See <class_doc href="DeviceExtractorCapacitor">DeviceExtractorCapacitor</class_doc> for more details
 about this extractor.
+</p>
+<a name="capacitor_class"/><h2>"capacitor_class" - Supplies the device class for a capacitor</h2>
+<keyword name="capacitor_class"/>
+<p>Usage:</p>
+<ul>
+<li><tt>capacitor_class(name)</tt></li>
+</ul>
+<p>
+See <class_doc href="DeviceClassCapacitor">DeviceClassCapacitor</class_doc> for more details
+about this device class.
 </p>
 <a name="capacitor_with_bulk"/><h2>"capacitor_with_bulk" - Supplies the capacitor extractor class that includes a bulk terminal</h2>
 <keyword name="capacitor_with_bulk"/>
 <p>Usage:</p>
 <ul>
 <li><tt>capacitor_with_bulk(name, area_cap)</tt></li>
-<li><tt>capacitor_with_bulk(name, area_cap, class)</tt></li>
+<li><tt>capacitor_with_bulk(device_class, area_cap)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a capacitor 
 with a bulk terminal.
 The area_cap argument is the capacitance in Farad per square micrometer.
+If used with a name, the extractor will produce devices with device
+class <class_doc href="DeviceClassCapacitorWithBulk">DeviceClassCapacitorWithBulk</class_doc>. If used with a specific device
+class object, the extractor will produce devices with this class.
+It is the responsibility of the user that this class is compatible with
+the parameters and terminals the extractor will require.
 </p><p>
 See <class_doc href="DeviceExtractorCapacitorWithBulk">DeviceExtractorCapacitorWithBulk</class_doc> for more details
 about this extractor.
+</p>
+<a name="capacitor_with_bulk_class"/><h2>"capacitor_with_bulk_class" - Supplies the device class for a capacitor that includes a bulk terminal</h2>
+<keyword name="capacitor_with_bulk_class"/>
+<p>Usage:</p>
+<ul>
+<li><tt>capacitor_with_bulk_class(name)</tt></li>
+</ul>
+<p>
+See <class_doc href="DeviceClassCapacitorWithBulk">DeviceClassCapacitorWithBulk</class_doc> for more details
+about this device class.
 </p>
 <a name="cell"/><h2>"cell" - Selects a cell for input on the default source</h2>
 <keyword name="cell"/>
@@ -470,46 +530,91 @@ See <a href="/about/drc_ref_netter.xml#device_scaling">Netter#device_scaling</a>
 <p>Usage:</p>
 <ul>
 <li><tt>diode(name)</tt></li>
-<li><tt>diode(name, class)</tt></li>
+<li><tt>diode(device_class)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
 planar diode 
+If used with a name, the extractor will produce devices with device
+class <class_doc href="DeviceClassDiode">DeviceClassDiode</class_doc>. If used with a specific device
+class object, the extractor will produce devices with this class.
+It is the responsibility of the user that this class is compatible with
+the parameters and terminals the extractor will require.
 </p><p>
 See <class_doc href="DeviceExtractorDiode">DeviceExtractorDiode</class_doc> for more details
 about this extractor.
+</p>
+<a name="diode_class"/><h2>"diode_class" - Supplies the device class for a diode</h2>
+<keyword name="diode_class"/>
+<p>Usage:</p>
+<ul>
+<li><tt>diode_class(name)</tt></li>
+</ul>
+<p>
+See <class_doc href="DeviceClassDiode">DeviceClassDiode</class_doc> for more details
+about this device class.
 </p>
 <a name="dmos3"/><h2>"dmos3" - Supplies the DMOS3 transistor extractor class</h2>
 <keyword name="dmos3"/>
 <p>Usage:</p>
 <ul>
 <li><tt>dmos3(name)</tt></li>
-<li><tt>dmos3(name, class)</tt></li>
+<li><tt>dmos3(device_class)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
 three-terminal DMOS transistor. A DMOS transistor is essentially
 the same than a MOS transistor, but source and drain are 
 separated.
+If used with a name, the extractor will produce devices with device
+class <class_doc href="DeviceClassMOS3Transistor">DeviceClassMOS3Transistor</class_doc>. If used with a specific device
+class object, the extractor will produce devices with this class.
+It is the responsibility of the user that this class is compatible with
+the parameters and terminals the extractor will require.
 </p><p>
 See <class_doc href="DeviceExtractorMOS3Transistor">DeviceExtractorMOS3Transistor</class_doc> for more details
 about this extractor (strict mode applies for 'dmos3').
+</p>
+<a name="dmos3_class"/><h2>"dmos3_class" - Supplies the device class for a three-terminal DMOS transistor</h2>
+<keyword name="dmos3_class"/>
+<p>Usage:</p>
+<ul>
+<li><tt>dmos3_class(name)</tt></li>
+</ul>
+<p>
+See <class_doc href="DeviceClassMOS3Transistor">DeviceClassMOS3Transistor</class_doc> for more details
+about this device class.
 </p>
 <a name="dmos4"/><h2>"dmos4" - Supplies the MOS4 transistor extractor class</h2>
 <keyword name="dmos4"/>
 <p>Usage:</p>
 <ul>
 <li><tt>dmos4(name)</tt></li>
-<li><tt>dmos4(name, class)</tt></li>
+<li><tt>dmos4(device_class)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
 four-terminal DMOS transistor. A DMOS transistor is essentially
 the same than a MOS transistor, but source and drain are 
 separated.
+If used with a name, the extractor will produce devices with device
+class <class_doc href="DeviceClassMOS4Transistor">DeviceClassMOS4Transistor</class_doc>. If used with a specific device
+class object, the extractor will produce devices with this class.
+It is the responsibility of the user that this class is compatible with
+the parameters and terminals the extractor will require.
 </p><p>
 See <class_doc href="DeviceExtractorMOS4Transistor">DeviceExtractorMOS4Transistor</class_doc> for more details
 about this extractor (strict mode applies for 'dmos4').
+</p>
+<a name="dmos4_class"/><h2>"dmos4_class" - Supplies the device class for a four-terminal DMOS transistor</h2>
+<keyword name="dmos4_class"/>
+<p>Usage:</p>
+<ul>
+<li><tt>dmos4_class(name)</tt></li>
+</ul>
+<p>
+See <class_doc href="DeviceClassMOS4Transistor">DeviceClassMOS4Transistor</class_doc> for more details
+about this device class.
 </p>
 <a name="edge"/><h2>"edge" - Creates an edge object</h2>
 <keyword name="edge"/>
@@ -1201,28 +1306,58 @@ argument, "middle" represents the bounding box center marker generator on primar
 <p>Usage:</p>
 <ul>
 <li><tt>mos3(name)</tt></li>
-<li><tt>mos3(name, class)</tt></li>
+<li><tt>mos3(device_class)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
 three-terminal MOS transistor.
+If used with a name, the extractor will produce devices with device
+class <class_doc href="DeviceClassMOS3Transistor">DeviceClassMOS3Transistor</class_doc>. If used with a specific device
+class object, the extractor will produce devices with this class.
+It is the responsibility of the user that this class is compatible with
+the parameters and terminals the extractor will require.
 </p><p>
 See <class_doc href="DeviceExtractorMOS3Transistor">DeviceExtractorMOS3Transistor</class_doc> for more details
 about this extractor (non-strict mode applies for 'mos3').
+</p>
+<a name="mos3_class"/><h2>"mos3_class" - Supplies the device class for a three-terminal symmetric MOS transistor</h2>
+<keyword name="mos3_class"/>
+<p>Usage:</p>
+<ul>
+<li><tt>mos3_class(name)</tt></li>
+</ul>
+<p>
+See <class_doc href="DeviceClassMOS3Transistor">DeviceClassMOS3Transistor</class_doc> for more details
+about this device class.
 </p>
 <a name="mos4"/><h2>"mos4" - Supplies the MOS4 transistor extractor class</h2>
 <keyword name="mos4"/>
 <p>Usage:</p>
 <ul>
 <li><tt>mos4(name)</tt></li>
-<li><tt>mos4(name, class)</tt></li>
+<li><tt>mos4(device_class)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
 four-terminal MOS transistor.
+If used with a name, the extractor will produce devices with device
+class <class_doc href="DeviceClassMOS4Transistor">DeviceClassMOS4Transistor</class_doc>. If used with a specific device
+class object, the extractor will produce devices with this class.
+It is the responsibility of the user that this class is compatible with
+the parameters and terminals the extractor will require.
 </p><p>
 See <class_doc href="DeviceExtractorMOS4Transistor">DeviceExtractorMOS4Transistor</class_doc> for more details
 about this extractor (non-strict mode applies for 'mos4').
+</p>
+<a name="mos4_class"/><h2>"mos4_class" - Supplies the device class for a four-terminal symmetric MOS transistor</h2>
+<keyword name="mos4_class"/>
+<p>Usage:</p>
+<ul>
+<li><tt>mos4_class(name)</tt></li>
+</ul>
+<p>
+See <class_doc href="DeviceClassMOS4Transistor">DeviceClassMOS4Transistor</class_doc> for more details
+about this device class.
 </p>
 <a name="name"/><h2>"name" - Assigns a name to a layer for reference in the LVS database</h2>
 <keyword name="name"/>
@@ -1666,6 +1801,26 @@ l1 = input(1, 0)
 </p><p>
 To remove this condition, call "region_touch" without any arguments.
 </p>
+<a name="register_device_class"/><h2>"register_device_class" - Registers a device class for device extraction and netlisting</h2>
+<keyword name="register_device_class"/>
+<p>Usage:</p>
+<ul>
+<li><tt>register_device_class(dc)</tt></li>
+</ul>
+<p>
+Registers the device class for extraction and netlist input and output.
+"dc" is an object of type <class_doc href="DeviceClass">DeviceClass</class_doc>.
+</p><p>
+Registers a device class for extraction and netlist output.
+Registering a device class is optional. However, using registered
+device classed simplify SPICE netlist writing, as device classes
+can be configured with SPICE profiles to customize SPICE output.
+In the LVS context, <a href="#register_device_class">register_device_class</a> also controls the way
+schematic netlists are read from SPICE.
+See <a href="/about/drc_ref_netter.xml#register_device_class">Netter#register_device_class</a> for a description of this function.
+Also see <a href="/about/drc_ref_netter.xml#extract_devices">Netter#extract_devices</a> for how to use it with registered
+device classes.
+</p>
 <a name="relative_height"/><h2>"relative_height" - Selects primary shapes based on the ratio of height and width of their bounding boxes</h2>
 <keyword name="relative_height"/>
 <p>Usage:</p>
@@ -1718,36 +1873,64 @@ will also be written to the given file.
 If a file name is given and "long" is true, a verbose 
 version of the L2N DB format will be used.
 </p>
-<a name="resistor"/><h2>"resistor" - Supplies the resistor extractor class</h2>
+<a name="resistor"/><h2>"resistor" - Supplies the resistor extractor class.</h2>
 <keyword name="resistor"/>
 <p>Usage:</p>
 <ul>
-<li><tt>resistor(name, sheet_rho)</tt></li>
-<li><tt>resistor(name, sheet_rho, class)</tt></li>
+<li><tt>resistor(name, rho)</tt></li>
+<li><tt>resistor(device_class, rho)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a resistor.
-</p><p>
-The sheet_rho value is the sheet resistance in ohms/square. It is used
-to compute the resistance from the geometry.
+"rho" is the sheet resistance in ohms/square.
+If used with a name, the extractor will produce devices with device
+class <class_doc href="DeviceClassResistor">DeviceClassResistor</class_doc>. If used with a specific device
+class object, the extractor will produce devices with this class.
+It is the responsibility of the user that this class is compatible with
+the parameters and terminals the extractor will require.
 </p><p>
 See <class_doc href="DeviceExtractorResistor">DeviceExtractorResistor</class_doc> for more details
 about this extractor.
+</p>
+<a name="resistor_class"/><h2>"resistor_class" - Supplies the device class for a resistor</h2>
+<keyword name="resistor_class"/>
+<p>Usage:</p>
+<ul>
+<li><tt>resistor_class(name)</tt></li>
+</ul>
+<p>
+See <class_doc href="DeviceClassResistor">DeviceClassResistor</class_doc> for more details
+about this device class.
 </p>
 <a name="resistor_with_bulk"/><h2>"resistor_with_bulk" - Supplies the resistor extractor class that includes a bulk terminal</h2>
 <keyword name="resistor_with_bulk"/>
 <p>Usage:</p>
 <ul>
-<li><tt>resistor_with_bulk(name, sheet_rho)</tt></li>
-<li><tt>resistor_with_bulk(name, sheet_rho, class)</tt></li>
+<li><tt>resistor_with_bulk(name, rho)</tt></li>
+<li><tt>resistor_with_bulk(device_class, rho)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a resistor 
 with a bulk terminal.
-The sheet_rho value is the sheet resistance in ohms/square.
+"rho" is the sheet resistance in ohms/square.
+If used with a name, the extractor will produce devices with device
+class <class_doc href="DeviceClassResistorWithBulk">DeviceClassResistorWithBulk</class_doc>. If used with a specific device
+class object, the extractor will produce devices with this class.
+It is the responsibility of the user that this class is compatible with
+the parameters and terminals the extractor will require.
 </p><p>
 See <class_doc href="DeviceExtractorResistorWithBulk">DeviceExtractorResistorWithBulk</class_doc> for more details
 about this extractor.
+</p>
+<a name="resistor_with_bulk_class"/><h2>"resistor_with_bulk_class" - Supplies the device class for a resistor that includes a bulk terminal</h2>
+<keyword name="resistor_with_bulk_class"/>
+<p>Usage:</p>
+<ul>
+<li><tt>resistor_with_bulk_class(name)</tt></li>
+</ul>
+<p>
+See <class_doc href="DeviceClassResistorWithBulk">DeviceClassResistorWithBulk</class_doc> for more details
+about this device class.
 </p>
 <a name="rounded_corners"/><h2>"rounded_corners" - Applies corner rounding</h2>
 <keyword name="rounded_corners"/>
@@ -2318,6 +2501,7 @@ shape.
 <ul>
 <li><tt>write_spice([ use_net_names [, with_comments ] ])</tt></li>
 <li><tt>write_spice(writer_delegate [, use_net_names [, with_comments ] ])</tt></li>
+<li><tt>write_spice(spice_profile [, use_net_names [, with_comments ] ])</tt></li>
 </ul>
 <p>
 Use this option in <a href="#target_netlist">target_netlist</a> for the format parameter to 
@@ -2328,5 +2512,12 @@ information comments such as instance coordinates or pin names.
 </p><p>
 "writer_delegate" allows using a <class_doc href="NetlistSpiceWriterDelegate">NetlistSpiceWriterDelegate</class_doc> object to 
 control the actual writing.
+</p><p>
+To provide the name of a SPICE profile to use, include it the following way:
+</p><p>
+<pre>
+# write SPICE files using profile "my_profile"
+write_spice(spice_profile("my-profile"))
+</pre>
 </p>
 </doc>

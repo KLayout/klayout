@@ -57,12 +57,15 @@ class CompoundRegionOperationNode;
  *  This cache is important to avoid duplicate evaluation of the same node in
  *  a diamond-graph structure of nodes.
  */
+#include "tlThreads.h"
+
 class DB_PUBLIC CompoundRegionOperationCache
 {
 public:
   template <class TR>
   std::pair<bool, std::vector<std::unordered_set<TR> > *> get (const CompoundRegionOperationNode *node)
   {
+    tl::MutexLocker lock (&m_mutex);
     bool valid = false;
     std::vector<std::unordered_set<TR> > *cache = 0;
     get_cache (cache, valid, node);
@@ -70,6 +73,7 @@ public:
   }
 
 private:
+  tl::Mutex m_mutex;
   std::map<const CompoundRegionOperationNode *, std::vector<std::unordered_set<db::PolygonRefWithProperties> > > m_cache_polyref_wp;
   std::map<const CompoundRegionOperationNode *, std::vector<std::unordered_set<db::PolygonWithProperties> > > m_cache_poly_wp;
   std::map<const CompoundRegionOperationNode *, std::vector<std::unordered_set<db::EdgeWithProperties> > > m_cache_edge_wp;

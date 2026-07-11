@@ -766,46 +766,52 @@ CompoundRegionGeometricalBoolOperationNode::implement_bool (CompoundRegionOperat
   one_a.push_back (std::unordered_set<T1> ());
 
   shape_interactions<T, T> computed_a;
-  child (0)->compute_local (cache, layout, cell, interactions_for_child (interactions, 0, computed_a), one_a, proc);
+
+  std::vector<std::unordered_set<T2> > one_b;
+  one_b.push_back (std::unordered_set<T2> ());
+
+  shape_interactions<T, T> computed_b;
+
+  bool can_parallel = (m_op != GeometricalOp::And && m_op != GeometricalOp::Not);
+
+#if defined(_OPENMP)
+  if (can_parallel && proc->threads() > 0) {
+    #pragma omp task shared(one_a, computed_a, cache, layout, cell, interactions, proc)
+    {
+      child (0)->compute_local (cache, layout, cell, interactions_for_child (interactions, 0, computed_a), one_a, proc);
+    }
+    #pragma omp task shared(one_b, computed_b, cache, layout, cell, interactions, proc)
+    {
+      child (1)->compute_local (cache, layout, cell, interactions_for_child (interactions, 1, computed_b), one_b, proc);
+    }
+    #pragma omp taskwait
+  } else
+#endif
+  {
+    child (0)->compute_local (cache, layout, cell, interactions_for_child (interactions, 0, computed_a), one_a, proc);
+    if (!one_a.front().empty()) {
+      child (1)->compute_local (cache, layout, cell, interactions_for_child (interactions, 1, computed_b), one_b, proc);
+    } else {
+      if (!can_parallel) { // And or Not and A is empty
+        return; // nothing to do, results remain empty
+      }
+    }
+  }
 
   if (one_a.front ().empty ()) {
-
-    if (m_op == GeometricalOp::And || m_op == GeometricalOp::Not) {
-
+    if (!can_parallel) {
       //  .. no results ..
-
     } else {
-
-      std::vector<std::unordered_set<T2> > one_b;
-      one_b.push_back (std::unordered_set<T2> ());
-
-      shape_interactions<T, T> computed_b;
-      child (1)->compute_local (cache, layout, cell, interactions_for_child (interactions, 1, computed_b), one_b, proc);
-
       copy_results (results, one_b);
-
     }
-
   } else {
-
-    std::vector<std::unordered_set<T2> > one_b;
-    one_b.push_back (std::unordered_set<T2> ());
-
-    shape_interactions<T, T> computed_b;
-    child (1)->compute_local (cache, layout, cell, interactions_for_child (interactions, 1, computed_b), one_b, proc);
-
     if (one_b.front ().empty ()) {
-
       if (m_op != GeometricalOp::And) {
         copy_results (results, one_a);
       }
-
     } else {
-
       run_bool (m_op, layout, one_a.front (), one_b.front (), results.front ());
-
     }
-
   }
 }
 
@@ -934,30 +940,54 @@ void compound_region_generic_operation_node<TS, TI, TR>::implement_compute_local
   shape_interactions<TTS, TTI> self_interactions_heap;
   const shape_interactions<TTS, TTI> &self_interactions = interactions_for_child (interactions, 0, self_interactions_heap);
 
-  self->compute_local (cache, layout, cell, self_interactions, self_result, proc);
+  std::vector<db::generic_shape_iterator<TI> > iiv;
+  std::vector<std::unordered_set<TI> > intruder_results;
+  intruder_results.resize (children () - 1);  //  allocate memory upfront
+
+  #if defined(_OPENMP)
+  if (proc->threads() > 0) {
+    #pragma omp task shared(self_result, self_interactions_heap, cache, layout, cell, interactions, proc)
+    {
+      self->compute_local (cache, layout, cell, self_interactions, self_result, proc);
+    }
+    for (unsigned int ci = 1; ci < children (); ++ci) {
+      #pragma omp task shared(intruder_results, cache, layout, cell, interactions, proc) firstprivate(ci)
+      {
+        const CompoundRegionOperationNode *intruder = child (ci);
+        std::vector<std::unordered_set<TI> > intruder_result;
+        intruder_result.push_back (std::unordered_set<TI> ());
+
+        shape_interactions<TTS, TTI> intruder_interactions_heap;
+        const shape_interactions<TTS, TTI> &intruder_interactions = interactions_for_child (interactions, ci, intruder_interactions_heap);
+
+        intruder->compute_local (cache, layout, cell, intruder_interactions, intruder_result, proc);
+        intruder_results[ci - 1] = std::move(intruder_result.front());
+      }
+    }
+    #pragma omp taskwait
+  } else
+  #endif
+  {
+    self->compute_local (cache, layout, cell, self_interactions, self_result, proc);
+
+    for (unsigned int ci = 1; ci < children (); ++ci) {
+
+      const CompoundRegionOperationNode *intruder = child (ci);
+      std::vector<std::unordered_set<TI> > intruder_result;
+      intruder_result.push_back (std::unordered_set<TI> ());
+
+      shape_interactions<TTS, TTI> intruder_interactions_heap;
+      const shape_interactions<TTS, TTI> &intruder_interactions = interactions_for_child (interactions, ci, intruder_interactions_heap);
+
+      intruder->compute_local (cache, layout, cell, intruder_interactions, intruder_result, proc);
+      intruder_results[ci - 1] = std::move(intruder_result.front());
+    }
+  }
 
   db::generic_shape_iterator <TS> is (self_result.front ().begin (), self_result.front ().end ());
 
-  std::vector<db::generic_shape_iterator<TI> > iiv;
-  std::vector<std::unordered_set<TI> > intruder_results;
-  intruder_results.reserve (children () - 1);  //  important, so that the memory layout will not change while we generate them
-
   for (unsigned int ci = 1; ci < children (); ++ci) {
-
-    const CompoundRegionOperationNode *intruder = child (ci);
-    std::vector<std::unordered_set<TI> > intruder_result;
-    intruder_result.push_back (std::unordered_set<TI> ());
-
-    shape_interactions<TTS, TTI> intruder_interactions_heap;
-    const shape_interactions<TTS, TTI> &intruder_interactions = interactions_for_child (interactions, ci, intruder_interactions_heap);
-
-    intruder->compute_local (cache, layout, cell, intruder_interactions, intruder_result, proc);
-
-    intruder_results.push_back (std::unordered_set<TI> ());
-    intruder_results.back ().swap (intruder_result.front ());
-
-    iiv.push_back (db::generic_shape_iterator<TI> (intruder_results.back ().begin (), intruder_results.back ().end ()));
-
+    iiv.push_back (db::generic_shape_iterator <TI> (intruder_results[ci - 1].begin (), intruder_results[ci - 1].end ()));
   }
 
   db::local_processor <TS, TI, TR> lproc (layout);

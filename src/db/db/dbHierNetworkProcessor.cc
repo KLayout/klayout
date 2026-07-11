@@ -2945,10 +2945,23 @@ template <class T>
 void
 hier_clusters<T>::build_hier_connections_for_cells (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const std::vector<db::cell_index_type> &cells, const db::Connectivity &conn, const std::set<db::cell_index_type> *breakout_cells, tl::RelativeProgress &progress, instance_interaction_cache_type &instance_interaction_cache, bool separate_attributes)
 {
+#if defined(_OPENMP)
+  #pragma omp parallel for schedule(dynamic)
+  for (long long i = 0; i < (long long)cells.size (); ++i) {
+    db::cell_index_type c = cells[i];
+    build_hier_connections (cbc, layout, layout.cell (c), conn, breakout_cells, instance_interaction_cache, separate_attributes);
+    
+    #pragma omp critical
+    {
+      ++progress;
+    }
+  }
+#else
   for (std::vector<db::cell_index_type>::const_iterator c = cells.begin (); c != cells.end (); ++c) {
     build_hier_connections (cbc, layout, layout.cell (*c), conn, breakout_cells, instance_interaction_cache, separate_attributes);
     ++progress;
   }
+#endif
 }
 
 namespace {

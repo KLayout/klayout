@@ -454,3 +454,7 @@ INCLUDEPATH += $$TL_INC $$GSI_INC
 DEPENDPATH += $$TL_INC $$GSI_INC
 LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi
 
+packagesExist(tbb) {
+    LIBS += -ltbb
+}
+

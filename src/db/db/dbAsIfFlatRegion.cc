@@ -43,6 +43,14 @@
 #include "dbLayoutToNetlist.h"
 
 #include <sstream>
+#include <algorithm>
+
+#if defined(__cpp_lib_execution)
+#include <execution>
+#define PARALLEL_EXEC_POLICY std::execution::par,
+#else
+#define PARALLEL_EXEC_POLICY
+#endif
 
 namespace db
 {
@@ -440,7 +448,7 @@ void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, 
       addressable_polygons.inc ();
     }
 
-    std::sort (polygons_by_prop_id.begin (), polygons_by_prop_id.end (), ComparePolygonsWithProperties ());
+    std::sort (PARALLEL_EXEC_POLICY polygons_by_prop_id.begin (), polygons_by_prop_id.end (), ComparePolygonsWithProperties ());
 
     for (auto p = polygons_by_prop_id.begin (); p != polygons_by_prop_id.end (); ) {
 

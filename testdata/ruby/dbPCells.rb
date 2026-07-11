@@ -173,6 +173,20 @@ if RBA.constants.member?(:PCellDeclarationHelper)
       
   end
 
+  # A PCell with a parameter named "name"
+  class PCellWithNameParameter < RBA::PCellDeclarationHelper
+
+    def initialize
+      super()
+      param(:name, TypeString, "Name", :default => "")
+    end
+
+    def produce_impl
+      cell.shapes(layout.layer(1, 0)).insert(RBA::Text::new(name, RBA::Trans::new))
+    end
+
+  end
+
   class PCellTestLib2 < RBA::Library
 
     def initialize  
@@ -182,6 +196,7 @@ if RBA.constants.member?(:PCellDeclarationHelper)
       
       # create the PCell declarations
       layout.register_pcell("Box2", BoxPCell2::new)
+      layout.register_pcell("PCellWithNameParameter", PCellWithNameParameter::new)
 
       # register us with the name "MyLib"
       self.register("PCellTestLib2")
@@ -1009,6 +1024,25 @@ class DBPCell_TestClass < TestBase
     assert_equal(cell.library_cell_name, "")   # it's not a static library cell
     assert_equal(cell.library_name, "PCellTestLib")
     assert_equal(cell.display_title, "<defunct>PCellTestLib.Box")
+
+  end
+
+  # PCell with "name" parameter
+  def test_15
+
+    # instantiate and register the library
+    tl = PCellTestLib2::new
+
+    lib = RBA::Library::library_by_name("PCellTestLib2")
+    pcell_decl_id = lib.layout.pcell_id("PCellWithNameParameter")
+
+    param = { "name" => "xyz" }
+    pcell_var_id = lib.layout.add_pcell_variant(pcell_decl_id, param)
+
+    assert_equal(lib.layout.cell(pcell_var_id).name, "PCellWithNameParameter")
+    assert_equal(first_shape(lib.layout.begin_shapes(pcell_var_id, lib.layout.layer(1, 0))).to_s, "text ('xyz',r0 0,0)")
+
+    tl._destroy
 
   end
 

@@ -892,14 +892,38 @@ static db::Layout *layout_default_ctor()
   return new db::Layout (true);
 }
 
-static db::Layout *editable_layout_ctor_with_manager(bool editable, db::Manager &manager)
+static db::Layout *editable_layout_ctor_with_manager(bool editable, db::Manager *manager)
 {
-  return new db::Layout (editable, &manager);
+  return new db::Layout (editable, manager);
 }
 
-static db::Layout *editable_layout_default_ctor(bool editable)
+static db::Layout *layout_ctor_from_cell(const db::Cell &source_cell, tl::Variant editable, db::Manager *manager)
 {
-  return new db::Layout (editable);
+  const db::Layout *source_layout = source_cell.layout ();
+  if (! source_layout) {
+    throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
+  }
+
+  bool editable_flag = source_layout->is_editable ();
+  if (! editable.is_nil ()) {
+    editable_flag = editable.to_bool ();
+  }
+
+  std::unique_ptr<db::Layout> target_layout (new db::Layout (editable_flag, manager));
+  db::cell_index_type target_cell_index = target_layout->add_cell (source_layout->cell_name (source_cell.cell_index ()));
+  target_layout->dbu (source_layout->dbu ());
+
+  db::CellMapping cm;
+  cm.create_single_mapping_full (*target_layout, target_cell_index, *source_layout, source_cell.cell_index ());
+
+  db::LayerMapping lm;
+  lm.create_full (*target_layout, *source_cell.layout ());
+
+  std::vector <db::cell_index_type> source_cells;
+  source_cells.push_back (source_cell.cell_index ());
+  db::copy_shapes (*target_layout, *source_layout, db::ICplxTrans (), source_cells, cm.table (), lm.table ());
+
+  return target_layout.release ();
 }
 
 static db::cell_index_type add_lib_pcell_variant (db::Layout *layout, db::Library *lib, db::pcell_id_type pcell_id, const std::vector<tl::Variant> &parameters)
@@ -1286,7 +1310,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "always editable. Before that version, they inherited the editable flag from "
     "the application."
   ) +
-  gsi::constructor ("new", &editable_layout_ctor_with_manager, gsi::arg ("editable"), gsi::arg ("manager"),
+  gsi::constructor ("new", &editable_layout_ctor_with_manager, gsi::arg ("editable"), gsi::arg ("manager", (db::Manager *) 0, "nil"),
     "@brief Creates a layout object attached to a manager\n"
     "\n"
     "This constructor specifies a manager object which is used to "
@@ -1294,16 +1318,21 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "the layout is editable. In editable mode, some optimizations are disabled "
     "and the layout can be manipulated through a variety of methods.\n"
     "\n"
+    "The manager object can be nil - in that case, undo/redo is not supported.\n"
+    "\n"
     "This method was introduced in version 0.22.\n"
   ) +
-  gsi::constructor ("new", &editable_layout_default_ctor, gsi::arg ("editable"),
-    "@brief Creates a layout object\n"
+  gsi::constructor ("new", &layout_ctor_from_cell, gsi::arg ("source_cell"), gsi::arg ("editable", tl::Variant (), "nil"), gsi::arg ("manager", (db::Manager *) 0, "nil"),
+    "@brief Creates a layout object as a copy of another cell\n"
     "\n"
-    "This constructor specifies whether "
-    "the layout is editable. In editable mode, some optimizations are disabled "
-    "and the layout can be manipulated through a variety of methods.\n"
+    "This convenience constructor creates a new layout object as a hierarchical copy of the source cell including all "
+    "child cells and shapes.\n"
     "\n"
-    "This method was introduced in version 0.22.\n"
+    "If 'editable' is a boolean value, the new layout object will be made editable depending on that value. "
+    "If 'nil' is used for 'editable', the editable attribute is copied from the layout the source cell lives in.\n"
+    "'manager' can be a \\Manager object to which the new layout will be attached.\n"
+    "\n"
+    "This method was introduced in version 0.30.10.\n"
   ) +
   gsi::method ("library", &db::Layout::library,
     "@brief Gets the library this layout lives in or nil if the layout is not part of a library\n"

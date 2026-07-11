@@ -2113,3 +2113,13 @@ TEST(148_sparse_array_limit)
   run_test (_this, "148", true);
 }
 
+//  issue 2384
+TEST(149_compound_drc_with_mag)
+{
+  run_test (_this, "149", false);
+}
+
+TEST(149d_compound_drc_with_mag)
+{
+  run_test (_this, "149", true);
+}

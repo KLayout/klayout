@@ -465,6 +465,9 @@ void
 Service::show_images (bool f)
 {
   if (m_images_visible != f) {
+    if (! f) {
+      clear_selection ();
+    }
     m_images_visible = f;
     view ()->redraw_deco_layer ();
   }

@@ -126,12 +126,32 @@ static std::vector<char> pixel_buffer_to_png (const tl::PixelBuffer *pb)
 #endif
 }
 
-//  Returns the raw ARGB32 pixel data as a byte vector (no encoding overhead)
+//  Returns an 8-byte header (width, height as uint32) followed by the raw ARGB32 pixel data
 static std::vector<char> pixel_buffer_to_bytes (const tl::PixelBuffer *pb)
 {
-  const char *p = (const char *) pb->data ();
-  size_t n = (size_t) pb->width () * (size_t) pb->height () * 4;
-  return std::vector<char> (p, p + n);
+  uint32_t w = pb->width (), h = pb->height ();
+  size_t n = (size_t) w * (size_t) h * 4;
+  std::vector<char> data (8 + n);
+  memcpy (data.data (), &w, 4);
+  memcpy (data.data () + 4, &h, 4);
+  memcpy (data.data () + 8, pb->data (), n);
+  return data;
+}
+
+//  Inverse of to_bytes: reads width/height from the header and checks the length
+static tl::PixelBuffer pixel_buffer_from_bytes (const std::vector<char> &data)
+{
+  uint32_t w = 0, h = 0;
+  if (data.size () >= 8) {
+    memcpy (&w, data.data (), 4);
+    memcpy (&h, data.data () + 4, 4);
+  }
+  if (data.size () != 8 + (size_t) w * (size_t) h * 4) {
+    throw tl::Exception (tl::to_string (tr ("Invalid PixelBuffer byte stream: length does not match the width and height in the header")));
+  }
+  tl::PixelBuffer pb (w, h, (const tl::color_t *) (data.data () + 8));
+  pb.set_transparent (true);
+  return pb;
 }
 
 
@@ -199,10 +219,19 @@ Class<tl::PixelBuffer> decl_PixelBuffer ("lay", "PixelBuffer",
   gsi::method_ext ("to_bytes", &pixel_buffer_to_bytes,
     "@brief Converts the pixel buffer to a raw byte stream\n"
     "\n"
-    "Returns the raw ARGB32 pixel data with 4 bytes per pixel in row-major order, "
-    "top to bottom. Unlike \\to_png_data this method has zero encoding overhead.\n"
+    "The stream starts with an 8-byte header (width and height as 32-bit unsigned integers) "
+    "followed by the raw ARGB32 pixel data with 4 bytes per pixel in row-major order, "
+    "top to bottom. Unlike \\to_png_data this method has zero encoding overhead. "
+    "Use \\from_bytes to reconstruct the pixel buffer.\n"
     "\n"
-    "This method has been added in version 0.30.9."
+    "This method has been added in version 0.30.10."
+  ) +
+  gsi::method ("from_bytes", &pixel_buffer_from_bytes, gsi::arg ("data"),
+    "@brief Reconstructs a pixel buffer from a byte stream produced by \\to_bytes\n"
+    "\n"
+    "The width and height are taken from the header and the stream length is checked against them.\n"
+    "\n"
+    "This method has been added in version 0.30.10."
   ) +
   gsi::method ("patch", &tl::PixelBuffer::patch, gsi::arg ("other"),
     "@brief Patches another pixel buffer into this one\n"

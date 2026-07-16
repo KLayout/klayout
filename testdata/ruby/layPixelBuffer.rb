@@ -152,6 +152,32 @@ class LAYPixelBuffer_TestClass < TestBase
 
   end
 
+  def test_5
+
+    # to_bytes / from_bytes round-trip
+
+    pb = RBA::PixelBuffer::new(10, 20)
+    pb.transparent = true
+    pb.fill(0xf0010203)
+    pb.set_pixel(1, 2, 0x80102030)
+
+    bytes = pb.to_bytes
+    assert_equal(bytes.size, 8 + 10 * 20 * 4)
+    assert_equal(bytes[0, 8].unpack("VV"), [ 10, 20 ])  # width, height header
+
+    assert_equal(pb == RBA::PixelBuffer.from_bytes(bytes), true)
+
+    # a mismatched stream is rejected
+    error = false
+    begin
+      RBA::PixelBuffer.from_bytes(bytes[0, bytes.size - 4])
+    rescue
+      error = true
+    end
+    assert_equal(error, true)
+
+  end
+
   def test_11
 
     pb = RBA::BitmapBuffer::new

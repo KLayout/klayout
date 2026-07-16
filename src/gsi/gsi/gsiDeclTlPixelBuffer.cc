@@ -126,6 +126,40 @@ static std::vector<char> pixel_buffer_to_png (const tl::PixelBuffer *pb)
 #endif
 }
 
+//  Returns an 8-byte header (width, height as uint32) followed by the raw ARGB32 pixel data
+static std::vector<char> pixel_buffer_to_bytes (const tl::PixelBuffer *pb)
+{
+  uint32_t w = pb->width (), h = pb->height ();
+  size_t n = (size_t) w * (size_t) h * 4;
+  std::vector<char> data (8 + n);
+  memcpy (data.data (), &w, 4);
+  memcpy (data.data () + 4, &h, 4);
+  memcpy (data.data () + 8, pb->data (), n);
+  return data;
+}
+
+//  Inverse of to_bytes: reads width/height from the header and checks the length
+static tl::PixelBuffer pixel_buffer_from_bytes (const std::vector<char> &data)
+{
+  uint32_t w = 0, h = 0;
+  if (data.size () >= 8) {
+    memcpy (&w, data.data (), 4);
+    memcpy (&h, data.data () + 4, 4);
+  }
+  //  sanity guard against malformed headers: reader caps dimensions at 64k x 64k
+  //  (generous for finely-resolved drawings), writer stays full 32-bit
+  const uint32_t max_dim = 65536;
+  if (w > max_dim || h > max_dim) {
+    throw tl::Exception (tl::to_string (tr ("Invalid PixelBuffer byte stream: width or height exceeds the 65536 x 65536 limit")));
+  }
+  if (data.size () != 8 + (size_t) w * (size_t) h * 4) {
+    throw tl::Exception (tl::to_string (tr ("Invalid PixelBuffer byte stream: length does not match the width and height in the header")));
+  }
+  tl::PixelBuffer pb (w, h, (const tl::color_t *) (data.data () + 8));
+  pb.set_transparent (true);
+  return pb;
+}
+
 
 Class<tl::PixelBuffer> decl_PixelBuffer ("lay", "PixelBuffer",
   gsi::constructor ("new", &create_pixel_buffer, gsi::arg ("width"), gsi::arg ("height"),
@@ -187,6 +221,24 @@ Class<tl::PixelBuffer> decl_PixelBuffer ("lay", "PixelBuffer",
     "@brief Converts the pixel buffer to a PNG byte stream"
     "\n"
     "This method may not be available if PNG support is not compiled into KLayout."
+  ) +
+  gsi::method_ext ("to_bytes", &pixel_buffer_to_bytes,
+    "@brief Converts the pixel buffer to a raw byte stream\n"
+    "\n"
+    "The stream starts with an 8-byte header (width and height as 32-bit unsigned integers) "
+    "followed by the raw ARGB32 pixel data with 4 bytes per pixel in row-major order, "
+    "top to bottom. Unlike \\to_png_data this method has zero encoding overhead. "
+    "Use \\from_bytes to reconstruct the pixel buffer.\n"
+    "\n"
+    "This method has been added in version 0.30.10."
+  ) +
+  gsi::method ("from_bytes", &pixel_buffer_from_bytes, gsi::arg ("data"),
+    "@brief Reconstructs a pixel buffer from a byte stream produced by \\to_bytes\n"
+    "\n"
+    "The width and height are taken from the header and the stream length is checked against them. "
+    "The dimensions are capped at 65536 x 65536; a header exceeding this limit raises an error.\n"
+    "\n"
+    "This method has been added in version 0.30.10."
   ) +
   gsi::method ("patch", &tl::PixelBuffer::patch, gsi::arg ("other"),
     "@brief Patches another pixel buffer into this one\n"

@@ -146,6 +146,12 @@ static tl::PixelBuffer pixel_buffer_from_bytes (const std::vector<char> &data)
     memcpy (&w, data.data (), 4);
     memcpy (&h, data.data () + 4, 4);
   }
+  //  sanity guard against malformed headers: reader caps dimensions at 64k x 64k
+  //  (generous for finely-resolved drawings), writer stays full 32-bit
+  const uint32_t max_dim = 65536;
+  if (w > max_dim || h > max_dim) {
+    throw tl::Exception (tl::to_string (tr ("Invalid PixelBuffer byte stream: width or height exceeds the 65536 x 65536 limit")));
+  }
   if (data.size () != 8 + (size_t) w * (size_t) h * 4) {
     throw tl::Exception (tl::to_string (tr ("Invalid PixelBuffer byte stream: length does not match the width and height in the header")));
   }
@@ -229,7 +235,8 @@ Class<tl::PixelBuffer> decl_PixelBuffer ("lay", "PixelBuffer",
   gsi::method ("from_bytes", &pixel_buffer_from_bytes, gsi::arg ("data"),
     "@brief Reconstructs a pixel buffer from a byte stream produced by \\to_bytes\n"
     "\n"
-    "The width and height are taken from the header and the stream length is checked against them.\n"
+    "The width and height are taken from the header and the stream length is checked against them. "
+    "The dimensions are capped at 65536 x 65536; a header exceeding this limit raises an error.\n"
     "\n"
     "This method has been added in version 0.30.10."
   ) +

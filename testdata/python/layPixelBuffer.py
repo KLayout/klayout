@@ -78,6 +78,10 @@ class LAYPixelBufferTests(unittest.TestCase):
     with self.assertRaises(Exception):
       pya.PixelBuffer.from_bytes(data[:-4])
 
+    # a header beyond the 64k x 64k limit is rejected
+    with self.assertRaises(Exception):
+      pya.PixelBuffer.from_bytes(struct.pack("=II", 65537, 1))
+
 
 # run unit tests
 if __name__ == '__main__':

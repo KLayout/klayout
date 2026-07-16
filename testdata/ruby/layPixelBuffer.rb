@@ -176,6 +176,15 @@ class LAYPixelBuffer_TestClass < TestBase
     end
     assert_equal(error, true)
 
+    # a header beyond the 64k x 64k limit is rejected
+    error = false
+    begin
+      RBA::PixelBuffer.from_bytes([ 65537, 1 ].pack("VV"))
+    rescue
+      error = true
+    end
+    assert_equal(error, true)
+
   end
 
   def test_11

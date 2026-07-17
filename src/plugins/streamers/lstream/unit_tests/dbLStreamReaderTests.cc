@@ -131,3 +131,23 @@ TEST(variants)
   run_test (_this, tl::testdata (), "variants.lstr", "variants_au.oas");
 }
 
+TEST(reload_layer_props)
+{
+  db::LoadLayoutOptions options;
+
+  db::Layout layout;
+  auto l1 = layout.insert_layer (db::LayerProperties (1, 0, "A"));
+  auto l2 = layout.insert_layer (db::LayerProperties (2, 0, "B"));
+
+  {
+    std::string fn (tl::testdata ());
+    fn += "/lstream/layers.lstr";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (layout, options);
+  }
+
+  //  layer 1 got renamed
+  EXPECT_EQ (layout.get_properties (l1).to_string (), "ONE (1/0)");
+  EXPECT_EQ (layout.get_properties (l2).to_string (), "B (2/0)");
+}

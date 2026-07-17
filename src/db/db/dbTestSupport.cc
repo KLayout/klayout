@@ -163,8 +163,9 @@ void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::
                                        (n > 0 ? db::layout_diff::f_silent : db::layout_diff::f_verbose)
                                        | ((norm & AsPolygons) != 0 ? db::layout_diff::f_boxes_as_polygons + db::layout_diff::f_paths_as_polygons : 0)
                                        | ((norm & WithArrays) != 0 ? 0 : db::layout_diff::f_flatten_array_insts)
-                                       | ((norm & WithMeta) == 0 ? 0 : db::layout_diff::f_with_meta
-                                       | db::layout_diff::f_smart_cell_mapping)
+                                       | ((norm & WithMeta) == 0 ? 0 : db::layout_diff::f_with_meta)
+                                       | ((norm & WithoutLayerNames) == 0 ? 0 : db::layout_diff::f_no_layer_names)
+                                       | db::layout_diff::f_smart_cell_mapping
                                      /*| db::layout_diff::f_no_text_details | db::layout_diff::f_no_text_orientation*/
                                      , tolerance, 100 /*max diff lines*/);
 
@@ -176,6 +177,7 @@ void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::
                                        | ((norm & AsPolygons) != 0 ? db::layout_diff::f_boxes_as_polygons + db::layout_diff::f_paths_as_polygons : 0)
                                        | ((norm & WithArrays) != 0 ? 0 : db::layout_diff::f_flatten_array_insts)
                                        | ((norm & WithMeta) == 0 ? 0 : db::layout_diff::f_with_meta)
+                                       | ((norm & WithoutLayerNames) == 0 ? 0 : db::layout_diff::f_no_layer_names)
                                      /*| db::layout_diff::f_no_text_details | db::layout_diff::f_no_text_orientation*/
                                      , tolerance, 100 /*max diff lines*/);
 

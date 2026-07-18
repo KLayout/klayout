@@ -707,14 +707,12 @@ Layout::set_technology_name (const std::string &tech)
 
     for (db::Layout::iterator c = begin (); c != end (); ++c) {
 
-      std::map<db::lib_id_type, db::lib_id_type>::const_iterator m;
-
       db::LibraryProxy *lib_proxy = dynamic_cast<db::LibraryProxy *> (&*c);
       if (! lib_proxy) {
         continue;
       }
 
-      if ((m = mapping.find (lib_proxy->lib_id ())) != mapping.end ()) {
+      if (mapping.find (lib_proxy->lib_id ()) != mapping.end ()) {
 
         db::Library *lib = db::LibraryManager::instance ().lib (lib_proxy->lib_id ());
         db::Cell *lib_cell = &lib->layout ().cell (lib_proxy->library_cell_index ());
@@ -745,7 +743,10 @@ Layout::set_technology_name (const std::string &tech)
       db::cell_index_type ci = lp->first->Cell::cell_index ();
       db::PCellVariant *lib_pcell = lp->second;
 
-      std::pair<bool, pcell_id_type> pn = lib_pcell->layout ()->pcell_by_name (lp->first->get_basic_name ().c_str ());
+      db::Library *new_lib = db::LibraryManager::instance ().lib (mapping [lp->first->lib_id ()]);
+      tl_assert (new_lib != 0);
+
+      std::pair<bool, pcell_id_type> pn = new_lib->layout ().pcell_by_name (lp->first->get_basic_name ().c_str ());
 
       if (! pn.first) {
 
@@ -755,8 +756,6 @@ Layout::set_technology_name (const std::string &tech)
         create_cold_proxy_as (info, ci);
 
       } else {
-
-        db::Library *new_lib = db::LibraryManager::instance ().lib (mapping [lp->first->lib_id ()]);
 
         const db::PCellDeclaration *old_pcell_decl = lib_pcell->layout ()->pcell_declaration (lib_pcell->pcell_id ());
         const db::PCellDeclaration *new_pcell_decl = new_lib->layout ().pcell_declaration (pn.second);

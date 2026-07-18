@@ -286,6 +286,20 @@ public:
   std::vector<double> default_grids () const;
 
   /**
+   *  @brief Gets the default grid
+   *
+   *  The default (fallback) grid is the one marked with "!" in the grid list
+   *  and it is used, when the current grid is not one of the provided grids
+   *  in the default grid list.
+   *
+   *  The default grid is globally defined, but my change depending on the technology
+   *  selected in the current view.
+   *
+   *  If no such grid exists, 0 is returned.
+   */
+  double default_grid () const;
+
+  /**
    *  @brief Hierarchy level selection setter
    */
   void set_hier_levels (std::pair<int, int> l);

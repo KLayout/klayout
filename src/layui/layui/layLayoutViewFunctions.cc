@@ -2154,8 +2154,6 @@ public:
     menu_entries.push_back (lay::menu_item ("cm_sel_move_interactive", "sel_move_interactive:edit", at, tl::to_string (tr ("Move Interactive"))));
     menu_entries.push_back (lay::menu_item ("cm_select_next_item", "select_next_item:edit", at, tl::to_string (tr ("Select Next Item(Space)"))));
     menu_entries.push_back (lay::menu_item ("cm_select_next_item_add", "select_next_item_add:edit", at, tl::to_string (tr ("Select Next Item too(Shift+Space)"))));
-    menu_entries.push_back (lay::menu_item ("cm_grid_decrease", "grid_decrease:edit", at, tl::to_string (tr ("Select Finer Grid(G)"))));
-    menu_entries.push_back (lay::menu_item ("cm_grid_increase", "grid_increase:edit", at, tl::to_string (tr ("Select Coarser Grid(Shift+G)"))));
 
     at = "edit_menu.edit_options_group";
     menu_entries.push_back (lay::menu_item ("cm_undo", "undo:edit", at, tl::to_string (tr ("Undo(Ctrl+Z)"))));

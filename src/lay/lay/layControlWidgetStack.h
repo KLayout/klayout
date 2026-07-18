@@ -45,6 +45,7 @@ public:
 
   void add_widget (QWidget *w);
   void remove_widget (size_t index);
+  void move_widget (size_t from, size_t to);
   void raise_widget (size_t index);
   QWidget *widget (size_t index);
   QWidget *background_widget ();

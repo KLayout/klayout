@@ -1971,6 +1971,18 @@ MainWindow::redraw ()
 }
 
 void
+MainWindow::cm_grid_decrease ()
+{
+  change_grid (-1);
+}
+
+void
+MainWindow::cm_grid_increase ()
+{
+  change_grid (1);
+}
+
+void
 MainWindow::cm_cancel ()
 {
   cancel ();
@@ -4041,6 +4053,10 @@ MainWindow::menu_activated (const std::string &symbol)
     cm_bookmark_view ();
   } else if (symbol == "cm_cancel") {
     cm_cancel ();
+  } else if (symbol == "cm_grid_decrease") {
+    cm_grid_decrease ();
+  } else if (symbol == "cm_grid_increase") {
+    cm_grid_increase ();
   } else if (symbol == "cm_save_layer_props") {
     cm_save_layer_props ();
   } else if (symbol == "cm_load_layer_props") {
@@ -4137,6 +4153,54 @@ MainWindow::menu_changed ()
   dm_do_update_menu ();
 }
 
+std::vector<double>
+MainWindow::default_grids () const
+{
+  lay::TechnologyController *tc = lay::TechnologyController::instance ();
+  if (tc && tc->active_technology ()) {
+    std::vector<double> tech_grids = tc->active_technology ()->default_grid_list ();
+    if (! tech_grids.empty ()) {
+      return tech_grids;
+    }
+  }
+
+  return m_default_grids;
+}
+
+void
+MainWindow::change_grid (int dir)
+{
+  std::vector<double> grids = default_grids ();
+  if (grids.empty ()) {
+    return;
+  }
+
+  std::sort (grids.begin (), grids.end ());
+
+  size_t i = 0;
+  for (std::vector<double>::const_iterator g = grids.begin (); g != grids.end (); ++g, ++i) {
+    if (db::coord_traits<db::DCoord>::equals (*g, m_grid_micron)) {
+      break;
+    }
+  }
+
+  if (i == grids.size ()) {
+    i = (dir > 0 ? grids.size () - 1 : 0);
+  } else {
+    if (dir > 0) {
+      if (i + 1 < grids.size ()) {
+        ++i;
+      }
+    } else if (dir < 0) {
+      if (i > 0) {
+        --i;
+      }
+    }
+  }
+
+  dispatcher ()->config_set (cfg_grid, grids [i]);
+}
+
 void
 MainWindow::do_update_grids ()
 {
@@ -4176,15 +4240,7 @@ MainWindow::do_update_menu ()
 
     m_default_grids_updated = false;
 
-    const std::vector<double> *grids = &m_default_grids;
-    std::vector<double> tech_grids;
-    lay::TechnologyController *tc = lay::TechnologyController::instance ();
-    if (tc && tc->active_technology ()) {
-      tech_grids = tc->active_technology ()->default_grid_list ();
-      if (! tech_grids.empty ()) {
-        grids = &tech_grids;
-      }
-    }
+    std::vector<double> grids = default_grids ();
 
     std::vector<std::string> group = menu ()->group ("default_grids_group");
 
@@ -4196,7 +4252,7 @@ MainWindow::do_update_menu ()
     }
 
     int i = 1;
-    for (std::vector<double>::const_iterator g = grids->begin (); g != grids->end (); ++g, ++i) {
+    for (std::vector<double>::const_iterator g = grids.begin (); g != grids.end (); ++g, ++i) {
 
       std::string name = "default_grid_" + tl::to_string (i);
 

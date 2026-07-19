@@ -29,6 +29,7 @@
 #include "layPixelBufferPainter.h"
 #include "laySnap.h"
 #include "tlColor.h"
+#include "tlInternational.h"
 #include "dbTrans.h"
 
 #if defined(HAVE_QT)

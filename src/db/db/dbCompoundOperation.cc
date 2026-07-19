@@ -1682,13 +1682,9 @@ CompoundRegionCheckOperationNode::computed_dist () const
 void
 CompoundRegionCheckOperationNode::do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonWithProperties, db::PolygonWithProperties> &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties> > &results, const db::LocalProcessorBase *proc) const
 {
-  //  consider magnification variants
-  db::EdgeRelationFilter check = m_check;
-  check.set_distance (proc->dist_for_cell (cell, check.distance ()));
-
   // TODO: needs a concept to deal with merged/non-merged inputs
   bool is_merged = true;
-  db::check_local_operation<db::PolygonWithProperties, db::PolygonWithProperties> op (check, m_different_polygons, is_merged, m_has_other, m_is_other_merged, m_options);
+  db::check_local_operation<db::PolygonWithProperties, db::PolygonWithProperties> op (m_check, m_different_polygons, is_merged, m_has_other, m_is_other_merged, m_options);
 
   tl_assert (results.size () == 1);
   if (results.front ().empty ()) {
@@ -1704,13 +1700,9 @@ CompoundRegionCheckOperationNode::do_compute_local (CompoundRegionOperationCache
 void
 CompoundRegionCheckOperationNode::do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties> > &results, const db::LocalProcessorBase *proc) const
 {
-  //  consider magnification variants
-  db::EdgeRelationFilter check = m_check;
-  check.set_distance (proc->dist_for_cell (cell, check.distance ()));
-
   // TODO: needs a concept to deal with merged/non-merged inputs
   bool is_merged = true;
-  db::check_local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties> op (check, m_different_polygons, is_merged, m_has_other, m_is_other_merged, m_options);
+  db::check_local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties> op (m_check, m_different_polygons, is_merged, m_has_other, m_is_other_merged, m_options);
 
   tl_assert (results.size () == 1);
   if (results.front ().empty ()) {

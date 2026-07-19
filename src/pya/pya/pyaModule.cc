@@ -338,6 +338,11 @@ public:
       //  crashes with this option set
       type->tp_flags &= ~Py_TPFLAGS_INLINE_VALUES;
 #endif
+#if PY_VERSION_HEX < 0x03000000
+      type->tp_flags |= Py_TPFLAGS_HAVE_WEAKREFS;
+      type->tp_weaklistoffset = type->tp_basicsize;
+      type->tp_basicsize += sizeof (PyObject *);
+#endif
       type->tp_basicsize += sizeof (PYAObjectBase);
       type->tp_init = &pya_object_init;
       type->tp_new = &pya_object_new;

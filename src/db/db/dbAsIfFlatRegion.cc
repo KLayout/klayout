@@ -1242,9 +1242,21 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   }
 
   bool needs_merged_primary = (! has_other && different_polygons) || options.needs_merged ();
+  bool primary_is_merged = is_merged ();
+  db::RegionIterator polygons;
 
-  db::RegionIterator polygons (needs_merged_primary ? begin_merged () : begin ());
-  bool primary_is_merged = ! merged_semantics () || needs_merged_primary || is_merged ();
+  if (! merged_semantics ()) {
+    primary_is_merged = true;  //  means: don't merge again
+    needs_merged_primary = false;
+    polygons = begin ();
+  } else if (! needs_merged_primary) {
+    //  The implementation may run faster if the primary is not merged
+    primary_is_merged = false;
+    polygons = begin_unmerged ();
+  } else {
+    primary_is_merged = true;
+    polygons = begin_merged ();
+  }
 
   EdgeRelationFilter check (rel, d, options);
 

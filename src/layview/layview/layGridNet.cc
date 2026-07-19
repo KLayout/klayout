@@ -119,7 +119,7 @@ GridNetPluginDeclaration::get_options (std::vector < std::pair<std::string, std:
 lay::ConfigPage *
 GridNetPluginDeclaration::config_page (QWidget *parent, std::string &title) const
 {
-  title = tl::to_string (QObject::tr ("Display|Background"));
+  title = tl::to_string (tr ("Display|Background"));
   return new GridNetConfigPage (parent); 
 }
 #endif
@@ -224,9 +224,9 @@ GridNet::configure (const std::string &name, const std::string &value)
       std::string gs;
       if (m_grid < 0.4) {
         //  pick nm units below 400nm
-        gs = tl::to_string (m_grid * 1000.0) + tl::to_string (QObject::tr (" nm"));
+        gs = tl::to_string (m_grid * 1000.0) + tl::to_string (tr (" nm"));
       } else {
-        gs = tl::to_string (m_grid) + tl::to_string (QObject::tr (" um"));
+        gs = tl::to_string (m_grid) + tl::to_string (tr (" um"));
       }
       mp_view->message (tl::sprintf (tl::to_string (tr ("Grid: %s")), gs));
 

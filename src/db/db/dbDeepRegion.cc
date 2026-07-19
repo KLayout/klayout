@@ -2368,6 +2368,7 @@ DeepRegion::cop_to_edges (db::CompoundRegionOperationNode &node, db::PropertyCon
 EdgePairsDelegate *
 DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const
 {
+  // @@@
   if (empty ()) {
     return new db::DeepEdgePairs (deep_layer ().derived ());
   } else if (other && ! is_subject_regionptr (other) && other->empty () && ! options.negative) {

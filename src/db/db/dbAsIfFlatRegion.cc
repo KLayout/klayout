@@ -1184,13 +1184,8 @@ AsIfFlatRegion::width_check (db::Coord d, const RegionCheckOptions &options) con
 EdgePairsDelegate *
 AsIfFlatRegion::space_or_isolated_check (db::Coord d, const RegionCheckOptions &options, bool isolated) const
 {
-  if (options.opposite_filter != NoOppositeFilter || options.rect_filter != NoRectFilter || options.shielded) {
-    //  NOTE: we have to use the "foreign" scheme with a filter because only this scheme
-    //  guarantees that all subject shapes are visited.
-    return run_check (db::SpaceRelation, isolated, foreign_regionptr (), d, options);
-  } else {
-    return run_check (db::SpaceRelation, isolated, subject_regionptr (), d, options);
-  }
+  //  NOTE: we have to use "foreign" to make sure every subject sees neighboring subjects
+  return run_check (db::SpaceRelation, isolated, foreign_regionptr (), d, options);
 }
 
 EdgePairsDelegate *
@@ -1238,12 +1233,14 @@ AsIfFlatRegion::inside_check (const Region &other, db::Coord d, const RegionChec
 EdgePairsDelegate *
 AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const
 {
+  bool has_other = other && other != subject_regionptr () && other != foreign_regionptr ();
+
   //  force different polygons in the different properties case to skip intra-polygon checks
-  if (pc_always_different (options.prop_constraint)) {
+  if (! has_other && pc_always_different (options.prop_constraint)) {
     different_polygons = true;
   }
 
-  bool needs_merged_primary = different_polygons || options.needs_merged ();
+  bool needs_merged_primary = (! has_other && different_polygons) || options.needs_merged ();
 
   db::RegionIterator polygons (needs_merged_primary ? begin_merged () : begin ());
   bool primary_is_merged = ! merged_semantics () || needs_merged_primary || is_merged ();
@@ -1252,15 +1249,18 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
 
   std::vector<db::RegionIterator> others;
   std::vector<bool> foreign;
-  bool has_other = false;
   bool other_is_merged = true;
 
-  if (other == subject_regionptr () || other == foreign_regionptr ()) {
+  if (! has_other) {
+
     foreign.push_back (other == foreign_regionptr ());
     others.push_back (polygons);
     other_is_merged = primary_is_merged;
+
   } else {
+
     foreign.push_back (false);
+
     if (! other->merged_semantics ()) {
       others.push_back (other->begin ());
       other_is_merged = true;
@@ -1272,7 +1272,13 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
       others.push_back (other->begin ());
       other_is_merged = other->is_merged ();
     }
-    has_other = true;
+
+    //  adds another intruder section to implement subject merging ("primary_intruders")
+    if (! primary_is_merged) {
+      foreign.push_back (true);
+      others.push_back (polygons);
+    }
+
   }
 
   std::unique_ptr<FlatEdgePairs> output (new FlatEdgePairs ());

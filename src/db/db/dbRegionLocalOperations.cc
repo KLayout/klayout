@@ -2381,8 +2381,11 @@ PolygonToEdgeLocalOperation::do_compute_local (db::Layout * /*layout*/, db::Cell
 
     db::properties_id_type prop_id = shapes_by_prop_id->first;
 
+    ep.clear ();
+
+    size_t p = 0;
     for (auto s = shapes_by_prop_id->second.first.begin (); s != shapes_by_prop_id->second.first.end (); ++s) {
-      ep.insert (**s);
+      ep.insert (**s, p++);
     }
 
     db::property_injector<db::Edge, std::unordered_set<db::EdgeWithProperties> > results_with_properties (&results.front (), prop_id);
@@ -2395,7 +2398,6 @@ PolygonToEdgeLocalOperation::do_compute_local (db::Layout * /*layout*/, db::Cell
 
     } else {
 
-      // @@@ that's not correct, isn't it?
       //  With intruders: to compute our local contribution we take the edges without and with intruders
       //  and deliver what is in both sets
 
@@ -2407,18 +2409,19 @@ PolygonToEdgeLocalOperation::do_compute_local (db::Layout * /*layout*/, db::Cell
 
       ep.clear ();
 
-      for (auto s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
-        ep.insert (s->second);
+      size_t p = 0;
+      for (auto s = shapes_by_prop_id->second.first.begin (); s != shapes_by_prop_id->second.first.end (); ++s) {
+        ep.insert (**s, ++p);
       }
-      for (auto i = interactions.begin_intruders (); i != interactions.end_intruders (); ++i) {
-        ep.insert (i->second.second);
+      for (auto s = shapes_by_prop_id->second.second.begin (); s != shapes_by_prop_id->second.second.end (); ++s) {
+        ep.insert (*(s->second), ++p);
       }
 
       std::vector<Edge> edges2;
       db::EdgeContainer ec2 (edges2);
       ep.process (ec2, op);
 
-      //  Runs the boolean AND between the result with and without intruders
+      //  Runs the boolean AND between the result with and without intruders - this identifies outside edges
 
       db::box_scanner<db::Edge, size_t> scanner;
       scanner.reserve (edges1.size () + edges2.size ());

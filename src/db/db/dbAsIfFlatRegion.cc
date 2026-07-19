@@ -1185,6 +1185,7 @@ EdgePairsDelegate *
 AsIfFlatRegion::space_or_isolated_check (db::Coord d, const RegionCheckOptions &options, bool isolated) const
 {
   //  NOTE: we have to use "foreign" to make sure every subject sees neighboring subjects
+  // @@@ use null ptr instead of foreign_regionptr
   return run_check (db::SpaceRelation, isolated, foreign_regionptr (), d, options);
 }
 

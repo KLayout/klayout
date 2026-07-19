@@ -2368,48 +2368,57 @@ DeepRegion::cop_to_edges (db::CompoundRegionOperationNode &node, db::PropertyCon
 EdgePairsDelegate *
 DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const
 {
-  // @@@
   if (empty ()) {
     return new db::DeepEdgePairs (deep_layer ().derived ());
   } else if (other && ! is_subject_regionptr (other) && other->empty () && ! options.negative) {
     return new db::DeepEdgePairs (deep_layer ().derived ());
   }
 
+  bool has_other = other && other != subject_regionptr () && other != foreign_regionptr ();
+
   //  force different polygons in the different properties case to skip intra-polygon checks
-  if (pc_always_different (options.prop_constraint)) {
+  if (! has_other && pc_always_different (options.prop_constraint)) {
     //  TODO: this forces merged primaries, so maybe that is not a good optimization?
     different_polygons = true;
   }
 
   const db::DeepRegion *other_deep = 0;
-  unsigned int other_layer = 0;
   bool other_is_merged = true;
 
-  bool needs_merged_primary = different_polygons || options.needs_merged ();
+  bool needs_merged_primary = (! has_other && different_polygons) || options.needs_merged ();
   bool primary_is_merged = ! merged_semantics () || needs_merged_primary || is_merged ();
 
-  if (other == subject_regionptr ()) {
-    other_layer = subject_idlayer ();
+  std::vector<unsigned int> other_layers;
+
+  if (! has_other) {
+
+    other_layers.push_back (other == foreign_regionptr () ? foreign_idlayer () : subject_idlayer ());
     other_is_merged = primary_is_merged;
-  } else if (other == foreign_regionptr ()) {
-    other_layer = foreign_idlayer ();
-    other_is_merged = primary_is_merged;
+
   } else {
+
     other_deep = dynamic_cast<const db::DeepRegion *> (other->delegate ());
     if (! other_deep) {
       return db::AsIfFlatRegion::run_check (rel, different_polygons, other, d, options);
     }
+
     if (! other->merged_semantics ()) {
-      other_layer = other_deep->deep_layer ().layer ();
+      other_layers.push_back (other_deep->deep_layer ().layer ());
       other_is_merged = true;
     } else if (options.whole_edges) {
       //  NOTE: whole edges needs both inputs merged
-      other_layer = other_deep->merged_deep_layer ().layer ();
+      other_layers.push_back (other_deep->merged_deep_layer ().layer ());
       other_is_merged = true;
     } else {
-      other_layer = other_deep->deep_layer ().layer ();
+      other_layers.push_back (other_deep->deep_layer ().layer ());
       other_is_merged = other->is_merged ();
     }
+
+    //  adds another intruder section to implement subject merging ("primary_intruders")
+    if (! primary_is_merged) {
+      other_layers.push_back (foreign_idlayer ());
+    }
+
   }
 
   const db::DeepLayer &polygons = needs_merged_primary ? merged_deep_layer () : deep_layer ();
@@ -2427,7 +2436,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 
   if (options.prop_constraint == db::IgnoreProperties) {
 
-    db::CheckLocalOperation op (check, different_polygons, primary_is_merged, other_deep != 0, other_is_merged, options);
+    db::CheckLocalOperation op (check, different_polygons, primary_is_merged, has_other, other_is_merged, options);
 
     db::local_processor<db::PolygonRef, db::PolygonRef, db::EdgePair> proc (subject_layout, subject_top,
                                                                             intruder_layout, intruder_top,
@@ -2436,7 +2445,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
     configure_proc (proc);
     proc.set_threads (polygons.store ()->threads ());
 
-    proc.run (&op, polygons.layer (), other_layer, res->deep_layer ().layer ());
+    proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer ());
 
   } else {
 
@@ -2449,7 +2458,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
     configure_proc (proc);
     proc.set_threads (polygons.store ()->threads ());
 
-    proc.run (&op, polygons.layer (), other_layer, res->deep_layer ().layer ());
+    proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer ());
 
   }
 

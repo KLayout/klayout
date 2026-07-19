@@ -2123,3 +2123,13 @@ TEST(149d_compound_drc_with_mag)
 {
   run_test (_this, "149", true);
 }
+
+TEST(150_optimized_separation)
+{
+  run_test (_this, "150", false);
+}
+
+TEST(150d_optimized_separation)
+{
+  run_test (_this, "150", true);
+}

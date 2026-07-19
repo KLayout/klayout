@@ -2370,15 +2370,13 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 {
   if (empty ()) {
     return new db::DeepEdgePairs (deep_layer ().derived ());
-  } else if (other && ! is_subject_regionptr (other) && other->empty () && ! options.negative) {
+  } else if (other && other->empty () && ! options.negative) {
     return new db::DeepEdgePairs (deep_layer ().derived ());
   }
 
-  bool has_other = other && other != subject_regionptr () && other != foreign_regionptr ();
-
   //  delegate to AsIfFlatRegion if the other region is not a deep one
   const db::DeepRegion *other_deep = 0;
-  if (has_other) {
+  if (other) {
     other_deep = dynamic_cast<const db::DeepRegion *> (other->delegate ());
     if (! other_deep) {
       return db::AsIfFlatRegion::run_check (rel, different_polygons, other, d, options);
@@ -2386,14 +2384,14 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
   }
 
   //  force different polygons in the different properties case to skip intra-polygon checks
-  if (! has_other && pc_always_different (options.prop_constraint)) {
+  if (! other_deep && pc_always_different (options.prop_constraint)) {
     //  TODO: this forces merged primaries, so maybe that is not a good optimization?
     different_polygons = true;
   }
 
   //  primary input
 
-  bool needs_merged_primary = (! has_other && different_polygons) || options.needs_merged ();
+  bool needs_merged_primary = (! other_deep && different_polygons) || options.needs_merged ();
   bool primary_is_merged = false;
 
   db::DeepLayer polygons;
@@ -2416,9 +2414,9 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
   std::vector<unsigned int> other_layers;
   bool other_is_merged = true;
 
-  if (! has_other) {
+  if (! other_deep) {
 
-    other_layers.push_back (other == foreign_regionptr () ? foreign_idlayer () : subject_idlayer ());
+    other_layers.push_back (foreign_idlayer ());
     other_is_merged = primary_is_merged;
 
   } else {
@@ -2455,7 +2453,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 
   if (options.prop_constraint == db::IgnoreProperties) {
 
-    db::CheckLocalOperation op (check, different_polygons, primary_is_merged, has_other, other_is_merged, options);
+    db::CheckLocalOperation op (check, different_polygons, primary_is_merged, other_deep != 0, other_is_merged, options);
 
     db::local_processor<db::PolygonRef, db::PolygonRef, db::EdgePair> proc (subject_layout, subject_top,
                                                                             intruder_layout, intruder_top,

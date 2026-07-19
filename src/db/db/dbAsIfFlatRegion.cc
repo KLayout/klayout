@@ -1184,9 +1184,7 @@ AsIfFlatRegion::width_check (db::Coord d, const RegionCheckOptions &options) con
 EdgePairsDelegate *
 AsIfFlatRegion::space_or_isolated_check (db::Coord d, const RegionCheckOptions &options, bool isolated) const
 {
-  //  NOTE: we have to use "foreign" to make sure every subject sees neighboring subjects
-  // @@@ use null ptr instead of foreign_regionptr
-  return run_check (db::SpaceRelation, isolated, foreign_regionptr (), d, options);
+  return run_check (db::SpaceRelation, isolated, 0, d, options);
 }
 
 EdgePairsDelegate *
@@ -1234,14 +1232,12 @@ AsIfFlatRegion::inside_check (const Region &other, db::Coord d, const RegionChec
 EdgePairsDelegate *
 AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const
 {
-  bool has_other = other && other != subject_regionptr () && other != foreign_regionptr ();
-
   //  force different polygons in the different properties case to skip intra-polygon checks
-  if (! has_other && pc_always_different (options.prop_constraint)) {
+  if (! other && pc_always_different (options.prop_constraint)) {
     different_polygons = true;
   }
 
-  bool needs_merged_primary = (! has_other && different_polygons) || options.needs_merged ();
+  bool needs_merged_primary = (! other && different_polygons) || options.needs_merged ();
   bool primary_is_merged = is_merged ();
   db::RegionIterator polygons;
 
@@ -1264,9 +1260,9 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   std::vector<bool> foreign;
   bool other_is_merged = true;
 
-  if (! has_other) {
+  if (! other) {
 
-    foreign.push_back (other == foreign_regionptr ());
+    foreign.push_back (true);
     others.push_back (polygons);
     other_is_merged = primary_is_merged;
 
@@ -1301,7 +1297,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
 
   if (pc_skip (options.prop_constraint)) {
 
-    db::check_local_operation<db::Polygon, db::Polygon> op (check, different_polygons, primary_is_merged, has_other, other_is_merged, options);
+    db::check_local_operation<db::Polygon, db::Polygon> op (check, different_polygons, primary_is_merged, other != 0, other_is_merged, options);
 
     db::local_processor<db::Polygon, db::Polygon, db::EdgePair> proc;
     proc.set_base_verbosity (base_verbosity ());
@@ -1312,7 +1308,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
 
   } else {
 
-    db::check_local_operation_with_properties<db::Polygon, db::Polygon> op (check, different_polygons, primary_is_merged, has_other, other_is_merged, options);
+    db::check_local_operation_with_properties<db::Polygon, db::Polygon> op (check, different_polygons, primary_is_merged, other != 0, other_is_merged, options);
 
     db::local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePairWithProperties> proc;
     proc.set_base_verbosity (base_verbosity ());

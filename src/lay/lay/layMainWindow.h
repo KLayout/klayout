@@ -278,6 +278,28 @@ public:
   double grid_micron () const;
 
   /**
+   *  @brief Gets a list of the default grids
+   *
+   *  The default grids are globally defined, but may change depending on the technology
+   *  selected in the current view.
+   */
+  std::vector<double> default_grids () const;
+
+  /**
+   *  @brief Gets the default grid
+   *
+   *  The default (fallback) grid is the one marked with "!" in the grid list
+   *  and it is used, when the current grid is not one of the provided grids
+   *  in the default grid list.
+   *
+   *  The default grid is globally defined, but my change depending on the technology
+   *  selected in the current view.
+   *
+   *  If no such grid exists, 0 is returned.
+   */
+  double default_grid () const;
+
+  /**
    *  @brief Hierarchy level selection setter
    */
   void set_hier_levels (std::pair<int, int> l);
@@ -818,6 +840,8 @@ private:
   void cm_manage_bookmarks ();
   void cm_bookmark_view ();
   void cm_cancel ();
+  void cm_grid_decrease ();
+  void cm_grid_increase ();
   void cm_save_layer_props ();
   void cm_load_layer_props ();
   void cm_save_session ();
@@ -862,6 +886,8 @@ private:
   void update_window_title ();
   void update_tab_title (int i);
   void add_view (LayoutViewWidget *view);
+
+  void change_grid (int dir);
 
   bool can_close ();
   lay::CellViewRef create_or_load_layout (const std::string *filename, const db::LoadLayoutOptions *options, const std::string &tech, const int mode);

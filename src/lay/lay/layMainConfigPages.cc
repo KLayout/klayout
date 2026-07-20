@@ -27,6 +27,7 @@
 #include "layStream.h"
 #include "layAbstractMenu.h"
 #include "layMainWindow.h"
+#include "tlLog.h"
 #include "ui_MainConfigPage.h"
 #include "ui_MainConfigPage2.h"
 #include "ui_MainConfigPage3.h"
@@ -412,15 +413,31 @@ CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::st
     //  gets the current bindings and merges with the given ones
     m_current_bindings = mp_dispatcher->menu ()->get_shortcuts (false);
 
+    //  retained bindings, even if not configured
+    std::vector<std::map<std::string, std::string>::iterator> retained;
+    std::set<std::string> shortcuts;
+
+    //  initialize configured bindings, clear others (for now) and remember
     std::map<std::string, std::string> b;
     b.insert (key_bindings.begin (), key_bindings.end ());
-    for (std::map<std::string, std::string>::iterator kb = m_current_bindings.begin (); kb != m_current_bindings.end (); ++kb) {
+    for (auto kb = m_current_bindings.begin (); kb != m_current_bindings.end (); ++kb) {
       std::map<std::string, std::string>::iterator bb = b.find (kb->first);
       if (bb != b.end ()) {
         lay::Action *a = mp_dispatcher->menu ()->action (kb->first);
         kb->second = a->get_effective_shortcut_for (bb->second);
-      } else {
-        kb->second.clear ();
+        if (! kb->second.empty ()) {
+          shortcuts.insert (kb->second);
+        }
+      } else if (! kb->second.empty ()) {
+        retained.push_back (kb);
+      }
+    }
+
+    //  retain key bindings which don't conflict
+    for (auto i = retained.begin (); i != retained.end (); ++i) {
+      if (shortcuts.find ((*i)->second) != shortcuts.end ()) {
+        tl::warn << tl::sprintf (tl::to_string (tr ("Resetting key binding for '%s' (was '%s') because of conflicts")), (*i)->first, (*i)->second);
+        (*i)->second.clear ();
       }
     }
 

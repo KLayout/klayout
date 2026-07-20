@@ -43,6 +43,11 @@ namespace pya
 void
 pya_object_deallocate (PyObject *self)
 {
+  //  Clear weak refs - needed for signal binding and other purposes
+#if PY_VERSION_HEX > 0x03020000
+  PyObject_ClearWeakRefs (self);
+#endif
+
   //  This avoids an assertion in debug builds (Python, gcmodule.c - update_refs).
   //  In short, the GC expects not to see objects with refcount 0 and asserts.
   //  However, due to triggering of signals or similar, the destructor call below

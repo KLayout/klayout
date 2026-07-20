@@ -1,3 +1,31 @@
+0.30.10          (2026-07-22):
+* Bugfix: %GITHUB%/issues/2384 Deep DRC failure with scaled instances
+* Enhancement: %GITHUB%/issues/2391 Grid Features: switching between coarser and finier grids with keyboard shortcut
+* Bugfix: %GITHUB%/issues/2392 Wrong PCell instantiations when switching technologies
+* Bugfix: %GITHUB%/issues/2396 Python objects did nott support weak refs
+* Bugfix: Region#edges was not working properly when used on Regions with properties
+  enabled. Now, with properties enabled, the regions are consistently formed from polygons with
+  identical properties before generating the edges.
+* Enhancement: DRC two-layer checks now do not necessarily require merging for the
+  first input. This in general speeds up the operation in certain cases.
+  As a side effect, the error markers may be split according to partial input
+  polygons, as is the case for plain "space" check already.
+* Enhancement: Use multiple drawing workers for image_with_options rendering
+* Bugfix: Update layer names in layer list (when used in addition to layer/datatypes) on reload
+  As a side effect, the layer properties nodes will update the "real source" according to
+  the actual name if the name is used in addition to layer/datatypes. Also, the layout readers
+  will update layer names in the layer properties of the Layout object.
+* Bugfix: Marek's bug: move interactive/copy interactive did not do anything when the mouse wasn't moved
+* Bugfix: Entering '16:17' (or other nonsense) into 'new layout' layer list made KLayout hang
+* Bugfix: API: removing a pin from a Circuit does not crash if the pin was not disconnected before.
+  Now it's disconnected automatically
+* Enhancement: Improved the image pixel value display: favors selected image, and follows mouse instantly
+* Bugfix: When images are selected and images are turned off, the selection no longer persists
+* Bugfix: Using PCell parameter name 'name' won't break PCell's cell_name_impl default implementation
+* Enhancement: New API functions
+  * Create a Layout as a deep copy of a cell (Layout#new)
+  * PixelBuffer#to_bytes and PixelBuffer#from_bytes for zero-overhead RGBA pixel access
+
 0.30.9           (2026-05-25):
 * Bugfix: %GITHUB%/issues/2331 Screen size error (Assertion tlPixelBuffer.cc:260 n < m_height was not true)
 * Enhancement: %GITHUB%/issues/2335 Editor Options (F3) behaviour has changed

@@ -179,8 +179,10 @@ DeepRegion::~DeepRegion ()
 DeepRegion::DeepRegion (const DeepRegion &other)
   : MutableRegion (other), DeepShapeCollectionDelegateBase (other),
     m_merged_polygons_valid (other.m_merged_polygons_valid),
+    m_merged_polygons_min_coherence (other.m_merged_polygons_min_coherence),
     m_merged_polygons_boc_hash (other.m_merged_polygons_boc_hash),
-    m_is_merged (other.m_is_merged)
+    m_is_merged (other.m_is_merged),
+    m_is_merged_min_coherence (other.m_is_merged_min_coherence)
 {
   if (m_merged_polygons_valid) {
     m_merged_polygons = other.m_merged_polygons.copy ();
@@ -196,8 +198,10 @@ DeepRegion::operator= (const DeepRegion &other)
     DeepShapeCollectionDelegateBase::operator= (other);
 
     m_merged_polygons_valid = other.m_merged_polygons_valid;
+    m_merged_polygons_min_coherence = other.m_merged_polygons_min_coherence;
     m_merged_polygons_boc_hash = other.m_merged_polygons_boc_hash;
     m_is_merged = other.m_is_merged;
+    m_is_merged_min_coherence = other.m_is_merged_min_coherence;
     if (m_merged_polygons_valid) {
       m_merged_polygons = other.m_merged_polygons.copy ();
     }
@@ -210,9 +214,11 @@ DeepRegion::operator= (const DeepRegion &other)
 void DeepRegion::init ()
 {
   m_merged_polygons_valid = false;
+  m_merged_polygons_min_coherence = false;
   m_merged_polygons_boc_hash = 0;
   m_merged_polygons = db::DeepLayer ();
   m_is_merged = false;
+  m_is_merged_min_coherence = false;
 }
 
 RegionDelegate *
@@ -228,7 +234,7 @@ void DeepRegion::merged_semantics_changed ()
 
 void DeepRegion::min_coherence_changed ()
 {
-  set_is_merged (false);
+  //  merged status is tracked in separate variables and is validated on inquiry
 }
 
 void DeepRegion::join_properties_on_merge_changed ()
@@ -468,7 +474,7 @@ DeepRegion::empty () const
 bool
 DeepRegion::is_merged () const
 {
-  return m_is_merged;
+  return m_is_merged && (m_is_merged_min_coherence == min_coherence ());
 }
 
 const db::Polygon *
@@ -739,18 +745,21 @@ DeepRegion::merged_deep_layer () const
 bool
 DeepRegion::merged_polygons_available () const
 {
-  return m_is_merged || (m_merged_polygons_valid && m_merged_polygons_boc_hash == deep_layer ().breakout_cells_hash ());
+  return (m_is_merged && m_is_merged_min_coherence == min_coherence ()) ||
+         (m_merged_polygons_valid && m_merged_polygons_min_coherence == min_coherence () && m_merged_polygons_boc_hash == deep_layer ().breakout_cells_hash ());
 }
 
 void
 DeepRegion::ensure_merged_polygons_valid () const
 {
-  if (! m_merged_polygons_valid || (! m_is_merged && m_merged_polygons_boc_hash != deep_layer ().breakout_cells_hash ())) {
+  if (! m_merged_polygons_valid || m_merged_polygons_min_coherence != min_coherence () ||
+      ((! m_is_merged || m_is_merged_min_coherence != min_coherence ()) && m_merged_polygons_boc_hash != deep_layer ().breakout_cells_hash ())) {
 
-    if (m_is_merged) {
+    if (m_is_merged && m_is_merged_min_coherence == min_coherence ()) {
 
       //  NOTE: this will reuse the deep layer reference
       m_merged_polygons = deep_layer ();
+      m_merged_polygons_min_coherence = min_coherence ();
 
     } else {
 
@@ -796,6 +805,7 @@ DeepRegion::ensure_merged_polygons_valid () const
     }
 
     m_merged_polygons_valid = true;
+    m_merged_polygons_min_coherence = min_coherence ();
     m_merged_polygons_boc_hash = deep_layer ().breakout_cells_hash ();
 
   }
@@ -813,7 +823,9 @@ DeepRegion::ensure_unmerged_polygons_valid () const
   db::DeepLayer &polygons = const_cast<db::DeepLayer &> (deep_layer ());
 
   m_merged_polygons_valid = true;
+  m_merged_polygons_min_coherence = m_is_merged_min_coherence;
   m_is_merged = false;
+  m_is_merged_min_coherence = min_coherence ();
   m_merged_polygons_boc_hash = deep_layer ().breakout_cells_hash ();
 
   db::Layout &layout = polygons.layout ();
@@ -845,6 +857,7 @@ void
 DeepRegion::set_is_merged (bool f)
 {
   m_is_merged = f;
+  m_is_merged_min_coherence = min_coherence ();
   m_merged_polygons_valid = false;
   m_merged_polygons_boc_hash = 0;
   m_merged_polygons = db::DeepLayer ();
@@ -2026,6 +2039,7 @@ DeepRegion::merged () const
 
   res->deep_layer ().layer ();
 
+  res->set_min_coherence (min_coherence ());
   res->set_is_merged (true);
   return res.release ();
 }

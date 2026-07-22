@@ -3400,6 +3400,7 @@ TEST(min_coherence_and_merge)
 
   //  inserting a box into the region will reset the merged valid flag and not bring it back by resetting min_coherence
   db::Region r3 = r1;
+  EXPECT_EQ (r3.min_coherence (), true);
   r3.insert (db::Box (0, 0, 100, 100));
   r3.set_min_coherence (false);
   EXPECT_EQ (r3.is_merged (), false);

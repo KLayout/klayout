@@ -1349,7 +1349,7 @@ AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord 
 }
 
 RegionDelegate *
-AsIfFlatRegion::merged (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge) const
+AsIfFlatRegion::merged (bool min_coh, unsigned int min_wc, bool join_properties_on_merge) const
 {
   if (empty ()) {
 
@@ -1366,8 +1366,8 @@ AsIfFlatRegion::merged (bool min_coherence, unsigned int min_wc, bool join_prope
 
   } else {
 
-    std::unique_ptr<FlatRegion> new_region (new FlatRegion (true));
-    merge_polygons_to (new_region->raw_polygons (), min_coherence, min_wc, join_properties_on_merge);
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion (true, 0, 0, min_coh));
+    merge_polygons_to (new_region->raw_polygons (), min_coh, min_wc, join_properties_on_merge);
 
     return new_region.release ();
 

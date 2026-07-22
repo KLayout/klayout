@@ -45,34 +45,43 @@ FlatRegion::FlatRegion (const FlatRegion &other)
     m_area_ratio (other.m_area_ratio), m_max_vertex_count (other.m_max_vertex_count)
 {
   init ();
+  set_min_coherence (other.min_coherence ());
   m_is_merged = other.m_is_merged;
+  m_is_merged_min_coherence = other.m_is_merged_min_coherence;
   m_merged_polygons_valid = other.m_merged_polygons_valid;
+  m_merged_polygons_min_coherence = other.m_merged_polygons_min_coherence;
 }
 
-FlatRegion::FlatRegion (const db::Shapes &polygons, bool is_merged, double area_ratio, size_t max_vertex_count)
+FlatRegion::FlatRegion (const db::Shapes &polygons, bool is_merged, double area_ratio, size_t max_vertex_count, bool min_coh)
   : MutableRegion (), mp_polygons (new db::Shapes (polygons)), mp_merged_polygons (new db::Shapes (false)),
     m_area_ratio (area_ratio), m_max_vertex_count (max_vertex_count)
 {
   init ();
+  set_min_coherence (min_coh);
   m_is_merged = is_merged;
+  m_is_merged_min_coherence = min_coh;
 }
 
-FlatRegion::FlatRegion (const db::Shapes &polygons, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged, double area_ratio, size_t max_vertex_count)
+FlatRegion::FlatRegion (const db::Shapes &polygons, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged, double area_ratio, size_t max_vertex_count, bool min_coh)
   : MutableRegion (), mp_polygons (new db::Shapes (polygons)), mp_merged_polygons (new db::Shapes (false)),
     m_area_ratio (area_ratio), m_max_vertex_count (max_vertex_count)
 {
   init ();
+  set_min_coherence (min_coh);
   m_is_merged = is_merged;
+  m_is_merged_min_coherence = min_coh;
   transform_generic (trans);
   set_merged_semantics (merged_semantics);
 }
 
-FlatRegion::FlatRegion (bool is_merged, double area_ratio, size_t max_vertex_count)
+FlatRegion::FlatRegion (bool is_merged, double area_ratio, size_t max_vertex_count, bool min_coh)
   : MutableRegion (), mp_polygons (new db::Shapes (false)), mp_merged_polygons (new db::Shapes (false)),
     m_area_ratio (area_ratio), m_max_vertex_count (max_vertex_count)
 {
   init ();
+  set_min_coherence (min_coh);
   m_is_merged = is_merged;
+  m_is_merged_min_coherence = min_coh;
 }
 
 FlatRegion::~FlatRegion ()
@@ -83,6 +92,7 @@ FlatRegion::~FlatRegion ()
 void FlatRegion::set_is_merged (bool m)
 {
   m_is_merged = m;
+  m_is_merged_min_coherence = min_coherence ();
 }
 
 void FlatRegion::invalidate_cache ()
@@ -95,7 +105,9 @@ void FlatRegion::invalidate_cache ()
 void FlatRegion::init ()
 {
   m_is_merged = false;
+  m_is_merged_min_coherence = false;
   m_merged_polygons_valid = false;
+  m_merged_polygons_min_coherence = false;
 }
 
 void FlatRegion::merged_semantics_changed ()
@@ -112,9 +124,7 @@ void FlatRegion::join_properties_on_merge_changed ()
 
 void FlatRegion::min_coherence_changed ()
 {
-  m_is_merged = false;
-  mp_merged_polygons->clear ();
-  m_merged_polygons_valid = false;
+  //  merged status is tracked in separate variables and is validated on inquiry
 }
 
 void FlatRegion::reserve (size_t n)
@@ -122,12 +132,25 @@ void FlatRegion::reserve (size_t n)
   mp_polygons->reserve (db::Polygon::tag (), n);
 }
 
+bool
+FlatRegion::merged_polygons_valid () const
+{
+  return m_merged_polygons_valid && m_merged_polygons_min_coherence == min_coherence ();
+}
+
+bool
+FlatRegion::merged_polygons_available () const
+{
+  return is_merged () || merged_polygons_valid ();
+}
+
 void
 FlatRegion::ensure_merged_polygons_valid () const
 {
-  if (! m_merged_polygons_valid) {
+  if (! merged_polygons_valid ()) {
     merge_polygons_to (*mp_merged_polygons, min_coherence (), 0, join_properties_on_merge ());
     m_merged_polygons_valid = true;
+    m_merged_polygons_min_coherence = min_coherence ();
   }
 }
 
@@ -140,7 +163,9 @@ FlatRegion::ensure_unmerged_polygons_valid () const
 
   mp_merged_polygons.reset (new db::Shapes (*mp_polygons));
   m_merged_polygons_valid = true;
+  m_merged_polygons_min_coherence = m_is_merged_min_coherence;
   m_is_merged = false;
+  m_is_merged_min_coherence = min_coherence ();
 
   break_polygons (*mp_polygons, m_max_vertex_count, m_area_ratio);
 }
@@ -152,7 +177,7 @@ RegionIteratorDelegate *FlatRegion::begin () const
 
 RegionIteratorDelegate *FlatRegion::begin_merged () const
 {
-  if (! merged_semantics () || m_is_merged) {
+  if (! merged_semantics () || is_merged ()) {
     return begin ();
   } else {
     ensure_merged_polygons_valid ();
@@ -173,7 +198,7 @@ std::pair<db::RecursiveShapeIterator, db::ICplxTrans> FlatRegion::begin_iter () 
 
 std::pair<db::RecursiveShapeIterator, db::ICplxTrans> FlatRegion::begin_merged_iter () const
 {
-  if (! merged_semantics () || m_is_merged) {
+  if (! merged_semantics () || is_merged ()) {
     return begin_iter ();
   } else {
     ensure_merged_polygons_valid ();
@@ -204,7 +229,7 @@ size_t FlatRegion::hier_count () const
 
 bool FlatRegion::is_merged () const
 {
-  return m_is_merged;
+  return m_is_merged && m_is_merged_min_coherence == min_coherence ();
 }
 
 Box FlatRegion::compute_bbox () const
@@ -246,6 +271,7 @@ RegionDelegate *FlatRegion::filter_in_place (const PolygonFilterBase &filter)
   mp_merged_polygons->clear ();
   invalidate_cache ();
   m_is_merged = filter.requires_raw_input () ? false : merged_semantics ();
+  m_is_merged_min_coherence = min_coherence ();
 
   return this;
 }
@@ -276,6 +302,7 @@ RegionDelegate *FlatRegion::process_in_place (const PolygonProcessorBase &filter
   mp_merged_polygons->clear ();
   invalidate_cache ();
   m_is_merged = filter.result_is_merged () && merged_semantics ();
+  m_is_merged_min_coherence = min_coherence ();
 
   if (filter.result_must_not_be_merged ()) {
     set_merged_semantics (false);
@@ -286,14 +313,15 @@ RegionDelegate *FlatRegion::process_in_place (const PolygonProcessorBase &filter
 
 RegionDelegate *FlatRegion::merged_in_place ()
 {
-  if (! m_is_merged) {
+  if (! is_merged ()) {
 
-    if (m_merged_polygons_valid) {
+    if (merged_polygons_valid ()) {
 
       db::Shapes &merged_polygons = *mp_merged_polygons;
       mp_polygons->swap (merged_polygons);
       merged_polygons.clear ();
       m_is_merged = true;
+      m_is_merged_min_coherence = min_coherence ();
       return this;
 
     } else {
@@ -305,7 +333,7 @@ RegionDelegate *FlatRegion::merged_in_place ()
   }
 }
 
-RegionDelegate *FlatRegion::merged_in_place (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge)
+RegionDelegate *FlatRegion::merged_in_place (bool min_coh, unsigned int min_wc, bool join_properties_on_merge)
 {
   if (empty ()) {
 
@@ -322,9 +350,11 @@ RegionDelegate *FlatRegion::merged_in_place (bool min_coherence, unsigned int mi
   } else {
 
     invalidate_cache ();
-    merge_polygons_to (*mp_polygons, min_coherence, min_wc, join_properties_on_merge);
+    merge_polygons_to (*mp_polygons, min_coh, min_wc, join_properties_on_merge);
 
+    set_min_coherence (min_coh);
     m_is_merged = true;
+    m_is_merged_min_coherence = min_coh;
 
   }
 
@@ -333,17 +363,33 @@ RegionDelegate *FlatRegion::merged_in_place (bool min_coherence, unsigned int mi
 
 RegionDelegate *FlatRegion::merged () const
 {
-  if (! m_is_merged) {
+  if (! is_merged ()) {
 
-    if (m_merged_polygons_valid) {
-      return new FlatRegion (*mp_merged_polygons, true);
-    } else {
-      return AsIfFlatRegion::merged (min_coherence (), 0, join_properties_on_merge ());
+    if (! merged_polygons_valid ()) {
+      ensure_merged_polygons_valid ();
     }
+
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion (*mp_merged_polygons, true, 0, 0, min_coherence ()));
+
+    new_region->set_max_vertex_count (m_max_vertex_count);
+    new_region->set_area_ratio (m_area_ratio);
+
+    return new_region.release ();
 
   } else {
     return clone ();
   }
+}
+
+RegionDelegate *FlatRegion::merged (bool min_coh, unsigned int min_wc, bool jp) const
+{
+  std::unique_ptr<FlatRegion> new_region (new FlatRegion (true, 0, 0, min_coh));
+  merge_polygons_to (new_region->raw_polygons (), min_coh, min_wc, jp);
+
+  new_region->set_max_vertex_count (m_max_vertex_count);
+  new_region->set_area_ratio (m_area_ratio);
+
+  return new_region.release ();
 }
 
 RegionDelegate *FlatRegion::add (const Region &other) const

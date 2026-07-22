@@ -142,28 +142,34 @@ OriginalLayerRegion::OriginalLayerRegion ()
 OriginalLayerRegion::OriginalLayerRegion (const OriginalLayerRegion &other)
   : AsIfFlatRegion (other),
     m_is_merged (other.m_is_merged),
+    m_is_merged_min_coherence (other.m_is_merged_min_coherence),
     m_merged_polygons (other.m_merged_polygons),
     m_merged_polygons_valid (other.m_merged_polygons_valid),
+    m_merged_polygons_min_coherence (other.m_merged_polygons_min_coherence),
     m_iter (other.m_iter),
     m_iter_trans (other.m_iter_trans)
 {
   //  .. nothing yet ..
 }
 
-OriginalLayerRegion::OriginalLayerRegion (const RecursiveShapeIterator &si, bool is_merged)
+OriginalLayerRegion::OriginalLayerRegion (const RecursiveShapeIterator &si, bool is_merged, bool min_coh)
   : AsIfFlatRegion (), m_merged_polygons (false), m_iter (si)
 {
   init ();
+  set_min_coherence (min_coh);
 
   m_is_merged = is_merged;
+  m_is_merged_min_coherence = min_coh;
 }
 
-OriginalLayerRegion::OriginalLayerRegion (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged)
+OriginalLayerRegion::OriginalLayerRegion (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged, bool min_coh)
   : AsIfFlatRegion (), m_merged_polygons (false), m_iter (si), m_iter_trans (trans)
 {
   init ();
+  set_min_coherence (min_coh);
 
   m_is_merged = is_merged;
+  m_is_merged_min_coherence = min_coh;
   set_merged_semantics (merged_semantics);
 }
 
@@ -183,6 +189,7 @@ OriginalLayerRegion::merged_semantics_changed ()
 {
   m_merged_polygons.clear ();
   m_merged_polygons_valid = false;
+  m_merged_polygons_min_coherence = false;
 }
 
 void
@@ -190,14 +197,13 @@ OriginalLayerRegion::join_properties_on_merge_changed ()
 {
   m_merged_polygons.clear ();
   m_merged_polygons_valid = false;
+  m_merged_polygons_min_coherence = false;
 }
 
 void
 OriginalLayerRegion::min_coherence_changed ()
 {
-  m_is_merged = false;
-  m_merged_polygons.clear ();
-  m_merged_polygons_valid = false;
+  //  merged status is tracked in separate variables and is validated on inquiry
 }
 
 size_t
@@ -309,7 +315,7 @@ OriginalLayerRegion::begin () const
 RegionIteratorDelegate *
 OriginalLayerRegion::begin_merged () const
 {
-  if (! merged_semantics () || m_is_merged) {
+  if (! merged_semantics () || is_merged ()) {
     return begin ();
   } else {
     ensure_merged_polygons_valid ();
@@ -332,7 +338,7 @@ OriginalLayerRegion::begin_iter () const
 std::pair<db::RecursiveShapeIterator, db::ICplxTrans>
 OriginalLayerRegion::begin_merged_iter () const
 {
-  if (! merged_semantics () || m_is_merged) {
+  if (! merged_semantics () || is_merged ()) {
     return begin_iter ();
   } else {
     ensure_merged_polygons_valid ();
@@ -346,6 +352,33 @@ OriginalLayerRegion::begin_unmerged_iter () const
   return std::make_pair (m_iter, m_iter_trans);
 }
 
+RegionDelegate *
+OriginalLayerRegion::merged () const
+{
+  if (! is_merged ()) {
+
+    if (! merged_polygons_valid ()) {
+      ensure_merged_polygons_valid ();
+    }
+
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion (m_merged_polygons, true, 0, 0, min_coherence ()));
+
+    return new_region.release ();
+
+  } else {
+    return clone ();
+  }
+}
+
+RegionDelegate *
+OriginalLayerRegion::merged (bool min_coh, unsigned int min_wc, bool jp) const
+{
+  std::unique_ptr<FlatRegion> new_region (new FlatRegion (true, 0, 0, min_coh));
+  merge_polygons_to (new_region->raw_polygons (), min_coh, min_wc, jp);
+
+  return new_region.release ();
+}
+
 bool
 OriginalLayerRegion::empty () const
 {
@@ -355,7 +388,13 @@ OriginalLayerRegion::empty () const
 bool
 OriginalLayerRegion::is_merged () const
 {
-  return m_is_merged;
+  return m_is_merged && m_is_merged_min_coherence == min_coherence ();
+}
+
+bool
+OriginalLayerRegion::merged_polygons_valid () const
+{
+  return m_merged_polygons_valid && m_merged_polygons_min_coherence == min_coherence ();
 }
 
 const db::Polygon *
@@ -379,7 +418,7 @@ OriginalLayerRegion::has_valid_polygons () const
 bool
 OriginalLayerRegion::has_valid_merged_polygons () const
 {
-  return merged_semantics () && ! m_is_merged;
+  return merged_semantics () && ! is_merged ();
 }
 
 const db::RecursiveShapeIterator *
@@ -394,6 +433,7 @@ OriginalLayerRegion::apply_property_translator (const db::PropertiesTranslator &
   m_iter.apply_property_translator (pt);
 
   m_merged_polygons_valid = false;
+  m_merged_polygons_min_coherence = false;
   m_merged_polygons.clear ();
 }
 
@@ -423,7 +463,9 @@ void
 OriginalLayerRegion::init ()
 {
   m_is_merged = false;
+  m_is_merged_min_coherence = false;
   m_merged_polygons_valid = false;
+  m_merged_polygons_min_coherence = false;
 }
 
 namespace {
@@ -459,15 +501,22 @@ OriginalLayerRegion::insert_into (Layout *layout, db::cell_index_type into_cell,
   }
 }
 
+bool
+OriginalLayerRegion::merged_polygons_available () const
+{
+  return is_merged () || merged_polygons_valid ();
+}
+
 void
 OriginalLayerRegion::ensure_merged_polygons_valid () const
 {
-  if (! m_merged_polygons_valid) {
+  if (! merged_polygons_valid ()) {
 
     m_merged_polygons.clear ();
     merge_polygons_to (m_merged_polygons, min_coherence (), 0, join_properties_on_merge ());
 
     m_merged_polygons_valid = true;
+    m_merged_polygons_min_coherence = min_coherence ();
 
   }
 }

@@ -813,8 +813,27 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, db::Cell *s
 
   unsigned int primary_intruder_layer = check_local_operation_base<TS, TI>::m_has_other ? 1 : 0;
 
+  //  in the case of a two-layer check, return if there is no second layer shape
+  if (check_local_operation_base<TS, TI>::m_has_other) {
+
+    bool any = false;
+    for (auto i = interactions.begin (); i != interactions.end () && ! any; ++i) {
+      for (auto ii = i->second.begin (); ii != i->second.end () && ! any; ++ii) {
+        const auto &is = interactions.intruder_shape (*ii);
+        any = (is.first != primary_intruder_layer);
+      }
+    }
+
+    if (! any) {
+      return;
+    }
+
+  }
+
   for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+
     subjects.push_back (&interactions.subject_shape (i->first));
+
     for (auto ii = i->second.begin (); ii != i->second.end (); ++ii) {
       const auto &is = interactions.intruder_shape (*ii);
       if (is.first == primary_intruder_layer) {
@@ -823,6 +842,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, db::Cell *s
         intruders.insert (&is.second);
       }
     }
+
   }
 
   tl_assert (results.size () == 1);
@@ -861,6 +881,19 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, db::Cell *s
   for (auto i = tmp_results.front ().begin (); i != tmp_results.front ().end (); ++i) {
     results.front ().insert (db::EdgePairWithProperties (*i, db::properties_id_type (0)));
   }
+}
+
+template <class TS, class TI>
+std::map<unsigned int, db::Coord>
+check_local_operation<TS, TI>::override_distance () const
+{
+  //  makes sure, the "foreign"-type pseudo-intruder used for merging only
+  //  does not use the full search range, but only "touching".
+  std::map<unsigned int, db::Coord> od;
+  if (check_local_operation_base<TS, TI>::m_has_other) {
+    od.insert (std::make_pair (1, 0));
+  }
+  return od;
 }
 
 template <class TS, class TI>

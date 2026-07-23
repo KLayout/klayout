@@ -119,6 +119,14 @@ public:
   virtual db::Coord dist () const { return 0; }
 
   /**
+   *  @brief Gets a override distance for a specific input layer
+   *  The input layers are numbered from 0 to n-1, where n is the allowed number of intruder layers
+   *  The override distance is used insted of the global distance ("dist()") for the given
+   *  input layer. The override distance cannot be bigger than the global distance.
+   */
+  virtual std::map<unsigned int, db::Coord> override_distance () const { return std::map<unsigned int, db::Coord> (); }
+
+  /**
    *  @brief Gets the cell variant reducer that indicates whether to build cell variants and which
    */
   virtual const db::TransformationReducer *vars () const { return 0; }

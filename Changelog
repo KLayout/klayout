@@ -1,4 +1,4 @@
-0.30.10          (2026-07-22):
+0.30.10          (2026-07-25):
 * Bugfix: %GITHUB%/issues/2384 Deep DRC failure with scaled instances
 * Enhancement: %GITHUB%/issues/2391 Grid Features: switching between coarser and finier grids with keyboard shortcut
 * Bugfix: %GITHUB%/issues/2392 Wrong PCell instantiations when switching technologies

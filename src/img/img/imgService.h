@@ -195,6 +195,7 @@ private:
 
 class IMG_PUBLIC Service
   : public lay::BackgroundViewObject,
+    public lay::ViewService,
     public lay::Editable,
     public lay::Plugin,
     public db::Object
@@ -436,7 +437,15 @@ public:
   /**
    *  @brief Obtain the lay::Editable interface
    */
-  lay::Editable *editable_interface ()
+  virtual lay::Editable *editable_interface ()
+  {
+    return this;
+  }
+
+  /**
+   *  @brief Obtain the lay::ViewService interface
+   */
+  virtual lay::ViewService *view_service_interface ()
   {
     return this;
   }

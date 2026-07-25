@@ -179,8 +179,10 @@ private:
 
   mutable DeepLayer m_merged_polygons;
   mutable bool m_merged_polygons_valid;
+  mutable bool m_merged_polygons_min_coherence;
   mutable size_t m_merged_polygons_boc_hash;
   mutable bool m_is_merged;
+  mutable bool m_is_merged_min_coherence;
 
   void init ();
   void ensure_merged_polygons_valid () const;

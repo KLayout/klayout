@@ -91,8 +91,10 @@ struct DB_PUBLIC LayerProperties
    *  relative layer/datatype specifications in the format "*+1" or "*-100".
    *  "*" for layer or datatype is for "don't care" (on input) or "leave as is"
    *  (for output).
+   *
+   *  Returns true, if a layer was read successfully.
    */
-  void read (tl::Extractor &ex, bool as_target = false);
+  bool read (tl::Extractor &ex, bool as_target = false);
 
   /**
    *  @brief "Logical" equality

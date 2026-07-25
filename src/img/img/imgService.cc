@@ -412,6 +412,7 @@ View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
 
 Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
   : lay::BackgroundViewObject (view->canvas ()),
+    lay::ViewService (view->canvas ()),
     lay::Editable (view),
     lay::Plugin (view),
     db::Object (manager),
@@ -424,6 +425,9 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     m_images_visible (true),
     m_visibility_cache_valid (false)
 { 
+  //  for receiving mouse_move events to get the pixel value
+  ui ()->grab_mouse (this, false);
+
   // place images behind the grid
   z_order (-1);
 
@@ -465,6 +469,9 @@ void
 Service::show_images (bool f)
 {
   if (m_images_visible != f) {
+    if (! f) {
+      clear_selection ();
+    }
     m_images_visible = f;
     view ()->redraw_deco_layer ();
   }
@@ -596,9 +603,52 @@ dragging_what (const img::Object *iobj, const db::DBox &search_dbox, img::Servic
 }
 
 bool 
-Service::mouse_move_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/) 
+Service::mouse_move_event (const db::DPoint &pos, unsigned int /*buttons*/, bool prio)
 {
-  //  .. nothing yet ..
+  if (! prio && (m_selected_image_views.size () == size_t (1) || (mp_transient_view && ! editables ()->has_selection ()))) {
+
+    const img::Object *image = 0;
+    bool is_transient = false;
+    if (! m_selected_image_views.empty ()) {
+      image = m_selected_image_views.front ()->image_object ();
+    } else if (mp_transient_view) {
+      image = mp_transient_view->image_object ();
+      is_transient = true;
+    }
+
+    if (image) {
+
+      std::string data_string;
+
+      db::DPoint pixel = image->matrix ().inverted ().trans (pos);
+      if (pixel.x () > image->width () * -0.5 - 0.5 + db::epsilon && pixel.x () < image->width () * 0.5 + 0.5 - db::epsilon &&
+          pixel.y () > image->height () * -0.5 - 0.5 + db::epsilon && pixel.y () < image->height () * 0.5 + 0.5 - db::epsilon) {
+
+        db::Point pixel_index = db::Point (pixel + db::DVector (image->width () * 0.5 - 0.5, image->height () * 0.5 - 0.5));
+
+        //  check once again to account to rounding issues
+        if (pixel_index.x () >= 0 && pixel_index.x () < image->width () &&
+            pixel_index.y () >= 0 && pixel_index.y () < image->height ()) {
+
+          if (image->is_color ()) {
+            data_string = tl::sprintf ("RGB: %.5g,%.5g,%.5g",
+                                       image->pixel (pixel_index.x (), pixel_index.y (), 0),
+                                       image->pixel (pixel_index.x (), pixel_index.y (), 1),
+                                       image->pixel (pixel_index.x (), pixel_index.y (), 2));
+          } else {
+            data_string = tl::sprintf ("%.5g", image->pixel (pixel_index.x (), pixel_index.y ()));
+          }
+
+        }
+
+      }
+
+      display_status (is_transient, data_string);
+
+    }
+
+  }
+
   return false;
 }
 
@@ -1309,7 +1359,6 @@ Service::transient_select (const db::DPoint &pos)
   clear_transient_selection ();
 
   bool any_selected = false;
-  std::string data_string;
 
   //  compute search box
   double l = catch_distance ();
@@ -1337,41 +1386,12 @@ Service::transient_select (const db::DPoint &pos)
       mp_transient_view = new img::View (this, imin, img::View::mode_transient);
     }
 
-    if (mp_transient_view->image_object ()) {
-
-      const img::Object *image = mp_transient_view->image_object ();
-
-      db::DPoint pixel = image->matrix ().inverted ().trans (pos);
-      if (pixel.x () > image->width () * -0.5 - 0.5 + db::epsilon && pixel.x () < image->width () * 0.5 + 0.5 - db::epsilon &&
-          pixel.y () > image->height () * -0.5 - 0.5 + db::epsilon && pixel.y () < image->height () * 0.5 + 0.5 - db::epsilon) {
-
-        db::Point pixel_index = db::Point (pixel + db::DVector (image->width () * 0.5 - 0.5, image->height () * 0.5 - 0.5));
-
-        //  check once again to account to rounding issues
-        if (pixel_index.x () >= 0 && pixel_index.x () < image->width () &&
-            pixel_index.y () >= 0 && pixel_index.y () < image->height ()) {
-
-          if (image->is_color ()) {
-            data_string = tl::sprintf ("RGB: %.5g,%.5g,%.5g",
-                                       image->pixel (pixel_index.x (), pixel_index.y (), 0),
-                                       image->pixel (pixel_index.x (), pixel_index.y (), 1),
-                                       image->pixel (pixel_index.x (), pixel_index.y (), 2));
-          } else {
-            data_string = tl::sprintf ("%.5g", image->pixel (pixel_index.x (), pixel_index.y ()));
-          }
-
-        }
-
-      }
-
-    }
-
     any_selected = true;
 
   }
 
   if (any_selected && ! editables ()->has_selection ()) {
-    display_status (true, data_string);
+    display_status (true);
   }
 
   return any_selected;
@@ -1474,6 +1494,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
         select (mp_view->annotation_shapes ().iterator_from_pointer (robj), mode);
         m_previous_selection.insert (mp_view->annotation_shapes ().iterator_from_pointer (robj));
         needs_update = true;
+        any_selected = true;
       }
 
     }

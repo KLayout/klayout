@@ -2518,6 +2518,40 @@ class DBLayoutTests1_TestClass < TestBase
 
   end
 
+  # Create layout from a cell
+  def test_newLayoutFromCell
+
+    [ true, false ].each do |editable|
+
+      ly = RBA::Layout::new(editable)
+      top = ly.create_cell("TOP")
+      a = ly.create_cell("A")
+      b = ly.create_cell("B")
+      l1 = ly.layer(1, 0)
+      a.shapes(l1).insert(RBA::Box::new(0, 0, 1000, 2000))
+      b.shapes(l1).insert(RBA::Box::new(0, 0, 100, 200))
+      top.insert(RBA::CellInstArray::new(a, RBA::Trans::new))
+      a.insert(RBA::CellInstArray::new(b, RBA::Trans::new(1, 2)))
+
+      ly2 = RBA::Layout::new(a)
+      assert_equal(ly2.is_editable?, ly.is_editable?)
+      assert_equal(ly2.top_cell.name, "A")
+      assert_equal(collect(ly2.top_cell.begin_shapes_rec(ly2.layer(1, 0)), ly2), "[A](0,0;1000,2000)/[B](1,2;101,202)")
+
+      ly2 = RBA::Layout::new(a, false)
+      assert_equal(ly2.is_editable?, false)
+      assert_equal(ly2.top_cell.name, "A")
+      assert_equal(collect(ly2.top_cell.begin_shapes_rec(ly2.layer(1, 0)), ly2), "[A](0,0;1000,2000)/[B](1,2;101,202)")
+
+      ly2 = RBA::Layout::new(a, true)
+      assert_equal(ly2.is_editable?, true)
+      assert_equal(ly2.top_cell.name, "A")
+      assert_equal(collect(ly2.top_cell.begin_shapes_rec(ly2.layer(1, 0)), ly2), "[A](0,0;1000,2000)/[B](1,2;101,202)")
+
+    end
+
+  end
+
 end
 
 load("test_epilogue.rb")

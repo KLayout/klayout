@@ -541,31 +541,58 @@ CommonReaderBase::open_dl_uncached (db::Layout &layout, const LDPair &dl)
     }
 
     unsigned int nl = layout.insert_layer (lp);
+
+    //  change OASIS layer name if a layer already exists by layer/datatype, but has a different name
+    if (! lp.name.empty () && layout.get_properties (nl).name != lp.name) {
+      layout.set_properties (nl, lp);
+    }
+
     m_layer_map_out.map (dl, nl, lp);
 
     m_layers_created.insert (nl);
 
     return std::make_pair (true, nl);
 
-  } else if (li.size () == 1) {
-
-    m_layer_map_out.map (dl, *li.begin (), layout.get_properties (*li.begin ()));
-
-    return std::make_pair (true, *li.begin ());
-
   } else {
 
-    for (std::set<unsigned int>::const_iterator i = li.begin (); i != li.end (); ++i) {
-      m_layer_map_out.mmap (dl, *i, layout.get_properties (*i));
+    for (auto i = li.begin (); i != li.end (); ++i) {
+
+      //  change OASIS layer name if a layer exists by layer/datatype, but has a different name
+      const tl::interval_map <db::ld_type, std::string> *names_dmap = m_layer_names.mapped (dl.layer);
+      if (names_dmap != 0) {
+        const std::string *name = names_dmap->mapped (dl.datatype);
+        if (name != 0) {
+          db::LayerProperties lp_out = layout.get_properties (*i);
+          if (lp_out.name != *name) {
+            lp_out.name = *name;
+            layout.set_properties (*i, lp_out);
+          }
+        }
+      }
+
     }
 
-    std::map<std::set<unsigned int>, unsigned int>::iterator mmp = m_multi_mapping_placeholders.find (li);
-    if (mmp == m_multi_mapping_placeholders.end ()) {
-      //  create a placeholder layer
-      mmp = m_multi_mapping_placeholders.insert (std::make_pair (li, layout.insert_layer ())).first;
-    }
+    if (li.size () == 1) {
 
-    return std::make_pair (true, mmp->second);
+      m_layer_map_out.map (dl, *li.begin (), layout.get_properties (*li.begin ()));
+
+      return std::make_pair (true, *li.begin ());
+
+    } else {
+
+      for (std::set<unsigned int>::const_iterator i = li.begin (); i != li.end (); ++i) {
+        m_layer_map_out.mmap (dl, *i, layout.get_properties (*i));
+      }
+
+      std::map<std::set<unsigned int>, unsigned int>::iterator mmp = m_multi_mapping_placeholders.find (li);
+      if (mmp == m_multi_mapping_placeholders.end ()) {
+        //  create a placeholder layer
+        mmp = m_multi_mapping_placeholders.insert (std::make_pair (li, layout.insert_layer ())).first;
+      }
+
+      return std::make_pair (true, mmp->second);
+
+    }
 
   }
 }

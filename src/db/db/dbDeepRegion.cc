@@ -179,8 +179,10 @@ DeepRegion::~DeepRegion ()
 DeepRegion::DeepRegion (const DeepRegion &other)
   : MutableRegion (other), DeepShapeCollectionDelegateBase (other),
     m_merged_polygons_valid (other.m_merged_polygons_valid),
+    m_merged_polygons_min_coherence (other.m_merged_polygons_min_coherence),
     m_merged_polygons_boc_hash (other.m_merged_polygons_boc_hash),
-    m_is_merged (other.m_is_merged)
+    m_is_merged (other.m_is_merged),
+    m_is_merged_min_coherence (other.m_is_merged_min_coherence)
 {
   if (m_merged_polygons_valid) {
     m_merged_polygons = other.m_merged_polygons.copy ();
@@ -196,8 +198,10 @@ DeepRegion::operator= (const DeepRegion &other)
     DeepShapeCollectionDelegateBase::operator= (other);
 
     m_merged_polygons_valid = other.m_merged_polygons_valid;
+    m_merged_polygons_min_coherence = other.m_merged_polygons_min_coherence;
     m_merged_polygons_boc_hash = other.m_merged_polygons_boc_hash;
     m_is_merged = other.m_is_merged;
+    m_is_merged_min_coherence = other.m_is_merged_min_coherence;
     if (m_merged_polygons_valid) {
       m_merged_polygons = other.m_merged_polygons.copy ();
     }
@@ -210,9 +214,11 @@ DeepRegion::operator= (const DeepRegion &other)
 void DeepRegion::init ()
 {
   m_merged_polygons_valid = false;
+  m_merged_polygons_min_coherence = false;
   m_merged_polygons_boc_hash = 0;
   m_merged_polygons = db::DeepLayer ();
   m_is_merged = false;
+  m_is_merged_min_coherence = false;
 }
 
 RegionDelegate *
@@ -228,7 +234,7 @@ void DeepRegion::merged_semantics_changed ()
 
 void DeepRegion::min_coherence_changed ()
 {
-  set_is_merged (false);
+  //  merged status is tracked in separate variables and is validated on inquiry
 }
 
 void DeepRegion::join_properties_on_merge_changed ()
@@ -468,7 +474,7 @@ DeepRegion::empty () const
 bool
 DeepRegion::is_merged () const
 {
-  return m_is_merged;
+  return m_is_merged && (m_is_merged_min_coherence == min_coherence ());
 }
 
 const db::Polygon *
@@ -739,18 +745,21 @@ DeepRegion::merged_deep_layer () const
 bool
 DeepRegion::merged_polygons_available () const
 {
-  return m_is_merged || (m_merged_polygons_valid && m_merged_polygons_boc_hash == deep_layer ().breakout_cells_hash ());
+  return (m_is_merged && m_is_merged_min_coherence == min_coherence ()) ||
+         (m_merged_polygons_valid && m_merged_polygons_min_coherence == min_coherence () && m_merged_polygons_boc_hash == deep_layer ().breakout_cells_hash ());
 }
 
 void
 DeepRegion::ensure_merged_polygons_valid () const
 {
-  if (! m_merged_polygons_valid || (! m_is_merged && m_merged_polygons_boc_hash != deep_layer ().breakout_cells_hash ())) {
+  if (! m_merged_polygons_valid || m_merged_polygons_min_coherence != min_coherence () ||
+      ((! m_is_merged || m_is_merged_min_coherence != min_coherence ()) && m_merged_polygons_boc_hash != deep_layer ().breakout_cells_hash ())) {
 
-    if (m_is_merged) {
+    if (m_is_merged && m_is_merged_min_coherence == min_coherence ()) {
 
       //  NOTE: this will reuse the deep layer reference
       m_merged_polygons = deep_layer ();
+      m_merged_polygons_min_coherence = min_coherence ();
 
     } else {
 
@@ -796,6 +805,7 @@ DeepRegion::ensure_merged_polygons_valid () const
     }
 
     m_merged_polygons_valid = true;
+    m_merged_polygons_min_coherence = min_coherence ();
     m_merged_polygons_boc_hash = deep_layer ().breakout_cells_hash ();
 
   }
@@ -813,7 +823,9 @@ DeepRegion::ensure_unmerged_polygons_valid () const
   db::DeepLayer &polygons = const_cast<db::DeepLayer &> (deep_layer ());
 
   m_merged_polygons_valid = true;
+  m_merged_polygons_min_coherence = m_is_merged_min_coherence;
   m_is_merged = false;
+  m_is_merged_min_coherence = min_coherence ();
   m_merged_polygons_boc_hash = deep_layer ().breakout_cells_hash ();
 
   db::Layout &layout = polygons.layout ();
@@ -845,6 +857,7 @@ void
 DeepRegion::set_is_merged (bool f)
 {
   m_is_merged = f;
+  m_is_merged_min_coherence = min_coherence ();
   m_merged_polygons_valid = false;
   m_merged_polygons_boc_hash = 0;
   m_merged_polygons = db::DeepLayer ();
@@ -2026,6 +2039,7 @@ DeepRegion::merged () const
 
   res->deep_layer ().layer ();
 
+  res->set_min_coherence (min_coherence ());
   res->set_is_merged (true);
   return res.release ();
 }
@@ -2370,48 +2384,75 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 {
   if (empty ()) {
     return new db::DeepEdgePairs (deep_layer ().derived ());
-  } else if (other && ! is_subject_regionptr (other) && other->empty () && ! options.negative) {
+  } else if (other && other->empty () && ! options.negative) {
     return new db::DeepEdgePairs (deep_layer ().derived ());
   }
 
-  //  force different polygons in the different properties case to skip intra-polygon checks
-  if (pc_always_different (options.prop_constraint)) {
-    //  TODO: this forces merged primaries, so maybe that is not a good optimization?
-    different_polygons = true;
-  }
-
+  //  delegate to AsIfFlatRegion if the other region is not a deep one
   const db::DeepRegion *other_deep = 0;
-  unsigned int other_layer = 0;
-  bool other_is_merged = true;
-
-  bool needs_merged_primary = different_polygons || options.needs_merged ();
-  bool primary_is_merged = ! merged_semantics () || needs_merged_primary || is_merged ();
-
-  if (other == subject_regionptr ()) {
-    other_layer = subject_idlayer ();
-    other_is_merged = primary_is_merged;
-  } else if (other == foreign_regionptr ()) {
-    other_layer = foreign_idlayer ();
-    other_is_merged = primary_is_merged;
-  } else {
+  if (other) {
     other_deep = dynamic_cast<const db::DeepRegion *> (other->delegate ());
     if (! other_deep) {
       return db::AsIfFlatRegion::run_check (rel, different_polygons, other, d, options);
     }
+  }
+
+  //  force different polygons in the different properties case to skip intra-polygon checks
+  if (! other_deep && pc_always_different (options.prop_constraint)) {
+    //  TODO: this forces merged primaries, so maybe that is not a good optimization?
+    different_polygons = true;
+  }
+
+  //  primary input
+
+  bool needs_merged_primary = (! other_deep && different_polygons) || options.needs_merged ();
+  bool primary_is_merged = false;
+
+  db::DeepLayer polygons;
+
+  if (! merged_semantics ()) {
+    primary_is_merged = true;  //  means: don't merge again
+    polygons = deep_layer ();
+  } else if (! needs_merged_primary) {
+    //  The implementation may run faster if the primary is not merged
+    primary_is_merged = false;
+    ensure_unmerged_polygons_valid ();
+    polygons = deep_layer ();
+  } else {
+    primary_is_merged = true;
+    polygons = merged_deep_layer ();
+  }
+
+  //  other input
+
+  std::vector<unsigned int> other_layers;
+  bool other_is_merged = true;
+
+  if (! other_deep) {
+
+    other_layers.push_back (foreign_idlayer ());
+    other_is_merged = primary_is_merged;
+
+  } else {
+
     if (! other->merged_semantics ()) {
-      other_layer = other_deep->deep_layer ().layer ();
+      other_layers.push_back (other_deep->deep_layer ().layer ());
       other_is_merged = true;
     } else if (options.whole_edges) {
       //  NOTE: whole edges needs both inputs merged
-      other_layer = other_deep->merged_deep_layer ().layer ();
+      other_layers.push_back (other_deep->merged_deep_layer ().layer ());
       other_is_merged = true;
     } else {
-      other_layer = other_deep->deep_layer ().layer ();
+      other_layers.push_back (other_deep->deep_layer ().layer ());
       other_is_merged = other->is_merged ();
     }
-  }
 
-  const db::DeepLayer &polygons = needs_merged_primary ? merged_deep_layer () : deep_layer ();
+    //  adds another intruder section to implement subject merging ("primary_intruders")
+    if (! primary_is_merged) {
+      other_layers.push_back (foreign_idlayer ());
+    }
+
+  }
 
   EdgeRelationFilter check (rel, d, options);
 
@@ -2435,7 +2476,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
     configure_proc (proc);
     proc.set_threads (polygons.store ()->threads ());
 
-    proc.run (&op, polygons.layer (), other_layer, res->deep_layer ().layer ());
+    proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer ());
 
   } else {
 
@@ -2448,7 +2489,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
     configure_proc (proc);
     proc.set_threads (polygons.store ()->threads ());
 
-    proc.run (&op, polygons.layer (), other_layer, res->deep_layer ().layer ());
+    proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer ());
 
   }
 

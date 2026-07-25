@@ -631,14 +631,14 @@ namespace {
 class OutputPairHolder
 {
 public:
-  OutputPairHolder (InteractingOutputMode output_mode, bool merged_semantics)
+  OutputPairHolder (InteractingOutputMode output_mode, bool merged_semantics, bool min_coherence)
   {
     if (output_mode == None) {
       return;
     }
 
     if (output_mode == Positive || output_mode == Negative || output_mode == PositiveAndNegative) {
-      m_positive.reset (new FlatRegion (merged_semantics));
+      m_positive.reset (new FlatRegion (merged_semantics, 0.0, 0, min_coherence));
       m_results.push_back (& m_positive->raw_polygons ());
     } else {
       m_results.push_back ((db::Shapes *) 0);
@@ -667,7 +667,7 @@ private:
 std::pair<RegionDelegate *, RegionDelegate *>
 AsIfFlatRegion::in_and_out_generic (const Region &other, InteractingOutputMode output_mode) const
 {
-  OutputPairHolder oph (output_mode, merged_semantics ());
+  OutputPairHolder oph (output_mode, merged_semantics (), min_coherence ());
 
   if (output_mode == None) {
     return oph.region_pair ();
@@ -717,7 +717,7 @@ AsIfFlatRegion::in_and_out_generic (const Region &other, InteractingOutputMode o
 std::pair<RegionDelegate *, RegionDelegate *>
 AsIfFlatRegion::selected_interacting_generic (const Edges &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
 {
-  OutputPairHolder oph (output_mode, merged_semantics () || is_merged ());
+  OutputPairHolder oph (output_mode, merged_semantics () || is_merged (), min_coherence ());
 
   if (output_mode == None) {
     return oph.region_pair ();
@@ -756,7 +756,7 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, InteractingOut
   std::vector<generic_shape_iterator<db::Edge> > others;
   others.push_back (counting ? other.begin_merged () : other.begin ());
 
-  std::unique_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
+  std::unique_ptr<FlatRegion> output (new FlatRegion (merged_semantics (), 0.0, 0, min_coherence ()));
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_polygons ());
 
@@ -768,7 +768,7 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, InteractingOut
 std::pair<RegionDelegate *, RegionDelegate *>
 AsIfFlatRegion::selected_interacting_generic (const Texts &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
 {
-  OutputPairHolder oph (output_mode, merged_semantics () || is_merged ());
+  OutputPairHolder oph (output_mode, merged_semantics () || is_merged (), min_coherence ());
 
   if (output_mode == None) {
     return oph.region_pair ();
@@ -814,7 +814,7 @@ AsIfFlatRegion::selected_interacting_generic (const Texts &other, InteractingOut
 std::pair<RegionDelegate *, RegionDelegate *>
 AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, bool touching, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
 {
-  OutputPairHolder oph (output_mode, merged_semantics () || is_merged ());
+  OutputPairHolder oph (output_mode, merged_semantics () || is_merged (), min_coherence ());
 
   if (output_mode == None) {
     return oph.region_pair ();
@@ -941,7 +941,7 @@ AsIfFlatRegion::pull_generic (const Region &other, int mode, bool touching) cons
   std::vector<generic_shape_iterator<db::Polygon> > others;
   others.push_back (other.begin_merged ());
 
-  std::unique_ptr<FlatRegion> output (new FlatRegion (other.merged_semantics () || other.is_merged ()));
+  std::unique_ptr<FlatRegion> output (new FlatRegion (other.merged_semantics () || other.is_merged (), 0.0, 0, min_coherence ()));
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_polygons ());
 
@@ -1106,7 +1106,7 @@ AsIfFlatRegion::scaled_and_snapped (db::Coord gx, db::Coord mx, db::Coord dx, db
     throw tl::Exception (tl::to_string (tr ("Scale and snap requires positive and non-null magnification or divisor values")));
   }
 
-  std::unique_ptr<FlatRegion> new_region (new FlatRegion (merged_semantics ()));
+  std::unique_ptr<FlatRegion> new_region (new FlatRegion (merged_semantics (), 0.0, 0, min_coherence ()));
 
   gx = std::max (db::Coord (1), gx);
   gy = std::max (db::Coord (1), gy);
@@ -1184,13 +1184,7 @@ AsIfFlatRegion::width_check (db::Coord d, const RegionCheckOptions &options) con
 EdgePairsDelegate *
 AsIfFlatRegion::space_or_isolated_check (db::Coord d, const RegionCheckOptions &options, bool isolated) const
 {
-  if (options.opposite_filter != NoOppositeFilter || options.rect_filter != NoRectFilter || options.shielded) {
-    //  NOTE: we have to use the "foreign" scheme with a filter because only this scheme
-    //  guarantees that all subject shapes are visited.
-    return run_check (db::SpaceRelation, isolated, foreign_regionptr (), d, options);
-  } else {
-    return run_check (db::SpaceRelation, isolated, subject_regionptr (), d, options);
-  }
+  return run_check (db::SpaceRelation, isolated, 0, d, options);
 }
 
 EdgePairsDelegate *
@@ -1239,28 +1233,43 @@ EdgePairsDelegate *
 AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const
 {
   //  force different polygons in the different properties case to skip intra-polygon checks
-  if (pc_always_different (options.prop_constraint)) {
+  if (! other && pc_always_different (options.prop_constraint)) {
     different_polygons = true;
   }
 
-  bool needs_merged_primary = different_polygons || options.needs_merged ();
+  bool needs_merged_primary = (! other && different_polygons) || options.needs_merged ();
+  bool primary_is_merged = is_merged ();
+  db::RegionIterator polygons;
 
-  db::RegionIterator polygons (needs_merged_primary ? begin_merged () : begin ());
-  bool primary_is_merged = ! merged_semantics () || needs_merged_primary || is_merged ();
+  if (! merged_semantics ()) {
+    primary_is_merged = true;  //  means: don't merge again
+    needs_merged_primary = false;
+    polygons = begin ();
+  } else if (! needs_merged_primary) {
+    //  The implementation may run faster if the primary is not merged
+    primary_is_merged = false;
+    polygons = begin_unmerged ();
+  } else {
+    primary_is_merged = true;
+    polygons = begin_merged ();
+  }
 
   EdgeRelationFilter check (rel, d, options);
 
   std::vector<db::RegionIterator> others;
   std::vector<bool> foreign;
-  bool has_other = false;
   bool other_is_merged = true;
 
-  if (other == subject_regionptr () || other == foreign_regionptr ()) {
-    foreign.push_back (other == foreign_regionptr ());
+  if (! other) {
+
+    foreign.push_back (true);
     others.push_back (polygons);
     other_is_merged = primary_is_merged;
+
   } else {
+
     foreign.push_back (false);
+
     if (! other->merged_semantics ()) {
       others.push_back (other->begin ());
       other_is_merged = true;
@@ -1272,7 +1281,13 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
       others.push_back (other->begin ());
       other_is_merged = other->is_merged ();
     }
-    has_other = true;
+
+    //  adds another intruder section to implement subject merging ("primary_intruders")
+    if (! primary_is_merged) {
+      foreign.push_back (true);
+      others.push_back (polygons);
+    }
+
   }
 
   std::unique_ptr<FlatEdgePairs> output (new FlatEdgePairs ());
@@ -1282,7 +1297,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
 
   if (pc_skip (options.prop_constraint)) {
 
-    db::check_local_operation<db::Polygon, db::Polygon> op (check, different_polygons, primary_is_merged, has_other, other_is_merged, options);
+    db::check_local_operation<db::Polygon, db::Polygon> op (check, different_polygons, primary_is_merged, other != 0, other_is_merged, options);
 
     db::local_processor<db::Polygon, db::Polygon, db::EdgePair> proc;
     proc.set_base_verbosity (base_verbosity ());
@@ -1293,7 +1308,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
 
   } else {
 
-    db::check_local_operation_with_properties<db::Polygon, db::Polygon> op (check, different_polygons, primary_is_merged, has_other, other_is_merged, options);
+    db::check_local_operation_with_properties<db::Polygon, db::Polygon> op (check, different_polygons, primary_is_merged, other != 0, other_is_merged, options);
 
     db::local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePairWithProperties> proc;
     proc.set_base_verbosity (base_verbosity ());
@@ -1334,7 +1349,7 @@ AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord 
 }
 
 RegionDelegate *
-AsIfFlatRegion::merged (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge) const
+AsIfFlatRegion::merged (bool min_coh, unsigned int min_wc, bool join_properties_on_merge) const
 {
   if (empty ()) {
 
@@ -1351,8 +1366,8 @@ AsIfFlatRegion::merged (bool min_coherence, unsigned int min_wc, bool join_prope
 
   } else {
 
-    std::unique_ptr<FlatRegion> new_region (new FlatRegion (true));
-    merge_polygons_to (new_region->raw_polygons (), min_coherence, min_wc, join_properties_on_merge);
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion (true, 0, 0, min_coh));
+    merge_polygons_to (new_region->raw_polygons (), min_coh, min_wc, join_properties_on_merge);
 
     return new_region.release ();
 
@@ -1695,7 +1710,7 @@ AsIfFlatRegion::and_or_not_with (bool is_and, const Region &other, PropertyConst
       ep.insert (*p, n);
     }
 
-    std::unique_ptr<FlatRegion> new_region (new FlatRegion (true));
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion (true, 0.0, 0, min_coherence ()));
     db::BooleanOp op (is_and ? db::BooleanOp::And : db::BooleanOp::ANotB);
     db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence ());
@@ -1772,12 +1787,12 @@ AsIfFlatRegion::andnot_with (const Region &other, PropertyConstraint property_co
       ep.insert (*p, n);
     }
 
-    std::unique_ptr<FlatRegion> new_region1 (new FlatRegion (true));
+    std::unique_ptr<FlatRegion> new_region1 (new FlatRegion (true, 0.0, 0, min_coherence ()));
     db::BooleanOp op1 (db::BooleanOp::And);
     db::ShapeGenerator pc1 (new_region1->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg1 (pc1, false /*don't resolve holes*/, min_coherence ());
 
-    std::unique_ptr<FlatRegion> new_region2 (new FlatRegion (true));
+    std::unique_ptr<FlatRegion> new_region2 (new FlatRegion (true, 0.0, 0, min_coherence ()));
     db::BooleanOp op2 (db::BooleanOp::ANotB);
     db::ShapeGenerator pc2 (new_region2->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg2 (pc2, false /*don't resolve holes*/, min_coherence ());
@@ -1860,7 +1875,7 @@ AsIfFlatRegion::xor_with (const Region &other, PropertyConstraint prop_constrain
       ep.insert (*p, n);
     }
 
-    std::unique_ptr<FlatRegion> new_region (new FlatRegion (true));
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion (true, 0.0, 0, min_coherence ()));
     db::BooleanOp op (db::BooleanOp::Xor);
     db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence ());
@@ -1916,7 +1931,7 @@ AsIfFlatRegion::or_with (const Region &other, PropertyConstraint /*prop_constrai
       ep.insert (*p, n);
     }
 
-    std::unique_ptr<FlatRegion> new_region (new FlatRegion (true));
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion (true, 0.0, 0, min_coherence ()));
     db::BooleanOp op (db::BooleanOp::Or);
     db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence ());

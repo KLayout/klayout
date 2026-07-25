@@ -353,6 +353,7 @@ Pin &Circuit::add_pin (const std::string &name)
 void Circuit::remove_pin (size_t id)
 {
   if (id < m_pin_by_id.size () && ! tl::is_null_iterator (m_pin_by_id [id])) {
+    connect_pin (id, 0);
     m_pins.erase (m_pin_by_id [id]);
     m_pin_by_id [id] = pin_list::iterator ();
   }

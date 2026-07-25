@@ -236,7 +236,7 @@ Shapes::do_insert (const Shapes &d, unsigned int flags)
   if (layout () == d.layout ()) {
 
     //  both shape containers reside in the same repository space - simply copy
-    if (m_layers.empty ()) {
+    if (m_layers.empty () && is_editable () == d.is_editable ()) {
 
       m_layers.reserve (d.m_layers.size ());
       for (tl::vector<LayerBase *>::const_iterator l = d.m_layers.begin (); l != d.m_layers.end (); ++l) {

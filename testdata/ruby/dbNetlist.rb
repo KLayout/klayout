@@ -213,6 +213,15 @@ class DBNetlist_TestClass < TestBase
     assert_equal(p1.name, "X")
     assert_equal(p2.name, "B")
 
+    n1 = c.create_net("NET1")
+    n2 = c.create_net("NET2")
+
+    c.connect_pin(p1.id, n1)
+    assert_equal(n1.pin_count, 1)
+
+    c.connect_pin(p2.id, n2)
+    assert_equal(n2.pin_count, 1)
+
     assert_equal(p1.property(17), nil)
     p1.set_property(17, 42)
     assert_equal(p1.property(17), 42)
@@ -245,6 +254,9 @@ class DBNetlist_TestClass < TestBase
 
     c.remove_pin(0)
 
+    assert_equal(n1.pin_count, 0)
+    assert_equal(n2.pin_count, 1)
+
     names = []
     c.each_pin { |p| names << p.name }
     assert_equal(names, [ "B" ])
@@ -252,6 +264,13 @@ class DBNetlist_TestClass < TestBase
     assert_equal(c.pin_by_id(0) == nil, true)
     assert_equal(c.pin_by_id(1) == nil, false)
     assert_equal(c.pin_by_id(1).name, "B")
+
+    c.remove_pin(1)
+
+    assert_equal(n1.pin_count, 0)
+    assert_equal(n2.pin_count, 0)
+
+    assert_equal(c.pin_by_id(1) == nil, true)
 
   end
 

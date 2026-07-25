@@ -376,10 +376,10 @@ private:
  */
 template <class TS, class TI>
 DB_PUBLIC_TEMPLATE
-std::map<db::properties_id_type, std::pair<std::vector<const TS *>, std::set<const TI *> > >
+std::map<db::properties_id_type, std::pair<std::vector<const TS *>, std::set<std::pair<unsigned int, const TI *> > > >
 separate_interactions_by_properties (const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, db::PropertyConstraint property_constraint)
 {
-  std::map<db::properties_id_type, std::pair<std::vector<const TS *>, std::set<const TI *> > > by_prop_id;
+  std::map<db::properties_id_type, std::pair<std::vector<const TS *>, std::set<std::pair<unsigned int, const TI *> > > > by_prop_id;
 
   for (auto i = interactions.begin (); i != interactions.end (); ++i) {
 
@@ -387,7 +387,7 @@ separate_interactions_by_properties (const shape_interactions<db::object_with_pr
 
     db::properties_id_type prop_id = subject.properties_id ();
 
-    std::pair<std::vector<const TS *>, std::set<const TI *> > &s2p = by_prop_id [prop_id];
+    auto &s2p = by_prop_id [prop_id];
     s2p.first.push_back (&subject);
 
     for (auto ii = i->second.begin (); ii != i->second.end (); ++ii) {
@@ -395,7 +395,7 @@ separate_interactions_by_properties (const shape_interactions<db::object_with_pr
       const std::pair<unsigned int, db::object_with_properties<TI> > &intruder = interactions.intruder_shape (*ii);
 
       if (pc_match (property_constraint, prop_id, intruder.second.properties_id ())) {
-        s2p.second.insert (&intruder.second);
+        s2p.second.insert (std::make_pair (intruder.first, &intruder.second));
       }
 
     }

@@ -626,7 +626,7 @@ Editables::end_move (const db::DVector &v, db::Transaction *transaction)
 {
   std::unique_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (tr ("Move"))));
 
-  if (m_any_move_operation) {
+  if (m_any_move_operation || v != db::DVector ()) {
 
     trans_holder->open ();
 

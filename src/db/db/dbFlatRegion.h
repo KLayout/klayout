@@ -52,9 +52,9 @@ public:
   typedef polygon_layer_wp_type::iterator polygon_iterator_wp_type;
 
   FlatRegion (double area_ratio = 0.0, size_t max_vertex_count = 0);
-  FlatRegion (const db::Shapes &polygons, bool is_merged = false, double area_ratio = 0.0, size_t max_vertex_count = 0);
-  FlatRegion (const db::Shapes &polygons, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged = false, double area_ratio = 0.0, size_t max_vertex_count = 0);
-  FlatRegion (bool is_merged, double area_ratio = 0.0, size_t max_vertex_count = 0);
+  FlatRegion (const db::Shapes &polygons, bool is_merged = false, double area_ratio = 0.0, size_t max_vertex_count = 0, bool min_coh = false);
+  FlatRegion (const db::Shapes &polygons, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged = false, double area_ratio = 0.0, size_t max_vertex_count = 0, bool min_coh = false);
+  FlatRegion (bool is_merged, double area_ratio = 0.0, size_t max_vertex_count = 0, bool min_coh = false);
 
   FlatRegion (const FlatRegion &other);
 
@@ -85,10 +85,9 @@ public:
   virtual RegionDelegate *merged_in_place ();
   virtual RegionDelegate *merged_in_place (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge);
   virtual RegionDelegate *merged () const;
-  virtual RegionDelegate *merged (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge) const
-  {
-    return db::AsIfFlatRegion::merged (min_coherence, min_wc, join_properties_on_merge);
-  }
+  virtual RegionDelegate *merged (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge) const;
+
+  bool merged_polygons_available () const;
 
   virtual RegionDelegate *process_in_place (const PolygonProcessorBase &filter);
   virtual RegionDelegate *filter_in_place (const PolygonFilterBase &filter);
@@ -138,6 +137,7 @@ protected:
   virtual Box compute_bbox () const;
   void invalidate_cache ();
   void set_is_merged (bool m);
+  bool merged_polygons_valid () const;
 
 private:
   friend class AsIfFlatRegion;
@@ -146,15 +146,27 @@ private:
   FlatRegion &operator= (const FlatRegion &other);
 
   mutable bool m_is_merged;
+  mutable bool m_is_merged_min_coherence;
   mutable tl::copy_on_write_ptr<db::Shapes> mp_polygons;
   mutable tl::copy_on_write_ptr<db::Shapes> mp_merged_polygons;
   mutable bool m_merged_polygons_valid;
+  mutable bool m_merged_polygons_min_coherence;
   double m_area_ratio;
   size_t m_max_vertex_count;
 
   void init ();
   void ensure_merged_polygons_valid () const;
   void ensure_unmerged_polygons_valid () const;
+
+  void set_area_ratio (double ar)
+  {
+    m_area_ratio = ar;
+  }
+
+  void set_max_vertex_count (size_t mc)
+  {
+    m_max_vertex_count = mc;
+  }
 
   template <class Trans>
   void transform_generic (const Trans &trans)

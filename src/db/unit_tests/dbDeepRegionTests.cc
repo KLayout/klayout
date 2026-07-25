@@ -3341,3 +3341,133 @@ TEST(deep_region_peel)
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/deep_region_peel_au.gds");
 }
 
+TEST(min_coherence_and_merge)
+{
+  db::Layout ly;
+
+  auto &top = ly.cell (ly.add_cell ("TOP"));
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+
+  top.shapes (l1).insert (db::Box (0, 0, 1000, 2000));
+  top.shapes (l1).insert (db::Box (1000, 2000, 10000, 3000));
+  top.shapes (l1).insert (db::Box (9000, 3000, 10000, 10000));
+
+  db::DeepShapeStore dss;
+
+  db::Region r1 (db::RecursiveShapeIterator (ly, top, l1), dss);
+
+  EXPECT_EQ (r1.min_coherence (), false);
+  EXPECT_EQ (r1.is_merged (), false);
+  EXPECT_EQ (dynamic_cast<const db::DeepRegion *> (r1.delegate ())->merged_polygons_available (), false);
+  EXPECT_EQ (r1.to_string (), "(0,0;0,2000;1000,2000;1000,0);(1000,2000;1000,3000;10000,3000;10000,2000);(9000,3000;9000,10000;10000,10000;10000,3000)");
+
+  //  forces merged status
+  r1.sized (1);
+
+  EXPECT_EQ (r1.min_coherence (), false);
+  EXPECT_EQ (r1.is_merged (), false);
+  EXPECT_EQ (dynamic_cast<const db::DeepRegion *> (r1.delegate ())->merged_polygons_available (), true);
+
+  db::Region r2 = r1.merged ();
+  EXPECT_EQ (r2.to_string (), "(0,0;0,2000;1000,2000;1000,3000;9000,3000;9000,10000;10000,10000;10000,2000;1000,2000;1000,0)");
+
+  EXPECT_EQ (r2.min_coherence (), false);
+
+  EXPECT_EQ (r1.min_coherence (), false);
+  EXPECT_EQ (r1.is_merged (), false);
+  EXPECT_EQ (dynamic_cast<const db::DeepRegion *> (r1.delegate ())->merged_polygons_available (), true);
+
+  r1.set_min_coherence (true);
+
+  //  valid_merged_polygons is invalidated
+  EXPECT_EQ (r1.min_coherence (), true);
+  EXPECT_EQ (r1.is_merged (), false);
+  EXPECT_EQ (dynamic_cast<const db::DeepRegion *> (r1.delegate ())->merged_polygons_available (), false);
+
+  r1.set_min_coherence (false);
+
+  //  setting min_coherence to false will bring the validation back
+  EXPECT_EQ (r1.min_coherence (), false);
+  EXPECT_EQ (r1.is_merged (), false);
+  EXPECT_EQ (dynamic_cast<const db::DeepRegion *> (r1.delegate ())->merged_polygons_available (), true);
+
+  r1.set_min_coherence (true);
+
+  //  valid_merged_polygons is invalidated again by setting min_coherence to true
+  EXPECT_EQ (r1.min_coherence (), true);
+  EXPECT_EQ (r1.is_merged (), false);
+  EXPECT_EQ (dynamic_cast<const db::DeepRegion *> (r1.delegate ())->merged_polygons_available (), false);
+
+  //  inserting a box into the region will reset the merged valid flag and not bring it back by resetting min_coherence
+  db::Region r3 = r1;
+  EXPECT_EQ (r3.min_coherence (), true);
+  r3.insert (db::Box (0, 0, 100, 100));
+  r3.set_min_coherence (false);
+  EXPECT_EQ (r3.is_merged (), false);
+  EXPECT_EQ (dynamic_cast<const db::DeepRegion *> (r3.delegate ())->merged_polygons_available (), false);
+
+  //  creates a intrinsically merged copy and tests if the min_coherence
+  //  flag is inherited
+  r3 = r1.merged ();
+  EXPECT_EQ (r3.to_string (), "(0,0;0,2000;1000,2000;1000,0);(1000,2000;1000,3000;9000,3000;9000,10000;10000,10000;10000,2000)");
+  EXPECT_EQ (r3.is_merged (), true);
+  EXPECT_EQ (r3.min_coherence (), true);
+
+  //  merged polygons are validated against min_coherence = true during r1.merged() before, so
+  //  resetting min_coherence to false will invalidat them
+  r1.set_min_coherence (false);
+  EXPECT_EQ (r1.min_coherence (), false);
+  EXPECT_EQ (r1.is_merged (), false);
+  EXPECT_EQ (dynamic_cast<const db::DeepRegion *> (r1.delegate ())->merged_polygons_available (), false);
+
+  //  creates a intrinsically merged copy and tests if the min_coherence
+  //  flag is inherited
+  r3 = r1.merged ();
+  EXPECT_EQ (r3.to_string (), "(0,0;0,2000;1000,2000;1000,3000;9000,3000;9000,10000;10000,10000;10000,2000;1000,2000;1000,0)");
+  EXPECT_EQ (r3.is_merged (), true);
+  EXPECT_EQ (r3.min_coherence (), false);
+
+  //  r2 is an intrinsically merged region (with min coherence false)
+  EXPECT_EQ (r2.min_coherence (), false);
+  EXPECT_EQ (r2.is_merged (), true);
+  EXPECT_EQ (r2.to_string (), "(0,0;0,2000;1000,2000;1000,3000;9000,3000;9000,10000;10000,10000;10000,2000;1000,2000;1000,0)");
+
+  //  after changing min_coherence, the merged status is no longer true
+  r2.set_min_coherence (true);
+  EXPECT_EQ (r2.min_coherence (), true);
+  EXPECT_EQ (r2.is_merged (), false);
+  EXPECT_EQ (r2.to_string (), "(0,0;0,2000;1000,2000;1000,3000;9000,3000;9000,10000;10000,10000;10000,2000;1000,2000;1000,0)");
+
+  //  read-only experiments with r2
+
+  //  inserting a box into the region will reset the merged state
+  //  and not bring it back by resetting min_coherence
+  r3 = r2;
+  r3.insert (db::Box (0, 0, 100, 100));
+  r3.set_min_coherence (false);
+  EXPECT_EQ (r3.is_merged (), false);
+  EXPECT_EQ (r3.to_string (), "(0,0;0,2000;1000,2000;1000,3000;9000,3000;9000,10000;10000,10000;10000,2000;1000,2000;1000,0);(0,0;0,100;100,100;100,0)");
+
+  //  unmerge after resetting min coherence
+  r3 = r2;
+  r3.set_min_coherence (false);
+  EXPECT_EQ (r3.is_merged (), true);
+  r3.begin_unmerged ();
+  EXPECT_EQ (r3.is_merged (), false);
+  EXPECT_EQ (r3.to_string (), "(1000,2000;1000,3000;10000,3000;10000,2000);(9000,3000;9000,10000;10000,10000;10000,3000);(0,0;0,2000;1000,2000;1000,0)");
+
+  //  r2 still remembers it is merged, even though it does not say so and
+  //  will unmerge
+  r3 = r2;
+  EXPECT_EQ (r3.is_merged (), false);
+  //  unmerge
+  r3.begin_unmerged ();
+  EXPECT_EQ (r3.is_merged (), false);
+  EXPECT_EQ (r3.to_string (), "(1000,2000;1000,3000;10000,3000;10000,2000);(9000,3000;9000,10000;10000,10000;10000,3000);(0,0;0,2000;1000,2000;1000,0)");
+
+  //  r2 merged state it can be restored by resetting min_coherence to false
+  r2.set_min_coherence (false);
+  EXPECT_EQ (r2.min_coherence (), false);
+  EXPECT_EQ (r2.is_merged (), true);
+  EXPECT_EQ (r2.to_string (), "(0,0;0,2000;1000,2000;1000,3000;9000,3000;9000,10000;10000,10000;10000,2000;1000,2000;1000,0)");
+}

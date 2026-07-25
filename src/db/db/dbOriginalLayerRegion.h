@@ -43,8 +43,8 @@ class DB_PUBLIC OriginalLayerRegion
 public:
   OriginalLayerRegion ();
   OriginalLayerRegion (const OriginalLayerRegion &other);
-  OriginalLayerRegion (const RecursiveShapeIterator &si, bool is_merged = false);
-  OriginalLayerRegion (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged = false);
+  OriginalLayerRegion (const RecursiveShapeIterator &si, bool is_merged = false, bool min_coh = false);
+  OriginalLayerRegion (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged = false, bool min_coh = false);
   virtual ~OriginalLayerRegion ();
 
   RegionDelegate *clone () const;
@@ -56,6 +56,11 @@ public:
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const;
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_merged_iter () const;
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_unmerged_iter () const;
+
+  virtual RegionDelegate *merged () const;
+  virtual RegionDelegate *merged (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge) const;
+
+  bool merged_polygons_available () const;
 
   virtual bool empty () const;
 
@@ -85,13 +90,16 @@ private:
   OriginalLayerRegion &operator= (const OriginalLayerRegion &other);
 
   bool m_is_merged;
+  mutable bool m_is_merged_min_coherence;
   mutable db::Shapes m_merged_polygons;
   mutable bool m_merged_polygons_valid;
+  mutable bool m_merged_polygons_min_coherence;
   mutable db::RecursiveShapeIterator m_iter;
   db::ICplxTrans m_iter_trans;
 
   void init ();
   void ensure_merged_polygons_valid () const;
+  bool merged_polygons_valid () const;
 };
 
 }

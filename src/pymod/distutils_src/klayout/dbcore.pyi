@@ -16161,8 +16161,7 @@ class DText:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: float
     r"""
@@ -39453,22 +39452,13 @@ class Layout:
         ...
     @overload
     @classmethod
-    def new(cls, editable: bool) -> Layout:
-        r"""
-        @brief Creates a layout object
-
-        This constructor specifies whether the layout is editable. In editable mode, some optimizations are disabled and the layout can be manipulated through a variety of methods.
-
-        This method was introduced in version 0.22.
-        """
-        ...
-    @overload
-    @classmethod
-    def new(cls, editable: bool, manager: Manager) -> Layout:
+    def new(cls, editable: bool, manager: Optional[Manager] = ...) -> Layout:
         r"""
         @brief Creates a layout object attached to a manager
 
         This constructor specifies a manager object which is used to store undo information for example. It also allows one to specify whether the layout is editable. In editable mode, some optimizations are disabled and the layout can be manipulated through a variety of methods.
+
+        The manager object can be nil - in that case, undo/redo is not supported.
 
         This method was introduced in version 0.22.
         """
@@ -39482,6 +39472,20 @@ class Layout:
         This constructor specifies a manager object which is used to store undo information for example.
 
         Starting with version 0.25, layouts created with the default constructor are always editable. Before that version, they inherited the editable flag from the application.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, source_cell: Cell, editable: Optional[Any] = ..., manager: Optional[Manager] = ...) -> Layout:
+        r"""
+        @brief Creates a layout object as a copy of another cell
+
+        This convenience constructor creates a new layout object as a hierarchical copy of the source cell including all child cells and shapes.
+
+        If 'editable' is a boolean value, the new layout object will be made editable depending on that value. If 'nil' is used for 'editable', the editable attribute is copied from the layout the source cell lives in.
+        'manager' can be a \Manager object to which the new layout will be attached.
+
+        This method was introduced in version 0.30.10.
         """
         ...
     @classmethod
@@ -39591,21 +39595,13 @@ class Layout:
         """
         ...
     @overload
-    def __init__(self, editable: bool) -> None:
-        r"""
-        @brief Creates a layout object
-
-        This constructor specifies whether the layout is editable. In editable mode, some optimizations are disabled and the layout can be manipulated through a variety of methods.
-
-        This method was introduced in version 0.22.
-        """
-        ...
-    @overload
-    def __init__(self, editable: bool, manager: Manager) -> None:
+    def __init__(self, editable: bool, manager: Optional[Manager] = ...) -> None:
         r"""
         @brief Creates a layout object attached to a manager
 
         This constructor specifies a manager object which is used to store undo information for example. It also allows one to specify whether the layout is editable. In editable mode, some optimizations are disabled and the layout can be manipulated through a variety of methods.
+
+        The manager object can be nil - in that case, undo/redo is not supported.
 
         This method was introduced in version 0.22.
         """
@@ -39618,6 +39614,19 @@ class Layout:
         This constructor specifies a manager object which is used to store undo information for example.
 
         Starting with version 0.25, layouts created with the default constructor are always editable. Before that version, they inherited the editable flag from the application.
+        """
+        ...
+    @overload
+    def __init__(self, source_cell: Cell, editable: Optional[Any] = ..., manager: Optional[Manager] = ...) -> None:
+        r"""
+        @brief Creates a layout object as a copy of another cell
+
+        This convenience constructor creates a new layout object as a hierarchical copy of the source cell including all child cells and shapes.
+
+        If 'editable' is a boolean value, the new layout object will be made editable depending on that value. If 'nil' is used for 'editable', the editable attribute is copied from the layout the source cell lives in.
+        'manager' can be a \Manager object to which the new layout will be attached.
+
+        This method was introduced in version 0.30.10.
         """
         ...
     def _const_cast(self) -> Layout:
@@ -49955,17 +49964,17 @@ class Netlist:
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index (const version).
+        @brief Gets the circuit object for a given cell index.
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
-
-        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index.
+        @brief Gets the circuit object for a given cell index (const version).
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
@@ -66555,10 +66564,10 @@ class Shape:
     Applies to texts only. Will throw an exception if the object is not a text.
 
     Setter:
-    @brief Sets the text transformation
+    @brief Sets the text transformation in micrometer units
     Applies to texts only. Will throw an exception if the object is not a text.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     text_valign: int
     r"""
@@ -71393,8 +71402,7 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: int
     r"""

@@ -196,7 +196,9 @@ NewLayoutPropertiesDialog::exec_dialog (std::string &technology, std::string &ce
     while (! ex.at_end ()) {
       db::LayerProperties lp;
       try {
-        lp.read (ex);
+        if (! lp.read (ex)) {
+          break;
+        }
       } catch (...) {
         break;
       }

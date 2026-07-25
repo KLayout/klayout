@@ -640,6 +640,13 @@ LayerProperties::do_realize (const LayoutViewBase *view) const
 
       }
 
+      if (m_layer_index >= 0 && cv->layout ().is_valid_layer (m_layer_index)) {
+        const auto &lp = cv->layout ().get_properties (m_layer_index);
+        if (! lp.name.empty () && m_source_real.name () != lp.name) {
+          m_source_real.name (lp.name);
+        }
+      }
+
     }
 
   }

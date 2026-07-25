@@ -3383,6 +3383,7 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
   }
 
   set_properties (new_props);
+  do_update_layer_sources ();
 
   goto_view (state);
 }

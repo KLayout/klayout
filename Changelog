@@ -6,6 +6,7 @@
 * Bugfix: Region#edges was not working properly when used on Regions with properties
   enabled. Now, with properties enabled, the regions are consistently formed from polygons with
   identical properties before generating the edges.
+* Enhancement: %GITHUB%/issues/2398 Clarify 'move to' (and others) scope in window caption
 * Enhancement: DRC two-layer checks now do not necessarily require merging for the
   first input. This in general speeds up the operation in certain cases.
   As a side effect, the error markers may be split according to partial input

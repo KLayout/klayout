@@ -1425,7 +1425,7 @@ LayoutViewFunctions::cm_lay_free_rot ()
   static QString s_angle_value = QString::fromUtf8 ("0.0");
 
   lay::LayoutViewFunctionDialog dialog (QApplication::activeWindow (),
-                                        tr ("Free rotation"),
+                                        tr ("Free Rotate Layout"),
                                         tr ("Rotation angle in degree (counterclockwise)"));
 
   dialog.accept_event.add (this, &LayoutViewFunctions::on_lay_free_rot);
@@ -1449,7 +1449,7 @@ LayoutViewFunctions::cm_lay_scale ()
   static QString s_scale_value = QString::fromUtf8 ("1.0");
 
   lay::LayoutViewFunctionDialog dialog (QApplication::activeWindow (),
-                                        tr ("Scaling"),
+                                        tr ("Scale Layout"),
                                         tr ("Scaling factor"));
 
   dialog.accept_event.add (this, &LayoutViewFunctions::on_lay_scale);
@@ -1471,6 +1471,7 @@ void
 LayoutViewFunctions::cm_lay_move ()
 {
   lay::MoveOptionsDialog options (parent_widget ());
+  options.setWindowTitle (tr ("Move Layout"));
 
   options.accept_event.add (this, &LayoutViewFunctions::on_lay_move);
   options.apply_event.add (this, &LayoutViewFunctions::on_lay_move);
@@ -1534,7 +1535,7 @@ LayoutViewFunctions::cm_sel_free_rot ()
   static QString s_angle_value = QString::fromUtf8 ("0.0");
 
   lay::LayoutViewFunctionDialog dialog (QApplication::activeWindow (),
-                                        tr ("Free rotation"),
+                                        tr ("Free Rotate Selection"),
                                         tr ("Rotation angle in degree (counterclockwise)"));
 
   dialog.accept_event.add (this, &LayoutViewFunctions::on_sel_free_rot);
@@ -1563,7 +1564,7 @@ LayoutViewFunctions::cm_sel_scale ()
   static QString s_scale_value = QString::fromUtf8 ("1.0");
 
   lay::LayoutViewFunctionDialog dialog (QApplication::activeWindow (),
-                                        tr ("Scaling"),
+                                        tr ("Scale Selection"),
                                         tr ("Scaling factor"));
 
   dialog.accept_event.add (this, &LayoutViewFunctions::on_sel_scale);
@@ -1622,6 +1623,7 @@ void
 LayoutViewFunctions::cm_sel_move ()
 {
   lay::MoveOptionsDialog options (parent_widget ());
+  options.setWindowTitle (tr ("Move Selection"));
 
   options.apply_event.add (this, &LayoutViewFunctions::on_sel_move);
   options.accept_event.add (this, &LayoutViewFunctions::on_sel_move);

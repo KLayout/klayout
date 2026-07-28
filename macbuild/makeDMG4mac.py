@@ -78,13 +78,13 @@ def SetGlobals():
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-    Usage += "       for making a DMG file of KLayout 0.30.5 or later on different Apple macOS platforms.\n"
+    Usage += "       for making a DMG file of KLayout 0.30.9 or later on different Apple macOS platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./makeDMG4mac.py\n"
     Usage += "   option & argument    : descriptions                                               | default value\n"
     Usage += "   ----------------------------------------------------------------------------------+-----------------\n"
     Usage += "   <-p|--pkg <dir>>     : package directory created by `build4mac.py` with [-y|-Y]   | ``\n"
-    Usage += "                        : like 'LW-qt5MP.pkg.macos-Sequoia-release-Rmp34Pmp313'      | \n"
+    Usage += "                        : like 'LW-qt5MP.pkg.macos-Sequoia-C32-release-Rmp34Pmp314'  | \n"
     Usage += "   <-c|--clean>         : clean the work directory                                   | disabled\n"
     Usage += "   <-m|--make>          : make a compressed DMG file                                 | disabled\n"
     Usage += "                        :   <-c|--clean> and <-m|--make> are mutually exclusive      | \n"
@@ -106,7 +106,11 @@ def SetGlobals():
 
     release = int( Release.split(".")[0] ) # take the first of ['21', '0', '0']
     LatestOS = ""
-    if release == 25:
+    if release == 27:
+        GenOSName = "macOS"
+        Platform  = "GoldenGate"
+        LatestOS  = Platform
+    elif release == 25:
         GenOSName = "macOS"
         Platform  = "Tahoe"
         LatestOS  = Platform
@@ -135,7 +139,7 @@ def SetGlobals():
 
     if not Machine == "x86_64":
         # with an Apple Silicon Chip?
-        if Machine == "arm64" and Platform in ["Tahoe", "Sequoia", "Sonoma", "Ventura", "Monterey"]:
+        if Machine == "arm64" and Platform in ["GoldenGate", "Tahoe", "Sequoia", "Sonoma", "Ventura", "Monterey"]:
             print("")
             print( "### Your Mac equips an Apple Silicon Chip ###" )
             print("")
@@ -222,17 +226,17 @@ def SetGlobals():
 ## To check the contents of the package directory
 #
 # The package directory name should look like:
-#     * ST-qt5MP.pkg.macos-Sequoia-release-RsysPsys
-#     * LW-qt5Ana3.pkg.macos-Sequoia-release-Rana3Pana3
-#     * LW-qt6Brew.pkg.macos-Sequoia-release-Rhb34Phb312  --- (1)
-#     * LW-qt5MP.pkg.macos-Sequoia-release-Rmp33Pmp312
-#     * HW-qt6Brew.pkg.macos-Sequoia-release-RsysPhb311
+#     * ST-qt5MP.pkg.macos-Sequoia-C32-release-RsysPsys
+#     * LW-qt5Ana3.pkg.macos-Sequoia-C32-release-Rana3Pana3
+#     * LW-qt6Brew.pkg.macos-Sequoia-C32-release-Rhb34Phb312  --- (1)
+#     * LW-qt5MP.pkg.macos-Sequoia-C32-release-Rmp33Pmp312
+#     * HW-qt6Brew.pkg.macos-Sequoia-C32-release-RsysPhb311
 #
-#     * ST-qt6MP.pkg.macos-Sequoia-release-RsysPsys
-#     * LW-qt6MP.pkg.macos-Sequoia-release-Rmp33Pmp312
+#     * ST-qt6MP.pkg.macos-Sequoia-C32-release-RsysPsys
+#     * LW-qt6MP.pkg.macos-Sequoia-C32-release-Rmp33Pmp312
 #
 # Generated DMG will be, for example,
-#     (1) ---> LW-klayout-0.30.2-macOS-Sequoia-1-qt6Brew-Rhb34Phb312.dmg
+#     (1) ---> LW-klayout-0.30.2-macOS-Sequoia-C32-1-qt6Brew-Rhb34Phb312.dmg
 #
 # @return on success, positive integer in [MB] that tells approx. occupied disc space;
 #         on failure, -1
@@ -247,6 +251,7 @@ def CheckPkgDirectory():
     global BundleName
     global PackagePrefix
     global QtIdentification
+    global CoordSize
     global BuildType
     global RubyPythonID
     global BackgroundPNG
@@ -272,18 +277,18 @@ def CheckPkgDirectory():
 
     #-----------------------------------------------------------------------------------------------
     # [2] Identify (Qt, Ruby, Python) from PkgDir
-    #     * ST-qt5MP.pkg.macos-Sequoia-release-RsysPsys
-    #     * LW-qt5Ana3.pkg.macos-Sequoia-release-Rana3Pana3
-    #     * LW-qt6Brew.pkg.macos-Sequoia-release-Rhb34Phb312
-    #     * LW-qt5MP.pkg.macos-Sequoia-release-Rmp33Pmp312
-    #     * HW-qt6Brew.pkg.macos-Sequoia-release-RsysPhb311
-    #     * EX-qt5MP.pkg.macos-Sequoia-release-Rhb34Pmp312
+    #     * ST-qt5MP.pkg.macos-Sequoia-C32-release-RsysPsys
+    #     * LW-qt5Ana3.pkg.macos-Sequoia-C32-release-Rana3Pana3
+    #     * LW-qt6Brew.pkg.macos-Sequoia-C32-release-Rhb34Phb312
+    #     * LW-qt5MP.pkg.macos-Sequoia-C32-release-Rmp33Pmp312
+    #     * HW-qt6Brew.pkg.macos-Sequoia-C32-release-RsysPhb311
+    #     * EX-qt5MP.pkg.macos-Sequoia-C32-release-Rhb34Pmp312
     #
-    #     * ST-qt6MP.pkg.macos-Sequoia-release-RsysPsys
-    #     * LW-qt6MP.pkg.macos-Sequoia-release-Rmp33Pmp312
+    #     * ST-qt6MP.pkg.macos-Sequoia-C32-release-RsysPsys
+    #     * LW-qt6MP.pkg.macos-Sequoia-C32-release-Rmp33Pmp312
     #-----------------------------------------------------------------------------------------------
-    #                  0      1      2                      3                  4                    5         6        7
-    patQRP = r'(ST|LW|HW|EX)([-])([qt5|qt6][0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-])(release|debug)([-])([0-9A-Za-z]+)'
+    #                  0      1      2                      3                  4                 5      6          7        8        9
+    patQRP = r'(ST|LW|HW|EX)([-])([qt5|qt6][0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-])(C32|C64)([-])(release|debug)([-])([0-9A-Za-z]+)'
     regQRP = re.compile(patQRP)
     if not regQRP.match(PkgDir):
         print( "! Cannot identify (Qt, Ruby, Python) from the package directory name" )
@@ -309,14 +314,25 @@ def CheckPkgDirectory():
         else:
             BackgroundPNG = None
             raise Exception( "! neither qt5 nor qt6" )
-        if pkgdirComponents[5] == 'release':
+
+        if pkgdirComponents[5] == 'C32':
+            CoordSize = 'C32'
+        elif pkgdirComponents[5] == 'C64':
+            CoordSize = 'C64'
+        else:
+            CoordSize = None
+            raise Exception( "! neither C32 nor C64" )
+
+        RubyPythonID = pkgdirComponents[7]
+        if pkgdirComponents[7] == 'release':
             BuildType = 'release'
-        elif pkgdirComponents[5] == 'debug':
+        elif pkgdirComponents[7] == 'debug':
             BuildType = 'debug'
         else:
             BuildType = None
             raise Exception( "! neither release nor debug" )
-        RubyPythonID = pkgdirComponents[7]
+
+        RubyPythonID = pkgdirComponents[9]
 
         #-----------------------------------------------------------------------------
         # [3] Check if the "LatestOS" with MacPorts / Homebrew / Anaconda3
@@ -329,12 +345,12 @@ def CheckPkgDirectory():
         LatestOSMacPorts   = Platform == LatestOS
         LatestOSMacPorts  &= PackagePrefix == "LW"
         LatestOSMacPorts  &= QtIdentification in [ "qt5MP", "qt6MP" ]
-        LatestOSMacPorts  &= RubyPythonID in [ "Rmp34Pmp313", "Rmp34Pmp312", "Rmp34Pmp311" ]
+        LatestOSMacPorts  &= RubyPythonID in [ "Rmp34Pmp314", "Rmp34Pmp313" ]
 
         LatestOSHomebrew   = Platform == LatestOS
         LatestOSHomebrew  &= PackagePrefix == "LW"
         LatestOSHomebrew  &= QtIdentification in [ "qt5Brew", "qt6Brew", "qt5MP", "qt6MP" ] # "qt[5|6]MP" are the alternatives
-        LatestOSHomebrew  &= RubyPythonID in [ "Rhb34Phb313", "Rhb34Phb312", "Rhb34Phb311", "Rhb34Phbauto" ]
+        LatestOSHomebrew  &= RubyPythonID in [ "Rhb34Phb314", "Rhb34Phb313", "Rhb34Phb311", "Rhb34Phbauto" ]
 
         LatestOSAnaconda3  = Platform == LatestOS
         LatestOSAnaconda3 &= PackagePrefix == "LW"
@@ -555,8 +571,8 @@ def ParseCommandLineArguments():
     if opt.target_dmg != "":
         TargetDMG = opt.target_dmg
     else:
-        TargetDMG = "%s-klayout-%s-%s-%s-%d-%s-%s.dmg" \
-                        % (PackagePrefix, KLVersion, GenOSName, Platform, DMGSerialNum, QtIdentification, RubyPythonID)
+        TargetDMG = "%s-klayout-%s-%s-%s-%s-%d-%s-%s.dmg" \
+                        % (PackagePrefix, KLVersion, GenOSName, Platform, CoordSize, DMGSerialNum, QtIdentification, RubyPythonID)
         if Machine == "arm64": # with an Apple Silicon Chip
             TargetDMG = Machine + TargetDMG
         if BuildType == "debug": # in the case of 'debug' build

@@ -33,9 +33,9 @@ namespace db
 // -----------------------------------------------------------------------------------
 //  LEFImporter implementation
 
-LEFImporter::LEFImporter (int warn_level, bool skip_duplicate_macros)
+LEFImporter::LEFImporter (int warn_level)
   : LEFDEFImporter (warn_level),
-    m_skip_duplicate_macros (skip_duplicate_macros)
+    m_skip_duplicate_macros (false)
 {
   //  .. nothing yet ..
 }
@@ -885,66 +885,20 @@ void
 LEFImporter::read_macro (Layout &layout)
 {
   std::string mn = get ();
+  set_cellname (mn);
+
+  GeometryBasedLayoutGenerator *mg = 0;
 
   if (m_macros.find (mn) != m_macros.end ()) {
     if (m_skip_duplicate_macros) {
-      // 1. Change error to warning
-      warn (tl::to_string (tr ("Duplicate MACRO name: ")) + mn + tl::to_string (tr (" (Skipping duplicate)")));
-
-      // Safe LEF block skipping
-      while (! at_end ()) {
-        
-        if (test ("END")) {
-          expect (mn);
-          break;
-        } else if (test ("PIN")) {
-            std::string pn = get (); // PIN always has a pin-name -> skip it
-            //tl::info << tl::to_string (tr ("Found PIN : ")) + pn;
-            while (! at_end ()) {
-              if (test ("PORT")) {
-                //tl::info << tl::to_string (tr ("Found PORT within ")) + pn;
-                while (! at_end ()) {
-                  if (test ("END")) {
-                    //tl::info << tl::to_string (tr ("Found PORT END within ")) + pn;
-                    break;
-                  } else {
-                    skip_entry ();
-                  }
-                }
-              } else if (test ("END")) {
-                std::string pn = get (); // PIN always has a pin-name -> skip it
-                //tl::info << tl::to_string (tr ("Found PIN END : ")) + pn;
-                break;
-              } else {
-                skip_entry ();
-              }
-            }
-        } else if (test ("OBS")) {
-          //tl::info << tl::to_string (tr ("Found OBS"));
-          while (! at_end ()) {
-            if (test ("END")) {
-              //tl::info << tl::to_string (tr ("Found END OBS"));
-              break;
-            } else {
-              skip_entry ();
-            }
-          }
-        } else {
-          skip_entry ();
-        }
-      }
-      tl::info << tl::to_string (tr ("Successfully skipped duplicate MACRO: ")) + mn;
-
-      return; // Exit early so we don't register or process this duplicate
+      warn (tl::to_string (tr ("Skipping duplicate MACRO: : ")) + mn + tl::to_string (tr (" (skip option is enabled by user)")));
     } else {
       error (tl::to_string (tr ("Duplicate MACRO name: ")) + mn);
     }
+  } else {
+    mg = new GeometryBasedLayoutGenerator ();
+    reader_state ()->register_macro_cell (mn, mg);
   }
-
-  set_cellname (mn);
-
-  GeometryBasedLayoutGenerator *mg = new GeometryBasedLayoutGenerator ();
-  reader_state ()->register_macro_cell (mn, mg);
 
   db::Trans foreign_trans;
   std::string foreign_name;
@@ -1017,7 +971,7 @@ LEFImporter::read_macro (Layout &layout)
             read_geometries (mg, layout.dbu (), LEFPins, &boxes_for_labels, prop_id);
 
             for (std::map <std::string, db::Box>::const_iterator b = boxes_for_labels.begin (); b != boxes_for_labels.end (); ++b) {
-              if (! b->second.empty ()) {
+              if (mg && ! b->second.empty ()) {
                 mg->add_text (b->first, LEFLabel, db::Text (label.c_str (), db::Trans (b->second.center () - db::Point ())), 0, 0);
               }
             }
@@ -1104,7 +1058,9 @@ LEFImporter::read_macro (Layout &layout)
 
     } else if (test ("FIXEDMASK")) {
 
-      mg->set_fixedmask (true);
+      if (mg) {
+        mg->set_fixedmask (true);
+      }
       expect (";");
 
     } else {
@@ -1127,8 +1083,10 @@ LEFImporter::read_macro (Layout &layout)
 
   }
 
-  mg->add_box (std::string (), Outline, db::Box (-origin, -origin + size), 0, 0);
-  mg->subtract_overlap_from_outline (m_overlap_layers);
+  if (mg) {
+    mg->add_box (std::string (), Outline, db::Box (-origin, -origin + size), 0, 0);
+    mg->subtract_overlap_from_outline (m_overlap_layers);
+  }
 
   MacroDesc macro_desc;
   macro_desc.foreign_name = foreign_name;

@@ -50,7 +50,7 @@ public:
   /**
    *  @brief Default constructor
    */
-  LEFImporter (int warn_level, bool skip_duplicate_macros);
+  LEFImporter (int warn_level);
 
   /**
    *  @brief Destructor
@@ -147,6 +147,31 @@ public:
    */
   void finish_lef (db::Layout &layout);
 
+  /**
+   *  @brief Sets a flag indicating whether to skip duplicate macros
+   *
+   *  With this flag set to true, macros are ignored when there already
+   *  is a macro with the same name. Use this option with caution, as
+   *  skipping is only permitted if both macros are identical. The
+   *  LEF reader does not check this condition.
+   *
+   *  The default is "false" (raise an error on duplicate macros).
+   */
+  void set_skip_duplicate_macros (bool f)
+  {
+    m_skip_duplicate_macros = f;
+  }
+
+  /**
+   *  @brief Gets a flag indicating whether to skip duplicate macros
+   *
+   *  See set_skip_duplicate_macros for an explanation of this flag.
+   */
+  bool skip_duplicate_macros () const
+  {
+    return m_skip_duplicate_macros;
+  }
+
 protected:
   void do_read (db::Layout &layout);
 
@@ -159,6 +184,7 @@ private:
   std::map<std::string, ViaDesc> m_vias;
   std::set<std::string> m_routing_layers, m_cut_layers, m_overlap_layers;
   std::map<std::string, unsigned int> m_num_masks;
+  bool m_skip_duplicate_macros;
 
   std::vector <db::Trans> get_iteration (double dbu);
   void read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, LayerPurpose purpose, std::map<std::string, db::Box> *collect_bboxes = 0, properties_id_type prop_id = 0);
@@ -169,8 +195,6 @@ private:
   void read_layer (Layout &layout);
   void read_macro (Layout &layout);
   void skip_entry ();
-
-  bool m_skip_duplicate_macros;
 };
 
 }

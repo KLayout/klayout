@@ -142,7 +142,7 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
     tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file")));
 
-    db::LEFImporter importer (warn_level (), effective_options.skip_duplicate_macros ());
+    db::LEFImporter importer (warn_level ());
 
     for (std::vector<std::string>::const_iterator l = effective_options.begin_lef_files (); l != effective_options.end_lef_files (); ++l) {
 

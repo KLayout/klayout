@@ -189,6 +189,7 @@ private:
   std::vector<std::string> m_lefdef_map_files;
   int m_lefdef_macro_resolution_mode;
   std::vector<std::string> m_lefdef_lef_layout_files;
+  bool m_lefdef_skip_duplicate_macros;
 };
 
 /**

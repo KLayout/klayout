@@ -392,6 +392,10 @@ class DBReaders_TestClass < TestBase
     conf.read_lef_with_def = false
     assert_equal(conf.read_lef_with_def, false)
 
+    assert_equal(conf.skip_duplicate_macros, false)
+    conf.skip_duplicate_macros = true
+    assert_equal(conf.skip_duplicate_macros, true)
+
   end
 
   # MAG Options

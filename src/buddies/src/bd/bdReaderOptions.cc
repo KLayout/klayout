@@ -112,6 +112,7 @@ GenericReaderOptions::GenericReaderOptions ()
   m_lefdef_produce_special_routing = load_options.get_option_by_name ("lefdef_config.produce_special_routing").to_bool ();
   m_lefdef_special_routing_suffix = load_options.get_option_by_name ("lefdef_config.special_routing_suffix_str").to_string ();
   m_lefdef_special_routing_datatype = load_options.get_option_by_name ("lefdef_config.special_routing_datatype_str").to_string ();
+  m_lefdef_skip_duplicate_macros = load_options.get_option_by_name ("lefdef_config.skip_duplicate_macros").to_bool ();
 
   tl::Variant lef_files = load_options.get_option_by_name ("lefdef_config.lef_files");
   for (tl::Variant::const_iterator i = lef_files.begin (); i != lef_files.end (); ++i) {
@@ -686,6 +687,15 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "See also '--" + m_long_prefix + "lefdef-read-lef-with-def' for an option to implicitly read all LEF files in the same "
                     "place than the DEF file.\n"
                    )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-skip-duplicate-macros", &m_lefdef_skip_duplicate_macros, "Skip duplicate LEF macros",
+                    "This option applies when reading DEF files.\n"
+                    "\n"
+                    "If this option is present, having the same macro in different LEF files is a warning rather than being an error. "
+                    "In that case, the first occurance is used. Use this option with care, as it may render invalid layouts when "
+                    "the versions of the macro are defined differently. It is intended for cases, when macros with the same name are guaranteed "
+                    "to be identical. KLayout does not check, if that is actually the case."
+                   )
       ;
 
   }
@@ -814,6 +824,7 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options)
   load_options.set_option_by_name ("lefdef_config.macro_resolution_mode", m_lefdef_macro_resolution_mode);
   load_options.set_option_by_name ("lefdef_config.macro_resolution_mode", m_lefdef_macro_resolution_mode);
   load_options.set_option_by_name ("lefdef_config.paths_relative_to_cwd", true);
+  load_options.set_option_by_name ("lefdef_config.skip_duplicate_macros", m_lefdef_skip_duplicate_macros);
 
   tl::Variant lef_layout_files = tl::Variant::empty_list ();
   for (std::vector<std::string>::const_iterator l = m_lefdef_lef_layout_files.begin (); l != m_lefdef_lef_layout_files.end (); ++l) {

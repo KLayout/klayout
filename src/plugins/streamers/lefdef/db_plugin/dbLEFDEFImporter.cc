@@ -597,6 +597,7 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
     m_special_routing_datatype (0),
     m_separate_groups (false),
     m_joined_paths (false),
+    m_skip_duplicate_macros (false),
     m_macro_resolution_mode (0),
     m_read_lef_with_def (true),
     m_paths_relative_to_cwd (false),
@@ -682,6 +683,7 @@ LEFDEFReaderOptions &LEFDEFReaderOptions::operator= (const LEFDEFReaderOptions &
     m_macro_layout_files = d.m_macro_layout_files;
     m_read_lef_with_def = d.m_read_lef_with_def;
     m_paths_relative_to_cwd = d.m_paths_relative_to_cwd;
+    m_skip_duplicate_macros = d.m_skip_duplicate_macros;
     set_macro_layouts (d.macro_layouts ());
   }
   return *this;
@@ -1070,6 +1072,9 @@ LEFDEFReaderState::ensure_lef_importer (int warn_level)
 {
   if (! mp_lef_importer.get ()) {
     mp_lef_importer.reset (new db::LEFImporter (warn_level));
+    if (mp_tech_comp) {
+      mp_lef_importer->set_skip_duplicate_macros (mp_tech_comp->skip_duplicate_macros ());
+    }
   }
 }
 

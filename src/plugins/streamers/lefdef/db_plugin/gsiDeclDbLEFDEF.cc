@@ -967,6 +967,24 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "\n"
     "This property has been added in version 0.27. The ability to supply multiple files has been added in version 0.30.6.\n"
   ) +
+  gsi::method ("skip_duplicate_macros", &db::LEFDEFReaderOptions::skip_duplicate_macros,
+    "@brief Gets a value indicating wether to skip duplicate LEF Macro definitions.\n"
+    "If this property is 'true', having the same macro in different LEF files is a warning rather than being an error. "
+    "In that case, the first occurance is used. Use this option with care, as it may render invalid layouts when "
+    "the versions of the macro are defined differently. It is intended for cases, when macros with the same name are guaranteed "
+    "to be identical. KLayout does not check, if that is actually the case."
+    "\n"
+    "The default is 'false' (duplicate macro names are an error).\n"
+    "\n"
+    "This property has been added in version 0.30.x.\n"
+  ) +
+  gsi::method ("skip_duplicate_macros=", &db::LEFDEFReaderOptions::set_skip_duplicate_macros, gsi::arg ("skip_duplicate_macros"),
+    "@brief Sets a value indicating wether to skip duplicate LEF Macro definitions.\n"
+    "\n"
+    "See \\skip_duplicate_macros for a description of this property.\n"
+    "\n"
+    "This property has been added in version 0.30.11.\n"
+  ) + 
   gsi::method ("macro_resolution_mode", &db::LEFDEFReaderOptions::macro_resolution_mode,
     "@brief Gets the macro resolution mode (LEF macros into DEF).\n"
     "This property describes the way LEF macros are turned into layout cells when reading DEF. There "

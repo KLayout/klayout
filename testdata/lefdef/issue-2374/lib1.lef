@@ -1,0 +1,20 @@
+VERSION 5.8 ;
+
+MACRO a
+  ORIGIN 0 0 ;
+  SIZE 600 BY 600 ;
+  OBS 
+    LAYER M1 ;
+      RECT 10 10 590 590 ;
+  END
+END a
+
+MACRO b
+  ORIGIN -600 0 ;
+  SIZE 400 BY 500 ;
+  OBS 
+    LAYER M1 ;
+      RECT 610 10 990 490 ;
+  END
+END b
+

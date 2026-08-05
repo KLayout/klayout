@@ -1199,3 +1199,54 @@ TEST(216_line_extensions)
   run_test (_this, "issue-2075", "map:test.map+lef:test.lef+def:test.def", "au.oas", default_options (), false);
 }
 
+//  issue-2374 (skip duplicate LEF macro option)
+TEST(217_skip_duplicate_macro)
+{
+  std::string fn_path (tl::testdata ());
+  fn_path += "/lefdef/issue-2374/";
+
+  db::LEFDEFReaderOptions lefdef_opt = default_options ();
+  lefdef_opt.set_single_map_file ("tech.map");
+  std::vector<std::string> lf;
+  lf.push_back ("tech.lef");
+  lf.push_back ("lib1.lef");  //  macros a,b
+  lf.push_back ("lib2.lef");  //  macros b,c
+  lefdef_opt.set_lef_files (lf);
+  lefdef_opt.set_read_lef_with_def (false);
+
+  db::Layout ly;
+
+  try {
+
+    db::LoadLayoutOptions opt;
+    opt.set_options (lefdef_opt);
+    EXPECT_EQ (lefdef_opt.skip_duplicate_macros (), false);
+
+    tl::InputStream is (fn_path + "top.def");
+    db::Reader reader (is);
+    reader.read (ly, opt);
+
+    //  must throw an exception because of duplicate macros
+    EXPECT_EQ (1, 0);
+
+  } catch (...) { }
+
+  ly = db::Layout ();
+
+  {
+
+    db::LEFDEFReaderOptions lo = lefdef_opt;
+    lo.set_skip_duplicate_macros (true);
+    EXPECT_EQ (lo.skip_duplicate_macros (), true);
+    db::LoadLayoutOptions opt;
+    opt.set_options (lo);
+
+    tl::InputStream is (fn_path + "top.def");
+    db::Reader reader (is);
+    reader.read (ly, opt);
+
+  }
+
+  db::compare_layouts (_this, ly, fn_path + "au.oas", db::WriteOAS);
+}
+

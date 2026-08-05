@@ -5,7 +5,7 @@
 # File: "macbuild/build4mac.py"
 #
 #  The top Python script for building KLayout (http://www.klayout.de/index.php).
-#  version 0.30.5 or later on different Apple Mac OSX platforms.
+#  version 0.30.9 or later on different Apple Mac OSX platforms.
 #===============================================================================
 import sys
 import os
@@ -36,7 +36,7 @@ from bundle_qtconf  import generate_qtconf, QtConfError
 # @return (usage, moduleset)-tuple
 #-------------------------------------------------------------------------------
 def GenerateUsage(platform):
-    if platform.upper() in [ "TAHOE", "SEQUOIA", "SONOMA", "VENTURA", "MONTEREY" ]: # with Xcode [13.1 .. ]
+    if platform.upper() in [ "GOLDENGATE", "TAHOE", "SEQUOIA", "SONOMA", "VENTURA", "MONTEREY" ]: # with Xcode [13.1 .. ]
         myQt56    = "qt5macports"
         myRuby    = "sys"
         myPython  = "sys"
@@ -47,7 +47,7 @@ def GenerateUsage(platform):
     usage  = "\n"
     usage += "-----------------------------------------------------------------------------------------------------------\n"
     usage += "<< Usage of 'build4mac.py' >>\n"
-    usage += "       for building KLayout 0.30.5 or later on different Apple macOS platforms.\n"
+    usage += "       for building KLayout 0.30.9 or later on different Apple macOS platforms.\n"
     usage += "\n"
     usage += "$ [python] ./build4mac.py\n"
     usage += "   option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)  | default value\n"
@@ -63,27 +63,27 @@ def GenerateUsage(platform):
     usage += "                        :                        (*) migration to Qt6 is ongoing           |\n"
     usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP34', 'HB34', 'Ana3']     | %s\n" % myRuby
     usage += "                        :    nil: don't bind Ruby                                          |\n"
-    usage += "                        :    Sys: use [Tahoe|Sequoia|Sonoma]-bundled Ruby 2.6              |\n"
+    usage += "                        :    Sys: use [GoldenGate|Tahoe|Sequoia|Sonoma]-bundled Ruby 2.6   |\n"
     usage += "                        :   MP34: use Ruby 3.4 from MacPorts                               |\n"
     usage += "                        :   HB34: use Ruby 3.4 from Homebrew                               |\n"
     usage += "                        :   Ana3: use Ruby 3.4 from Anaconda3                              |\n"
-    usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP313', 'HB313', 'Ana3',   | %s\n" % myPython
-    usage += "                        :                        'MP312', 'MP312',                         |\n"
-    usage += "                        :                        'MP311', 'HB311', 'HBAuto']               |\n"
+    usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP314', 'HB314', 'Ana3',   | %s\n" % myPython
+    usage += "                        :                        'MP313', 'HB313',                         |\n"
+    usage += "                        :                        'HB311', 'HBAuto']                        |\n"
     usage += "                        :    nil: don't bind Python                                        |\n"
-    usage += "                        :    Sys: use [Tahoe|Sequoia|Sonoma]-bundled Python 3.9            |\n"
+    usage += "                        :    Sys: use [GoldenGate|Tahoe|Sequoia|Sonoma]-bundled Python 3.9 |\n"
+    usage += "                        :  MP314: use Python 3.14 from MacPorts                            |\n"
+    usage += "                        :  HB314: use Python 3.14 from Homebrew                            |\n"
+    usage += "                        :   Ana3: use Python 3.13 from Anaconda3                           |\n"
     usage += "                        :  MP313: use Python 3.13 from MacPorts                            |\n"
     usage += "                        :  HB313: use Python 3.13 from Homebrew                            |\n"
-    usage += "                        :   Ana3: use Python 3.13 from Anaconda3                           |\n"
-    usage += "                        :  MP312: use Python 3.12 from MacPorts                            |\n"
-    usage += "                        :  HB312: use Python 3.12 from Homebrew                            |\n"
-    usage += "                        :  MP311: use Python 3.11 from MacPorts                            |\n"
     usage += "                        :  HB311: use Python 3.11 from Homebrew (+)                        |\n"
     usage += "                        :               (+) required to provide the legacy pip in HW-*.dmg |\n"
     usage += "                        : HBAuto: use the latest Python 3.x auto-detected from Homebrew    |\n"
     usage += "   [-P|--buildPymod]    : build and deploy Pymod (*.whl) for LW-*.dmg                      | disabled\n"
     usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                        | disabled\n"
     usage += "   [-u|--noqtuitools]   : don't include uitools in Qt binding                              | disabled\n"
+    usage += "   [-s|--no32bitcoord]  : don't use short (32bit) coordinates; use long (64bit) instead    | disabled\n"
     usage += "   [-g|--nolibgit2]     : don't include libgit2 for Git package support                    | disabled\n"
     usage += "   [-m|--make <option>] : option passed to 'make'                                          | '--jobs=4'\n"
     usage += "   [-d|--debug]         : enable debug mode build; AddressSanitizer (ASAN) is linked       | disabled\n"
@@ -123,7 +123,9 @@ def Get_Default_Config():
     # Dropped [ElCapitan - BigSur] (2023-10-24).
     # See 415b5aa2efca04928f1148a69e77efd5d76f8c1d for the previous states.
     #----------------------------------------------------------------------------
-    if   release == 25:
+    if   release == 27:
+        Platform = "GoldenGate"
+    elif release == 25:
         Platform = "Tahoe"
     elif release == 24:
         Platform = "Sequoia"
@@ -142,7 +144,7 @@ def Get_Default_Config():
 
     if not Machine == "x86_64":
 		# with an Apple Silicon Chip?
-        if Machine == "arm64" and Platform in ["Tahoe", "Sequoia", "Sonoma", "Ventura", "Monterey"]:
+        if Machine == "arm64" and Platform in ["GoldenGate", "Tahoe", "Sequoia", "Sonoma", "Ventura", "Monterey"]:
             print("")
             print( "### Your Mac equips an Apple Silicon Chip ###" )
             print( "    Setting QMAKE_APPLE_DEVICE_ARCHS=arm64\n")
@@ -160,7 +162,11 @@ def Get_Default_Config():
     ToolDebug = list()
 
     # Set the default modules
-    if   Platform == "Tahoe":
+    if   Platform == "GoldenGate":
+        ModuleQt     = "Qt5MacPorts"
+        ModuleRuby   = "Sys"
+        ModulePython = "Sys"
+    elif Platform == "Tahoe":
         ModuleQt     = "Qt5MacPorts"
         ModuleRuby   = "Sys"
         ModulePython = "Sys"
@@ -189,6 +195,7 @@ def Get_Default_Config():
     NonOSStdLang  = False
     NoQtBindings  = False
     NoQtUiTools   = False
+    No32bitCoord  = False
     NoLibGit2     = False
     MakeOptions   = "--jobs=4"
     DebugMode     = False
@@ -214,6 +221,7 @@ def Get_Default_Config():
     config['NonOSStdLang']  = NonOSStdLang      # True if non-OS-standard language is chosen
     config['NoQtBindings']  = NoQtBindings      # True if not creating Qt bindings for Ruby scripts
     config['NoQtUiTools']   = NoQtUiTools       # True if not to include QtUiTools in Qt binding
+    config['No32bitCoord']  = No32bitCoord      # True if not use the short (32bit) coordinate
     config['NoLibGit2']     = NoLibGit2         # True if not to include libgit2 for Git package support
     config['MakeOptions']   = MakeOptions       # options passed to `make`
     config['DebugMode']     = DebugMode         # True if debug mode build
@@ -259,6 +267,7 @@ def Parse_CLI_Args(config):
     NonOSStdLang  = config['NonOSStdLang']
     NoQtBindings  = config['NoQtBindings']
     NoQtUiTools   = config['NoQtUiTools']
+    No32bitCoord  = config['No32bitCoord']
     NoLibGit2     = config['NoLibGit2']
     MakeOptions   = config['MakeOptions']
     DebugMode     = config['DebugMode']
@@ -287,7 +296,7 @@ def Parse_CLI_Args(config):
 
     p.add_option( '-p', '--python',
                     dest='type_python',
-                    help="Python type=['nil', 'Sys', 'MP313', 'HB313', 'Ana3', 'MP312', 'HB312', 'MP311', 'HB311', 'HBAuto']" )
+                    help="Python type=['nil', 'Sys', 'MP314', 'HB314', 'Ana3', 'MP313', 'HB313', 'HB311', 'HBAuto']" )
 
     p.add_option( '-P', '--buildPymod',
                     action='store_true',
@@ -306,6 +315,12 @@ def Parse_CLI_Args(config):
                     dest='no_qt_uitools',
                     default=False,
                     help="don't include uitools in Qt binding" )
+
+    p.add_option( '-s', '--no32bitcoord',
+                    action='store_true',
+                    dest='no_32_bitcoord',
+                    default=False,
+                    help="don't use short (32bit) coordinates; use long (64bit) instead " )
 
     p.add_option( '-g', '--nolibgit2',
                     action='store_true',
@@ -356,13 +371,14 @@ def Parse_CLI_Args(config):
                     default=False,
                     help='check usage' )
 
-    if Platform.upper() in [ "TAHOE", "SEQUOIA", "SONOMA", "VENTURA", "MONTEREY" ]: # with Xcode [13.1 .. ]
+    if Platform.upper() in [ "GOLDENGATE", "TAHOE", "SEQUOIA", "SONOMA", "VENTURA", "MONTEREY" ]: # with Xcode [13.1 .. ]
         p.set_defaults( type_qt         = "qt5macports",
                         type_ruby       = "sys",
                         type_python     = "sys",
                         build_pymod_whl = False,
                         no_qt_binding   = False,
                         no_qt_uitools   = False,
+                        no_32_bitcoord  = False,
                         no_libgit2      = False,
                         make_option     = "--jobs=4",
                         debug_build     = False,
@@ -432,7 +448,9 @@ def Parse_CLI_Args(config):
         if choiceRuby == "nil":
             ModuleRuby = 'nil'
         elif choiceRuby == "Sys":
-            if Platform == "Tahoe":
+            if Platform == "GoldenGate":
+                ModuleRuby = 'RubyGoldenGate'
+            elif Platform == "Tahoe":
                 ModuleRuby = 'RubyTahoe'
             elif Platform == "Sequoia":
                 ModuleRuby = 'RubySequoia'
@@ -465,12 +483,11 @@ def Parse_CLI_Args(config):
     candidates           = dict()
     candidates['NIL']    = 'nil'
     candidates['SYS']    = 'Sys'
+    candidates['MP314']  = 'MP314'
+    candidates['HB314']  = 'HB314'
+    candidates['ANA3']   = 'Ana3'
     candidates['MP313']  = 'MP313'
     candidates['HB313']  = 'HB313'
-    candidates['ANA3']   = 'Ana3'
-    candidates['MP312']  = 'MP312'
-    candidates['HB312']  = 'HB312'
-    candidates['MP311']  = 'MP311'
     candidates['HB311']  = 'HB311'
     candidates['HBAUTO'] = 'HBAuto'
     try:
@@ -484,7 +501,10 @@ def Parse_CLI_Args(config):
             ModulePython = 'nil'
             OSPython3FW  = None
         elif choicePython == "Sys":
-            if Platform == "Tahoe":
+            if Platform == "GoldenGate":
+                ModulePython = 'PythonGoldenGate'
+                OSPython3FW  = GoldenGatePy3FW
+            elif Platform == "Tahoe":
                 ModulePython = 'PythonTahoe'
                 OSPython3FW  = TahoePy3FW
             elif Platform == "Sequoia":
@@ -499,12 +519,12 @@ def Parse_CLI_Args(config):
             elif Platform == "Monterey":
                 ModulePython = 'PythonMonterey'
                 OSPython3FW  = MontereyPy3FW
-        elif choicePython == "MP313":
-            ModulePython = 'Python313MacPorts'
+        elif choicePython == "MP314":
+            ModulePython = 'Python314MacPorts'
             OSPython3FW  = None
             NonOSStdLang = True
-        elif choicePython == "HB313":
-            ModulePython = 'Python313Brew'
+        elif choicePython == "HB314":
+            ModulePython = 'Python314Brew'
             OSPython3FW  = None
             NonOSStdLang = True
         elif choicePython == "Ana3":
@@ -514,12 +534,12 @@ def Parse_CLI_Args(config):
                 ModulePython = 'PythonAnaconda3V6'
             OSPython3FW  = None
             NonOSStdLang = True
-        elif choicePython == "MP312":
-            ModulePython = 'Python312MacPorts'
+        elif choicePython == "MP313":
+            ModulePython = 'Python313MacPorts'
             OSPython3FW  = None
             NonOSStdLang = True
-        elif choicePython == "HB312":
-            ModulePython = 'Python312Brew'
+        elif choicePython == "HB313":
+            ModulePython = 'Python313Brew'
             OSPython3FW  = None
             NonOSStdLang = True
         elif choicePython == "HB311":
@@ -544,6 +564,7 @@ def Parse_CLI_Args(config):
     BuildPymodWhl = opt.build_pymod_whl
     NoQtBindings  = opt.no_qt_binding
     NoQtUiTools   = opt.no_qt_uitools
+    No32bitCoord  = opt.no_32_bitcoord
     NoLibGit2     = opt.no_libgit2
     MakeOptions   = opt.make_option
     DebugMode     = opt.debug_build
@@ -630,6 +651,7 @@ def Parse_CLI_Args(config):
     config['NonOSStdLang']  = NonOSStdLang
     config['NoQtBindings']  = NoQtBindings
     config['NoQtUiTools']   = NoQtUiTools
+    config['No32bitCoord']  = No32bitCoord
     config['NoLibGit2']     = NoLibGit2
     config['MakeOptions']   = MakeOptions
     config['DebugMode']     = DebugMode
@@ -674,6 +696,7 @@ def Get_Build_Parameters(config):
     ModuleSet     = config['ModuleSet']
     NoQtBindings  = config['NoQtBindings']
     NoQtUiTools   = config['NoQtUiTools']
+    No32bitCoord  = config['No32bitCoord']
     NoLibGit2     = config['NoLibGit2']
     MakeOptions   = config['MakeOptions']
     DebugMode     = config['DebugMode']
@@ -701,34 +724,46 @@ def Get_Build_Parameters(config):
     (qt, ruby, python) = ModuleSet  # ( 'qt6Brew', 'Sys', 'Sys' )
     ruby_python = "R%sP%s" % ( ruby.lower(), python.lower() )
 
-    # (C) Target directories and files
-    MacPkgDir             = "%s%s.pkg.macos-%s-%s-%s"     % (PackagePrefix, qt, Platform, mode, ruby_python)
-    MacBinDir             = "%s.bin.macos-%s-%s-%s"       % (               qt, Platform, mode, ruby_python)
-    MacBuildDir           = "%s.build.macos-%s-%s-%s"     % (               qt, Platform, mode, ruby_python)
-    MacBuildLog           = "%s.build.macos-%s-%s-%s.log" % (               qt, Platform, mode, ruby_python)
+    # (C) Coordinate size
+    if No32bitCoord:
+        coordSize = "C64"
+    else:
+        coordSize = "C32"
+
+    # (D) Target directories and files
+    MacPkgDir             = "%s%s.pkg.macos-%s-%s-%s-%s"     % (PackagePrefix, qt, Platform, coordSize, mode, ruby_python)
+    MacBinDir             = "%s.bin.macos-%s-%s-%s-%s"       % (               qt, Platform, coordSize, mode, ruby_python)
+    MacBuildDir           = "%s.build.macos-%s-%s-%s-%s"     % (               qt, Platform, coordSize, mode, ruby_python)
+    MacBuildLog           = "%s.build.macos-%s-%s-%s-%s.log" % (               qt, Platform, coordSize, mode, ruby_python)
     MacBuildDirQAT        = MacBuildDir + ".macQAT"
     parameters['bin']     = MacBinDir
     parameters['build']   = MacBuildDir
     parameters['logfile'] = MacBuildLog
 
-    # (D) about Qt[5|6]
+    # (E) about Qt[5|6]
     parameters['qmake']       = Qt56Dictionary[ModuleQt]['qmake']
     parameters['deploy_tool'] = Qt56Dictionary[ModuleQt]['deploy']
     parameters['qt_lib_root'] = Qt56Dictionary[ModuleQt]['libdir']
 
-    # (E) rpath
+    # (F) rpath
     if OSPython3FW in [ MontereyPy3FW, VenturaPy3FW, SonomaPy3FW, SequoiaPy3FW, TahoePy3FW ]:
         parameters['rpath'] = OSPython3FW
     else:
         parameters['rpath'] = "@executable_path/../Frameworks"
 
-    # (F) want Qt bindings with Ruby scripts?
+    # (G) want Qt bindings with Ruby scripts?
     parameters['no_qt_bindings'] = NoQtBindings
 
-    # (G) want QtUiTools?
+    # (H) want QtUiTools?
     parameters['no_qt_uitools'] = NoQtUiTools
 
-    # (H) options to `make` tool
+    # (I) want 32bitCoord?
+    parameters['no_32_bitcoord'] = No32bitCoord
+
+    # (J) want libgit2?
+    parameters['no_libgit2'] = NoLibGit2
+
+    # (K) options to `make` tool
     if not MakeOptions == "":
         parameters['make_options'] = MakeOptions
         try:
@@ -739,7 +774,7 @@ def Get_Build_Parameters(config):
         else:
             parameters['num_parallel'] = pnum
 
-    # (I) about Ruby
+    # (L) about Ruby
     if ModuleRuby != "nil":
         parameters['ruby']  = RubyDictionary[ModuleRuby]['exe']
         parameters['rbinc'] = RubyDictionary[ModuleRuby]['inc']
@@ -747,7 +782,7 @@ def Get_Build_Parameters(config):
         if 'inc2' in RubyDictionary[ModuleRuby]:
             parameters['rbinc2'] = RubyDictionary[ModuleRuby]['inc2']
 
-    # (J) about Python
+    # (M) about Python
     if ModulePython != "nil":
         parameters['python'] = PythonDictionary[ModulePython]['exe']
         parameters['pyinc']  = PythonDictionary[ModulePython]['inc']
@@ -759,28 +794,28 @@ def Get_Build_Parameters(config):
     config['MacBuildDirQAT'] = MacBuildDirQAT   # relative path to build directory for QATest
     config['MacBuildLog']    = MacBuildLog      # relative path to build log file
 
-    # (K) Extra parameters needed for deployment
+    # (N) Extra parameters needed for deployment
     parameters['project_dir'] = ProjectDir
 
-    # (L) Extra parameters needed for <pymod>
+    # (O) Extra parameters needed for <pymod>
     #     <pymod> will be built if:
     #       BuildPymodWhl = True
-    #       Platform      = [ 'Tahoe', 'Sequoia', 'Sonoma', 'Ventura', 'Monterey' ]
-    #       ModuleRuby    = [ 'Ruby34MacPorts', 'Ruby34Brew', 'RubyAnaconda3' ]
-    #       ModulePython  = [ 'Python313MacPorts', 'Python312MacPorts', 'Python311MacPorts',
-    #                         'Python313Brew',     'Python312Brew',     'Python311Brew',
-    #                         'PythonAnaconda3' ]
+    #       Platform      = [ 'GoldenGate', 'Tahoe', 'Sequoia', 'Sonoma', 'Ventura', 'Monterey' ]
+    #       ModuleRuby    = [ 'Ruby34MacPorts', 'Ruby34Brew', 'RubyAnaconda3V5', 'RubyAnaconda3V6' ]
+    #       ModulePython  = [ 'Python314MacPorts', 'Python313MacPorts',
+    #                         'Python314Brew',     'Python313Brew',     'Python311Brew',
+    #                         'PythonAnaconda3V5', 'PythonAnaconda3V6' ]
     parameters['BuildPymodWhl'] = BuildPymodWhl
     parameters['Platform']      = Platform
     parameters['ModuleRuby']    = ModuleRuby
     parameters['ModulePython']  = ModulePython
 
     PymodDistDir = dict()
-    if Platform in [ 'Tahoe', 'Sequoia', 'Sonoma', 'Ventura', 'Monterey' ]:
+    if Platform in [ 'GoldenGate', 'Tahoe', 'Sequoia', 'Sonoma', 'Ventura', 'Monterey' ]:
         if ModuleRuby in [ 'Ruby34MacPorts', 'Ruby34Brew', 'RubyAnaconda3V5', 'RubyAnaconda3V6' ]:
-            if ModulePython in [ 'Python313MacPorts', 'Python312MacPorts', 'Python311MacPorts' ]:
+            if ModulePython in [ 'Python314MacPorts', 'Python313MacPorts' ]:
                 PymodDistDir[ModulePython] = 'dist-MP3-%s' % ModuleQt
-            elif ModulePython in [ 'Python313Brew', 'Python312Brew', 'Python311Brew' ]:
+            elif ModulePython in [ 'Python314Brew', 'Python313Brew', 'Python311Brew' ]:
                 PymodDistDir[ModulePython] = 'dist-HB3-%s' % ModuleQt
             elif ModulePython in [ 'PythonAnaconda3V5', 'PythonAnaconda3V6' ]:
                 PymodDistDir[ModulePython] = 'dist-ana3-%s' % ModuleQt
@@ -799,10 +834,10 @@ def Build_pymod_wheel(parameters):
     #-----------------------------------------------------------------------------------------------------------
     # [1] <pymod> will be built if:
     #       BuildPymodWhl = True
-    #       Platform      = [ 'Tahoe', 'Sequoia', 'Sonoma', 'Ventura', 'Monterey' ]
+    #       Platform      = [ 'GoldenGate', 'Tahoe', 'Sequoia', 'Sonoma', 'Ventura', 'Monterey' ]
     #       ModuleRuby    = [ 'Ruby34MacPorts', 'Ruby34Brew', 'RubyAnaconda3V5', 'RubyAnaconda3V6' ]
-    #       ModulePython  = [ 'Python313MacPorts', 'Python312MacPorts', 'Python311MacPorts',
-    #                         'Python313Brew',     'Python312Brew',     'Python311Brew',
+    #       ModulePython  = [ 'Python314MacPorts', 'Python313MacPorts',
+    #                         'Python314Brew',     'Python313Brew',     'Python311Brew',
     #                         'PythonAnaconda3V5', 'PythonAnaconda3V6' ]
     #-----------------------------------------------------------------------------------------------------------
     BuildPymodWhl = parameters['BuildPymodWhl']
@@ -811,12 +846,12 @@ def Build_pymod_wheel(parameters):
     ModulePython  = parameters['ModulePython']
     if not BuildPymodWhl:
         return 0
-    if not Platform in [ 'Tahoe', 'Sequoia', 'Sonoma', 'Ventura', 'Monterey' ]:
+    if not Platform in [ 'GoldenGate', 'Tahoe', 'Sequoia', 'Sonoma', 'Ventura', 'Monterey' ]:
         return 0
     elif not ModuleRuby in [ 'Ruby34MacPorts', 'Ruby34Brew', 'RubyAnaconda3V5', 'RubyAnaconda3V6' ]:
         return 0
-    elif not ModulePython in [ 'Python313MacPorts', 'Python312MacPorts', 'Python311MacPorts', \
-                               'Python313Brew',     'Python312Brew',     'Python311Brew', \
+    elif not ModulePython in [ 'Python314MacPorts', 'Python313MacPorts', \
+                               'Python314Brew',     'Python313Brew',     'Python311Brew', \
                                'PythonAnaconda3V5', 'PythonAnaconda3V6' ]:
         return 0
 
@@ -1124,25 +1159,31 @@ def Run_Build_Command(config, parameters):
         cmd_args += " \\\n  -build %s" % parameters['build']
         cmd_args += " \\\n  -rpath %s" % parameters['rpath']
 
-        # (E) want Qt bindings with Ruby scripts?
+        # (F) want Qt bindings with Ruby scripts?
         if parameters['no_qt_bindings']:
             cmd_args += " \\\n  -without-qtbinding"
         else:
             cmd_args += " \\\n  -with-qtbinding"
 
-        # (F) want QtUiTools?
+        # (G) want QtUiTools?
         if parameters['no_qt_uitools']:
             cmd_args += " \\\n  -without-qt-uitools"
 
-        # (G) don't want to use libgit2?
-        if NoLibGit2:
-            cmd_args += " \\\n  -libgit2"
+        # (I) want 32bitCoord?
+        if parameters['no_32_bitcoord']:
+            cmd_args += " \\\n  -with-64bit-coord" # EXPERIMENTAL FEATURE
+        else:
+            cmd_args += " \\\n  -without-64bit-coord" # default
 
-        # (H) options to `make` tool
+        # (J) want libgit2?
+        if parameters['no_libgit2']:
+            cmd_args += " \\\n  -nolibgit2"
+
+        # (K) options to `make` tool
         if 'make_options' in parameters:
             cmd_args += " \\\n  -option %s" % parameters['make_options']
 
-        # (I) about Ruby
+        # (L) about Ruby
         if 'ruby' in parameters:
             cmd_args += " \\\n  -ruby   %s" % parameters['ruby']
             cmd_args += " \\\n  -rbinc  %s" % parameters['rbinc']
@@ -1152,7 +1193,7 @@ def Run_Build_Command(config, parameters):
         else:
             cmd_args += " \\\n  -noruby"
 
-        # (J) about Python
+        # (M) about Python
         if 'python' in parameters:
             cmd_args += " \\\n  -python %s" % parameters['python']
             cmd_args += " \\\n  -pyinc  %s" % parameters['pyinc']
@@ -1645,9 +1686,10 @@ def Deploy_Binaries_For_Bundle(config, parameters):
         regQt = re.compile(patQt)
 
         # (4) Python frameworks (only for Homebrew) # in the case of Intel Mac...
-        libPy3_1 = "%s/" % HBPython312FrameworkPath # /usr/local/opt/python@3.12/Frameworks/Python.framework/
-        libPy3_2 = "%s/" % HBPython311FrameworkPath # /usr/local/opt/python@3.11/Frameworks/Python.framework/
-        patPy3   = r'^(%s|%s)(.+)' % (libPy3_1, libPy3_2)
+        libPy3_1 = "%s/" % HBPython314FrameworkPath # /usr/local/opt/python@3.14/Frameworks/Python.framework/
+        libPy3_2 = "%s/" % HBPython313FrameworkPath # /usr/local/opt/python@3.13/Frameworks/Python.framework/
+        libPy3_3 = "%s/" % HBPython311FrameworkPath # /usr/local/opt/python@3.11/Frameworks/Python.framework/
+        patPy3   = r'^(%s|%s|%s)(.+)' % (libPy3_1, libPy3_2, libPy3_3)
         regPy3   = re.compile(patPy3)
 
         #-------------------------------------------------------------------------------
@@ -2285,7 +2327,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     #-------------------------------------------------------------
     # [11] Sign the application bundle
     #-------------------------------------------------------------
-    if Platform in ['Tahoe']:
+    if Platform in ['GoldenGate', 'Tahoe']:
         print( " [11] Signing the macOS application bundle (ad-hoc) after all post-build edits (install_name_tool/strip)..." )
         appbundle = "%s/klayout.app" % AbsMacPkgDir
         res = Sign_App_Bundle(appbundle)

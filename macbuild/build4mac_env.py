@@ -6,7 +6,7 @@
 #
 # Here are dictionaries of ...
 #  different modules for building KLayout (http://www.klayout.de/index.php)
-#  version 0.30.5 or later on different Apple Mac OSX platforms.
+#  version 0.30.9 or later on different Apple Mac OSX platforms.
 #
 # This file is imported by the 'build4mac.py' script.
 #===============================================================================
@@ -255,7 +255,7 @@ Qt56Dictionary  = { 'Qt5MacPorts': Qt5MacPorts,
 #           for the previous states.
 #-----------------------------------------------------
 RubyNil  = [ 'nil' ]
-RubySys  = [ 'RubyMonterey', 'RubyVentura', 'RubySonoma', 'RubySequoia', 'RubyTahoe' ]
+RubySys  = [ 'RubyMonterey', 'RubyVentura', 'RubySonoma', 'RubySequoia', 'RubyTahoe', 'RubyGoldenGate' ]
 RubyExt  = [ 'Ruby34MacPorts', 'Ruby34Brew', 'RubyAnaconda3' ]
 Rubies   = RubyNil + RubySys + RubyExt
 
@@ -324,11 +324,21 @@ RubyTahoe        = { 'exe':  '/System/Library/Frameworks/Ruby.framework/Versions
                      'lib':  '%s/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/libruby.tbd' % TahoeXcSDK
                    }
 
+# Bundled with Golden Gate (27.x)
+# [Key Type Name] = 'Sys'
+GoldenGateXcSDK  = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
+GoldenGateCLTSDK = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
+RubyGoldenGate   = { 'exe':  '/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby',
+                     'inc':  '%s/System/Library/Frameworks/Ruby.framework/Headers' % GoldenGateXcSDK,
+                     'inc2': '%s/System/Library/Frameworks/Ruby.framework/Headers/ruby' % GoldenGateXcSDK,
+                     'lib':  '%s/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/libruby.tbd' % GoldenGateXcSDK
+                   }
+
 # Ruby 3.4 from MacPorts (https://www.macports.org/)
 #  install with 'sudo port install ruby34'
 # [Key Type Name] = 'MP34'
 Ruby34MacPorts  = { 'exe': '/opt/local/bin/ruby3.4',
-                    'inc': '/opt/local/include/ruby-3.4.9',
+                    'inc': '/opt/local/include/ruby-3.4.10',
                     'lib': '/opt/local/lib/libruby.3.4.dylib'
                   }
 
@@ -361,6 +371,7 @@ RubyDictionary  = { 'nil'             : None,
                     'RubySonoma'      : RubySonoma,
                     'RubySequoia'     : RubySequoia,
                     'RubyTahoe'       : RubyTahoe,
+                    'RubyGoldenGate'  : RubyGoldenGate,
                     'Ruby34MacPorts'  : Ruby34MacPorts,
                     'Ruby34Brew'      : Ruby34Brew,
                     'RubyAnaconda3V5' : RubyAnaconda3V5,
@@ -376,9 +387,9 @@ RubyDictionary  = { 'nil'             : None,
 #           for the previous states.
 #-----------------------------------------------------
 PythonNil  = [ 'nil' ]
-PythonSys  = [ 'PythonMonterey', 'PythonVentura', 'PythonSonoma', 'PythonSequoia', 'PythonTahoe' ]
-PythonExt  = [ 'Python311MacPorts', 'Python312MacPorts', 'Python313MacPorts' ]
-PythonExt += [ 'Python311Brew', 'Python312Brew', 'Python313Brew', 'PythonAutoBrew' ]
+PythonSys  = [ 'PythonMonterey', 'PythonVentura', 'PythonSonoma', 'PythonSequoia', 'PythonTahoe', 'PythonGoldenGate' ]
+PythonExt  = [ 'Python314MacPorts', 'Python313MacPorts' ]
+PythonExt += [ 'Python314Brew', 'Python313Brew', 'Python311Brew', 'PythonAutoBrew' ]
 PythonExt += [ 'PythonAnaconda3' ]
 Pythons    = PythonNil + PythonSys + PythonExt
 
@@ -430,20 +441,21 @@ PythonTahoe      = { 'exe': '%s/Python3.framework/Versions/3.9/bin/python3.9' % 
                      'lib': '%s/Python3.framework/Versions/3.9/lib/libpython3.9.dylib' % TahoePy3FW
                    }
 
-# Python 3.11 from MacPorts (https://www.macports.org/)
-#   install with 'sudo port install python311'
-# [Key Type Name] = 'MP311'
-Python311MacPorts = { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versions/3.11/bin/python3.11',
-                      'inc': '/opt/local/Library/Frameworks/Python.framework/Versions/3.11/include/python3.11',
-                      'lib': '/opt/local/Library/Frameworks/Python.framework/Versions/3.11/lib/libpython3.11.dylib'
+# Bundled with Golden Gate (27.x)
+# [Key Type Name] = 'Sys'
+GoldenGatePy3FWXc = "/Applications/Xcode.app/Contents/Developer/Library/Frameworks"
+GoldenGatePy3FW   = "/Library/Developer/CommandLineTools/Library/Frameworks"
+PythonGoldenGate  = { 'exe': '%s/Python3.framework/Versions/3.9/bin/python3.9' % GoldenGatePy3FW,
+                      'inc': '%s/Python3.framework/Versions/3.9/include/python3.9' % GoldenGatePy3FW,
+                      'lib': '%s/Python3.framework/Versions/3.9/lib/libpython3.9.dylib' % GoldenGatePy3FW
                     }
 
-# Python 3.12 from MacPorts (https://www.macports.org/)
-#   install with 'sudo port install python312'
-# [Key Type Name] = 'MP312'
-Python312MacPorts = { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12',
-                      'inc': '/opt/local/Library/Frameworks/Python.framework/Versions/3.12/include/python3.12',
-                      'lib': '/opt/local/Library/Frameworks/Python.framework/Versions/3.12/lib/libpython3.12.dylib'
+# Python 3.14 from MacPorts (https://www.macports.org/)
+#   install with 'sudo port install python314'
+# [Key Type Name] = 'MP314'
+Python314MacPorts = { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versions/3.14/bin/python3.14',
+                      'inc': '/opt/local/Library/Frameworks/Python.framework/Versions/3.14/include/python3.14',
+                      'lib': '/opt/local/Library/Frameworks/Python.framework/Versions/3.14/lib/libpython3.14.dylib'
                     }
 
 # Python 3.13 from MacPorts (https://www.macports.org/)
@@ -454,22 +466,13 @@ Python313MacPorts = { 'exe': '/opt/local/Library/Frameworks/Python.framework/Ver
                       'lib': '/opt/local/Library/Frameworks/Python.framework/Versions/3.13/lib/libpython3.13.dylib'
                     }
 
-# Python 3.11 from Homebrew
-#   install with 'brew install python@3.11'
-# [Key Type Name] = 'HB311'
-HBPython311FrameworkPath = '%s/opt/python@3.11/Frameworks/Python.framework' % DefaultHomebrewRoot
-Python311Brew     = { 'exe': '%s/Versions/3.11/bin/python3.11' % HBPython311FrameworkPath,
-                      'inc': '%s/Versions/3.11/include/python3.11' % HBPython311FrameworkPath,
-                      'lib': '%s/Versions/3.11/lib/libpython3.11.dylib' % HBPython311FrameworkPath
-                    }
-
-# Python 3.12 from Homebrew
-#   install with 'brew install python@3.12'
-# [Key Type Name] = 'HB312'
-HBPython312FrameworkPath = '%s/opt/python@3.12/Frameworks/Python.framework' % DefaultHomebrewRoot
-Python312Brew     = { 'exe': '%s/Versions/3.12/bin/python3.12' % HBPython312FrameworkPath,
-                      'inc': '%s/Versions/3.12/include/python3.12' % HBPython312FrameworkPath,
-                      'lib': '%s/Versions/3.12/lib/libpython3.12.dylib' % HBPython312FrameworkPath
+# Python 3.14 from Homebrew
+#   install with 'brew install python@3.14'
+# [Key Type Name] = 'HB314'
+HBPython314FrameworkPath = '%s/opt/python@3.14/Frameworks/Python.framework' % DefaultHomebrewRoot
+Python314Brew     = { 'exe': '%s/Versions/3.14/bin/python3.14' % HBPython314FrameworkPath,
+                      'inc': '%s/Versions/3.14/include/python3.14' % HBPython314FrameworkPath,
+                      'lib': '%s/Versions/3.14/lib/libpython3.14.dylib' % HBPython314FrameworkPath
                     }
 
 # Python 3.13 from Homebrew
@@ -479,6 +482,15 @@ HBPython313FrameworkPath = '%s/opt/python@3.13/Frameworks/Python.framework' % De
 Python313Brew     = { 'exe': '%s/Versions/3.13/bin/python3.13' % HBPython313FrameworkPath,
                       'inc': '%s/Versions/3.13/include/python3.13' % HBPython313FrameworkPath,
                       'lib': '%s/Versions/3.13/lib/libpython3.13.dylib' % HBPython313FrameworkPath
+                    }
+
+# Python 3.11 from Homebrew
+#   install with 'brew install python@3.11'
+# [Key Type Name] = 'HB311'
+HBPython311FrameworkPath = '%s/opt/python@3.11/Frameworks/Python.framework' % DefaultHomebrewRoot
+Python311Brew     = { 'exe': '%s/Versions/3.11/bin/python3.11' % HBPython311FrameworkPath,
+                      'inc': '%s/Versions/3.11/include/python3.11' % HBPython311FrameworkPath,
+                      'lib': '%s/Versions/3.11/lib/libpython3.11.dylib' % HBPython311FrameworkPath
                     }
 
 # Python 3.13 installed under [/opt|/Applications]/anaconda3/klayout-qt[5|6]
@@ -551,13 +563,13 @@ PythonDictionary = { 'nil'                : None,
                      'PythonSonoma'       : PythonSonoma,
                      'PythonSequoia'      : PythonSequoia,
                      'PythonTahoe'        : PythonTahoe,
+                     'PythonGoldenGate'   : PythonGoldenGate,
+                     'Python314MacPorts'  : Python314MacPorts,
                      'Python313MacPorts'  : Python313MacPorts,
+                     'Python314Brew'      : Python314Brew,
                      'Python313Brew'      : Python313Brew,
                      'PythonAnaconda3V5'  : PythonAnaconda3V5,
                      'PythonAnaconda3V6'  : PythonAnaconda3V6,
-                     'Python312MacPorts'  : Python312MacPorts,
-                     'Python312Brew'      : Python312Brew,
-                     'Python311MacPorts'  : Python311MacPorts,
                      'Python311Brew'      : Python311Brew
                    }
 if _have_Homebrew_Python:

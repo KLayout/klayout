@@ -311,7 +311,7 @@ SelectionService::begin (const db::DPoint &pos)
   m_p1 = pos;
   m_p2 = pos;
   mp_box = new lay::RubberBox (ui (), m_color, pos, pos);
-  mp_box->set_stipple (6); // coarse hatched
+  mp_box->set_line_style (4); // short dashed
 
   ui ()->grab_mouse (this, true);
 }

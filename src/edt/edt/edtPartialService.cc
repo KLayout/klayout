@@ -1962,7 +1962,7 @@ PartialService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bo
       m_p1 = p;
       m_p2 = p;
       mp_box = new lay::RubberBox (ui (), m_color, p, p);
-      mp_box->set_stipple (6); // coarse hatched
+      mp_box->set_line_style (3); // long dashed dotted
 
       ui ()->grab_mouse (this, true);
 

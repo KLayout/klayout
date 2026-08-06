@@ -37,7 +37,7 @@ public:
   RubberBox (lay::ViewObjectUI *canvas, unsigned int color, const db::DPoint &p1, const db::DPoint &p2);
 
   void set_color (unsigned int color);
-  void set_stipple (unsigned int s);
+  void set_line_style (unsigned int s);
   void set_points (const db::DPoint &begin, const db::DPoint &end);
 
 private:
@@ -45,7 +45,7 @@ private:
 
   db::DPoint m_p1, m_p2;
   unsigned int m_color;
-  unsigned int m_stipple;
+  unsigned int m_line_style;
 };
 
 }

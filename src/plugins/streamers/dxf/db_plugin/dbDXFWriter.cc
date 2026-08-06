@@ -153,14 +153,20 @@ DXFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
 
   for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
 
-    *this << 0 << endl << "LAYER" << endl;
-    *this << 70 << endl << 0 << endl;               //  flags: seems to be required by some tools
-    *this << 62 << endl << color << endl;           //  color
-    *this << 6 << endl << linestyle << endl;     //  line style
-    *this << 2 << endl;
-    emit_layer (l->second);
+    //  skip the zero layer on the table, as it is not a "real" design layer
+    //  this avoids replicating it as "L0D0_0" in a DXF read/write spin.
+    if (! (l->second.layer == 0 && l->second.datatype == 0 && l->second.name == "L0D0_0")) {
 
-    color += 1;
+      *this << 0 << endl << "LAYER" << endl;
+      *this << 70 << endl << 0 << endl;               //  flags: seems to be required by some tools
+      *this << 62 << endl << color << endl;           //  color
+      *this << 6 << endl << linestyle << endl;        //  line style
+      *this << 2 << endl;
+      emit_layer (l->second);
+
+      color += 1;
+
+    }
 
   }
 
@@ -255,7 +261,7 @@ DXFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
 void 
 DXFWriter::emit_layer(const db::LayerProperties &lp)
 {
-  if (lp.layer == 0 && lp.datatype == 0 && lp.name == "L0D0") {
+  if (lp.layer == 0 && lp.datatype == 0 && lp.name == "L0D0_0") {
     // zero layer
     *this << "0" << endl;
   } else {

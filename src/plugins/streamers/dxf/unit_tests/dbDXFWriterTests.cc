@@ -245,3 +245,48 @@ TEST(Polygons4e)
   opt.polygon_mode = 4;
   do_run_test (_this, l, tl::testdata () + std::string ("/dxf/") + "dxf4e_au.dxf", opt);
 }
+
+TEST(FullSpinWithLayer0)
+{
+  db::Layout l;
+  std::string fn = tl::testdata () + "/dxf/dxf5.dxf";
+
+  {
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (l);
+  }
+
+  std::string tmp = tmp_file ("tmp.dxf");
+
+  {
+    db::SaveLayoutOptions options;
+    options.set_format ("DXF");
+
+    tl::OutputStream stream (tmp);
+    db::Writer writer (options);
+    writer.write (l, stream);
+  }
+
+  db::Layout l2;
+
+  {
+    tl::InputStream stream (tmp);
+    db::Reader reader (stream);
+    reader.read (l2);
+  }
+
+  std::string tmp2 = tmp_file ("tmp2.dxf");
+
+  {
+    db::SaveLayoutOptions options;
+    options.set_format ("DXF");
+
+    tl::OutputStream stream (tmp2);
+    db::Writer writer (options);
+    writer.write (l2, stream);
+  }
+
+  std::string fn_au = tl::testdata () + std::string ("/dxf/") + "dxf5_au.dxf";
+  compare_text_files (tmp2, fn_au);
+}

@@ -118,7 +118,7 @@ struct LayerNameValidator
  */
 std::string cif_layer_name (const db::LayerProperties &lp)
 {
-  if (lp.is_named ()) {
+  if (! lp.name.empty ()) {
     return lp.name;
   } else if (lp.is_null ()) {
     return std::string ();

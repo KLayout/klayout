@@ -288,11 +288,20 @@ end</pre>
   </p>
 
   <ul>
-    <li><tt>l, set_l, l_layer</tt>: getter and setter for the current value of "l". l_layer is the layer index in the context 
+    <li><tt>l, set_l, l_layer</tt>: getter and setter for the current value of "l". "l_layer" is the layer index in the context 
       of the PCell production method. The layer index can be used to access the layer in the layout or cell.</li>
     <li><tt>s, set_s</tt>: getter and setter for the current value of "s".</li>
     <li><tt>r, set_r, n, set_n, ru, set_ru</tt>: same for "r", "n" and "ru".</li>
   </ul>  
+
+  <p>
+  Layer parameters are "optional" is a sense that the value can always be set to "empty" by the user. 
+  "Empty" layers have a <class_doc href="LayerInfo"/> value that is "anonymous". In general it
+  is a good idea to check production code for an anonymous layer info and skip shape generation
+  in that case. Empty layers can be present if a PCell is freshly initialized or the layer is 
+  not yet given by the user. A PCell should behave nicely in that case and not empty any polygons
+  to a non-existing layer. 
+  </p>
 
   <p>
   After the PCell initialization is finished, we can start with the production code. These are the methods

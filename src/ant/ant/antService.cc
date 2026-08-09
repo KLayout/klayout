@@ -1541,6 +1541,19 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
   }
 }
 
+static int snap_prio (lay::PointSnapToObjectResult::ObjectSnap os)
+{
+  if (os == lay::PointSnapToObjectResult::ObjectVertex) {
+    return 3;
+  } else if (os == lay::PointSnapToObjectResult::ObjectEdge) {
+    return 2;
+  } else if (os == lay::PointSnapToObjectResult::ObjectUnspecific) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
 void
 Service::snap_rulers (lay::angle_constraint_type ac)
 {
@@ -1566,7 +1579,7 @@ Service::snap_rulers (lay::angle_constraint_type ac)
     auto snp = snap2_details (org1, p1, ruler, ac);
     double dist = p1.distance (snp.snapped_point);
 
-    if (min_dist < 0 || dist < min_dist) {
+    if (min_dist < 0 || snap_prio (snp.object_snap) > snap_prio (min_snp.object_snap) || (snap_prio (snp.object_snap) == snap_prio (min_snp.object_snap) && dist < min_dist)) {
       min_snp = snp;
       min_dist = dist;
       min_delta = snp.snapped_point - p1;
@@ -1575,7 +1588,7 @@ Service::snap_rulers (lay::angle_constraint_type ac)
     snp = snap2_details (org2, p2, ruler, ac);
     dist = p2.distance (snp.snapped_point);
 
-    if (min_dist < 0 || dist < min_dist) {
+    if (min_dist < 0 || snap_prio (snp.object_snap) > snap_prio (min_snp.object_snap) || (snap_prio (snp.object_snap) == snap_prio (min_snp.object_snap) && dist < min_dist)) {
       min_snp = snp;
       min_dist = dist;
       min_delta = snp.snapped_point - p2;
@@ -1597,7 +1610,7 @@ Service::move_transform (const db::DPoint & /*p*/, db::DFTrans tr, lay::angle_co
     return;
   }
 
-  auto ac_eff = ac == lay::AC_Global ? m_snap_mode : ac;
+  auto ac_eff = ac == lay::AC_Global ? lay::AC_Any : ac;
   clear_mouse_cursors ();
 
   if (m_move_mode == MoveSelected) {
@@ -1621,19 +1634,20 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
     return;
   }
 
-  auto ac_eff = ac == lay::AC_Global ? m_snap_mode : ac;
   clear_mouse_cursors ();
 
   if (m_move_mode == MoveSelected) {
+
+    auto ac_eff = ac == lay::AC_Global ? lay::AC_Any : ac;
 
     db::DVector dp = p - m_p1;
     dp = lay::snap_angle (dp, ac_eff);
 
     m_trans = db::DTrans (dp + (m_p1 - db::DPoint ()) - m_trans.disp ()) * m_trans * db::DTrans (db::DPoint () - m_p1);
 
-    propose_move_transformation (m_trans, 1);
-
     snap_rulers (ac_eff);
+
+    propose_move_transformation (m_trans, 1);
 
     for (std::vector<ant::View *>::iterator r = m_rulers.begin (); r != m_rulers.end (); ++r) {
       (*r)->transform_by (db::DCplxTrans (m_trans));
@@ -1643,7 +1657,28 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
 
   } else if (m_move_mode != MoveNone) {
 
-    db::DPoint ps = snap2_visual (m_p1, p, &m_current, ac);
+    db::DPoint ps;
+
+    if (m_move_mode == MoveP1 && m_current.segments () == 1) {
+
+      //  when moving p1 in a normal ruler, observe the currently active angle constraints and use p2 as reference
+      db::DPoint pref = m_current.seg_p2 (m_seg_index);
+      ps = snap2_visual (pref, p, &m_current, ac);
+
+    } else if (m_move_mode == MoveP2 && m_current.segments () == 1) {
+
+      //  when moving p2 in a normal ruler, observe the currently active angle constraints and use p1 as reference
+      db::DPoint pref = m_current.seg_p1 (m_seg_index);
+      ps = snap2_visual (pref, p, &m_current, ac);
+
+    } else {
+
+      //  other move modes use the angle constraint imposed by the modifier buttons
+      //  and the start point for reference
+      ps = snap2_visual (m_p1, p, &m_current, ac == lay::AC_Global ? lay::AC_Any : ac);
+
+    }
+
     m_trans = db::DTrans (ps - m_p1);
 
     apply_partial_move (ps);
@@ -1834,6 +1869,7 @@ Service::edit_cancel ()
     m_move_mode = MoveNone;
     m_selected.clear ();
     selection_to_view ();
+    clear_mouse_cursors ();
 
   }
 }

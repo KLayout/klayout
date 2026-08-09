@@ -1065,7 +1065,7 @@ static void _call_cbs_advance_767_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_advance_767_0 (arg1);
 }
@@ -1110,8 +1110,8 @@ static void _call_cbs_collidesWithItem_c4977_1 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QGraphicsItem *arg1 = args.read<const QGraphicsItem * > (heap);
-  const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & > (heap);
+  const QGraphicsItem *arg1 = gsi::arg_reader<const QGraphicsItem * >() (args, heap);
+  const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::ItemSelectionMode>(heap, Qt::IntersectsItemShape), heap);
   ret.write<bool > ((bool)((QGraphicsPixmapItem_Adaptor *)cls)->cbs_collidesWithItem_c4977_1 (arg1, arg2));
 }
 
@@ -1136,8 +1136,8 @@ static void _call_cbs_collidesWithPath_c4877_1 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
-  const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
+  const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::ItemSelectionMode>(heap, Qt::IntersectsItemShape), heap);
   ret.write<bool > ((bool)((QGraphicsPixmapItem_Adaptor *)cls)->cbs_collidesWithPath_c4877_1 (arg1, arg2));
 }
 
@@ -1160,7 +1160,7 @@ static void _call_cbs_contains_c1986_0 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<bool > ((bool)((QGraphicsPixmapItem_Adaptor *)cls)->cbs_contains_c1986_0 (arg1));
 }
 
@@ -1183,7 +1183,7 @@ static void _call_cbs_contextMenuEvent_3674_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsSceneContextMenuEvent *arg1 = args.read<QGraphicsSceneContextMenuEvent * > (heap);
+  QGraphicsSceneContextMenuEvent *arg1 = gsi::arg_reader<QGraphicsSceneContextMenuEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_contextMenuEvent_3674_0 (arg1);
 }
@@ -1207,7 +1207,7 @@ static void _call_cbs_dragEnterEvent_3315_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsSceneDragDropEvent *arg1 = args.read<QGraphicsSceneDragDropEvent * > (heap);
+  QGraphicsSceneDragDropEvent *arg1 = gsi::arg_reader<QGraphicsSceneDragDropEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_dragEnterEvent_3315_0 (arg1);
 }
@@ -1231,7 +1231,7 @@ static void _call_cbs_dragLeaveEvent_3315_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsSceneDragDropEvent *arg1 = args.read<QGraphicsSceneDragDropEvent * > (heap);
+  QGraphicsSceneDragDropEvent *arg1 = gsi::arg_reader<QGraphicsSceneDragDropEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_dragLeaveEvent_3315_0 (arg1);
 }
@@ -1255,7 +1255,7 @@ static void _call_cbs_dragMoveEvent_3315_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsSceneDragDropEvent *arg1 = args.read<QGraphicsSceneDragDropEvent * > (heap);
+  QGraphicsSceneDragDropEvent *arg1 = gsi::arg_reader<QGraphicsSceneDragDropEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_dragMoveEvent_3315_0 (arg1);
 }
@@ -1279,7 +1279,7 @@ static void _call_cbs_dropEvent_3315_0 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsSceneDragDropEvent *arg1 = args.read<QGraphicsSceneDragDropEvent * > (heap);
+  QGraphicsSceneDragDropEvent *arg1 = gsi::arg_reader<QGraphicsSceneDragDropEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_dropEvent_3315_0 (arg1);
 }
@@ -1303,7 +1303,7 @@ static void _call_cbs_extension_c2119_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVariant &arg1 = args.read<const QVariant & > (heap);
+  const QVariant &arg1 = gsi::arg_reader<const QVariant & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QGraphicsPixmapItem_Adaptor *)cls)->cbs_extension_c2119_0 (arg1));
 }
 
@@ -1326,7 +1326,7 @@ static void _call_cbs_focusInEvent_1729_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFocusEvent *arg1 = args.read<QFocusEvent * > (heap);
+  QFocusEvent *arg1 = gsi::arg_reader<QFocusEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_focusInEvent_1729_0 (arg1);
 }
@@ -1350,7 +1350,7 @@ static void _call_cbs_focusOutEvent_1729_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFocusEvent *arg1 = args.read<QFocusEvent * > (heap);
+  QFocusEvent *arg1 = gsi::arg_reader<QFocusEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_focusOutEvent_1729_0 (arg1);
 }
@@ -1374,7 +1374,7 @@ static void _call_cbs_hoverEnterEvent_3044_0 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsSceneHoverEvent *arg1 = args.read<QGraphicsSceneHoverEvent * > (heap);
+  QGraphicsSceneHoverEvent *arg1 = gsi::arg_reader<QGraphicsSceneHoverEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_hoverEnterEvent_3044_0 (arg1);
 }
@@ -1398,7 +1398,7 @@ static void _call_cbs_hoverLeaveEvent_3044_0 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsSceneHoverEvent *arg1 = args.read<QGraphicsSceneHoverEvent * > (heap);
+  QGraphicsSceneHoverEvent *arg1 = gsi::arg_reader<QGraphicsSceneHoverEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_hoverLeaveEvent_3044_0 (arg1);
 }
@@ -1422,7 +1422,7 @@ static void _call_cbs_hoverMoveEvent_3044_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsSceneHoverEvent *arg1 = args.read<QGraphicsSceneHoverEvent * > (heap);
+  QGraphicsSceneHoverEvent *arg1 = gsi::arg_reader<QGraphicsSceneHoverEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_hoverMoveEvent_3044_0 (arg1);
 }
@@ -1446,7 +1446,7 @@ static void _call_cbs_inputMethodEvent_2354_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QInputMethodEvent *arg1 = args.read<QInputMethodEvent * > (heap);
+  QInputMethodEvent *arg1 = gsi::arg_reader<QInputMethodEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_inputMethodEvent_2354_0 (arg1);
 }
@@ -1470,7 +1470,7 @@ static void _call_cbs_inputMethodQuery_c2420_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QGraphicsPixmapItem_Adaptor *)cls)->cbs_inputMethodQuery_c2420_0 (arg1));
 }
 
@@ -1493,7 +1493,7 @@ static void _call_cbs_isObscuredBy_c2614_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QGraphicsItem *arg1 = args.read<const QGraphicsItem * > (heap);
+  const QGraphicsItem *arg1 = gsi::arg_reader<const QGraphicsItem * >() (args, heap);
   ret.write<bool > ((bool)((QGraphicsPixmapItem_Adaptor *)cls)->cbs_isObscuredBy_c2614_0 (arg1));
 }
 
@@ -1518,8 +1518,8 @@ static void _call_cbs_itemChange_5658_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QGraphicsItem::GraphicsItemChange>::target_type & arg1 = args.read<const qt_gsi::Converter<QGraphicsItem::GraphicsItemChange>::target_type & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const qt_gsi::Converter<QGraphicsItem::GraphicsItemChange>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QGraphicsItem::GraphicsItemChange>::target_type & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QGraphicsPixmapItem_Adaptor *)cls)->cbs_itemChange_5658_0 (arg1, arg2));
 }
 
@@ -1542,7 +1542,7 @@ static void _call_cbs_keyPressEvent_1514_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QKeyEvent *arg1 = args.read<QKeyEvent * > (heap);
+  QKeyEvent *arg1 = gsi::arg_reader<QKeyEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_keyPressEvent_1514_0 (arg1);
 }
@@ -1566,7 +1566,7 @@ static void _call_cbs_keyReleaseEvent_1514_0 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QKeyEvent *arg1 = args.read<QKeyEvent * > (heap);
+  QKeyEvent *arg1 = gsi::arg_reader<QKeyEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_keyReleaseEvent_1514_0 (arg1);
 }
@@ -1590,7 +1590,7 @@ static void _call_cbs_mouseDoubleClickEvent_3049_0 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsSceneMouseEvent *arg1 = args.read<QGraphicsSceneMouseEvent * > (heap);
+  QGraphicsSceneMouseEvent *arg1 = gsi::arg_reader<QGraphicsSceneMouseEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_mouseDoubleClickEvent_3049_0 (arg1);
 }
@@ -1614,7 +1614,7 @@ static void _call_cbs_mouseMoveEvent_3049_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsSceneMouseEvent *arg1 = args.read<QGraphicsSceneMouseEvent * > (heap);
+  QGraphicsSceneMouseEvent *arg1 = gsi::arg_reader<QGraphicsSceneMouseEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_mouseMoveEvent_3049_0 (arg1);
 }
@@ -1638,7 +1638,7 @@ static void _call_cbs_mousePressEvent_3049_0 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsSceneMouseEvent *arg1 = args.read<QGraphicsSceneMouseEvent * > (heap);
+  QGraphicsSceneMouseEvent *arg1 = gsi::arg_reader<QGraphicsSceneMouseEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_mousePressEvent_3049_0 (arg1);
 }
@@ -1662,7 +1662,7 @@ static void _call_cbs_mouseReleaseEvent_3049_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsSceneMouseEvent *arg1 = args.read<QGraphicsSceneMouseEvent * > (heap);
+  QGraphicsSceneMouseEvent *arg1 = gsi::arg_reader<QGraphicsSceneMouseEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_mouseReleaseEvent_3049_0 (arg1);
 }
@@ -1709,9 +1709,9 @@ static void _call_cbs_paint_6301_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QStyleOptionGraphicsItem *arg2 = args.read<const QStyleOptionGraphicsItem * > (heap);
-  QWidget *arg3 = args.read<QWidget * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QStyleOptionGraphicsItem *arg2 = gsi::arg_reader<const QStyleOptionGraphicsItem * >() (args, heap);
+  QWidget *arg3 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_paint_6301_0 (arg1, arg2, arg3);
 }
@@ -1765,7 +1765,7 @@ static void _call_cbs_sceneEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QGraphicsPixmapItem_Adaptor *)cls)->cbs_sceneEvent_1217_0 (arg1));
 }
 
@@ -1790,8 +1790,8 @@ static void _call_cbs_sceneEventFilter_3028_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args.read<QGraphicsItem * > (heap);
-  QEvent *arg2 = args.read<QEvent * > (heap);
+  QGraphicsItem *arg1 = gsi::arg_reader<QGraphicsItem * >() (args, heap);
+  QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QGraphicsPixmapItem_Adaptor *)cls)->cbs_sceneEventFilter_3028_0 (arg1, arg2));
 }
 
@@ -1816,8 +1816,8 @@ static void _call_cbs_setExtension_4817_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_setExtension_4817_0 (arg1, arg2);
 }
@@ -1860,7 +1860,7 @@ static void _call_cbs_supportsExtension_c2806_0 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
   ret.write<bool > ((bool)((QGraphicsPixmapItem_Adaptor *)cls)->cbs_supportsExtension_c2806_0 (arg1));
 }
 
@@ -1917,7 +1917,7 @@ static void _call_cbs_wheelEvent_3029_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsSceneWheelEvent *arg1 = args.read<QGraphicsSceneWheelEvent * > (heap);
+  QGraphicsSceneWheelEvent *arg1 = gsi::arg_reader<QGraphicsSceneWheelEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem_Adaptor *)cls)->cbs_wheelEvent_3029_0 (arg1);
 }

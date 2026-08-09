@@ -268,7 +268,7 @@ public:
    *
    *  Returns true, if the suffix indicates a known format.
    */
-  bool set_format_from_filename (const std::string &fn);
+  std::pair<bool, std::string> set_format_from_filename(const std::string &fn);
 
   /**
    *  @brief Sets specific options for the given format
@@ -449,7 +449,7 @@ private:
   std::string m_format;
   std::map<unsigned int, db::LayerProperties> m_layers;
   std::set<db::cell_index_type> m_cells;
-  std::set<db::cell_index_type> m_implied_childred;
+  std::set<db::cell_index_type> m_implied_children;
   bool m_all_layers;
   bool m_all_cells;
   double m_dbu;

@@ -175,8 +175,8 @@ static void _call_cbs_deviceDescription_4510_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const QByteArray &arg2 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const QByteArray &arg2 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QString > ((QString)((QMediaServiceSupportedDevicesInterface_Adaptor *)cls)->cbs_deviceDescription_4510_0 (arg1, arg2));
 }
 
@@ -199,7 +199,7 @@ static void _call_cbs_devices_c2309_0 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QList<QByteArray> > ((QList<QByteArray>)((QMediaServiceSupportedDevicesInterface_Adaptor *)cls)->cbs_devices_c2309_0 (arg1));
 }
 

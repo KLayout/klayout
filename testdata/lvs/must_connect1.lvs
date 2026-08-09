@@ -132,6 +132,7 @@ connect_implicit("INVCHAIN", "VDD")
 
 # Compare section
 
+netlist.make_top_level_pins(false)
 netlist.simplify
 align
 

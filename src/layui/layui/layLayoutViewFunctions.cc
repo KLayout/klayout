@@ -601,6 +601,27 @@ LayoutViewFunctions::cm_cell_convert_to_static ()
 
     db::Layout &layout = view ()->cellview (cv_index)->layout ();
 
+    //  check that all (unselected) parents are static cells - must not convert children
+    //  of proxy cells.
+
+    std::set<db::cell_index_type> to_convert;
+    for (std::vector<lay::LayoutViewBase::cell_path_type>::iterator p = paths.begin (); p != paths.end (); ++p) {
+      if (! p->empty () && layout.is_valid_cell_index (p->back ())) {
+        to_convert.insert (p->back ());
+      }
+    }
+
+    for (auto c = to_convert.begin (); c != to_convert.end (); ++c) {
+      std::set<db::cell_index_type> callers;
+      layout.cell (*c).collect_caller_cells (callers);
+      for (auto cc = callers.begin (); cc != callers.end (); ++cc) {
+        if (layout.cell (*cc).is_proxy () && to_convert.find (*cc) == to_convert.end ()) {
+          throw tl::Exception (tl::sprintf (tl::to_string (tr ("Cannot convert cells to static cells if they have library or PCell parents - here: %s as child of %s")),
+                                            layout.cell (*c).get_display_name (), layout.cell (*cc).get_display_name ()));
+        }
+      }
+    }
+
     //  remember the current path
     lay::LayoutViewBase::cell_path_type cell_path (view ()->cellview (cv_index).combined_unspecific_path ());
 
@@ -609,6 +630,8 @@ LayoutViewFunctions::cm_cell_convert_to_static ()
     view ()->transaction (tl::to_string (tr ("Convert cells to static")));
 
     std::map<db::cell_index_type, db::cell_index_type> cell_map;
+
+    //  perform the conversion
 
     for (std::vector<lay::LayoutViewBase::cell_path_type>::iterator p = paths.begin (); p != paths.end (); ++p) {
       if (! p->empty () && layout.is_valid_cell_index (p->back ())) {
@@ -1402,7 +1425,7 @@ LayoutViewFunctions::cm_lay_free_rot ()
   static QString s_angle_value = QString::fromUtf8 ("0.0");
 
   lay::LayoutViewFunctionDialog dialog (QApplication::activeWindow (),
-                                        tr ("Free rotation"),
+                                        tr ("Free Rotate Layout"),
                                         tr ("Rotation angle in degree (counterclockwise)"));
 
   dialog.accept_event.add (this, &LayoutViewFunctions::on_lay_free_rot);
@@ -1426,7 +1449,7 @@ LayoutViewFunctions::cm_lay_scale ()
   static QString s_scale_value = QString::fromUtf8 ("1.0");
 
   lay::LayoutViewFunctionDialog dialog (QApplication::activeWindow (),
-                                        tr ("Scaling"),
+                                        tr ("Scale Layout"),
                                         tr ("Scaling factor"));
 
   dialog.accept_event.add (this, &LayoutViewFunctions::on_lay_scale);
@@ -1448,6 +1471,7 @@ void
 LayoutViewFunctions::cm_lay_move ()
 {
   lay::MoveOptionsDialog options (parent_widget ());
+  options.setWindowTitle (tr ("Move Layout"));
 
   options.accept_event.add (this, &LayoutViewFunctions::on_lay_move);
   options.apply_event.add (this, &LayoutViewFunctions::on_lay_move);
@@ -1511,7 +1535,7 @@ LayoutViewFunctions::cm_sel_free_rot ()
   static QString s_angle_value = QString::fromUtf8 ("0.0");
 
   lay::LayoutViewFunctionDialog dialog (QApplication::activeWindow (),
-                                        tr ("Free rotation"),
+                                        tr ("Free Rotate Selection"),
                                         tr ("Rotation angle in degree (counterclockwise)"));
 
   dialog.accept_event.add (this, &LayoutViewFunctions::on_sel_free_rot);
@@ -1540,7 +1564,7 @@ LayoutViewFunctions::cm_sel_scale ()
   static QString s_scale_value = QString::fromUtf8 ("1.0");
 
   lay::LayoutViewFunctionDialog dialog (QApplication::activeWindow (),
-                                        tr ("Scaling"),
+                                        tr ("Scale Selection"),
                                         tr ("Scaling factor"));
 
   dialog.accept_event.add (this, &LayoutViewFunctions::on_sel_scale);
@@ -1599,6 +1623,7 @@ void
 LayoutViewFunctions::cm_sel_move ()
 {
   lay::MoveOptionsDialog options (parent_widget ());
+  options.setWindowTitle (tr ("Move Selection"));
 
   options.apply_event.add (this, &LayoutViewFunctions::on_sel_move);
   options.accept_event.add (this, &LayoutViewFunctions::on_sel_move);

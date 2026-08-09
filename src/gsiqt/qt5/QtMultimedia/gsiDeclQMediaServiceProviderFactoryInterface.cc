@@ -171,7 +171,7 @@ static void _call_cbs_create_2025_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QMediaService * > ((QMediaService *)((QMediaServiceProviderFactoryInterface_Adaptor *)cls)->cbs_create_2025_0 (arg1));
 }
 
@@ -194,7 +194,7 @@ static void _call_cbs_release_1904_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMediaService *arg1 = args.read<QMediaService * > (heap);
+  QMediaService *arg1 = gsi::arg_reader<QMediaService * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaServiceProviderFactoryInterface_Adaptor *)cls)->cbs_release_1904_0 (arg1);
 }

@@ -41,6 +41,7 @@ HAVE_CURL=0
 HAVE_EXPAT=0
 HAVE_GIT2=1
 HAVE_LSTREAM=1
+HAVE_CPP20=0
 
 RUBYINCLUDE=""
 RUBYINCLUDE2=""
@@ -217,6 +218,9 @@ while [ "$*" != "" ]; do
   -nolstream)
     HAVE_LSTREAM=0
     ;;
+  -cpp20)
+    HAVE_CPP20=1
+    ;;
   -qt5)
     echo "*** WARNING: -qt5 option is ignored - Qt version is auto-detected now."
     ;;
@@ -275,6 +279,7 @@ while [ "$*" != "" ]; do
     echo "  -libpng               Use libpng instead of Qt for PNG generation"
     echo "  -nolibgit2            Do not include libgit2 for Git package support"
     echo "  -nolstream            Do not include the LStream plugin"
+    echo "  -cpp20                Uses some C++20 features (e.g. atomics)"
     echo ""
     echo "Environment Variables:"
     echo ""
@@ -670,6 +675,7 @@ qmake_options=(
   HAVE_PNG="$HAVE_PNG"
   HAVE_GIT2="$HAVE_GIT2"
   HAVE_LSTREAM="$HAVE_LSTREAM"
+  HAVE_CPP20="$HAVE_CPP20"
   PREFIX="$BIN"
   RPATH="$RPATH"
   KLAYOUT_VERSION="$KLAYOUT_VERSION"

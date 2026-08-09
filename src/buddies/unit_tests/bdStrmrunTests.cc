@@ -28,10 +28,7 @@
 TEST(1)
 {
 #if defined(HAVE_PYTHON)
-  std::string fp (tl::testsrc ());
-  fp += "/testdata/bd/strmrun.py";
-
-  std::string cmd;
+  std::string cmd_call;
 
 #if defined(__APPLE__)
   //  NOTE: because of system integrity, MacOS does not inherit DYLD_LIBRARY_PATH to child
@@ -39,19 +36,42 @@ TEST(1)
   const char *ldpath_name = "DYLD_LIBRARY_PATH";
   const char *ldpath = getenv (ldpath_name);
   if (ldpath) {
-    cmd += std::string (ldpath_name) + "=\"" + ldpath + "\"; export " + ldpath_name + "; ";
+    cmd_call += std::string (ldpath_name) + "=\"" + ldpath + "\"; export " + ldpath_name + "; ";
   }
 #endif
 
-  cmd += tl::combine_path (tl::get_inst_path (), "strmrun ") + fp;
-  tl::info << cmd;
+  cmd_call += tl::combine_path (tl::get_inst_path (), "strmrun");
 
-  tl::InputPipe pipe (cmd);
-  tl::InputStream is (pipe);
-  std::string data = is.read_all ();
-  tl::info << data;
+  {
+    std::string fp (tl::testsrc ());
+    fp += "/testdata/bd/strmrun.py";
 
-  EXPECT_EQ (data, "Hello, world (0,-42;42,0)!\n");
+    std::string cmd = cmd_call + " " + fp;
+    tl::info << cmd;
+
+    tl::InputPipe pipe (cmd);
+    tl::InputStream is (pipe);
+    std::string data = is.read_all ();
+    tl::info << data;
+
+    EXPECT_EQ (data, "Hello, world (0,-42;42,0)!\n");
+  }
+
+  {
+    std::string fp (tl::testsrc ());
+    fp += "/testdata/bd/strmrun.drc";
+
+    std::string cmd = cmd_call + " " + fp;
+    tl::info << cmd;
+
+    tl::InputPipe pipe (cmd);
+    tl::InputStream is (pipe);
+    std::string data = is.read_all ();
+    tl::info << data;
+
+    EXPECT_EQ (data, "This is DRC.\n");
+  }
+
 #endif
 }
 

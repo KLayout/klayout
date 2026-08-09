@@ -314,46 +314,48 @@ PropertiesPage::min_max_value_changed ()
   emit edited ();
 }
 
+bool
+PropertiesPage::update_controls ()
+{
+  bool has_error = false;
+
+  value_le->setText (QString ());
+  value_le->setEnabled (false);
+
+  colors->setEnabled (false_color_control->has_selection ());
+  colors->set_single_mode (false);
+
+  if (false_color_control->has_selection () && false_color_control->selected_node () > 0 && false_color_control->selected_node () < int (false_color_control->nodes ().size ()) - 1) {
+
+    double xmin, xmax;
+    get_xmin_xmax (xmin, xmax, has_error);
+
+    if (! has_error) {
+
+      double x = false_color_control->nodes () [false_color_control->selected_node ()].first;
+      double xx = x * (xmax - xmin) + xmin;
+
+      value_le->setText (tl::to_qstring (tl::sprintf ("%.4g", xx)));
+      value_le->setEnabled (true);
+
+    }
+
+  } else if (false_color_control->has_selection ()) {
+
+    colors->set_single_mode (true);
+
+  }
+
+  return has_error;
+}
+
 void
 PropertiesPage::color_mapping_changed ()
 {
-  if (! m_no_signals) {
-
-    bool has_error = false;
-
-    value_le->setText (QString ());
-    value_le->setEnabled (false);
-
-    colors->setEnabled (false_color_control->has_selection ());
-    colors->set_single_mode (false);
-
-    if (false_color_control->has_selection () && false_color_control->selected_node () > 0 && false_color_control->selected_node () < int (false_color_control->nodes ().size ()) - 1) {
-
-      double xmin, xmax;
-      get_xmin_xmax (xmin, xmax, has_error);
-
-      if (! has_error) {
-
-        double x = false_color_control->nodes () [false_color_control->selected_node ()].first;
-        double xx = x * (xmax - xmin) + xmin;
-
-        value_le->setText (tl::to_qstring (tl::sprintf ("%.4g", xx)));
-        value_le->setEnabled (true);
-
-      }
-
-    } else if (false_color_control->has_selection ()) {
-
-      colors->set_single_mode (true);
-
-    }
-
-    if (! has_error) {
-      m_in_color_mapping_signal = true;
-      emit edited ();
-      m_in_color_mapping_signal = false;
-    }
-
+  if (! m_no_signals && ! update_controls ()) {
+    m_in_color_mapping_signal = true;
+    emit edited ();
+    m_in_color_mapping_signal = false;
   }
 }
 
@@ -509,6 +511,7 @@ PropertiesPage::update ()
 
   m_no_signals = false;
 
+  update_controls ();
   recompute_histogram ();
 }
 

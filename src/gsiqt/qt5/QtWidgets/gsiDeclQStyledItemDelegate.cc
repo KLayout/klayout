@@ -748,7 +748,7 @@ static void _call_cbs_childEvent_1701_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QChildEvent *arg1 = args.read<QChildEvent * > (heap);
+  QChildEvent *arg1 = gsi::arg_reader<QChildEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStyledItemDelegate_Adaptor *)cls)->cbs_childEvent_1701_0 (arg1);
 }
@@ -815,9 +815,9 @@ static void _call_cbs_createEditor_c6860_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const QStyleOptionViewItem &arg2 = args.read<const QStyleOptionViewItem & > (heap);
-  const QModelIndex &arg3 = args.read<const QModelIndex & > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QStyleOptionViewItem &arg2 = gsi::arg_reader<const QStyleOptionViewItem & >() (args, heap);
+  const QModelIndex &arg3 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QWidget * > ((QWidget *)((QStyledItemDelegate_Adaptor *)cls)->cbs_createEditor_c6860_0 (arg1, arg2, arg3));
 }
 
@@ -840,7 +840,7 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStyledItemDelegate_Adaptor *)cls)->cbs_customEvent_1217_0 (arg1);
 }
@@ -866,8 +866,8 @@ static void _call_cbs_destroyEditor_c3602_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const QModelIndex &arg2 = args.read<const QModelIndex & > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QModelIndex &arg2 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStyledItemDelegate_Adaptor *)cls)->cbs_destroyEditor_c3602_0 (arg1, arg2);
 }
@@ -909,7 +909,7 @@ static void _call_cbs_disconnectNotify_2394_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStyledItemDelegate_Adaptor *)cls)->cbs_disconnectNotify_2394_0 (arg1);
 }
@@ -935,8 +935,8 @@ static void _call_cbs_displayText_c3997_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVariant &arg1 = args.read<const QVariant & > (heap);
-  const QLocale &arg2 = args.read<const QLocale & > (heap);
+  const QVariant &arg1 = gsi::arg_reader<const QVariant & >() (args, heap);
+  const QLocale &arg2 = gsi::arg_reader<const QLocale & >() (args, heap);
   ret.write<QString > ((QString)((QStyledItemDelegate_Adaptor *)cls)->cbs_displayText_c3997_0 (arg1, arg2));
 }
 
@@ -965,10 +965,10 @@ static void _call_cbs_editorEvent_9073_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
-  QAbstractItemModel *arg2 = args.read<QAbstractItemModel * > (heap);
-  const QStyleOptionViewItem &arg3 = args.read<const QStyleOptionViewItem & > (heap);
-  const QModelIndex &arg4 = args.read<const QModelIndex & > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
+  QAbstractItemModel *arg2 = gsi::arg_reader<QAbstractItemModel * >() (args, heap);
+  const QStyleOptionViewItem &arg3 = gsi::arg_reader<const QStyleOptionViewItem & >() (args, heap);
+  const QModelIndex &arg4 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<bool > ((bool)((QStyledItemDelegate_Adaptor *)cls)->cbs_editorEvent_9073_0 (arg1, arg2, arg3, arg4));
 }
 
@@ -991,7 +991,7 @@ static void _call_cbs_event_1217_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QStyledItemDelegate_Adaptor *)cls)->cbs_event_1217_0 (arg1));
 }
 
@@ -1016,8 +1016,8 @@ static void _call_cbs_eventFilter_2411_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QEvent *arg2 = args.read<QEvent * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QStyledItemDelegate_Adaptor *)cls)->cbs_eventFilter_2411_0 (arg1, arg2));
 }
 
@@ -1046,10 +1046,10 @@ static void _call_cbs_helpEvent_9380_0 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QHelpEvent *arg1 = args.read<QHelpEvent * > (heap);
-  QAbstractItemView *arg2 = args.read<QAbstractItemView * > (heap);
-  const QStyleOptionViewItem &arg3 = args.read<const QStyleOptionViewItem & > (heap);
-  const QModelIndex &arg4 = args.read<const QModelIndex & > (heap);
+  QHelpEvent *arg1 = gsi::arg_reader<QHelpEvent * >() (args, heap);
+  QAbstractItemView *arg2 = gsi::arg_reader<QAbstractItemView * >() (args, heap);
+  const QStyleOptionViewItem &arg3 = gsi::arg_reader<const QStyleOptionViewItem & >() (args, heap);
+  const QModelIndex &arg4 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<bool > ((bool)((QStyledItemDelegate_Adaptor *)cls)->cbs_helpEvent_9380_0 (arg1, arg2, arg3, arg4));
 }
 
@@ -1074,8 +1074,8 @@ static void _call_cbs_initStyleOption_c4962_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QStyleOptionViewItem *arg1 = args.read<QStyleOptionViewItem * > (heap);
-  const QModelIndex &arg2 = args.read<const QModelIndex & > (heap);
+  QStyleOptionViewItem *arg1 = gsi::arg_reader<QStyleOptionViewItem * >() (args, heap);
+  const QModelIndex &arg2 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStyledItemDelegate_Adaptor *)cls)->cbs_initStyleOption_c4962_0 (arg1, arg2);
 }
@@ -1139,9 +1139,9 @@ static void _call_cbs_paint_c6971_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QStyleOptionViewItem &arg2 = args.read<const QStyleOptionViewItem & > (heap);
-  const QModelIndex &arg3 = args.read<const QModelIndex & > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QStyleOptionViewItem &arg2 = gsi::arg_reader<const QStyleOptionViewItem & >() (args, heap);
+  const QModelIndex &arg3 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStyledItemDelegate_Adaptor *)cls)->cbs_paint_c6971_0 (arg1, arg2, arg3);
 }
@@ -1232,8 +1232,8 @@ static void _call_cbs_setEditorData_c3602_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const QModelIndex &arg2 = args.read<const QModelIndex & > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QModelIndex &arg2 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStyledItemDelegate_Adaptor *)cls)->cbs_setEditorData_c3602_0 (arg1, arg2);
 }
@@ -1261,9 +1261,9 @@ static void _call_cbs_setModelData_c5913_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  QAbstractItemModel *arg2 = args.read<QAbstractItemModel * > (heap);
-  const QModelIndex &arg3 = args.read<const QModelIndex & > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  QAbstractItemModel *arg2 = gsi::arg_reader<QAbstractItemModel * >() (args, heap);
+  const QModelIndex &arg3 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStyledItemDelegate_Adaptor *)cls)->cbs_setModelData_c5913_0 (arg1, arg2, arg3);
 }
@@ -1289,8 +1289,8 @@ static void _call_cbs_sizeHint_c5653_0 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionViewItem &arg1 = args.read<const QStyleOptionViewItem & > (heap);
-  const QModelIndex &arg2 = args.read<const QModelIndex & > (heap);
+  const QStyleOptionViewItem &arg1 = gsi::arg_reader<const QStyleOptionViewItem & >() (args, heap);
+  const QModelIndex &arg2 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QSize > ((QSize)((QStyledItemDelegate_Adaptor *)cls)->cbs_sizeHint_c5653_0 (arg1, arg2));
 }
 
@@ -1331,7 +1331,7 @@ static void _call_cbs_timerEvent_1730_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTimerEvent *arg1 = args.read<QTimerEvent * > (heap);
+  QTimerEvent *arg1 = gsi::arg_reader<QTimerEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStyledItemDelegate_Adaptor *)cls)->cbs_timerEvent_1730_0 (arg1);
 }
@@ -1359,9 +1359,9 @@ static void _call_cbs_updateEditorGeometry_c6860_0 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const QStyleOptionViewItem &arg2 = args.read<const QStyleOptionViewItem & > (heap);
-  const QModelIndex &arg3 = args.read<const QModelIndex & > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QStyleOptionViewItem &arg2 = gsi::arg_reader<const QStyleOptionViewItem & >() (args, heap);
+  const QModelIndex &arg3 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStyledItemDelegate_Adaptor *)cls)->cbs_updateEditorGeometry_c6860_0 (arg1, arg2, arg3);
 }

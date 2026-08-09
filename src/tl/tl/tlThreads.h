@@ -33,8 +33,7 @@
 #  include <QThread>
 #  include <QThreadStorage>
 #else
-//  atomics taken from https://github.com/mbitsnbites/atomic
-#  include "atomic/spinlock.h"
+#  include <atomic>
 #endif
 
 namespace tl
@@ -60,11 +59,21 @@ public:
 class TL_PUBLIC Mutex
 {
 public:
-  Mutex () : m_spinlock () { }
-  void lock () { m_spinlock.lock (); }
-  void unlock () { m_spinlock.unlock (); }
+  Mutex () { }
+
+  void lock ()
+  {
+    while (flag.test_and_set (std::memory_order_acquire))
+      ;
+  }
+
+  void unlock ()
+  {
+    flag.clear (std::memory_order_release);
+  }
+
 private:
-  atomic::spinlock m_spinlock;
+  std::atomic_flag flag = ATOMIC_FLAG_INIT;
 };
 
 #endif
@@ -75,7 +84,7 @@ private:
  *  available.
  */
 
-#if defined(HAVE_QT) && !defined(HAVE_PTHREADS)
+#if defined(HAVE_QT) && !defined(HAVE_PTHREADS) && !defined(HAVE_CPP20)
 
 class TL_PUBLIC WaitCondition
   : public QWaitCondition

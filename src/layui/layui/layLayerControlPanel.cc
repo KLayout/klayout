@@ -257,7 +257,7 @@ LayerControlPanel::LayerControlPanel (lay::LayoutViewBase *view, db::Manager *ma
   mp_search_edit_box->set_escape_signal_enabled (true);
   mp_search_edit_box->set_tab_signal_enabled (true);
   connect (mp_search_edit_box, SIGNAL (returnPressed ()), this, SLOT (search_editing_finished ()));
-  connect (mp_search_edit_box, SIGNAL (textEdited (const QString &)), this, SLOT (search_edited ()));
+  connect (mp_search_edit_box, SIGNAL (textEdited (const QString &)), this, SLOT (search_edited_no_signal ()));
   connect (mp_search_edit_box, SIGNAL (esc_pressed ()), this, SLOT (search_editing_finished ()));
   connect (mp_search_edit_box, SIGNAL (tab_pressed ()), this, SLOT (search_next ()));
   connect (mp_search_edit_box, SIGNAL (backtab_pressed ()), this, SLOT (search_prev ()));
@@ -1160,12 +1160,46 @@ LayerControlPanel::search_triggered (const QString &t)
     mp_search_frame->show ();
     mp_search_edit_box->setText (t);
     mp_search_edit_box->setFocus ();
-    search_edited ();
+    search_edited_no_signal ();
+  }
+}
+
+void
+LayerControlPanel::set_search_as_filter (bool f)
+{
+  if (f != search_as_filter ()) {
+    mp_filter->setChecked (f);
+    search_edited_no_signal ();
+  }
+}
+
+void
+LayerControlPanel::set_search_case_sensitive (bool f)
+{
+  if (f != search_case_sensitive ()) {
+    mp_case_sensitive->setChecked (f);
+    search_edited_no_signal ();
+  }
+}
+
+void
+LayerControlPanel::set_search_as_expression (bool f)
+{
+  if (f != search_as_expression ()) {
+    mp_use_regular_expressions->setChecked (f);
+    search_edited_no_signal ();
   }
 }
 
 void
 LayerControlPanel::search_edited ()
+{
+  search_edited_no_signal ();
+  emit search_options_changed ();
+}
+
+void
+LayerControlPanel::search_edited_no_signal ()
 {
   if (! mp_model) {
     return;
@@ -1951,7 +1985,9 @@ LayerControlPanel::do_update_content ()
     mp_layer_list->doItemsLayout ();
 
     //  establishes the current layer in case it was changed during the "in update" phase
-    mp_layer_list->set_current (lay::LayerPropertiesConstIterator (mp_view->get_properties (), m_current_layer));
+    if (m_current_layer != 0) {
+      mp_layer_list->set_current (lay::LayerPropertiesConstIterator (mp_view->get_properties (), m_current_layer));
+    }
 
     m_needs_update = false;
 

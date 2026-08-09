@@ -49,6 +49,7 @@ class ConfigureAction;
  *  @brief A delegate by which the dispatcher can submit notification events
  */
 class LAYBASIC_PUBLIC DispatcherDelegate
+  : public tl::Object
 {
 public:
   /**
@@ -147,9 +148,12 @@ public:
    *  If the configuration file cannot be written, false
    *  is returned but no exception is thrown.
    *
+   *  "keep_backups" is the number of backup files kept.
+   *  By default, no backups are kept.
+   *
    *  @return false, if an error occurred.
    */
-  bool write_config (const std::string &config_file);
+  bool write_config (const std::string &config_file, int keep_backups = 0);
 
   /**
    *  @brief Read the configuration from a file
@@ -268,7 +272,7 @@ private:
 #if defined(HAVE_QT)
   QWidget *mp_menu_parent_widget;
 #endif
-  DispatcherDelegate *mp_delegate;
+  tl::weak_ptr<DispatcherDelegate> mp_delegate;
 };
 
 }

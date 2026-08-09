@@ -6,6 +6,8 @@
   <title>About Libraries</title>
   <keyword name="Library"/>
   <keyword name="Libraries"/>
+  <keyword name="Lib Files"/>
+  <keyword name="Static Libraries"/>
 
   <p>
   Starting with version 0.22, KLayout offers a library concept. 
@@ -50,6 +52,22 @@
       name of the library file minus the extension.
       </p>
     </li>
+    <li><p><b>Layout files by declaration:</b>
+      Starting with version 0.30.8, KLayout supports declaration of static libraries by
+      a library definition file. This is an alternative mechanism to the "libraries" folder
+      and has a number of advantages:
+      </p>
+      <ul>
+        <li>Libraries can be referenced from any place in the file system</li>
+        <li>Library definition files can include other files and include environment variables</li>
+        <li>Additional attributes are available for declaration</li>
+      </ul>
+      <p>
+      This feature is limited to static libraries - i.e. libraries declared by library
+      definition files cannot include PCells. PCells are an exclusive feature of coded
+      libraries.
+      </p>
+    </li>
     <li><b>Coded libraries:</b>
       Such libraries are provided by code, either through shared objects/DLL's or through Ruby code.
       Basically such code has to provide a layout object containing the library cells. 
@@ -64,6 +82,187 @@
   this way. Library deinstallation too. See <link href="/about/packages.xml"/> for details
   about packages.
   </p>
+
+  <p>
+  Static libraries, whether defined by a library declaration file or implicitly from the 
+  "libraries" folder, are automatically reloaded, when the file changes. If this feature 
+  is not desired, you can disable automatic reload in the Setup dialog and manually refresh 
+  the libraries if required.
+  </p>
+
+  <h2>How libraries work</h2>
+
+  <p>
+  Unlike other systems, libraries are not external references for KLayout. Instead, a library
+  is essentially a copy source. When you use a library cell, it is copied into your
+  working layout and is weakly linked to the original place. You can refresh the library,
+  which will also refresh the copy. This process is called "replication".
+  </p>
+
+  <p>
+  This approach implies a memory adder, but has a number of benefits:
+  </p>
+
+  <ul>
+    <li>The working layout is "whole" - i.e. if a library vanishes or is not available
+    when transferring the layout to someone else, the layout is still functional. The
+    copy acts as a snapshot.
+    </li>
+    <li>
+    The independent copy allows for compensating database unit differences and layer details,
+    so the libraries can be made with a different database unit than the working layout for example.
+    </li>
+    <li>
+    This design greatly simplifies the database organisation, as the internal 
+    structure does not need to care about layer index translations and all information
+    needed to build lookup trees is available in a single layout object. It is easy
+    to temporarily detach a layout object from the libraries without destroying the
+    structure.
+    </li>
+  </ul>
+
+  <p>
+  The design also implies that libraries are read-only. You edit the working
+  copy only - library cells pulled into the layout are copies that cannot and
+  should not be edited, as they are restored from their original source
+  occasionally. Libraries should be thought of as external deliveries similar
+  to Python modules for example.
+  </p>
+
+  <p>
+  When saving a working layout, the copies are stored in the layout file too.
+  This feature can be disabled in a per-library basis in the library declaration
+  files (only available for static libraries). See the description of the
+  "replicate" attribute below. Note that when you use this feature, you can
+  only restore the entire layout, if you have these libraries installed.
+  </p>
+
+  <h2>Library declaration files</h2>
+
+  <p>
+  By default, library declaration files are called "klayout.lib" and are looked up in 
+  all places of the KLayout search path - this includes the home folder, the technology
+  folders and the package folders. You can override this mechanism by setting the 
+  "KLAYOUT_LIB" environment variable to a specific file. In that case, only this 
+  file is loaded.
+  </p>
+
+  <p>
+  The format of the library declaration file is "KLayout expressions". This means: function 
+  calls need to be with round brackets and expressions are separated 
+  by ";". For more information about expressions, see <link href="/about/expressions.xml"/>.
+  </p>
+
+  <p>
+  Two functions are available: "define" and "include". These are used to build
+  the declaration files.
+  </p>
+
+  <h3>"include" function</h3>
+
+  <p><b>Usage:</b></p>
+
+  <pre>include(path);</pre>
+
+  <p><b>Description:</b></p>
+
+  <p>
+  Includes the lib file given by the path. The path is
+  resolved relative to the current lib file.
+  </p>
+
+  <h3>"define" function</h3>
+
+  <p><b>Usage:</b></p>
+
+  <pre>define(name, path [, options]);
+define(path [, options]);</pre>
+
+  <p><b>Description:</b></p>
+
+  <p>
+  Defines a library. In the path-only version, the library name
+  is taken from the layout file's LIBNAME record (GDS) or the 
+  file name. In the name/path version, "name" is the name the
+  library is registered under.
+  </p>
+
+  <p>
+  The path is resolved relative to the current lib file.
+  If you want to include an environment variable, use the "env" expression
+  function:
+  </p>
+
+  <pre>define("A", env("HOME") + "/mylibs/a.gds");</pre>
+
+  <p>
+  Note that the order of library definitions matters. Dependencies
+  need to be defined already when a library is loaded. For example
+  if a library "B" uses components from library "A", the order needs
+  to be:
+  </p>
+
+  <pre>define("A", "a.gds");
+define("B", "b.gds");</pre>
+
+  <p>
+  The following options are available:
+  </p>
+
+  <ul>
+
+    <li>
+      
+      <p><b>technology</b>: binds a library to a technology - i.e. it is only
+      available in the editor when that technology is selected:</p>
+
+      <pre>define("A", "a.gds", technology="SG13A");</pre>
+
+      <p>
+      By default, libraries are not bound to a technology, except if
+      the library file is loaded in the context of a technology (i.e.
+      sits in a technology folder). You can explicitly enable a library
+      for all technologies using:
+      </p>
+
+      <pre>define("A", "a.gds", technology="*");</pre>
+
+    </li>
+
+    <li>
+
+      <p><b>technologies</b>: binds a library to several technologies. The 
+      argument is a list:</p>
+
+      <pre>define("A", "a.gds", technologies=["SG13A","GF180"]);</pre>
+
+    </li>
+
+    <li>
+
+      <p><b>replicate</b>: this flag indicates that components of the library
+      are replicated in the layout files using a library element.
+      This allows loading that file without actually having the library.
+      However, it comes with a size overhead, that can be avoided
+      by skipping this replication:
+      </p>
+
+      <pre>define("A", "a.gds", replicate=false);</pre>
+
+      <p>By default, replication is enabled.</p>
+
+    </li>
+
+    <li>
+
+      <p><b>description</b>: Specifies a description for that library.
+      </p>
+
+      <pre>define("A", "a.gds", description="Library A");</pre>
+
+    </li>
+
+  </ul>
 
 </doc>
 

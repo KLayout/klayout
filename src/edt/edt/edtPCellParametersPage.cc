@@ -699,7 +699,9 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
   //  initial callback
 
   try {
-    mp_pcell_decl->callback (mp_view->cellview (m_cv_index)->layout (), std::string (), m_states);
+    if (mp_pcell_decl->layout ()) {
+      mp_pcell_decl->callback (*mp_pcell_decl->layout (), std::string (), m_states);
+    }
   } catch (tl::Exception &ex) {
     //  potentially caused by script errors in callback implementation
     tl::error << ex.msg ();
@@ -788,7 +790,9 @@ PCellParametersPage::parameter_changed ()
 
     //  Note: checking for is_busy prevents callbacks during debugger execution
     if (! edit_error) {
-      mp_pcell_decl->callback (mp_view->cellview (m_cv_index)->layout (), pd ? pd->get_name () : std::string (), states);
+      if (mp_pcell_decl->layout ()) {
+        mp_pcell_decl->callback (*mp_pcell_decl->layout (), pd ? pd->get_name () : std::string (), states);
+      }
       m_states = states;
     }
 
@@ -1014,7 +1018,9 @@ PCellParametersPage::get_parameters (db::ParameterStates &states, bool *ok)
 
       auto parameters = parameter_from_states (states);
       auto before_coerce = parameters;
-      mp_pcell_decl->coerce_parameters (mp_view->cellview (m_cv_index)->layout (), parameters);
+      if (mp_pcell_decl->layout ()) {
+        mp_pcell_decl->coerce_parameters (*mp_pcell_decl->layout (), parameters);
+      }
 
       if (parameters != before_coerce) {
         states_from_parameters (states, parameters);
@@ -1070,8 +1076,8 @@ PCellParametersPage::set_parameters (const std::vector<tl::Variant> &parameters)
   states_from_parameters (m_states, parameters);
 
   try {
-    if (mp_view->cellview (m_cv_index).is_valid ()) {
-      mp_pcell_decl->callback (mp_view->cellview (m_cv_index)->layout (), std::string (), m_states);
+    if (mp_view->cellview (m_cv_index).is_valid () && mp_pcell_decl->layout ()) {
+      mp_pcell_decl->callback (*mp_pcell_decl->layout (), std::string (), m_states);
     }
   } catch (tl::Exception &ex) {
     //  potentially caused by script errors in callback implementation

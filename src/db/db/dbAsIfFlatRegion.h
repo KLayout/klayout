@@ -138,6 +138,11 @@ public:
 
   virtual RegionDelegate *add (const Region &other) const;
 
+  virtual RegionDelegate *peel (double /*complexity_factor*/) const
+  {
+    return const_cast<AsIfFlatRegion *> (this);
+  }
+
   virtual RegionDelegate *selected_outside (const Region &other) const
   {
     return selected_interacting_generic (other, 1, false, Positive, size_t (1), std::numeric_limits<size_t>::max ()).first;

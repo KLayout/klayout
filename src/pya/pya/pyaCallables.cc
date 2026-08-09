@@ -43,6 +43,11 @@ namespace pya
 void
 pya_object_deallocate (PyObject *self)
 {
+  //  Clear weak refs - needed for signal binding and other purposes
+#if PY_VERSION_HEX > 0x03020000
+  PyObject_ClearWeakRefs (self);
+#endif
+
   //  This avoids an assertion in debug builds (Python, gcmodule.c - update_refs).
   //  In short, the GC expects not to see objects with refcount 0 and asserts.
   //  However, due to triggering of signals or similar, the destructor call below
@@ -1214,8 +1219,9 @@ property_setter_impl (int mid, PyObject *self, PyObject *value)
 
         //  check arguments (count and type)
         bool is_valid = (*m)->compatible_with_num_args (1);
-        bool loose = (pass != 0);  //  loose in the second pass
-        if (is_valid && ! test_arg (*(*m)->begin_arguments (), value, loose, loose)) {
+        bool loose = (pass > 0);                  //  loose in the second and third pass
+        bool object_substitution = (pass > 1);    //  object substitution in the third pass
+        if (is_valid && ! test_arg (*(*m)->begin_arguments (), value, loose, object_substitution)) {
           is_valid = false;
         }
 
@@ -1228,7 +1234,7 @@ property_setter_impl (int mid, PyObject *self, PyObject *value)
 
       ++pass;
 
-    } while (! meth && pass < 2);
+    } while (! meth && pass < 3);
 
   }
 

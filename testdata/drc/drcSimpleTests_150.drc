@@ -1,0 +1,20 @@
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+deep
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+
+l1.space(1.um).output(100, 0)
+l1.sep(l2, 1.um).output(101, 0)
+(l1 + l2).space(1.um, transparent).output(102, 0)
+(l1 + l2).space(1.um).output(103, 0)
+

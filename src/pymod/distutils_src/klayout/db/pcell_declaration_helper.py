@@ -352,7 +352,7 @@ class _PCellDeclarationHelperMixin:
     """
     default implementation
     """
-    return self.name()
+    return super(_PCellDeclarationHelperMixin, self).name()
  
   def coerce_parameters_impl(self):
     """

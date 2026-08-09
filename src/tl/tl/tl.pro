@@ -11,6 +11,7 @@ FORMS =
 SOURCES = \
     tlAssert.cc \
     tlBase64.cc \
+    tlBinaryStream.cc \
     tlColor.cc \
     tlClassRegistry.cc \
     tlCopyOnWrite.cc \
@@ -62,6 +63,7 @@ HEADERS = \
     tlAlgorithm.h \
     tlAssert.h \
     tlBase64.h \
+    tlBinaryStream.h \
     tlColor.h \
     tlClassRegistry.h \
     tlCopyOnWrite.h \

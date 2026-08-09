@@ -38,6 +38,7 @@ class DBTrans_TestClass < TestBase
 
     assert_equal( a.to_s, "r0 0,0" )
     assert_equal( RBA::DTrans::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::DTrans::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( b.to_s, "m135 17,5" )
     assert_equal( c.to_s, "m135 17,5" )
     assert_equal( d.to_s, "r0 17,5" )
@@ -47,6 +48,7 @@ class DBTrans_TestClass < TestBase
     assert_equal( RBA::DTrans::new( RBA::Trans::M135, RBA::DPoint::new( 1.2, 0.25 )).to_itype(0.001).to_s, "m135 1200,250" )
     assert_equal( RBA::Trans::new( RBA::Trans::M135, RBA::Point::new( 1200, 250 )).to_dtype(0.001).to_s, "m135 1.2,0.25" )
     assert_equal( RBA::DTrans::from_s(f.to_s).to_s, f.to_s )
+    assert_equal( RBA::DTrans::from_bytes(f.to_bytes).to_s, f.to_s )
 
     assert_equal( b.trans( RBA::DPoint::new( 1, 0 )).to_s, "17,4" )
 
@@ -139,6 +141,7 @@ class DBTrans_TestClass < TestBase
 
     assert_equal( i.to_s, "m135 *0.5 2.5,8.5" )
     assert_equal( RBA::DCplxTrans::from_s(i.to_s).to_s, i.to_s )
+    assert_equal( RBA::DCplxTrans::from_bytes(i.to_bytes).to_s, i.to_s )
     assert_equal( i * mb == u, true )
     assert_equal( mb * i == u, true )
 
@@ -244,6 +247,7 @@ class DBTrans_TestClass < TestBase
 
     assert_equal( a.to_s, "r0 0,0" )
     assert_equal( RBA::Trans::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::Trans::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( b.to_s, "m135 17,5" )
     assert_equal( c.to_s, "m135 17,5" )
     assert_equal( d.to_s, "r0 17,5" )
@@ -251,6 +255,7 @@ class DBTrans_TestClass < TestBase
     assert_equal( e2.to_s, "m135 0,0" )
     assert_equal( f.to_s, "m135 17,5" )
     assert_equal( RBA::Trans::from_s(f.to_s).to_s, f.to_s )
+    assert_equal( RBA::Trans::from_bytes(f.to_bytes).to_s, f.to_s )
 
     assert_equal( b.trans( RBA::Point::new( 1, 0 )).to_s, "17,4" )
 
@@ -340,6 +345,7 @@ class DBTrans_TestClass < TestBase
     c = RBA::CplxTrans::new( 5, -7 )
     assert_equal( c.to_s, "r0 *1 5,-7" )
     assert_equal( RBA::CplxTrans::from_s(c.to_s).to_s, c.to_s )
+    assert_equal( RBA::CplxTrans::from_bytes(c.to_bytes).to_s, c.to_s )
 
     c = RBA::CplxTrans::new( RBA::CplxTrans::M135 )
     assert_equal( c.to_s, "m135 *1 0,0" )
@@ -367,6 +373,7 @@ class DBTrans_TestClass < TestBase
     c = RBA::CplxTrans::new( 0.75, 45, true, 2.5, -12.5 )
     assert_equal( c.to_s, "m22.5 *0.75 2.5,-12.5" )
     assert_equal( RBA::CplxTrans::from_s(c.to_s).to_s, c.to_s )
+    assert_equal( RBA::CplxTrans::from_bytes(c.to_bytes).to_s, c.to_s )
     c = RBA::CplxTrans::new( 0.75, 45, true, RBA::DPoint::new( 2.5, -12.5 ) )
     assert_equal( c.to_s, "m22.5 *0.75 2.5,-12.5" )
     assert_equal( c.is_unity?, false )
@@ -436,6 +443,7 @@ class DBTrans_TestClass < TestBase
 
     assert_equal( m.to_s, "r0 *1.1 0,0" )
     assert_equal( RBA::DCplxTrans::from_s(m.to_s).to_s, m.to_s )
+    assert_equal( RBA::DCplxTrans::from_bytes(m.to_bytes).to_s, m.to_s )
     assert_equal( m.trans( RBA::Point::new( 5, -7 )).to_s, "5.5,-7.7" )
 
     im = RBA::ICplxTrans::new( a, 0.5 )
@@ -443,6 +451,7 @@ class DBTrans_TestClass < TestBase
 
     assert_equal( im.to_s, "r0 *0.5 0,0" )
     assert_equal( RBA::ICplxTrans::from_s(im.to_s).to_s, im.to_s )
+    assert_equal( RBA::ICplxTrans::from_bytes(im.to_bytes).to_s, im.to_s )
     assert_equal( im.trans( RBA::Point::new( 5, -7 )).to_s, "3,-4" )
 
     im = RBA::ICplxTrans::new(m)

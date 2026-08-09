@@ -196,7 +196,9 @@ NewLayoutPropertiesDialog::exec_dialog (std::string &technology, std::string &ce
     while (! ex.at_end ()) {
       db::LayerProperties lp;
       try {
-        lp.read (ex);
+        if (! lp.read (ex)) {
+          break;
+        }
       } catch (...) {
         break;
       }
@@ -384,11 +386,11 @@ END_PROTECTED;
 LayoutViewFunctionDialog::LayoutViewFunctionDialog (QWidget *parent, const QString &title, const QString &label)
   : QDialog (parent)
 {
-  setObjectName (QString::fromUtf8 ("layout_view_function_dialog"));
-  setWindowTitle (title);
-
   mp_ui = new Ui::LayoutViewFunctionDialog ();
   mp_ui->setupUi (this);
+
+  setObjectName (QString::fromUtf8 ("layout_view_function_dialog"));
+  setWindowTitle (title);
 
   mp_ui->label->setText (label);
 

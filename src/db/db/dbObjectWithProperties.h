@@ -271,7 +271,7 @@ public:
   {
     std::string s = Obj::to_string ();
     s += " props=";
-    s += db::properties (properties_id ()).to_dict_var ().to_string ();
+    s += db::properties (properties_id ()).to_dict_var ().to_parsable_string ();
     return s;
   }
 

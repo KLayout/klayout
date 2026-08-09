@@ -14,6 +14,7 @@ FORMS = \
   RulerConfigPage3.ui \
   RulerConfigPage4.ui \
   RulerPropertiesPage.ui \
+  RulerOptions.ui \
 
 }
 
@@ -22,10 +23,12 @@ FORMS = \
 HEADERS = \
   antConfigPage.h \
   antPropertiesPage.h \
+  antRulerOptionsPage.h
 
 SOURCES = \
   antConfigPage.cc \
   antPropertiesPage.cc \
+  antRulerOptionsPage.cc
 
 # Enabled without Qt:
 

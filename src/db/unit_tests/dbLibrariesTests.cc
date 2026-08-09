@@ -32,6 +32,9 @@
 #include "dbReader.h"
 #include "dbLayoutDiff.h"
 #include "dbTestSupport.h"
+#include "dbFileBasedLibrary.h"
+#include "dbColdProxy.h"
+#include "dbTextWriter.h"
 #include "tlStream.h"
 #include "tlStaticObjects.h"
 #include "tlUnitTest.h"
@@ -506,6 +509,16 @@ TEST(3)
   std::unique_ptr<LIBT_B> lib_b (new LIBT_B ());
   db::LibraryManager::instance ().register_lib (lib_b.get ());
 
+  EXPECT_EQ (lib_a->is_for_technology ("X"), false);
+  EXPECT_EQ (lib_a->is_for_technology ("*"), false);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "*").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").second, lib_a->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").second, lib_a->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "*").second, lib_a->get_id ());
+
   //  This test tests the ability to reference libraries out of other libraries ("B" references "A"),
   //  the ability to persist that and whether this survives a write/read cycle.
 
@@ -545,6 +558,15 @@ TEST(4)
   std::unique_ptr<LIBT_A> lib_a1_inst (new LIBT_A ());
   tl::weak_ptr<LIBT_A> lib_a1 (lib_a1_inst.get ());
   lib_a1->add_technology ("X");
+  EXPECT_EQ (lib_a1->is_for_technology ("Z"), false);
+  EXPECT_EQ (lib_a1->is_for_technology ("X"), true);
+  EXPECT_EQ (lib_a1->is_for_technology ("XX"), false);
+  EXPECT_EQ (lib_a1->is_for_technology ("*"), true);
+  lib_a1->add_technology ("XX");
+  EXPECT_EQ (lib_a1->is_for_technology ("Z"), false);
+  EXPECT_EQ (lib_a1->is_for_technology ("X"), true);
+  EXPECT_EQ (lib_a1->is_for_technology ("XX"), true);
+  EXPECT_EQ (lib_a1->is_for_technology ("*"), true);
 
   std::unique_ptr<LIBT_A> lib_a2_inst (new LIBT_A ());
   tl::weak_ptr<LIBT_A> lib_a2 (lib_a2_inst.get ());
@@ -552,12 +574,15 @@ TEST(4)
 
   std::unique_ptr<LIBT_A> lib_a3_inst (new LIBT_A ());
   tl::weak_ptr<LIBT_A> lib_a3 (lib_a3_inst.get ());
+  //  same technologies as a1, so it can entirely replace it:
   lib_a3->add_technology ("X");
+  lib_a3->add_technology ("XX");
 
   std::unique_ptr<LIBT_A> lib_a4_inst (new LIBT_A ());
   tl::weak_ptr<LIBT_A> lib_a4 (lib_a4_inst.get ());
 
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").first, false);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "*").first, false);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Z").first, false);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").first, false);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").first, false);
@@ -565,20 +590,25 @@ TEST(4)
   db::LibraryManager::instance ().register_lib (lib_a1.get ());
 
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").first, false);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "*").first, true);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Z").first, false);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").first, false);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").first, true);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").second, lib_a1->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "XX").second, lib_a1->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "*").second, lib_a1->get_id ());
 
   db::LibraryManager::instance ().register_lib (lib_a2.get ());
 
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").first, false);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "*").first, true);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Z").first, false);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").first, false);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").first, true);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").second, lib_a1->get_id ());
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Y").first, true);
   EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Y").second, lib_a2->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "*").second, lib_a2->get_id ());
 
   db::LibraryManager::instance ().register_lib (lib_a3.get ());
   //  lib_a3 replaces lib_a1
@@ -698,3 +728,198 @@ TEST(6_issue996)
   CHECKPOINT ();
   db::compare_layouts (this, ly, tl::testdata () + "/gds/lib_test6b.gds", db::NormalizationMode (db::WriteGDS2 + db::NoContext));
 }
+
+static size_t num_top_cells (const db::Layout &layout)
+{
+  size_t n = 0;
+  for (auto t = layout.begin_top_down (); t != layout.end_top_cells (); ++t) {
+    ++n;
+  }
+  return n;
+}
+
+static size_t num_cells (const db::Layout &layout)
+{
+  size_t n = 0;
+  for (auto t = layout.begin_top_down (); t != layout.end_top_down (); ++t) {
+    ++n;
+  }
+  return n;
+}
+
+static size_t num_defunct (const db::Layout &layout)
+{
+  size_t ndefunct = 0;
+  for (auto c = layout.begin (); c != layout.end (); ++c) {
+    if (dynamic_cast<const db::ColdProxy *> (c.operator-> ())) {
+      ++ndefunct;
+    }
+  }
+  return ndefunct;
+}
+
+//  monster lib refresh issue
+//  (monster lib is a layout with manifold library references to existing and non-existing libraries)
+TEST(7_monsterlib)
+{
+  std::pair<bool, db::lib_id_type> lib;
+
+  //  tabula rasa
+  lib = db::LibraryManager::instance ().lib_by_name ("EX");
+  if (lib.first) {
+    db::LibraryManager::instance ().delete_lib (db::LibraryManager::instance ().lib (lib.second));
+  }
+  lib = db::LibraryManager::instance ().lib_by_name ("EX2");
+  if (lib.first) {
+    db::LibraryManager::instance ().delete_lib (db::LibraryManager::instance ().lib (lib.second));
+  }
+  lib = db::LibraryManager::instance ().lib_by_name ("NOEX");
+  if (lib.first) {
+    db::LibraryManager::instance ().delete_lib (db::LibraryManager::instance ().lib (lib.second));
+  }
+  lib = db::LibraryManager::instance ().lib_by_name ("NOEX2");
+  if (lib.first) {
+    db::LibraryManager::instance ().delete_lib (db::LibraryManager::instance ().lib (lib.second));
+  }
+
+  //  first, read the layout with only EX and EX2 in place
+
+  db::FileBasedLibrary *lib_ex = new db::FileBasedLibrary (tl::testsrc () + "/testdata/libman/libs/EX.gds", "EX");
+  lib_ex->load ();
+  db::LibraryManager::instance ().register_lib (lib_ex);
+  db::FileBasedLibrary *lib_ex2 = new db::FileBasedLibrary (tl::testsrc () + "/testdata/libman/libs/EX2.gds", "EX2");
+  lib_ex2->load ();
+  db::LibraryManager::instance ().register_lib (lib_ex2);
+
+  db::Layout layout;
+  layout.do_cleanup (true);
+
+  {
+    tl::InputStream is (tl::testsrc () + "/testdata/libman/design.gds");
+    db::Reader reader (is);
+    reader.read (layout);
+  }
+
+  //  as NOEX and NOEX2 are not present, a number of references are defunct (aka cold proxies)
+  EXPECT_EQ (num_defunct (layout), size_t (6));
+  EXPECT_EQ (num_cells (layout), size_t (25));
+  EXPECT_EQ (num_top_cells (layout), size_t (1));
+
+  //  NOTE: normalization would spoil the layout, so don't do it
+  //  The golden layout is a spoiled version that uses preliminary cell versions for the
+  //  unresolved references of NOEX and NOEX2. This is intentional to test the replication.
+  //  Also note, that the golden file has static cells.
+  db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/libman/design_au1.gds", db::NormalizationMode (db::NoNormalization | db::WithoutCellNames | db::AsPolygons));
+
+  //  then, establish NOEX and NOEX2 too - this will update the libraries in the layout that was read
+
+  db::FileBasedLibrary *lib_noex = new db::FileBasedLibrary (tl::testsrc () + "/testdata/libman/libs/NOEX.gds", "NOEX");
+  lib_noex->load ();
+  db::LibraryManager::instance ().register_lib (lib_noex);
+  db::FileBasedLibrary *lib_noex2 = new db::FileBasedLibrary (tl::testsrc () + "/testdata/libman/libs/NOEX2.gds", "NOEX2");
+  lib_noex2->load ();
+  db::LibraryManager::instance ().register_lib (lib_noex2);
+
+  //  all references now need to be resolved
+  EXPECT_EQ (num_defunct (layout), size_t (0));
+  EXPECT_EQ (num_cells (layout), size_t (25));
+  EXPECT_EQ (num_top_cells (layout), size_t (1));
+
+  db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/libman/design_au2.gds", db::NormalizationMode (db::NoNormalization | db::WithoutCellNames | db::AsPolygons));
+
+  //  refresh must not change the layout
+  lib_ex->refresh ();
+  lib_ex2->refresh ();
+  lib_noex->refresh ();
+  lib_noex2->refresh ();
+
+  //  all references now need to be resolved
+  EXPECT_EQ (num_defunct (layout), size_t (0));
+  EXPECT_EQ (num_cells (layout), size_t (25));
+  EXPECT_EQ (num_top_cells (layout), size_t (1));
+
+  db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/libman/design_au3.gds", db::NormalizationMode (db::NoNormalization | db::WithoutCellNames | db::AsPolygons));
+
+  db::LibraryManager::instance ().delete_lib (lib_noex);
+  db::LibraryManager::instance ().delete_lib (lib_noex2);
+
+  //  after removing the libraries, we have defunct cells again
+  EXPECT_EQ (num_defunct (layout), size_t (6));
+  EXPECT_EQ (num_cells (layout), size_t (25));
+  EXPECT_EQ (num_top_cells (layout), size_t (1));
+
+  //  but the layout did not change
+  db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/libman/design_au4.gds", db::NormalizationMode (db::NoNormalization | db::WithoutCellNames | db::AsPolygons));
+
+  db::LibraryManager::instance ().delete_lib (lib_ex);
+  db::LibraryManager::instance ().delete_lib (lib_ex2);
+
+  //  after removing all libraries, we have even more defunct cells (i.e. all, except top)
+  EXPECT_EQ (num_defunct (layout), size_t (12));
+  EXPECT_EQ (num_cells (layout), size_t (25));
+  EXPECT_EQ (num_top_cells (layout), size_t (1));
+
+  //  but the layout did not change
+  db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/libman/design_au5.gds", db::NormalizationMode (db::NoNormalization | db::WithoutCellNames | db::AsPolygons));
+}
+
+namespace {
+
+class PCellWithChildDeclaration :
+  public db::PCellDeclaration
+{
+  void produce (const db::Layout &layout, const std::vector<unsigned int> & /*layer_ids*/, const db::pcell_parameters_type & /*parameters*/, db::Cell &cell) const
+  {
+    auto cid = const_cast<db::Layout &> (layout).add_cell ("CHILD");
+
+    db::PropertiesSet ps;
+    ps.insert ("id", tl::Variant ("my_id"));
+
+    auto ps_id = db::properties_id (ps);
+    cell.insert (db::CellInstArrayWithProperties (db::CellInstArray (cid, db::Trans ()), ps_id));
+  }
+};
+
+}
+
+static std::string l2s (const db::Layout &layout)
+{
+  tl::OutputStringStream os;
+  tl::OutputStream ostream (os);
+  db::TextWriter writer (ostream);
+  writer.write (layout);
+  return os.string ();
+}
+
+//  PCells with subcells with properties
+TEST(8_issue2344)
+{
+  std::unique_ptr<db::Library> lib (new db::Library ());
+  lib->set_name ("__PCellLibrary");
+  lib->layout ().register_pcell ("PCell1", new PCellWithChildDeclaration ());
+  db::LibraryManager::instance ().register_lib (lib.get ());
+
+  db::Layout ly;
+  std::pair<bool, db::pcell_id_type> pc = lib->layout ().pcell_by_name ("PCell1");
+  tl_assert (pc.first);
+
+  db::cell_index_type lib_cell = lib->layout ().get_pcell_variant_dict (pc.second, std::map<std::string, tl::Variant> ());
+  ly.get_lib_proxy (lib.get (), lib_cell);
+
+  EXPECT_EQ (l2s (ly),
+    "begin_lib 0.001\n"
+    "begin_cell {CHILD}\n"
+    "end_cell\n"
+    "begin_cell {PCell1}\n"
+    "set props {\n"
+    "  {{id} {my_id}}\n"
+    "}\n"
+    "srefp $props {CHILD} 0 0 1 {0 0}\n"
+    "end_cell\n"
+    "end_lib\n"
+  );
+
+  db::LibraryManager::instance ().delete_lib (lib.release ());
+  EXPECT (true);
+}
+

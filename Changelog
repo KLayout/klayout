@@ -1,3 +1,147 @@
+0.30.10          (2026-07-25):
+* Bugfix: %GITHUB%/issues/2384 Deep DRC failure with scaled instances
+* Enhancement: %GITHUB%/issues/2391 Grid Features: switching between coarser and finier grids with keyboard shortcut
+* Bugfix: %GITHUB%/issues/2392 Wrong PCell instantiations when switching technologies
+* Bugfix: %GITHUB%/issues/2396 Python objects did nott support weak refs
+* Bugfix: Region#edges was not working properly when used on Regions with properties
+  enabled. Now, with properties enabled, the regions are consistently formed from polygons with
+  identical properties before generating the edges.
+* Enhancement: %GITHUB%/issues/2398 Clarify 'move to' (and others) scope in window caption
+* Enhancement: DRC two-layer checks now do not necessarily require merging for the
+  first input. This in general speeds up the operation in certain cases.
+  As a side effect, the error markers may be split according to partial input
+  polygons, as is the case for plain "space" check already.
+* Enhancement: Use multiple drawing workers for image_with_options rendering
+* Bugfix: Update layer names in layer list (when used in addition to layer/datatypes) on reload
+  As a side effect, the layer properties nodes will update the "real source" according to
+  the actual name if the name is used in addition to layer/datatypes. Also, the layout readers
+  will update layer names in the layer properties of the Layout object.
+* Bugfix: Marek's bug: move interactive/copy interactive did not do anything when the mouse wasn't moved
+* Bugfix: Entering '16:17' (or other nonsense) into 'new layout' layer list made KLayout hang
+* Bugfix: API: removing a pin from a Circuit does not crash if the pin was not disconnected before.
+  Now it's disconnected automatically
+* Enhancement: Improved the image pixel value display: favors selected image, and follows mouse instantly
+* Bugfix: When images are selected and images are turned off, the selection no longer persists
+* Bugfix: Using PCell parameter name 'name' won't break PCell's cell_name_impl default implementation
+* Enhancement: New API functions
+  * Create a Layout as a deep copy of a cell (Layout#new)
+  * PixelBuffer#to_bytes and PixelBuffer#from_bytes for zero-overhead RGBA pixel access
+
+0.30.9           (2026-05-25):
+* Bugfix: %GITHUB%/issues/2331 Screen size error (Assertion tlPixelBuffer.cc:260 n < m_height was not true)
+* Enhancement: %GITHUB%/issues/2335 Editor Options (F3) behaviour has changed
+* Enhancement: %GITHUB%/issues/2337 [Feature Request] Add to_bytes and from_bytes to shape classes
+* Bugfix: %GITHUB%/issues/2339 Ruby ReportDatabase merging can lead to internal error
+* Bugfix: %GITHUB%/issues/2343 copy_tree implicitly drops collinear points
+* Bugfix: %GITHUB%/issues/2344 Instance properties inside a PCell are not preserved in KLayout
+* Bugfix: %GITHUB%/issues/2345 Substrate sequestration
+  Although this ticket was more a discussion, this enhancement fixes the behavior of
+  empty layers in deep mode, which allows placing device terminals on them.
+  This eliminates the need for the workaround mentioned in the ticket.
+* Bugfix: %GITHUB%/issues/2350 strm2oas klayout/testdata/gds/issue_1835.gds a.oas, a.oas is empty
+  With this fix, it is possible to save and load layouts that use a single library references
+  or PCell variants as top cell. This is not strictly a supported use model, but may be 
+  useful in some cases. The "strm2xxx" tools now allow translating such files from OASIS
+  to GDS and back.
+* Bugfix: %GITHUB%/issues/2356 Edit options always shown, even for klayout -ne
+* Enhancement: because of issue #2356 and #2335, the "Editor Options" dock was overhauled
+  * It is called "Tool Options" now as it hosts not just shape editor options
+  * The Ruler tool got its own page as the original page was not functional and
+    rulers have other options. This replicates some settings from the "Ruler
+    and annotations setup" page.
+  * The dock widget's visibility can be controlled in the same way than the other
+    docks. The "Edit/Editor Options" entry moved to "View/Tool Options". It turns
+    on or off the tool options dock, which is populated with pages depending on the tool.
+    The default key binding (F3) will now show or hide this dock.
+* Enhancement: %GITHUB%/issues/2360 Sort ports by name in "make_top_level_pins"
+* Enhancement: A feature to compute a density map. It is found inside Tools/Density Map.
+  The density map can be computed from one or multiple layers, the region can be 
+  specified in terms of visible region, rulers or bounding boxes of certain layers
+  or the whole cell. The tool will generate an image overlay over the layout
+  holding the density data.
+* Bugfix: using "xkill" on a KLayout instance ended in a crash
+* Enhancement: settings of search features are persisted (see discussion 2868)
+* Enhancement: when moving rulers with "snap to objects", all points of the
+  rulers snap to edges or vertexes now.
+* Bugfix: false color maps in images where incorrectly interpolated in some
+  cases.
+* Bugfix: small bugfix in L2N/LVSDB reader - default values of parameters were
+  treated as int.
+* Bugfix: properties on objects with properties (such as BoxWithProperties) where
+  not properly serialized. Specifically their representation did not include the
+  type. Hence it was not possible to retrieve properties on deserialization with
+  "from_s". The fix is to annotate the property values with type information.
+  NOTE: this is a change that is not backward-compatible.
+* Bugfix: snapping rulers to edges parallel to the allowed ruler direction resulted
+  in skew rulers.
+* Enhancement: renamed ruler option for more clarity - changed 
+  'snap to objects (unless disabled in template)' to 'never snap to object' (inverted)
+* Enhancement: enhancements in the script API
+  * Cell#is_cold_proxy?: indicates if a cell is a "defunc" library reference
+  * Cell#library_cell_name: gets the library cell name for a "defunc" reference
+  * Cell#library_name: gets the library name for a "defunc" reference
+  * Cell#pcell_name: gets the pcell name for a "defunct" reference
+  * Layout#delete_cells: now available with a list of cell object
+  * Layout#delete_cell_rec: now available with a cell object
+  * Layout#prune_cell: now available with a cell object
+  * Layout#prune_cells: for pruning multiple cells in one call
+  * Layout#prune_subcells: now with a cell object
+  * Layout#prune_subcells: now with multiple root cells
+  * Layout#flatten: now with a cell object
+  * Layout#flatten_into: now with cell objects
+  * Layout#delete_cell: now with a cell object
+  * Default value "all" for "levels" argument in "prune_subcells" and "prune_cell"
+  * Default value "all" for "levels" and "true" for "prune" argument in "flatten"
+  * Default value "all" for "levels" and "unity" for "trans" argument in "flatten_into"
+
+0.30.8           (2026-04-14):
+* Enhancement: %GITHUB%/issues/2248 Switch layouts but without losing the handle
+* Bugfix: %GITHUB%/issues/2299 gf180mcu DRC performance regression.
+  This patch contains some other enhancements which improve performance of DRC, 
+  although in certain cases only.
+* Enhancement: %GITHUB%/issues/2300 More options to set layout format, specifically on LEF/DEF
+* Bugfix: %GITHUB%/2301 UI freezes permanently with open Macro Development window and event listening plugin
+* Bugfix: %GITHUB%/issues/2305 Library reloading problems
+* Enhancement: %GITHUB%/2306 Feature Request: API-access to a setter for the selected entry in the Netlist Database Browser
+* Bugfix: %GITHUB%/2311 Tip window is shown although running in non-GUI modebug
+* Bugfix: %GITHUB%/2315 Edit/Layout/Scale causes confusing
+* Enhancement: %GITHUB%/2316 Edit/Selection/Make Array: support both pitch and spacing
+* Bugfix: %GITHUB%/2320 Failure to read OASIS files with large property strings
+* Enhancement: %GITHUB%/2322 Options(text): split text scaling and rotation into two separate options
+* Enhancement: %GITHUB%/2326 Fit shouldn't take bbox of "empty" struct into account
+* Bugfix: %GITHUB%/2331 Screen size error (Assertion tlPixelBuffer.cc:260 n < m_height was not true)
+* Enhancement: "strmrun" now can run DRC and LVS scripts
+* Enhancement: "Library#library_by_name" now can be used with "*" for technology 
+* Bugfix: PCell "coerce_parameters" and "callback" was called with the client layout
+  instead of definition layout, hence the DBU was incorrect if both layouts have different DBU.
+* Enhancement: new config option: disable generation of new layers
+  The name of the config option is "auto-create-new-layers".
+  With this option set to true (default), new layers are automatically added to the layer list on
+  "paste" or placing instances.
+* Enhancement: hovering over a pixel of an image with display the pixel's value in
+  the status bar.
+* Enhancement: experimental support for library declaration files to install static
+  libraries from other places than the "library" folder and with additional metadata.
+
+0.30.7           (2026-03-07):
+* Enhancement: %GITHUB%/issues/2248 Switch layouts but without losing the handle
+* Bugfix: %GITHUB%/issues/2273 Potential use-after-free bug due to Ruby GC
+* Bugfix: %GITHUB%/issues/2277 Poor netlister performance in some cases
+* Enhancement: %GITHUB%/issues/2278 Option to hide markers frames
+* Bugfix: %GITHUB%/issues/2284 klayoutrc parse issue silently replaces config file
+* Bugfix: %GITHUB%/issues/2286 CLI arguments, '--help' / '--version' should be implemented
+* Bugfix: %GITHUB%/issues/2293 Layers window: changing the layer order with the arrow buttons deselects the layer to be moved
+* Enhancement: ReportDatabase#merge - a method to merge two report databases
+* Bugfix: double clicking an edge in partial mode opened the properties dialog, not setting a point
+* Bugfix: Python did not support downcasting of PolygonWithProperties to Polygon on Shapes#polygon for example
+* Bugfix: OASIS reader was not able to read S_GDS_PROPERTY from file level or under forward reference conditions
+* Enhancement: Adding an option '-of|--format' to strmxor and strmclip to specify the output format instead of taking it from the suffix
+* Bugfix: 'oasis_read_all_options' as always on in buddy tools
+* Bugfix: avoid a crash on application exit when using objects for user property values or names
+* Bugfix: Fixing a small glitch: drawing into a ghost cell is possible, but did not turn off the ghost cell flag
+* Bugfix: Fixing a potential segfault during layout painting due to a race condition (rare but happened)
+* Enhancement: Performance improvement for hierarchical processor - better parallelization in some cases
+
 0.30.6           (2026-02-07):
 * Bugfix: %GITHUB%/issues/2210 LayoutView::create_measure_ruler() creates incorrect rulers
 * Enhancement: %GITHUB%/issues/2214 Take selection modifer into account on release rather than on click

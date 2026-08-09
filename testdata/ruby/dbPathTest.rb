@@ -33,6 +33,7 @@ class DBPath_TestClass < TestBase
     assert_equal( a.area.to_s, "0.0" )
     assert_equal( a.length.to_s, "0.0" )
     assert_equal( RBA::DPath::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::DPath::from_bytes(a.to_bytes).to_s, a.to_s )
 
     b = a.dup 
     a = RBA::DPath::new( [ RBA::DPoint::new( 0, 1 ), RBA::DPoint::new( 1, 5 ) ], 2.5 )
@@ -40,6 +41,7 @@ class DBPath_TestClass < TestBase
     assert_equal( "%.3f" % a.area, "10.308" )
     assert_equal( "%.3f" % a.length, "4.123" )
     assert_equal( RBA::DPath::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::DPath::from_bytes(a.to_bytes).to_s, a.to_s )
     c = a.dup 
 
     assert_equal( a == b, false )
@@ -55,6 +57,7 @@ class DBPath_TestClass < TestBase
     a = RBA::DPath::new( [ RBA::DPoint::new( 0, 1 ), RBA::DPoint::new( 1, 5 ) ], 2.5, -0.5, 1.5 )
     assert_equal( a.to_s, "(0,1;1,5) w=2.5 bx=-0.5 ex=1.5 r=false" )
     assert_equal( RBA::DPath::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::DPath::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( "%.3f" % a.length, "5.123" )
     assert_equal( RBA::Path::new(a).to_s, "(0,1;1,5) w=3 bx=-1 ex=2 r=false" )
 
@@ -122,6 +125,7 @@ class DBPath_TestClass < TestBase
     assert_equal( a.area.to_f.to_s, "0.0" )
     assert_equal( a.length.to_s, "0" )
     assert_equal( RBA::Path::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::Path::from_bytes(a.to_bytes).to_s, a.to_s )
 
     b = a.dup 
     a = RBA::Path::new( [ RBA::Point::new( 0, 10 ), RBA::Point::new( 10, 50 ) ], 25 )
@@ -129,6 +133,7 @@ class DBPath_TestClass < TestBase
     assert_equal( a.area.to_f.to_s, "1025.0" )
     assert_equal( a.length.to_s, "41" )
     assert_equal( RBA::Path::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::Path::from_bytes(a.to_bytes).to_s, a.to_s )
     c = a.dup 
 
     assert_equal( a == b, false )
@@ -144,6 +149,7 @@ class DBPath_TestClass < TestBase
     assert_equal( a.to_s, "(0,10;10,50) w=25 bx=-5 ex=15 r=false" )
     assert_equal( a.length.to_s, "51" )
     assert_equal( RBA::Path::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::Path::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( RBA::DPath::new(a).to_s, "(0,10;10,50) w=25 bx=-5 ex=15 r=false" )
 
     a.bgn_ext = 5
@@ -335,16 +341,16 @@ class DBPath_TestClass < TestBase
     assert_equal(s.to_s, "() w=0 bx=0 ex=0 r=false props={}")
 
     s = RBA::PathWithProperties::new(RBA::Path::new([ [0,0], [100, 0] ], 100), { 1 => "one" })
-    assert_equal(s.to_s, "(0,0;100,0) w=100 bx=0 ex=0 r=false props={1=>one}")
+    assert_equal(s.to_s, "(0,0;100,0) w=100 bx=0 ex=0 r=false props={#1=>'one'}")
 
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::PathWithProperties::new(RBA::Path::new([ [0,0], [100, 0] ], 100), pid)
-    assert_equal(s.to_s, "(0,0;100,0) w=100 bx=0 ex=0 r=false props={1=>one}")
-    assert_equal((RBA::CplxTrans::new(0.001) * s).to_s, "(0,0;0.1,0) w=0.1 bx=0 ex=0 r=false props={1=>one}")
+    assert_equal(s.to_s, "(0,0;100,0) w=100 bx=0 ex=0 r=false props={#1=>'one'}")
+    assert_equal((RBA::CplxTrans::new(0.001) * s).to_s, "(0,0;0.1,0) w=0.1 bx=0 ex=0 r=false props={#1=>'one'}")
     assert_equal(s.property(1), "one")
     assert_equal(s.properties, { 1 => "one" })
     s.set_property(1, "xxx")
-    assert_equal(s.to_s, "(0,0;100,0) w=100 bx=0 ex=0 r=false props={1=>xxx}")
+    assert_equal(s.to_s, "(0,0;100,0) w=100 bx=0 ex=0 r=false props={#1=>'xxx'}")
     s.delete_property(1)
     assert_equal(s.to_s, "(0,0;100,0) w=100 bx=0 ex=0 r=false props={}")
     assert_equal(s.property(1), nil)
@@ -353,16 +359,16 @@ class DBPath_TestClass < TestBase
     assert_equal(s.to_s, "() w=0 bx=0 ex=0 r=false props={}")
 
     s = RBA::DPathWithProperties::new(RBA::DPath::new([ [0,0], [100, 0] ], 100), { 1 => "one" })
-    assert_equal(s.to_s, "(0,0;100,0) w=100 bx=0 ex=0 r=false props={1=>one}")
+    assert_equal(s.to_s, "(0,0;100,0) w=100 bx=0 ex=0 r=false props={#1=>'one'}")
 
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::DPathWithProperties::new(RBA::DPath::new([ [0,0], [100, 0] ], 100), pid)
-    assert_equal(s.to_s, "(0,0;100,0) w=100 bx=0 ex=0 r=false props={1=>one}")
-    assert_equal((RBA::VCplxTrans::new(2.5) * s).to_s, "(0,0;250,0) w=250 bx=0 ex=0 r=false props={1=>one}")
+    assert_equal(s.to_s, "(0,0;100,0) w=100 bx=0 ex=0 r=false props={#1=>'one'}")
+    assert_equal((RBA::VCplxTrans::new(2.5) * s).to_s, "(0,0;250,0) w=250 bx=0 ex=0 r=false props={#1=>'one'}")
     assert_equal(s.property(1), "one")
     assert_equal(s.properties, { 1 => "one" })
     s.set_property(1, "xxx")
-    assert_equal(s.to_s, "(0,0;100,0) w=100 bx=0 ex=0 r=false props={1=>xxx}")
+    assert_equal(s.to_s, "(0,0;100,0) w=100 bx=0 ex=0 r=false props={#1=>'xxx'}")
     s.delete_property(1)
     assert_equal(s.to_s, "(0,0;100,0) w=100 bx=0 ex=0 r=false props={}")
     assert_equal(s.property(1), nil)

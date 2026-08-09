@@ -408,7 +408,9 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
       << tl::arg ("?output",                   &output,     "The output file to which the XOR differences are written",
                   "This argument is optional. If not given, the exit status alone will indicate whether the layouts "
                   "are identical or not. The output is a layout file. The format of the file is derived "
-                  "from the file name's suffix (.oas[.gz] for (gzipped) OASIS, .gds[.gz] for (gzipped) GDS2 etc.)."
+                  "from the file name's suffix (.oas for OASIS, .gds[.gz] for (gzipped) GDS2 etc.). "
+                  "You can also use any name, and specify the desired suffix in square brackets after the file name. "
+                  "For example, 'file.xor[oas]' will create an OASIS file called 'file.xor'."
                  )
       << tl::arg ("-ta|--top-a=name",          &top_a,      "Specifies the top cell for the first layout",
                   "Use this option to take a specific cell as the top cell from the first layout. All "
@@ -587,10 +589,10 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   if (output_layout.get ()) {
 
     db::SaveLayoutOptions save_options;
-    save_options.set_format_from_filename (output);
+    std::string of = save_options.set_format_from_filename (output).second;
     writer_options.configure (save_options, *output_layout);
 
-    tl::OutputStream stream (output);
+    tl::OutputStream stream (of);
     db::Writer writer (save_options);
     writer.write (*output_layout, stream);
 

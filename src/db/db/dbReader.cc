@@ -134,13 +134,26 @@ ReaderBase::check_dbu (double dbu) const
 Reader::Reader (tl::InputStream &stream)
   : mp_actual_reader (0), m_stream (stream)
 {
-  //  Detect the format by asking all reader declarations
-  for (tl::Registrar<db::StreamFormatDeclaration>::iterator rdr = tl::Registrar<db::StreamFormatDeclaration>::begin (); rdr != tl::Registrar<db::StreamFormatDeclaration>::end () && ! mp_actual_reader; ++rdr) {
-    m_stream.reset ();
-    if (rdr->detect (m_stream)) {
-      m_stream.reset ();
-      mp_actual_reader = rdr->create_reader (m_stream);
+  if (stream.is_explicit_suffix ()) {
+
+    //  If an explicit suffix is given for the stream, use it to find the reader
+    for (tl::Registrar<db::StreamFormatDeclaration>::iterator rdr = tl::Registrar<db::StreamFormatDeclaration>::begin (); rdr != tl::Registrar<db::StreamFormatDeclaration>::end () && ! mp_actual_reader; ++rdr) {
+      if (tl::match_filename_to_format ("." + stream.suffix (), rdr->file_format ())) {
+        mp_actual_reader = rdr->create_reader (m_stream);
+      }
     }
+
+  } else {
+
+    //  Detect the format by asking all reader declarations
+    for (tl::Registrar<db::StreamFormatDeclaration>::iterator rdr = tl::Registrar<db::StreamFormatDeclaration>::begin (); rdr != tl::Registrar<db::StreamFormatDeclaration>::end () && ! mp_actual_reader; ++rdr) {
+      m_stream.reset ();
+      if (rdr->detect (m_stream)) {
+        m_stream.reset ();
+        mp_actual_reader = rdr->create_reader (m_stream);
+      }
+    }
+
   }
 
   if (! mp_actual_reader) {

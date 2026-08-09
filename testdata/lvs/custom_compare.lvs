@@ -63,6 +63,7 @@ end
 netlist.device_class_by_name("RES").equal_parameters = ResistorComparator::new()
 
 # Netlist normalization
+netlist.make_top_level_pins(false)
 netlist.simplify
 
 # Hierarchy alignment (flatten out unmatched cells)

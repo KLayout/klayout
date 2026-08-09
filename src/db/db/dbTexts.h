@@ -209,6 +209,11 @@ public:
   void write (const std::string &fn) const;
 
   /**
+   *  @brief Converts the shape collection to a deep one using the specified layer
+   */
+  virtual void convert_to_deep (const db::DeepLayer &layer);
+
+  /**
    *  @brief Implementation of the ShapeCollection interface
    */
   ShapeCollectionDelegateBase *get_delegate () const

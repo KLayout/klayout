@@ -66,7 +66,7 @@ TEST(OutputPipe1)
   {
     tl::OutputPipe pipe ("cat >" + tf);
     tl::OutputStream str (pipe);
-    str << "Hello, world!";
+    str.put ("Hello, world!");
   }
 
   {
@@ -82,7 +82,7 @@ TEST(TextOutputStream)
 
   {
     tl::OutputStream os (fn, tl::OutputStream::OM_Auto, false);
-    os << "Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.";
+    os.put ("Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.");
   }
 
   {
@@ -140,7 +140,7 @@ TEST(TextInputStream)
 
   {
     tl::OutputStream os (fn, tl::OutputStream::OM_Auto, false);
-    os << "Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.";
+    os.put ("Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.");
   }
 
   {
@@ -187,6 +187,29 @@ TEST(DataInputStream)
   EXPECT_EQ (tis.get_line (), "separated by a LFCR and CRLF.");
   EXPECT_EQ (tis.line_number (), size_t (4));
   EXPECT_EQ (tis.at_end (), true);
+
+  EXPECT_EQ (is.is_explicit_suffix (), false);
+  EXPECT_EQ (is.suffix (), "");
+}
+
+TEST(DataInputStreamWithSuffix)
+{
+  tl::InputStream is ("data:SGVsbG8sIHdvcmxkIQpXaXRoIGFub3RoZXIgbGluZQoNDQpzZXBhcmF0ZWQgYnkgYSBMRkNSIGFuZCBDUkxGLg==[txt]");
+  tl::TextInputStream tis (is);
+  EXPECT_EQ (tis.get_line (), "Hello, world!");
+  EXPECT_EQ (tis.line_number (), size_t (1));
+  EXPECT_EQ (tis.get_line (), "With another line");
+  EXPECT_EQ (tis.line_number (), size_t (2));
+  EXPECT_EQ (tis.peek_char (), '\n');
+  EXPECT_EQ (tis.get_line (), "");
+  EXPECT_EQ (tis.line_number (), size_t (3));
+  EXPECT_EQ (tis.peek_char (), 's');
+  EXPECT_EQ (tis.get_line (), "separated by a LFCR and CRLF.");
+  EXPECT_EQ (tis.line_number (), size_t (4));
+  EXPECT_EQ (tis.at_end (), true);
+
+  EXPECT_EQ (is.is_explicit_suffix (), true);
+  EXPECT_EQ (is.suffix (), "txt");
 }
 
 namespace
@@ -219,7 +242,7 @@ TEST(SafeOutput)
 
   {
     tl::OutputStream os (tp);
-    os << "blabla\n";
+    os.put ("blabla\n");
   }
 
   EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
@@ -229,7 +252,7 @@ TEST(SafeOutput)
     tl::OutputStream os (tp);
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
     EXPECT_EQ (tl::file_exists (tp), true);
-    os << "Hello, world!\n";
+    os.put ("Hello, world!\n");
   }
 
   EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
@@ -245,7 +268,7 @@ TEST(SafeOutput)
     tl::OutputStream os (broken);
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
     EXPECT_EQ (tl::file_exists (tp), true);
-    os << "Hi!\n";
+    os.put ("Hi!\n");
     os.flush ();   //  raises the exception
     EXPECT_EQ (true, false);
   } catch (...) {
@@ -268,7 +291,7 @@ TEST(SafeOutput)
     tl::OutputStream os (broken);
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
     EXPECT_EQ (tl::file_exists (tp), true);
-    os << "Hi!\n";
+    os.put ("Hi!\n");
     os.flush ();   //  raises the exception
     EXPECT_EQ (true, false);
   } catch (...) {
@@ -300,7 +323,7 @@ TEST(SafeOutput2)
 
     {
       tl::OutputStream os (tp);
-      os << "blabla\n";
+      os.put ("blabla\n");
     }
 
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
@@ -310,7 +333,7 @@ TEST(SafeOutput2)
       tl::OutputStream os (tp);
       EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
       EXPECT_EQ (tl::file_exists (tp), true);
-      os << "Hello, world!\n";
+      os.put ("Hello, world!\n");
     }
 
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
@@ -335,7 +358,7 @@ TEST(Backups)
 
   {
     tl::OutputStream os (tp, tl::OutputStream::OM_Auto, false, 2);
-    os << "1\n";
+    os.put ("1\n");
   }
 
   EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
@@ -353,7 +376,7 @@ TEST(Backups)
     tl::OutputStream os (tp, tl::OutputStream::OM_Auto, false, 2);
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
     EXPECT_EQ (tl::file_exists (tp), true);
-    os << "2\n";
+    os.put ("2\n");
   }
 
   EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
@@ -376,7 +399,7 @@ TEST(Backups)
     tl::OutputStream os (tp, tl::OutputStream::OM_Auto, false, 2);
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
     EXPECT_EQ (tl::file_exists (tp), true);
-    os << "3\n";
+    os.put ("3\n");
   }
 
   EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
@@ -404,7 +427,7 @@ TEST(Backups)
     tl::OutputStream os (tp, tl::OutputStream::OM_Auto, false, 2);
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
     EXPECT_EQ (tl::file_exists (tp), true);
-    os << "4\n";
+    os.put ("4\n");
   }
 
   EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
@@ -433,7 +456,7 @@ TEST(Backups)
     tl::OutputStream os (broken);
     EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
     EXPECT_EQ (tl::file_exists (tp), true);
-    os << "5!\n";
+    os.put ("5!\n");
     os.flush ();   //  raises the exception
     EXPECT_EQ (true, false);
   } catch (...) {
@@ -587,4 +610,17 @@ TEST(AbstractPathFunctions)
   tl::file_utils_force_windows ();
   EXPECT_EQ (tl::InputStream::as_file_path ("a\\b\\c"), "a\\b\\c");
   tl::file_utils_force_reset ();
+}
+
+TEST(MatchFormat)
+{
+  EXPECT_EQ (tl::match_filename_to_format ("abc.txt", "Text files (*.txt *.TXT)"), true);
+  EXPECT_EQ (tl::match_filename_to_format ("abc.txt", "Text files (*.txt)"), true);
+  EXPECT_EQ (tl::match_filename_to_format ("abc.txt", "Text files (*.TXT)"), false);
+  EXPECT_EQ (tl::match_filename_to_format (".txt", "Text files (*.txt *.TXT)"), true);
+  EXPECT_EQ (tl::match_filename_to_format ("/home/xyz/abc.txt", "Text files (*.txt *.TXT)"), true);
+  EXPECT_EQ (tl::match_filename_to_format ("txt", "Text files (*.txt *.TXT)"), false);
+  EXPECT_EQ (tl::match_filename_to_format ("abc.TXT", "Text files (*.txt *.TXT)"), true);
+  EXPECT_EQ (tl::match_filename_to_format ("abc.TEXT", "Text files (*.txt *.TXT)"), false);
+  EXPECT_EQ (tl::match_filename_to_format ("abc.TEXT", "Text files (*)"), true);
 }

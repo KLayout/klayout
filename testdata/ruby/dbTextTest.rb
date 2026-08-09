@@ -30,10 +30,12 @@ class DBText_TestClass < TestBase
 
     a = RBA::DText::new( "hallo", 10.0, -15.0 )
     assert_equal( RBA::DText::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::DText::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( a.to_s, "('hallo',r0 10,-15)" )
 
     a = RBA::DText::new( RBA::Text::new( "itext",  RBA::Trans::new( RBA::Trans::R270, RBA::Point::new( 100, -150 ))))
     assert_equal( RBA::DText::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::DText::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( a.to_s, "('itext',r270 100,-150)" )
 
     a = RBA::DText::new
@@ -124,6 +126,7 @@ class DBText_TestClass < TestBase
 
     a = RBA::Text::new( "hallo", 10, -15 )
     assert_equal( RBA::Text::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::Text::from_bytes(a.to_bytes).to_s, a.to_s )
     assert_equal( a.to_s, "('hallo',r0 10,-15)" )
 
     a = RBA::Text::new( RBA::DText::new( "dtext",  RBA::DTrans::new( RBA::DTrans::R270, RBA::DPoint::new( 100.0, -150.0 ))))
@@ -136,6 +139,7 @@ class DBText_TestClass < TestBase
     a = RBA::Text::new( "hallo", RBA::Trans::new( RBA::Trans::R90, RBA::Point::new( 10, -15 )))
     assert_equal( a.to_s, "('hallo',r90 10,-15)" )
     assert_equal( RBA::Text::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( RBA::Text::from_bytes(a.to_bytes).to_s, a.to_s )
     c = a.dup 
 
     assert_equal( a == b, false )
@@ -260,16 +264,16 @@ class DBText_TestClass < TestBase
     assert_equal(s.to_s, "('',r0 0,0) props={}")
 
     s = RBA::TextWithProperties::new(RBA::Text::new("text", RBA::Trans::R90), { 1 => "one" })
-    assert_equal(s.to_s, "('text',r90 0,0) props={1=>one}")
+    assert_equal(s.to_s, "('text',r90 0,0) props={#1=>'one'}")
 
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::TextWithProperties::new(RBA::Text::new("text", RBA::Trans::R90), pid)
-    assert_equal(s.to_s, "('text',r90 0,0) props={1=>one}")
-    assert_equal((RBA::CplxTrans::new(0.001) * s).to_s, "('text',r90 0,0) props={1=>one}")
+    assert_equal(s.to_s, "('text',r90 0,0) props={#1=>'one'}")
+    assert_equal((RBA::CplxTrans::new(0.001) * s).to_s, "('text',r90 0,0) props={#1=>'one'}")
     assert_equal(s.property(1), "one")
     assert_equal(s.properties, { 1 => "one" })
     s.set_property(1, "xxx")
-    assert_equal(s.to_s, "('text',r90 0,0) props={1=>xxx}")
+    assert_equal(s.to_s, "('text',r90 0,0) props={#1=>'xxx'}")
     s.delete_property(1)
     assert_equal(s.to_s, "('text',r90 0,0) props={}")
     assert_equal(s.property(1), nil)
@@ -278,16 +282,16 @@ class DBText_TestClass < TestBase
     assert_equal(s.to_s, "('',r0 0,0) props={}")
 
     s = RBA::DTextWithProperties::new(RBA::DText::new("text", RBA::Trans::R90), { 1 => "one" })
-    assert_equal(s.to_s, "('text',r90 0,0) props={1=>one}")
+    assert_equal(s.to_s, "('text',r90 0,0) props={#1=>'one'}")
 
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::DTextWithProperties::new(RBA::DText::new("text", RBA::Trans::R90), pid)
-    assert_equal(s.to_s, "('text',r90 0,0) props={1=>one}")
-    assert_equal((RBA::VCplxTrans::new(2.5) * s).to_s, "('text',r90 0,0) props={1=>one}")
+    assert_equal(s.to_s, "('text',r90 0,0) props={#1=>'one'}")
+    assert_equal((RBA::VCplxTrans::new(2.5) * s).to_s, "('text',r90 0,0) props={#1=>'one'}")
     assert_equal(s.property(1), "one")
     assert_equal(s.properties, { 1 => "one" })
     s.set_property(1, "xxx")
-    assert_equal(s.to_s, "('text',r90 0,0) props={1=>xxx}")
+    assert_equal(s.to_s, "('text',r90 0,0) props={#1=>'xxx'}")
     s.delete_property(1)
     assert_equal(s.to_s, "('text',r90 0,0) props={}")
     assert_equal(s.property(1), nil)

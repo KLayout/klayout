@@ -630,9 +630,9 @@ static bool is_deep (const db::EdgePairs *ep)
   return dynamic_cast<const db::DeepEdgePairs *> (ep->delegate ()) != 0;
 }
 
-static size_t id (const db::EdgePairs *ep)
+static size_t data_id (const db::EdgePairs *ep)
 {
-  return tl::id_of (ep->delegate ());
+  return ep->delegate ()->data_id ();
 }
 
 static db::EdgePairs filtered (const db::EdgePairs *r, const gsi::EdgePairFilterBase *f)
@@ -1114,7 +1114,7 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "This method has been added in version 0.26."
   ) +
-  method_ext ("data_id", &id,
+  method_ext ("data_id", &data_id,
     "@brief Returns the data ID (a unique identifier for the underlying data storage)\n"
     "\n"
     "This method has been added in version 0.26."

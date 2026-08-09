@@ -7,6 +7,7 @@ TARGET = lay_tests
 include($$PWD/../../lib_ut.pri)
 
 SOURCES = \
+  layLibraryControllerTests.cc \
   laySalt.cc \
   layHelpIndexTest.cc \
   laySaltParsedURLTests.cc \

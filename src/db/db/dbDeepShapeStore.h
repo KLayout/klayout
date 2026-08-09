@@ -121,6 +121,11 @@ public:
   bool operator== (const DeepLayer &other) const;
 
   /**
+   *  @brief Swap two layers
+   */
+  void swap (DeepLayer &other);
+
+  /**
    *  @brief Gets the layout object
    *  The return value is guaranteed to be non-null.
    */
@@ -697,6 +702,27 @@ public:
   bool wants_all_cells () const;
 
   /**
+   *  @brief Sets the "sparse array" limit
+   *
+   *  Sparse arrays are instance arrays whose bounding box is no longer a
+   *  good approximation of the covered area. The "sparse array ratio" is
+   *  the area of the bounding box divided by the area of the bounding box
+   *  of a single instance.
+   *
+   *  Arrays above this limit will be resolved into single instances.
+   *
+   *  Setting this value to 0 will resolve all arrays. Setting this
+   *  value to a negative value will never split arrays. The latter
+   *  is the default.
+   */
+  void set_sparse_array_limit (double l);
+
+  /**
+   *  @brief Gets the "sparse array" limit
+   */
+  double sparse_array_limit () const;
+
+  /**
    *  @brief Sets a flag indicating whether to reject odd polygons
    *
    *  Some kind of "odd" (e.g. non-orientable) polygons may spoil the functionality
@@ -853,6 +879,7 @@ private:
   std::list<DeepShapeStoreState> m_state_stack;
   bool m_keep_layouts;
   bool m_wants_all_cells;
+  double m_sparse_array_limit;
   tl::Mutex m_lock;
 
   struct DeliveryMappingCacheKey

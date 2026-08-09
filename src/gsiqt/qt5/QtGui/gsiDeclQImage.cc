@@ -2246,7 +2246,7 @@ static void _call_cbs_initPainter_c1426_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QImage_Adaptor *)cls)->cbs_initPainter_c1426_0 (arg1);
 }
@@ -2270,7 +2270,7 @@ static void _call_cbs_metric_c3445_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & arg1 = args.read<const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & > (heap);
+  const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & >() (args, heap);
   ret.write<int > ((int)((QImage_Adaptor *)cls)->cbs_metric_c3445_0 (arg1));
 }
 
@@ -2355,7 +2355,7 @@ static void _call_cbs_redirected_c1225_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPoint *arg1 = args.read<QPoint * > (heap);
+  QPoint *arg1 = gsi::arg_reader<QPoint * >() (args, heap);
   ret.write<QPaintDevice * > ((QPaintDevice *)((QImage_Adaptor *)cls)->cbs_redirected_c1225_0 (arg1));
 }
 

@@ -164,7 +164,7 @@ module DRC
   
     def initialize
 
-      cv = RBA::CellView::active
+      cv = RBA.const_defined?(:CellView) && RBA::CellView::active
 
       @time = Time::now
       @force_gc = ($drc_force_gc == true)   # for testing, $drc_force_gc can be set to true
@@ -197,10 +197,11 @@ module DRC
       @total_timer = nil
       @drc_progress = nil
       
-      # initialize the defaults for max_area_ratio, max_vertex_count
+      # initialize the defaults for max_area_ratio, max_vertex_count, sparse_array_limit
       dss = RBA::DeepShapeStore::new
       @max_area_ratio = dss.max_area_ratio
       @max_vertex_count = dss.max_vertex_count
+      @sparse_array_limit = dss.sparse_array_limit
       @deep_reject_odd_polygons = dss.reject_odd_polygons
       dss._destroy
 
@@ -1310,6 +1311,43 @@ module DRC
     end
 
     # %DRC%
+    # @name sparse_array_limit
+    # @brief Gets or sets the sparse array singularization limit
+    # @synopsis sparse_array_limit(limit)
+    # @synopsis sparse_array_limit
+    #
+    # In deep mode, array instances with a bad ratio of overall bounding box area
+    # vs. actually covered area, induce a performance penalty, because their bounding
+    # box is not longer a good approximation for their footprint.
+    # The "sparse array limit" defines the ratio of array instance bounding box area
+    # vs. sum of bounding box areas of the individual instances, above which the array
+    # is resolved into single instances.
+    #
+    # Use this method without an argument to get the current value.
+    #
+    # By default, this feature is off (the sparse array limit value is negative). 
+    # If your design uses many arrays with a bad coverage, you can set the sparse
+    # array limit to a value of 10 for example.
+ 
+    def sparse_array_limit(sal = nil)
+      if sal
+        if @dss
+          raise("sparse_array_limit must be set before the first 'input' statement in deep mode")
+        end
+        if sal.is_a?(1.0.class) || sal.is_a?(1.class)
+          @sparse_array_limit = sal
+        else
+          raise("Argument is not numerical in sparse_array_limit")
+        end
+      end
+      @sparse_array_limit
+    end
+
+    def sparse_array_limit=(sal)
+      self.sparse_array_limit(sal)
+    end
+
+    # %DRC%
     # @name max_area_ratio
     # @brief Gets or sets the maximum bounding box to polygon area ratio for deep mode fragmentation
     # @synopsis max_area_ratio(ratio)
@@ -1444,7 +1482,7 @@ module DRC
           
             if arg =~ /^@(\d+)/
               n = $1.to_i - 1
-              view = RBA::LayoutView::current
+              view = RBA.const_defined?(:LayoutView) && RBA::LayoutView::current
               view || raise("No view open")
               (n >= 0 && view.cellviews > n) || raise("Invalid layout index @#{n + 1}")
               cv = view.cellview(n)
@@ -1543,7 +1581,7 @@ module DRC
           
             if arg =~ /^@(\d+)/
               n = $1.to_i - 1
-              view = RBA::LayoutView::current
+              view = RBA.const_defined?(:LayoutView) && RBA::LayoutView::current
               view || raise("No view open")
               (n >= 0 && view.cellviews > n) || raise("Invalid layout index @#{n + 1}")
               cv = view.cellview(n)
@@ -1608,7 +1646,7 @@ module DRC
       self._context("report") do
 
         # finish what we got so far
-        view = RBA::LayoutView::current
+        view = RBA.const_defined?(:LayoutView) && RBA::LayoutView::current
         @def_output && @def_output.finish(false, view)
 
         @def_output = nil
@@ -2925,7 +2963,7 @@ CODE
     def _start(job_description)
     
       # clearing the selection avoids some nasty problems
-      view = RBA::LayoutView::current
+      view = RBA.const_defined?(:LayoutView) && RBA::LayoutView::current
       view && view.cancel
       
       @total_timer = RBA::Timer::new
@@ -2950,7 +2988,7 @@ CODE
 
         _flush    
 
-        view = RBA::LayoutView::current
+        view = RBA.const_defined?(:LayoutView) && RBA::LayoutView::current
 
         @def_output && @def_output.finish(final, view)
 
@@ -3305,6 +3343,7 @@ CODE
           @dss.reject_odd_polygons = @deep_reject_odd_polygons
           @dss.max_vertex_count = @max_vertex_count
           @dss.max_area_ratio = @max_area_ratio
+          @dss.sparse_array_limit = @sparse_array_limit
 
           r = cls.new(iter, @dss, RBA::ICplxTrans::new(sf.to_f))
 
@@ -3484,7 +3523,7 @@ CODE
       
       output_rdb_index = nil
 
-      view = RBA::LayoutView::current
+      view = RBA.const_defined?(:LayoutView) && RBA::LayoutView::current
       if view
         if self._rdb_index
           output_rdb = RBA::ReportDatabase::new("")   # reuse existing name
@@ -3518,7 +3557,7 @@ CODE
       
         if arg =~ /^@(\d+|\+)/
 
-          view = RBA::LayoutView::current
+          view = RBA.const_defined?(:LayoutView) && RBA::LayoutView::current
           view || raise("No view open")
           if $1 == "+"
             prev_cv = view.active_cellview_index

@@ -298,7 +298,7 @@ Bitmap::fill_pattern (int y, int x, const uint32_t *pp, unsigned int stride, uns
         uint32_t p = *pp;
 
         int x1 = x + s * 32;
-        if (x1 <= -32 || x1 >= m_width) {
+        if (x1 <= -32 || x1 >= (int)m_width) {
           continue;
         } else if (x1 < 0) {
           p >>= (unsigned int)-x1;

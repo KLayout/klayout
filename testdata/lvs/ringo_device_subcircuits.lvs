@@ -120,6 +120,7 @@ same_device_classes("PMOS", $change_case ? "xpMos" : "XPMOS")
 
 # Compare section
 
+netlist.make_top_level_pins(false)
 netlist.simplify
 
 compare

@@ -305,12 +305,12 @@ klayout_main (int &argc, char **argv)
 
   for (int i = 1; i < argc; ++i) {
 
-    if (argv [i] == std::string ("-v")) {
+    if (argv [i] == std::string ("-v") || argv [i] == std::string ("--version")) {
 
       tl::info << lay::ApplicationBase::version ();
       return 0;
 
-    } else if (argv [i] == std::string ("-h")) {
+    } else if (argv [i] == std::string ("-h") || argv [i] == std::string ("--help")) {
 
       tl::info << lay::ApplicationBase::usage () << tl::noendl;
       return 0;

@@ -134,6 +134,16 @@ if "PCellDeclarationHelper" in pya.__dict__:
       self.width = self.shape.box.width() * self.layout.dbu
       self.height = self.shape.box.height() * self.layout.dbu
       
+  # A PCell with a parameter named "name"
+  class PCellWithNameParameter(pya.PCellDeclarationHelper):
+
+    def __init__(self):
+      super(PCellWithNameParameter, self).__init__()
+      self.param("name", self.TypeString, "Name", default = "")
+
+    def produce_impl(self):
+      self.cell.shapes(self.layout.layer(1, 0)).insert(pya.Text(self.name, pya.Trans()))
+
   class PCellTestLib2(pya.Library):
 
     def __init__(self):  
@@ -143,6 +153,7 @@ if "PCellDeclarationHelper" in pya.__dict__:
       
       # create the PCell declarations
       self.layout().register_pcell("Box2", BoxPCell2())
+      self.layout().register_pcell("PCellWithNameParameter", PCellWithNameParameter())
 
       # register us with the name "PCellTestLib2"
       self.register("PCellTestLib2")
@@ -587,6 +598,22 @@ class DBPCellTests(unittest.TestCase):
 
     self.assertEqual(c2.display_title(), "PCellTestLib3.RecursivePCell(L=1/0,E=(0,0;20,0),LVL=4")
     self.assertEqual(str(c1.dbbox()), "(0,0;20,5.774)")
+
+  # PCell with "name" parameter
+  def test_15(self):
+
+    # instantiate and register the library
+    tl = PCellTestLib2()
+
+    lib = pya.Library.library_by_name("PCellTestLib2")
+    pcell_decl_id = lib.layout().pcell_id("PCellWithNameParameter")
+
+    param = { "name": "xyz" }
+    pcell_var_id = lib.layout().add_pcell_variant(pcell_decl_id, param)
+
+    self.assertEqual(lib.layout().cell(pcell_var_id).name, "PCellWithNameParameter")
+    self.assertEqual(lib.layout().begin_shapes(pcell_var_id, lib.layout().layer(1, 0)).shape().to_s(), "text ('xyz',r0 0,0)")
+
 
 # run unit tests
 if __name__ == '__main__':

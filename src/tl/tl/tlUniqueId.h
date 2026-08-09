@@ -75,6 +75,17 @@ inline id_type id_of (const UniqueId *o)
   return o ? o->m_id : 0;
 }
 
+/**
+ *  @brief A sorting operator of pointers by ID
+ */
+struct sort_by_id
+{
+  bool operator () (const UniqueId *a, const UniqueId *b) const
+  {
+    return id_of (a) < id_of (b);
+  }
+};
+
 } // namespace tl
 
 #endif

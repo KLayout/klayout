@@ -34,7 +34,7 @@ class shape_as_user_object
   : public db::DUserObjectBase
 {
 public:
-  shape_as_user_object<Sh> (const Sh &sh)
+  shape_as_user_object (const Sh &sh)
     : m_shape (sh)
   { }
 

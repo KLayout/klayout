@@ -848,6 +848,12 @@ LayerSelectionComboBox::is_no_layer_selected () const
   return currentIndex () < 0;
 }
 
+int
+LayerSelectionComboBox::cv_index () const
+{
+  return mp_private->cv_index;
+}
+
 int 
 LayerSelectionComboBox::current_layer () const
 {

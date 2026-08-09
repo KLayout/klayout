@@ -89,6 +89,11 @@ class GDS2TextFormatDeclaration
   {
     return true;
   }
+
+  virtual bool supports_context () const
+  {
+    return true;
+  }
 };
 
 static tl::RegisteredClass<db::StreamFormatDeclaration> format_txt_decl (new GDS2TextFormatDeclaration(), 1, "GDS2Text");

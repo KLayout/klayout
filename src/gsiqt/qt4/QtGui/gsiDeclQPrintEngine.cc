@@ -326,7 +326,7 @@ static void _call_cbs_metric_c3445_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & arg1 = args.read<const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & > (heap);
+  const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & >() (args, heap);
   ret.write<int > ((int)((QPrintEngine_Adaptor *)cls)->cbs_metric_c3445_0 (arg1));
 }
 
@@ -387,7 +387,7 @@ static void _call_cbs_property_c4045_0 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPrintEngine::PrintEnginePropertyKey>::target_type & arg1 = args.read<const qt_gsi::Converter<QPrintEngine::PrintEnginePropertyKey>::target_type & > (heap);
+  const qt_gsi::Converter<QPrintEngine::PrintEnginePropertyKey>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPrintEngine::PrintEnginePropertyKey>::target_type & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QPrintEngine_Adaptor *)cls)->cbs_property_c4045_0 (arg1));
 }
 
@@ -412,8 +412,8 @@ static void _call_cbs_setProperty_6056_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPrintEngine::PrintEnginePropertyKey>::target_type & arg1 = args.read<const qt_gsi::Converter<QPrintEngine::PrintEnginePropertyKey>::target_type & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const qt_gsi::Converter<QPrintEngine::PrintEnginePropertyKey>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPrintEngine::PrintEnginePropertyKey>::target_type & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrintEngine_Adaptor *)cls)->cbs_setProperty_6056_0 (arg1, arg2);
 }

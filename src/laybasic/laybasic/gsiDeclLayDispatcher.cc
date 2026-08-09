@@ -71,12 +71,17 @@ Class<lay::Dispatcher> decl_Dispatcher ("lay", "Dispatcher",
     "\n"
     "@return The instance\n"
   ) +
-  method ("write_config", &lay::Dispatcher::write_config, gsi::arg ("file_name"),
+  method ("write_config", &lay::Dispatcher::write_config, gsi::arg ("file_name"), gsi::arg ("keep_backups", 0),
     "@brief Writes configuration to a file\n"
     "@return A value indicating whether the operation was successful\n"
     "\n"
     "If the configuration file cannot be written, false \n"
     "is returned but no exception is thrown.\n"
+    "\n"
+    "@param file_name The path to write the config file to.\n"
+    "@param keep_backups The number of backups to keep (0 for 'no backups').\n"
+    "\n"
+    "The 'keep_backups' option was introduced in version 0.30.7.\n"
   ) +
   method ("read_config", &lay::Dispatcher::read_config, gsi::arg ("file_name"),
     "@brief Reads the configuration from a file\n"
@@ -100,6 +105,9 @@ Class<lay::Dispatcher> decl_Dispatcher ("lay", "Dispatcher",
     "\n"
     "@param name The name of the configuration parameter to set\n"
     "@param value The value to which to set the configuration parameter\n"
+    "\n"
+    "The configuration parameter name needs to be a valid XML element name. Otherwise, a corrupt "
+    "configuration file will be produced.\n"
     "\n"
     "This method sets a configuration parameter with the given name to the given value. "
     "Values can only be strings. Numerical values have to be converted into strings first. "

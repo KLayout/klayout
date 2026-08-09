@@ -144,9 +144,9 @@ static void _call_cbs_nativeEventFilter_6949_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  void *arg2 = args.read<void * > (heap);
-  QIntegerForSizeof<void *>::Signed *arg3 = args.read<QIntegerForSizeof<void *>::Signed * > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  void *arg2 = gsi::arg_reader<void * >() (args, heap);
+  QIntegerForSizeof<void *>::Signed *arg3 = gsi::arg_reader<QIntegerForSizeof<void *>::Signed * >() (args, heap);
   ret.write<bool > ((bool)((QAbstractNativeEventFilter_Adaptor *)cls)->cbs_nativeEventFilter_6949_0 (arg1, arg2, arg3));
 }
 

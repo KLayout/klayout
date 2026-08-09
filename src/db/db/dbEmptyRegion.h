@@ -46,9 +46,11 @@ public:
 
   virtual RegionIteratorDelegate *begin () const { return 0; }
   virtual RegionIteratorDelegate *begin_merged () const { return 0; }
+  virtual RegionIteratorDelegate *begin_unmerged () const { return 0; }
 
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const { return std::make_pair (db::RecursiveShapeIterator (), db::ICplxTrans ()); }
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_merged_iter () const { return std::make_pair (db::RecursiveShapeIterator (), db::ICplxTrans ()); }
+  virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_unmerged_iter () const { return std::make_pair (db::RecursiveShapeIterator (), db::ICplxTrans ()); }
 
   virtual bool empty () const { return true; }
   virtual size_t count () const { return 0; }
@@ -108,6 +110,8 @@ public:
   virtual RegionDelegate *or_with (const Region &other, db::PropertyConstraint prop_constraint) const;
   virtual RegionDelegate *add_in_place (const Region &other);
   virtual RegionDelegate *add (const Region &other) const;
+
+  virtual RegionDelegate *peel (double /*complexity_factor*/) const { return new EmptyRegion (); }
 
   virtual RegionDelegate *selected_outside (const Region &) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_not_outside (const Region &) const { return new EmptyRegion (); }

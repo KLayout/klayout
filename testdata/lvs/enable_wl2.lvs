@@ -28,6 +28,7 @@ connect(contact, metal1_not_res)
 connect(metal1_not_res, metal1_lbl)
 
 align
+netlist.make_top_level_pins(false)
 netlist.simplify
 compare
 

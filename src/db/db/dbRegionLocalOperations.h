@@ -194,7 +194,7 @@ protected:
   bool m_other_is_merged;
   db::RegionCheckOptions m_options;
 
-  void compute_results (db::Layout *layout, db::Cell *subject_cell, const std::vector<const TS *> &subjects, const std::set<const TI *> &intruders, std::unordered_set<db::EdgePair> &result, std::unordered_set<db::EdgePair> &intra_polygon_result, const LocalProcessorBase *proc) const;
+  void compute_results (db::Layout *layout, db::Cell *subject_cell, const std::vector<const TS *> &subjects, const std::set<const TI *> &primary_intruders, const std::set<const TI *> &intruders, std::unordered_set<db::EdgePair> &result, std::unordered_set<db::EdgePair> &intra_polygon_result, const LocalProcessorBase *proc) const;
   void apply_opposite_filter (const std::vector<const TS *> &subjects, std::unordered_set<db::EdgePair> &result, std::unordered_set<db::EdgePair> &intra_polygon_result) const;
   void apply_rectangle_filter (const std::vector<const TS *> &subjects, std::unordered_set<db::EdgePair> &result) const;
 };
@@ -207,6 +207,7 @@ public:
   check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool is_merged, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options);
 
   virtual db::Coord dist () const;
+  virtual std::map<unsigned int, db::Coord> override_distance () const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual bool requests_single_subjects () const { return true; }
   virtual std::string description () const;

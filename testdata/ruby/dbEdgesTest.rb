@@ -970,7 +970,7 @@ class DBEdges_TestClass < TestBase
 
     r = RBA::Edges::new([ RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 100), { 1 => "one" }) ])
     assert_equal(r.to_s, "(0,0;100,100){1=>one}")
-    assert_equal(r[0].to_s, "(0,0;100,100) props={1=>one}")
+    assert_equal(r[0].to_s, "(0,0;100,100) props={#1=>'one'}")
 
     r = RBA::Edges::new([])
     assert_equal(r.to_s, "")
@@ -1040,15 +1040,15 @@ class DBEdges_TestClass < TestBase
     r.insert(RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 0), { 1 => "one" }))
     r.insert(RBA::Edge::new(10, 0, 110, 0))
     s = r.each.collect(&:to_s).join(";")
-    assert_equal(s, "(10,0;110,0) props={};(0,0;100,0) props={1=>one}")
+    assert_equal(s, "(10,0;110,0) props={};(0,0;100,0) props={#1=>'one'}")
     s = r.each_merged.collect(&:to_s).join(";")
-    assert_equal(s, "(10,0;110,0) props={};(0,0;100,0) props={1=>one}")
+    assert_equal(s, "(10,0;110,0) props={};(0,0;100,0) props={#1=>'one'}")
 
     r = RBA::Edges::new
     r.insert(RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 0), { 1 => "one" }))
     r.insert(RBA::EdgeWithProperties::new(RBA::Edge::new(10, 0, 110, 0), { 1 => "one" }))
     s = r.each_merged.collect(&:to_s).join(";")
-    assert_equal(s, "(0,0;110,0) props={1=>one}")
+    assert_equal(s, "(0,0;110,0) props={#1=>'one'}")
 
   end
 

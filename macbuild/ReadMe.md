@@ -1,16 +1,17 @@
-Relevant KLayout version: 0.30.5<br>
+Relevant KLayout version: 0.30.9<br>
 Author: Kazzz-S<br>
-Last modified: 2025-11-10<br>
+Last modified: 2026-07-26<br>
 
 # 1. Introduction
-This directory **`macbuild`** contains various files required for building KLayout (http://www.klayout.de/) version 0.30.5 or later for different 64-bit macOS, including:
+This directory **`macbuild`** contains various files required for building KLayout (http://www.klayout.de/) version 0.30.9 or later for different 64-bit macOS, including:
+* Golden Gate (27.x)    : really experimental (on M4 Mac Mini)
 * Tahoe       (26.x)    : really experimental (on M4 Mac Mini)
 * Sequoia     (15.x)    : the primary development environment
 * Sonoma      (14.x)    : experimental
 
 Building KLayout for the previous operating systems listed below has been discontinued.<br>
 Pre-built DMG packages are also not provided.<br>
-As of today (November 2025), Homebrew classifies macOS Catalina 10.15 - Ventura 13 as Tier 3.
+As of November 2025, Homebrew classifies macOS Catalina 10.15 - Ventura 13 as Tier 3.
 * Ventura     (13.7.8; the build would still be possible)
 * Monterey    (12.7.6; the build would still be possible)
 * Big Sur     (11.7.10)
@@ -47,7 +48,7 @@ Then, follow the instructions in Section 6F.
 
 The migration work to "Qt6" is ongoing. You can try to use it; however, you might encounter some build or runtime errors.<br>
 If you use **Homebrew** to build KLayout >= 0.29.0, you need "Qt6" to address [the compilation issue](https://github.com/KLayout/klayout/issues/1599).<br>
-I have also tried migrating to "Python 3.13.x" (earlier, Python 3.12.x) in this version.
+I have also tried migrating to "Python 3.14.x" (earlier, Python 3.13.x) in this version.
 
 # 3. Script language support: Ruby and Python
 
@@ -72,7 +73,7 @@ The operating system type is detected automatically.
 ```
 -----------------------------------------------------------------------------------------------------------
 << Usage of 'build4mac.py' >>
-       for building KLayout 0.30.5 or later on different Apple macOS platforms.
+       for building KLayout 0.30.9 or later on different Apple macOS platforms.
 
 $ [python] ./build4mac.py
    option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)  | default value
@@ -88,27 +89,27 @@ $ [python] ./build4mac.py
                         :                        (*) migration to Qt6 is ongoing           |
    [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP34', 'HB34', 'Ana3']     | sys
                         :    nil: don't bind Ruby                                          |
-                        :    Sys: use [Tahoe|Sequoia|Sonoma]-bundled Ruby 2.6              |
+                        :    Sys: use [GoldenGate|Tahoe|Sequoia|Sonoma]-bundled Ruby 2.6   |
                         :   MP34: use Ruby 3.4 from MacPorts                               |
                         :   HB34: use Ruby 3.4 from Homebrew                               |
                         :   Ana3: use Ruby 3.4 from Anaconda3                              |
-   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP313', 'HB313', 'Ana3',   | sys
-                        :                        'MP312', 'MP312',                         |
-                        :                        'MP311', 'HB311', 'HBAuto']               |
+   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP314', 'HB314', 'Ana3',   | sys
+                        :                        'MP314', 'HB314',                         |
+                        :                        'HB311', 'HBAuto']                        |
                         :    nil: don't bind Python                                        |
-                        :    Sys: use [Tahoe|Sequoia|Sonoma]-bundled Python 3.9            |
-                        :  MP313: use Python 3.13 from MacPorts                            |
-                        :  HB313: use Python 3.13 from Homebrew                            |
-                        :   Ana3: use Python 3.13 from Anaconda3                           |
-                        :  MP312: use Python 3.12 from MacPorts                            |
-                        :  HB312: use Python 3.12 from Homebrew                            |
-                        :  MP311: use Python 3.11 from MacPorts                            |
+                        :    Sys: use [GoldenGate|Tahoe|Sequoia|Sonoma]-bundled Python 3.9 |
+                        :  MP314: use Python 3.14 from MacPorts                            |
+                        :  HB314: use Python 3.14 from Homebrew                            |
+                        :   Ana3: use Python 3.14 from Anaconda3                           |
+                        :  MP314: use Python 3.14 from MacPorts                            |
+                        :  HB314: use Python 3.14 from Homebrew                            |
                         :  HB311: use Python 3.11 from Homebrew (+)                        |
                         :               (+) required to provide the legacy pip in HW-*.dmg |
                         : HBAuto: use the latest Python 3.x auto-detected from Homebrew    |
    [-P|--buildPymod]    : build and deploy Pymod (*.whl) for LW-*.dmg                      | disabled
    [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                        | disabled
    [-u|--noqtuitools]   : don't include uitools in Qt binding                              | disabled
+   [-s|--no32bitcoord]  : don't use short (32bit) coordinates; use long (64bit) instead    | disabled
    [-g|--nolibgit2]     : don't include libgit2 for Git package support                    | disabled
    [-m|--make <option>] : option passed to 'make'                                          | '--jobs=4'
    [-d|--debug]         : enable debug mode build; AddressSanitizer (ASAN) is linked       | disabled
@@ -160,27 +161,28 @@ $ ./build4mac.py -q qt5macports -r sys -p sys
 $ ./build4mac.py -q qt5macports -r sys -p sys -y
 ```
   The application bundle **`klayout.app`** is located under:<br>
-  **`ST-qt5MP.pkg.macos-Sequoia-release-RsysPsys`** directory, where
+  **`ST-qt5MP.pkg.macos-Sequoia-C32-release-RsysPsys`** directory, where
 * "ST-"        means this is a standard package.
 * "qt5MP"      means that Qt5 from MacPorts is used.
+* "C32"        means that the coordinate representation is a 32-bit integer (C64, for 64-bit).
 * "RsysPsys"   means that Ruby is 2.6 provided by OS; Python is 3.9 provided by OS.
 4. Copy/move the generated application bundle **`klayout.app`** to your **`/Applications`** directory for installation.
 
-### 6B. Fully MacPorts-flavored build with MacPorts Ruby 3.4 and MacPorts Python 3.13
-0. Install MacPorts, then install Qt5, Ruby 3.4, Python 3.13, and libgit2 by
+### 6B. Fully MacPorts-flavored build with MacPorts Ruby 3.4 and MacPorts Python 3.14
+0. Install MacPorts, then install Qt5, Ruby 3.4, Python 3.14, and libgit2 by
 ```
 $ sudo port install coreutils
 $ sudo port install findutils
 $ sudo port install qt5
 $ sudo port install ruby34
-$ sudo port install python313
-$ sudo port install py313-pip
+$ sudo port install python314
+$ sudo port install py314-pip
 $ sudo port install libgit2
 ```
 1. Invoke **`build4mac.py`** with the following options:
 ```
 $ cd /where/'build.sh'/exists
-$ ./build4mac.py -q qt5macports -r mp34 -p mp313
+$ ./build4mac.py -q qt5macports -r mp34 -p mp314
 ```
 2. Confirm successful build (it will take about one hour, depending on your machine spec).
 3. Rerun **`build4mac.py`** with the same options used in 1. PLUS "-Y" to deploy executables and libraries under **`klayout.app`** bundle.<br>
@@ -188,50 +190,52 @@ $ ./build4mac.py -q qt5macports -r mp34 -p mp313
    If you use `--buildPymod` option in Step-1 and Step-3, the KLayout Standalone Python Package (\*.whl) will be built and deployed under **klayout.app/Contents/pymod-dist/**.
 
 ```
-$ ./build4mac.py -q qt5macports -r mp34 -p mp313 -Y
+$ ./build4mac.py -q qt5macports -r mp34 -p mp314 -Y
 ```
   The application bundle **`klayout.app`** is located under:<br>
-  **`LW-qt5MP.pkg.macos-Sequoia-release-Rmp34Pmp313`** directory, where
+  **`LW-qt5MP.pkg.macos-Sequoia-C32-release-Rmp34Pmp314`** directory, where
 * "LW-"        means this is a lightweight package.
 * "qt5MP"      means that Qt5 from MacPorts is used.
-* "Rmp34Pmp313" means that Ruby is 3.4 from MacPorts; Python is 3.13 from MacPorts.
+* "C32"        means that the coordinate representation is a 32-bit integer (C64, for 64-bit).
+* "Rmp34Pmp314" means that Ruby is 3.4 from MacPorts; Python is 3.14 from MacPorts.
 4. Copy/move the generated application bundle **`klayout.app`** to your **`/Applications`** directory for installation.
 
-### 6C. Fully Homebrew-flavored build with Homebrew Ruby 3.4 and Homebrew Python 3.13
+### 6C. Fully Homebrew-flavored build with Homebrew Ruby 3.4 and Homebrew Python 3.14
 > [!IMPORTANT]
 > To build KLayout >= 0.29.0, you need "Qt6" >= 6.7.0 to address [the compilation issue](https://github.com/KLayout/klayout/issues/1599).<br>
 
-0. Install Homebrew, then install Qt6, Ruby 3.4, Python 3.13, and libgit2 by
+0. Install Homebrew, then install Qt6, Ruby 3.4, Python 3.14, and libgit2 by
 ```
 $ brew install qt@6
 $ brew install ruby@3.4
-$ brew install python@3.13
+$ brew install python@3.14
 $ brew install libgit2
 $ cd /where/'build.sh'/exists
 $ cd macbuild
-$ ./python3HB.py -v 3.13
+$ ./python3HB.py -v 3.14
 ```
 1. Invoke **`build4mac.py`** with the following options:
 ```
 $ cd /where/'build.sh'/exists
-$ ./build4mac.py -q qt6brew -r hb34 -p hb313
+$ ./build4mac.py -q qt6brew -r hb34 -p hb314
 ```
 2. Confirm successful build (it will take about one hour, depending on your machine spec).
 3. Rerun **`build4mac.py`** with the same options used in 1. PLUS "-Y" to deploy executables and libraries under **`klayout.app`** bundle.<br>
    The buddy command-line tools (strm*) will also be deployed under **klayout.app/Contents/Buddy/** in this step.<br>
 
 ```
-$ ./build4mac.py -q qt6brew -r hb34 -p hb313 -Y
+$ ./build4mac.py -q qt6brew -r hb34 -p hb314 -Y
 ```
   The application bundle **`klayout.app`** is located under:<br>
-  **`LW-qt6Brew.pkg.macos-Sequoia-release-Rhb34Phb313`** directory, where
+  **`LW-qt6Brew.pkg.macos-Sequoia-C32-release-Rhb34Phb314`** directory, where
 * "LW-"        means this is a lightweight package.
 * "qt6Brew"    means that Qt6 from Homebrew is used.
-* "Rhb34Phb313" means that Ruby is 3.4 from Homebrew; Python is 3.13 from Homebrew.
+* "C32"        means that the coordinate representation is a 32-bit integer (C64, for 64-bit).
+* "Rhb34Phb314" means that Ruby is 3.4 from Homebrew; Python is 3.14 from Homebrew.
 4. Copy/move the generated application bundle **`klayout.app`** to your **`/Applications`** directory for installation.
 
 > [!WARNING]
-> We can no longer use the legacy **pip** command with Homebew Python@3.13, and we will get,
+> We can no longer use the legacy **pip** command with Homebew Python@3.12-, and we will get,
 > ```
 > error: externally-managed-environment
 > ```
@@ -264,9 +268,10 @@ $ ./build4mac.py -q qt6brew -r sys -p hb311
 $ ./build4mac.py -q qt6brew -r sys -p hb311 -y
 ```
   The application bundle **`klayout.app`** is located under:<br>
-  **`HW-qt6Brew.pkg.macos-Sequoia-release-RsysPhb311`** directory, where
+  **`HW-qt6Brew.pkg.macos-Sequoia-C32-release-RsysPhb311`** directory, where
 * "HW-"        means this is a heavyweight package because both Qt6 and Python Frameworks are deployed.
 * "qt6Brew"    means that Qt6 from Homebrew is used.
+* "C32"        means that the coordinate representation is a 32-bit integer (C64, for 64-bit).
 * "RsysPhb311"  means that Ruby is OS-bundled; Python is 3.11 from Homebrew.
 4. Copy/move the generated application bundle **`klayout.app`** to your **`/Applications`** directory for installation.
 > [!IMPORTANT]
@@ -306,9 +311,10 @@ $ ./build4mac.py -q qt5macports -r sys -p hb311
 $ ./build4mac.py -q qt5macports -r sys -p hb311 -y
 ```
   The application bundle **`klayout.app`** is located under:<br>
-  **`HW-qt5MP.pkg.macos-Sequoia-release-RsysPhb311`** directory, where
+  **`HW-qt5MP.pkg.macos-Sequoia-C32-release-RsysPhb311`** directory, where
 * "HW-"        means this is a heavyweight package because both Qt5 and Python Frameworks are deployed.
 * "qt5MP"      means that Qt5 from MacPorts is used.
+* "C32"        means that the coordinate representation is a 32-bit integer (C64, for 64-bit).
 * "RsysPhb311" means that Ruby is OS-bundled; Python is 3.11 from Homebrew.
 4. Copy/move the generated application bundle **`klayout.app`** to your **`/Applications`** directory for installation.
 
@@ -355,9 +361,10 @@ $ ./build4mac.py -q qt6ana3 -r ana3 -p ana3
 $ ./build4mac.py -q qt6ana3 -r ana3 -p ana3 -Y
 ```
   The application bundle **`klayout.app`** is located under:<br>
-  **`LW-qt6Ana3.pkg.macos-Sequoia-release-Rana3Pana3`** directory, where
+  **`LW-qt6Ana3.pkg.macos-Sequoia-C32-release-Rana3Pana3`** directory, where
 * "LW-"        means this is a lightweight package.
 * "qt6Ana3"    means that Qt6 from Anaconda3 is used.
+* "C32"        means that the coordinate representation is a 32-bit integer (C64, for 64-bit).
 * "Rana3Pana3" means that Ruby (3.4) is from Anaconda3; Python (3.13) is from Anaconda3.
 4. Copy/move the generated application bundle **`klayout.app`** to your **`/Applications`** directory for installation.
 5. Now, you need to create an Automator wrapper app (Launcher) to start the application.
@@ -420,11 +427,11 @@ makeDMG4mac.py -> macbuild/makeDMG4mac.py
 2. Invoke **`makeDMG4mac.py`** with -p and -m options, for example,
 ```
 $ cd /where/'build.sh'/exists
-$ ./makeDMG4mac.py -p LW-qt5MP.pkg.macos-Sequoia-release-Rmp34Pmp313 -m
+$ ./makeDMG4mac.py -p LW-qt5MP.pkg.macos-Sequoia-C32-release-Rmp34Pmp314 -m
 ```
 This command will generate the two files below:<br>
-* **`LW-klayout-0.30.5-macOS-Sequoia-1-qt5MP-Rmp34Pmp313.dmg`**      ---(1) the main DMG file
-* **`LW-klayout-0.30.5-macOS-Sequoia-1-qt5MP-Rmp34Pmp313.dmg.md5`**  ---(2) MD5-value text file
+* **`LW-klayout-0.30.9-macOS-Sequoia-C32-1-qt5MP-Rmp34Pmp314.dmg`**      ---(1) the main DMG file
+* **`LW-klayout-0.30.9-macOS-Sequoia-C32-1-qt5MP-Rmp34Pmp314.dmg.md5`**  ---(2) MD5-value text file
 
 # Known issues
 Because we assume some specific versions of non-OS-standard Ruby and Python, updating Homebrew, MacPorts, or Anaconda3 may cause build- and link errors.<br>

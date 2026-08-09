@@ -197,6 +197,19 @@ Class<lay::ManagedDMarker> decl_Marker ("lay", "Marker",
     "@brief Gets the halo flag\n"
     "See \\halo= for a description of the halo flag."
   ) +
+  gsi::method ("text_frame_enabled=", (void (lay::ManagedDMarker::*) (bool)) &lay::ManagedDMarker::set_text_frame_enabled, gsi::arg ("enabled"),
+    "@brief Enables or disables the label frame\n"
+    "With the value set to true (the default), texts (labels) are drawn with a frame indicating the label dimension.\n"
+    "To turn off that frame, set this attribute to false.\n"
+    "\n"
+    "This attribute has been introduced in version 0.30.7."
+  ) +
+  gsi::method ("text_frame_enabled", (bool (lay::ManagedDMarker::*) () const) &lay::ManagedDMarker::is_text_frame_enabled,
+    "@brief Gets a value indicating whether label frames are enabled\n"
+    "See \\text_frame_enabled= for a description of this attribute."
+    "\n"
+    "This attribute has been introduced in version 0.30.7."
+  ) +
   gsi::method ("dither_pattern=", (void (lay::ManagedDMarker::*) (int)) &lay::ManagedDMarker::set_dither_pattern, gsi::arg ("index"),
     "@brief Sets the stipple pattern index\n"
     "A value of -1 or less than zero indicates that the marker is not filled. Otherwise, the "

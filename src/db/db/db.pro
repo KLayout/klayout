@@ -8,6 +8,7 @@ DEFINES += MAKE_DB_LIBRARY
 
 SOURCES = \
   dbArray.cc \
+  dbBinarySerialize.cc \
   dbBox.cc \
   dbBoxConvert.cc \
   dbBoxScanner.cc \
@@ -34,6 +35,7 @@ SOURCES = \
   dbEdgeProcessor.cc \
   dbEdges.cc \
   dbEdgesLocalOperations.cc \
+  dbFileBasedLibrary.cc \
   dbFillTool.cc \
   dbFuzzyCellMapping.cc \
   dbGenericShapeIterator.cc \
@@ -152,6 +154,7 @@ SOURCES = \
   gsiDeclDbRecursiveInstanceIterator.cc \
   gsiDeclDbRecursiveShapeIterator.cc \
   gsiDeclDbRegion.cc \
+  gsiDeclDbSaveLayoutOptions.cc \
   gsiDeclDbShape.cc \
   gsiDeclDbShapeProcessor.cc \
   gsiDeclDbShapes.cc \
@@ -246,6 +249,7 @@ SOURCES = \
 
 HEADERS = \
   dbArray.h \
+  dbBinarySerialize.h \
   dbBoxConvert.h \
   dbBox.h \
   dbBoxScanner.h \
@@ -274,6 +278,7 @@ HEADERS = \
   dbEdges.h \
   dbEdgesLocalOperations.h \
   dbEdgesToContours.h \
+  dbFileBasedLibrary.h \
   dbFillTool.h \
   dbFuzzyCellMapping.h \
   dbGenericShapeIterator.h \

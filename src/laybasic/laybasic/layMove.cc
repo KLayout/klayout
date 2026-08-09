@@ -118,7 +118,7 @@ MoveService::key_event (unsigned int key, unsigned int buttons)
   }
 
   if (buttons == 0 && (key == lay::KeyEnter || key == lay::KeyReturn)) {
-    end_move ();
+    finish_move ();
     return true;
   }
 
@@ -269,9 +269,12 @@ MoveService::mouse_double_click_event (const db::DPoint &p, unsigned int buttons
       handle_click (p, buttons, false, 0);
     }
 
-    lay::SelectionService *selector = mp_view->selection_service ();
-    if (selector) {
-      return selector->mouse_double_click_event (p, buttons, prio);
+    if (is_active ()) {
+      //  in move mode, a double click opens the properties dialog
+      lay::SelectionService *selector = mp_view->selection_service ();
+      if (selector) {
+        return selector->mouse_double_click_event (p, buttons, prio);
+      }
     }
 
   }
@@ -375,7 +378,7 @@ MoveService::start_move (db::Transaction *transaction, bool transient_selection)
 }
 
 void
-MoveService::end_move ()
+MoveService::finish_move ()
 {
   if (m_dragging) {
     handle_click (m_mouse_pos, 0, false, 0);
@@ -434,9 +437,12 @@ MoveService::drag_cancel ()
 {
   m_shift = db::DPoint ();
   if (m_dragging) {
+
     show_toolbox (false);
     ui ()->ungrab_mouse (this);
+
     m_dragging = false;
+
   }
 }
 
@@ -476,11 +482,15 @@ public:
     return new MoveService (view);
   }
 
-  virtual std::vector<std::string> additional_editor_options_pages () const
+  virtual std::vector<std::string> additional_editor_options_pages (lay::LayoutViewBase *view) const
   {
     std::vector<std::string> names;
-    //  TODO: provide in a central place instead of borrowing from the edt module
-    names.push_back ("GenericEditorOptions");
+    if (view->is_editable ()) {
+      //  TODO: provide in a central place instead of borrowing from the edt module
+      names.push_back ("GenericEditorOptions");
+    }
+    //  TODO: provide in a central place instead of borrowing from the ant module
+    names.push_back ("ant::RulerOptions");
     return names;
   }
 };

@@ -97,6 +97,34 @@ TEST(2)
     tl::InputStream stream (output);
     db::Reader reader (stream);
     reader.read (layout);
+    EXPECT_EQ (reader.format (), "GDS2");
+  }
+
+  db::compare_layouts (this, layout, au, db::NoNormalization);
+}
+
+//  with explicit output format
+TEST(3)
+{
+  std::string input = tl::testdata ();
+  input += "/bd/strm2clip_in.gds";
+
+  std::string au = tl::testdata ();
+  au += "/bd/strm2clip_au2.gds";
+
+  std::string output = this->tmp_file () + "[oas]";
+
+  const char *argv[] = { "x", input.c_str (), output.c_str (), "-r=0,-2,9,5", "-t", "INV2", "-x=CLIP_OUT" };
+
+  EXPECT_EQ (strmclip (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+    EXPECT_EQ (reader.format (), "OASIS");
   }
 
   db::compare_layouts (this, layout, au, db::NoNormalization);

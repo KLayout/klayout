@@ -75,7 +75,12 @@ class DB_PUBLIC ShapeCollectionDelegateBase
   : public tl::UniqueId
 {
 public:
-  ShapeCollectionDelegateBase () { }
+  ShapeCollectionDelegateBase ()
+    : m_data_id (tl::id_of (this))
+  {
+    //  .. nothing yet ..
+  }
+
   virtual ~ShapeCollectionDelegateBase () { }
 
   virtual DeepShapeCollectionDelegateBase *deep () { return 0; }
@@ -87,6 +92,22 @@ public:
     if (remove) {
       apply_property_translator (db::PropertiesTranslator::make_remove_all ());
     }
+  }
+
+  tl::id_type data_id () const
+  {
+    return m_data_id;
+  }
+
+private:
+  friend class ShapeCollection;
+
+  tl::id_type m_data_id;
+
+  //  used for conversion to deep
+  void set_data_id (tl::id_type data_id)
+  {
+    m_data_id = data_id;
   }
 };
 
@@ -103,6 +124,11 @@ public:
   virtual ShapeCollectionDelegateBase *get_delegate () const = 0;
 
   /**
+   *  @brief Converts the shape collection to a deep one using the specified layer
+   */
+  virtual void convert_to_deep (const db::DeepLayer &layer) = 0;
+
+  /**
    *  @brief Applies a PropertyTranslator
    *
    *  This method will translate the property IDs according to the given property translator.
@@ -111,6 +137,14 @@ public:
    *  delivered by "properties_repository".
    */
   void apply_property_translator (const db::PropertiesTranslator &pt);
+
+protected:
+  template <class Delegate>
+  Delegate *copy_data_id (Delegate *dlg)
+  {
+    dlg->set_data_id (get_delegate ()->data_id ());
+    return dlg;
+  }
 };
 
 }

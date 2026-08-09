@@ -688,7 +688,7 @@ static void _call_cbs_childEvent_1701_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QChildEvent *arg1 = args.read<QChildEvent * > (heap);
+  QChildEvent *arg1 = gsi::arg_reader<QChildEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVariantAnimation_Adaptor *)cls)->cbs_childEvent_1701_0 (arg1);
 }
@@ -730,7 +730,7 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVariantAnimation_Adaptor *)cls)->cbs_customEvent_1217_0 (arg1);
 }
@@ -790,7 +790,7 @@ static void _call_cbs_disconnectNotify_2394_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVariantAnimation_Adaptor *)cls)->cbs_disconnectNotify_2394_0 (arg1);
 }
@@ -833,7 +833,7 @@ static void _call_cbs_event_1217_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QVariantAnimation_Adaptor *)cls)->cbs_event_1217_0 (arg1));
 }
 
@@ -858,8 +858,8 @@ static void _call_cbs_eventFilter_2411_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QEvent *arg2 = args.read<QEvent * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QVariantAnimation_Adaptor *)cls)->cbs_eventFilter_2411_0 (arg1, arg2));
 }
 
@@ -900,9 +900,9 @@ static void _call_cbs_interpolated_c5093_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVariant &arg1 = args.read<const QVariant & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
-  double arg3 = args.read<double > (heap);
+  const QVariant &arg1 = gsi::arg_reader<const QVariant & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
   ret.write<QVariant > ((QVariant)((QVariantAnimation_Adaptor *)cls)->cbs_interpolated_c5093_0 (arg1, arg2, arg3));
 }
 
@@ -1028,7 +1028,7 @@ static void _call_cbs_timerEvent_1730_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTimerEvent *arg1 = args.read<QTimerEvent * > (heap);
+  QTimerEvent *arg1 = gsi::arg_reader<QTimerEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVariantAnimation_Adaptor *)cls)->cbs_timerEvent_1730_0 (arg1);
 }
@@ -1052,7 +1052,7 @@ static void _call_cbs_updateCurrentTime_767_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVariantAnimation_Adaptor *)cls)->cbs_updateCurrentTime_767_0 (arg1);
 }
@@ -1076,7 +1076,7 @@ static void _call_cbs_updateCurrentValue_2119_0 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVariant &arg1 = args.read<const QVariant & > (heap);
+  const QVariant &arg1 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVariantAnimation_Adaptor *)cls)->cbs_updateCurrentValue_2119_0 (arg1);
 }
@@ -1100,7 +1100,7 @@ static void _call_cbs_updateDirection_3310_0 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAbstractAnimation::Direction>::target_type & arg1 = args.read<const qt_gsi::Converter<QAbstractAnimation::Direction>::target_type & > (heap);
+  const qt_gsi::Converter<QAbstractAnimation::Direction>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAbstractAnimation::Direction>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVariantAnimation_Adaptor *)cls)->cbs_updateDirection_3310_0 (arg1);
 }
@@ -1126,8 +1126,8 @@ static void _call_cbs_updateState_5680_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAbstractAnimation::State>::target_type & arg1 = args.read<const qt_gsi::Converter<QAbstractAnimation::State>::target_type & > (heap);
-  const qt_gsi::Converter<QAbstractAnimation::State>::target_type & arg2 = args.read<const qt_gsi::Converter<QAbstractAnimation::State>::target_type & > (heap);
+  const qt_gsi::Converter<QAbstractAnimation::State>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAbstractAnimation::State>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QAbstractAnimation::State>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QAbstractAnimation::State>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVariantAnimation_Adaptor *)cls)->cbs_updateState_5680_0 (arg1, arg2);
 }

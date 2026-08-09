@@ -94,6 +94,7 @@
 #include "laySettingsForm.h"
 #include "laySelectCellViewForm.h"
 #include "layTechnologyController.h"
+#include "layLibraryController.h"
 #include "laySaltController.h"
 #include "layTipDialog.h"
 #include "layMacroController.h"
@@ -164,7 +165,6 @@ show_dock_widget (QDockWidget *dock_widget, bool visible)
 
 MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
     : QMainWindow (0),
-      tl::Object (),
       lay::DispatcherDelegate (),
       m_dispatcher (this),
       m_text_progress (this, 10 /*verbosity threshold*/),
@@ -274,6 +274,34 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   connect (action, SIGNAL (triggered ()), this, SLOT (clone ()));
   mp_tab_bar->addAction (action);
 
+  mp_view_stack = new ViewWidgetStack (mp_main_frame);
+  mp_view_stack->setObjectName (QString::fromUtf8 ("view_stack"));
+  vbl->addWidget (mp_view_stack);
+
+  mp_navigator_dock_widget = new QDockWidget (QObject::tr ("Navigator"), this);
+  mp_navigator_dock_widget->setObjectName (QString::fromUtf8 ("navigator_dock_widget"));
+  mp_navigator = new Navigator (this);
+  mp_navigator_dock_widget->setWidget (mp_navigator);
+  mp_navigator_dock_widget->setFocusProxy (mp_navigator);
+  connect (mp_navigator_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
+  m_navigator_visible = true;
+
+  mp_lp_dock_widget = new QDockWidget (QObject::tr ("Layers"), this);
+  mp_lp_dock_widget->setObjectName (QString::fromUtf8 ("lp_dock_widget"));
+  mp_lp_stack = new ControlWidgetStack (mp_lp_dock_widget, "lp_stack");
+  mp_lp_dock_widget->setWidget (mp_lp_stack);
+  mp_lp_dock_widget->setFocusProxy (mp_lp_stack);
+  connect (mp_lp_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
+  m_lp_visible = true;
+
+  mp_layer_toolbox_dock_widget = new QDockWidget (QObject::tr ("Layer Toolbox"), this);
+  mp_layer_toolbox_dock_widget->setObjectName (QString::fromUtf8 ("lt_dock_widget"));
+  mp_layer_toolbox_stack = new ControlWidgetStack (mp_layer_toolbox_dock_widget, "layer_toolbox_stack", true);
+  mp_layer_toolbox_dock_widget->setWidget (mp_layer_toolbox_stack);
+  mp_layer_toolbox_dock_widget->setFocusProxy (mp_layer_toolbox_stack);
+  connect (mp_layer_toolbox_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
+  m_layer_toolbox_visible = true;
+
   mp_hp_dock_widget = new QDockWidget (QObject::tr ("Cells"), this);
   mp_hp_dock_widget->setObjectName (QString::fromUtf8 ("hp_dock_widget"));
   mp_hp_stack = new ControlWidgetStack (mp_hp_dock_widget, "hp_stack");
@@ -290,15 +318,6 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   connect (mp_libs_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
   m_libs_visible = true;
 
-  mp_eo_dock_widget = new QDockWidget (QObject::tr ("Editor Options"), this);
-  mp_eo_dock_widget->setObjectName (QString::fromUtf8 ("eo_dock_widget"));
-  mp_eo_dock_widget->setMinimumHeight (150);
-  mp_eo_stack = new ControlWidgetStack (mp_eo_dock_widget, "eo_stack");
-  mp_eo_dock_widget->setWidget (mp_eo_stack);
-  mp_eo_dock_widget->setFocusProxy (mp_eo_stack);
-  connect (mp_eo_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
-  m_eo_visible = true;
-
   mp_bm_dock_widget = new QDockWidget (QObject::tr ("Bookmarks"), this);
   mp_bm_dock_widget->setObjectName (QString::fromUtf8 ("bookmarks_dock_widget"));
   mp_bm_stack = new ControlWidgetStack (mp_bm_dock_widget, "bookmarks_stack");
@@ -307,33 +326,14 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   connect (mp_bm_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
   m_bm_visible = true;
 
-  mp_view_stack = new ViewWidgetStack (mp_main_frame);
-  mp_view_stack->setObjectName (QString::fromUtf8 ("view_stack"));
-  vbl->addWidget (mp_view_stack);
-
-  mp_layer_toolbox_dock_widget = new QDockWidget (QObject::tr ("Layer Toolbox"), this);
-  mp_layer_toolbox_dock_widget->setObjectName (QString::fromUtf8 ("lt_dock_widget"));
-  mp_layer_toolbox_stack = new ControlWidgetStack (mp_layer_toolbox_dock_widget, "layer_toolbox_stack", true);
-  mp_layer_toolbox_dock_widget->setWidget (mp_layer_toolbox_stack);
-  mp_layer_toolbox_dock_widget->setFocusProxy (mp_layer_toolbox_stack);
-  connect (mp_layer_toolbox_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
-  m_layer_toolbox_visible = true;
-
-  mp_lp_dock_widget = new QDockWidget (QObject::tr ("Layers"), this);
-  mp_lp_dock_widget->setObjectName (QString::fromUtf8 ("lp_dock_widget"));
-  mp_lp_stack = new ControlWidgetStack (mp_lp_dock_widget, "lp_stack");
-  mp_lp_dock_widget->setWidget (mp_lp_stack);
-  mp_lp_dock_widget->setFocusProxy (mp_lp_stack);
-  connect (mp_lp_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
-  m_lp_visible = true;
-
-  mp_navigator_dock_widget = new QDockWidget (QObject::tr ("Navigator"), this);
-  mp_navigator_dock_widget->setObjectName (QString::fromUtf8 ("navigator_dock_widget"));
-  mp_navigator = new Navigator (this);
-  mp_navigator_dock_widget->setWidget (mp_navigator);
-  mp_navigator_dock_widget->setFocusProxy (mp_navigator);
-  connect (mp_navigator_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
-  m_navigator_visible = true;
+  mp_eo_dock_widget = new QDockWidget (QObject::tr ("Tool Options"), this);
+  mp_eo_dock_widget->setObjectName (QString::fromUtf8 ("eo_dock_widget"));
+  mp_eo_dock_widget->setMinimumHeight (150);
+  mp_eo_stack = new ControlWidgetStack (mp_eo_dock_widget, "eo_stack");
+  mp_eo_dock_widget->setWidget (mp_eo_stack);
+  mp_eo_dock_widget->setFocusProxy (mp_eo_stack);
+  connect (mp_eo_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
+  m_eo_visible = true;
 
   //  Add dock widgets
 #if QT_VERSION >= 0x040500
@@ -567,7 +567,7 @@ MainWindow::technology_changed ()
 }
 
 void
-MainWindow::dock_widget_visibility_changed (bool visible)
+MainWindow::dock_widget_visibility_changed (bool /*visible*/)
 {
   if (sender () == mp_lp_dock_widget) {
     dispatcher ()->config_set (cfg_show_layer_panel, tl::to_string (!mp_lp_dock_widget->isHidden ()));
@@ -582,7 +582,7 @@ MainWindow::dock_widget_visibility_changed (bool visible)
   } else if (sender () == mp_layer_toolbox_dock_widget) {
     dispatcher ()->config_set (cfg_show_layer_toolbox, tl::to_string (!mp_layer_toolbox_dock_widget->isHidden ()));
   } else if (sender () == mp_eo_dock_widget) {
-    m_eo_visible = visible;
+    dispatcher ()->config_set (cfg_show_tool_options, tl::to_string (!mp_eo_dock_widget->isHidden ()));
   }
 }
 
@@ -1133,6 +1133,17 @@ MainWindow::configure (const std::string &name, const std::string &value)
 
     return true;
 
+  } else if (name == cfg_show_tool_options) {
+
+    tl::from_string (value, m_eo_visible);
+    if (m_eo_visible) {
+      mp_eo_dock_widget->show ();
+    } else {
+      mp_eo_dock_widget->hide ();
+    }
+
+    return true;
+
   } else if (name == cfg_navigator_show_images) {
 
     bool flag = false;
@@ -1321,6 +1332,7 @@ MainWindow::read_dock_widget_state ()
   dispatcher ()->config_set (cfg_show_bookmarks_view, tl::to_string (!mp_bm_dock_widget->isHidden ()));
   dispatcher ()->config_set (cfg_show_navigator, tl::to_string (!mp_navigator_dock_widget->isHidden ()));
   dispatcher ()->config_set (cfg_show_layer_toolbox, tl::to_string (!mp_layer_toolbox_dock_widget->isHidden ()));
+  dispatcher ()->config_set (cfg_show_tool_options, tl::to_string (!mp_eo_dock_widget->isHidden ()));
 }
 
 void
@@ -1699,38 +1711,6 @@ MainWindow::select_mode (int m)
       }
     }
 
-    update_editor_options_dock ();
-
-  }
-}
-
-void
-MainWindow::update_editor_options_dock ()
-{
-  //  if the current mode supports editing, show the editor options panel
-
-  const lay::PluginDeclaration *pd_sel = 0;
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    const lay::PluginDeclaration *pd = cls.operator-> ();
-    if (pd->id () == m_mode) {
-      pd_sel = pd;
-    }
-  }
-
-  bool eo_visible = false;
-  if (mp_eo_stack && pd_sel) {
-    eo_visible = pd_sel->editable_enabled ();
-  }
-  if (current_view () && eo_visible) {
-    lay::EditorOptionsPageCollection *eo_pages = current_view ()->editor_options_pages ();
-    if (! eo_pages || ! eo_pages->has_content ()) {
-      eo_visible = false;
-    }
-  }
-
-  if (eo_visible != m_eo_visible) {
-    m_eo_visible = eo_visible;
-    show_dock_widget (mp_eo_dock_widget, m_eo_visible);
   }
 }
 
@@ -1988,6 +1968,18 @@ MainWindow::redraw ()
   if (current_view ()) {
     current_view ()->redraw ();
   }
+}
+
+void
+MainWindow::cm_grid_decrease ()
+{
+  change_grid (-1);
+}
+
+void
+MainWindow::cm_grid_increase ()
+{
+  change_grid (1);
 }
 
 void
@@ -2270,7 +2262,7 @@ MainWindow::cm_save_current_cell_as ()
 
           db::SaveLayoutOptions options (cv->save_options ());
           options.set_dbu (cv->layout ().dbu ());
-          options.set_format_from_filename (fn);
+          fn = options.set_format_from_filename (fn).second;
 
           tl::OutputStream::OutputStreamMode om = tl::OutputStream::OM_Auto;
           if (mp_layout_save_as_options->get_options (current_view (), cv_index, fn, om, options)) {
@@ -2370,7 +2362,7 @@ MainWindow::do_save (bool as)
           db::SaveLayoutOptions options = get_save_options_from_cv (cv);
 
           if (as || options.format ().empty ()) {
-            options.set_format_from_filename (fn);
+            fn = options.set_format_from_filename (fn).second;
           }
 
           tl::OutputStream::OutputStreamMode om = tl::OutputStream::OM_Auto;
@@ -2419,7 +2411,7 @@ MainWindow::cm_save_all ()
         db::SaveLayoutOptions options = get_save_options_from_cv (cv);
 
         if (options.format ().empty ()) {
-          options.set_format_from_filename (fn);
+          fn = options.set_format_from_filename (fn).second;
         }
 
         tl::OutputStream::OutputStreamMode om = tl::OutputStream::OM_Auto;
@@ -2499,7 +2491,6 @@ MainWindow::select_view (int index)
 
     current_view_changed ();
 
-    update_editor_options_dock ();
     clear_current_pos ();
     edits_enabled_changed ();
     clear_messages ();
@@ -2612,6 +2603,10 @@ MainWindow::cm_writer_options ()
 void
 MainWindow::cm_refresh ()
 {
+  if (lay::LibraryController::instance ()) {
+    lay::LibraryController::instance ()->sync_files (false);
+  }
+
   db::LibraryManager::instance ().refresh_all ();
 }
 
@@ -4058,6 +4053,10 @@ MainWindow::menu_activated (const std::string &symbol)
     cm_bookmark_view ();
   } else if (symbol == "cm_cancel") {
     cm_cancel ();
+  } else if (symbol == "cm_grid_decrease") {
+    cm_grid_decrease ();
+  } else if (symbol == "cm_grid_increase") {
+    cm_grid_increase ();
   } else if (symbol == "cm_save_layer_props") {
     cm_save_layer_props ();
   } else if (symbol == "cm_load_layer_props") {
@@ -4154,36 +4153,112 @@ MainWindow::menu_changed ()
   dm_do_update_menu ();
 }
 
-void
-MainWindow::do_update_grids ()
+std::vector<double>
+MainWindow::default_grids () const
 {
-  const std::vector<double> *grids = &m_default_grids;
-  double default_grid = m_default_grid;
-
-  std::vector<double> tech_grids;
   lay::TechnologyController *tc = lay::TechnologyController::instance ();
   if (tc && tc->active_technology ()) {
-    tech_grids = tc->active_technology ()->default_grid_list ();
+    std::vector<double> tech_grids = tc->active_technology ()->default_grid_list ();
     if (! tech_grids.empty ()) {
-      grids = &tech_grids;
-      default_grid = tc->active_technology ()->default_grid ();
+      return tech_grids;
     }
   }
 
-  if (default_grid > db::epsilon) {
-    for (auto g = grids->begin (); g != grids->end (); ++g) {
+  return m_default_grids;
+}
+
+double
+MainWindow::default_grid () const
+{
+  lay::TechnologyController *tc = lay::TechnologyController::instance ();
+  if (tc && tc->active_technology ()) {
+    auto tech_grids = tc->active_technology ()->default_grid_list ();
+    if (! tech_grids.empty ()) {
+      return tc->active_technology ()->default_grid ();
+    }
+  }
+
+  return m_default_grid;
+}
+
+void
+MainWindow::change_grid (int dir)
+{
+  std::vector<double> grids = default_grids ();
+  if (grids.empty ()) {
+    return;
+  }
+
+  std::sort (grids.begin (), grids.end ());
+
+  size_t i = 0;
+  for (std::vector<double>::const_iterator g = grids.begin (); g != grids.end (); ++g, ++i) {
+    if (db::coord_traits<db::DCoord>::equals (*g, m_grid_micron)) {
+      break;
+    }
+  }
+
+  if (i == grids.size ()) {
+    i = (dir > 0 ? grids.size () - 1 : 0);
+  } else {
+    if (dir > 0) {
+      if (i + 1 < grids.size ()) {
+        ++i;
+      }
+    } else if (dir < 0) {
+      if (i > 0) {
+        --i;
+      }
+    }
+  }
+
+  dispatcher ()->config_set (cfg_grid, grids [i]);
+}
+
+void
+MainWindow::do_update_grids ()
+{
+  std::vector<double> grids = default_grids ();
+  double def_grid = default_grid ();
+
+  if (def_grid > db::epsilon) {
+    for (auto g = grids.begin (); g != grids.end (); ++g) {
       if (db::coord_traits<db::DCoord>::equals (*g, m_grid_micron)) {
-        default_grid = 0.0;
+        def_grid = 0.0;
         break;
       }
     }
   }
 
-  if (default_grid > db::epsilon) {
-    dispatcher ()->config_set (cfg_grid, default_grid);
+  if (def_grid > db::epsilon) {
+    dispatcher ()->config_set (cfg_grid, def_grid);
   }
 
   do_update_menu ();
+}
+
+namespace {
+
+class GenericMenuAction
+  : public Action
+{
+public:
+  GenericMenuAction (lay::Dispatcher *dispatcher, const std::string &title, const std::string &symbol)
+    : Action (title), mp_dispatcher (dispatcher), m_symbol (symbol)
+  { }
+
+  void triggered ()
+  {
+    if (mp_dispatcher) {
+      mp_dispatcher->menu_activated (m_symbol);
+    }
+  }
+
+private:
+  Dispatcher *mp_dispatcher;
+  std::string m_symbol;
+};
+
 }
 
 void
@@ -4193,27 +4268,26 @@ MainWindow::do_update_menu ()
 
     m_default_grids_updated = false;
 
-    const std::vector<double> *grids = &m_default_grids;
-    std::vector<double> tech_grids;
-    lay::TechnologyController *tc = lay::TechnologyController::instance ();
-    if (tc && tc->active_technology ()) {
-      tech_grids = tc->active_technology ()->default_grid_list ();
-      if (! tech_grids.empty ()) {
-        grids = &tech_grids;
-      }
-    }
+    std::vector<double> grids = default_grids ();
+    double def_grid = default_grid ();
 
     std::vector<std::string> group = menu ()->group ("default_grids_group");
 
     for (std::vector<std::string>::const_iterator t = group.begin (); t != group.end (); ++t) {
+
       std::vector<std::string> items = menu ()->items (*t);
       for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
         menu ()->delete_item (*i);
       }
+
+      menu ()->insert_item (*t + ".end", "finer_grid", new GenericMenuAction (dispatcher (), tl::to_string (tr ("Finer Grid(G)")), "cm_grid_decrease"));
+      menu ()->insert_item (*t + ".end", "coarser_grid", new GenericMenuAction (dispatcher (), tl::to_string (tr ("Coarser Grid(Shift+G)")), "cm_grid_increase"));
+      menu ()->insert_separator (*t + ".end", "default_grids_group_separator");
+
     }
 
     int i = 1;
-    for (std::vector<double>::const_iterator g = grids->begin (); g != grids->end (); ++g, ++i) {
+    for (std::vector<double>::const_iterator g = grids.begin (); g != grids.end (); ++g, ++i) {
 
       std::string name = "default_grid_" + tl::to_string (i);
 
@@ -4223,6 +4297,10 @@ MainWindow::do_update_menu ()
         gs = tl::to_string (*g * 1000.0) + tl::to_string (QObject::tr (" nm"));
       } else {
         gs = tl::to_string (*g) + tl::to_string (QObject::tr (" um"));
+      }
+
+      if (def_grid > 0 && db::coord_traits<db::DCoord>::equals (*g, def_grid)) {
+        gs += tl::to_string (tr (" \\(default)"));
       }
 
       lay::Action *ga = new lay::ConfigureAction (gs, cfg_grid, tl::to_string (*g));
@@ -4498,7 +4576,6 @@ public:
 
     at = "edit_menu.end";
     menu_entries.push_back (lay::separator ("edit_options_group:edit_mode", "edit_menu.end"));
-    menu_entries.push_back (lay::menu_item ("cm_edit_options", "edit_options:edit_mode", "edit_menu.end", tl::to_string (QObject::tr ("Editor Options")) + "(F3)"));
 
     at = "file_menu.end";
     menu_entries.push_back (lay::menu_item ("cm_new_layout", "new_layout:edit:edit_mode", at, tl::to_string (QObject::tr ("New Layout"))));
@@ -4564,6 +4641,7 @@ public:
     menu_entries.push_back (lay::config_menu_item ("show_hierarchy_panel", at, tl::to_string (QObject::tr ("Cells")), cfg_show_hierarchy_panel, "?"));
     menu_entries.push_back (lay::config_menu_item ("show_libraries_view", at, tl::to_string (QObject::tr ("Libraries")), cfg_show_libraries_view, "?"));
     menu_entries.push_back (lay::config_menu_item ("show_bookmarks_view", at, tl::to_string (QObject::tr ("Bookmarks")), cfg_show_bookmarks_view, "?"));
+    menu_entries.push_back (lay::config_menu_item ("show_tool_options", at, tl::to_string (QObject::tr ("Tool Options(F3)")), cfg_show_tool_options, "?"));
     menu_entries.push_back (lay::menu_item ("cm_reset_window_state", "reset_window_state", at, tl::to_string (QObject::tr ("Restore Window")))),
     menu_entries.push_back (lay::separator ("selection_group", at));
     menu_entries.push_back (lay::config_menu_item ("transient_selection", at, tl::to_string (QObject::tr ("Highlight Object Under Mouse")), cfg_sel_transient_mode, "?"));

@@ -332,7 +332,9 @@ InstService::make_cell (const lay::CellView &cv)
 
   }
 
-  view ()->add_new_layers (layer_state);
+  if (view ()->auto_create_new_layers ()) {
+    view ()->add_new_layers (layer_state);
+  }
 
   m_has_valid_cell = true;
   m_current_cell = inst_cell_index;

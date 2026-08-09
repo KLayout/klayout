@@ -52,56 +52,56 @@ TEST(1_Circle)
   params["actual_radius"] = 10.0;
 
   db::cell_index_type lib_cell;
-  db::Cell *circle;
+  db::cell_index_type circle;
   std::vector<tl::Variant> plist;
 
   lib_cell = lib_basic->layout ().get_pcell_variant_dict (pc.second, params);
-  circle = &ly.cell (ly.get_lib_proxy (lib_basic, lib_cell));
+  circle = ly.get_lib_proxy (lib_basic, lib_cell);
 
   //  change radius explicitly
 
   //  has radius 10um
-  EXPECT_EQ (circle->bbox ().to_string (), "(-10000,-10000;10000,10000)");
-  EXPECT_EQ (circle->get_display_name (), "Basic.CIRCLE(l=1/0,r=10,n=64)");
+  EXPECT_EQ (ly.cell (circle).bbox ().to_string (), "(-10000,-10000;10000,10000)");
+  EXPECT_EQ (ly.cell (circle).get_display_name (), "Basic.CIRCLE(l=1/0,r=10,n=64)");
 
   //  only after Library::refresh the parameters get updated
-  EXPECT_EQ (ly.get_pcell_parameters (circle->cell_index ()) [p_radius].to_double (), 0.0);
+  EXPECT_EQ (ly.get_pcell_parameters (circle) [p_radius].to_double (), 0.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (circle->bbox ().to_string (), "(-10000,-10000;10000,10000)");
-  EXPECT_EQ (circle->get_display_name (), "Basic.CIRCLE(l=1/0,r=10,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (circle->cell_index ()) [p_radius].to_double (), 10.0);
-  EXPECT_EQ (ly.get_pcell_parameters (circle->cell_index ()) [p_actual_radius].to_double (), 10.0);
+  EXPECT_EQ (ly.cell (circle).bbox ().to_string (), "(-10000,-10000;10000,10000)");
+  EXPECT_EQ (ly.cell (circle).get_display_name (), "Basic.CIRCLE(l=1/0,r=10,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (circle) [p_radius].to_double (), 10.0);
+  EXPECT_EQ (ly.get_pcell_parameters (circle) [p_actual_radius].to_double (), 10.0);
 
   //  change radius explicitly
 
-  plist = ly.get_pcell_parameters (circle->cell_index ());
+  plist = ly.get_pcell_parameters (ly.cell (circle).cell_index ());
   plist[p_actual_radius] = 9.0;
-  circle = &ly.cell (ly.get_pcell_variant_cell (circle->cell_index (), plist));
+  circle = ly.get_pcell_variant_cell (circle, plist);
 
   //  as the radius is an input parameter, only after Library::refresh the other parameters get updated
-  EXPECT_EQ (ly.get_pcell_parameters (circle->cell_index ()) [p_radius].to_double (), 10.0);
+  EXPECT_EQ (ly.get_pcell_parameters (circle) [p_radius].to_double (), 10.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (circle->bbox ().to_string (), "(-9000,-9000;9000,9000)");
-  EXPECT_EQ (circle->get_display_name (), "Basic.CIRCLE(l=1/0,r=9,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (circle->cell_index ()) [p_radius].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (circle->cell_index ()) [p_actual_radius].to_double (), 9.0);
+  EXPECT_EQ (ly.cell (circle).bbox ().to_string (), "(-9000,-9000;9000,9000)");
+  EXPECT_EQ (ly.cell (circle).get_display_name (), "Basic.CIRCLE(l=1/0,r=9,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (circle) [p_radius].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (circle) [p_actual_radius].to_double (), 9.0);
 
   //  change handle explicitly
 
-  plist = ly.get_pcell_parameters (circle->cell_index ());
+  plist = ly.get_pcell_parameters (circle);
   plist[p_handle] = db::DPoint (0.0, 8.0);
-  circle = &ly.cell (ly.get_pcell_variant_cell (circle->cell_index (), plist));
+  circle = ly.get_pcell_variant_cell (circle, plist);
 
   //  as the handle is an input parameter, only after Library::refresh the other parameters get updated
-  EXPECT_EQ (ly.get_pcell_parameters (circle->cell_index ()) [p_actual_radius].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (circle) [p_actual_radius].to_double (), 9.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (circle->bbox ().to_string (), "(-8000,-8000;8000,8000)");
-  EXPECT_EQ (circle->get_display_name (), "Basic.CIRCLE(l=1/0,r=8,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (circle->cell_index ()) [p_radius].to_double (), 8.0);
-  EXPECT_EQ (ly.get_pcell_parameters (circle->cell_index ()) [p_actual_radius].to_double (), 8.0);
+  EXPECT_EQ (ly.cell (circle).bbox ().to_string (), "(-8000,-8000;8000,8000)");
+  EXPECT_EQ (ly.cell (circle).get_display_name (), "Basic.CIRCLE(l=1/0,r=8,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (circle) [p_radius].to_double (), 8.0);
+  EXPECT_EQ (ly.get_pcell_parameters (circle) [p_actual_radius].to_double (), 8.0);
 
   unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
 
@@ -145,145 +145,145 @@ TEST(2_Pie)
   params["actual_end_angle"] = 0.0;
 
   db::cell_index_type lib_cell;
-  db::Cell *pie;
+  db::cell_index_type pie;
   std::vector<tl::Variant> plist;
 
   lib_cell = lib_basic->layout ().get_pcell_variant_dict (pc.second, params);
-  pie = &ly.cell (ly.get_lib_proxy (lib_basic, lib_cell));
+  pie = ly.get_lib_proxy (lib_basic, lib_cell);
 
   //  change radius explicitly
 
   //  has radius 10um, but bbox isn't correct for now (because handle was not updated)
-  EXPECT_EQ (pie->bbox ().to_string (), "(-1000,-10000;10000,1000)");
-  EXPECT_EQ (pie->get_display_name (), "Basic.PIE(l=1/0,r=10,a=-90..0,n=64)");
+  EXPECT_EQ (ly.cell (pie).bbox ().to_string (), "(-1000,-10000;10000,1000)");
+  EXPECT_EQ (ly.cell (pie).get_display_name (), "Basic.PIE(l=1/0,r=10,a=-90..0,n=64)");
 
   //  only after Library::refresh the parameters get updated and bbox is correct
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_radius].to_double (), 0.0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_radius].to_double (), 0.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (pie->bbox ().to_string (), "(0,-10000;10000,0)");
-  EXPECT_EQ (pie->get_display_name (), "Basic.PIE(l=1/0,r=10,a=-90..0,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_radius].to_double (), 10.0);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_radius].to_double (), 10.0);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_start_angle].to_double (), -90);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_start_angle].to_double (), -90);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_end_angle].to_double (), 0);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_end_angle].to_double (), 0);
+  EXPECT_EQ (ly.cell (pie).bbox ().to_string (), "(0,-10000;10000,0)");
+  EXPECT_EQ (ly.cell (pie).get_display_name (), "Basic.PIE(l=1/0,r=10,a=-90..0,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_radius].to_double (), 10.0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_radius].to_double (), 10.0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_start_angle].to_double (), -90);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_start_angle].to_double (), -90);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_end_angle].to_double (), 0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_end_angle].to_double (), 0);
 
   //  change radius explicitly
 
-  plist = ly.get_pcell_parameters (pie->cell_index ());
+  plist = ly.get_pcell_parameters (pie);
   plist[p_actual_radius] = 9.0;
-  pie = &ly.cell (ly.get_pcell_variant_cell (pie->cell_index (), plist));
+  pie = ly.get_pcell_variant_cell (pie, plist);
 
   //  as the radius is an input parameter, only after Library::refresh the other parameters get updated
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_radius].to_double (), 10.0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_radius].to_double (), 10.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (pie->bbox ().to_string (), "(0,-9000;9000,0)");
-  EXPECT_EQ (pie->get_display_name (), "Basic.PIE(l=1/0,r=9,a=-90..0,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_handle1].to_string (), "0,-9");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_handle2].to_string (), "9,0");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_handle1].to_string (), "0,-9");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_handle2].to_string (), "9,0");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_radius].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_radius].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_start_angle].to_double (), -90);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_start_angle].to_double (), -90);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_end_angle].to_double (), 0);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_end_angle].to_double (), 0);
+  EXPECT_EQ (ly.cell (pie).bbox ().to_string (), "(0,-9000;9000,0)");
+  EXPECT_EQ (ly.cell (pie).get_display_name (), "Basic.PIE(l=1/0,r=9,a=-90..0,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_handle1].to_string (), "0,-9");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_handle2].to_string (), "9,0");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_handle1].to_string (), "0,-9");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_handle2].to_string (), "9,0");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_radius].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_radius].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_start_angle].to_double (), -90);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_start_angle].to_double (), -90);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_end_angle].to_double (), 0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_end_angle].to_double (), 0);
 
   //  change end angle explicitly
 
-  plist = ly.get_pcell_parameters (pie->cell_index ());
+  plist = ly.get_pcell_parameters (pie);
   plist[p_actual_end_angle] = 90.0;
-  pie = &ly.cell (ly.get_pcell_variant_cell (pie->cell_index (), plist));
+  pie = ly.get_pcell_variant_cell (pie, plist);
 
   //  as the end angle is an input parameter, only after Library::refresh the other parameters get updated
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_end_angle].to_double (), 0.0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_end_angle].to_double (), 0.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (pie->bbox ().to_string (), "(0,-9000;9000,9000)");
-  EXPECT_EQ (pie->get_display_name (), "Basic.PIE(l=1/0,r=9,a=-90..90,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_handle1].to_string (), "0,-9");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_handle2].to_string (), "0,9");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_handle1].to_string (), "0,-9");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_handle2].to_string (), "0,9");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_radius].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_radius].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_start_angle].to_double (), -90);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_start_angle].to_double (), -90);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_end_angle].to_double (), 90);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_end_angle].to_double (), 90);
+  EXPECT_EQ (ly.cell (pie).bbox ().to_string (), "(0,-9000;9000,9000)");
+  EXPECT_EQ (ly.cell (pie).get_display_name (), "Basic.PIE(l=1/0,r=9,a=-90..90,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_handle1].to_string (), "0,-9");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_handle2].to_string (), "0,9");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_handle1].to_string (), "0,-9");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_handle2].to_string (), "0,9");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_radius].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_radius].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_start_angle].to_double (), -90);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_start_angle].to_double (), -90);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_end_angle].to_double (), 90);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_end_angle].to_double (), 90);
 
   //  change start angle explicitly
 
-  plist = ly.get_pcell_parameters (pie->cell_index ());
+  plist = ly.get_pcell_parameters (pie);
   plist[p_actual_start_angle] = 0.0;
-  pie = &ly.cell (ly.get_pcell_variant_cell (pie->cell_index (), plist));
+  pie = ly.get_pcell_variant_cell (pie, plist);
 
   //  as the end angle is an input parameter, only after Library::refresh the other parameters get updated
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_start_angle].to_double (), -90.0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_start_angle].to_double (), -90.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (pie->bbox ().to_string (), "(0,0;9000,9000)");
-  EXPECT_EQ (pie->get_display_name (), "Basic.PIE(l=1/0,r=9,a=0..90,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_handle1].to_string (), "9,0");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_handle2].to_string (), "0,9");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_handle1].to_string (), "9,0");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_handle2].to_string (), "0,9");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_radius].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_radius].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_start_angle].to_double (), 0);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_start_angle].to_double (), 0);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_end_angle].to_double (), 90);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_end_angle].to_double (), 90);
+  EXPECT_EQ (ly.cell (pie).bbox ().to_string (), "(0,0;9000,9000)");
+  EXPECT_EQ (ly.cell (pie).get_display_name (), "Basic.PIE(l=1/0,r=9,a=0..90,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_handle1].to_string (), "9,0");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_handle2].to_string (), "0,9");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_handle1].to_string (), "9,0");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_handle2].to_string (), "0,9");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_radius].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_radius].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_start_angle].to_double (), 0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_start_angle].to_double (), 0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_end_angle].to_double (), 90);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_end_angle].to_double (), 90);
 
   //  change handle1 explicitly
 
-  plist = ly.get_pcell_parameters (pie->cell_index ());
+  plist = ly.get_pcell_parameters (pie);
   plist[p_actual_handle1] = db::DPoint (0.0, -5.0);
-  pie = &ly.cell (ly.get_pcell_variant_cell (pie->cell_index (), plist));
+  pie = ly.get_pcell_variant_cell (pie, plist);
 
   //  as the handle is an input parameter, only after Library::refresh the other parameters get updated
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_start_angle].to_double (), 0.0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_start_angle].to_double (), 0.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (pie->bbox ().to_string (), "(0,-9000;9000,9000)");
-  EXPECT_EQ (pie->get_display_name (), "Basic.PIE(l=1/0,r=9,a=-90..90,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_handle1].to_string (), "0,-5");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_handle2].to_string (), "0,9");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_handle1].to_string (), "0,-5");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_handle2].to_string (), "0,9");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_start_angle].to_double (), -90.0);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_start_angle].to_double (), -90.0);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_end_angle].to_double (), 90);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_end_angle].to_double (), 90);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_radius].to_double (), 9);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_radius].to_double (), 9);
+  EXPECT_EQ (ly.cell (pie).bbox ().to_string (), "(0,-9000;9000,9000)");
+  EXPECT_EQ (ly.cell (pie).get_display_name (), "Basic.PIE(l=1/0,r=9,a=-90..90,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_handle1].to_string (), "0,-5");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_handle2].to_string (), "0,9");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_handle1].to_string (), "0,-5");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_handle2].to_string (), "0,9");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_start_angle].to_double (), -90.0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_start_angle].to_double (), -90.0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_end_angle].to_double (), 90);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_end_angle].to_double (), 90);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_radius].to_double (), 9);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_radius].to_double (), 9);
 
   //  change handle2 explicitly
 
-  plist = ly.get_pcell_parameters (pie->cell_index ());
+  plist = ly.get_pcell_parameters (pie);
   plist[p_actual_handle2] = db::DPoint (5.0, 0.0);
-  pie = &ly.cell (ly.get_pcell_variant_cell (pie->cell_index (), plist));
+  pie = ly.get_pcell_variant_cell (pie, plist);
 
   //  as the handle is an input parameter, only after Library::refresh the other parameters get updated
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_end_angle].to_double (), 90.0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_end_angle].to_double (), 90.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (pie->bbox ().to_string (), "(0,-5000;5000,0)");
-  EXPECT_EQ (pie->get_display_name (), "Basic.PIE(l=1/0,r=5,a=-90..0,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_handle1].to_string (), "0,-5");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_handle2].to_string (), "5,0");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_handle1].to_string (), "0,-5");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_handle2].to_string (), "5,0");
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_start_angle].to_double (), -90.0);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_start_angle].to_double (), -90.0);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_end_angle].to_double (), 0);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_end_angle].to_double (), 0);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_radius].to_double (), 5);
-  EXPECT_EQ (ly.get_pcell_parameters (pie->cell_index ()) [p_actual_radius].to_double (), 5);
+  EXPECT_EQ (ly.cell (pie).bbox ().to_string (), "(0,-5000;5000,0)");
+  EXPECT_EQ (ly.cell (pie).get_display_name (), "Basic.PIE(l=1/0,r=5,a=-90..0,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_handle1].to_string (), "0,-5");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_handle2].to_string (), "5,0");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_handle1].to_string (), "0,-5");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_handle2].to_string (), "5,0");
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_start_angle].to_double (), -90.0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_start_angle].to_double (), -90.0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_end_angle].to_double (), 0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_end_angle].to_double (), 0);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_radius].to_double (), 5);
+  EXPECT_EQ (ly.get_pcell_parameters (pie) [p_actual_radius].to_double (), 5);
 }
 
 TEST(3_Arc)
@@ -320,182 +320,182 @@ TEST(3_Arc)
   params["actual_end_angle"] = 0.0;
 
   db::cell_index_type lib_cell;
-  db::Cell *arc;
+  db::cell_index_type arc;
   std::vector<tl::Variant> plist;
 
   lib_cell = lib_basic->layout ().get_pcell_variant_dict (pc.second, params);
-  arc = &ly.cell (ly.get_lib_proxy (lib_basic, lib_cell));
+  arc = ly.get_lib_proxy (lib_basic, lib_cell);
 
   //  change radius explicitly
 
   //  has radius 10um, but bbox isn't correct for now (because handle was not updated)
-  EXPECT_EQ (arc->bbox ().to_string (), "(0,-10000;10000,1000)");
-  EXPECT_EQ (arc->get_display_name (), "Basic.ARC(l=1/0,r=4..10,a=-90..0,n=64)");
+  EXPECT_EQ (ly.cell (arc).bbox ().to_string (), "(0,-10000;10000,1000)");
+  EXPECT_EQ (ly.cell (arc).get_display_name (), "Basic.ARC(l=1/0,r=4..10,a=-90..0,n=64)");
 
   //  only after Library::refresh the parameters get updated and bbox is correct
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_radius1].to_double (), 0.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_radius1].to_double (), 0.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (arc->bbox ().to_string (), "(0,-10000;10000,0)");
-  EXPECT_EQ (arc->get_display_name (), "Basic.ARC(l=1/0,r=4..10,a=-90..0,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_radius1].to_double (), 4.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_radius1].to_double (), 4.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_radius2].to_double (), 10.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_radius2].to_double (), 10.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_start_angle].to_double (), -90);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_start_angle].to_double (), -90);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_end_angle].to_double (), 0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_end_angle].to_double (), 0);
+  EXPECT_EQ (ly.cell (arc).bbox ().to_string (), "(0,-10000;10000,0)");
+  EXPECT_EQ (ly.cell (arc).get_display_name (), "Basic.ARC(l=1/0,r=4..10,a=-90..0,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_radius1].to_double (), 4.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_radius1].to_double (), 4.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_radius2].to_double (), 10.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_radius2].to_double (), 10.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_start_angle].to_double (), -90);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_start_angle].to_double (), -90);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_end_angle].to_double (), 0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_end_angle].to_double (), 0);
 
   //  change radius2 explicitly
 
-  plist = ly.get_pcell_parameters (arc->cell_index ());
+  plist = ly.get_pcell_parameters (arc);
   plist[p_actual_radius2] = 9.0;
-  arc = &ly.cell (ly.get_pcell_variant_cell (arc->cell_index (), plist));
+  arc = ly.get_pcell_variant_cell (arc, plist);
 
   //  as the radius is an input parameter, only after Library::refresh the other parameters get updated
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_radius2].to_double (), 10.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_radius2].to_double (), 10.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (arc->bbox ().to_string (), "(0,-9000;9000,0)");
-  EXPECT_EQ (arc->get_display_name (), "Basic.ARC(l=1/0,r=4..9,a=-90..0,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_handle1].to_string (), "0,-4");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_handle2].to_string (), "9,0");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_handle1].to_string (), "0,-4");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_handle2].to_string (), "9,0");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_radius1].to_double (), 4.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_radius1].to_double (), 4.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_radius2].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_radius2].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_start_angle].to_double (), -90);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_start_angle].to_double (), -90);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_end_angle].to_double (), 0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_end_angle].to_double (), 0);
+  EXPECT_EQ (ly.cell (arc).bbox ().to_string (), "(0,-9000;9000,0)");
+  EXPECT_EQ (ly.cell (arc).get_display_name (), "Basic.ARC(l=1/0,r=4..9,a=-90..0,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_handle1].to_string (), "0,-4");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_handle2].to_string (), "9,0");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_handle1].to_string (), "0,-4");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_handle2].to_string (), "9,0");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_radius1].to_double (), 4.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_radius1].to_double (), 4.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_radius2].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_radius2].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_start_angle].to_double (), -90);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_start_angle].to_double (), -90);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_end_angle].to_double (), 0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_end_angle].to_double (), 0);
 
   //  change radius1 explicitly
 
-  plist = ly.get_pcell_parameters (arc->cell_index ());
+  plist = ly.get_pcell_parameters (arc);
   plist[p_actual_radius1] = 5.0;
-  arc = &ly.cell (ly.get_pcell_variant_cell (arc->cell_index (), plist));
+  arc = ly.get_pcell_variant_cell (arc, plist);
 
   //  as the radius is an input parameter, only after Library::refresh the other parameters get updated
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_radius1].to_double (), 4.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_radius1].to_double (), 4.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (arc->bbox ().to_string (), "(0,-9000;9000,0)");
-  EXPECT_EQ (arc->get_display_name (), "Basic.ARC(l=1/0,r=5..9,a=-90..0,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_handle1].to_string (), "0,-5");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_handle2].to_string (), "9,0");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_handle1].to_string (), "0,-5");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_handle2].to_string (), "9,0");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_radius1].to_double (), 5.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_radius1].to_double (), 5.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_radius2].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_radius2].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_start_angle].to_double (), -90);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_start_angle].to_double (), -90);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_end_angle].to_double (), 0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_end_angle].to_double (), 0);
+  EXPECT_EQ (ly.cell (arc).bbox ().to_string (), "(0,-9000;9000,0)");
+  EXPECT_EQ (ly.cell (arc).get_display_name (), "Basic.ARC(l=1/0,r=5..9,a=-90..0,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_handle1].to_string (), "0,-5");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_handle2].to_string (), "9,0");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_handle1].to_string (), "0,-5");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_handle2].to_string (), "9,0");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_radius1].to_double (), 5.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_radius1].to_double (), 5.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_radius2].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_radius2].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_start_angle].to_double (), -90);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_start_angle].to_double (), -90);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_end_angle].to_double (), 0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_end_angle].to_double (), 0);
 
   //  change end angle explicitly
 
-  plist = ly.get_pcell_parameters (arc->cell_index ());
+  plist = ly.get_pcell_parameters (arc);
   plist[p_actual_end_angle] = 90.0;
-  arc = &ly.cell (ly.get_pcell_variant_cell (arc->cell_index (), plist));
+  arc = ly.get_pcell_variant_cell (arc, plist);
 
   //  as the end angle is an input parameter, only after Library::refresh the other parameters get updated
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_end_angle].to_double (), 0.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_end_angle].to_double (), 0.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (arc->bbox ().to_string (), "(0,-9000;9000,9000)");
-  EXPECT_EQ (arc->get_display_name (), "Basic.ARC(l=1/0,r=5..9,a=-90..90,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_handle1].to_string (), "0,-5");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_handle2].to_string (), "0,9");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_handle1].to_string (), "0,-5");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_handle2].to_string (), "0,9");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_radius1].to_double (), 5.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_radius1].to_double (), 5.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_radius2].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_radius2].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_start_angle].to_double (), -90);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_start_angle].to_double (), -90);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_end_angle].to_double (), 90);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_end_angle].to_double (), 90);
+  EXPECT_EQ (ly.cell (arc).bbox ().to_string (), "(0,-9000;9000,9000)");
+  EXPECT_EQ (ly.cell (arc).get_display_name (), "Basic.ARC(l=1/0,r=5..9,a=-90..90,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_handle1].to_string (), "0,-5");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_handle2].to_string (), "0,9");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_handle1].to_string (), "0,-5");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_handle2].to_string (), "0,9");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_radius1].to_double (), 5.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_radius1].to_double (), 5.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_radius2].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_radius2].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_start_angle].to_double (), -90);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_start_angle].to_double (), -90);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_end_angle].to_double (), 90);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_end_angle].to_double (), 90);
 
   //  change start angle explicitly
 
-  plist = ly.get_pcell_parameters (arc->cell_index ());
+  plist = ly.get_pcell_parameters (arc);
   plist[p_actual_start_angle] = 0.0;
-  arc = &ly.cell (ly.get_pcell_variant_cell (arc->cell_index (), plist));
+  arc = ly.get_pcell_variant_cell (arc, plist);
 
   //  as the end angle is an input parameter, only after Library::refresh the other parameters get updated
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_start_angle].to_double (), -90.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_start_angle].to_double (), -90.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (arc->bbox ().to_string (), "(0,0;9000,9000)");
-  EXPECT_EQ (arc->get_display_name (), "Basic.ARC(l=1/0,r=5..9,a=0..90,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_handle1].to_string (), "5,0");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_handle2].to_string (), "0,9");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_handle1].to_string (), "5,0");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_handle2].to_string (), "0,9");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_radius1].to_double (), 5.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_radius1].to_double (), 5.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_radius2].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_radius2].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_start_angle].to_double (), 0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_start_angle].to_double (), 0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_end_angle].to_double (), 90);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_end_angle].to_double (), 90);
+  EXPECT_EQ (ly.cell (arc).bbox ().to_string (), "(0,0;9000,9000)");
+  EXPECT_EQ (ly.cell (arc).get_display_name (), "Basic.ARC(l=1/0,r=5..9,a=0..90,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_handle1].to_string (), "5,0");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_handle2].to_string (), "0,9");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_handle1].to_string (), "5,0");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_handle2].to_string (), "0,9");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_radius1].to_double (), 5.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_radius1].to_double (), 5.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_radius2].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_radius2].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_start_angle].to_double (), 0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_start_angle].to_double (), 0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_end_angle].to_double (), 90);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_end_angle].to_double (), 90);
 
   //  change handle1 explicitly
 
-  plist = ly.get_pcell_parameters (arc->cell_index ());
+  plist = ly.get_pcell_parameters (arc);
   plist[p_actual_handle1] = db::DPoint (0.0, -5.0);
-  arc = &ly.cell (ly.get_pcell_variant_cell (arc->cell_index (), plist));
+  arc = ly.get_pcell_variant_cell (arc, plist);
 
   //  as the handle is an input parameter, only after Library::refresh the other parameters get updated
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_start_angle].to_double (), 0.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_start_angle].to_double (), 0.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (arc->bbox ().to_string (), "(0,-9000;9000,9000)");
-  EXPECT_EQ (arc->get_display_name (), "Basic.ARC(l=1/0,r=5..9,a=-90..90,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_handle1].to_string (), "0,-5");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_handle2].to_string (), "0,9");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_handle1].to_string (), "0,-5");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_handle2].to_string (), "0,9");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_start_angle].to_double (), -90.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_start_angle].to_double (), -90.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_end_angle].to_double (), 90);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_end_angle].to_double (), 90);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_radius1].to_double (), 5);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_radius1].to_double (), 5);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_radius2].to_double (), 9);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_radius2].to_double (), 9);
+  EXPECT_EQ (ly.cell (arc).bbox ().to_string (), "(0,-9000;9000,9000)");
+  EXPECT_EQ (ly.cell (arc).get_display_name (), "Basic.ARC(l=1/0,r=5..9,a=-90..90,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_handle1].to_string (), "0,-5");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_handle2].to_string (), "0,9");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_handle1].to_string (), "0,-5");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_handle2].to_string (), "0,9");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_start_angle].to_double (), -90.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_start_angle].to_double (), -90.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_end_angle].to_double (), 90);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_end_angle].to_double (), 90);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_radius1].to_double (), 5);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_radius1].to_double (), 5);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_radius2].to_double (), 9);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_radius2].to_double (), 9);
 
   //  change handle2 explicitly
 
-  plist = ly.get_pcell_parameters (arc->cell_index ());
+  plist = ly.get_pcell_parameters (arc);
   plist[p_actual_handle2] = db::DPoint (9.0, 0.0);
-  arc = &ly.cell (ly.get_pcell_variant_cell (arc->cell_index (), plist));
+  arc = ly.get_pcell_variant_cell (arc, plist);
 
   //  as the handle is an input parameter, only after Library::refresh the other parameters get updated
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_end_angle].to_double (), 90.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_end_angle].to_double (), 90.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (arc->bbox ().to_string (), "(0,-9000;9000,0)");
-  EXPECT_EQ (arc->get_display_name (), "Basic.ARC(l=1/0,r=5..9,a=-90..0,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_handle1].to_string (), "0,-5");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_handle2].to_string (), "9,0");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_handle1].to_string (), "0,-5");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_handle2].to_string (), "9,0");
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_start_angle].to_double (), -90.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_start_angle].to_double (), -90.0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_end_angle].to_double (), 0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_end_angle].to_double (), 0);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_radius1].to_double (), 5);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_radius1].to_double (), 5);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_radius2].to_double (), 9);
-  EXPECT_EQ (ly.get_pcell_parameters (arc->cell_index ()) [p_actual_radius2].to_double (), 9);
+  EXPECT_EQ (ly.cell (arc).bbox ().to_string (), "(0,-9000;9000,0)");
+  EXPECT_EQ (ly.cell (arc).get_display_name (), "Basic.ARC(l=1/0,r=5..9,a=-90..0,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_handle1].to_string (), "0,-5");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_handle2].to_string (), "9,0");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_handle1].to_string (), "0,-5");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_handle2].to_string (), "9,0");
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_start_angle].to_double (), -90.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_start_angle].to_double (), -90.0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_end_angle].to_double (), 0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_end_angle].to_double (), 0);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_radius1].to_double (), 5);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_radius1].to_double (), 5);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_radius2].to_double (), 9);
+  EXPECT_EQ (ly.get_pcell_parameters (arc) [p_actual_radius2].to_double (), 9);
 }
 
 TEST(4_Donut)
@@ -526,98 +526,98 @@ TEST(4_Donut)
   params["actual_end_angle"] = 0.0;
 
   db::cell_index_type lib_cell;
-  db::Cell *donut;
+  db::cell_index_type donut;
   std::vector<tl::Variant> plist;
 
   lib_cell = lib_basic->layout ().get_pcell_variant_dict (pc.second, params);
-  donut = &ly.cell (ly.get_lib_proxy (lib_basic, lib_cell));
+  donut = ly.get_lib_proxy (lib_basic, lib_cell);
 
   //  change radius explicitly
 
   //  has radius 10um, but bbox isn't correct for now (because handle was not updated)
-  EXPECT_EQ (donut->bbox ().to_string (), "(-10000,-10000;10000,10000)");
-  EXPECT_EQ (donut->get_display_name (), "Basic.DONUT(l=1/0,r=4..10,n=64)");
+  EXPECT_EQ (ly.cell (donut).bbox ().to_string (), "(-10000,-10000;10000,10000)");
+  EXPECT_EQ (ly.cell (donut).get_display_name (), "Basic.DONUT(l=1/0,r=4..10,n=64)");
 
   //  only after Library::refresh the parameters get updated and bbox is correct
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_radius1].to_double (), 0.0);
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_radius1].to_double (), 0.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (donut->bbox ().to_string (), "(-10000,-10000;10000,10000)");
-  EXPECT_EQ (donut->get_display_name (), "Basic.DONUT(l=1/0,r=4..10,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_radius1].to_double (), 4.0);
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_actual_radius1].to_double (), 4.0);
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_radius2].to_double (), 10.0);
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_actual_radius2].to_double (), 10.0);
+  EXPECT_EQ (ly.cell (donut).bbox ().to_string (), "(-10000,-10000;10000,10000)");
+  EXPECT_EQ (ly.cell (donut).get_display_name (), "Basic.DONUT(l=1/0,r=4..10,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_radius1].to_double (), 4.0);
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_actual_radius1].to_double (), 4.0);
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_radius2].to_double (), 10.0);
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_actual_radius2].to_double (), 10.0);
 
   //  change radius2 explicitly
 
-  plist = ly.get_pcell_parameters (donut->cell_index ());
+  plist = ly.get_pcell_parameters (donut);
   plist[p_actual_radius2] = 9.0;
-  donut = &ly.cell (ly.get_pcell_variant_cell (donut->cell_index (), plist));
+  donut = ly.get_pcell_variant_cell (donut, plist);
 
   //  as the radius is an input parameter, only after Library::refresh the other parameters get updated
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_radius2].to_double (), 10.0);
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_radius2].to_double (), 10.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (donut->bbox ().to_string (), "(-9000,-9000;9000,9000)");
-  EXPECT_EQ (donut->get_display_name (), "Basic.DONUT(l=1/0,r=4..9,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_handle1].to_string (), "-4,0");
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_handle2].to_string (), "-9,0");
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_radius1].to_double (), 4.0);
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_actual_radius1].to_double (), 4.0);
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_radius2].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_actual_radius2].to_double (), 9.0);
+  EXPECT_EQ (ly.cell (donut).bbox ().to_string (), "(-9000,-9000;9000,9000)");
+  EXPECT_EQ (ly.cell (donut).get_display_name (), "Basic.DONUT(l=1/0,r=4..9,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_handle1].to_string (), "-4,0");
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_handle2].to_string (), "-9,0");
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_radius1].to_double (), 4.0);
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_actual_radius1].to_double (), 4.0);
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_radius2].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_actual_radius2].to_double (), 9.0);
 
   //  change radius1 explicitly
 
-  plist = ly.get_pcell_parameters (donut->cell_index ());
+  plist = ly.get_pcell_parameters (donut);
   plist[p_actual_radius1] = 5.0;
-  donut = &ly.cell (ly.get_pcell_variant_cell (donut->cell_index (), plist));
+  donut = ly.get_pcell_variant_cell (donut, plist);
 
   //  as the radius is an input parameter, only after Library::refresh the other parameters get updated
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_radius1].to_double (), 4.0);
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_radius1].to_double (), 4.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (donut->bbox ().to_string (), "(-9000,-9000;9000,9000)");
-  EXPECT_EQ (donut->get_display_name (), "Basic.DONUT(l=1/0,r=5..9,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_handle1].to_string (), "-5,0");
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_handle2].to_string (), "-9,0");
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_radius1].to_double (), 5.0);
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_actual_radius1].to_double (), 5.0);
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_radius2].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_actual_radius2].to_double (), 9.0);
+  EXPECT_EQ (ly.cell (donut).bbox ().to_string (), "(-9000,-9000;9000,9000)");
+  EXPECT_EQ (ly.cell (donut).get_display_name (), "Basic.DONUT(l=1/0,r=5..9,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_handle1].to_string (), "-5,0");
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_handle2].to_string (), "-9,0");
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_radius1].to_double (), 5.0);
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_actual_radius1].to_double (), 5.0);
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_radius2].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_actual_radius2].to_double (), 9.0);
 
   //  change handle1 explicitly
 
-  plist = ly.get_pcell_parameters (donut->cell_index ());
+  plist = ly.get_pcell_parameters (donut);
   plist[p_handle1] = db::DPoint (0.0, -5.0);
-  donut = &ly.cell (ly.get_pcell_variant_cell (donut->cell_index (), plist));
+  donut = ly.get_pcell_variant_cell (donut, plist);
 
   lib_basic->refresh ();
-  EXPECT_EQ (donut->bbox ().to_string (), "(-9000,-9000;9000,9000)");
-  EXPECT_EQ (donut->get_display_name (), "Basic.DONUT(l=1/0,r=5..9,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_handle1].to_string (), "0,-5");
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_handle2].to_string (), "-9,0");
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_radius1].to_double (), 5);
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_actual_radius1].to_double (), 5);
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_radius2].to_double (), 9);
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_actual_radius2].to_double (), 9);
+  EXPECT_EQ (ly.cell (donut).bbox ().to_string (), "(-9000,-9000;9000,9000)");
+  EXPECT_EQ (ly.cell (donut).get_display_name (), "Basic.DONUT(l=1/0,r=5..9,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_handle1].to_string (), "0,-5");
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_handle2].to_string (), "-9,0");
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_radius1].to_double (), 5);
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_actual_radius1].to_double (), 5);
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_radius2].to_double (), 9);
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_actual_radius2].to_double (), 9);
 
   //  change handle2 explicitly
 
-  plist = ly.get_pcell_parameters (donut->cell_index ());
+  plist = ly.get_pcell_parameters (donut);
   plist[p_handle2] = db::DPoint (9.0, 0.0);
-  donut = &ly.cell (ly.get_pcell_variant_cell (donut->cell_index (), plist));
+  donut = ly.get_pcell_variant_cell (donut, plist);
 
   lib_basic->refresh ();
-  EXPECT_EQ (donut->bbox ().to_string (), "(-9000,-9000;9000,9000)");
-  EXPECT_EQ (donut->get_display_name (), "Basic.DONUT(l=1/0,r=5..9,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_handle1].to_string (), "0,-5");
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_handle2].to_string (), "9,0");
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_radius1].to_double (), 5);
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_actual_radius1].to_double (), 5);
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_radius2].to_double (), 9);
-  EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_actual_radius2].to_double (), 9);
+  EXPECT_EQ (ly.cell (donut).bbox ().to_string (), "(-9000,-9000;9000,9000)");
+  EXPECT_EQ (ly.cell (donut).get_display_name (), "Basic.DONUT(l=1/0,r=5..9,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_handle1].to_string (), "0,-5");
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_handle2].to_string (), "9,0");
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_radius1].to_double (), 5);
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_actual_radius1].to_double (), 5);
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_radius2].to_double (), 9);
+  EXPECT_EQ (ly.get_pcell_parameters (donut) [p_actual_radius2].to_double (), 9);
 
   unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
 
@@ -659,98 +659,98 @@ TEST(5_Ellipse)
   params["actual_end_angle"] = 0.0;
 
   db::cell_index_type lib_cell;
-  db::Cell *ellipse;
+  db::cell_index_type ellipse;
   std::vector<tl::Variant> plist;
 
   lib_cell = lib_basic->layout ().get_pcell_variant_dict (pc.second, params);
-  ellipse = &ly.cell (ly.get_lib_proxy (lib_basic, lib_cell));
+  ellipse = ly.get_lib_proxy (lib_basic, lib_cell);
 
   //  change radius explicitly
 
   //  has radius 10um, but bbox isn't correct for now (because handle was not updated)
-  EXPECT_EQ (ellipse->bbox ().to_string (), "(-4000,-10000;4000,10000)");
-  EXPECT_EQ (ellipse->get_display_name (), "Basic.ELLIPSE(l=1/0,rx=4,ry=10,n=64)");
+  EXPECT_EQ (ly.cell (ellipse).bbox ().to_string (), "(-4000,-10000;4000,10000)");
+  EXPECT_EQ (ly.cell (ellipse).get_display_name (), "Basic.ELLIPSE(l=1/0,rx=4,ry=10,n=64)");
 
   //  only after Library::refresh the parameters get updated and bbox is correct
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_radius_x].to_double (), 0.0);
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_radius_x].to_double (), 0.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (ellipse->bbox ().to_string (), "(-4000,-10000;4000,10000)");
-  EXPECT_EQ (ellipse->get_display_name (), "Basic.ELLIPSE(l=1/0,rx=4,ry=10,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_radius_x].to_double (), 4.0);
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_actual_radius_x].to_double (), 4.0);
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_radius_y].to_double (), 10.0);
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_actual_radius_y].to_double (), 10.0);
+  EXPECT_EQ (ly.cell (ellipse).bbox ().to_string (), "(-4000,-10000;4000,10000)");
+  EXPECT_EQ (ly.cell (ellipse).get_display_name (), "Basic.ELLIPSE(l=1/0,rx=4,ry=10,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_radius_x].to_double (), 4.0);
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_actual_radius_x].to_double (), 4.0);
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_radius_y].to_double (), 10.0);
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_actual_radius_y].to_double (), 10.0);
 
   //  change radius2 explicitly
 
-  plist = ly.get_pcell_parameters (ellipse->cell_index ());
+  plist = ly.get_pcell_parameters (ellipse);
   plist[p_actual_radius_y] = 9.0;
-  ellipse = &ly.cell (ly.get_pcell_variant_cell (ellipse->cell_index (), plist));
+  ellipse = ly.get_pcell_variant_cell (ellipse, plist);
 
   //  as the radius is an input parameter, only after Library::refresh the other parameters get updated
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_radius_y].to_double (), 10.0);
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_radius_y].to_double (), 10.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (ellipse->bbox ().to_string (), "(-4000,-9000;4000,9000)");
-  EXPECT_EQ (ellipse->get_display_name (), "Basic.ELLIPSE(l=1/0,rx=4,ry=9,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_handle_x].to_string (), "-4,0");
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_handle_y].to_string (), "0,9");
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_radius_x].to_double (), 4.0);
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_actual_radius_x].to_double (), 4.0);
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_radius_y].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_actual_radius_y].to_double (), 9.0);
+  EXPECT_EQ (ly.cell (ellipse).bbox ().to_string (), "(-4000,-9000;4000,9000)");
+  EXPECT_EQ (ly.cell (ellipse).get_display_name (), "Basic.ELLIPSE(l=1/0,rx=4,ry=9,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_handle_x].to_string (), "-4,0");
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_handle_y].to_string (), "0,9");
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_radius_x].to_double (), 4.0);
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_actual_radius_x].to_double (), 4.0);
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_radius_y].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_actual_radius_y].to_double (), 9.0);
 
   //  change radius1 explicitly
 
-  plist = ly.get_pcell_parameters (ellipse->cell_index ());
+  plist = ly.get_pcell_parameters (ellipse);
   plist[p_actual_radius_x] = 5.0;
-  ellipse = &ly.cell (ly.get_pcell_variant_cell (ellipse->cell_index (), plist));
+  ellipse = ly.get_pcell_variant_cell (ellipse, plist);
 
   //  as the radius is an input parameter, only after Library::refresh the other parameters get updated
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_radius_x].to_double (), 4.0);
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_radius_x].to_double (), 4.0);
 
   lib_basic->refresh ();
-  EXPECT_EQ (ellipse->bbox ().to_string (), "(-5000,-9000;5000,9000)");
-  EXPECT_EQ (ellipse->get_display_name (), "Basic.ELLIPSE(l=1/0,rx=5,ry=9,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_handle_x].to_string (), "-5,0");
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_handle_y].to_string (), "0,9");
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_radius_x].to_double (), 5.0);
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_actual_radius_x].to_double (), 5.0);
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_radius_y].to_double (), 9.0);
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_actual_radius_y].to_double (), 9.0);
+  EXPECT_EQ (ly.cell (ellipse).bbox ().to_string (), "(-5000,-9000;5000,9000)");
+  EXPECT_EQ (ly.cell (ellipse).get_display_name (), "Basic.ELLIPSE(l=1/0,rx=5,ry=9,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_handle_x].to_string (), "-5,0");
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_handle_y].to_string (), "0,9");
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_radius_x].to_double (), 5.0);
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_actual_radius_x].to_double (), 5.0);
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_radius_y].to_double (), 9.0);
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_actual_radius_y].to_double (), 9.0);
 
   //  change handle1 explicitly
 
-  plist = ly.get_pcell_parameters (ellipse->cell_index ());
+  plist = ly.get_pcell_parameters (ellipse);
   plist[p_handle_x] = db::DPoint (-5.0, 0.0);
-  ellipse = &ly.cell (ly.get_pcell_variant_cell (ellipse->cell_index (), plist));
+  ellipse = ly.get_pcell_variant_cell (ellipse, plist);
 
   lib_basic->refresh ();
-  EXPECT_EQ (ellipse->bbox ().to_string (), "(-5000,-9000;5000,9000)");
-  EXPECT_EQ (ellipse->get_display_name (), "Basic.ELLIPSE(l=1/0,rx=5,ry=9,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_handle_x].to_string (), "-5,0");
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_handle_y].to_string (), "0,9");
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_radius_x].to_double (), 5);
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_actual_radius_x].to_double (), 5);
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_radius_y].to_double (), 9);
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_actual_radius_y].to_double (), 9);
+  EXPECT_EQ (ly.cell (ellipse).bbox ().to_string (), "(-5000,-9000;5000,9000)");
+  EXPECT_EQ (ly.cell (ellipse).get_display_name (), "Basic.ELLIPSE(l=1/0,rx=5,ry=9,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_handle_x].to_string (), "-5,0");
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_handle_y].to_string (), "0,9");
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_radius_x].to_double (), 5);
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_actual_radius_x].to_double (), 5);
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_radius_y].to_double (), 9);
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_actual_radius_y].to_double (), 9);
 
   //  change handle2 explicitly
 
-  plist = ly.get_pcell_parameters (ellipse->cell_index ());
+  plist = ly.get_pcell_parameters (ellipse);
   plist[p_handle_y] = db::DPoint (0.0, 9.0);
-  ellipse = &ly.cell (ly.get_pcell_variant_cell (ellipse->cell_index (), plist));
+  ellipse = ly.get_pcell_variant_cell (ellipse, plist);
 
   lib_basic->refresh ();
-  EXPECT_EQ (ellipse->bbox ().to_string (), "(-5000,-9000;5000,9000)");
-  EXPECT_EQ (ellipse->get_display_name (), "Basic.ELLIPSE(l=1/0,rx=5,ry=9,n=64)");
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_handle_x].to_string (), "-5,0");
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_handle_y].to_string (), "0,9");
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_radius_x].to_double (), 5);
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_actual_radius_x].to_double (), 5);
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_radius_y].to_double (), 9);
-  EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_actual_radius_y].to_double (), 9);
+  EXPECT_EQ (ly.cell (ellipse).bbox ().to_string (), "(-5000,-9000;5000,9000)");
+  EXPECT_EQ (ly.cell (ellipse).get_display_name (), "Basic.ELLIPSE(l=1/0,rx=5,ry=9,n=64)");
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_handle_x].to_string (), "-5,0");
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_handle_y].to_string (), "0,9");
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_radius_x].to_double (), 5);
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_actual_radius_x].to_double (), 5);
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_radius_y].to_double (), 9);
+  EXPECT_EQ (ly.get_pcell_parameters (ellipse) [p_actual_radius_y].to_double (), 9);
 
   unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
 

@@ -73,6 +73,7 @@ tolerance("PMOS", "W", 0.01, 0.1) # relative + absolute
 tolerance("NMOS", "L", :absolute => 0.01)
 tolerance("NMOS", "W", :relative => 0.07)
 
+netlist.make_top_level_pins(false)
 netlist.simplify
 
 compare

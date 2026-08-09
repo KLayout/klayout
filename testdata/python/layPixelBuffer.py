@@ -57,6 +57,31 @@ class LAYPixelBufferTests(unittest.TestCase):
     pb_copy = pya.PixelBuffer.read_png(tmp)
     self.assertEqual(compare(pb, pb_copy), True)
 
+  def test_2(self):
+
+    # to_bytes / from_bytes round-trip
+
+    import struct
+
+    pb = pya.PixelBuffer(10, 20)
+    pb.transparent = True
+    pb.fill(0xf0010203)
+    pb.set_pixel(1, 2, 0x80102030)
+
+    data = bytes(pb.to_bytes())
+    self.assertEqual(len(data), 8 + 10 * 20 * 4)
+    self.assertEqual(struct.unpack("=II", data[0:8]), (10, 20))  # width, height header
+
+    self.assertEqual(pb == pya.PixelBuffer.from_bytes(data), True)
+
+    # a mismatched stream is rejected
+    with self.assertRaises(Exception):
+      pya.PixelBuffer.from_bytes(data[:-4])
+
+    # a header beyond the 64k x 64k limit is rejected
+    with self.assertRaises(Exception):
+      pya.PixelBuffer.from_bytes(struct.pack("=II", 65537, 1))
+
 
 # run unit tests
 if __name__ == '__main__':

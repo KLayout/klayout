@@ -315,6 +315,12 @@ Variant::Variant (const std::vector<char> &ba)
   m_var.m_bytearray = new std::vector<char> (ba);
 }
 
+Variant::Variant (std::vector<char> &&ba)
+  : m_type (t_bytearray), m_string (0)
+{
+  m_var.m_bytearray = new std::vector<char> (ba);
+}
+
 #if defined(HAVE_QT)
 
 Variant::Variant (const QByteArray &qba) 
@@ -530,7 +536,13 @@ Variant::Variant (const std::string &s)
   m_var.m_stdstring = new std::string (s);
 }
 
-Variant::Variant (const char *s) 
+Variant::Variant (std::string &&s)
+  : m_type (t_stdstring), m_string (0)
+{
+  m_var.m_stdstring = new std::string (s);
+}
+
+Variant::Variant (const char *s)
   : m_type (s != 0 ? t_string : t_nil)
 {
   if (s) {
@@ -645,6 +657,12 @@ Variant::Variant (const Variant &v)
   operator= (v);
 }
 
+Variant::Variant (Variant &&v)
+  : m_type (t_nil), m_string (0)
+{
+  swap (v);
+}
+
 Variant::~Variant ()
 {
   reset ();
@@ -714,7 +732,35 @@ Variant::operator= (const std::string &s)
 }
 
 Variant &
+Variant::operator= (std::string &&s)
+{
+  if (m_type == t_stdstring && &s == m_var.m_stdstring) {
+    //  we are assigning to ourselves
+  } else {
+    std::string *snew = new std::string (s);
+    reset ();
+    m_type = t_stdstring;
+    m_var.m_stdstring = snew;
+  }
+  return *this;
+}
+
+Variant &
 Variant::operator= (const std::vector<char> &s)
+{
+  if (m_type == t_bytearray && &s == m_var.m_bytearray) {
+    //  we are assigning to ourselves
+  } else {
+    std::vector<char> *snew = new std::vector<char> (s);
+    reset ();
+    m_type = t_bytearray;
+    m_var.m_bytearray = snew;
+  }
+  return *this;
+}
+
+Variant &
+Variant::operator= (std::vector<char> &&s)
 {
   if (m_type == t_bytearray && &s == m_var.m_bytearray) {
     //  we are assigning to ourselves
@@ -899,6 +945,13 @@ Variant::operator= (__int128 l)
   return *this;
 }
 #endif
+
+Variant &
+Variant::operator= (Variant &&v)
+{
+  swap (v);
+  return *this;
+}
 
 Variant &
 Variant::operator= (const Variant &v)
@@ -1958,7 +2011,7 @@ Variant::to_string () const
     } else if (m_type == t_float) {
       r = tl::to_string (m_var.m_float, 7);
     } else if (m_type == t_char) {
-      r = tl::to_string ((int) m_var.m_char);
+      r += m_var.m_char;
     } else if (m_type == t_schar) {
       r = tl::to_string ((int) m_var.m_schar);
     } else if (m_type == t_uchar) {
@@ -2602,12 +2655,10 @@ Variant::to_parsable_string () const
     return "nil";
   } else if (is_stdstring ()) {
     return tl::to_quoted_string (*m_var.m_stdstring);
-#if defined(HAVE_QT)
-  } else if (is_cstring () || is_qstring () || is_qbytearray () || is_bytearray ()) {
-#else
-  } else if (is_cstring () || is_bytearray ()) {
-#endif
-    return tl::to_quoted_string (to_string ());
+  } else if (is_a_string ()) {
+    return tl::to_quoted_string (to_stdstring ());
+  } else if (is_a_bytearray ()) {
+    return tl::to_quoted_string (to_stdstring ()) + "b";
   } else if (is_list ()) {
     std::string r = "(";
     for (tl::Variant::const_iterator l = begin (); l != end (); ++l) {
@@ -2630,6 +2681,10 @@ Variant::to_parsable_string () const
     }
     r += "}";
     return r;
+  } else if (is_char ()) {
+    std::string s;
+    s += to_char ();
+    return tl::to_quoted_string (s) + "c";
   } else if (is_id ()) {
     return "[id" + tl::to_string (m_var.m_id) + "]";
   } else if (is_user ()) {
@@ -3049,7 +3104,15 @@ TL_PUBLIC bool test_extractor_impl (tl::Extractor &ex, tl::Variant &v)
 
   } else if (ex.try_read_word_or_quoted (s)) {
 
-    v = tl::Variant (s);
+    if (ex.test ("c") || ex.test ("C")) {
+      v = s.empty () ? tl::Variant () : tl::Variant ((char) s.front ());
+    } else if (ex.test ("b") || ex.test ("B")) {
+      std::vector<char> cv (s.begin (), s.end ());
+      v = tl::Variant (std::move (cv));
+    } else {
+      v = tl::Variant (s);
+    }
+
     return true;
 
   } else {

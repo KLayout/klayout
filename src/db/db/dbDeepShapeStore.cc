@@ -232,6 +232,14 @@ bool DeepLayer::operator== (const DeepLayer &other) const
   return true;
 }
 
+void
+DeepLayer::swap (DeepLayer &other)
+{
+  tl_assert (mp_store.get () == other.mp_store.get ());
+  std::swap (m_layer, other.m_layer);
+  std::swap (m_layout, other.m_layout);
+}
+
 db::Layout &
 DeepLayer::layout ()
 {
@@ -563,13 +571,13 @@ static unsigned int init_layer (db::Layout &layout, const db::RecursiveShapeIter
 }
 
 DeepShapeStore::DeepShapeStore ()
-  : m_keep_layouts (true), m_wants_all_cells (false)
+  : m_keep_layouts (true), m_wants_all_cells (false), m_sparse_array_limit (-1.0)
 {
   ++s_instance_count;
 }
 
 DeepShapeStore::DeepShapeStore (const std::string &topcell_name, double dbu)
-  : m_keep_layouts (true), m_wants_all_cells (false)
+  : m_keep_layouts (true), m_wants_all_cells (false), m_sparse_array_limit (-1.0)
 {
   ++s_instance_count;
 
@@ -857,6 +865,16 @@ bool DeepShapeStore::wants_all_cells () const
   return m_wants_all_cells;
 }
 
+void DeepShapeStore::set_sparse_array_limit (double l)
+{
+  m_sparse_array_limit = l;
+}
+
+double DeepShapeStore::sparse_array_limit () const
+{
+  return m_sparse_array_limit;
+}
+
 void DeepShapeStore::set_reject_odd_polygons (bool f)
 {
   m_state.set_reject_odd_polygons (f);
@@ -1022,6 +1040,7 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
 
   builder.set_wants_all_cells (m_wants_all_cells);
+  builder.set_sparse_array_limit (m_sparse_array_limit);
 
   unsigned int layer_index = init_layer (layout, si);
   builder.set_target_layer (layer_index);
@@ -1055,6 +1074,9 @@ DeepLayer DeepShapeStore::create_custom_layer (const db::RecursiveShapeIterator 
 
   db::Layout &layout = m_layouts[layout_index]->layout;
   db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
+
+  builder.set_wants_all_cells (m_wants_all_cells);
+  builder.set_sparse_array_limit (m_sparse_array_limit);
 
   unsigned int layer_index = init_layer (layout, si);
   builder.set_target_layer (layer_index);
@@ -1367,7 +1389,6 @@ namespace
   {
   public:
     DeepShapeStoreToShapeTransformer (const DeepShapeStore &dss, const db::Layout &layout)
-      : mp_layout (& layout)
     {
       //  gets the text annotation property ID -
       //  this is how the texts are passed for annotating the net names
@@ -1423,7 +1444,6 @@ namespace
 
   private:
     std::pair<bool, db::property_names_id_type> m_text_annot_name_id;
-    const db::Layout *mp_layout;
   };
 }
 

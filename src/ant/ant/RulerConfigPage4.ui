@@ -594,12 +594,12 @@
           </widget>
          </item>
          <item row="10" column="1">
-          <widget class="QCheckBox" name="t_snap_cbx">
+          <widget class="QCheckBox" name="t_never_snap_cbx">
            <property name="toolTip">
             <string>If checked, snap to edges or vertices of objects unless disabled above</string>
            </property>
            <property name="text">
-            <string>Snap to objects</string>
+            <string>Never snap to objects</string>
            </property>
           </widget>
          </item>
@@ -893,7 +893,7 @@
   <tabstop>style_cb</tabstop>
   <tabstop>outline_cb</tabstop>
   <tabstop>t_angle_cb</tabstop>
-  <tabstop>t_snap_cbx</tabstop>
+  <tabstop>t_never_snap_cbx</tabstop>
  </tabstops>
  <resources>
   <include location="../../icons/icons.qrc"/>

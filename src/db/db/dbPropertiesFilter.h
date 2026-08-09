@@ -69,19 +69,19 @@ class polygon_properties_filter
   : public PolygonFilter, public PropertiesFilter
 {
 public:
-  polygon_properties_filter<PolygonFilter> (const tl::Variant &name, const tl::GlobPattern &pattern, bool inverse)
+  polygon_properties_filter (const tl::Variant &name, const tl::GlobPattern &pattern, bool inverse)
     : PropertiesFilter (name, pattern, inverse)
   {
     //  .. nothing yet ..
   }
 
-  polygon_properties_filter<PolygonFilter> (const tl::Variant &name, const tl::Variant &value, bool inverse)
+  polygon_properties_filter(const tl::Variant &name, const tl::Variant &value, bool inverse)
     : PropertiesFilter (name, value, inverse)
   {
     //  .. nothing yet ..
   }
 
-  polygon_properties_filter<PolygonFilter> (const tl::Variant &name, const tl::Variant &from, const tl::Variant &to, bool inverse)
+  polygon_properties_filter (const tl::Variant &name, const tl::Variant &from, const tl::Variant &to, bool inverse)
     : PropertiesFilter (name, from, to, inverse)
   {
     //  .. nothing yet ..
@@ -103,19 +103,19 @@ class generic_properties_filter
   : public BasicFilter, public PropertiesFilter
 {
 public:
-  generic_properties_filter<BasicFilter, ShapeType> (const tl::Variant &name, const tl::GlobPattern &pattern, bool inverse)
+  generic_properties_filter (const tl::Variant &name, const tl::GlobPattern &pattern, bool inverse)
     : PropertiesFilter (name, pattern, inverse)
   {
     //  .. nothing yet ..
   }
 
-  generic_properties_filter<BasicFilter, ShapeType> (const tl::Variant &name, const tl::Variant &value, bool inverse)
+  generic_properties_filter (const tl::Variant &name, const tl::Variant &value, bool inverse)
     : PropertiesFilter (name, value, inverse)
   {
     //  .. nothing yet ..
   }
 
-  generic_properties_filter<BasicFilter, ShapeType> (const tl::Variant &name, const tl::Variant &from, const tl::Variant &to, bool inverse)
+  generic_properties_filter (const tl::Variant &name, const tl::Variant &from, const tl::Variant &to, bool inverse)
     : PropertiesFilter (name, from, to, inverse)
   {
     //  .. nothing yet ..

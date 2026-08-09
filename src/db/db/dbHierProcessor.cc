@@ -622,21 +622,28 @@ public:
   typedef typename local_processor_cell_contexts<TS, TI, TR>::context_key_type interactions_value_type;
   typedef std::unordered_map<std::pair<db::cell_index_type, db::ICplxTrans>, interactions_value_type> interactions_type;
 
-  interaction_registration_inst2shape (db::Layout *subject_layout, unsigned int subject_layer, db::Coord dist, interactions_type *result)
-    : mp_subject_layout (subject_layout), m_subject_layer (subject_layer), m_dist (dist), mp_result (result), m_rt (subject_layout)
+  interaction_registration_inst2shape (db::Layout *subject_layout, unsigned int subject_layer, db::Coord dist, const std::map<unsigned int, db::Coord> &override_distance, interactions_type *result)
+    : mp_subject_layout (subject_layout), m_subject_layer (subject_layer), m_dist (dist), m_override_distance (override_distance), mp_result (result), m_rt (subject_layout)
   {
     //  nothing yet ..
   }
 
   void add (const db::CellInstArray *inst, unsigned int, const TI *ref, unsigned int layer)
   {
-    collect_instance_shape_interactions (inst, layer, *ref, m_dist);
+    db::Coord d = m_dist;
+    auto od = m_override_distance.find (layer);
+    if (od != m_override_distance.end ()) {
+      d = std::min (d, od->second);
+    }
+
+    collect_instance_shape_interactions (inst, layer, *ref, d);
   }
 
 private:
   db::Layout *mp_subject_layout;
   unsigned int m_subject_layer;
   db::Coord m_dist;
+  std::map<unsigned int, db::Coord> m_override_distance;
   interactions_type *mp_result;
   db::shape_reference_translator_with_trans<TI, db::ICplxTrans> m_rt;
 
@@ -681,11 +688,11 @@ private:
 //  LocalProcessorContextComputationTask implementation
 
 template <class TS, class TI, class TR>
-local_processor_context_computation_task<TS, TI, TR>::local_processor_context_computation_task (const local_processor<TS, TI, TR> *proc, local_processor_contexts<TS, TI, TR> &contexts, db::local_processor_cell_context<TS, TI, TR> *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, db::Coord dist)
+local_processor_context_computation_task<TS, TI, TR>::local_processor_context_computation_task (const local_processor<TS, TI, TR> *proc, local_processor_contexts<TS, TI, TR> &contexts, db::local_processor_cell_context<TS, TI, TR> *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, db::Coord dist, const std::map<unsigned int, db::Coord> &override_distance)
   : tl::Task (),
     mp_proc (proc), mp_contexts (&contexts), mp_parent_context (parent_context),
     mp_subject_parent (subject_parent), mp_subject_cell (subject_cell), m_subject_cell_inst (subject_cell_inst),
-    mp_intruder_cell (intruder_cell), m_dist (dist)
+    mp_intruder_cell (intruder_cell), m_dist (dist), m_override_distance (override_distance)
 {
   //  This is quick, but will take away the intruders from the caller
   m_intruders.swap (intruders);
@@ -695,7 +702,7 @@ template <class TS, class TI, class TR>
 void
 local_processor_context_computation_task<TS, TI, TR>::perform ()
 {
-  mp_proc->compute_contexts (*mp_contexts, mp_parent_context, mp_subject_parent, mp_subject_cell, m_subject_cell_inst, mp_intruder_cell, m_intruders, m_dist);
+  mp_proc->compute_contexts (*mp_contexts, mp_parent_context, mp_subject_parent, mp_subject_cell, m_subject_cell_inst, mp_intruder_cell, m_intruders, m_dist, m_override_distance);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -714,7 +721,6 @@ local_processor_result_computation_task<TS, TI, TR>::perform ()
 {
   mp_cell_contexts->compute_results (*mp_contexts, mp_cell, mp_op, m_output_layers, mp_proc);
 
-  //  erase the contexts we don't need any longer
   {
     tl::MutexLocker locker (& mp_contexts->lock ());
 
@@ -734,7 +740,10 @@ local_processor_result_computation_task<TS, TI, TR>::perform ()
     }
 #endif
 
-    mp_contexts->context_map ().erase (mp_cell);
+    //  release some memory
+    auto ctx = mp_contexts->context_map ().find (mp_cell);
+    tl_assert (ctx != mp_contexts->context_map ().end ());
+    ctx->second.cleanup ();
   }
 }
 
@@ -742,7 +751,7 @@ local_processor_result_computation_task<TS, TI, TR>::perform ()
 //  LocalProcessorBase implementation
 
 LocalProcessorBase::LocalProcessorBase ()
-  : m_report_progress (true), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_boolean_core (false),
+  : m_report_progress (true), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_top_down (false), m_boolean_core (false),
     m_base_verbosity (30), mp_vars (0), mp_current_cell (0)
 {
   //  .. nothing yet ..
@@ -882,15 +891,6 @@ void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned
 }
 
 template <class TS, class TI, class TR>
-void local_processor<TS, TI, TR>::push_results (db::Cell *cell, unsigned int output_layer, const std::unordered_set<TR> &result) const
-{
-  if (! result.empty ()) {
-    tl::MutexLocker locker (&cell->layout ()->lock ());
-    cell->shapes (output_layer).insert (result.begin (), result.end ());
-  }
-}
-
-template <class TS, class TI, class TR>
 void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS, TI, TR> &contexts, const local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers) const
 {
   try {
@@ -907,8 +907,18 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
     contexts.set_intruder_layers (intruder_layers);
     contexts.set_subject_layer (subject_layer);
 
+    //  collect override distances per layer ID
+    auto od = op->override_distance ();
+    std::map<unsigned int, db::Coord> override_distance;
+    for (auto il = intruder_layers.begin (); il != intruder_layers.end (); ++il) {
+      auto o = od.find ((unsigned int) (il - intruder_layers.begin ()));
+      if (o != od.end ()) {
+        override_distance [*il] = o->second;
+      }
+    }
+
     typename local_processor_cell_contexts<TS, TI, TR>::context_key_type intruders;
-    issue_compute_contexts (contexts, 0, 0, mp_subject_top, db::ICplxTrans (), mp_intruder_top, intruders, op->dist ());
+    issue_compute_contexts (contexts, 0, 0, mp_subject_top, db::ICplxTrans (), mp_intruder_top, intruders, op->dist (), override_distance);
 
     if (mp_cc_job.get ()) {
       mp_cc_job->start ();
@@ -929,14 +939,15 @@ void local_processor<TS, TI, TR>::issue_compute_contexts (local_processor_contex
                                                  const db::ICplxTrans &subject_cell_inst,
                                                  const db::Cell *intruder_cell,
                                                  typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders,
-                                                 db::Coord dist) const
+                                                 db::Coord dist,
+                                                 const std::map<unsigned int, db::Coord> &override_distance) const
 {
   bool is_small_job = subject_cell->begin ().at_end ();
 
   if (! is_small_job && mp_cc_job.get ()) {
-    mp_cc_job->schedule (new local_processor_context_computation_task<TS, TI, TR> (this, contexts, parent_context, subject_parent, subject_cell, subject_cell_inst, intruder_cell, intruders, dist));
+    mp_cc_job->schedule (new local_processor_context_computation_task<TS, TI, TR> (this, contexts, parent_context, subject_parent, subject_cell, subject_cell_inst, intruder_cell, intruders, dist, override_distance));
   } else {
-    compute_contexts (contexts, parent_context, subject_parent, subject_cell, subject_cell_inst, intruder_cell, intruders, dist);
+    compute_contexts (contexts, parent_context, subject_parent, subject_cell, subject_cell_inst, intruder_cell, intruders, dist, override_distance);
   }
 }
 
@@ -948,7 +959,8 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
                                                     const db::ICplxTrans &subject_cell_inst,
                                                     const db::Cell *intruder_cell,
                                                     const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders,
-                                                    db::Coord dist_top) const
+                                                    db::Coord dist_top,
+                                                    const std::map<unsigned int, db::Coord> &override_distance) const
 {
   CRONOLOGY_COLLECTION_BRACKET(event_compute_contexts)
 
@@ -1041,84 +1053,96 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
       }
     }
 
-    //  TODO: can we shortcut this if interactions is empty?
-    for (std::vector<unsigned int>::const_iterator il = contexts.intruder_layers ().begin (); il != contexts.intruder_layers ().end (); ++il) {
+    //  in top-down mode we are not interested in cell-to-cell interactions, nor shape-to-instance interactions
+    //  except local ones (shape-to-child cells), hence we skip this part
+    if (! top_down ()) {
 
-      db::box_convert <db::CellInstArray, true> inst_bci (*mp_intruder_layout, contexts.actual_intruder_layer (*il));
+      //  TODO: can we shortcut this if interactions is empty?
+      for (std::vector<unsigned int>::const_iterator il = contexts.intruder_layers ().begin (); il != contexts.intruder_layers ().end (); ++il) {
 
-      db::box_scanner2<db::CellInstArray, int, db::CellInstArray, int> scanner;
-      interaction_registration_inst2inst<TS, TI, TR> rec (mp_subject_layout, contexts.subject_layer (), mp_intruder_layout, contexts.actual_intruder_layer (*il), contexts.is_foreign (*il), dist, &interactions);
-
-      unsigned int id = 0;
-
-      if (subject_cell == intruder_cell) {
-
-        //  Use the same id's for same instances - this way we can easily detect same instances
-        //  and don't make them self-interacting
-
-        for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
-          unsigned int iid = ++id;
-          if (! inst_bcs (i->cell_inst ()).empty () && ! subject_cell_is_breakout (i->cell_index ())) {
-            scanner.insert1 (&i->cell_inst (), iid);
-          }
-          if (! inst_bci (i->cell_inst ()).empty () && ! intruder_cell_is_breakout (i->cell_index ())) {
-            scanner.insert2 (&i->cell_inst (), iid);
-          }
+        auto od = override_distance.find (*il);
+        db::Coord d = dist;
+        if (od != override_distance.end ()) {
+          d = std::min (d, od->second);
         }
 
-      } else {
+        db::box_convert <db::CellInstArray, true> inst_bci (*mp_intruder_layout, contexts.actual_intruder_layer (*il));
 
-        for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
-          if (! inst_bcs (i->cell_inst ()).empty () && ! subject_cell_is_breakout (i->cell_index ())) {
-            scanner.insert1 (&i->cell_inst (), ++id);
-          }
-        }
+        db::box_scanner2<db::CellInstArray, int, db::CellInstArray, int> scanner;
+        interaction_registration_inst2inst<TS, TI, TR> rec (mp_subject_layout, contexts.subject_layer (), mp_intruder_layout, contexts.actual_intruder_layer (*il), contexts.is_foreign (*il), d, &interactions);
 
-        if (intruder_cell) {
-          for (db::Cell::const_iterator i = intruder_cell->begin (); !i.at_end (); ++i) {
+        unsigned int id = 0;
+
+        if (subject_cell == intruder_cell) {
+
+          //  Use the same id's for same instances - this way we can easily detect same instances
+          //  and don't make them self-interacting
+
+          for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
+            unsigned int iid = ++id;
+            if (! inst_bcs (i->cell_inst ()).empty () && ! subject_cell_is_breakout (i->cell_index ())) {
+              scanner.insert1 (&i->cell_inst (), iid);
+            }
             if (! inst_bci (i->cell_inst ()).empty () && ! intruder_cell_is_breakout (i->cell_index ())) {
-              scanner.insert2 (&i->cell_inst (), ++id);
+              scanner.insert2 (&i->cell_inst (), iid);
             }
           }
+
+        } else {
+
+          for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
+            if (! inst_bcs (i->cell_inst ()).empty () && ! subject_cell_is_breakout (i->cell_index ())) {
+              scanner.insert1 (&i->cell_inst (), ++id);
+            }
+          }
+
+          if (intruder_cell) {
+            for (db::Cell::const_iterator i = intruder_cell->begin (); !i.at_end (); ++i) {
+              if (! inst_bci (i->cell_inst ()).empty () && ! intruder_cell_is_breakout (i->cell_index ())) {
+                scanner.insert2 (&i->cell_inst (), ++id);
+              }
+            }
+          }
+
         }
+
+        for (std::set<db::CellInstArray>::const_iterator i = intruders.first.begin (); i != intruders.first.end (); ++i) {
+          if (! inst_bci (*i).empty ()) {
+            scanner.insert2 (i.operator-> (), ++id);
+          }
+        }
+
+        scanner.process (rec, dist, inst_bcs, inst_bci);
 
       }
 
-      for (std::set<db::CellInstArray>::const_iterator i = intruders.first.begin (); i != intruders.first.end (); ++i) {
-        if (! inst_bci (*i).empty ()) {
-          scanner.insert2 (i.operator-> (), ++id);
+      if (! intruders.second.empty () || ! intruder_shapes.empty ()) {
+
+        db::box_scanner2<db::CellInstArray, int, TI, int> scanner;
+        db::addressable_object_from_shape<TI> heap;
+        interaction_registration_inst2shape<TS, TI, TR> rec (mp_subject_layout, contexts.subject_layer (), dist, override_distance, &interactions);
+
+        for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
+          if (! inst_bcs (i->cell_inst ()).empty () && ! subject_cell_is_breakout (i->cell_index ())) {
+            scanner.insert1 (&i->cell_inst (), 0);
+          }
         }
-      }
 
-      scanner.process (rec, dist, inst_bcs, inst_bci);
-
-    }
-
-    if (! intruders.second.empty () || ! intruder_shapes.empty ()) {
-
-      db::box_scanner2<db::CellInstArray, int, TI, int> scanner;
-      db::addressable_object_from_shape<TI> heap;
-      interaction_registration_inst2shape<TS, TI, TR> rec (mp_subject_layout, contexts.subject_layer (), dist, &interactions);
-
-      for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
-        if (! inst_bcs (i->cell_inst ()).empty () && ! subject_cell_is_breakout (i->cell_index ())) {
-          scanner.insert1 (&i->cell_inst (), 0);
+        for (typename std::map<unsigned int, std::set<TI> >::const_iterator il = intruders.second.begin (); il != intruders.second.end (); ++il) {
+          for (typename std::set<TI>::const_iterator i = il->second.begin (); i != il->second.end (); ++i) {
+            scanner.insert2 (i.operator-> (), il->first);
+          }
         }
-      }
 
-      for (typename std::map<unsigned int, std::set<TI> >::const_iterator il = intruders.second.begin (); il != intruders.second.end (); ++il) {
-        for (typename std::set<TI>::const_iterator i = il->second.begin (); i != il->second.end (); ++i) {
-          scanner.insert2 (i.operator-> (), il->first);
+        for (std::map<unsigned int, const db::Shapes *>::const_iterator im = intruder_shapes.begin (); im != intruder_shapes.end (); ++im) {
+          for (db::Shapes::shape_iterator i = im->second->begin (shape_flags<TI> ()); !i.at_end (); ++i) {
+            scanner.insert2 (heap (*i), im->first);
+          }
         }
-      }
 
-      for (std::map<unsigned int, const db::Shapes *>::const_iterator im = intruder_shapes.begin (); im != intruder_shapes.end (); ++im) {
-        for (db::Shapes::shape_iterator i = im->second->begin (shape_flags<TI> ()); !i.at_end (); ++i) {
-          scanner.insert2 (heap (*i), im->first);
-        }
-      }
+        scanner.process (rec, dist, inst_bcs, db::box_convert<TI> ());
 
-      scanner.process (rec, dist, inst_bcs, db::box_convert<TI> ());
+      }
 
     }
 
@@ -1128,7 +1152,7 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
       db::Cell *subject_child_cell = &mp_subject_layout->cell (i->first.first);
       db::Cell *intruder_child_cell = (subject_cell == intruder_cell ? subject_child_cell : 0);
 
-      issue_compute_contexts (contexts, cell_context, subject_cell, subject_child_cell, i->first.second, intruder_child_cell, i->second, dist);
+      issue_compute_contexts (contexts, cell_context, subject_cell, subject_child_cell, i->first.second, intruder_child_cell, i->second, dist, override_distance);
 
     }
 
@@ -1248,7 +1272,7 @@ local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, T
         typename local_processor_contexts<TS, TI, TR>::iterator cpc = contexts.context_map ().find (&mp_subject_layout->cell (*bu));
         if (cpc != contexts.context_map ().end ()) {
           cpc->second.compute_results (contexts, cpc->first, op, output_layers, this);
-          contexts.context_map ().erase (cpc);
+          cpc->second.cleanup ();   //  release some memory
         }
 
       }
@@ -1260,6 +1284,24 @@ local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, T
       throw;
     }
 
+  }
+
+  //  deliver the results
+  {
+    tl::MutexLocker locker (& mp_subject_layout->lock ());
+    for (auto c = contexts.begin (); c != contexts.end (); ++c) {
+
+      db::Cell *cell = c->first;
+      auto r = c->second.result ().begin ();
+      auto rend = c->second.result ().end ();
+
+      for (auto o = output_layers.begin (); r != rend && o != output_layers.end (); ++o, ++r) {
+        if (! r->empty ()) {
+          cell->shapes (*o).insert (r->begin (), r->end ());
+        }
+      }
+
+    }
   }
 }
 
@@ -1369,7 +1411,8 @@ template <class TS, class TI, class TR>
 void
 local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_contexts<TS, TI, TR> &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const local_operation<TS, TI, TR> *op, const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, std::vector<std::unordered_set<TR> > &result) const
 {
-  db::Coord dist = dist_for_cell (subject_cell->cell_index (), op->dist ());
+  auto override_distance = op->override_distance ();
+  db::Coord dist_global = dist_for_cell (subject_cell->cell_index (), op->dist ());
 
   const db::Shapes *subject_shapes = &subject_cell->shapes (contexts.subject_layer ());
   db::shape_to_object<TS> s2o;
@@ -1395,6 +1438,13 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
   unsigned int il_index = 0;
   for (std::vector<unsigned int>::const_iterator il = contexts.intruder_layers ().begin (); il != contexts.intruder_layers ().end (); ++il, ++il_index) {
 
+    //  compute effective distance
+    db::Coord dist = dist_global;
+    auto od = override_distance.find (il_index);
+    if (od != override_distance.end ()) {
+      dist = std::min (dist, dist_for_cell (subject_cell->cell_index (), od->second));
+    }
+
     unsigned int ail = contexts.actual_intruder_layer (*il);
     bool foreign = contexts.is_foreign (*il);
 
@@ -1406,14 +1456,14 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
       }
     }
 
-    //  local shapes vs. child cell
-
     db::box_convert<db::CellInstArray, true> inst_bci (*mp_intruder_layout, ail);
 
     typename std::map<unsigned int, std::set<TI> >::const_iterator ipl = intruders.second.find (*il);
     static std::set<TI> empty_intruders;
 
-    if (! subject_shapes->empty () && (intruder_shapes || ipl != intruders.second.end ())) {
+    //  local shapes vs. local shapes
+
+    if (! top_down () && ! subject_shapes->empty () && (intruder_shapes || ipl != intruders.second.end ())) {
 
       if (subject_cell == intruder_cell && contexts.subject_layer () == ail && !foreign) {
 
@@ -1428,6 +1478,8 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
     }
 
+    //  local shapes vs. child cells
+
     if (! subject_shapes->empty () && ! ((! intruder_cell || intruder_cell->begin ().at_end ()) && intruders.first.empty ())) {
 
       db::box_scanner2<TS, int, db::CellInstArray, int> scanner;
@@ -1441,7 +1493,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
       unsigned int inst_id = 0;
 
-      if (subject_cell == intruder_cell && contexts.subject_layer () == ail && !foreign) {
+      if (! top_down () && subject_cell == intruder_cell && contexts.subject_layer () == ail && !foreign) {
 
         //  Same cell, same layer -> no shape to child instance interactions because this will be taken care of
         //  by the instances themselves (and their intruders). This also means, we prefer to deal with
@@ -1614,15 +1666,16 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
   //  build the subjects in the intruders list
 
-  db::Coord dist = op->dist ();
+  db::Coord dist_global = op->dist ();
+  auto override_distance = op->override_distance ();
 
-  db::Box subjects_box = safe_box_enlarged (subjects.bbox (), dist, dist);
+  db::Box subjects_box = safe_box_enlarged (subjects.bbox (), dist_global, dist_global);
 
   db::Box intruders_box;
   for (typename std::vector<generic_shape_iterator<TI> >::const_iterator il = intruders.begin (); il != intruders.end (); ++il) {
     intruders_box += il->bbox ();
   }
-  intruders_box = safe_box_enlarged (intruders_box, dist, dist);
+  intruders_box = safe_box_enlarged (intruders_box, dist_global, dist_global);
 
   db::Box common_box = intruders_box & subjects_box;
   if (common_box.empty () || common_box.width () == 0 || common_box.height () == 0) {
@@ -1650,6 +1703,12 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
       for (typename std::vector<generic_shape_iterator<TI> >::const_iterator il = intruders.begin (); il != intruders.end (); ++il, ++il_index) {
 
         bool ff = foreign.size () > il_index && foreign [il_index];
+
+        db::Coord dist = dist_global;
+        auto od = override_distance.find (il_index);
+        if (od != override_distance.end ()) {
+          dist = std::min (dist, od->second);
+        }
 
         if (*il == subjects && ! ff) {
 
@@ -1717,6 +1776,12 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
         bool ff = foreign.size () > il_index && foreign [il_index];
 
+        db::Coord dist = dist_global;
+        auto od = override_distance.find (il_index);
+        if (od != override_distance.end ()) {
+          dist = std::min (dist, od->second);
+        }
+
         if (*il == subjects && ! ff) {
 
           interaction_registration_shape1_scanner_combo<TS, TI> scanner (&interactions, il_index, report_progress (), scan_description);
@@ -1770,6 +1835,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
           }
 
         }
+
       }
 
     }

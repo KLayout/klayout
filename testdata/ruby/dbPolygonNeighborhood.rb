@@ -122,8 +122,8 @@ class DBPolygonNeighborhood_TestClass < TestBase
 
     assert_equal(visitor.log, 
       "Polygon: (-1100,0;-1100,1000;-100,1000;-100,0) props={}\n" +
-      "  0: (0,0;0,1000;1000,1000;1000,0) props={1=>one}\n" +
-      "Polygon: (0,0;0,1000;1000,1000;1000,0) props={1=>one}\n" +
+      "  0: (0,0;0,1000;1000,1000;1000,0) props={#1=>'one'}\n" +
+      "Polygon: (0,0;0,1000;1000,1000;1000,0) props={#1=>'one'}\n" +
       "  0: (-1100,0;-1100,1000;-100,1000;-100,0) props={}\n"
     )
 

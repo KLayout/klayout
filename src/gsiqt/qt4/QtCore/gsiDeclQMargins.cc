@@ -235,12 +235,12 @@ static void _call_f_top_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 
 //  bool ::operator==(const QMargins &m1, const QMargins &m2)
 static bool op_QMargins_operator_eq__eq__4122(const QMargins *_self, const QMargins &m2) {
-  return ::operator==(*_self, m2);
+  return operator==(*_self, m2);
 }
 
 //  bool ::operator!=(const QMargins &m1, const QMargins &m2)
 static bool op_QMargins_operator_excl__eq__4122(const QMargins *_self, const QMargins &m2) {
-  return ::operator!=(*_self, m2);
+  return operator!=(*_self, m2);
 }
 
 

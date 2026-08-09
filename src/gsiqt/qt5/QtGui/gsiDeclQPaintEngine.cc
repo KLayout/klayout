@@ -853,7 +853,7 @@ static void _call_cbs_begin_1803_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPaintDevice *arg1 = args.read<QPaintDevice * > (heap);
+  QPaintDevice *arg1 = gsi::arg_reader<QPaintDevice * >() (args, heap);
   ret.write<bool > ((bool)((QPaintEngine_Adaptor *)cls)->cbs_begin_1803_0 (arg1));
 }
 
@@ -895,7 +895,7 @@ static void _call_cbs_drawEllipse_1862_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine_Adaptor *)cls)->cbs_drawEllipse_1862_0 (arg1);
 }
@@ -919,7 +919,7 @@ static void _call_cbs_drawEllipse_1792_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine_Adaptor *)cls)->cbs_drawEllipse_1792_0 (arg1);
 }
@@ -949,10 +949,10 @@ static void _call_cbs_drawImage_8645_1 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
-  const QImage &arg2 = args.read<const QImage & > (heap);
-  const QRectF &arg3 = args.read<const QRectF & > (heap);
-  QFlags<Qt::ImageConversionFlag> arg4 = args.read<QFlags<Qt::ImageConversionFlag> > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
+  const QImage &arg2 = gsi::arg_reader<const QImage & >() (args, heap);
+  const QRectF &arg3 = gsi::arg_reader<const QRectF & >() (args, heap);
+  QFlags<Qt::ImageConversionFlag> arg4 = args ? gsi::arg_reader<QFlags<Qt::ImageConversionFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::ImageConversionFlag> >() (Qt::AutoColor, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine_Adaptor *)cls)->cbs_drawImage_8645_1 (arg1, arg2, arg3, arg4);
 }
@@ -976,7 +976,7 @@ static void _call_cbs_drawPath_2514_0 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine_Adaptor *)cls)->cbs_drawPath_2514_0 (arg1);
 }
@@ -1004,9 +1004,9 @@ static void _call_cbs_drawPixmap_5525_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
-  const QPixmap &arg2 = args.read<const QPixmap & > (heap);
-  const QRectF &arg3 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
+  const QPixmap &arg2 = gsi::arg_reader<const QPixmap & >() (args, heap);
+  const QRectF &arg3 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine_Adaptor *)cls)->cbs_drawPixmap_5525_0 (arg1, arg2, arg3);
 }
@@ -1032,8 +1032,8 @@ static void _call_cbs_drawTextItem_4092_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  const QTextItem &arg2 = args.read<const QTextItem & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QTextItem &arg2 = gsi::arg_reader<const QTextItem & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine_Adaptor *)cls)->cbs_drawTextItem_4092_0 (arg1, arg2);
 }
@@ -1061,9 +1061,9 @@ static void _call_cbs_drawTiledPixmap_5649_0 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
-  const QPixmap &arg2 = args.read<const QPixmap & > (heap);
-  const QPointF &arg3 = args.read<const QPointF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
+  const QPixmap &arg2 = gsi::arg_reader<const QPixmap & >() (args, heap);
+  const QPointF &arg3 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine_Adaptor *)cls)->cbs_drawTiledPixmap_5649_0 (arg1, arg2, arg3);
 }
@@ -1125,7 +1125,7 @@ static void _call_cbs_updateState_3013_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPaintEngineState &arg1 = args.read<const QPaintEngineState & > (heap);
+  const QPaintEngineState &arg1 = gsi::arg_reader<const QPaintEngineState & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine_Adaptor *)cls)->cbs_updateState_3013_0 (arg1);
 }

@@ -250,7 +250,7 @@ static void _call_cbs_availableDevices_c1520_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAudio::Mode>::target_type & arg1 = args.read<const qt_gsi::Converter<QAudio::Mode>::target_type & > (heap);
+  const qt_gsi::Converter<QAudio::Mode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAudio::Mode>::target_type & >() (args, heap);
   ret.write<QList<QByteArray> > ((QList<QByteArray>)((QAudioSystemFactoryInterface_Adaptor *)cls)->cbs_availableDevices_c1520_0 (arg1));
 }
 
@@ -275,8 +275,8 @@ static void _call_cbs_createDeviceInfo_3721_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const qt_gsi::Converter<QAudio::Mode>::target_type & arg2 = args.read<const qt_gsi::Converter<QAudio::Mode>::target_type & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const qt_gsi::Converter<QAudio::Mode>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QAudio::Mode>::target_type & >() (args, heap);
   ret.write<QAbstractAudioDeviceInfo * > ((QAbstractAudioDeviceInfo *)((QAudioSystemFactoryInterface_Adaptor *)cls)->cbs_createDeviceInfo_3721_0 (arg1, arg2));
 }
 
@@ -299,7 +299,7 @@ static void _call_cbs_createInput_2309_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QAbstractAudioInput * > ((QAbstractAudioInput *)((QAudioSystemFactoryInterface_Adaptor *)cls)->cbs_createInput_2309_0 (arg1));
 }
 
@@ -322,7 +322,7 @@ static void _call_cbs_createOutput_2309_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QAbstractAudioOutput * > ((QAbstractAudioOutput *)((QAudioSystemFactoryInterface_Adaptor *)cls)->cbs_createOutput_2309_0 (arg1));
 }
 

@@ -412,9 +412,9 @@ JobBase::stop ()
   m_stopping = false;
   m_running = false;
 
-  m_lock.unlock ();
-
   stopped ();
+
+  m_lock.unlock ();
 }
 
 void

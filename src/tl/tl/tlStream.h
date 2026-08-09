@@ -408,9 +408,14 @@ public:
    *  This will automatically create the appropriate delegate and 
    *  delete it later.
    *
-   *  The abstract path
+   *  @param abstract_path The abstract path (can be "pipe:<cmd>", "data:<base64-data>", "file:...", "http(s):...".
+   *  @param allow_explicit_suffix If true, extracts the suffix from the abstract path
+   *
+   *  With explicit suffix, the abstract path can be appended an override suffix in the
+   *  form "path[suffix]" (e.g. "file.any[gds]"). The override suffix can be accessed with
+   *  the "suffix" accessor. If an explicit suffix is given, "is_explicit_suffix" is true.
    */
-  InputStream (const std::string &abstract_path);
+  InputStream (const std::string &abstract_path, bool allow_explicit_suffix = true);
 
   /**
    *  @brief Destructor
@@ -529,6 +534,25 @@ public:
   }
 
   /**
+   *  @brief Gets the suffix
+   *
+   *  The suffix is either the override suffix or the
+   *  filename's suffix if no override is given.
+   */
+  const std::string &suffix () const
+  {
+    return m_suffix;
+  }
+
+  /**
+   *  @brief Gets a value indicating if an explicit suffix is given
+   */
+  bool is_explicit_suffix () const
+  {
+    return m_explicit_suffix;
+  }
+
+  /**
    *  @brief Reset to the initial position
    */
   virtual void reset ();
@@ -592,6 +616,9 @@ private:
   char *mp_bptr;
   InputStreamBase *mp_delegate;
   bool m_owns_delegate;
+
+  std::string m_suffix;
+  bool m_explicit_suffix;
 
   //  inflate support 
   InflateFilter *mp_inflate;
@@ -703,7 +730,7 @@ public:
   }
 
   /**
-   *  @brief Get a single line (presumably UTF8 encoded)
+   *  @brief Gets a single line (presumably UTF8 encoded)
    */
   const std::string &get_line ();
 
@@ -720,7 +747,7 @@ public:
   std::string read_all (size_t max_count);
 
   /**
-   *  @brief Get a single character
+   *  @brief Gets a single character
    */
   char get_char ();
 
@@ -730,14 +757,14 @@ public:
   char peek_char ();
 
   /**
-   *  @brief Skip blanks, newlines etc.
+   *  @brief Skips blanks, newlines etc.
    *
    *  Returns the following character without getting it.
    */
   char skip ();
 
   /**
-   *  @brief Get the source specification
+   *  @brief Gets the source specification
    */
   std::string source () const
   {
@@ -745,7 +772,7 @@ public:
   }
 
   /**
-   *  @brief Get the current line number
+   *  @brief Gets the current line number
    */
   size_t line_number ()
   {
@@ -753,7 +780,7 @@ public:
   }
 
   /**
-   *  @brief Return false, if no more characters can be obtained
+   *  @brief Returns false, if no more characters can be obtained
    */
   bool at_end () const 
   {
@@ -761,7 +788,7 @@ public:
   }
 
   /**
-   *  @brief Reset to the initial position
+   *  @brief Resets to the initial position
    */
   void reset ();
 
@@ -853,9 +880,9 @@ public:
   /**
    *  @brief Create a string writer
    */
-  OutputMemoryStream ()
+  OutputMemoryStream (size_t initial_alloc = 65536)
   {
-    m_buffer.reserve (65336);
+    m_buffer.reserve (initial_alloc);
   }
 
   /**
@@ -1285,12 +1312,19 @@ public:
   void close ();
 
   /** 
-   *  @brief This is the outer write method to call
+   *  @brief Puts a string into the stream
    *  
-   *  This implementation writes data through the 
-   *  protected write call.
+   *  In text mode, this handles line separator conversion.
+   *  In binary mode, this method is equivalent to "put_raw".
    */
   void put (const char *b, size_t n);
+
+  /**
+   *  @brief Puts the raw bytes into the stream
+   *
+   *  This method bypasses the line feed translation.
+   */
+  void put_raw (const char *b, size_t n);
 
   /**
    *  @brief Puts a C string (UTF-8) to the output
@@ -1309,7 +1343,7 @@ public:
   }
 
   /**
-   *  @brief << operator
+   *  @brief << operator: inserts character
    */
   OutputStream &operator<< (char s)
   {
@@ -1318,7 +1352,7 @@ public:
   }
 
   /**
-   *  @brief << operator
+   *  @brief << operator: inserts a character
    */
   OutputStream &operator<< (unsigned char s)
   {
@@ -1327,16 +1361,22 @@ public:
   }
 
   /**
-   *  @brief << operator
+   *  @brief << operator: inserts a string
+   *
+   *  In binary mode, the string is inserted as a length/data
+   *  combination. That matches the extraction in BinaryInputStream.
    */
   OutputStream &operator<< (const char *s)
   {
-    put (s);
+    put (s, strlen (s));
     return *this;
   }
 
   /**
-   *  @brief << operator
+   *  @brief << operator: inserts a string
+   *
+   *  In binary mode, the string is inserted as a length/data
+   *  combination. That matches the extraction in BinaryInputStream.
    */
   OutputStream &operator<< (const std::string &s)
   {
@@ -1345,7 +1385,7 @@ public:
   }
 
   /**
-   *  @brief << operator
+   *  @brief << operator: inserts an object supported by "put_native".
    */
   template <class T>
   OutputStream &operator<< (const T &t)
@@ -1428,8 +1468,6 @@ private:
   char *mp_buffer;
   size_t m_buffer_capacity, m_buffer_pos;
   std::string m_path;
-
-  void put_raw (const char *b, size_t n);
 
   //  No copying currently
   OutputStream (const OutputStream &);

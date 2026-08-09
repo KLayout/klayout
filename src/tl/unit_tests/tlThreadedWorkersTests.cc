@@ -197,7 +197,7 @@ TEST(4)
 
   s_sum[0].reset ();
 
-  for (int i = 0; i < 10000; ++i) {
+  for (int i = 0; i < 100000; ++i) {
     job.schedule (new MyTask (100000));
   }
 
@@ -205,7 +205,7 @@ TEST(4)
   bool status = job.wait (100);
 
   EXPECT_EQ (status, false /*timed out*/);
-  EXPECT_EQ (s_sum[0].sum () < 10000000, true);
+  EXPECT_EQ (s_sum[0].sum () < 100000000, true);
 }
 
 TEST(5) 
@@ -214,7 +214,7 @@ TEST(5)
 
   s_sum[0].reset ();
 
-  for (int i = 0; i < 10000; ++i) {
+  for (int i = 0; i < 100000; ++i) {
     job.schedule (new MyTask (100000));
   }
 
@@ -223,7 +223,7 @@ TEST(5)
   tl::usleep (100000);
   job.terminate ();
 
-  EXPECT_EQ (s_sum[0].sum () < 10000000, true);
+  EXPECT_EQ (s_sum[0].sum () < 100000000, true);
 }
 
 TEST(10) 

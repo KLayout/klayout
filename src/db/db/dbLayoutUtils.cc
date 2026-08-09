@@ -218,6 +218,7 @@ copy_or_propagate_shapes (db::Layout &target,
 
     db::Cell &target_cell = target.cell (cm->second);
     transformer->insert_transformed (target_cell.shapes (target_layer), source_cell.shapes (source_layer), trans * propagate_trans);
+
   }
 }
 

@@ -7,6 +7,44 @@ trigger:
   tags:
     include:
       - 'v*'
+  paths:
+    exclude:
+    - '*.md'
+    - docs/*
+    - samples/*
+    - etc/*
+    - macbuild/*
+    - ci-scripts/*
+    - scripts/*
+    - .travis.yml
+    - Jenkinsfile*
+    - .gitignore
+    - LICENSE
+    - COPYRIGHT
+    - CONTRIB
+    - Changelog*
+
+pr:
+  branches:
+    include:
+    - master
+    - staging
+  paths:
+    exclude:
+    - '*.md'
+    - docs/*
+    - samples/*
+    - etc/*
+    - macbuild/*
+    - ci-scripts/*
+    - scripts/*
+    - .travis.yml
+    - Jenkinsfile*
+    - .gitignore
+    - LICENSE
+    - COPYRIGHT
+    - CONTRIB
+    - Changelog*
 
 jobs:
 - job: Build
@@ -14,18 +52,6 @@ jobs:
     vmImage: 'windows-2022' # other options: 'macOS-10.13', 'ubuntu-16.04'
   strategy:
     matrix:
-      cp36-cp36m-win_amd64.whl:
-        python.version: '3.6'
-        python.architecture: 'x64'
-      cp37-cp37m-win_amd64.whl:
-        python.version: '3.7'
-        python.architecture: 'x64'
-      cp38-cp38-win_amd64.whl:
-        python.version: '3.8'
-        python.architecture: 'x64'
-      cp39-cp39-win_amd64.whl:
-        python.version: '3.9'
-        python.architecture: 'x64'
       cp310-cp310-win_amd64.whl:
         python.version: '3.10'
         python.architecture: 'x64'
@@ -41,18 +67,6 @@ jobs:
       cp314-cp314-win_amd64.whl:
         python.version: '3.14'
         python.architecture: 'x64'
-      cp36-cp36m-win32.whl:
-        python.version: '3.6'
-        python.architecture: 'x86'
-      cp37-cp37m-win32.whl:
-        python.version: '3.7'
-        python.architecture: 'x86'
-      cp38-cp38-win32.whl:
-        python.version: '3.8'
-        python.architecture: 'x86'
-      cp39-cp39-win32.whl:
-        python.version: '3.9'
-        python.architecture: 'x86'
       cp310-cp310-win32.whl:
         python.version: '3.10'
         python.architecture: 'x86'
@@ -76,6 +90,13 @@ jobs:
       versionSpec: '$(python.version)'
       architecture: '$(python.architecture)'
 
+  - task: Cache@2
+    inputs:
+      key: 'microbits | "4.0"'
+      path: $(Build.SourcesDirectory)/klayout-microbits
+      cacheHitVar: MICROBITS_CACHED
+    displayName: 'Cache KLayout microbits'
+
   # Add additional tasks to run using each Python version in the matrix above
 
   # PowerShell
@@ -86,9 +107,13 @@ jobs:
       #arguments: # Optional
       script: | # Required when targetType == Inline
         pwd
-        Invoke-WebRequest -Uri "https://www.klayout.org/downloads/klayout-microbits-4.0.zip" -OutFile klayout-microbits-4.0.zip
-        dir
-        Expand-Archive klayout-microbits-4.0.zip -DestinationPath klayout-microbits
+        if ("$(MICROBITS_CACHED)" -ne "true") {
+          Write-Host "Cache miss: downloading and extracting KLayout microbits..."
+          Invoke-WebRequest -Uri "https://www.klayout.org/downloads/klayout-microbits-4.0.zip" -OutFile klayout-microbits-4.0.zip
+          Expand-Archive klayout-microbits-4.0.zip -DestinationPath klayout-microbits
+        } else {
+          Write-Host "Cache hit: restored KLayout microbits from cache."
+        }
         dir klayout-microbits
       #errorActionPreference: 'stop' # Optional. Options: stop, continue, silentlyContinue
       #failOnStderr: false # Optional
@@ -175,26 +200,6 @@ jobs:
         artifactName: 'wheel-3.10.x64'
         downloadPath: '$(System.DefaultWorkingDirectory)'
     - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts wheel-3.9.x64'
-      inputs:
-        artifactName: 'wheel-3.9.x64'
-        downloadPath: '$(System.DefaultWorkingDirectory)'
-    - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts wheel-3.8.x64'
-      inputs:
-        artifactName: 'wheel-3.8.x64'
-        downloadPath: '$(System.DefaultWorkingDirectory)'
-    - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts wheel-3.7.x64'
-      inputs:
-        artifactName: 'wheel-3.7.x64'
-        downloadPath: '$(System.DefaultWorkingDirectory)'
-    - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts wheel-3.6.x64'
-      inputs:
-        artifactName: 'wheel-3.6.x64'
-        downloadPath: '$(System.DefaultWorkingDirectory)'
-    - task: DownloadBuildArtifacts@0
       displayName: 'Download Build Artifacts wheel-3.14.x86'
       inputs:
         artifactName: 'wheel-3.14.x86'
@@ -218,26 +223,6 @@ jobs:
       displayName: 'Download Build Artifacts wheel-3.10.x86'
       inputs:
         artifactName: 'wheel-3.10.x86'
-        downloadPath: '$(System.DefaultWorkingDirectory)'
-    - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts wheel-3.9.x86'
-      inputs:
-        artifactName: 'wheel-3.9.x86'
-        downloadPath: '$(System.DefaultWorkingDirectory)'
-    - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts wheel-3.8.x86'
-      inputs:
-        artifactName: 'wheel-3.8.x86'
-        downloadPath: '$(System.DefaultWorkingDirectory)'
-    - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts wheel-3.7.x86'
-      inputs:
-        artifactName: 'wheel-3.7.x86'
-        downloadPath: '$(System.DefaultWorkingDirectory)'
-    - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts wheel-3.6.x86'
-      inputs:
-        artifactName: 'wheel-3.6.x86'
         downloadPath: '$(System.DefaultWorkingDirectory)'
     - task: CopyFiles@2
       condition: always()

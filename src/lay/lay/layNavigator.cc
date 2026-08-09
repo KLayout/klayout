@@ -576,6 +576,7 @@ Navigator::showEvent (QShowEvent *)
 void 
 Navigator::closeEvent (QCloseEvent *)
 {
+  //  TODO: this is most likely never called
   mp_main_window->dispatcher ()->config_set (cfg_show_navigator, "false");
   mp_main_window->dispatcher ()->config_end ();
 }

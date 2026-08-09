@@ -41,6 +41,9 @@ ubuntu22)
 ubuntu24)
   depends="libqt5core5t64 (>= 5.15.13), libqt5designer5 (>= 5.15.13), libqt5gui5t64 (>= 5.15.13), libqt5multimedia5 (>= 5.15.13), libqt5multimediawidgets5 (>= 5.15.13), libqt5network5t64 (>= 5.15.13), libqt5opengl5t64 (>= 5.15.13), libqt5printsupport5t64 (>= 5.15.13), libqt5sql5t64 (>= 5.15.13), libqt5svg5 (>= 5.15.13), libqt5widgets5t64 (>= 5.15.13), libqt5xml5t64 (>= 5.15.13), libqt5xmlpatterns5 (>= 5.15.13), zlib1g (>= 1.3), libgit2-1.7 (>= 1.7.2), libruby3.2 (>= 3.2.3), python3 (>= 3.12.3), libpython3.12 (>= 3.12.3), libstdc++6 (>=14), libc6 (>= 2.39)" 
   ;;
+ubuntu26)
+  depends="libqt5core5t64 (>= 5.15.18), libqt5designer5 (>= 5.15.18), libqt5gui5t64 (>= 5.15.18), libqt5multimedia5 (>= 5.15.18), libqt5multimediawidgets5 (>= 5.15.18), libqt5network5t64 (>= 5.15.18), libqt5opengl5t64 (>= 5.15.18), libqt5printsupport5t64 (>= 5.15.18), libqt5sql5t64 (>= 5.15.18), libqt5svg5 (>= 5.15.18), libqt5widgets5t64 (>= 5.15.18), libqt5xml5t64 (>= 5.15.18), libqt5xmlpatterns5 (>= 5.15.18), zlib1g (>= 1.3), libgit2-1.9 (>= 1.9.1), libruby3.3 (>= 3.3.8), python3 (>= 3.14.3), libpython3.14 (>= 3.14.3), libstdc++6 (>=16), libc6 (>= 2.43)" 
+  ;;
 *)
   echo "Unknown target '$target' (given as first argument)"
   exit 1

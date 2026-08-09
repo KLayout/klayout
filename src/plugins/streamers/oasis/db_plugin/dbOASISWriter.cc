@@ -1481,18 +1481,6 @@ OASISWriter::write_layername_table (size_t &layernames_table_pos, const std::vec
   end_table (layernames_table_pos);
 }
 
-static bool must_write_cell (const db::Cell &cref)
-{
-  //  Don't write proxy cells which are not employed
-  return ! cref.is_proxy () || ! cref.is_top ();
-}
-
-static bool skip_cell_body (const db::Cell &cref)
-{
-  //  Skip cell bodies for ghost cells unless empty (they are not longer ghost cells in this case)
-  return cref.is_ghost_cell () && cref.empty ();
-}
-
 void
 OASISWriter::create_cell_nstrings (const db::Layout &layout, const std::set <db::cell_index_type> &cell_set)
 {
@@ -1561,13 +1549,13 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
   cells_by_index.reserve (cell_set.size ());
 
   for (db::Layout::bottom_up_const_iterator cell = layout.begin_bottom_up (); cell != layout.end_bottom_up (); ++cell) {
-    if (cell_set.find (*cell) != cell_set.end () && must_write_cell (layout.cell (*cell))) {
+    if (cell_set.find (*cell) != cell_set.end ()) {
       cells.push_back (*cell);
     }
   }
 
   for (db::Layout::const_iterator cell = layout.begin (); cell != layout.end (); ++cell) {
-    if (cell_set.find (cell->cell_index ()) != cell_set.end () && must_write_cell (layout.cell (cell->cell_index ()))) {
+    if (cell_set.find (cell->cell_index ()) != cell_set.end ()) {
       cells_by_index.push_back (cell->cell_index ());
     }
   }
@@ -1714,7 +1702,7 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
     mp_cell = &cref;
 
     //  skip cell body if the cell is not to be written
-    if (skip_cell_body (cref)) {
+    if (cref.is_real_ghost_cell ()) {
       continue;
     }
 
@@ -1777,18 +1765,23 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
       write_props (cref.prop_id ());
     }
 
-    //  instances
-    if (cref.cell_instances () > 0) {
-      write_insts (cell_set);
-    }
+    bool skip_body = options.write_context_info () && cref.can_skip_replica ();
+    if (! skip_body) {
 
-    //  shapes
-    for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-      const db::Shapes &shapes = cref.shapes (l->first);
-      if (! shapes.empty ()) {
-        write_shapes (l->second, shapes);
-        m_progress.set (mp_stream->pos ());
+      //  instances
+      if (cref.cell_instances () > 0) {
+        write_insts (cell_set);
       }
+
+      //  shapes
+      for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
+        const db::Shapes &shapes = cref.shapes (l->first);
+        if (! shapes.empty ()) {
+          write_shapes (l->second, shapes);
+          m_progress.set (mp_stream->pos ());
+        }
+      }
+
     }
 
     //  end CBLOCK if required

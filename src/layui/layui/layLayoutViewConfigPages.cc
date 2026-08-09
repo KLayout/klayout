@@ -300,7 +300,15 @@ LayoutViewConfigPage2b::setup (lay::Dispatcher *root)
 
   bool flag = false;
   root->config_get (cfg_apply_text_trans, flag);
-  mp_ui->text_apply_trans_cbx->setChecked (flag);
+
+  unsigned int mode = 0;
+  if (flag) {
+    mode = 3;
+    root->config_get (cfg_apply_text_trans_mode, mode);
+  }
+
+  mp_ui->text_apply_trans_scale_cbx->setChecked ((mode & 1) != 0);
+  mp_ui->text_apply_trans_rotate_cbx->setChecked ((mode & 2) != 0);
 
   root->config_get (cfg_text_visible, flag);
   mp_ui->text_group->setChecked (flag);
@@ -327,8 +335,11 @@ LayoutViewConfigPage2b::setup (lay::Dispatcher *root)
 void 
 LayoutViewConfigPage2b::commit (lay::Dispatcher *root)
 {
+  unsigned int mode = (mp_ui->text_apply_trans_scale_cbx->isChecked () ? 1 : 0) | (mp_ui->text_apply_trans_rotate_cbx->isChecked () ? 2 : 0);
+  root->config_set (cfg_apply_text_trans, mode != 0);    //  for backward compatibility before version 0.30.8
+  root->config_set (cfg_apply_text_trans_mode, mode);
+
   root->config_set (cfg_text_color, mp_ui->text_color_pb->get_color (), ColorConverter ());
-  root->config_set (cfg_apply_text_trans, mp_ui->text_apply_trans_cbx->isChecked ());
   root->config_set (cfg_text_visible, mp_ui->text_group->isChecked ());
   root->config_set (cfg_show_properties, mp_ui->show_properties_cbx->isChecked ());
   root->config_set (cfg_text_font, mp_ui->text_font_cb->currentIndex ());
@@ -1013,6 +1024,10 @@ LayoutViewConfigPage5::setup (lay::Dispatcher *root)
   bool always_show_li = false;
   root->config_get (cfg_layers_always_show_layout_index, always_show_li);
   mp_ui->ly_index_cb->setChecked (always_show_li);
+
+  bool auto_create_new_layers = true;
+  root->config_get (cfg_auto_create_new_layers, auto_create_new_layers);
+  mp_ui->auto_create_new_layers_cb->setChecked (auto_create_new_layers);
 }
 
 void 
@@ -1027,6 +1042,7 @@ LayoutViewConfigPage5::commit (lay::Dispatcher *root)
   root->config_set (cfg_layers_always_show_source, mp_ui->source_display_cb->isChecked ());
   root->config_set (cfg_layers_always_show_ld, mp_ui->ld_display_cb->isChecked ());
   root->config_set (cfg_layers_always_show_layout_index, mp_ui->ly_index_cb->isChecked ());
+  root->config_set (cfg_auto_create_new_layers, mp_ui->auto_create_new_layers_cb->isChecked ());
 }
 
 void 

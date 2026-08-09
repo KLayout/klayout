@@ -463,12 +463,12 @@ static void _call_f_united_c2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 
 //  QPolygonF ::operator *(const QPolygonF &a, const QMatrix &m)
 static QPolygonF op_QPolygonF_operator_star__4123(const QPolygonF *_self, const QMatrix &m) {
-  return ::operator *(*_self, m);
+  return operator *(*_self, m);
 }
 
 //  QPolygonF ::operator *(const QPolygonF &a, const QTransform &m)
 static QPolygonF op_QPolygonF_operator_star__4450(const QPolygonF *_self, const QTransform &m) {
-  return ::operator *(*_self, m);
+  return operator *(*_self, m);
 }
 
 

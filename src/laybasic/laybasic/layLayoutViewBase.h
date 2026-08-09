@@ -1401,6 +1401,26 @@ public:
   }
   
   /**
+   *  @brief Sets the mode how to apply the text transformation
+   *
+   *  The mode value has two bits:
+   *  - bit 0: apply scaling
+   *  - bit 1: apply rotation
+   *
+   *  The default is mode "3" (scaling and rotation).
+   *  The mode is effective only if "apply_text_trans" is true.
+   */
+  void apply_text_trans_mode (unsigned int m);
+
+  /**
+   *  @brief Gets the mode how to apply the text transformation
+   */
+  unsigned int apply_text_trans_mode () const
+  {
+    return m_apply_text_trans ? m_apply_text_trans_mode : 0;
+  }
+
+  /**
    *  @brief Text object color
    */
   void text_color (tl::Color c);
@@ -1885,6 +1905,22 @@ public:
   void absolute_coordinates (bool f);
 
   /**
+   *  @brief Gets a value indicating whether new layer entries shall be created in the view
+   *
+   *  Certain operations such as paste or creation of instances establish new layers.
+   *  This flag controls whether such new layers are automatically added to the layer list.
+   */
+  bool auto_create_new_layers () const
+  {
+    return m_auto_create_new_layers;
+  }
+
+  /**
+   *  @brief Sets a value indicating whether new layer entries shall be created in the view
+   */
+  void auto_create_new_layers (bool f);
+
+  /**
    *  @brief Gets the canvas object (where the layout is drawn and view objects are placed)
    */
   lay::LayoutCanvas *canvas ()
@@ -2187,6 +2223,14 @@ public:
       }
     }
     return pi;
+  }
+
+  /**
+   *  @brief Gets the active plugin
+   */
+  lay::Plugin *active_plugin () const
+  {
+    return mp_active_plugin;
   }
 
   /** 
@@ -3074,6 +3118,7 @@ private:
   bool m_show_properties;
   tl::Color m_text_color;
   bool m_apply_text_trans;
+  unsigned int m_apply_text_trans_mode;
   double m_default_text_size;
   bool m_text_point_mode;
   unsigned int m_text_font;
@@ -3092,6 +3137,7 @@ private:
   bool m_clear_ruler_new_cell;
   bool m_dbu_coordinates;
   bool m_absolute_coordinates;
+  bool m_auto_create_new_layers;
 
   bool m_dirty;
   bool m_prop_changed;
@@ -3175,11 +3221,6 @@ protected:
   LayoutViewBase (lay::LayoutView *ui, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
 
   void init (db::Manager *mgr);
-
-  lay::Plugin *active_plugin () const
-  {
-    return mp_active_plugin;
-  }
 
   virtual LayoutView *get_ui ();
 

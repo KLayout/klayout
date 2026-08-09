@@ -855,7 +855,9 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
   lay::RedrawThread redraw_thread (&rd_canvas, mp_view);
 
   //  render the layout
-  redraw_thread.start (0 /*synchronous*/, m_layers, vp, resolution, font_resolution, true);
+  int workers = mp_view->synchronous () ? 0 : mp_view->drawing_workers ();
+  redraw_thread.start (workers, m_layers, vp, resolution, font_resolution, true);
+  redraw_thread.wait ();
   redraw_thread.stop (); // safety
 
   //  paint the background objects. It uses "img" to paint on.
@@ -947,8 +949,10 @@ LayoutCanvas::screenshot ()
 void
 LayoutCanvas::resize_event (unsigned int width, unsigned int height)
 {
-  unsigned int w = width * dpr () + 0.5, h = height * dpr () + 0.5;
-  unsigned int wl = width * m_oversampling * dpr () + 0.5, hl = height * m_oversampling * dpr () + 0.5;
+  unsigned int w = (unsigned int) ceil (width * dpr () - db::epsilon);
+  unsigned int h = (unsigned int) ceil (height * dpr () - db::epsilon);
+  unsigned int wl = w * m_oversampling;
+  unsigned int hl = h * m_oversampling;
 
   if (m_viewport.width () != w || m_viewport.height () != h ||
       m_viewport_l.width () != wl || m_viewport_l.height () != hl) {
@@ -957,8 +961,8 @@ LayoutCanvas::resize_event (unsigned int width, unsigned int height)
     m_image_cache.clear ();
 
     //  set the viewport to the new size
-    m_viewport.set_size (width * dpr () + 0.5, height * dpr () + 0.5);
-    m_viewport_l.set_size (width * m_oversampling * dpr () + 0.5, height * m_oversampling * dpr () + 0.5);
+    m_viewport.set_size (w, h);
+    m_viewport_l.set_size (wl, hl);
 
     mouse_event_trans (db::DCplxTrans (1.0 / dpr ()) * m_viewport.trans ());
     do_redraw_all (true);

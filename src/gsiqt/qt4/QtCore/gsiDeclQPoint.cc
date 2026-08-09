@@ -282,37 +282,37 @@ static void _call_f_y_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi
 
 //  bool ::operator==(const QPoint &p1, const QPoint &p2)
 static bool op_QPoint_operator_eq__eq__3724(const QPoint *_self, const QPoint &p2) {
-  return ::operator==(*_self, p2);
+  return operator==(*_self, p2);
 }
 
 //  bool ::operator!=(const QPoint &p1, const QPoint &p2)
 static bool op_QPoint_operator_excl__eq__3724(const QPoint *_self, const QPoint &p2) {
-  return ::operator!=(*_self, p2);
+  return operator!=(*_self, p2);
 }
 
 //  const QPoint ::operator+(const QPoint &p1, const QPoint &p2)
 static const QPoint op_QPoint_operator_plus__3724(const QPoint *_self, const QPoint &p2) {
-  return ::operator+(*_self, p2);
+  return operator+(*_self, p2);
 }
 
 //  const QPoint ::operator-(const QPoint &p1, const QPoint &p2)
 static const QPoint op_QPoint_operator_minus__3724(const QPoint *_self, const QPoint &p2) {
-  return ::operator-(*_self, p2);
+  return operator-(*_self, p2);
 }
 
 //  const QPoint ::operator*(const QPoint &p, qreal c)
 static const QPoint op_QPoint_operator_star__2777(const QPoint *_self, qreal c) {
-  return ::operator*(*_self, c);
+  return operator*(*_self, c);
 }
 
 //  const QPoint ::operator-(const QPoint &p)
 static const QPoint op_QPoint_operator_minus__1916(const QPoint *_self) {
-  return ::operator-(*_self);
+  return operator-(*_self);
 }
 
 //  const QPoint ::operator/(const QPoint &p, qreal c)
 static const QPoint op_QPoint_operator_slash__2777(const QPoint *_self, qreal c) {
-  return ::operator/(*_self, c);
+  return operator/(*_self, c);
 }
 
 

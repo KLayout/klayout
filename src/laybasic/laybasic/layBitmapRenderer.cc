@@ -389,9 +389,13 @@ BitmapRenderer::draw (const db::Shape &shape, const db::CplxTrans &trans,
       db::DCoord h = trans.mag () * m_default_text_size;
       db::Font font = shape.text_font () == db::NoFont ? m_font : shape.text_font ();
 
-      if (m_apply_text_trans && font != db::NoFont && font != db::DefaultFont) {
-        fp = db::DFTrans (trans.fp_trans () * shape.text_trans ());
-        h = trans.mag () * (shape.text_size () > 0 ? shape.text_size () : m_default_text_size);
+      if (font != db::NoFont && font != db::DefaultFont) {
+        if ((m_apply_text_trans_mode & 2) != 0) {
+          fp = db::DFTrans (trans.fp_trans () * shape.text_trans ());
+        }
+        if ((m_apply_text_trans_mode & 1) != 0) {
+          h = trans.mag () * (shape.text_size () > 0 ? shape.text_size () : m_default_text_size);
+        }
       }
 
       db::HAlign halign = shape.text_halign ();
@@ -1090,9 +1094,13 @@ BitmapRenderer::draw (const db::Text &txt, const db::CplxTrans &trans,
     db::DCoord h = trans.mag () * m_default_text_size;
     db::Font font = txt.font () == db::NoFont ? m_font : txt.font ();
 
-    if (m_apply_text_trans && font != db::NoFont && font != db::DefaultFont) {
-      fp = db::DFTrans (trans.fp_trans () * txt.trans ());
-      h = trans.mag () * (txt.size () > 0 ? txt.size () : m_default_text_size);
+    if (font != db::NoFont && font != db::DefaultFont) {
+      if ((m_apply_text_trans_mode & 2) != 0) {
+        fp = db::DFTrans (trans.fp_trans () * txt.trans ());
+      }
+      if ((m_apply_text_trans_mode & 1) != 0) {
+        h = trans.mag () * (txt.size () > 0 ? txt.size () : m_default_text_size);
+      }
     }
 
     double fy = 0.0;
@@ -1161,9 +1169,13 @@ BitmapRenderer::draw (const db::DText &txt, const db::DCplxTrans &trans,
     db::DCoord h = trans.ctrans (m_default_text_size_dbl);
     db::Font font = txt.font () == db::NoFont ? m_font : txt.font ();
 
-    if (m_apply_text_trans && font != db::NoFont && font != db::DefaultFont) {
-      fp = trans.fp_trans () * db::DFTrans (txt.trans ());
-      h = trans.ctrans (txt.size () > 0 ? txt.size () : m_default_text_size_dbl);
+    if (font != db::NoFont && font != db::DefaultFont) {
+      if ((m_apply_text_trans_mode & 2) != 0) {
+        fp = trans.fp_trans () * db::DFTrans (txt.trans ());
+      }
+      if ((m_apply_text_trans_mode & 1) != 0) {
+        h = trans.ctrans (txt.size () > 0 ? txt.size () : m_default_text_size_dbl);
+      }
     }
 
     double fy = 0.0;

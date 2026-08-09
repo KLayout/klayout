@@ -114,6 +114,8 @@ public slots:
   void layer_tab_changed ();
   void layer_order_changed ();
   void select_cell_dispatch (const cell_path_type &path, int cellview_index);
+  void layer_search_options_edited ();
+  void cell_search_options_edited ();
   void min_hier_changed (int i);
   void max_hier_changed (int i);
   void app_terminated ();
@@ -654,6 +656,8 @@ private:
   void layer_order_changed ();
   void min_hier_changed (int i);
   void max_hier_changed (int i);
+  void layer_search_options_edited ();
+  void cell_search_options_edited ();
 
   bool event_filter (QObject *obj, QEvent *ev, bool &taken);
   QSize size_hint () const;

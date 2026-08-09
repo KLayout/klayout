@@ -351,6 +351,7 @@ LayoutViewBase::init (db::Manager *mgr)
   m_bitmap_caching = true;
   m_show_properties = false;
   m_apply_text_trans = true;
+  m_apply_text_trans_mode = 3;
   m_default_text_size = 0.1;
   m_text_point_mode = false;
   m_text_font = 0;
@@ -362,6 +363,7 @@ LayoutViewBase::init (db::Manager *mgr)
   m_clear_ruler_new_cell = false;
   m_dbu_coordinates = false;
   m_absolute_coordinates = false;
+  m_auto_create_new_layers = true;
   m_drop_small_cells = false;
   m_drop_small_cells_value = 10;
   m_drop_small_cells_cond = DSC_Max;
@@ -1029,6 +1031,13 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
     apply_text_trans (flag);
     return true;
 
+  } else if (name == cfg_apply_text_trans_mode) {
+
+    unsigned int mode;
+    tl::from_string (value, mode);
+    apply_text_trans_mode (mode);
+    return true;
+
   } else if (name == cfg_markers_visible) {
 
     bool flag;
@@ -1097,6 +1106,13 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
     bool flag;
     tl::from_string (value, flag);
     absolute_coordinates (flag);
+    return true;
+
+  } else if (name == cfg_auto_create_new_layers) {
+
+    bool flag;
+    tl::from_string (value, flag);
+    auto_create_new_layers (flag);
     return true;
 
   } else if (name == cfg_guiding_shape_visible) {
@@ -3367,6 +3383,7 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
   }
 
   set_properties (new_props);
+  do_update_layer_sources ();
 
   goto_view (state);
 }
@@ -3912,18 +3929,34 @@ LayoutViewBase::full_box () const
   db::DBox bbox;
 
   auto tv = cv_transform_variants_with_empty ();
+
+  //  first, use the bounding box of actual drawn layout (issue #2326)
   for (auto i = tv.begin (); i != tv.end (); ++i) {
     const lay::CellView &cv = cellview (i->second);
     if (cv.is_valid ()) {
       double dbu = cv->layout ().dbu ();
-      bbox += (i->first * db::CplxTrans (dbu) * cv.context_trans ()) * cv.cell ()->bbox_with_empty ();
+      bbox += (i->first * db::CplxTrans (dbu) * cv.context_trans ()) * cv.cell ()->bbox ();
     }
   }
 
+  //  if that is empty, use the bounding box computed while treating empty cells as
+  //  dots at the origin of the cells
+  if (bbox.empty ()) {
+    for (auto i = tv.begin (); i != tv.end (); ++i) {
+      const lay::CellView &cv = cellview (i->second);
+      if (cv.is_valid ()) {
+        double dbu = cv->layout ().dbu ();
+        bbox += (i->first * db::CplxTrans (dbu) * cv.context_trans ()) * cv.cell ()->bbox_with_empty ();
+      }
+    }
+  }
+
+  //  add annotations
   for (lay::AnnotationShapes::iterator a = annotation_shapes ().begin (); ! a.at_end (); ++a) {
     bbox += a->box ();
   }
 
+  //  produce a default if still empty and enlarge by some small amount to have a border
   if (bbox.empty ()) {
     bbox = db::DBox (0, 0, 0, 0); // default box
   } else {
@@ -4965,7 +4998,13 @@ LayoutViewBase::absolute_coordinates (bool f)
   m_absolute_coordinates = f;
 }
 
-void 
+void
+LayoutViewBase::auto_create_new_layers (bool f)
+{
+  m_auto_create_new_layers = f;
+}
+
+void
 LayoutViewBase::select_cellviews_fit (const std::list <CellView> &cvs)
 {
   if (m_cellviews != cvs) {
@@ -5541,7 +5580,16 @@ LayoutViewBase::apply_text_trans (bool f)
   }
 }
   
-void 
+void
+LayoutViewBase::apply_text_trans_mode (unsigned int m)
+{
+  if (m_apply_text_trans_mode != m) {
+    m_apply_text_trans_mode = m;
+    redraw ();
+  }
+}
+
+void
 LayoutViewBase::offset_stipples (bool f)
 {
   if (m_stipple_offset != f) {

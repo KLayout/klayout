@@ -224,7 +224,7 @@ private:
   bool m_text_lazy_rendering;
   bool m_bitmap_caching;
   bool m_show_properties;
-  bool m_apply_text_trans;
+  unsigned int m_apply_text_trans_mode;
   double m_default_text_size;
   bool m_drop_small_cells;
   unsigned int m_drop_small_cells_value;

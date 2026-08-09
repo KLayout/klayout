@@ -910,7 +910,7 @@ static void _call_cbs_setDir_864_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo_Adaptor *)cls)->cbs_setDir_864_0 (arg1);
 }
@@ -934,7 +934,7 @@ static void _call_cbs_setFile_864_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo_Adaptor *)cls)->cbs_setFile_864_0 (arg1);
 }
@@ -958,7 +958,7 @@ static void _call_cbs_setGroup_2025_0 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo_Adaptor *)cls)->cbs_setGroup_2025_0 (arg1);
 }
@@ -982,7 +982,7 @@ static void _call_cbs_setLastModified_2175_0 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo_Adaptor *)cls)->cbs_setLastModified_2175_0 (arg1);
 }
@@ -1006,7 +1006,7 @@ static void _call_cbs_setName_2025_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo_Adaptor *)cls)->cbs_setName_2025_0 (arg1);
 }
@@ -1030,7 +1030,7 @@ static void _call_cbs_setOwner_2025_0 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo_Adaptor *)cls)->cbs_setOwner_2025_0 (arg1);
 }
@@ -1054,7 +1054,7 @@ static void _call_cbs_setPermissions_767_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo_Adaptor *)cls)->cbs_setPermissions_767_0 (arg1);
 }
@@ -1078,7 +1078,7 @@ static void _call_cbs_setReadable_864_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo_Adaptor *)cls)->cbs_setReadable_864_0 (arg1);
 }
@@ -1102,7 +1102,7 @@ static void _call_cbs_setSize_986_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo_Adaptor *)cls)->cbs_setSize_986_0 (arg1);
 }
@@ -1126,7 +1126,7 @@ static void _call_cbs_setSymLink_864_0 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo_Adaptor *)cls)->cbs_setSymLink_864_0 (arg1);
 }
@@ -1150,7 +1150,7 @@ static void _call_cbs_setWritable_864_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo_Adaptor *)cls)->cbs_setWritable_864_0 (arg1);
 }

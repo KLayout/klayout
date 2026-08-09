@@ -141,6 +141,12 @@ NetlistBrowserDialog::db ()
   return mp_ui->browser_page->db ();
 }
 
+int
+NetlistBrowserDialog::l2n_index ()
+{
+  return m_l2n_index;
+}
+
 const lay::NetlistObjectsPath &
 NetlistBrowserDialog::current_path () const
 {
@@ -149,6 +155,14 @@ NetlistBrowserDialog::current_path () const
   } else {
     static lay::NetlistObjectsPath empty;
     return empty;
+  }
+}
+
+void
+NetlistBrowserDialog::set_current_path (const lay::NetlistObjectsPath &path)
+{
+  if (mp_ui->browser_page) {
+    mp_ui->browser_page->select_path (path);
   }
 }
 

@@ -123,6 +123,7 @@ connect_implicit("INV2", "VSS")
 
 # Compare section
 
+# NOTE: indirectly tests "make_top_level_pins" with name sorting (#2360)
 netlist.simplify
 align
 

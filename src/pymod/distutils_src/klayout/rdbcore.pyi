@@ -1270,17 +1270,17 @@ class RdbReference:
     @overload
     def database(self) -> ReportDatabase:
         r"""
-        @brief Gets the database object that category is associated with (non-const version)
+        @brief Gets the database object that category is associated with
 
-        This method has been introduced in version 0.29.
+        This method has been introduced in version 0.23.
         """
         ...
     @overload
     def database(self) -> ReportDatabase:
         r"""
-        @brief Gets the database object that category is associated with
+        @brief Gets the database object that category is associated with (non-const version)
 
-        This method has been introduced in version 0.23.
+        This method has been introduced in version 0.29.
         """
         ...
     def destroy(self) -> None:
@@ -1923,6 +1923,17 @@ class ReportDatabase:
         @brief Loads the database from the given file
         @param filename The file from which to load the database
         The reader recognizes the format automatically and will choose the appropriate decoder. 'gzip' compressed files are uncompressed automatically.
+        """
+        ...
+    def merge(self, other: ReportDatabase) -> None:
+        r"""
+        @brief Merges the other database with this one
+        This method will merge the other database with this one. The other database needs to have the same top cell than
+        this database. In the merge step, identical cells and categories will be identified and missing cells or categories
+        will be created in this database. After that, all items will be transferred from the other database into this one
+        and will be associated with cells and categories from this database.
+
+        This method has been added in version 0.30.7.
         """
         ...
     def name(self) -> str:

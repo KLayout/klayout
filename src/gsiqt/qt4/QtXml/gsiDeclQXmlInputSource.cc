@@ -344,8 +344,8 @@ static void _call_cbs_fromRawData_3065_1 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  bool arg2 = args.read<bool > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (false, heap);
   ret.write<QString > ((QString)((QXmlInputSource_Adaptor *)cls)->cbs_fromRawData_3065_1 (arg1, arg2));
 }
 
@@ -407,7 +407,7 @@ static void _call_cbs_setData_2025_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlInputSource_Adaptor *)cls)->cbs_setData_2025_0 (arg1);
 }

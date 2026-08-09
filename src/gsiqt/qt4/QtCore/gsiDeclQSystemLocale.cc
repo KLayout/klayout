@@ -188,8 +188,8 @@ static void _call_cbs_query_c3956_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSystemLocale::QueryType>::target_type & arg1 = args.read<const qt_gsi::Converter<QSystemLocale::QueryType>::target_type & > (heap);
-  QVariant arg2 = args.read<QVariant > (heap);
+  const qt_gsi::Converter<QSystemLocale::QueryType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSystemLocale::QueryType>::target_type & >() (args, heap);
+  QVariant arg2 = gsi::arg_reader<QVariant >() (args, heap);
   ret.write<QVariant > ((QVariant)((QSystemLocale_Adaptor *)cls)->cbs_query_c3956_0 (arg1, arg2));
 }
 

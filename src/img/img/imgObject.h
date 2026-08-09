@@ -145,7 +145,7 @@ public:
 /**
  *  @brief A helper function to interpolate a color in the color bar at a given x
  */
-tl::Color interpolated_color (const DataMapping::false_color_nodes_type &nodes, double x);
+IMG_PUBLIC tl::Color interpolated_color (const DataMapping::false_color_nodes_type &nodes, double x);
 
 /**
  *  @brief A image object
@@ -582,6 +582,22 @@ public:
   }
 
   /**
+   *  @brief Sets the tag string
+   *
+   *  The tag string is an arbitrary string that can be used to identify
+   *  the image. It is not persisted and it not considered for equality or sorting.
+   */
+  void set_tag (const std::string &tag);
+
+  /**
+   *  @brief Gets the tag string
+   */
+  const std::string tag () const
+  {
+    return m_tag;
+  }
+
+  /**
    *  @brief Accessor to the width property
    */
   size_t width () const;
@@ -794,7 +810,7 @@ public:
   /**
    *  @brief Set the transformation matrix
    *
-   *  This transformation matrix converts pixel coordinates (0,0 being the lower left corner and each pixel having the dimension of pixel_width and pixel_height)
+   *  This transformation matrix converts pixel coordinates (0,0 being the center and each pixel having the dimension of pixel_width and pixel_height)
    *  to micron coordinates. The coordinate of the pixel is the lower left corner of the pixel.
    */
   void set_matrix (const db::Matrix3d &trans);
@@ -802,7 +818,7 @@ public:
   /**
    *  @brief Return the pixel-to-micron transformation
    *
-   *  This transformation converts pixel coordinates (0,0 being the lower left corner and each pixel having the dimension of pixel_width and pixel_height)
+   *  This transformation converts pixel coordinates (0,0 being the center and each pixel having the dimension of pixel_width and pixel_height)
    *  to micron coordinates. The coordinate of the pixel is the lower left corner of the pixel.
    */
   const db::Matrix3d &matrix () const
@@ -1036,6 +1052,7 @@ protected:
 
 private:
   std::string m_filename;
+  std::string m_tag;
   db::Matrix3d m_trans;
   DataHeader *mp_data;
   size_t m_id;

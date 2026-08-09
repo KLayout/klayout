@@ -29,6 +29,7 @@
 #include "layPixelBufferPainter.h"
 #include "laySnap.h"
 #include "tlColor.h"
+#include "tlInternational.h"
 #include "dbTrans.h"
 
 #if defined(HAVE_QT)
@@ -118,7 +119,7 @@ GridNetPluginDeclaration::get_options (std::vector < std::pair<std::string, std:
 lay::ConfigPage *
 GridNetPluginDeclaration::config_page (QWidget *parent, std::string &title) const
 {
-  title = tl::to_string (QObject::tr ("Display|Background"));
+  title = tl::to_string (tr ("Display|Background"));
   return new GridNetConfigPage (parent); 
 }
 #endif
@@ -216,9 +217,21 @@ GridNet::configure (const std::string &name, const std::string &value)
     double g = 0;
     tl::from_string (value, g);
     if (fabs (g - m_grid) > 1e-6) {
+
       m_grid = g;
       need_update = true;
+
+      std::string gs;
+      if (m_grid < 0.4) {
+        //  pick nm units below 400nm
+        gs = tl::to_string (m_grid * 1000.0) + tl::to_string (tr (" nm"));
+      } else {
+        gs = tl::to_string (m_grid) + tl::to_string (tr (" um"));
+      }
+      mp_view->message (tl::sprintf (tl::to_string (tr ("Grid: %s")), gs));
+
     }
+
     taken = false; // to let others use the grid too.
 
   } else {

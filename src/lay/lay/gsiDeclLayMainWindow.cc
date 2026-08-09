@@ -202,9 +202,9 @@ static void clear_config (lay::MainWindow *mw)
   mw->dispatcher ()->clear_config ();
 }
 
-static bool write_config (lay::MainWindow *mw, const std::string &config_file)
+static bool write_config (lay::MainWindow *mw, const std::string &config_file, int keep_backups)
 {
-  return mw->dispatcher ()->write_config (config_file);
+  return mw->dispatcher ()->write_config (config_file, keep_backups);
 }
 
 static bool read_config (lay::MainWindow *mw, const std::string &config_file)
@@ -348,7 +348,7 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
-  method_ext ("write_config", &write_config, gsi::arg ("file_name"),
+  method_ext ("write_config", &write_config, gsi::arg ("file_name"), gsi::arg ("keep_backups", 0),
     "@brief Writes configuration to a file\n"
     "This method is provided for using MainWindow without an Application object. "
     "It's a convience method which is equivalent to 'dispatcher().write_config(...)'. See \\Dispatcher#write_config for details.\n"

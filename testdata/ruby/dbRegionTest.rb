@@ -235,7 +235,7 @@ class DBRegion_TestClass < TestBase
     r.insert(RBA::PolygonWithProperties::new(RBA::Box::new(0, 0, 10, 20), { 1 => 'value' }))
     r.insert(RBA::Box::new(1, 2, 11, 22))
     assert_equal(r[0].to_s, "(1,2;1,22;11,22;11,2) props={}")
-    assert_equal(r[1].to_s, "(0,0;0,20;10,20;10,0) props={1=>value}")
+    assert_equal(r[1].to_s, "(0,0;0,20;10,20;10,0) props={#1=>'value'}")
     
     r = RBA::Region::new(ly.begin_shapes(c1.cell_index, l2), "*")
     assert_equal(csort(r.to_s), csort("(-11,-21;-11,-19;-9,-19;-9,-21);(9,19;9,21;11,21;11,19);(-11,79;-11,81;-9,81;-9,79);(9,119;9,121;11,121;11,119);(189,79;189,81;191,81;191,79);(209,119;209,121;211,121;211,119)"))
@@ -1635,20 +1635,20 @@ class DBRegion_TestClass < TestBase
     r.insert(RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
     r.insert(RBA::Box::new(10, 20, 110, 220))
     s = r.each.collect(&:to_s).join(";")
-    assert_equal(s, "(10,20;10,220;110,220;110,20) props={};(0,0;0,200;100,200;100,0) props={1=>one}")
+    assert_equal(s, "(10,20;10,220;110,220;110,20) props={};(0,0;0,200;100,200;100,0) props={#1=>'one'}")
     rr = r.dup
     rr.join_properties_on_merge = true
     assert_equal(rr.join_properties_on_merge, true)
     s = rr.each_merged.collect(&:to_s).join(";")
-    assert_equal(s, "(0,0;0,200;10,200;10,220;110,220;110,20;100,20;100,0) props={1=>one}")
+    assert_equal(s, "(0,0;0,200;10,200;10,220;110,220;110,20;100,20;100,0) props={#1=>'one'}")
     s = r.each_merged.collect(&:to_s).join(";")
-    assert_equal(s, "(10,20;10,220;110,220;110,20) props={};(0,0;0,200;100,200;100,0) props={1=>one}")
+    assert_equal(s, "(10,20;10,220;110,220;110,20) props={};(0,0;0,200;100,200;100,0) props={#1=>'one'}")
 
     r = RBA::Region::new
     r.insert(RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
     r.insert(RBA::BoxWithProperties::new(RBA::Box::new(10, 20, 110, 220), { 1 => "one" }))
     s = r.each_merged.collect(&:to_s).join(";")
-    assert_equal(s, "(0,0;0,200;10,200;10,220;110,220;110,20;100,20;100,0) props={1=>one}")
+    assert_equal(s, "(0,0;0,200;10,200;10,220;110,220;110,20;100,20;100,0) props={#1=>'one'}")
 
   end
 

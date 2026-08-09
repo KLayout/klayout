@@ -172,8 +172,8 @@ static void _call_cbs_resolveEntity_3942_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QXmlStreamEntityResolver_Adaptor *)cls)->cbs_resolveEntity_3942_0 (arg1, arg2));
 }
 
@@ -196,7 +196,7 @@ static void _call_cbs_resolveUndeclaredEntity_2025_0 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QXmlStreamEntityResolver_Adaptor *)cls)->cbs_resolveUndeclaredEntity_2025_0 (arg1));
 }
 

@@ -82,6 +82,16 @@ public:
   }
 
   /**
+   *  @brief Reimplemented from Cell: unregisters the proxy at the layout
+   */
+  virtual void unregister ();
+
+  /**
+   *  @brief Reimplemented from Cell: reregisters the proxy at the layout
+   */
+  virtual void reregister ();
+
+  /**
    *  @brief Gets a list of cold proxies for a given library name
    */
   static const tl::weak_collection<ColdProxy> &cold_proxies_per_lib_name (const std::string &libname);

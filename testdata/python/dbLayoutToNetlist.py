@@ -105,15 +105,15 @@ circuit INV2 (OUT=OUT,$2=$3,$3=$4);
 end;
 circuit RINGO ();
   subcircuit INV2 $1 (OUT='FB,OSC',$2=VSS,$3=VDD);
-  subcircuit INV2 $2 (OUT=$I20,$2=VSS,$3=VDD);
-  subcircuit INV2 $3 (OUT=$I19,$2=VSS,$3=VDD);
-  subcircuit INV2 $4 (OUT=$I21,$2=VSS,$3=VDD);
-  subcircuit INV2 $5 (OUT=$I22,$2=VSS,$3=VDD);
+  subcircuit INV2 $2 (OUT=$I27,$2=VSS,$3=VDD);
+  subcircuit INV2 $3 (OUT=$I26,$2=VSS,$3=VDD);
+  subcircuit INV2 $4 (OUT=$I25,$2=VSS,$3=VDD);
+  subcircuit INV2 $5 (OUT=$I24,$2=VSS,$3=VDD);
   subcircuit INV2 $6 (OUT=$I23,$2=VSS,$3=VDD);
-  subcircuit INV2 $7 (OUT=$I24,$2=VSS,$3=VDD);
-  subcircuit INV2 $8 (OUT=$I25,$2=VSS,$3=VDD);
-  subcircuit INV2 $9 (OUT=$I26,$2=VSS,$3=VDD);
-  subcircuit INV2 $10 (OUT=$I27,$2=VSS,$3=VDD);
+  subcircuit INV2 $7 (OUT=$I22,$2=VSS,$3=VDD);
+  subcircuit INV2 $8 (OUT=$I21,$2=VSS,$3=VDD);
+  subcircuit INV2 $9 (OUT=$I20,$2=VSS,$3=VDD);
+  subcircuit INV2 $10 (OUT=$I19,$2=VSS,$3=VDD);
 end;
 """)
 
@@ -134,7 +134,7 @@ end;
     for sc in sc_path:
       a.append(sc.expanded_name())
       t = t * sc.trans
-    self.assertEqual(",".join(a), "$2")
+    self.assertEqual(",".join(a), "$9")
     self.assertEqual(str(t), "r0 *1 2.64,0")
 
     self.assertEqual(str(l2n.shapes_of_net(n, rmetal1, True)),
@@ -206,16 +206,16 @@ circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);
   subcircuit TRANS $4 ($1=$4,$2=OUT,$3=$2);
 end;
 circuit RINGO ();
-  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);
+  subcircuit INV2 $1 (IN=$I18,$2=FB,OUT=OSC,$4=VSS,$5=VDD);
   subcircuit INV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VDD);
-  subcircuit INV2 $3 (IN=$I19,$2=$I39,OUT=$I1,$4=VSS,$5=VDD);
-  subcircuit INV2 $4 (IN=$I1,$2=$I40,OUT=$I2,$4=VSS,$5=VDD);
-  subcircuit INV2 $5 (IN=$I2,$2=$I41,OUT=$I3,$4=VSS,$5=VDD);
-  subcircuit INV2 $6 (IN=$I3,$2=$I42,OUT=$I4,$4=VSS,$5=VDD);
-  subcircuit INV2 $7 (IN=$I4,$2=$I43,OUT=$I5,$4=VSS,$5=VDD);
-  subcircuit INV2 $8 (IN=$I5,$2=$I44,OUT=$I6,$4=VSS,$5=VDD);
-  subcircuit INV2 $9 (IN=$I6,$2=$I45,OUT=$I7,$4=VSS,$5=VDD);
-  subcircuit INV2 $10 (IN=$I7,$2=$I46,OUT=$I8,$4=VSS,$5=VDD);
+  subcircuit INV2 $3 (IN=$I17,$2=$I46,OUT=$I18,$4=VSS,$5=VDD);
+  subcircuit INV2 $4 (IN=$I16,$2=$I45,OUT=$I17,$4=VSS,$5=VDD);
+  subcircuit INV2 $5 (IN=$I15,$2=$I44,OUT=$I16,$4=VSS,$5=VDD);
+  subcircuit INV2 $6 (IN=$I14,$2=$I43,OUT=$I15,$4=VSS,$5=VDD);
+  subcircuit INV2 $7 (IN=$I13,$2=$I42,OUT=$I14,$4=VSS,$5=VDD);
+  subcircuit INV2 $8 (IN=$I12,$2=$I41,OUT=$I13,$4=VSS,$5=VDD);
+  subcircuit INV2 $9 (IN=$I11,$2=$I40,OUT=$I12,$4=VSS,$5=VDD);
+  subcircuit INV2 $10 (IN=$I19,$2=$I39,OUT=$I11,$4=VSS,$5=VDD);
 end;
 """)
 
@@ -287,16 +287,16 @@ end;
     l2n.extract_netlist()
 
     self.assertEqual(str(l2n.netlist()), """circuit RINGO ();
-  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);
+  subcircuit INV2 $1 (IN=$I18,$2=FB,OUT=OSC,$4=VSS,$5=VDD);
   subcircuit INV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VDD);
-  subcircuit INV2 $3 (IN=$I19,$2=$I39,OUT=$I1,$4=VSS,$5=VDD);
-  subcircuit INV2 $4 (IN=$I1,$2=$I40,OUT=$I2,$4=VSS,$5=VDD);
-  subcircuit INV2 $5 (IN=$I2,$2=$I41,OUT=$I3,$4=VSS,$5=VDD);
-  subcircuit INV2 $6 (IN=$I3,$2=$I42,OUT=$I4,$4=VSS,$5=VDD);
-  subcircuit INV2 $7 (IN=$I4,$2=$I43,OUT=$I5,$4=VSS,$5=VDD);
-  subcircuit INV2 $8 (IN=$I5,$2=$I44,OUT=$I6,$4=VSS,$5=VDD);
-  subcircuit INV2 $9 (IN=$I6,$2=$I45,OUT=$I7,$4=VSS,$5=VDD);
-  subcircuit INV2 $10 (IN=$I7,$2=$I46,OUT=$I8,$4=VSS,$5=VDD);
+  subcircuit INV2 $3 (IN=$I17,$2=$I46,OUT=$I18,$4=VSS,$5=VDD);
+  subcircuit INV2 $4 (IN=$I16,$2=$I45,OUT=$I17,$4=VSS,$5=VDD);
+  subcircuit INV2 $5 (IN=$I15,$2=$I44,OUT=$I16,$4=VSS,$5=VDD);
+  subcircuit INV2 $6 (IN=$I14,$2=$I43,OUT=$I15,$4=VSS,$5=VDD);
+  subcircuit INV2 $7 (IN=$I13,$2=$I42,OUT=$I14,$4=VSS,$5=VDD);
+  subcircuit INV2 $8 (IN=$I12,$2=$I41,OUT=$I13,$4=VSS,$5=VDD);
+  subcircuit INV2 $9 (IN=$I11,$2=$I40,OUT=$I12,$4=VSS,$5=VDD);
+  subcircuit INV2 $10 (IN=$I19,$2=$I39,OUT=$I11,$4=VSS,$5=VDD);
 end;
 circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);
   device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);
@@ -402,11 +402,11 @@ end;
     l2n.extract_netlist()
 
     self.assertEqual(str(l2n.netlist()), """circuit RINGO ();
-  subcircuit INV2PAIR $1 (BULK=VSS,$2=FB,$3=VDD,$4=VSS,$5=$I11,$6=OSC,$7=VDD);
+  subcircuit INV2PAIR $1 (BULK=VSS,$2=FB,$3=VDD,$4=VSS,$5=$I16,$6=OSC,$7=VDD);
   subcircuit INV2PAIR $2 (BULK=VSS,$2=$I22,$3=VDD,$4=VSS,$5=FB,$6=$I17,$7=VDD);
-  subcircuit INV2PAIR $3 (BULK=VSS,$2=$I23,$3=VDD,$4=VSS,$5=$I17,$6=$I9,$7=VDD);
-  subcircuit INV2PAIR $4 (BULK=VSS,$2=$I24,$3=VDD,$4=VSS,$5=$I9,$6=$I10,$7=VDD);
-  subcircuit INV2PAIR $5 (BULK=VSS,$2=$I25,$3=VDD,$4=VSS,$5=$I10,$6=$I11,$7=VDD);
+  subcircuit INV2PAIR $3 (BULK=VSS,$2=$I25,$3=VDD,$4=VSS,$5=$I15,$6=$I16,$7=VDD);
+  subcircuit INV2PAIR $4 (BULK=VSS,$2=$I24,$3=VDD,$4=VSS,$5=$I14,$6=$I15,$7=VDD);
+  subcircuit INV2PAIR $5 (BULK=VSS,$2=$I23,$3=VDD,$4=VSS,$5=$I17,$6=$I14,$7=VDD);
 end;
 circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1);
   subcircuit INV2 $1 ($1=$I1,IN=$I3,$3=$I7,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);
@@ -431,11 +431,11 @@ end;
     l2n.netlist().purge()
 
     self.assertEqual(str(l2n.netlist()), """circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,VSS=VSS);
-  subcircuit INV2PAIR $1 (BULK=VSS,$2=FB,$3=VDD,$4=VSS,$5=$I11,$6=OSC,$7=VDD);
+  subcircuit INV2PAIR $1 (BULK=VSS,$2=FB,$3=VDD,$4=VSS,$5=$I16,$6=OSC,$7=VDD);
   subcircuit INV2PAIR $2 (BULK=VSS,$2=$I22,$3=VDD,$4=VSS,$5=FB,$6=$I17,$7=VDD);
-  subcircuit INV2PAIR $3 (BULK=VSS,$2=$I23,$3=VDD,$4=VSS,$5=$I17,$6=$I9,$7=VDD);
-  subcircuit INV2PAIR $4 (BULK=VSS,$2=$I24,$3=VDD,$4=VSS,$5=$I9,$6=$I10,$7=VDD);
-  subcircuit INV2PAIR $5 (BULK=VSS,$2=$I25,$3=VDD,$4=VSS,$5=$I10,$6=$I11,$7=VDD);
+  subcircuit INV2PAIR $3 (BULK=VSS,$2=$I25,$3=VDD,$4=VSS,$5=$I15,$6=$I16,$7=VDD);
+  subcircuit INV2PAIR $4 (BULK=VSS,$2=$I24,$3=VDD,$4=VSS,$5=$I14,$6=$I15,$7=VDD);
+  subcircuit INV2PAIR $5 (BULK=VSS,$2=$I23,$3=VDD,$4=VSS,$5=$I17,$6=$I14,$7=VDD);
 end;
 circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1);
   subcircuit INV2 $1 ($1=$I1,IN=$I3,$3=$I7,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);

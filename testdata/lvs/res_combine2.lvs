@@ -92,6 +92,7 @@ schematic.simplify
 
 # Netlist vs. netlist
 align
+netlist.make_top_level_pins(false)
 netlist.simplify
 no_lvs_hints
 compare

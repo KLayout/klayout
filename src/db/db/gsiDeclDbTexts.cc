@@ -477,9 +477,9 @@ static bool is_deep (const db::Texts *t)
   return dynamic_cast<const db::DeepTexts *> (t->delegate ()) != 0;
 }
 
-static size_t id (const db::Texts *t)
+static size_t data_id (const db::Texts *t)
 {
-  return tl::id_of (t->delegate ());
+  return t->delegate ()->data_id ();
 }
 
 static db::Texts filtered (const db::Texts *r, const gsi::TextFilterBase *f)
@@ -686,7 +686,7 @@ Class<db::Texts> decl_Texts (decl_dbShapeCollection, "db", "Texts",
   method_ext ("is_deep?", &is_deep,
     "@brief Returns true if the edge pair collection is a deep (hierarchical) one\n"
   ) +
-  method_ext ("data_id", &id,
+  method_ext ("data_id", &data_id,
     "@brief Returns the data ID (a unique identifier for the underlying data storage)\n"
   ) +
   method ("+|join", &db::Texts::operator+, gsi::arg ("other"),

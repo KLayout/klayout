@@ -659,42 +659,42 @@ static void _call_f_slerp_5767 (const qt_gsi::GenericStaticMethod * /*decl*/, gs
 
 //  const QQuaternion ::operator*(const QQuaternion &q1, const QQuaternion &q2)
 static const QQuaternion op_QQuaternion_operator_star__4804(const QQuaternion *_self, const QQuaternion &q2) {
-  return ::operator*(*_self, q2);
+  return operator*(*_self, q2);
 }
 
 //  bool ::operator==(const QQuaternion &q1, const QQuaternion &q2)
 static bool op_QQuaternion_operator_eq__eq__4804(const QQuaternion *_self, const QQuaternion &q2) {
-  return ::operator==(*_self, q2);
+  return operator==(*_self, q2);
 }
 
 //  bool ::operator!=(const QQuaternion &q1, const QQuaternion &q2)
 static bool op_QQuaternion_operator_excl__eq__4804(const QQuaternion *_self, const QQuaternion &q2) {
-  return ::operator!=(*_self, q2);
+  return operator!=(*_self, q2);
 }
 
 //  const QQuaternion ::operator+(const QQuaternion &q1, const QQuaternion &q2)
 static const QQuaternion op_QQuaternion_operator_plus__4804(const QQuaternion *_self, const QQuaternion &q2) {
-  return ::operator+(*_self, q2);
+  return operator+(*_self, q2);
 }
 
 //  const QQuaternion ::operator-(const QQuaternion &q1, const QQuaternion &q2)
 static const QQuaternion op_QQuaternion_operator_minus__4804(const QQuaternion *_self, const QQuaternion &q2) {
-  return ::operator-(*_self, q2);
+  return operator-(*_self, q2);
 }
 
 //  const QQuaternion ::operator*(const QQuaternion &quaternion, qreal factor)
 static const QQuaternion op_QQuaternion_operator_star__3317(const QQuaternion *_self, qreal factor) {
-  return ::operator*(*_self, factor);
+  return operator*(*_self, factor);
 }
 
 //  const QQuaternion ::operator-(const QQuaternion &quaternion)
 static const QQuaternion op_QQuaternion_operator_minus__2456(const QQuaternion *_self) {
-  return ::operator-(*_self);
+  return operator-(*_self);
 }
 
 //  const QQuaternion ::operator/(const QQuaternion &quaternion, qreal divisor)
 static const QQuaternion op_QQuaternion_operator_slash__3317(const QQuaternion *_self, qreal divisor) {
-  return ::operator/(*_self, divisor);
+  return operator/(*_self, divisor);
 }
 
 

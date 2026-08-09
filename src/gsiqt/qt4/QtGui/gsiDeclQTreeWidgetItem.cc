@@ -1787,8 +1787,8 @@ static void _call_cbs_data_c1426_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QVariant > ((QVariant)((QTreeWidgetItem_Adaptor *)cls)->cbs_data_c1426_0 (arg1, arg2));
 }
 
@@ -1826,7 +1826,7 @@ static void _call_cbs_operator_lt__c2805_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTreeWidgetItem &arg1 = args.read<const QTreeWidgetItem & > (heap);
+  const QTreeWidgetItem &arg1 = gsi::arg_reader<const QTreeWidgetItem & >() (args, heap);
   ret.write<bool > ((bool)((QTreeWidgetItem_Adaptor *)cls)->cbs_operator_lt__c2805_0 (arg1));
 }
 
@@ -1849,7 +1849,7 @@ static void _call_cbs_read_1697_0 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDataStream &arg1 = args.read<QDataStream & > (heap);
+  QDataStream &arg1 = gsi::arg_reader<QDataStream & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidgetItem_Adaptor *)cls)->cbs_read_1697_0 (arg1);
 }
@@ -1877,9 +1877,9 @@ static void _call_cbs_setData_3437_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QVariant &arg3 = args.read<const QVariant & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QVariant &arg3 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidgetItem_Adaptor *)cls)->cbs_setData_3437_0 (arg1, arg2, arg3);
 }
@@ -1903,7 +1903,7 @@ static void _call_cbs_write_c1697_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDataStream &arg1 = args.read<QDataStream & > (heap);
+  QDataStream &arg1 = gsi::arg_reader<QDataStream & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidgetItem_Adaptor *)cls)->cbs_write_c1697_0 (arg1);
 }

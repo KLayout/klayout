@@ -235,8 +235,8 @@ static void _call_cbs_createEditor_c2983_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QVariant::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QVariant::Type>::target_type & > (heap);
-  QWidget *arg2 = args.read<QWidget * > (heap);
+  const qt_gsi::Converter<QVariant::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QVariant::Type>::target_type & >() (args, heap);
+  QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<QWidget * > ((QWidget *)((QItemEditorFactory_Adaptor *)cls)->cbs_createEditor_c2983_0 (arg1, arg2));
 }
 
@@ -259,7 +259,7 @@ static void _call_cbs_valuePropertyName_c1776_0 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QVariant::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QVariant::Type>::target_type & > (heap);
+  const qt_gsi::Converter<QVariant::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QVariant::Type>::target_type & >() (args, heap);
   ret.write<QByteArray > ((QByteArray)((QItemEditorFactory_Adaptor *)cls)->cbs_valuePropertyName_c1776_0 (arg1));
 }
 

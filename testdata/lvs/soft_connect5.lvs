@@ -88,6 +88,7 @@ soft_connect_global(ptie, "SUBSTRATE")
 # for debugging: _make_soft_connection_diodes(true)
 netlist
 
+netlist.make_top_level_pins(false)
 netlist.simplify
 
 

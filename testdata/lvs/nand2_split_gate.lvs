@@ -76,6 +76,7 @@ connect_global(ptie, "SUBSTRATE")
 
 netlist
 join_symmetric_nets("*")
+netlist.make_top_level_pins(false)
 netlist.simplify
 
 # Compare section

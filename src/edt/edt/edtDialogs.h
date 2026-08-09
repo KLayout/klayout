@@ -56,6 +56,8 @@ namespace lay
 
 namespace edt {
 
+class ArrayOptions;
+
 /**
  *  @brief The copy mode dialog
  */
@@ -173,10 +175,10 @@ class MakeArrayOptionsDialog
     private Ui::MakeArrayOptionsDialog
 {
 Q_OBJECT
-
 public:
+
   MakeArrayOptionsDialog (QWidget *parent);
-  bool exec_dialog (db::DVector &a, unsigned int &na, db::DVector &b, unsigned int &nb);
+  bool exec_dialog (ArrayOptions &options);
 
   virtual void accept ();
 };

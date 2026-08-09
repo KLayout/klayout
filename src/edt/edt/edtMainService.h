@@ -56,6 +56,21 @@ class DistributeOptionsDialog;
 
 // -------------------------------------------------------------
 
+struct ArrayOptions
+{
+  enum mode_type { PitchVectors, Spaced };
+
+  ArrayOptions () : mode (PitchVectors), a (0.0, 1.0), b (1.0, 0.0), na (1), nb (1) { }
+
+  mode_type mode;
+  db::DVector a, b;
+  unsigned int na, nb;
+  db::DVector space;
+  bool use_visible_layers;
+};
+
+// -------------------------------------------------------------
+
 class MainService
   : public lay::Plugin,
     public lay::Editable,
@@ -156,6 +171,11 @@ public:
   void cm_make_array ();
 
   /**
+   *  @brief The parameterized function for making arrays
+   */
+  void make_array (unsigned na, unsigned nb, const db::DVector &a, const db::DVector &b);
+
+  /**
    *  @brief Align the selected shapes and instances
    */
   void cm_align ();
@@ -242,11 +262,11 @@ private:
   std::string m_make_cell_name;
   int m_origin_mode_x, m_origin_mode_y;
   bool m_origin_visible_layers_for_bbox;
-  db::DVector m_array_a, m_array_b;
-  unsigned int m_array_na, m_array_nb;
   double m_router, m_rinner;
   unsigned int m_npoints;
   bool m_undo_before_apply;
+  ArrayOptions m_array_options;
+
 #if defined(HAVE_QT)
   edt::RoundCornerOptionsDialog *mp_round_corners_dialog;
   edt::AreaAndPerimeterDialog *mp_area_and_perimeter_dialog;

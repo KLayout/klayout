@@ -141,13 +141,16 @@ static gsi::Methods application_methods ()
       "@param name The name of the configuration parameter to set\n"
       "@param value The value to which to set the configuration parameter\n"
       "\n"
+      "The configuration parameter name needs to be a valid XML element name. Otherwise, a corrupt "
+      "configuration file will be produced.\n"
+      "\n"
       "This method sets the configuration parameter with the given name to the given value. "
       "Values can only be strings. Numerical values have to be converted into strings first. "
       "The actual format of the value depends on the configuration parameter. The name must "
       "be one of the names returned by \\get_config_names."
       "\n"
       "It is possible to write an arbitrary name/value pair into the configuration database which then is "
-      "written to the configuration file."
+      "written to the configuration file.\n"
     ) +
     //  TODO: basically this method belongs to Dispatcher (aka MainWindow).
     //  There is separate declaration for Dispatcher which we have to synchronize
@@ -164,12 +167,17 @@ static gsi::Methods application_methods ()
     //  TODO: basically this method belongs to Dispatcher (aka MainWindow).
     //  There is separate declaration for Dispatcher which we have to synchronize
     //  with this method.
-    method<C, bool, const std::string &> ("write_config", &C::write_config, gsi::arg ("file_name"),
+    method<C, bool, const std::string &, int> ("write_config", &C::write_config, gsi::arg ("file_name"), gsi::arg ("keep_backups", 0),
       "@brief Writes configuration to a file\n"
       "@return A value indicating whether the operation was successful\n"
       "\n"
       "If the configuration file cannot be written, \n"
       "is returned but no exception is thrown.\n"
+      "\n"
+      "@param file_name The path to write the config file to.\n"
+      "@param keep_backups The number of backups to keep (0 for 'no backups').\n"
+      "\n"
+      "The 'keep_backups' option was introduced in version 0.30.7.\n"
     ) +
     //  TODO: basically this method belongs to Dispatcher (aka MainWindow).
     //  There is separate declaration for Dispatcher which we have to synchronize

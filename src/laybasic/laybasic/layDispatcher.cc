@@ -238,10 +238,10 @@ config_structure (const lay::Dispatcher *plugin)
 
 
 bool
-Dispatcher::write_config (const std::string &config_file)
+Dispatcher::write_config (const std::string &config_file, int keep_backups)
 {
   try {
-    tl::OutputStream os (config_file, tl::OutputStream::OM_Plain);
+    tl::OutputStream os (config_file, tl::OutputStream::OM_Plain, true, keep_backups);
     config_structure (this).write (os, *this);
     return true;
   } catch (...) {

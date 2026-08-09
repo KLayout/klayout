@@ -206,9 +206,19 @@ public:
   Variant (const tl::Variant &d);
 
   /**
+   *  @brief Move ctor
+   */
+  Variant (tl::Variant &&d);
+
+  /**
    *  @brief Initialize the Variant with a std::vector<char>
    */
   Variant (const std::vector<char> &s);
+
+  /**
+   *  @brief Initialize the Variant with a std::vector<char> (move semantics)
+   */
+  Variant (std::vector<char> &&s);
 
 #if defined(HAVE_QT)
   /**
@@ -233,6 +243,11 @@ public:
    *  @brief Initialize the Variant with "string"
    */
   Variant (const std::string &s);
+
+  /**
+   *  @brief Initialize the Variant with "string" (move semantics)
+   */
+  Variant (std::string &&s);
 
   /**
    *  @brief Initialize the Variant with "string"
@@ -467,9 +482,27 @@ public:
   }
 
   /**
+   *  @brief Initialize the Variant with an explicit vector of variants (move semantics)
+   */
+  Variant (std::vector<tl::Variant> &&list)
+    : m_type (t_list), m_string (0)
+  {
+    m_var.m_list = new std::vector<tl::Variant> (list);
+  }
+
+  /**
    *  @brief Initialize the Variant with an explicit map of variants
    */
   Variant (const std::map<tl::Variant, tl::Variant> &map)
+    : m_type (t_array), m_string (0)
+  {
+    m_var.m_array = new std::map<tl::Variant, tl::Variant> (map);
+  }
+
+  /**
+   *  @brief Initialize the Variant with an explicit map of variants (move semantics)
+   */
+  Variant (std::map<tl::Variant, tl::Variant> &&map)
     : m_type (t_array), m_string (0)
   {
     m_var.m_array = new std::map<tl::Variant, tl::Variant> (map);
@@ -547,6 +580,11 @@ public:
   Variant &operator= (const Variant &v);
 
   /**
+   *  @brief Assignment (move)
+   */
+  Variant &operator= (Variant &&v);
+
+  /**
    *  @brief Assignment of a string
    */
   Variant &operator= (const char *v);
@@ -569,9 +607,19 @@ public:
   Variant &operator= (const std::string &v);
 
   /**
+   *  @brief Assignment of a string (move)
+   */
+  Variant &operator= (std::string &&v);
+
+  /**
    *  @brief Assignment of a STL byte array
    */
   Variant &operator= (const std::vector<char> &v);
+
+  /**
+   *  @brief Assignment of a STL byte array (move)
+   */
+  Variant &operator= (std::vector<char> &&v);
 
   /**
    *  @brief Assignment of a double
@@ -1174,6 +1222,15 @@ public:
   }
 
   /**
+   *  @brief Add a element to the list (move semantics)
+   */
+  void push (tl::Variant &&v)
+  {
+    tl_assert (m_type == t_list);
+    m_var.m_list->push_back (v);
+  }
+
+  /**
    *  @brief Get the back element of the list
    */
   tl::Variant &back ()
@@ -1275,6 +1332,15 @@ public:
    *  @brief Insert an element into the array
    */
   void insert (const tl::Variant &k, const tl::Variant &v)
+  {
+    tl_assert (m_type == t_array);
+    m_var.m_array->insert (std::make_pair (k, v));
+  }
+
+  /**
+   *  @brief Insert an element into the array (move semantics)
+   */
+  void insert (tl::Variant &&k, tl::Variant &&v)
   {
     tl_assert (m_type == t_array);
     m_var.m_array->insert (std::make_pair (k, v));

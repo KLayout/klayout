@@ -48,6 +48,12 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_layers_always_show_ld, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_layers_always_show_layout_index, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_test_shapes_in_view, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_layer_search_as_expressions, "true"));
+    options.push_back (std::pair<std::string, std::string> (cfg_layer_search_as_filter, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_layer_search_case_sensitive, "true"));
+    options.push_back (std::pair<std::string, std::string> (cfg_cell_search_as_expressions, "true"));
+    options.push_back (std::pair<std::string, std::string> (cfg_cell_search_as_filter, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_cell_search_case_sensitive, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_flat_cell_list, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_split_cell_list, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_cell_list_sorting, "by-name"));
@@ -67,6 +73,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_bitmap_caching, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_show_properties, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_apply_text_trans, "true"));
+    options.push_back (std::pair<std::string, std::string> (cfg_apply_text_trans_mode, "3"));
     options.push_back (std::pair<std::string, std::string> (cfg_global_trans, "r0"));
     options.push_back (std::pair<std::string, std::string> (cfg_default_text_size, "0.1"));
     options.push_back (std::pair<std::string, std::string> (cfg_text_point_mode, "false"));
@@ -114,6 +121,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_guiding_shape_color, cc.to_string (tl::Color ())));
     options.push_back (std::pair<std::string, std::string> (cfg_guiding_shape_vertex_size, "5"));
     options.push_back (std::pair<std::string, std::string> (cfg_abs_units, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_auto_create_new_layers, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_dbu_units, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_drawing_workers, "1"));
     options.push_back (std::pair<std::string, std::string> (cfg_drop_small_cells, "false"));

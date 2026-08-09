@@ -146,9 +146,9 @@ static void _call_cbs_run_8664_0 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QVideoFrame *arg1 = args.read<QVideoFrame * > (heap);
-  const QVideoSurfaceFormat &arg2 = args.read<const QVideoSurfaceFormat & > (heap);
-  QFlags<QVideoFilterRunnable::RunFlag> arg3 = args.read<QFlags<QVideoFilterRunnable::RunFlag> > (heap);
+  QVideoFrame *arg1 = gsi::arg_reader<QVideoFrame * >() (args, heap);
+  const QVideoSurfaceFormat &arg2 = gsi::arg_reader<const QVideoSurfaceFormat & >() (args, heap);
+  QFlags<QVideoFilterRunnable::RunFlag> arg3 = gsi::arg_reader<QFlags<QVideoFilterRunnable::RunFlag> >() (args, heap);
   ret.write<QVideoFrame > ((QVideoFrame)((QVideoFilterRunnable_Adaptor *)cls)->cbs_run_8664_0 (arg1, arg2, arg3));
 }
 

@@ -332,6 +332,16 @@ public:
   {
     return new SelectionService (view);
   }
+
+  virtual std::vector<std::string> additional_editor_options_pages (lay::LayoutViewBase *view) const
+  {
+    std::vector<std::string> names;
+    if (view->is_editable ()) {
+      //  TODO: provide in a central place instead of borrowing from the edt module
+      names.push_back ("GenericEditorOptions");
+    }
+    return names;
+  }
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> selection_service_decl (new SelectionServiceDeclaration (), -980, "laybasic::SelectionServicePlugin");

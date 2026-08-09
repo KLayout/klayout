@@ -233,6 +233,22 @@ public:
   void set_text_enabled (bool en);
 
   /**
+   *  @brief Gets a value indicating whether text frame drawing is enabled
+   *
+   *  If this value is true (the default), labels are drawn with a frame indicating the text box.
+   *  Set this value to value to disable the text box.
+   */
+  bool is_text_frame_enabled () const
+  {
+    return m_text_frame_enabled;
+  }
+
+  /**
+   *  @brief Sets a value indicating whether text drawing is enabled
+   */
+  void set_text_frame_enabled (bool en);
+
+  /**
    *  @brief Gets the bounding box
    */
   virtual db::DBox bbox () const = 0;
@@ -255,6 +271,7 @@ private:
   tl::Color m_frame_color;
   int m_line_width, m_vertex_size, m_halo;
   bool m_text_enabled;
+  bool m_text_frame_enabled;
   lay::ViewOp::Shape m_vertex_shape;
   int m_line_style, m_dither_pattern, m_frame_pattern;
   lay::LayoutViewBase *mp_view;

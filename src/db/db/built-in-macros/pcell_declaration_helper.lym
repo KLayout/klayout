@@ -289,6 +289,11 @@ module RBA
       alias_method :_layout_base, :layout
     end
 
+    # makes PCellDeclaration's "name" method available
+    if ! self.method_defined?(:_name_base)
+      alias_method :_name_base, :name
+    end
+
     # import the Type... constants from PCellParameterDeclaration
     PCellParameterDeclaration.constants.each do |c|
       if !const_defined?(c)
@@ -595,7 +600,7 @@ module RBA
    
     # default implementation
     def cell_name_impl
-      self.name
+      _name_base()
     end
    
     # default implementation 

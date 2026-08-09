@@ -72,6 +72,10 @@ class LAYMarkers_TestClass < TestBase
     m.dither_pattern = 15
     assert_equal(m.dither_pattern, 15)
 
+    assert_equal(m.text_frame_enabled, true)
+    m.text_frame_enabled = false
+    assert_equal(m.text_frame_enabled, false)
+
     # Keep the marker alive after GC.start:
     # $marker = m
 

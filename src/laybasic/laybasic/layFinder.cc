@@ -220,7 +220,7 @@ Finder::do_find (const db::Cell &cell, int level, const db::DCplxTrans &vp, cons
       && (t * m_cell_box_convert (cell)).touches (m_scan_region)
       && (mp_view->select_inside_pcells_mode () || !cell.is_proxy ()) 
       && !mp_view->is_cell_hidden (cell.cell_index (), m_cv_index)
-      && !cell.is_ghost_cell ()) {
+      && !cell.is_real_ghost_cell ()) {
 
     db::ICplxTrans it = t.inverted ();
     db::Box scan_box (it * m_scan_region);
@@ -846,7 +846,7 @@ InstFinder::reset_counter ()
 bool
 InstFinder::consider_cell (const db::Cell &cell) const
 {
-  return cell.is_ghost_cell () ? m_consider_ghost_cells : m_consider_normal_cells;
+  return cell.is_real_ghost_cell () ? m_consider_ghost_cells : m_consider_normal_cells;
 }
 
 void 
@@ -877,7 +877,7 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
       //  just consider the instances exactly at the last level of
       //  hierarchy (this is where the boxes are drawn) or of cells that
       //  are hidden.
-      if (level == max_level () - 1 || inst_cell.is_proxy () || inst_cell.is_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
+      if (level == max_level () - 1 || inst_cell.is_proxy () || inst_cell.is_real_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
 
         db::box_convert <db::CellInst, false> bc (layout ());
         for (db::CellInstArray::iterator p = cell_inst.begin_touching (search_box, bc); ! p.at_end (); ++p) {
@@ -885,7 +885,7 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
           checkpoint ();
 
           db::Box ibox;
-          if (! m_visible_layers || level == mp_view->get_max_hier_levels () - 1 || inst_cell.is_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
+          if (! m_visible_layers || level == mp_view->get_max_hier_levels () - 1 || inst_cell.is_real_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
             ibox = inst_cell.bbox_with_empty ();
           } else if (inst_cell.bbox ().empty ()) {
             //  empty cells cannot be found by visible layers, so we always select them here
@@ -954,7 +954,7 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
       //  just consider the instances exactly at the last level of 
       //  hierarchy (this is where the boxes are drawn) or if of cells that
       //  are hidden.
-      if (level == max_level () - 1 || inst_cell.is_proxy () || inst_cell.is_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
+      if (level == max_level () - 1 || inst_cell.is_proxy () || inst_cell.is_real_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
 
         db::box_convert <db::CellInst, false> bc (layout ());
         for (db::CellInstArray::iterator p = cell_inst.begin_touching (search_box, bc); ! p.at_end (); ++p) {
@@ -965,7 +965,7 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
           double d = std::numeric_limits<double>::max ();
 
           db::Box ibox;
-          if (! m_visible_layers || level == mp_view->get_max_hier_levels () - 1 || inst_cell.is_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
+          if (! m_visible_layers || level == mp_view->get_max_hier_levels () - 1 || inst_cell.is_real_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
             ibox = inst_cell.bbox_with_empty ();
           } else if (inst_cell.bbox ().empty ()) {
             //  empty cells cannot be found by visible layers, so we always select them here

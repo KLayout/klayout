@@ -56,6 +56,7 @@ static const std::string cfg_show_hierarchy_panel ("show-hierarchy-panel");
 static const std::string cfg_show_libraries_view ("show-libraries-view");
 static const std::string cfg_show_bookmarks_view ("show-bookmarks-view");
 static const std::string cfg_show_layer_panel ("show-layer-panel");
+static const std::string cfg_show_tool_options ("show-tool-options");
 static const std::string cfg_window_state ("window-state");
 static const std::string cfg_layout_file_watcher_enabled ("layout-file-watcher-enabled");
 static const std::string cfg_window_geometry ("window-geometry");
@@ -63,6 +64,7 @@ static const std::string cfg_micron_digits ("digits-micron");
 static const std::string cfg_dbu_digits ("digits-dbu");
 static const std::string cfg_assistant_bookmarks ("assistant-bookmarks");
 static const std::string cfg_always_exit_without_saving ("always-exit-without-saving");
+static const std::string cfg_auto_sync_libraries ("auto-sync-libraries");
 
 }
 

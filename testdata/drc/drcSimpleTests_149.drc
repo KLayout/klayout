@@ -1,0 +1,18 @@
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+deep
+
+metal2_drawn = polygons(36, 0)
+metal2_slot = polygons(36, 3)
+
+metal2_drawn.output(36, 0)
+metal2_slot.output(36, 3)
+
+violations_enclosed = metal2_slot.drc(enclosed(metal2_drawn) < 10.um)
+violations_enclosed.output(100, 0)
+

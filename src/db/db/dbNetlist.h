@@ -523,7 +523,7 @@ public:
    *  referenced by subcircuits) into pins. This method can be used before purge to
    *  avoid that purge will remove nets which are directly connecting to subcircuits.
    */
-  void make_top_level_pins ();
+  void make_top_level_pins (bool sort_by_name = true);
 
   /**
    *  @brief Purge unused nets, circuits and subcircuits

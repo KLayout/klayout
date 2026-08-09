@@ -20,7 +20,6 @@
 
 */
 
-
 #include "dbHierNetworkProcessor.h"
 #include "dbShape.h"
 #include "dbShapes.h"
@@ -1794,7 +1793,7 @@ public:
   cell_clusters_box_converter (const db::Layout &layout, const hier_clusters<T> &tree)
     : mp_layout (&layout), mp_tree (&tree)
   {
-    //  .. nothing yet ..
+    m_cache.resize (layout.cells (), 0);
   }
 
   const box_type &operator() (const db::CellInst &cell_inst) const
@@ -1804,10 +1803,10 @@ public:
 
   const box_type &operator() (db::cell_index_type cell_index) const
   {
-    typename std::map<db::cell_index_type, box_type>::const_iterator b = m_cache.find (cell_index);
-    if (b != m_cache.end ()) {
+    const box_type *b = m_cache [cell_index];
+    if (b) {
 
-      return b->second;
+      return *b;
 
     } else {
 
@@ -1820,13 +1819,17 @@ public:
         box += inst_array.bbox (*this);
       }
 
-      return m_cache.insert (std::make_pair (cell_index, box)).first->second;
+      m_cached_boxes.push_front (box);
+      b = m_cached_boxes.begin ().operator-> ();
+      m_cache [cell_index] = b;
+      return *b;
 
     }
   }
 
 private:
-  mutable std::map<db::cell_index_type, box_type> m_cache;
+  mutable std::vector<const box_type *> m_cache;
+  mutable tl::slist<box_type> m_cached_boxes;
   const db::Layout *mp_layout;
   const hier_clusters<T> *mp_tree;
 };
@@ -1889,8 +1892,8 @@ namespace
  */
 template <class T>
 struct hc_receiver
-  : public db::box_scanner_receiver<db::Instance, unsigned int>,
-    public db::box_scanner_receiver2<local_cluster<T>, unsigned int, db::Instance, unsigned int>
+  : public db::box_scanner_receiver<db::Instance, db::Box>,
+    public db::box_scanner_receiver2<local_cluster<T>, db::Box, db::Instance, db::Box>
 {
 public:
   typedef typename hier_clusters<T>::box_type box_type;
@@ -1960,7 +1963,7 @@ public:
   /**
    *  @brief Receiver main event for instance-to-instance interactions
    */
-  void add (const db::Instance *i1, unsigned int /*p1*/, const db::Instance *i2, unsigned int /*p2*/)
+  void add (const db::Instance *i1, db::Box /*p1*/, const db::Instance *i2, db::Box /*p2*/)
   {
     db::ICplxTrans t;
 
@@ -1973,7 +1976,7 @@ public:
   /**
    *  @brief Single-instance treatment - may be required because of interactions between array members
    */
-  void finish (const db::Instance *i, unsigned int /*p1*/)
+  void finish (const db::Instance *i, db::Box /*p1*/)
   {
     consider_single_inst (*i);
   }
@@ -1981,7 +1984,7 @@ public:
   /**
    *  @brief Receiver main event for local-to-instance interactions
    */
-  void add (const local_cluster<T> *c1, unsigned int /*p1*/, const db::Instance *i2, unsigned int /*p2*/)
+  void add (const local_cluster<T> *c1, db::Box /*p1*/, const db::Instance *i2, db::Box /*p2*/)
   {
     std::list<ClusterInstanceInteraction> ic;
 
@@ -1993,10 +1996,10 @@ public:
   }
 
   /**
-   *  @brief Finally join the clusters in the join set
+   *  @brief Finally generate cluster-to-instance interactions and join the clusters in the join set
    *
    *  This step is postponed because doing this while the iteration happens would
-   *  invalidate the box trees.
+   *  invalidate the box trees and disturb the propagation mechanism.
    */
   void finish_cluster_to_instance_interactions ()
   {
@@ -2081,7 +2084,7 @@ private:
   const db::Connectivity *mp_conn;
   const std::set<db::cell_index_type> *mp_breakout_cells;
   typedef std::list<std::set<id_type> > join_set_list;
-  std::map<id_type, typename join_set_list::iterator> m_cm2join_map;
+  std::unordered_map<id_type, typename join_set_list::iterator> m_cm2join_map;
   join_set_list m_cm2join_sets;
   std::map<std::pair<size_t, size_t>, int> m_soft_connections;
   std::list<ClusterInstanceInteraction> m_ci_interactions;
@@ -2551,8 +2554,8 @@ private:
       return;
     }
 
-    typename std::map<id_type, typename join_set_list::iterator>::const_iterator x = m_cm2join_map.find (a);
-    typename std::map<id_type, typename join_set_list::iterator>::const_iterator y = m_cm2join_map.find (b);
+    typename std::unordered_map<id_type, typename join_set_list::iterator>::const_iterator x = m_cm2join_map.find (a);
+    typename std::unordered_map<id_type, typename join_set_list::iterator>::const_iterator y = m_cm2join_map.find (b);
 
     if (x == m_cm2join_map.end ()) {
 
@@ -2579,6 +2582,11 @@ private:
 
     } else if (x->second != y->second) {
 
+      //  the y set should be the smaller one for better efficiency
+      if (x->second->size () < y->second->size ()) {
+        std::swap (x, y);
+      }
+
       //  join two superclusters
       typename join_set_list::iterator yset = y->second;
       x->second->insert (yset->begin (), yset->end ());
@@ -2591,12 +2599,12 @@ private:
 
 #if defined(DEBUG_HIER_NETWORK_PROCESSOR)
     //  concistency check for debugging
-    for (typename std::map<id_type, typename join_set_list::iterator>::const_iterator j = m_cm2join_map.begin (); j != m_cm2join_map.end (); ++j) {
+    for (auto j = m_cm2join_map.begin (); j != m_cm2join_map.end (); ++j) {
       tl_assert (j->second->find (j->first) != j->second->end ());
     }
 
-    for (typename std::list<std::set<id_type> >::const_iterator i = m_cm2join_sets.begin (); i != m_cm2join_sets.end (); ++i) {
-      for (typename std::set<id_type>::const_iterator j = i->begin(); j != i->end(); ++j) {
+    for (auto i = m_cm2join_sets.begin (); i != m_cm2join_sets.end (); ++i) {
+      for (auto j = i->begin(); j != i->end(); ++j) {
         tl_assert(m_cm2join_map.find (*j) != m_cm2join_map.end ());
         tl_assert(m_cm2join_map[*j] == i);
       }
@@ -2604,8 +2612,8 @@ private:
 
     //  the sets must be disjunct
     std::set<id_type> all;
-    for (typename std::list<std::set<id_type> >::const_iterator i = m_cm2join_sets.begin (); i != m_cm2join_sets.end (); ++i) {
-      for (typename std::set<id_type>::const_iterator j = i->begin(); j != i->end(); ++j) {
+    for (auto i = m_cm2join_sets.begin (); i != m_cm2join_sets.end (); ++i) {
+      for (auto j = i->begin(); j != i->end(); ++j) {
         tl_assert(all.find (*j) == all.end());
         all.insert(*j);
       }
@@ -2700,23 +2708,13 @@ private:
       } else if (x1 != x2) {
 
         int soft = ic->soft;
-
-        //  for instance-to-instance interactions the number of connections is more important for the
-        //  cost of the join operation: make the one with more connections the target
-        //  TODO: this will be SLOW for STL's not providing a fast size()
-        if (mp_cell_clusters->connections_for_cluster (x1).size () < mp_cell_clusters->connections_for_cluster (x2).size ()) {
-          std::swap (x1, x2);
-          soft = -soft;
-        }
-
         if (soft != 0) {
 
           register_soft_connection (x1, x2, soft);
 
         } else {
 
-          mp_cell_clusters->join_cluster_with (x1, x2);
-          mp_cell_clusters->remove_cluster (x2);
+          mark_to_join (x1, x2);
 
         }
 
@@ -3081,15 +3079,15 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
     static std::string desc = tl::to_string (tr ("Instance to instance treatment"));
     tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 30, desc);
 
-    db::box_scanner<db::Instance, unsigned int> bs (true, desc);
+    db::box_scanner<db::Instance, db::Box> bs (true, desc);
 
     for (std::vector<db::Instance>::const_iterator inst = inst_storage.begin (); inst != inst_storage.end (); ++inst) {
       if (! is_breakout_cell (breakout_cells, inst->cell_index ())) {
-        bs.insert (inst.operator-> (), 0);
+        bs.insert (inst.operator-> (), cibc (*inst));
       }
     }
 
-    bs.process (*rec, 1 /*touching*/, cibc);
+    bs.process_with_adaptor (*rec, 1 /*touching*/);
   }
 
   //  handle local to instance connections
@@ -3101,7 +3099,8 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
     static std::string desc = tl::to_string (tr ("Local to instance treatment"));
     tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 30, desc);
 
-    db::box_scanner2<db::local_cluster<T>, unsigned int, db::Instance, unsigned int> bs2 (true, desc);
+    local_cluster_box_convert<T> lcbc;
+    db::box_scanner2<db::local_cluster<T>, db::Box, db::Instance, db::Box> bs2 (true, desc);
 
     for (typename connected_clusters<T>::const_iterator c = local.begin (); c != local.end (); ++c) {
 
@@ -3110,22 +3109,23 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
       std::back_insert_iterator<std::list<local_cluster<T> > > iout = std::back_inserter (heap);
       size_t n = c->split (area_ratio, iout);
       if (n == 0) {
-        bs2.insert1 (c.operator-> (), 0);
+        bs2.insert1 (c.operator-> (), lcbc (*c));
       } else {
         typename std::list<local_cluster<T> >::iterator h = heap.end ();
         while (n-- > 0) {
-          bs2.insert1 ((--h).operator-> (), 0);
+          --h;
+          bs2.insert1 (h.operator-> (), lcbc (*h));
         }
       }
     }
 
     for (std::vector<db::Instance>::const_iterator inst = inst_storage.begin (); inst != inst_storage.end (); ++inst) {
       if (! is_breakout_cell (breakout_cells, inst->cell_index ())) {
-        bs2.insert2 (inst.operator-> (), 0);
+        bs2.insert2 (inst.operator-> (), cibc (*inst));
       }
     }
 
-    bs2.process (*rec, 1 /*touching*/, local_cluster_box_convert<T> (), cibc);
+    bs2.process_with_adaptor (*rec, 1 /*touching*/);
 
   }
 

@@ -33,13 +33,13 @@
       just being horizontal. By default, the ruler uses the global setting. It can however be configured 
       to provide its own constraint.
     </li>
-    <li><b>Object snapping:</b> each ruler can be configure to snap to the closest object edge or vertex.
-      By default, the rulers use the global setting. It may be disabled however for each ruler.
-    </li>
     <li><b>Mode:</b> in normal mode, two clicks are required to define a ruler: to set the first
       point and to set the second one. In "Single click" mode, a single click will set both 
       points to the same. In "Auto measure" mode, the points will be determined by looking
       for edges in the vicinity of the click point and adjusting the points accordingly.
+    </li>
+    <li><b>Never snap to objects:</b> if this option is on, the ruler never snaps to drawing
+      objects, even if that global option is enabled.
     </li>
   </ul>
 

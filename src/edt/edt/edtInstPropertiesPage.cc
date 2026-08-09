@@ -934,7 +934,9 @@ InstPropertiesPage::do_apply (bool current_only, bool relative)
     throw;
   }
 
-  mp_service->view ()->add_new_layers (layer_state);
+  if (mp_service->view ()->auto_create_new_layers ()) {
+    mp_service->view ()->add_new_layers (layer_state);
+  }
 
   //  remove superfluous proxies
   for (unsigned int i = 0; i < mp_service->view ()->cellviews (); ++i) {

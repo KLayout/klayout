@@ -813,8 +813,8 @@ static void _call_cbs_cellAt_c1426_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QAccessibleInterface * > ((QAccessibleInterface *)((QAccessibleTableInterface_Adaptor *)cls)->cbs_cellAt_c1426_0 (arg1, arg2));
 }
 
@@ -856,7 +856,7 @@ static void _call_cbs_columnDescription_c767_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)((QAccessibleTableInterface_Adaptor *)cls)->cbs_columnDescription_c767_0 (arg1));
 }
 
@@ -879,7 +879,7 @@ static void _call_cbs_isColumnSelected_c767_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QAccessibleTableInterface_Adaptor *)cls)->cbs_isColumnSelected_c767_0 (arg1));
 }
 
@@ -902,7 +902,7 @@ static void _call_cbs_isRowSelected_c767_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QAccessibleTableInterface_Adaptor *)cls)->cbs_isRowSelected_c767_0 (arg1));
 }
 
@@ -925,7 +925,7 @@ static void _call_cbs_modelChange_3790_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAccessibleTableModelChangeEvent *arg1 = args.read<QAccessibleTableModelChangeEvent * > (heap);
+  QAccessibleTableModelChangeEvent *arg1 = gsi::arg_reader<QAccessibleTableModelChangeEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleTableInterface_Adaptor *)cls)->cbs_modelChange_3790_0 (arg1);
 }
@@ -968,7 +968,7 @@ static void _call_cbs_rowDescription_c767_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)((QAccessibleTableInterface_Adaptor *)cls)->cbs_rowDescription_c767_0 (arg1));
 }
 
@@ -991,7 +991,7 @@ static void _call_cbs_selectColumn_767_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QAccessibleTableInterface_Adaptor *)cls)->cbs_selectColumn_767_0 (arg1));
 }
 
@@ -1014,7 +1014,7 @@ static void _call_cbs_selectRow_767_0 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QAccessibleTableInterface_Adaptor *)cls)->cbs_selectRow_767_0 (arg1));
 }
 
@@ -1170,7 +1170,7 @@ static void _call_cbs_unselectColumn_767_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QAccessibleTableInterface_Adaptor *)cls)->cbs_unselectColumn_767_0 (arg1));
 }
 
@@ -1193,7 +1193,7 @@ static void _call_cbs_unselectRow_767_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QAccessibleTableInterface_Adaptor *)cls)->cbs_unselectRow_767_0 (arg1));
 }
 

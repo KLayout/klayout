@@ -511,7 +511,7 @@ static void _call_cbs_doAction_2025_0 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleActionInterface_Adaptor *)cls)->cbs_doAction_2025_0 (arg1);
 }
@@ -535,7 +535,7 @@ static void _call_cbs_keyBindingsForAction_c2025_0 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QStringList > ((QStringList)((QAccessibleActionInterface_Adaptor *)cls)->cbs_keyBindingsForAction_c2025_0 (arg1));
 }
 
@@ -558,7 +558,7 @@ static void _call_cbs_localizedActionDescription_c2025_0 (const qt_gsi::GenericM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QAccessibleActionInterface_Adaptor *)cls)->cbs_localizedActionDescription_c2025_0 (arg1));
 }
 
@@ -581,7 +581,7 @@ static void _call_cbs_localizedActionName_c2025_0 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QAccessibleActionInterface_Adaptor *)cls)->cbs_localizedActionName_c2025_0 (arg1));
 }
 

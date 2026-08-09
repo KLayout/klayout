@@ -638,10 +638,10 @@ static void _call_cbs_getContentsMargins_c4704_0 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double *arg1 = args.read<double * > (heap);
-  double *arg2 = args.read<double * > (heap);
-  double *arg3 = args.read<double * > (heap);
-  double *arg4 = args.read<double * > (heap);
+  double *arg1 = gsi::arg_reader<double * >() (args, heap);
+  double *arg2 = gsi::arg_reader<double * >() (args, heap);
+  double *arg3 = gsi::arg_reader<double * >() (args, heap);
+  double *arg4 = gsi::arg_reader<double * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsAnchorLayout_Adaptor *)cls)->cbs_getContentsMargins_c4704_0 (arg1, arg2, arg3, arg4);
 }
@@ -704,7 +704,7 @@ static void _call_cbs_itemAt_c767_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QGraphicsLayoutItem * > ((QGraphicsLayoutItem *)((QGraphicsAnchorLayout_Adaptor *)cls)->cbs_itemAt_c767_0 (arg1));
 }
 
@@ -727,7 +727,7 @@ static void _call_cbs_removeAt_767_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsAnchorLayout_Adaptor *)cls)->cbs_removeAt_767_0 (arg1);
 }
@@ -751,7 +751,7 @@ static void _call_cbs_setGeometry_1862_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsAnchorLayout_Adaptor *)cls)->cbs_setGeometry_1862_0 (arg1);
 }
@@ -815,8 +815,8 @@ static void _call_cbs_sizeHint_c3330_1 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::SizeHint>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::SizeHint>::target_type & > (heap);
-  const QSizeF &arg2 = args.read<const QSizeF & > (heap);
+  const qt_gsi::Converter<Qt::SizeHint>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::SizeHint>::target_type & >() (args, heap);
+  const QSizeF &arg2 = args ? gsi::arg_reader<const QSizeF & >() (args, heap) : gsi::arg_maker<const QSizeF & >() (QSizeF(), heap);
   ret.write<QSizeF > ((QSizeF)((QGraphicsAnchorLayout_Adaptor *)cls)->cbs_sizeHint_c3330_1 (arg1, arg2));
 }
 
@@ -859,7 +859,7 @@ static void _call_cbs_widgetEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsAnchorLayout_Adaptor *)cls)->cbs_widgetEvent_1217_0 (arg1);
 }

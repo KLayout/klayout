@@ -40,7 +40,7 @@ template <class X, class Y> struct address_of;
 template<class X> 
 struct address_of<X, X> 
 {
-  address_of<X, X> () : b () { }
+  address_of () : b () { }
   const void *operator() (const X &x) const { b = x; return &b; }
   mutable X b;
 };

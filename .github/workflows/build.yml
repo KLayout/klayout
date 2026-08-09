@@ -12,8 +12,39 @@ on:
   release:
     types: [published]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  changes:
+    name: Check for source changes
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code == 'true' || github.event_name == 'release' }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
+        id: filter
+        if: github.event_name != 'release'
+        with:
+          filters: |
+            code:
+              - '!**/*.md'
+              - '!docs/**'
+              - '!samples/**'
+              - '!Jenkinsfile*'
+              - '!.travis.yml'
+              - '!dropbox-deployment.yml'
+              - '!.gitignore'
+              - '!LICENSE'
+              - '!COPYRIGHT'
+              - '!CONTRIB'
+              - '!Changelog*'
+
   build:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -47,9 +78,7 @@ jobs:
           haskell: true
           large-packages: true
       - uses: hmarr/debug-action@v3
-      - name: Cancel Workflow Action
-        uses: styfle/cancel-workflow-action@0.13.0
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: ccache
         if: matrix.os != 'ubuntu-24.04-arm'
         uses: hendrikmuhs/ccache-action@v1.2
@@ -66,7 +95,7 @@ jobs:
           mkdir -p $HOST_CCACHE_DIR
       - name: Build wheels (ARM)
         if: matrix.os == 'ubuntu-24.04-arm'
-        uses: pypa/cibuildwheel@v3.3.1
+        uses: pypa/cibuildwheel@v4.1.1
         env:
           # override the default CentOS “yum install … ccache” and drop ccache
           CIBW_BEFORE_ALL_LINUX: |
@@ -81,7 +110,7 @@ jobs:
 
       - name: Build wheels (all other platforms)
         if: matrix.os != 'ubuntu-24.04-arm'
-        uses: pypa/cibuildwheel@v3.3.1
+        uses: pypa/cibuildwheel@v4.1.1
         env:
           CIBW_BUILD: ${{ matrix.cibuild }}
           CIBW_ARCHS_MACOS: ${{ matrix.macos-arch }}
@@ -98,7 +127,7 @@ jobs:
           mv ./wheelhouse/.ccache $HOST_CCACHE_DIR
           ls -la $HOST_CCACHE_DIR
           ccache -s
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: artifact-${{ matrix.os }}-${{ matrix.cibw_arch }}-${{ strategy.job-index }}
           path: ./wheelhouse/*.whl
@@ -106,14 +135,16 @@ jobs:
   # The following was taken from https://cibuildwheel.readthedocs.io/en/stable/deliver-to-pypi/
   make_sdist:
     name: Make SDist
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
 
     - name: Build SDist
       run: pipx run build --sdist
 
-    - uses: actions/upload-artifact@v6
+    - uses: actions/upload-artifact@v7
       with:
         name: artifact-sdist
         path: dist/*.tar.gz
@@ -122,12 +153,12 @@ jobs:
     needs: [build, make_sdist]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/download-artifact@v7
+    - uses: actions/download-artifact@v8
       with:
         merge-multiple: true
         path: dist
 
-    - uses: pypa/gh-action-pypi-publish@v1.13.0
+    - uses: pypa/gh-action-pypi-publish@v1.14.2
       continue-on-error: true   # might fail if we don't bump the version
       with:
         user: __token__
@@ -139,12 +170,12 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
     steps:
-    - uses: actions/download-artifact@v7
+    - uses: actions/download-artifact@v8
       with:
         merge-multiple: true
         path: dist
 
-    - uses: pypa/gh-action-pypi-publish@v1.13.0
+    - uses: pypa/gh-action-pypi-publish@v1.14.2
       with:
         user: __token__
         password: ${{ secrets.pypi_password }}

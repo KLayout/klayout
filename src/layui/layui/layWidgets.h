@@ -308,6 +308,14 @@ public:
   bool is_no_layer_selected () const;
 
   /**
+   *  @brief Gets the cellview index
+   *
+   *  NOTE: this methods returns -1 if the widget is not
+   *  associated with a cellview index.
+   */
+  int cv_index () const;
+
+  /**
    *  @brief Get the current layer (index)
    *
    *  NOTE: this method returns -1 if no layer is selected or

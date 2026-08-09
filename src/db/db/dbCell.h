@@ -857,7 +857,7 @@ public:
   void check_locked () const;
 
   /**
-   *  @brief Tell, if this cell is a proxy cell
+   *  @brief Gets a value indicating if this cell is a proxy cell
    *
    *  Proxy cells are such whose layout represents a snapshot of another entity.
    *  Such cells can be PCell variants or library references for example.
@@ -865,6 +865,17 @@ public:
   virtual bool is_proxy () const 
   { 
     return false; 
+  }
+
+  /**
+   *  @brief Gets a value indicating that this cell is a replica that can be skipped
+   *
+   *  This attribute is evaluated by file writers to skip cell replicas for
+   *  library cells that do not want to replicated.
+   */
+  virtual bool can_skip_replica () const
+  {
+    return false;
   }
 
   /**
@@ -926,14 +937,25 @@ public:
   }
 
   /**
+   *  @brief Gets a value indicating whether the cell is a "real" ghost cell
+   *
+   *  A ghost cell is a real ghost cell only if the ghost cell flag is set
+   *  and the cell is empty. Only in that case for example the cell is written
+   *  to GDS files as a ghost cell.
+   *
+   *  Otherwise, the ghost cell flag is mostly ignored.
+   */
+  bool is_real_ghost_cell () const
+  {
+    return m_ghost_cell && empty ();
+  }
+
+  /**
    *  @brief Sets the "ghost cell" flag
    *
    *  See "is_ghost_cell" for a description of this property.
    */
-  void set_ghost_cell (bool g)
-  {
-    m_ghost_cell = g;
-  }
+  void set_ghost_cell (bool g);
 
   /**
    *  @brief Gets a value indicating whether the cell is locked

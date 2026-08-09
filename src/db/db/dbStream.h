@@ -110,6 +110,11 @@ public:
   virtual bool can_write () const = 0;
 
   /**
+   *  @brief Returns true, when the format supports a context (e.g. PCell parameters, Library references)
+   */
+  virtual bool supports_context () const = 0;
+
+  /**
    *  @brief Delivers the XMLElement object that represents the reader options within a technology XML tree
    *
    *  This method is supposed to return an instance ReaderOptionsXMLElement<RO> where RO is the

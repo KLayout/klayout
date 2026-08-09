@@ -152,14 +152,14 @@ static std::pair<bool, std::set<db::Box> > compute_clip_variant (const db::Box &
 }
 
 HierarchyBuilder::HierarchyBuilder (db::Layout *target, unsigned int target_layer, const db::ICplxTrans &trans, HierarchyBuilderShapeReceiver *pipe)
-  : mp_target (target), m_target_layer (target_layer), m_wants_all_cells (false), m_trans (trans)
+  : mp_target (target), m_target_layer (target_layer), m_wants_all_cells (false), m_trans (trans), m_sparse_array_limit (-1.0)
 {
   set_shape_receiver (pipe);
   reset ();
 }
 
 HierarchyBuilder::HierarchyBuilder (db::Layout *target, const db::ICplxTrans &trans, HierarchyBuilderShapeReceiver *pipe)
-  : mp_target (target), m_target_layer (0), m_wants_all_cells (false), m_trans (trans)
+  : mp_target (target), m_target_layer (0), m_wants_all_cells (false), m_trans (trans), m_sparse_array_limit (-1.0)
 {
   set_shape_receiver (pipe);
   reset ();
@@ -396,13 +396,56 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
 
     //  for new cells, create this instance
     if (m_cell_stack.back ().first || m_cm_new_entry) {
-      db::CellInstArray new_inst (inst, &mp_target->array_repository ());
-      new_inst.object () = db::CellInst (new_cell);
-      new_inst.transform (always_apply);
-      new_inst.transform_into (m_trans);
-      for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {
-        (*c)->insert (new_inst);
+
+      //  check if the cell array is "sparse" according to
+      //  "sparse_array_limit" and resolve into single instances if so
+      bool resolve = false;
+      if (m_sparse_array_limit >= 0.0 && inst.size () > 1) {
+
+        if (m_sparse_array_limit == 0.0) {
+          resolve = true;
+        } else {
+          db::box_convert<db::CellInst> bc (*iter->layout ());
+          auto a1 = bc (inst.object ()).area ();
+          auto aa = inst.bbox (bc).area ();
+          if (a1 * m_sparse_array_limit * inst.size () < aa) {
+            resolve = true;
+          }
+        }
+
       }
+
+      if (resolve) {
+
+        //  resolve the instances of the array
+        for (auto i = inst.begin (); !i.at_end (); ++i) {
+
+          db::CellInstArray new_inst;
+          if (inst.is_complex ()) {
+            new_inst = db::CellInstArray (db::CellInst (new_cell), inst.complex_trans (*i));
+          } else {
+            new_inst = db::CellInstArray (db::CellInst (new_cell), *i);
+          }
+          new_inst.transform (always_apply);
+          new_inst.transform_into (m_trans);
+          for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {
+            (*c)->insert (new_inst);
+          }
+
+        }
+
+      } else {
+
+        db::CellInstArray new_inst (inst, &mp_target->array_repository ());
+        new_inst.object () = db::CellInst (new_cell);
+        new_inst.transform (always_apply);
+        new_inst.transform_into (m_trans);
+        for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {
+          (*c)->insert (new_inst);
+        }
+
+      }
+
     }
 
     //  To see the cell once, use NI_single. If we did see the cell already, skip the whole instance array.

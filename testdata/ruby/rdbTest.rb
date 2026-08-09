@@ -1205,6 +1205,77 @@ class RDB_TestClass < TestBase
 
   end
 
+  # apply
+  def test_16
+
+    rdb1 = RBA::ReportDatabase::new
+    cat = rdb1.create_category("CAT")
+    cell = rdb1.create_cell("TOP")
+    item = rdb1.create_item(cell, cat)
+    item.add_value("item1")
+    item.add_tag(rdb1.tag_id("t1"))
+
+    assert_equal(item.tags_str, "t1")
+
+    rdb2 = RBA::ReportDatabase::new
+    cat = rdb2.create_category("CAT")
+    cell = rdb2.create_cell("TOP")
+    item = rdb2.create_item(cell, cat)
+    item.add_value("item1")
+    item.add_tag(rdb2.tag_id("t2"))
+
+    assert_equal(item.tags_str, "t2")
+
+    items = rdb1.each_item.to_a
+    assert_equal(items.size, 1)
+
+    assert_equal(items[0].tags_str, "t1")
+
+    rdb1.apply(rdb2)
+
+    items = rdb1.each_item.to_a
+    assert_equal(items.size, 1)
+
+    assert_equal(items[0].tags_str, "t2")
+
+  end
+
+  # merge
+  def test_17
+
+    rdb1 = RBA::ReportDatabase::new
+    cat = rdb1.create_category("CAT")
+    cell = rdb1.create_cell("TOP")
+    item = rdb1.create_item(cell, cat)
+    item.add_value("item1")
+    item.add_tag(rdb1.tag_id("t1"))
+
+    assert_equal(item.tags_str, "t1")
+
+    rdb2 = RBA::ReportDatabase::new
+    cat = rdb2.create_category("CAT")
+    cell = rdb2.create_cell("TOP")
+    item = rdb2.create_item(cell, cat)
+    item.add_value("item1")
+    item.add_tag(rdb2.tag_id("t2"))
+
+    assert_equal(item.tags_str, "t2")
+
+    items = rdb1.each_item.to_a
+    assert_equal(items.size, 1)
+
+    assert_equal(items[0].tags_str, "t1")
+
+    rdb1.merge(rdb2)
+
+    items = rdb1.each_item.to_a
+    assert_equal(items.size, 2)
+
+    assert_equal(items[0].tags_str, "t1")
+    assert_equal(items[1].tags_str, "t2")
+
+  end
+
 end
 
 load("test_epilogue.rb")

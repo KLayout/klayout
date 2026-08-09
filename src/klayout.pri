@@ -204,12 +204,16 @@ msvc {
   #     -Wno-reserved-user-defined-literal \
   #
 
-  lessThan(QT_MAJOR_VERSION, 6) {
-    # because we use unordered_map/unordered_set:
-    QMAKE_CXXFLAGS += -std=c++11
+  equals(HAVE_CPP20, "1") {
+    QMAKE_CXXFLAGS += -std=c++20
+    DEFINES += HAVE_CPP20
   } else {
-    # because we use unordered_map/unordered_set:
-    QMAKE_CXXFLAGS += -std=c++17
+    lessThan(QT_MAJOR_VERSION, 6) {
+      # because we use unordered_map/unordered_set:
+      QMAKE_CXXFLAGS += -std=c++11
+    } else {
+      QMAKE_CXXFLAGS += -std=c++17
+    }
   }
 
   win32 {

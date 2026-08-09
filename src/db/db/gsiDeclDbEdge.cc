@@ -26,6 +26,7 @@
 #include "dbPoint.h"
 #include "dbEdge.h"
 #include "dbHash.h"
+#include "dbBinarySerialize.h"
 
 namespace gsi
 {
@@ -51,6 +52,18 @@ struct edge_defs
     std::unique_ptr<C> c (new C ());
     ex.read (*c.get ());
     return c.release ();
+  }
+
+  static C *from_bytes (const std::vector<char> &s)
+  {
+    std::unique_ptr<C> c (new C ());
+    db::from_bytes (s, *c);
+    return c.release ();
+  }
+
+  static std::vector<char> to_bytes (const C *c)
+  {
+    return db::to_bytes (*c);
   }
 
   static C *new_v ()
@@ -445,6 +458,19 @@ struct edge_defs
       "If a DBU is given, the output units will be micrometers.\n"
       "\n"
       "The DBU argument has been added in version 0.27.6.\n"
+    ) +
+    constructor ("from_bytes", &from_bytes, gsi::arg ("s"),
+      "@brief Creates an edge object from a binary serialization\n"
+      "Creates the object from a binary representation (as returned by \\to_bytes)\n"
+      "\n"
+      "This method has been added in version 0.30.9.\n"
+    ) +
+    method_ext ("to_bytes", &to_bytes,
+      "@brief Returns a binary string representing this edge\n"
+      "\n"
+      "This string can be turned into an edge again by using \\from_bytes\n. "
+      "\n"
+      "This method has been added in version 0.30.9.\n"
     ) +
     method ("is_parallel?", &C::parallel, gsi::arg ("e"),
       "@brief Test for being parallel\n"

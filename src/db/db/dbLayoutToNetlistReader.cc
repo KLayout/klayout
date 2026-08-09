@@ -458,7 +458,7 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
           std::string param_name;
           read_word_or_quoted (param_name);
           int primary = read_int ();
-          int default_value = read_double ();
+          double default_value = read_double ();
           if (! dc->has_parameter_with_name (param_name)) {
             db::DeviceParameterDefinition pd;
             pd.set_name (param_name);

@@ -190,7 +190,7 @@ static bool read_ld (tl::Extractor &ex, ld_type &l, bool with_relative)
   }
 }
 
-void
+bool
 LayerProperties::read (tl::Extractor &ex, bool as_target)
 {
   layer = db::any_ld ();
@@ -206,6 +206,8 @@ LayerProperties::read (tl::Extractor &ex, bool as_target)
 
     layer = l;
     datatype = d;
+
+    return true;
 
   } else if (ex.try_read_word_or_quoted (name)) {
 
@@ -223,6 +225,10 @@ LayerProperties::read (tl::Extractor &ex, bool as_target)
 
     }
 
+    return true;
+
+  } else {
+    return false;
   }
 }
 

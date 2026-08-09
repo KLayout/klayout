@@ -364,7 +364,7 @@ static void _call_cbs_mergeWith_2507_0 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUndoCommand *arg1 = args.read<const QUndoCommand * > (heap);
+  const QUndoCommand *arg1 = gsi::arg_reader<const QUndoCommand * >() (args, heap);
   ret.write<bool > ((bool)((QUndoCommand_Adaptor *)cls)->cbs_mergeWith_2507_0 (arg1));
 }
 

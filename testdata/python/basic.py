@@ -22,6 +22,7 @@ import os
 import sys
 import gc
 import copy
+import weakref
 
 # Set this to True to disable some tests involving exceptions
 leak_check = "TEST_LEAK_CHECK" in os.environ
@@ -3351,6 +3352,20 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(b.str(), "xyz")
     self.assertEqual(bc.str(), "xyz")
     self.assertEqual(bnc.str(), "xyz")
+
+  # weak refs
+  def test_94(self):
+
+    b = pya.B()
+    b.set_str("abc")
+
+    r = weakref.ref(b)
+    self.assertEqual(r() is None, False)
+    self.assertEqual(r().str(), "abc")
+
+    b = None
+    self.assertEqual(r() is None, True)
+
 
 # run unit tests
 if __name__ == '__main__':

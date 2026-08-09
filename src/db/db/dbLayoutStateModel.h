@@ -183,6 +183,14 @@ public:
     return m_busy;
   }
 
+  /**
+   *  @brief Issue a "cell name changed event"
+   */
+  void cell_name_changed ()
+  {
+    cell_name_changed_event ();
+  }
+
 protected:
   friend class PropertiesRepository;
 
@@ -190,14 +198,6 @@ protected:
    *  @brief Reimplement this method to update anything related to the hierarchy or bounding boxes.
    */
   virtual void do_update () { }
-
-  /**
-   *  @brief Issue a "prop id's changed event"
-   */
-  void cell_name_changed ()
-  {
-    cell_name_changed_event ();
-  }
 
   /**
    *  @brief Issue a "layer properties changed event"

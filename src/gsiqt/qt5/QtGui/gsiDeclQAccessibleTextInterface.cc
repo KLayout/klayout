@@ -742,8 +742,8 @@ static void _call_cbs_addSelection_1426_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleTextInterface_Adaptor *)cls)->cbs_addSelection_1426_0 (arg1, arg2);
 }
@@ -771,9 +771,9 @@ static void _call_cbs_attributes_c2457_0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int *arg2 = args.read<int * > (heap);
-  int *arg3 = args.read<int * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int *arg2 = gsi::arg_reader<int * >() (args, heap);
+  int *arg3 = gsi::arg_reader<int * >() (args, heap);
   ret.write<QString > ((QString)((QAccessibleTextInterface_Adaptor *)cls)->cbs_attributes_c2457_0 (arg1, arg2, arg3));
 }
 
@@ -815,7 +815,7 @@ static void _call_cbs_characterRect_c767_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QRect > ((QRect)((QAccessibleTextInterface_Adaptor *)cls)->cbs_characterRect_c767_0 (arg1));
 }
 
@@ -857,7 +857,7 @@ static void _call_cbs_offsetAtPoint_c1916_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<int > ((int)((QAccessibleTextInterface_Adaptor *)cls)->cbs_offsetAtPoint_c1916_0 (arg1));
 }
 
@@ -880,7 +880,7 @@ static void _call_cbs_removeSelection_767_0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleTextInterface_Adaptor *)cls)->cbs_removeSelection_767_0 (arg1);
 }
@@ -906,8 +906,8 @@ static void _call_cbs_scrollToSubstring_1426_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleTextInterface_Adaptor *)cls)->cbs_scrollToSubstring_1426_0 (arg1, arg2);
 }
@@ -935,9 +935,9 @@ static void _call_cbs_selection_c2457_0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int *arg2 = args.read<int * > (heap);
-  int *arg3 = args.read<int * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int *arg2 = gsi::arg_reader<int * >() (args, heap);
+  int *arg3 = gsi::arg_reader<int * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleTextInterface_Adaptor *)cls)->cbs_selection_c2457_0 (arg1, arg2, arg3);
 }
@@ -980,7 +980,7 @@ static void _call_cbs_setCursorPosition_767_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleTextInterface_Adaptor *)cls)->cbs_setCursorPosition_767_0 (arg1);
 }
@@ -1008,9 +1008,9 @@ static void _call_cbs_setSelection_2085_0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleTextInterface_Adaptor *)cls)->cbs_setSelection_2085_0 (arg1, arg2, arg3);
 }
@@ -1036,8 +1036,8 @@ static void _call_cbs_text_c1426_0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)((QAccessibleTextInterface_Adaptor *)cls)->cbs_text_c1426_0 (arg1, arg2));
 }
 
@@ -1066,10 +1066,10 @@ static void _call_cbs_textAfterOffset_c5663_0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QAccessible::TextBoundaryType>::target_type & arg2 = args.read<const qt_gsi::Converter<QAccessible::TextBoundaryType>::target_type & > (heap);
-  int *arg3 = args.read<int * > (heap);
-  int *arg4 = args.read<int * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QAccessible::TextBoundaryType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QAccessible::TextBoundaryType>::target_type & >() (args, heap);
+  int *arg3 = gsi::arg_reader<int * >() (args, heap);
+  int *arg4 = gsi::arg_reader<int * >() (args, heap);
   ret.write<QString > ((QString)((QAccessibleTextInterface_Adaptor *)cls)->cbs_textAfterOffset_c5663_0 (arg1, arg2, arg3, arg4));
 }
 
@@ -1098,10 +1098,10 @@ static void _call_cbs_textAtOffset_c5663_0 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QAccessible::TextBoundaryType>::target_type & arg2 = args.read<const qt_gsi::Converter<QAccessible::TextBoundaryType>::target_type & > (heap);
-  int *arg3 = args.read<int * > (heap);
-  int *arg4 = args.read<int * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QAccessible::TextBoundaryType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QAccessible::TextBoundaryType>::target_type & >() (args, heap);
+  int *arg3 = gsi::arg_reader<int * >() (args, heap);
+  int *arg4 = gsi::arg_reader<int * >() (args, heap);
   ret.write<QString > ((QString)((QAccessibleTextInterface_Adaptor *)cls)->cbs_textAtOffset_c5663_0 (arg1, arg2, arg3, arg4));
 }
 
@@ -1130,10 +1130,10 @@ static void _call_cbs_textBeforeOffset_c5663_0 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QAccessible::TextBoundaryType>::target_type & arg2 = args.read<const qt_gsi::Converter<QAccessible::TextBoundaryType>::target_type & > (heap);
-  int *arg3 = args.read<int * > (heap);
-  int *arg4 = args.read<int * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QAccessible::TextBoundaryType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QAccessible::TextBoundaryType>::target_type & >() (args, heap);
+  int *arg3 = gsi::arg_reader<int * >() (args, heap);
+  int *arg4 = gsi::arg_reader<int * >() (args, heap);
   ret.write<QString > ((QString)((QAccessibleTextInterface_Adaptor *)cls)->cbs_textBeforeOffset_c5663_0 (arg1, arg2, arg3, arg4));
 }
 

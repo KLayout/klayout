@@ -27,11 +27,35 @@
 #include "tlTypeTraits.h"
 #include "dbPropertiesRepository.h"
 #include "dbObjectWithProperties.h"
+#include "dbBinarySerialize.h"
 #include "dbTrans.h"
 #include "dbEdge.h"
 
 namespace gsi
 {
+
+template <class T>
+static T *from_string (const std::string &s)
+{
+  tl::Extractor ex (s);
+  std::unique_ptr<T> t (new T ());
+  ex.read (*t.get ());
+  return t.release ();
+}
+
+template <class T>
+static T *from_bytes (const std::vector<char> &s)
+{
+  std::unique_ptr<T> t (new T ());
+  db::from_bytes (s, *t);
+  return t.release ();
+}
+
+template <class T>
+static std::vector<char> to_bytes (const T *t)
+{
+  return db::to_bytes (*t);
+}
 
 template <class T>
 static void delete_property_meth_impl (T *s, const tl::Variant &key)
@@ -250,8 +274,27 @@ static gsi::Methods properties_support_methods ()
     "If no property with that key does not exist, it will return nil. Using that method is more "
     "convenient than using the layout object and the properties ID to retrieve the property value. "
   ) +
+  gsi::constructor ("from_s", &from_string<T>, gsi::arg ("s"),
+    "@brief Creates an object from a binary serialization\n"
+    "Creates the object from a binary representation (as returned by \\to_bytes)\n"
+    "\n"
+    "This method has been added in version 0.30.9.\n"
+  ) +
   gsi::method ("to_s", (std::string (T::*) () const) &T::to_string,
-    "@brief Returns a string representing the polygon\n"
+    "@brief Returns a string representing the object\n"
+  ) +
+  gsi::constructor ("from_bytes", &from_bytes<T>, gsi::arg ("s"),
+    "@brief Creates an object from a binary serialization\n"
+    "Creates the object from a binary representation (as returned by \\to_bytes)\n"
+    "\n"
+    "This method has been added in version 0.30.9.\n"
+  ) +
+  gsi::method_ext ("to_bytes", &to_bytes<T>,
+    "@brief Returns a binary string representing this object\n"
+    "\n"
+    "This string can be turned into an object again by using \\from_bytes\n. "
+    "\n"
+    "This method has been added in version 0.30.9.\n"
   ) +
   gsi::method_ext ("properties", &get_properties_meth_impl<T>,
     "@brief Gets the user properties\n"

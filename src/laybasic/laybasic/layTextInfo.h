@@ -74,7 +74,7 @@ public:
 private:
   double m_default_text_size;
   db::Font m_default_font;
-  bool m_apply_text_trans;
+  unsigned int m_apply_text_trans_mode;
   double m_resolution;
   bool m_point_mode;
 };

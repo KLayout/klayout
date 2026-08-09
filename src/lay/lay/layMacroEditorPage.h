@@ -28,6 +28,7 @@
 #include "lymMacro.h"
 #include "layGenericSyntaxHighlighter.h"
 #include "tlVariant.h"
+#include "tlDeferredExecution.h"
 
 #include <QDialog>
 #include <QPixmap>
@@ -417,12 +418,14 @@ private:
   QListWidget *mp_completer_list;
   std::list<MacroEditorNotification> m_notifications;
   std::map<const MacroEditorNotification *, QWidget *, CompareNotificationPointers> m_notification_widgets;
+  tl::DeferredMethod<lay::MacroEditorPage> dm_run_mode_changed;
 
   void update_extra_selections ();
   bool return_pressed ();
   bool backspace_pressed ();
   bool back_tab_key_pressed ();
   bool tab_key_pressed ();
+  void do_run_mode_changed ();
   void fill_completer_list ();
   void complete ();
   QTextCursor get_completer_cursor (int &pos0, int &pos);

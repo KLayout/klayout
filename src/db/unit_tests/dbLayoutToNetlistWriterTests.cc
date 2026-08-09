@@ -163,7 +163,7 @@ TEST(1_WriterBasic)
   rpoly_lbl.reset (0);
 
   l2n.extract_netlist ();
-  l2n.netlist ()->make_top_level_pins ();
+  l2n.netlist ()->make_top_level_pins (false);
   l2n.netlist ()->purge ();
 
   std::string path = tmp_file ("tmp_l2nwriter_1.txt");

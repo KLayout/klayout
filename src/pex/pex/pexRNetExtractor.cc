@@ -339,6 +339,8 @@ private:
     case RExtractorTechConductor::Tesselation:
       {
         pex::TriangulationRExtractor rex (m_dbu);
+        rex.triangulation_parameters ().max_area = mp_cond->triangulation_max_area;
+        rex.triangulation_parameters ().min_b = mp_cond->triangulation_min_b;
         rex.extract (poly, local_vertex_ports, local_polygon_ports, local_network);
       }
       break;

@@ -1470,8 +1470,9 @@ normalize (const QString &s)
 
   tl::Variant v;
 
-  if (*c == '#' || *c == '\"' || *c == '\'') {
-    tl::Extractor ex (c);
+  tl::Extractor ex (c);
+  ex.skip ();
+  if (*ex == '#' || *ex == '\"' || *ex == '\'' || *ex == '(' || *ex == '{' || *ex == '[') {
     ex.read (v);
     ex.expect_end ();
   } else {

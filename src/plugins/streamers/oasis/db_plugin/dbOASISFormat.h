@@ -101,7 +101,7 @@ public:
    *  @brief The constructor
    */
   OASISWriterOptions ()
-    : compression_level (2), write_cblocks (true), strict_mode (true), recompress (false), permissive (false),
+    : compression_level (2), enhanced_property_types (true), write_cblocks (true), strict_mode (true), recompress (false), permissive (false),
       write_std_properties (1), subst_char ("*"), tables_at_end (false)
   {
     //  .. nothing yet ..
@@ -116,7 +116,20 @@ public:
    *    1 - nearest neighbor shape array formation 
    *    2++ - enhanced shape array search algorithm using 2nd and further neighbor distances as well
    */
-  int compression_level; 
+  int compression_level;
+
+  /**
+   *  @brief Enhanced property types
+   *
+   *  If this option is set to true (the default), complex property types
+   *  such as lists or even objects can be embedded into OASIS files.
+   *  For this, KLayout uses strings with a special annotation
+   *  (i.e. "KLAYOUT_VALUE:...").
+   *
+   *  This option also implies that only properties with string values
+   *  (and numerical keys) are written as S_GDS_PROPERTY properties.
+   */
+  bool enhanced_property_types;
 
   /**
    *  @brief CBLOCK compression

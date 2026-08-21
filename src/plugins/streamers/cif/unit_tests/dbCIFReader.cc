@@ -238,22 +238,22 @@ static void run_test2 (tl::TestBase *_this, const std::string &base, db::Layout 
 
 TEST(1a)
 {
-  run_test (_this, tl::testdata_private (), "t1.cif.gz", "t1a_au.gds.gz");
+  run_test (_this, tl::testdata_private (), "t1.cif.gz", "t1a_au2.gds.gz");
 }
 
 TEST(1b)
 {
-  run_test (_this, tl::testdata_private (), "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01);
+  run_test (_this, tl::testdata_private (), "t1.cif.gz", "t1b_au2.gds.gz", 0, 0.01);
 }
 
 TEST(1c)
 {
-  run_test (_this, tl::testdata_private (), "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01, true);
+  run_test (_this, tl::testdata_private (), "t1.cif.gz", "t1b_au2.gds.gz", 0, 0.01, true);
 }
 
 TEST(1d)
 {
-  run_test (_this, tl::testdata_private (), "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01, false, true);
+  run_test (_this, tl::testdata_private (), "t1.cif.gz", "t1b_au2.gds.gz", 0, 0.01, false, true);
 }
 
 TEST(2)
@@ -263,17 +263,17 @@ TEST(2)
 
 TEST(3a)
 {
-  run_test (_this, tl::testdata_private (), "t3.cif.gz", "t3a_au.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26");
+  run_test (_this, tl::testdata_private (), "t3.cif.gz", "t3a_au2.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26");
 }
 
 TEST(3b)
 {
-  run_test (_this, tl::testdata_private (), "t3.cif.gz", "t3b_au.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26", 0.00012);
+  run_test (_this, tl::testdata_private (), "t3.cif.gz", "t3b_au2.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26", 0.00012);
 }
 
 TEST(3c)
 {
-  run_test (_this, tl::testdata_private (), "t3.cif.gz", "t3c_au.gds.gz", "(CPG:1/0) +(CPG:1000/0) (CCP:1/0) (CMF:2/0) +(CMF:1000/0) (CVA:3/0)", 0.00012);
+  run_test (_this, tl::testdata_private (), "t3.cif.gz", "t3c_au2.gds.gz", "(CPG:1/0) +(CPG:1000/0) (CCP:1/0) (CMF:2/0) +(CMF:1000/0) (CVA:3/0)", 0.00012);
 }
 
 TEST(4)

@@ -1353,7 +1353,7 @@ PrintingDifferenceReceiver::print_cell_inst (const db::CellInstArrayWithProperti
     enough (tl::info) << "" << tl::noendl;
   }
   if (ci.properties_id () != 0) {
-    enough (tl::info) << " [" << ci.properties_id () << "]";
+    enough (tl::info) << " " << db::properties (ci.properties_id ()).to_dict_var ().to_string ();
   } else {
     enough (tl::info) << "";
   }
@@ -1374,7 +1374,7 @@ PrintingDifferenceReceiver::print_cell_inst (const db::CellInstArrayWithProperti
     enough (tl::info) << "" << tl::noendl;
   }
   if (ci.properties_id () != 0) {
-    enough (tl::info) << " [" << ci.properties_id () << "]";
+    enough (tl::info) << " " << db::properties (ci.properties_id ()).to_dict_var ().to_string ();
   } else {
     enough (tl::info) << "";
   }

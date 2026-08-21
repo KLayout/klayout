@@ -112,7 +112,7 @@ GDS2ReaderBase::finish_element_with_props ()
 
       const char *value = get_string ();
       if (m_read_properties) {
-        properties.insert (tl::Variant (attr), tl::Variant (value));
+        properties.insert (map_property_name (attr), map_property_value (value));
         any = true;
       }
 
@@ -134,6 +134,80 @@ GDS2ReaderBase::finish_element_with_props ()
   }
 }
 
+
+tl::Variant
+GDS2ReaderBase::map_property_name (long attr) const
+{
+  auto i = m_property_names_map.find (attr);
+  if (i != m_property_names_map.end ()) {
+    return i->second;
+  } else {
+    return tl::Variant (attr);
+  }
+}
+
+tl::Variant
+GDS2ReaderBase::map_property_value (const std::string &value) const
+{
+  auto i = m_property_values_map.find (value);
+  if (i != m_property_values_map.end ()) {
+    return i->second;
+  } else {
+    return tl::Variant (value);
+  }
+}
+
+void
+GDS2ReaderBase::digest_context (db::Layout &layout, const std::vector<std::string> &context)
+{
+  for (auto c = context.begin (); c != context.end (); ++c) {
+
+    long kn;
+    std::string kv;
+    tl::Variant v;
+    db::ld_type l = 0, dt = 0;
+    std::string n;
+
+    tl::Extractor ex (c->c_str ());
+    if (ex.test ("PROP_NAME") && ex.test ("(") && ex.try_read (kn) && ex.test (")") && ex.test ("=") && ex.try_read (v)) {
+
+      m_property_names_map[kn].swap (v);
+
+    } else if (ex.test ("PROP_VALUE") && ex.test ("(") && ex.try_read_word_or_quoted (kv) && ex.test (")") && ex.test ("=") && ex.try_read (v)) {
+
+      m_property_values_map[kv].swap (v);
+
+    } else if (ex.test ("LNAME") && ex.test ("(") && ex.try_read (l) && ex.test (",") && ex.try_read (dt) && ex.test (")") && ex.test ("=") && ex.try_read_word_or_quoted (n)) {
+
+      //  add to the layer name map
+      tl::interval_map <db::ld_type, std::string> dt_map;
+      LNameJoinOp1 op1;
+      dt_map.add (dt, dt + 1, n, op1);
+      LNameJoinOp2 op2;
+      layer_names ().add (l, l + 1, dt_map, op2);
+
+      //  force a layer entry: this way we can have empty, but existing layers, just by naming them
+      open_dl (layout, db::LDPair (l, dt));
+
+    }
+
+  }
+}
+
+void
+GDS2ReaderBase::build_properties_from_context (const std::vector<std::string> &context, db::PropertiesSet &properties) const
+{
+  for (auto c = context.begin (); c != context.end (); ++c) {
+
+    tl::Variant pn, pv;
+
+    tl::Extractor ex (c->c_str ());
+    if (ex.test ("PROP") && ex.test ("(") && ex.try_read (pn) && ex.test (")") && ex.test ("=") && ex.try_read (pv)) {
+      properties.insert (pn, pv);
+    }
+
+  }
+}
 
 inline db::Point 
 pt_conv (const GDS2XY &p) 
@@ -186,6 +260,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
   long attr = 0;
   db::PropertiesSet layout_properties;
+  std::list<std::pair <long, std::string> > basic_layout_properties;
 
   //  read until 
   short rec_id = 0;
@@ -221,7 +296,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
       const char *value = get_string ();
       if (m_read_properties) {
-        layout_properties.insert (tl::Variant (attr), tl::Variant (value));
+        basic_layout_properties.push_back (std::make_pair (attr, value));
       }
 
     } else if (rec_id == sUNITS) {
@@ -244,11 +319,6 @@ GDS2ReaderBase::do_read (db::Layout &layout)
     }
 
   } while (true);
-
-  //  set the layout properties
-  if (! layout_properties.empty ()) {
-    layout.prop_id (db::properties_id (layout_properties));
-  }
 
   //  this container has been found to grow quite a lot.
   //  using a list instead of a vector should make this more efficient.
@@ -285,9 +355,23 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
       read_context_info_cell ();
 
+      //  deserialize global context information
+      auto ctx = m_context_info.find (std::string ());
+      if (ctx != m_context_info.end ()) {
+
+        LayoutOrCellContextInfo ci = LayoutOrCellContextInfo::deserialize (ctx->second.begin (), ctx->second.end ());
+        layout.fill_meta_info_from_context (ci);
+
+        build_properties_from_context (ctx->second, layout_properties);
+        digest_context (layout, ctx->second);
+
+      }
+
     } else {
 
       db::cell_index_type cell_index = make_cell (layout, m_cellname);
+
+      db::PropertiesSet cell_properties;
 
       bool ignore_cell = false;
       auto ctx = m_context_info.find (m_cellname);
@@ -303,6 +387,8 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
         layout.fill_meta_info_from_context (cell_index, ci);
 
+        build_properties_from_context (ctx->second, cell_properties);
+
       }
       
       db::Cell *cell = 0;
@@ -311,7 +397,6 @@ GDS2ReaderBase::do_read (db::Layout &layout)
       }
 
       long attr = 0;
-      db::PropertiesSet cell_properties;
 
       //  read cell content
       while ((rec_id = get_record ()) != sENDSTR) { 
@@ -330,7 +415,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
           const char *value = get_string ();
           if (m_read_properties) {
-            cell_properties.insert (tl::Variant (attr), tl::Variant (value));
+            cell_properties.insert (map_property_name (attr), map_property_value (value));
           }
 
         } else if (rec_id == sBOUNDARY) {
@@ -393,14 +478,19 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
   }
 
-  //  deserialize global context information
-  auto ctx = m_context_info.find (std::string ());
-  if (ctx != m_context_info.end ()) {
-    LayoutOrCellContextInfo ci = LayoutOrCellContextInfo::deserialize (ctx->second.begin (), ctx->second.end ());
-    layout.fill_meta_info_from_context (ci);
+  //  creat the set the layout properties
+
+  //  NOTE: we can only merge now, as we have the property names and values maps
+  for (auto i = basic_layout_properties.begin (); i != basic_layout_properties.end (); ++i) {
+    layout_properties.insert (map_property_name (i->first), map_property_value (i->second));
+  }
+
+  if (! layout_properties.empty ()) {
+    layout.prop_id (db::properties_id (layout_properties));
   }
 
   //  check, if the last record is a ENDLIB
+
   if (rec_id != sENDLIB) {
     error (tl::to_string (tr ("ENDLIB record expected")));
   }

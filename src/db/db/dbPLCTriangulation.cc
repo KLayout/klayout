@@ -46,7 +46,7 @@ static inline bool is_equal (const db::DPoint &a, const db::DPoint &b)
 const double snap_to_edge_vertex = 1e-5;
 
 //  distance of point to edge center to be considered "on edge center" relative to edge length involved
-double snap_to_edge_center = 1e-3;
+const double snap_to_edge_center = 1e-3;
 
 
 Triangulation::Triangulation (Graph *graph)
@@ -224,84 +224,86 @@ Triangulation::find_points_around (Vertex *vertex, double radius)
 }
 
 Vertex *
-Triangulation::insert_point (const db::DPoint &point, std::list<tl::weak_ptr<Polygon> > *new_triangles)
+Triangulation::insert_point (const db::DPoint &point, std::list<tl::weak_ptr<Polygon> > *new_triangles, double snap)
 {
-  return insert (mp_graph->create_vertex (point), new_triangles);
+  return insert (mp_graph->create_vertex (point), new_triangles, snap);
 }
 
 Vertex *
-Triangulation::insert_point (db::DCoord x, db::DCoord y, std::list<tl::weak_ptr<Polygon> > *new_triangles)
+Triangulation::insert_point (db::DCoord x, db::DCoord y, std::list<tl::weak_ptr<Polygon> > *new_triangles, double snap)
 {
-  return insert (mp_graph->create_vertex (x, y), new_triangles);
+  return insert (mp_graph->create_vertex (x, y), new_triangles, snap);
 }
 
 Vertex *
-Triangulation::insert (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles)
+Triangulation::insert (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles, double snap)
 {
-  std::vector<Polygon *> tris = find_triangle_for_point (*vertex);
+  Polygon *in_triangle = 0;
+  Edge *on_edge = 0;
 
-  //  the new vertex is outside the domain
-  if (tris.empty ()) {
+  if (! find_triangle_for_point (*vertex, snap, in_triangle, on_edge)) {
+
+    //  the new vertex is outside the domain
     tl_assert (! m_is_constrained);
     insert_new_vertex (vertex, new_triangles);
     return vertex;
-  }
-
-  //  check, if the new vertex is on an edge (may be edge between triangles or edge on outside)
-  Edge *on_edge = 0;
-  std::vector<Edge *> on_vertex;
-  for (int i = 0; i < 3; ++i) {
-
-    Edge *e = tris.front ()->edge (i);
-
-    double snap_range = snap_to_edge_vertex * e->length ();
-
-    if (std::abs (e->edge ().distance (*vertex)) < snap_range - db::epsilon) {
-      if (vertex->distance (*e->v1 ()) < snap_range + db::epsilon || vertex->distance (*e->v2 ()) < snap_range + db::epsilon) {
-        on_vertex.push_back (e);
-      } else if (! on_edge) {
-        on_edge = e;
-      }
-    }
 
   }
 
   if (on_edge) {
 
-    split_triangles_on_edge (vertex, on_edge, new_triangles);
+    // double snap_range = std::max (db::epsilon, snap_to_edge_vertex * e->length ()); @@@
+    double snap_range = std::max (db::epsilon, snap * on_edge->length ());
+
+    if (snap > 0.0 ? vertex->distance (*on_edge->v1 ()) < snap_range : is_equal (*vertex, *on_edge->v1 ())) {
+      return on_edge->v1 ();
+    } else if (snap > 0.0 ? vertex->distance (*on_edge->v2 ()) < snap_range : is_equal (*vertex, *on_edge->v2 ())) {
+      return on_edge->v2 ();
+    } else {
+      split_triangles_on_edge (vertex, on_edge, new_triangles);
+      return vertex;
+    }
+
+  } else if (in_triangle) {
+
+    split_triangle (in_triangle, vertex, new_triangles);
     return vertex;
 
-  } else if (! on_vertex.empty ()) {
+  } else {
 
-    tl_assert (on_vertex.size () == size_t (2));
-    return on_vertex.front ()->common_vertex (on_vertex [1]);
-
-  } else if (tris.size () == size_t (1)) {
-
-    //  the new vertex is inside one triangle
-    split_triangle (tris.front (), vertex, new_triangles);
-    return vertex;
+    tl_assert (false);
+    return 0;
 
   }
-
-  tl_assert (false);
 }
 
-std::vector<Polygon *>
-Triangulation::find_triangle_for_point (const db::DPoint &point)
+bool Triangulation::find_triangle_for_point (const db::DPoint &point, double snap, Polygon *&in_triangle, Edge *&on_edge)
 {
   Edge *edge = find_closest_edge (point);
 
-  std::vector<Polygon *> res;
   if (edge) {
-    for (auto t = edge->begin_polygons (); t != edge->end_polygons (); ++t) {
-      if (t->contains (point) >= 0) {
-        res.push_back (t.operator-> ());
+
+    double snap_range = std::max (db::epsilon, snap * edge->length ());
+
+    if (snap > 0.0 ? std::abs (edge->edge ().distance (point)) < snap_range : edge->side_of (point) == 0) {
+
+      on_edge = edge;
+      return true;
+
+    } else {
+
+      for (auto t = edge->begin_polygons (); t != edge->end_polygons (); ++t) {
+        if (t->contains (point) >= 0) {
+          in_triangle = t.operator-> ();
+          return true;
+        }
       }
+
     }
+
   }
 
-  return res;
+  return false;
 }
 
 Edge *
@@ -1378,8 +1380,14 @@ void
 Triangulation::make_contours (const Poly &poly, const Trans &trans, std::vector<std::vector<Vertex *> > &edge_contours)
 {
   edge_contours.push_back (std::vector<Vertex *> ());
+// @@@int id = 0; // @@@
   for (auto pt = poly.begin_hull (); pt != poly.end_hull (); ++pt) {
+// @@@if (id == 27) { // @@@
+// @@@tl::info << "@@@ BANG!"; // @@@
+// @@@} // @@@
+    // @@@ edge_contours.back ().push_back (insert_point (trans * *pt, 0, snap_to_edge_vertex));
     edge_contours.back ().push_back (insert_point (trans * *pt));
+// @@@++id; mp_graph->dump ("xxx" + tl::to_string(id) + ".gds"); tl::info << "@@@ xxx" << id; // @@@
   }
 
   for (unsigned int h = 0; h < poly.holes (); ++h) {

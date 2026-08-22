@@ -1078,7 +1078,7 @@ TEST(triangulate_issue1996)
   EXPECT_LT (plc.num_polygons (), size_t (132000));
 }
 
-TEST(triangulate_discussion_2883)
+TEST(triangulate_issue_2429)
 {
   db::DPoint contour[] = {
     db::DPoint (-13025.428, -33338.541),
@@ -1114,10 +1114,11 @@ TEST(triangulate_discussion_2883)
   db::DPolygon poly;
   poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
 
-  double dbu = 0.001;
+  double dbu = 1.0;
 
   db::plc::TriangulationParameters param;
   param.min_b = 0.3;
+  param.max_area = 500.0; // @@@
 
   db::plc::Graph plc;
   TestableTriangulation tri (&plc);

@@ -221,24 +221,24 @@ Triangulation::find_points_around (Vertex *vertex, double radius)
 }
 
 Vertex *
-Triangulation::insert_point (const db::DPoint &point, std::list<tl::weak_ptr<Polygon> > *new_triangles, double snap)
+Triangulation::insert_point (const db::DPoint &point, std::list<tl::weak_ptr<Polygon> > *new_triangles)
 {
-  return insert (mp_graph->create_vertex (point), new_triangles, snap);
+  return insert (mp_graph->create_vertex (point), new_triangles);
 }
 
 Vertex *
-Triangulation::insert_point (db::DCoord x, db::DCoord y, std::list<tl::weak_ptr<Polygon> > *new_triangles, double snap)
+Triangulation::insert_point (db::DCoord x, db::DCoord y, std::list<tl::weak_ptr<Polygon> > *new_triangles)
 {
-  return insert (mp_graph->create_vertex (x, y), new_triangles, snap);
+  return insert (mp_graph->create_vertex (x, y), new_triangles);
 }
 
 Vertex *
-Triangulation::insert (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles, double snap)
+Triangulation::insert (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles)
 {
   Polygon *in_triangle = 0;
   Edge *on_edge = 0;
 
-  if (! find_triangle_for_point (*vertex, snap, in_triangle, on_edge)) {
+  if (! find_triangle_for_point (*vertex, in_triangle, on_edge)) {
 
     //  the new vertex is outside the domain
     tl_assert (! m_is_constrained);
@@ -249,11 +249,9 @@ Triangulation::insert (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_tr
 
   if (on_edge) {
 
-    double snap_range = std::max (db::epsilon, snap * on_edge->length ());
-
-    if (snap > 0.0 ? vertex->distance (*on_edge->v1 ()) < snap_range : is_equal (*vertex, *on_edge->v1 ())) {
+    if (is_equal (*vertex, *on_edge->v1 ())) {
       return on_edge->v1 ();
-    } else if (snap > 0.0 ? vertex->distance (*on_edge->v2 ()) < snap_range : is_equal (*vertex, *on_edge->v2 ())) {
+    } else if (is_equal (*vertex, *on_edge->v2 ())) {
       return on_edge->v2 ();
     } else {
       split_triangles_on_edge (vertex, on_edge, new_triangles);
@@ -273,15 +271,13 @@ Triangulation::insert (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_tr
   }
 }
 
-bool Triangulation::find_triangle_for_point (const db::DPoint &point, double snap, Polygon *&in_triangle, Edge *&on_edge)
+bool Triangulation::find_triangle_for_point (const db::DPoint &point, Polygon *&in_triangle, Edge *&on_edge)
 {
   Edge *edge = find_closest_edge (point);
 
   if (edge) {
 
-    double snap_range = std::max (db::epsilon, snap * edge->length ());
-
-    if (snap > 0.0 ? std::abs (edge->edge ().distance (point)) < snap_range : edge->side_of (point) == 0) {
+    if (edge->side_of (point) == 0) {
 
       on_edge = edge;
       return true;

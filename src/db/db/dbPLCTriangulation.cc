@@ -42,9 +42,6 @@ static inline bool is_equal (const db::DPoint &a, const db::DPoint &b)
          std::abs (a.y () - b.y ()) < std::max (1.0, (std::abs (a.y ()) + std::abs (b.y ()))) * db::epsilon;
 }
 
-//  distance of point to vertex to be considered "on edge vertex" relative to edge length involved
-const double snap_to_edge_vertex = 1e-5;
-
 //  distance of point to edge center to be considered "on edge center" relative to edge length involved
 const double snap_to_edge_center = 1e-3;
 
@@ -252,7 +249,6 @@ Triangulation::insert (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_tr
 
   if (on_edge) {
 
-    // double snap_range = std::max (db::epsilon, snap_to_edge_vertex * e->length ()); @@@
     double snap_range = std::max (db::epsilon, snap * on_edge->length ());
 
     if (snap > 0.0 ? vertex->distance (*on_edge->v1 ()) < snap_range : is_equal (*vertex, *on_edge->v1 ())) {
@@ -1142,17 +1138,23 @@ static bool is_touching (const db::DEdge &a, const db::DEdge &b)
 std::vector<Edge *>
 Triangulation::ensure_edge_inner (Vertex *from, Vertex *to)
 {
-  auto crossed_edges = search_edges_crossing (from, to);
   std::vector<Edge *> result;
+
+  //  check if there is an edge already
+  Edge *already_there = find_edge_for_points (*from, *to);
+  if (already_there) {
+    result.push_back (already_there);
+    return result;
+  }
+
+  auto crossed_edges = search_edges_crossing (from, to);
 
   db::DEdge dedge (*from , *to);
 
   if (crossed_edges.empty ()) {
 
     //  no crossing edge - there should be a edge already
-    Edge *res = find_edge_for_points (*from, *to);
-    tl_assert (res != 0);
-    result.push_back (res);
+    tl_assert (false);
 
   } else if (crossed_edges.size () == 1 && ! is_touching (dedge, crossed_edges.front ()->edge ())) {
 
@@ -1173,7 +1175,7 @@ Triangulation::ensure_edge_inner (Vertex *from, Vertex *to)
       db::DPoint p = (*e)->intersection_point (dedge);
       double dp = fabs ((p - *from).sq_length () - l_half);
       if (d < 0.0 || dp < d) {
-        dp = d;
+        d = dp;
         split_point = p;
         split_edge = *e;
       }
@@ -1380,14 +1382,8 @@ void
 Triangulation::make_contours (const Poly &poly, const Trans &trans, std::vector<std::vector<Vertex *> > &edge_contours)
 {
   edge_contours.push_back (std::vector<Vertex *> ());
-// @@@int id = 0; // @@@
   for (auto pt = poly.begin_hull (); pt != poly.end_hull (); ++pt) {
-// @@@if (id == 27) { // @@@
-// @@@tl::info << "@@@ BANG!"; // @@@
-// @@@} // @@@
-    // @@@ edge_contours.back ().push_back (insert_point (trans * *pt, 0, snap_to_edge_vertex));
     edge_contours.back ().push_back (insert_point (trans * *pt));
-// @@@++id; mp_graph->dump ("xxx" + tl::to_string(id) + ".gds"); tl::info << "@@@ xxx" << id; // @@@
   }
 
   for (unsigned int h = 0; h < poly.holes (); ++h) {
@@ -1404,6 +1400,9 @@ template DB_PUBLIC void Triangulation::make_contours (const db::DPolygon &, cons
 void
 Triangulation::create_constrained_delaunay (const db::Region &region, const CplxTrans &trans)
 {
+  std::vector<std::vector<Vertex *> > box_contours;
+  make_contours (db::Polygon (region.bbox ()), trans, box_contours);
+
   std::vector<std::vector<Vertex *> > edge_contours;
 
   for (auto p = region.begin_merged (); ! p.at_end (); ++p) {
@@ -1416,6 +1415,9 @@ Triangulation::create_constrained_delaunay (const db::Region &region, const Cplx
 void
 Triangulation::create_constrained_delaunay (const db::Polygon &p, const CplxTrans &trans)
 {
+  std::vector<std::vector<Vertex *> > box_contours;
+  make_contours (db::Polygon (p.box ()), trans, box_contours);
+
   std::vector<std::vector<Vertex *> > edge_contours;
   make_contours (p, trans, edge_contours);
 
@@ -1425,6 +1427,9 @@ Triangulation::create_constrained_delaunay (const db::Polygon &p, const CplxTran
 void
 Triangulation::create_constrained_delaunay (const db::DPolygon &p, const DCplxTrans &trans)
 {
+  std::vector<std::vector<Vertex *> > box_contours;
+  make_contours (db::DPolygon (p.box ()), trans, box_contours);
+
   std::vector<std::vector<Vertex *> > edge_contours;
   make_contours (p, trans, edge_contours);
 
@@ -1493,6 +1498,9 @@ Triangulation::triangulate (const db::Region &region, const std::vector<db::Poin
 
   clear ();
 
+  std::vector<std::vector<Vertex *> > box_contours;
+  make_contours (db::Polygon (region.bbox ()), trans, box_contours);
+
   std::vector<std::vector<Vertex *> > edge_contours;
   for (auto p = region.begin_merged (); ! p.at_end (); ++p) {
     make_contours (*p, trans, edge_contours);
@@ -1522,6 +1530,9 @@ Triangulation::triangulate (const db::Polygon &poly, const std::vector<db::Point
 
   clear ();
 
+  std::vector<std::vector<Vertex *> > box_contours;
+  make_contours (db::Polygon (poly.box ()), trans, box_contours);
+
   std::vector<std::vector<Vertex *> > edge_contours;
   make_contours (poly, trans, edge_contours);
 
@@ -1547,6 +1558,9 @@ Triangulation::triangulate (const db::Polygon &poly, const std::vector<db::Point
 
   clear ();
 
+  std::vector<std::vector<Vertex *> > box_contours;
+  make_contours (db::Polygon (poly.box ()), trans, box_contours);
+
   std::vector<std::vector<Vertex *> > edge_contours;
   make_contours (poly, trans, edge_contours);
 
@@ -1571,6 +1585,9 @@ Triangulation::triangulate (const db::DPolygon &poly, const std::vector<db::DPoi
   tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
 
   clear ();
+
+  std::vector<std::vector<Vertex *> > box_contours;
+  make_contours (db::DPolygon (poly.box ()), trans, box_contours);
 
   std::vector<std::vector<Vertex *> > edge_contours;
   make_contours (poly, trans, edge_contours);

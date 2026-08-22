@@ -357,7 +357,7 @@ TEST(extraction_meander)
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R V0 V1 8.61417"          //  what is the "real" value?
+    "R V0 V1 8.60459"          //  what is the "real" value?
   )
 }
 

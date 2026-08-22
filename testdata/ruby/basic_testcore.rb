@@ -3176,7 +3176,7 @@ class Basic_TestClass < TestBase
     assert_equal(RBA::A::var2s(RBA::DBox::new(0, 0, 10, 20)), "[dbox:(0,0;10,20)]")
     assert_equal(RBA::A::var2s([ 0.5, "hello" ]), "(##0.5,'hello')")
     assert_equal(RBA::A::var2s([ 0.5, [ 1, 2 ] ]), "(##0.5,(#1,#2))")
-    if RUBY_VERSION > "2.0.0"
+    if RUBY_VERSION >= "3.0.0"
       # Ruby 2 can't pass a hash to a function's argument
       assert_equal(RBA::A::var2s({ 1 => 'one', 'two' => 17 }), "{#1=>'one','two'=>#17}")
     end

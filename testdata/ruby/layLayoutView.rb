@@ -450,7 +450,6 @@ class LAYLayoutView_TestClass < TestBase
 
     img = lv.get_pixels_with_options(500, 500, 1, 1, 1.0, RBA::DBox::new)
     au = RBA::PixelBuffer.read_png(File.join($ut_testsrc, "testdata/lay/au_lv1.png"))
-    img.write_png("/home/matthias/tmp.png")
     if au
       assert_equal(au == img, true)
     end

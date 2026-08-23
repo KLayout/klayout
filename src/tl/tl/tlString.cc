@@ -1268,20 +1268,36 @@ Extractor::try_read_signed_int (T &value)
   }
 
   value = 0;
-  while (safe_isdigit (*m_cp)) {
-    if (value > std::numeric_limits<T>::max () / 10) {
-      throw tl::Exception (overflow_msg_func<T> () ());
-    }
-    value *= 10;
-    if (value > std::numeric_limits<T>::max () - (*m_cp - '0')) {
-      throw tl::Exception (overflow_msg_func<T> () ());
-    }
-    value += (*m_cp - '0');
-    ++m_cp;
-  }
 
   if (minus) {
-    value = -value;
+
+    //  NOTE: that's a separate path as there are more numbers in the negative case
+    while (safe_isdigit (*m_cp)) {
+      if (value < std::numeric_limits<T>::min () / 10) {
+        throw tl::Exception (overflow_msg_func<T> () ());
+      }
+      value *= 10;
+      if (value < std::numeric_limits<T>::min () + (*m_cp - '0')) {
+        throw tl::Exception (overflow_msg_func<T> () ());
+      }
+      value -= (*m_cp - '0');
+      ++m_cp;
+    }
+
+  } else {
+
+    while (safe_isdigit (*m_cp)) {
+      if (value > std::numeric_limits<T>::max () / 10) {
+        throw tl::Exception (overflow_msg_func<T> () ());
+      }
+      value *= 10;
+      if (value > std::numeric_limits<T>::max () - (*m_cp - '0')) {
+        throw tl::Exception (overflow_msg_func<T> () ());
+      }
+      value += (*m_cp - '0');
+      ++m_cp;
+    }
+
   }
 
   return true;

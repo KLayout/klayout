@@ -6111,7 +6111,7 @@ class LayerPropertiesNodeRef(LayerPropertiesNode):
         r"""
         @brief Assigns the contents of the 'other' object to self.
 
-        This version accepts a \LayerProperties object. Assignment will change the properties of the layer in the view.
+        This version accepts a \LayerPropertiesNode object and allows modification of the layer node's hierarchy. Assignment will reconfigure the layer node in the view.
         """
         ...
     @overload
@@ -6119,7 +6119,7 @@ class LayerPropertiesNodeRef(LayerPropertiesNode):
         r"""
         @brief Assigns the contents of the 'other' object to self.
 
-        This version accepts a \LayerPropertiesNode object and allows modification of the layer node's hierarchy. Assignment will reconfigure the layer node in the view.
+        This version accepts a \LayerProperties object. Assignment will change the properties of the layer in the view.
         """
         ...
     def delete(self) -> None:

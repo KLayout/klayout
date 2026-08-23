@@ -5139,7 +5139,7 @@ class CompoundRegionOperationNode:
         ...
     class ParameterType:
         r"""
-        @brief This class represents the parameter type enum used in \CompoundRegionOperationNode#new_bbox_filter
+        @brief This class represents the parameter type enum used in CompoundRegionOperationNode#new_bbox_filter
 
         This enum has been introduced in version 0.27.
         """
@@ -5268,7 +5268,7 @@ class CompoundRegionOperationNode:
         ...
     class RatioParameterType:
         r"""
-        @brief This class represents the parameter type enum used in \CompoundRegionOperationNode#new_ratio_filter
+        @brief This class represents the parameter type enum used in CompoundRegionOperationNode#new_ratio_filter
 
         This enum has been introduced in version 0.27.
         """
@@ -16124,8 +16124,7 @@ class DText:
     Setter:
     @brief Sets the horizontal alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     size: float
     r"""
@@ -16161,7 +16160,8 @@ class DText:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: float
     r"""
@@ -16216,15 +16216,6 @@ class DText:
         ...
     @overload
     @classmethod
-    def new(cls, Text: Text) -> DText:
-        r"""
-        @brief Creates a floating-point coordinate text from an integer coordinate text
-
-        This constructor has been introduced in version 0.25 and replaces the previous static method 'from_itext'.
-        """
-        ...
-    @overload
-    @classmethod
     def new(cls, string: str, trans: DTrans) -> DText:
         r"""
         @brief Constructor with string and transformation
@@ -16253,6 +16244,15 @@ class DText:
         A string and a location is provided to this constructor. The location is specifies as a pair of x and y coordinates.
 
         This method has been introduced in version 0.23.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, text: Text) -> DText:
+        r"""
+        @brief Creates a floating-point coordinate text from an integer coordinate text
+
+        This constructor has been introduced in version 0.25 and replaces the previous static method 'from_itext'.
         """
         ...
     def __copy__(self) -> DText:
@@ -16290,14 +16290,6 @@ class DText:
         """
         ...
     @overload
-    def __init__(self, Text: Text) -> None:
-        r"""
-        @brief Creates a floating-point coordinate text from an integer coordinate text
-
-        This constructor has been introduced in version 0.25 and replaces the previous static method 'from_itext'.
-        """
-        ...
-    @overload
     def __init__(self, string: str, trans: DTrans) -> None:
         r"""
         @brief Constructor with string and transformation
@@ -16324,6 +16316,14 @@ class DText:
         A string and a location is provided to this constructor. The location is specifies as a pair of x and y coordinates.
 
         This method has been introduced in version 0.23.
+        """
+        ...
+    @overload
+    def __init__(self, text: Text) -> None:
+        r"""
+        @brief Creates a floating-point coordinate text from an integer coordinate text
+
+        This constructor has been introduced in version 0.25 and replaces the previous static method 'from_itext'.
         """
         ...
     def __lt__(self, t: DText) -> bool:
@@ -37885,6 +37885,22 @@ class LEFDEFReaderConfiguration:
 
     This property has been added in version 0.27.
     """
+    skip_duplicate_macros: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating wether to skip duplicate LEF Macro definitions.
+    If this property is 'true', having the same macro in different LEF files is a warning rather than being an error. In that case, the first occurance is used. Use this option with care, as it may render invalid layouts when the versions of the macro are defined differently. It is intended for cases, when macros with the same name are guaranteed to be identical. KLayout does not check, if that is actually the case.
+    The default is 'false' (duplicate macro names are an error).
+
+    This property has been added in version 0.30.x.
+
+    Setter:
+    @brief Sets a value indicating wether to skip duplicate LEF Macro definitions.
+
+    See \skip_duplicate_macros for a description of this property.
+
+    This property has been added in version 0.30.11.
+    """
     special_routing_datatype: int
     r"""
     Getter:
@@ -50079,17 +50095,17 @@ class Netlist:
     @overload
     def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits bottom-up
+        @brief Iterates over the circuits bottom-up (const version)
         Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
     def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits bottom-up (const version)
+        @brief Iterates over the circuits bottom-up
         Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
-
-        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
@@ -52634,6 +52650,11 @@ class PCellDeclaration(PCellDeclaration_Native):
         @hide
         """
         ...
+    def create_parameters_page(self) -> PCellParametersPageBase:
+        r"""
+        @hide
+        """
+        ...
     def description(self) -> str:
         r"""
         @hide
@@ -53638,11 +53659,143 @@ class PCellParameterStates:
         In that case, only const methods may be called on self.
         """
         ...
+    @overload
     def parameter(self, name: str) -> PCellParameterState:
         r"""
         @brief Gets the parameter by name
 
         This will return a \PCellParameterState object that can be used to manipulate the parameter state.
+        """
+        ...
+    @overload
+    def parameter(self, name: str) -> PCellParameterState:
+        r"""
+        @brief Gets the parameter by name (const version)
+
+        This will return a \PCellParameterState object which cannot be manipulated, but read.
+
+        The const flavor has been introduced in version 0.30.11.
+        """
+        ...
+    ...
+
+class PCellParametersPageBase:
+    r"""
+    @hide.
+    This abstract base class for PCell parameter pages has been introduced in version 0.30.11.
+    """
+    @classmethod
+    def new(cls) -> PCellParametersPageBase:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __copy__(self) -> PCellParametersPageBase:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __deepcopy__(self) -> PCellParametersPageBase:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _const_cast(self) -> PCellParametersPageBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PCellParametersPageBase:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def assign(self, other: PCellParametersPageBase) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def dup(self) -> PCellParametersPageBase:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
         """
         ...
     ...
@@ -66564,10 +66717,10 @@ class Shape:
     Applies to texts only. Will throw an exception if the object is not a text.
 
     Setter:
-    @brief Sets the text transformation in micrometer units
+    @brief Sets the text transformation
     Applies to texts only. Will throw an exception if the object is not a text.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     text_valign: int
     r"""
@@ -70742,17 +70895,17 @@ class SubCircuit(NetlistObject):
     @overload
     def net_for_pin(self, pin_id: int) -> Net:
         r"""
-        @brief Gets the net connected to the specified pin of the subcircuit.
+        @brief Gets the net connected to the specified pin of the subcircuit (non-const version).
         If the pin is not connected, nil is returned for the net.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def net_for_pin(self, pin_id: int) -> Net:
         r"""
-        @brief Gets the net connected to the specified pin of the subcircuit (non-const version).
+        @brief Gets the net connected to the specified pin of the subcircuit.
         If the pin is not connected, nil is returned for the net.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     ...

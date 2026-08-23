@@ -1,11 +1,13 @@
-0.30.11          (2026-08-22):
-* Bugfix: %GITHUB%/issues/2429 Internal error on triangulation
+0.30.11          (2026-08-23):
+* Bugfix: %GITHUB%/issues/2362 Range checks of integers in Python API and correct string deserialization of MIN_INT
+* Bugfix: %GITHUB%/issues/2369 Skipping cell name in OASIS error messages or warning unless inside a cell
 * Enhancement: %GITHUB%/issues/2374 LEF/DEF Import - skip duplicate Macros feature
 * Enhancement: %GITHUB%/issues/2407 Visualize "Select" and "Partial" via selection box style
 * Bugfix: %GITHUB%/issues/2416 Two-layer DRC check without merged first input produces separation violations that 0.30.9 does not reportbug
 * Enhancement: %GITHUB%/issues/2417 Better error message in LVS "name" function
 * Bugfix: %GITHUB%/issues/2419 Arc disappears when zoomed in and all anchor points are outside the viewportbug
 * Bugfix: %GITHUB%/issues/2423 DRC regression (separation check)
+* Bugfix: %GITHUB%/issues/2429 Internal error on triangulation
 * Bugfix: DXF - avoiding generating duplicates of zero layer during DXF read/write spin.
 * Bugfix: PCellDeclarationHelper documentation for Python was not visible in Assistant
 * Enhancement: Text markers can now be configured to have a filled text box

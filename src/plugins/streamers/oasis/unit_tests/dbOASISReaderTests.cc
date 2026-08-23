@@ -198,12 +198,12 @@ TEST(11_7)
 
 TEST(11_8)
 {
-  run_test_error (_this, "11.8", "Modal variable accessed before being defined: last-value-list (position=96, cell=)");
+  run_test_error (_this, "11.8", "Modal variable accessed before being defined: last-value-list (position=96)");
 }
 
 TEST(11_9)
 {
-  run_test_error (_this, "11.9", "Modal variable accessed before being defined: last-value-list (position=118, cell=)");
+  run_test_error (_this, "11.9", "Modal variable accessed before being defined: last-value-list (position=118)");
 }
 
 TEST(12_1)
@@ -248,7 +248,7 @@ TEST(2_2)
 
 TEST(2_3)
 {
-  run_test_error (_this, "2.3", "Explicit and implicit CELLNAME modes cannot be mixed (position=45, cell=)");
+  run_test_error (_this, "2.3", "Explicit and implicit CELLNAME modes cannot be mixed (position=45)");
 }
 
 TEST(2_4)
@@ -258,7 +258,7 @@ TEST(2_4)
 
 TEST(2_5)
 {
-  run_test_error (_this, "2.5", "No cellname defined for cell name id 2 (position=305, cell=)");
+  run_test_error (_this, "2.5", "No cellname defined for cell name id 2 (position=305)");
 }
 
 TEST(2_6)
@@ -298,12 +298,12 @@ TEST(3_2)
 
 TEST(3_3)
 {
-  run_test_error (_this, "3.3", "Explicit and implicit TEXTSTRING modes cannot be mixed (position=41, cell=)");
+  run_test_error (_this, "3.3", "Explicit and implicit TEXTSTRING modes cannot be mixed (position=41)");
 }
 
 TEST(3_4)
 {
-  run_test_error (_this, "3.4", "No text string defined for text string id 2 (position=309, cell=)");
+  run_test_error (_this, "3.4", "No text string defined for text string id 2 (position=309)");
 }
 
 TEST(3_5)
@@ -636,7 +636,7 @@ TEST(Bug_1474)
     //  Seen when private test data is not installed
     throw;
   } catch (tl::Exception &ex) {
-    EXPECT_EQ (ex.msg ().find ("Cell named ADDHX2 with ID 4 was already given name SEDFFTRX2 (position=763169, cell=)"), size_t (0));
+    EXPECT_EQ (ex.msg ().find ("Cell named ADDHX2 with ID 4 was already given name SEDFFTRX2 (position=763169)"), size_t (0));
   }
 }
 

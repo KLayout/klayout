@@ -32,9 +32,11 @@
 
 #include "tlVariant.h"
 #include "tlException.h"
+#include "tlInternational.h"
 #include "tlHeap.h"
 
 #include <string>
+#include <limits>
 #if defined(HAVE_QT)
 # include <QString>
 # include <QByteArray>
@@ -316,12 +318,28 @@ struct python2c_func_cast
   }
 };
 
+template <class D, class C>
+struct python2c_func_cast_check
+  : public python2c_func<C>
+{
+  D operator() (PyObject *rval)
+  {
+    C c = python2c_func<C>::operator() (rval);
+    if (c < std::numeric_limits<D>::min ()) {
+      throw tl::TypeError (tl::to_string (tr ("Value out of range: ")) + tl::to_string (c) + tl::to_string (tr (", min value is ")) + tl::to_string ((C) std::numeric_limits<D>::min ()));
+    } else if (c > std::numeric_limits<D>::max ()) {
+      throw tl::TypeError (tl::to_string (tr ("Value out of range: ")) + tl::to_string (c) + tl::to_string (tr (", max value is ")) + tl::to_string ((C) std::numeric_limits<D>::max ()));
+    }
+    return (D)c;
+  }
+};
+
 template <> struct python2c_func<signed char> : public python2c_func_cast<signed char, char> { };
 template <> struct python2c_func<unsigned char> : public python2c_func_cast<unsigned char, char> { };
-template <> struct python2c_func<short> : public python2c_func_cast<short, long> { };
-template <> struct python2c_func<unsigned short> : public python2c_func_cast<unsigned short, long> { };
-template <> struct python2c_func<int> : public python2c_func_cast<int, long> { };
-template <> struct python2c_func<unsigned int> : public python2c_func_cast<unsigned int, unsigned long> { };
+template <> struct python2c_func<short> : public python2c_func_cast_check<short, long> { };
+template <> struct python2c_func<unsigned short> : public python2c_func_cast_check<unsigned short, long> { };
+template <> struct python2c_func<int> : public python2c_func_cast_check<int, long> { };
+template <> struct python2c_func<unsigned int> : public python2c_func_cast_check<unsigned int, unsigned long> { };
 
 template <> PYA_PUBLIC long long python2c_func<long long>::operator() (PyObject *rval);
 template <> PYA_PUBLIC unsigned long long python2c_func<unsigned long long>::operator() (PyObject *rval);

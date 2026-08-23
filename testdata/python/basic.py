@@ -537,20 +537,20 @@ class BasicTest(unittest.TestCase):
     self.assertEqual( a3.get_n(), -11 )
 
     self.assertEqual( a1.a10_d(5.2), "5.2" )
-    self.assertEqual( a1.a10_s(0x70000000), "0" )
-    self.assertEqual( a1.a10_s(0x7fffffff), "-1" )
-    self.assertEqual( a1.a10_us(0x70000000), "0" )
-    self.assertEqual( a1.a10_us(0x7fffffff), "65535" )
+    self.assertEqual( a1.a10_s(0x7fff), "32767" )
+    self.assertEqual( a1.a10_s(-32768), "-32768" )
+    self.assertEqual( a1.a10_us(0), "0" )
+    self.assertEqual( a1.a10_us(0xffff), "65535" )
     self.assertEqual( a1.a10_i(-0x80000000), "-2147483648" )
     self.assertEqual( a1.a10_l(-0x80000000), "-2147483648" )
     self.assertEqual( a1.a10_ll(-0x80000000), "-2147483648" )
     self.assertEqual( a1.a10_ui(0xffffffff), "4294967295" )
     self.assertEqual( a1.a10_ul(0xffffffff), "4294967295" )
     self.assertEqual( a1.a10_ull(0xffffffff), "4294967295" )
-    self.assertEqual( a1.a11_s(0x70000000), 0 )
-    self.assertEqual( a1.a11_s(0x7fffffff), -1 )
-    self.assertEqual( a1.a11_us(0x70000000), 0 )
-    self.assertEqual( a1.a11_us(0x7fffffff), 65535 )
+    self.assertEqual( a1.a11_s(0x7fff), 32767 )
+    self.assertEqual( a1.a11_s(-32768), -32768 )
+    self.assertEqual( a1.a11_us(0), 0 )
+    self.assertEqual( a1.a11_us(0xffff), 65535 )
     self.assertEqual( a1.a11_i(-0x80000000), -2147483648 )
     self.assertEqual( a1.a11_l(-0x80000000), -2147483648 )
     self.assertEqual( a1.a11_ll(-0x80000000), -2147483648 )
@@ -3383,6 +3383,34 @@ class BasicTest(unittest.TestCase):
 
     b = None
     self.assertEqual(r() is None, True)
+
+  # range checks
+  def test_95(self):
+
+    # uses the A single-argument constructor to verify that int ranges
+    # are tested
+    a = pya.A.new_a(100)
+    self.assertEqual(a.a1(), 100)
+    a = pya.A.new_a(2147483647)
+    self.assertEqual(a.a1(), 2147483647)
+    a = pya.A.new_a(-2147483648)
+    self.assertEqual(a.a1(), -2147483648)
+
+    m = ""
+    try:
+      a = pya.A.new_a(2147483648)
+      self.assertEqual(a.a1(), 2147483648)
+    except Exception as ex:
+      m = str(ex)
+    self.assertEqual(m, "Value out of range: 2147483648, max value is 2147483647 for argument #1 in A.new_a")
+
+    m = ""
+    try:
+      a = pya.A.new_a(-2147483649)
+      self.assertEqual(a.a1(), -2147483649)
+    except Exception as ex:
+      m = str(ex)
+    self.assertEqual(m, "Value out of range: -2147483649, min value is -2147483648 for argument #1 in A.new_a")
 
 
 # run unit tests

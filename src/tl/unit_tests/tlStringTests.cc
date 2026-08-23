@@ -126,6 +126,14 @@ TEST(1a)
   ex.expect ("x");
 }
 
+template<class T>
+void
+ex_from_string (const std::string &s, T &v)
+{
+  tl::Extractor ex (s.c_str ());
+  ex.read (v);
+}
+
 TEST(2)
 {
   long l;
@@ -663,3 +671,56 @@ TEST(16)
   EXPECT_EQ (ex.try_read (x), true);
   EXPECT_EQ (tl::to_string (x), "-inf");
 }
+
+//  border cases of int values: round trip value->string->value
+TEST(17)
+{
+  int n, nn;
+  n = std::numeric_limits<int>::max ();
+  ex_from_string (to_string (n), nn);
+  EXPECT_EQ (n, nn);
+  n = std::numeric_limits<int>::min ();
+  ex_from_string (to_string (n), nn);
+  EXPECT_EQ (n, nn);
+
+  unsigned int un, unn;
+  un = std::numeric_limits<unsigned int>::max ();
+  ex_from_string (to_string (un), unn);
+  EXPECT_EQ (un, unn);
+  un = std::numeric_limits<unsigned int>::min ();
+  ex_from_string (to_string (un), unn);
+  EXPECT_EQ (un, unn);
+
+  long ln, lnn;
+  ln = std::numeric_limits<long>::max ();
+  ex_from_string (to_string (ln), lnn);
+  EXPECT_EQ (ln, lnn);
+  ln = std::numeric_limits<long>::min ();
+  ex_from_string (to_string (ln), lnn);
+  EXPECT_EQ (ln, lnn);
+
+  unsigned long uln, ulnn;
+  uln = std::numeric_limits<unsigned long>::max ();
+  ex_from_string (to_string (uln), ulnn);
+  EXPECT_EQ (uln, ulnn);
+  uln = std::numeric_limits<unsigned long>::min ();
+  ex_from_string (to_string (uln), ulnn);
+  EXPECT_EQ (uln, ulnn);
+
+  long long lln, llnn;
+  lln = std::numeric_limits<long long>::max ();
+  ex_from_string (to_string (lln), llnn);
+  EXPECT_EQ (lln, llnn);
+  lln = std::numeric_limits<long long>::min ();
+  ex_from_string (to_string (lln), llnn);
+  EXPECT_EQ (lln, llnn);
+
+  unsigned long long ulln, ullnn;
+  ulln = std::numeric_limits<unsigned long long>::max ();
+  ex_from_string (to_string (ulln), ullnn);
+  EXPECT_EQ (ulln, ullnn);
+  ulln = std::numeric_limits<unsigned long long>::min ();
+  ex_from_string (to_string (ulln), ullnn);
+  EXPECT_EQ (ulln, ullnn);
+}
+

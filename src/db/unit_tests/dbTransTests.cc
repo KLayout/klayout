@@ -420,4 +420,25 @@ TEST(15)
   EXPECT_EQ (db::Trans (t).to_string (), "r0 0,0");
 }
 
+TEST(16_issue2362)
+{
+  db::Trans t, tt;
+  std::string ts;
+  tl::Extractor ex;
 
+  t = db::Trans (0, false, db::Vector (std::numeric_limits<db::Coord>::min (), std::numeric_limits<db::Coord>::min ()));
+  ts = t.to_string ();
+
+  ex = tl::Extractor (ts.c_str ());
+  ex.read (tt);
+
+  EXPECT_EQ (ts, tt.to_string ());
+
+  t = db::Trans (0, false, db::Vector (std::numeric_limits<db::Coord>::max (), std::numeric_limits<db::Coord>::max ()));
+  ts = t.to_string ();
+
+  ex = tl::Extractor (ts.c_str ());
+  ex.read (tt);
+
+  EXPECT_EQ (ts, tt.to_string ());
+}

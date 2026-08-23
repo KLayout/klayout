@@ -446,7 +446,7 @@ OASISReader::get_gdelta (int64_t grid)
 void
 OASISReader::error (const std::string &msg)
 {
-  throw OASISReaderException (msg, m_stream.pos (), m_cellname.c_str (), m_stream.source ());
+  throw OASISReaderException (msg, m_stream.pos (), m_cellname, m_stream.source ());
 }
 
 void
@@ -468,10 +468,16 @@ OASISReader::warn (const std::string &msg, int wl)
 
     int ws = compress_warning (msg);
     if (ws < 0) {
-      tl::warn << msg
-               << tl::to_string (tr (" (position=")) << m_stream.pos ()
-               << tl::to_string (tr (", cell=")) << m_cellname
-               << ")";
+      if (m_cellname.empty ()) {
+        tl::warn << msg
+                 << tl::to_string (tr (" (position=")) << m_stream.pos ()
+                 << ")";
+      } else {
+        tl::warn << msg
+                 << tl::to_string (tr (" (position=")) << m_stream.pos ()
+                 << tl::to_string (tr (", cell=")) << m_cellname
+                 << ")";
+      }
     } else if (ws == 0) {
       tl::warn << tl::to_string (tr ("... further warnings of this kind are not shown"));
     }

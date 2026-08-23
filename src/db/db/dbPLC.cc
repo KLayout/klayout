@@ -903,10 +903,10 @@ Graph::bbox () const
 }
 
 db::Layout *
-Graph::to_layout (bool decompose_by_id) const
+Graph::to_layout (bool decompose_by_id, double dbu) const
 {
   db::Layout *layout = new db::Layout ();
-  layout->dbu (0.001);
+  layout->dbu (dbu);
 
   auto dbu_trans = db::CplxTrans (layout->dbu ()).inverted ();
 
@@ -950,9 +950,9 @@ Graph::to_layout (bool decompose_by_id) const
 }
 
 void
-Graph::dump (const std::string &path, bool decompose_by_id) const
+Graph::dump (const std::string &path, bool decompose_by_id, double dbu) const
 {
-  std::unique_ptr<db::Layout> ly (to_layout (decompose_by_id));
+  std::unique_ptr<db::Layout> ly (to_layout (decompose_by_id, dbu));
 
   tl::OutputStream stream (path);
 

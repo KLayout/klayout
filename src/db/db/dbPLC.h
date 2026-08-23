@@ -879,13 +879,13 @@ public:
    *  according to bit 0, 1 and 2 of the ID (useful with the 'mark_polygons'
    *  flat in TriangulateParameters).
    */
-  void dump (const std::string &path, bool decompose_by_id = false) const;
+  void dump (const std::string &path, bool decompose_by_id = false, double dbu = 0.001) const;
 
   /**
    *  @brief Creates a new layout object representing the polygon graph
    *  This method is for testing purposes mainly.
    */
-  db::Layout *to_layout (bool decompose_by_id = false) const;
+  db::Layout *to_layout (bool decompose_by_id = false, double dbu = 0.001) const;
 
 protected:
   Vertex *create_vertex (double x, double y);

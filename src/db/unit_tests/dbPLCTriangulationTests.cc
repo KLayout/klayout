@@ -896,8 +896,8 @@ TEST(triangulate_geo)
   }
 
   EXPECT_LT (n_skinny, size_t (20));
-  EXPECT_GT (plc.num_polygons (), size_t (29000));
-  EXPECT_LT (plc.num_polygons (), size_t (30000));
+  EXPECT_GT (plc.num_polygons (), size_t (30000));
+  EXPECT_LT (plc.num_polygons (), size_t (30200));
 }
 
 TEST(triangulate_analytic)
@@ -951,8 +951,8 @@ TEST(triangulate_analytic)
     EXPECT_GE (t->b (), param.min_b);
   }
 
-  EXPECT_GT (plc.num_polygons (), size_t (1250));
-  EXPECT_LT (plc.num_polygons (), size_t (1300));
+  EXPECT_GT (plc.num_polygons (), size_t (1300));
+  EXPECT_LT (plc.num_polygons (), size_t (1340));
 }
 
 TEST(triangulate_problematic)
@@ -1078,7 +1078,7 @@ TEST(triangulate_issue1996)
   EXPECT_LT (plc.num_polygons (), size_t (132000));
 }
 
-TEST(triangulate_discussion_2883)
+TEST(triangulate_issue_2429)
 {
   db::DPoint contour[] = {
     db::DPoint (-13025.428, -33338.541),
@@ -1114,27 +1114,76 @@ TEST(triangulate_discussion_2883)
   db::DPolygon poly;
   poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
 
-  double dbu = 0.001;
+  double dbu = 1.0;
 
-  db::plc::TriangulationParameters param;
-  param.min_b = 0.3;
+  {
+    db::plc::TriangulationParameters param;
+    param.min_b = 0.3;
+    param.max_area = 0.0;
 
-  db::plc::Graph plc;
-  TestableTriangulation tri (&plc);
-  db::DCplxTrans trans = db::DCplxTrans (dbu) * db::DCplxTrans (db::DTrans (db::DPoint () - poly.box ().center ()));
-  tri.triangulate (trans * poly, param);
+    db::plc::Graph plc;
+    TestableTriangulation tri (&plc);
+    db::DCplxTrans trans = db::DCplxTrans (dbu) * db::DCplxTrans (db::DTrans (db::DPoint () - poly.box ().center ()));
+    tri.triangulate (trans * poly, param);
 
-  EXPECT_EQ (tri.check (false), true);
+    EXPECT_EQ (tri.check (false), true);
 
-  //  for debugging:
-  //  tri.dump ("debug.gds");
+    //  for debugging:
+    //  tri.dump ("debug.gds");
 
-  for (auto t = plc.begin (); t != plc.end (); ++t) {
-    EXPECT_GE (t->b (), param.min_b);
+    for (auto t = plc.begin (); t != plc.end (); ++t) {
+      EXPECT_GE (t->b (), param.min_b);
+    }
+
+    EXPECT_GE (plc.num_polygons (), size_t (65));
+    EXPECT_LE (plc.num_polygons (), size_t (67));
   }
 
-  EXPECT_GE (plc.num_polygons (), size_t (70));
-  EXPECT_LE (plc.num_polygons (), size_t (72));
+  {
+    db::plc::TriangulationParameters param;
+    param.min_b = 0.3;
+    param.max_area = 500.0;
+
+    db::plc::Graph plc;
+    TestableTriangulation tri (&plc);
+    db::DCplxTrans trans = db::DCplxTrans (dbu) * db::DCplxTrans (db::DTrans (db::DPoint () - poly.box ().center ()));
+    tri.triangulate (trans * poly, param);
+
+    EXPECT_EQ (tri.check (false), true);
+
+    //  for debugging:
+    //  tri.dump ("debug.gds");
+
+    for (auto t = plc.begin (); t != plc.end (); ++t) {
+      EXPECT_GE (t->b (), param.min_b);
+    }
+
+    EXPECT_GE (plc.num_polygons (), size_t (94));
+    EXPECT_LE (plc.num_polygons (), size_t (96));
+  }
+
+  {
+    db::plc::TriangulationParameters param;
+    param.min_b = 0.9;
+    param.max_area = 50.0;
+
+    db::plc::Graph plc;
+    TestableTriangulation tri (&plc);
+    db::DCplxTrans trans = db::DCplxTrans (dbu) * db::DCplxTrans (db::DTrans (db::DPoint () - poly.box ().center ()));
+    tri.triangulate (trans * poly, param);
+
+    EXPECT_EQ (tri.check (false), true);
+
+    //  for debugging:
+    //  tri.dump ("debug.gds");
+
+    for (auto t = plc.begin (); t != plc.end (); ++t) {
+      EXPECT_GE (t->b (), param.min_b);
+    }
+
+    EXPECT_GE (plc.num_polygons (), size_t (670));
+    EXPECT_LE (plc.num_polygons (), size_t (676));
+  }
 }
 
 TEST(triangulate_with_vertexes)

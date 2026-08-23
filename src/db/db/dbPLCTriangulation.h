@@ -335,7 +335,7 @@ private:
   void remove_inside_vertex (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles_out = 0);
   std::vector<Polygon *> fill_concave_corners (const std::vector<Edge *> &edges);
   void fix_triangles (const std::vector<Polygon *> &tris, const std::vector<Edge *> &fixed_edges, std::list<tl::weak_ptr<Polygon> > *new_triangles);
-  std::vector<Polygon *> find_triangle_for_point (const db::DPoint &point);
+  bool find_triangle_for_point (const db::DPoint &point, Polygon *&in_triangle, Edge *&on_edge);
   Edge *find_closest_edge (const db::DPoint &p, Vertex *vstart = 0, bool inside_only = false) const;
   Vertex *insert (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles = 0);
   void split_triangle (Polygon *t, Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles_out);

@@ -40,60 +40,18 @@ bool is_derived_from (const gsi::ClassBase *cls, const std::type_info &ti)
 }
 
 template <>
-long python2c_func<long>::operator() (PyObject *rval)
-{
-#if PY_MAJOR_VERSION < 3
-  if (PyInt_Check (rval)) {
-    return PyInt_AsLong (rval);
-  } else
-#endif
-  if (PyLong_Check (rval)) {
-    return PyLong_AsLong (rval);
-  } else if (PyFloat_Check (rval)) {
-    return (long) (PyFloat_AsDouble (rval));
-  } else {
-    throw tl::TypeError (tl::to_string (tr ("Value cannot be converted to an integer")));
-  }
-}
-
-template <>
 bool python2c_func<bool>::operator() (PyObject *rval)
 {
   return PyObject_IsTrue (rval);
 }
 
-template <>
-char python2c_func<char>::operator() (PyObject *rval)
+template <class T>
+static T check_value (T l)
 {
-#if PY_MAJOR_VERSION < 3
-  if (PyInt_Check (rval)) {
-    return char (PyInt_AsLong (rval));
-  } else
-#endif
-  if (PyLong_Check (rval)) {
-    return char (PyLong_AsLong (rval));
-  } else if (PyFloat_Check (rval)) {
-    return char (PyFloat_AsDouble (rval));
-  } else {
-    throw tl::TypeError (tl::to_string (tr ("Value cannot be converted to a character")));
+  if (l == (T) -1) {
+    check_error ();
   }
-}
-
-template <>
-unsigned long python2c_func<unsigned long>::operator() (PyObject *rval)
-{
-#if PY_MAJOR_VERSION < 3
-  if (PyInt_Check (rval)) {
-    return PyInt_AsUnsignedLongMask (rval);
-  } else
-#endif
-  if (PyLong_Check (rval)) {
-    return PyLong_AsUnsignedLongMask (rval);
-  } else if (PyFloat_Check (rval)) {
-    return (unsigned long) (PyFloat_AsDouble (rval));
-  } else {
-    throw tl::TypeError (tl::to_string (tr ("Value cannot be converted to an integer")));
-  }
+  return l;
 }
 
 template <>
@@ -101,13 +59,13 @@ long long python2c_func<long long>::operator() (PyObject *rval)
 {
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check (rval)) {
-    return PyInt_AsLong (rval);
+    return check_value (PyInt_AsLong (rval));
   } else
 #endif
   if (PyLong_Check (rval)) {
-    return PyLong_AsLongLong (rval);
+    return check_value (PyLong_AsLongLong (rval));
   } else if (PyFloat_Check (rval)) {
-    return (long long) (PyFloat_AsDouble (rval));
+    return python2c_func_cast_check<long long, double> () (rval);
   } else {
     throw tl::TypeError (tl::to_string (tr ("Value cannot be converted to an integer")));
   }
@@ -118,13 +76,13 @@ unsigned long long python2c_func<unsigned long long>::operator() (PyObject *rval
 {
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check (rval)) {
-    return PyInt_AsUnsignedLongMask (rval);
+    return check_value (PyInt_AsUnsignedLongMask (rval));
   } else
 #endif
   if (PyLong_Check (rval)) {
-    return PyLong_AsUnsignedLongLongMask (rval);
+    return check_value (PyLong_AsUnsignedLongLongMask (rval));
   } else if (PyFloat_Check (rval)) {
-    return (unsigned long long) (PyFloat_AsDouble (rval));
+    return python2c_func_cast_check<unsigned long long, double> () (rval);
   } else {
     throw tl::TypeError (tl::to_string (tr ("Value cannot be converted to an integer")));
   }
@@ -137,13 +95,13 @@ __int128 python2c_func<__int128>::operator() (PyObject *rval)
   // TODO: this is pretty simplistic
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check (rval)) {
-    return PyInt_AsLong (rval);
+    return check_value (PyInt_AsLong (rval));
   } else
 #endif
   if (PyLong_Check (rval)) {
-    return PyLong_AsLongLong (rval);
+    return check_value (PyLong_AsLongLong (rval));
   } else if (PyFloat_Check (rval)) {
-    return PyFloat_AsDouble (rval);
+    return check_value (PyFloat_AsDouble (rval));
   } else {
     throw tl::TypeError (tl::to_string (tr ("Value cannot be converted to an integer")));
   }
@@ -155,13 +113,13 @@ double python2c_func<double>::operator() (PyObject *rval)
 {
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check (rval)) {
-    return PyInt_AsLong (rval);
+    return check_value (PyInt_AsLong (rval));
   } else
 #endif
   if (PyLong_Check (rval)) {
-    return PyLong_AsLongLong (rval);
+    return check_value (PyLong_AsLongLong (rval));
   } else if (PyFloat_Check (rval)) {
-    return PyFloat_AsDouble (rval);
+    return check_value (PyFloat_AsDouble (rval));
   } else {
     throw tl::TypeError (tl::to_string (tr ("Value cannot be converted to a floating-point value")));
   }

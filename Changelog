@@ -1,3 +1,6 @@
+0.30.12          (2026-08-26):
+* Bugfix: %GITHUB%/issues/2434 Application crashes with Ruby PCell
+
 0.30.11          (2026-08-23):
 * Bugfix: %GITHUB%/issues/2362 Range checks of integers in Python API and correct string deserialization of MIN_INT
 * Bugfix: %GITHUB%/issues/2369 Skipping cell name in OASIS error messages or warning unless inside a cell
@@ -20,6 +23,14 @@
 * Enhancement: Experimental support for custom PCell parameter pages
   With this feature, a PCell can supply a custom-made parameter page. For details
   and a sample see the "PCellParametersPage" class documentation.
+* Enhancement: Some widget classes from KLayout's core available in Python/Ruby
+  - DitherPatternSelectionButton
+  - LineStyleSelectionButton
+  - LibrarySelectionComboBox
+  - CellViewSelectionComboBox
+  - LayerSelectionComboBox
+  - SimpleColorButton
+  - ColorButton
 
 0.30.10          (2026-07-25):
 * Bugfix: %GITHUB%/issues/2384 Deep DRC failure with scaled instances
@@ -47,8 +58,8 @@
 * Bugfix: When images are selected and images are turned off, the selection no longer persists
 * Bugfix: Using PCell parameter name 'name' won't break PCell's cell_name_impl default implementation
 * Enhancement: New API functions
-  * Create a Layout as a deep copy of a cell (Layout#new)
-  * PixelBuffer#to_bytes and PixelBuffer#from_bytes for zero-overhead RGBA pixel access
+  - Create a Layout as a deep copy of a cell (Layout#new)
+  - PixelBuffer#to_bytes and PixelBuffer#from_bytes for zero-overhead RGBA pixel access
 
 0.30.9           (2026-05-25):
 * Bugfix: %GITHUB%/issues/2331 Screen size error (Assertion tlPixelBuffer.cc:260 n < m_height was not true)
@@ -68,11 +79,11 @@
   to GDS and back.
 * Bugfix: %GITHUB%/issues/2356 Edit options always shown, even for klayout -ne
 * Enhancement: because of issue #2356 and #2335, the "Editor Options" dock was overhauled
-  * It is called "Tool Options" now as it hosts not just shape editor options
-  * The Ruler tool got its own page as the original page was not functional and
+  - It is called "Tool Options" now as it hosts not just shape editor options
+  - The Ruler tool got its own page as the original page was not functional and
     rulers have other options. This replicates some settings from the "Ruler
     and annotations setup" page.
-  * The dock widget's visibility can be controlled in the same way than the other
+  - The dock widget's visibility can be controlled in the same way than the other
     docks. The "Edit/Editor Options" entry moved to "View/Tool Options". It turns
     on or off the tool options dock, which is populated with pages depending on the tool.
     The default key binding (F3) will now show or hide this dock.
@@ -100,22 +111,22 @@
 * Enhancement: renamed ruler option for more clarity - changed 
   'snap to objects (unless disabled in template)' to 'never snap to object' (inverted)
 * Enhancement: enhancements in the script API
-  * Cell#is_cold_proxy?: indicates if a cell is a "defunc" library reference
-  * Cell#library_cell_name: gets the library cell name for a "defunc" reference
-  * Cell#library_name: gets the library name for a "defunc" reference
-  * Cell#pcell_name: gets the pcell name for a "defunct" reference
-  * Layout#delete_cells: now available with a list of cell object
-  * Layout#delete_cell_rec: now available with a cell object
-  * Layout#prune_cell: now available with a cell object
-  * Layout#prune_cells: for pruning multiple cells in one call
-  * Layout#prune_subcells: now with a cell object
-  * Layout#prune_subcells: now with multiple root cells
-  * Layout#flatten: now with a cell object
-  * Layout#flatten_into: now with cell objects
-  * Layout#delete_cell: now with a cell object
-  * Default value "all" for "levels" argument in "prune_subcells" and "prune_cell"
-  * Default value "all" for "levels" and "true" for "prune" argument in "flatten"
-  * Default value "all" for "levels" and "unity" for "trans" argument in "flatten_into"
+  - Cell#is_cold_proxy?: indicates if a cell is a "defunc" library reference
+  - Cell#library_cell_name: gets the library cell name for a "defunc" reference
+  - Cell#library_name: gets the library name for a "defunc" reference
+  - Cell#pcell_name: gets the pcell name for a "defunct" reference
+  - Layout#delete_cells: now available with a list of cell object
+  - Layout#delete_cell_rec: now available with a cell object
+  - Layout#prune_cell: now available with a cell object
+  - Layout#prune_cells: for pruning multiple cells in one call
+  - Layout#prune_subcells: now with a cell object
+  - Layout#prune_subcells: now with multiple root cells
+  - Layout#flatten: now with a cell object
+  - Layout#flatten_into: now with cell objects
+  - Layout#delete_cell: now with a cell object
+  - Default value "all" for "levels" argument in "prune_subcells" and "prune_cell"
+  - Default value "all" for "levels" and "true" for "prune" argument in "flatten"
+  - Default value "all" for "levels" and "unity" for "trans" argument in "flatten_into"
 
 0.30.8           (2026-04-14):
 * Enhancement: %GITHUB%/issues/2248 Switch layouts but without losing the handle
@@ -305,7 +316,7 @@
 * Enhancement: DRC function "def_output": A simple yet useful extension to obtain 
   the output layout and to manipulate it (within limits)
 * Bugfixes and enhancements: fill feature (see also issue #2087)
-  - tiles in tiled mode most not overlap when the origin is not global as tiles may use different origins
+  - tiles in tiled mode must not overlap when the origin is not global as tiles may use different origins
   - more efficient computation of remaining fill area
   - fill pattern "margin" feature simplifies keeping distance to other fill
     shapes or original features in multi-fill scenarios

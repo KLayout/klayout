@@ -3252,6 +3252,10 @@ class Basic_TestClass < TestBase
     GC.start
     assert_equal(RBA::GObject.g_inst_count, gc)
 
+    gf = RBANilGFactory::new
+    go = RBA::GFactory.create_f(gf, 17)
+    assert_equal(go, nil)
+
   end
 
   # keyword arguments, enums and error messages

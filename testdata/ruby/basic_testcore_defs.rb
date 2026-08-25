@@ -76,3 +76,13 @@ class RBAGFactory < RBA::GFactory
   end
 end
 
+class RBANilGFactory < RBA::GFactory
+  def initialize
+    super()
+  end
+  # reimplementation of "virtual GObject *f(int)"
+  def f(z)
+    return nil
+  end
+end
+

@@ -146,6 +146,13 @@ class PyGFactory(pya.GFactory):
   def f(self, z):
     return PyGObject(z)
 
+class PyNilGFactory(pya.GFactory):
+  def __init__(self):
+    super(PyNilGFactory, self).__init__()
+  # reimplementation of "virtual GObject *f(int)"
+  def f(self, z):
+    return None
+
 class BasicTest(unittest.TestCase):
 
   def test_00(self):
@@ -3254,6 +3261,10 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(pya.GObject.g_inst_count(), gc + 1)
     go = None
     self.assertEqual(pya.GObject.g_inst_count(), gc)
+
+    gf = PyNilGFactory()
+    go = pya.GFactory.create_f(gf, 17)
+    self.assertEqual(go is None, True)
 
   # fallback to __rmul__ for not implemented __mul__
 

@@ -257,7 +257,7 @@ Proxy::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
 
     push_arg (meth->ret_type (), ret, rb_ret, heap);
 
-    if (meth->ret_type ().pass_obj ()) {
+    if (meth->ret_type ().pass_obj () && rb_ret != Qnil) {
       //  In factory callbacks, make sure the returned object is not deleted by
       //  anyone except the caller.
       Proxy *p = 0;

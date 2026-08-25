@@ -183,6 +183,9 @@ public:
 private slots:
   void update_pcell_parameters ();
 
+protected:
+  virtual void attach_events ();
+
 private:
   Ui::EditorOptionsInstPCellParam *mp_ui;
   std::unique_ptr<edt::PCellParametersPageBase> mp_pcell_parameters;

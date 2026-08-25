@@ -901,7 +901,6 @@ EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Var
     this->layout ()->addWidget (mp_pcell_parameters->page_widget ());
 
     mp_pcell_parameters->set_state (pcp_state);
-    mp_pcell_parameters->edited.add (this, &EditorOptionsInstPCellParam::parameters_page_edited);
 
   } else {
 
@@ -910,6 +909,16 @@ EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Var
     mp_placeholder_label->setAlignment (Qt::AlignHCenter | Qt::AlignVCenter);
     this->layout ()->addWidget (mp_placeholder_label);
 
+  }
+}
+
+void
+EditorOptionsInstPCellParam::attach_events ()
+{
+  lay::EditorOptionsPageWidget::attach_events ();
+
+  if (mp_pcell_parameters.get ()) {
+    mp_pcell_parameters->edited.add (this, &EditorOptionsInstPCellParam::parameters_page_edited);
   }
 }
 

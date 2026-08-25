@@ -304,6 +304,7 @@ protected:
   virtual void technology_changed (const std::string & /*tech*/) { }
   virtual void activated () { }
   virtual void deactivated () { }
+  virtual void attach_events ();
 
 private:
   EditorOptionsPageCollection *mp_owner;
@@ -316,7 +317,6 @@ private:
 
   void on_active_cellview_changed ();
   void on_technology_changed ();
-  void attach_events ();
 };
 
 /**

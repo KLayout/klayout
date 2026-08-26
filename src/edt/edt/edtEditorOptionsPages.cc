@@ -901,6 +901,7 @@ EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Var
     this->layout ()->addWidget (mp_pcell_parameters->page_widget ());
 
     mp_pcell_parameters->set_state (pcp_state);
+    mp_pcell_parameters->edited.add (this, &EditorOptionsInstPCellParam::parameters_page_edited);
 
   } else {
 

@@ -126,3 +126,30 @@ TEST(8)
   EXPECT_EQ (dm_to_string (dm), "0..2:0,0.5;0.2,0.7;1,1.9;1.2,2.4;2,4.8;2.2,5;");
 }
 
+TEST(9)
+{
+  tl::TableDataMapping *dmi = new tl::TableDataMapping ();
+  dmi->push_back (0.0, 1.0);
+  dmi->push_back (0.1, 1.0);
+  dmi->push_back (0.100001, 0.3);
+  dmi->push_back (0.11, 0.32);
+  dmi->push_back (0.15, 0.34);
+  dmi->push_back (1.0, 1.0);
+
+  tl::TableDataMapping *dmo = new tl::TableDataMapping ();
+  for (int i = 0; i <= 32; ++i) {
+    dmo->push_back (i / 32.0, 255.0 * i / 32.0);
+  }
+
+  tl::CombinedDataMapping *dm = new tl::CombinedDataMapping (dmo, dmi);
+
+  tl::DataMappingLookupTable lut (dm);
+  lut.update_table (dm->xmin (), dm->xmax (), 1.0, 1);
+  EXPECT_EQ (tl::to_string ((int)(lut[0.0] + 0.5)), "255");
+  EXPECT_EQ (tl::to_string ((int)(lut[0.05] + 0.5)), "255");
+  EXPECT_EQ (tl::to_string ((int)(lut[0.1] + 0.5)), "255");
+  EXPECT_EQ (tl::to_string ((int)(lut[0.101] + 0.5)), "77");
+  EXPECT_EQ (tl::to_string ((int)(lut[0.11] + 0.5)), "82");
+  EXPECT_EQ (tl::to_string ((int)(lut[0.2] + 0.5)), "97");
+  EXPECT_EQ (tl::to_string ((int)(lut[1.0] + 0.5)), "255");
+}

@@ -347,6 +347,11 @@ public:
   void set_data_mapping (DataMappingBase *dm);
 
   /**
+   *  @brief Returns the underlying data mapping object and releases it from management by the LookupTable
+   */
+  DataMappingBase *take_data_mapping ();
+
+  /**
    *  @brief Dump the table (for test purposes)
    */
   std::string dump () const;

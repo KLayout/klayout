@@ -139,13 +139,13 @@ CombinedDataMapping::generate_table (std::vector< std::pair<double, double> > &t
 
     while (tt2 < tt1) {
 
+      --tt1;
+
       //  Hint: can we be sure that tt1 == tt2 if y2 == y1 thus always y2 != y1 in this case?
-      double y = tt2->first;
+      double y = tt1->first;
       double x = x1 + (y - y1) * (x2 - x1) / (y2 - y1);
 
-      table.push_back (std::make_pair (x, tt2->second));
-
-      ++tt2;
+      table.push_back (std::make_pair (x, tt1->second));
 
     }
 
@@ -154,17 +154,19 @@ CombinedDataMapping::generate_table (std::vector< std::pair<double, double> > &t
   }
 
   //  sweep table and remove similar x values
+
   double epsilon = (table.back ().first - table.front ().first) * 1e-6;
+  double yepsilon = 10.0 * epsilon;
+
   std::vector< std::pair<double, double> >::iterator tw = table.begin ();
 
-  for (std::vector< std::pair<double, double> >::const_iterator t = table.begin (); t != table.end (); ++t) {
-    if (t + 1 != table.end () && t->first + epsilon > t[1].first) {
-      *tw = std::make_pair (0.5 * (t->first + t[1].first), 0.5 * (t->second + t[1].second));
+  for (auto t = table.begin (); t != table.end (); ++t) {
+    auto tt = t;
+    while (t + 1 != table.end () && tt->first + epsilon > t[1].first
+           && fabs (t[1].second - tt->second) < yepsilon) {
       ++t;
-    } else {
-      *tw = *t;
     }
-    ++tw;
+    *tw++ = std::make_pair (0.5 * (t->first + tt->first), 0.5 * (t->second + tt->second));
   }
 
   table.erase (tw, table.end ());
@@ -355,6 +357,16 @@ DataMappingLookupTable::set_data_mapping (DataMappingBase *dm)
   release ();
   mp_dm = dm;
 }
+
+DataMappingBase *
+DataMappingLookupTable::take_data_mapping ()
+{
+  auto *dm = mp_dm;
+  mp_dm = 0;
+  release ();
+  return dm;
+}
+
 
 void 
 DataMappingLookupTable::update_table (double xmin, double xmax, double delta_y, unsigned int ifactor)

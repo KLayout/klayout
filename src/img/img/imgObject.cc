@@ -328,6 +328,17 @@ DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, uns
                 )
               );
 
+    // @@@
+    tl::DataMappingLookupTable lut2 (gray_to_color);
+    lut2.update_table (gray_to_color->xmin (), gray_to_color->xmax (), 0.01, 1);
+    tl::info << "@@@2 " << channel << ": 0=" << lut2[0.0] << ", 0.05=" << lut2[0.05] << ", 0.1=" << lut2[0.1] << ", scale=" << scale;
+    lut2.take_data_mapping ();
+    tl::DataMappingLookupTable lut (dm);
+    lut.update_table (dm->xmin (), dm->xmax (), 1.0, 1);
+    tl::info << "@@@ " << channel << ": 0=" << lut[0.0] << ", 0.05=" << lut[0.05] << ", 0.1=" << lut[0.1] << ", scale=" << scale;
+    lut.take_data_mapping ();
+    // @@@
+
   } else {
 
     dm = new tl::CombinedDataMapping (

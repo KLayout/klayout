@@ -516,6 +516,19 @@ FillDialog::get_fill_parameters ()
     fp.column_step = db::DVector (0.0, fc_bbox.height () + fp.fill_cell_margin.y ());
   }
 
+  int vps = db::vprod_sign (fp.row_step, fp.column_step);
+  if (vps == 0) {
+    throw tl::Exception (tl::to_string (QObject::tr ("Primary row and column step vectors must not be parallel")));
+  } else if (vps < 0) {
+    throw tl::Exception (tl::to_string (QObject::tr ("Primary row vector must be 'right' of the primary column vector (i.e. 'later' on the clock)")));
+  }
+  if (fp.row_step.x () <= 0) {
+    throw tl::Exception (tl::to_string (tr ("Primary row vector must be pointing 'right' (i.e. have a positive x component)")));
+  }
+  if (fp.column_step.y () <= 0) {
+    throw tl::Exception (tl::to_string (tr ("Primary column vector must be pointing 'up' (i.e. have a positive y component)")));
+  }
+
   fp.fc_bbox = fc_bbox;
 
   if (second_order_fill_cb->isChecked ()) {
@@ -550,6 +563,20 @@ FillDialog::get_fill_parameters ()
       fp.column_step2 = db::DVector (x, y);
     } else {
       fp.column_step2 = db::DVector (0.0, fc_bbox2.height () + fp.fill_cell_margin2.y ());
+    }
+
+
+    int vps = db::vprod_sign (fp.row_step2, fp.column_step2);
+    if (vps == 0) {
+      throw tl::Exception (tl::to_string (QObject::tr ("Secondary row and column step vectors must not be parallel")));
+    } else if (vps < 0) {
+      throw tl::Exception (tl::to_string (QObject::tr ("Secondary row vector must be 'right' of the secondary column vector (i.e. 'later' on the clock)")));
+    }
+    if (fp.row_step2.x () <= 0) {
+      throw tl::Exception (tl::to_string (tr ("Secondary row vector must be pointing 'right' (i.e. have a positive x component)")));
+    }
+    if (fp.column_step2.y () <= 0) {
+      throw tl::Exception (tl::to_string (tr ("Secondary column vector must be pointing 'up' (i.e. have a positive y component)")));
     }
 
     fp.fc_bbox2 = fc_bbox2;

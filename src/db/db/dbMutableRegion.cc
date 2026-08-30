@@ -47,54 +47,28 @@ MutableRegion::~MutableRegion ()
 }
 
 void
-MutableRegion::insert (const db::Box &box)
+MutableRegion::insert (const db::Box &box, db::properties_id_type prop_id)
 {
   if (! box.empty () && box.width () > 0 && box.height () > 0) {
-    do_insert (db::Polygon (box), 0);
+    do_insert (db::Polygon (box), prop_id);
   }
 }
 
 void
-MutableRegion::insert (const db::BoxWithProperties &box)
-{
-  if (! box.empty () && box.width () > 0 && box.height () > 0) {
-    do_insert (db::Polygon (box), box.properties_id ());
-  }
-}
-
-void
-MutableRegion::insert (const db::Path &path)
+MutableRegion::insert (const db::Path &path, db::properties_id_type prop_id)
 {
   if (path.points () > 0) {
-    do_insert (path.polygon (), 0);
+    do_insert (path.polygon (), prop_id);
   }
 }
 
 void
-MutableRegion::insert (const db::PathWithProperties &path)
-{
-  if (path.points () > 0) {
-    do_insert (path.polygon (), path.properties_id ());
-  }
-}
-
-void
-MutableRegion::insert (const db::SimplePolygon &polygon)
+MutableRegion::insert (const db::SimplePolygon &polygon, db::properties_id_type prop_id)
 {
   if (polygon.vertices () > 0) {
     db::Polygon poly;
     poly.assign_hull (polygon.hull ());
-    do_insert (poly, 0);
-  }
-}
-
-void
-MutableRegion::insert (const db::SimplePolygonWithProperties &polygon)
-{
-  if (polygon.vertices () > 0) {
-    db::Polygon poly;
-    poly.assign_hull (polygon.hull ());
-    do_insert (poly, polygon.properties_id ());
+    do_insert (poly, prop_id);
   }
 }
 

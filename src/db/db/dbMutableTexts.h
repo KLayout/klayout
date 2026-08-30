@@ -63,7 +63,7 @@ public:
   void transform (const db::IMatrix3d &t) { do_transform (t); }
   void transform (const db::IMatrix2d &t) { do_transform (t); }
 
-  void insert (const db::Text &text) { do_insert (text, 0); }
+  void insert (const db::Text &text, db::properties_id_type prop_id = 0) { do_insert (text, prop_id); }
   void insert (const db::TextWithProperties &text) { do_insert (text, text.properties_id ()); }
   void insert (const db::Shape &shape);
 

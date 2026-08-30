@@ -385,6 +385,12 @@ public:
   void insert (const Sh &shape);
 
   /**
+   *  @brief Inserts the given shape (working object) into the edge set
+   */
+  template <class Sh>
+  void insert (const Sh &shape, db::properties_id_type prop_id);
+
+  /**
    *  @brief Insert a shape reference into the edge set
    */
   void insert (const db::Shape &shape);

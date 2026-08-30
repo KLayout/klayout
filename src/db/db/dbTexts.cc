@@ -128,7 +128,14 @@ void Texts::insert (const Sh &shape)
   mutable_texts ()->insert (shape);
 }
 
+template <class Sh>
+void Texts::insert (const Sh &shape, db::properties_id_type prop_id)
+{
+  mutable_texts ()->insert (shape, prop_id);
+}
+
 template DB_PUBLIC void Texts::insert (const db::Text &);
+template DB_PUBLIC void Texts::insert (const db::Text &, db::properties_id_type);
 template DB_PUBLIC void Texts::insert (const db::TextWithProperties &);
 
 void Texts::insert (const db::Shape &shape)

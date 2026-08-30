@@ -396,6 +396,12 @@ public:
   void insert (const Sh &shape);
 
   /**
+   *  @brief Inserts the given shape (working object) into the region with properties
+   */
+  template <class Sh>
+  void insert (const Sh &shape, db::properties_id_type prop_id);
+
+  /**
    *  @brief Insert a shape reference into the region
    */
   void insert (const db::Shape &shape);

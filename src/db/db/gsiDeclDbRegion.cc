@@ -587,11 +587,7 @@ static void insert_st (db::Region *r, const db::Shapes &a, const Trans &t)
   for (db::Shapes::shape_iterator p = a.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Boxes | db::ShapeIterator::Paths); !p.at_end (); ++p) {
     db::Polygon poly;
     p->polygon (poly);
-    if (p->prop_id () != 0) {
-      r->insert (db::PolygonWithProperties (poly.transformed (t), p->prop_id ()));
-    } else {
-      r->insert (poly.transformed (t));
-    }
+    r->insert (poly.transformed (t), p->prop_id ());
   }
 }
 

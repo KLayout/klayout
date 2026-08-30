@@ -458,17 +458,9 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
         poly.transform (trinv);
 
         if (si->is_box () && poly.is_box ()) {
-          if (si->has_prop_id ()) {
-            new_shapes.insert (db::BoxWithProperties (poly.box (), si->prop_id ()));
-          } else {
-            new_shapes.insert (poly.box ());
-          }
+          new_shapes.insert (poly.box (), si->prop_id ());
         } else {
-          if (si->has_prop_id ()) {
-            new_shapes.insert (db::PolygonWithProperties (poly, si->prop_id ()));
-          } else {
-            new_shapes.insert (poly);
-          }
+          new_shapes.insert (poly, si->prop_id ());
         }
 
       }
@@ -481,11 +473,7 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
         text.trans (db::Trans (text.trans ().rot (), scaled_and_snapped_vector (text.trans ().disp (), g, m, d, tr_disp.x (), g, m, d, tr_disp.y ())));
         text.transform (trinv);
 
-        if (si->has_prop_id ()) {
-          new_shapes.insert (db::TextWithProperties (text, si->prop_id ()));
-        } else {
-          new_shapes.insert (text);
-        }
+        new_shapes.insert (text, si->prop_id ());
 
       }
 
@@ -497,11 +485,7 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
         edge = scaled_and_snapped_edge (edge, g, m , d, tr_disp.x (), tr_disp.y ());
         edge.transform (trinv);
 
-        if (si->has_prop_id ()) {
-          new_shapes.insert (db::EdgeWithProperties (edge, si->prop_id ()));
-        } else {
-          new_shapes.insert (edge);
-        }
+        new_shapes.insert (edge, si->prop_id ());
 
       }
 
@@ -514,11 +498,7 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
                                   scaled_and_snapped_edge (edge_pair.second (), g, m , d, tr_disp.x (), tr_disp.y ()));
         edge_pair.transform (trinv);
 
-        if (si->has_prop_id ()) {
-          new_shapes.insert (db::EdgePairWithProperties (edge_pair, si->prop_id ()));
-        } else {
-          new_shapes.insert (edge_pair);
-        }
+        new_shapes.insert (edge_pair, si->prop_id ());
 
       }
 

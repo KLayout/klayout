@@ -248,11 +248,7 @@ void DeepRegion::do_insert (const db::Polygon &polygon, db::properties_id_type p
   if (layout.begin_top_down () != layout.end_top_down ()) {
     db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
     db::Shapes &shapes = top_cell.shapes (deep_layer ().layer ());
-    if (prop_id == 0) {
-      shapes.insert (db::PolygonRef (polygon, layout.shape_repository ()));
-    } else {
-      shapes.insert (db::PolygonRefWithProperties (db::PolygonRef (polygon, layout.shape_repository ()), prop_id));
-    }
+    shapes.insert (db::PolygonRef (polygon, layout.shape_repository ()), prop_id);
   }
 
   invalidate_bbox ();
@@ -369,11 +365,7 @@ flatten_layer (db::DeepLayer &deep_layer)
       if (iter->is_polygon ()) {
         db::Polygon poly;
         iter->polygon (poly);
-        if (! iter->prop_id ()) {
-          flat_shapes.insert (db::PolygonRef (poly.transformed (iter.trans ()), layout.shape_repository ()));
-        } else {
-          flat_shapes.insert (db::PolygonRefWithProperties (db::PolygonRef (poly.transformed (iter.trans ()), layout.shape_repository ()), iter->prop_id ()));
-        }
+        flat_shapes.insert (db::PolygonRef (poly.transformed (iter.trans ()), layout.shape_repository ()), iter->prop_id ());
       }
     }
 

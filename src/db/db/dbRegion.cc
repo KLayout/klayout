@@ -208,13 +208,23 @@ void Region::insert (const Sh &shape)
   mutable_region ()->insert (shape);
 }
 
+template <class Sh>
+void Region::insert (const Sh &shape, db::properties_id_type prop_id)
+{
+  mutable_region ()->insert (shape, prop_id);
+}
+
 template DB_PUBLIC void Region::insert (const db::Box &);
-template DB_PUBLIC void Region::insert (const db::BoxWithProperties &);
 template DB_PUBLIC void Region::insert (const db::SimplePolygon &);
-template DB_PUBLIC void Region::insert (const db::SimplePolygonWithProperties &);
 template DB_PUBLIC void Region::insert (const db::Polygon &);
-template DB_PUBLIC void Region::insert (const db::PolygonWithProperties &);
 template DB_PUBLIC void Region::insert (const db::Path &);
+template DB_PUBLIC void Region::insert (const db::Box &, db::properties_id_type);
+template DB_PUBLIC void Region::insert (const db::SimplePolygon &, db::properties_id_type);
+template DB_PUBLIC void Region::insert (const db::Polygon &, db::properties_id_type);
+template DB_PUBLIC void Region::insert (const db::Path &, db::properties_id_type);
+template DB_PUBLIC void Region::insert (const db::BoxWithProperties &);
+template DB_PUBLIC void Region::insert (const db::SimplePolygonWithProperties &);
+template DB_PUBLIC void Region::insert (const db::PolygonWithProperties &);
 template DB_PUBLIC void Region::insert (const db::PathWithProperties &);
 
 void Region::insert (const db::Shape &shape)

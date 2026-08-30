@@ -131,12 +131,7 @@ EdgePairsDelegate *FlatEdgePairs::add (const EdgePairs &other) const
   } else {
 
     for (EdgePairsIterator p (other.begin ()); ! p.at_end (); ++p) {
-      db::properties_id_type prop_id = p.prop_id ();
-      if (prop_id != 0) {
-        new_edge_pairs->raw_edge_pairs ().insert (db::EdgePairWithProperties (*p, prop_id));
-      } else {
-        new_edge_pairs->raw_edge_pairs ().insert (*p);
-      }
+      new_edge_pairs->raw_edge_pairs ().insert (*p, p.prop_id ());
     }
 
   }
@@ -158,12 +153,7 @@ EdgePairsDelegate *FlatEdgePairs::add_in_place (const EdgePairs &other)
   } else {
 
     for (EdgePairsIterator p (other.begin ()); ! p.at_end (); ++p) {
-      db::properties_id_type prop_id = p.prop_id ();
-      if (prop_id != 0) {
-        ep.insert (db::EdgePairWithProperties (*p, prop_id));
-      } else {
-        ep.insert (*p);
-      }
+      ep.insert (*p, p.prop_id ());
     }
 
   }
@@ -244,12 +234,7 @@ FlatEdgePairs::insert_into_as_polygons (Layout *layout, db::cell_index_type into
   db::Shapes &out = layout->cell (into_cell).shapes (into_layer);
 
   for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
-    db::properties_id_type prop_id = p.prop_id ();
-    if (prop_id != 0) {
-      out.insert (db::SimplePolygonWithProperties (p->normalized ().to_simple_polygon (enl), prop_id));
-    } else {
-      out.insert (p->normalized ().to_simple_polygon (enl));
-    }
+    out.insert (p->normalized ().to_simple_polygon (enl), p.prop_id ());
   }
 }
 
@@ -262,11 +247,7 @@ FlatEdgePairs::insert_into (Layout *layout, db::cell_index_type into_cell, unsig
 void
 FlatEdgePairs::do_insert (const db::EdgePair &ep, db::properties_id_type prop_id)
 {
-  if (prop_id != 0) {
-    mp_edge_pairs->insert (db::EdgePairWithProperties (ep, prop_id));
-  } else {
-    mp_edge_pairs->insert (ep);
-  }
+  mp_edge_pairs->insert (ep,prop_id);
   invalidate_cache ();
 }
 

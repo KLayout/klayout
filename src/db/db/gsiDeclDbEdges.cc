@@ -855,20 +855,12 @@ static void insert_st (db::Edges *e, const db::Shapes &a, const Trans &t)
   for (db::Shapes::shape_iterator p = a.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Boxes | db::ShapeIterator::Paths); !p.at_end (); ++p) {
     db::Polygon poly;
     p->polygon (poly);
-    if (p->prop_id () != 0) {
-      e->insert (db::PolygonWithProperties (poly.transformed (t), p->prop_id ()));
-    } else {
-      e->insert (poly.transformed (t));
-    }
+    e->insert (poly.transformed (t), p->prop_id ());
   }
   for (db::Shapes::shape_iterator p = a.begin (db::ShapeIterator::Edges); !p.at_end (); ++p) {
     db::Edge edge;
     p->edge (edge);
-    if (p->prop_id () != 0) {
-      e->insert (db::EdgeWithProperties (edge.transformed (t), p->prop_id ()));
-    } else {
-      e->insert (edge.transformed (t));
-    }
+    e->insert (edge.transformed (t), p->prop_id ());
   }
 }
 

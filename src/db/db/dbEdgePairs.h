@@ -277,6 +277,12 @@ public:
   void insert (const Sh &shape);
 
   /**
+   *  @brief Inserts the given shape (working object) into the edge pair set, using properties
+   */
+  template <class Sh>
+  void insert (const Sh &shape, db::properties_id_type prop_id);
+
+  /**
    *  @brief Inserts an edge pair made from two edges
    */
   void insert (const db::Edge &e1, const db::Edge &e2)

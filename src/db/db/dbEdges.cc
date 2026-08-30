@@ -226,11 +226,22 @@ void Edges::insert (const Sh &shape)
   mutable_edges ()->insert (shape);
 }
 
+template <class Sh>
+void Edges::insert (const Sh &shape, db::properties_id_type prop_id)
+{
+  mutable_edges ()->insert (shape, prop_id);
+}
+
 template DB_PUBLIC void Edges::insert (const db::Box &);
 template DB_PUBLIC void Edges::insert (const db::SimplePolygon &);
 template DB_PUBLIC void Edges::insert (const db::Polygon &);
 template DB_PUBLIC void Edges::insert (const db::Path &);
 template DB_PUBLIC void Edges::insert (const db::Edge &);
+template DB_PUBLIC void Edges::insert (const db::Box &, db::properties_id_type);
+template DB_PUBLIC void Edges::insert (const db::SimplePolygon &, db::properties_id_type);
+template DB_PUBLIC void Edges::insert (const db::Polygon &, db::properties_id_type);
+template DB_PUBLIC void Edges::insert (const db::Path &, db::properties_id_type);
+template DB_PUBLIC void Edges::insert (const db::Edge &, db::properties_id_type);
 template DB_PUBLIC void Edges::insert (const db::BoxWithProperties &);
 template DB_PUBLIC void Edges::insert (const db::SimplePolygonWithProperties &);
 template DB_PUBLIC void Edges::insert (const db::PolygonWithProperties &);

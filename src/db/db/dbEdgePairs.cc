@@ -132,7 +132,14 @@ void EdgePairs::insert (const Sh &shape)
   mutable_edge_pairs ()->insert (shape);
 }
 
+template <class Sh>
+void EdgePairs::insert (const Sh &shape, db::properties_id_type prop_id)
+{
+  mutable_edge_pairs ()->insert (shape, prop_id);
+}
+
 template DB_PUBLIC void EdgePairs::insert (const db::EdgePair &);
+template DB_PUBLIC void EdgePairs::insert (const db::EdgePair &, db::properties_id_type);
 template DB_PUBLIC void EdgePairs::insert (const db::EdgePairWithProperties &);
 
 void EdgePairs::insert (const db::Shape &shape)

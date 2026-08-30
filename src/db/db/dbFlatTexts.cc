@@ -130,11 +130,7 @@ TextsDelegate *FlatTexts::add (const Texts &other) const
   } else {
 
     for (TextsIterator p (other.begin ()); ! p.at_end (); ++p) {
-      if (p.prop_id () == 0) {
-        new_texts->raw_texts ().insert (*p);
-      } else {
-        new_texts->raw_texts ().insert (db::TextWithProperties (*p, p.prop_id ()));
-      }
+      new_texts->raw_texts ().insert (*p, p.prop_id ());
     }
 
   }
@@ -157,11 +153,7 @@ TextsDelegate *FlatTexts::add_in_place (const Texts &other)
   } else {
 
     for (TextsIterator p (other.begin ()); ! p.at_end (); ++p) {
-      if (p.prop_id () == 0) {
-        texts.insert (*p);
-      } else {
-        texts.insert (db::TextWithProperties (*p, p.prop_id ()));
-      }
+      texts.insert (*p, p.prop_id ());
     }
 
   }
@@ -256,11 +248,7 @@ FlatTexts::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned 
 void
 FlatTexts::do_insert (const db::Text &t, db::properties_id_type prop_id)
 {
-  if (prop_id != 0) {
-    mp_texts->insert (db::TextWithProperties (t, prop_id));
-  } else {
-    mp_texts->insert (t);
-  }
+  mp_texts->insert (t, prop_id);
   invalidate_cache ();
 }
 

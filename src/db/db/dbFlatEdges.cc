@@ -319,11 +319,7 @@ EdgesDelegate *FlatEdges::add (const Edges &other) const
   } else {
 
     for (EdgesIterator p (other.begin ()); ! p.at_end (); ++p) {
-      if (p.prop_id () == 0) {
-        new_region->raw_edges ().insert (*p);
-      } else {
-        new_region->raw_edges ().insert (db::EdgeWithProperties (*p, p.prop_id ()));
-      }
+      new_region->raw_edges ().insert (*p, p.prop_id ());
     }
 
   }
@@ -347,11 +343,7 @@ EdgesDelegate *FlatEdges::add_in_place (const Edges &other)
   } else {
 
     for (EdgesIterator p (other.begin ()); ! p.at_end (); ++p) {
-      if (p.prop_id () == 0) {
-        e.insert (*p);
-      } else {
-        e.insert (db::EdgeWithProperties (*p, p.prop_id ()));
-      }
+      e.insert (*p, p.prop_id ());
     }
 
   }
@@ -436,11 +428,7 @@ FlatEdges::do_insert (const db::Edge &edge, db::properties_id_type prop_id)
 {
   m_is_merged = empty ();
 
-  if (prop_id == 0) {
-    mp_edges->insert (edge);
-  } else {
-    mp_edges->insert (db::EdgeWithProperties (edge, prop_id));
-  }
+  mp_edges->insert (edge, prop_id);
 
   invalidate_cache ();
 }

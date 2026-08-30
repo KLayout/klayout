@@ -63,16 +63,18 @@ public:
 
   virtual void reserve (size_t n) = 0;
 
-  void insert (const db::Polygon &polygon) { do_insert (polygon, 0); }
-  void insert (const db::PolygonWithProperties &polygon) { do_insert (polygon, polygon.properties_id ()); }
-  void insert (const db::Box &box);
-  void insert (const db::BoxWithProperties &box);
-  void insert (const db::Path &path);
-  void insert (const db::PathWithProperties &path);
-  void insert (const db::SimplePolygon &polygon);
-  void insert (const db::SimplePolygonWithProperties &polygon);
+  void insert (const db::Polygon &polygon, db::properties_id_type prop_id = 0) { do_insert (polygon, prop_id); }
+  void insert (const db::Box &box, db::properties_id_type prop_id = 0);
+  void insert (const db::Path &path, db::properties_id_type prop_id = 0);
+  void insert (const db::SimplePolygon &polygon, db::properties_id_type prop_id = 0);
 
   void insert (const db::Shape &shape);
+
+  template <class Sh>
+  void insert (const db::object_with_properties<Sh> &owp)
+  {
+    insert ((const Sh &) owp, owp.properties_id ());
+  }
 
   template <class T>
   void insert (const db::Shape &shape, const T &trans)

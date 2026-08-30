@@ -407,11 +407,7 @@ RegionDelegate *FlatRegion::add (const Region &other) const
   } else {
 
     for (RegionIterator p (other.begin ()); ! p.at_end (); ++p) {
-      if (p.prop_id () == 0) {
-        new_region->raw_polygons ().insert (*p);
-      } else {
-        new_region->raw_polygons ().insert (db::PolygonWithProperties (*p, p.prop_id ()));
-      }
+      new_region->raw_polygons ().insert (*p, p.prop_id ());
     }
 
   }
@@ -435,11 +431,7 @@ RegionDelegate *FlatRegion::add_in_place (const Region &other)
   } else {
 
     for (RegionIterator p (other.begin ()); ! p.at_end (); ++p) {
-      if (p.prop_id () == 0) {
-        polygons.insert (*p);
-      } else {
-        polygons.insert (db::PolygonWithProperties (*p, p.prop_id ()));
-      }
+      polygons.insert (*p, p.prop_id ());
     }
 
   }
@@ -531,11 +523,7 @@ FlatRegion::do_insert (const db::Polygon &polygon, properties_id_type prop_id)
 
     bool is_box = (empty () && polygon.is_box ());
 
-    if (prop_id != 0) {
-      mp_polygons->insert (db::PolygonWithProperties (polygon, prop_id));
-    } else {
-      mp_polygons->insert (polygon);
-    }
+    mp_polygons->insert (polygon, prop_id);
     set_is_merged (is_box);
 
     invalidate_cache ();

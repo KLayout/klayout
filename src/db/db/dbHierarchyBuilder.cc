@@ -817,28 +817,17 @@ void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, db
   } else if (m_as_edges && shape.is_box ()) {
     push (shape.box (), prop_id, trans, region, complex_region, target);
   } else if (shape.is_edge ()) {
-    if (prop_id != 0) {
-      target->insert (db::EdgeWithProperties (shape.edge (), shape.prop_id ()));
-    } else {
-      target->insert (shape.edge ());
-    }
+    target->insert (shape.edge (), prop_id);
   }
 }
 
 void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Box &box, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
 {
   if (m_as_edges && ! box.empty ()) {
-    if (prop_id != 0) {
-      target->insert (db::EdgeWithProperties (db::Edge (box.p1 (), box.upper_left ()).transformed (trans), prop_id));
-      target->insert (db::EdgeWithProperties (db::Edge (box.upper_left (), box.p2 ()).transformed (trans), prop_id));
-      target->insert (db::EdgeWithProperties (db::Edge (box.p2 (), box.lower_right ()).transformed (trans), prop_id));
-      target->insert (db::EdgeWithProperties (db::Edge (box.lower_right (), box.p1 ()).transformed (trans), prop_id));
-    } else {
-      target->insert (db::Edge (box.p1 (), box.upper_left ()).transformed (trans));
-      target->insert (db::Edge (box.upper_left (), box.p2 ()).transformed (trans));
-      target->insert (db::Edge (box.p2 (), box.lower_right ()).transformed (trans));
-      target->insert (db::Edge (box.lower_right (), box.p1 ()).transformed (trans));
-    }
+    target->insert (db::Edge (box.p1 (), box.upper_left ()).transformed (trans), prop_id);
+    target->insert (db::Edge (box.upper_left (), box.p2 ()).transformed (trans), prop_id);
+    target->insert (db::Edge (box.p2 (), box.lower_right ()).transformed (trans), prop_id);
+    target->insert (db::Edge (box.lower_right (), box.p1 ()).transformed (trans), prop_id);
   }
 }
 
@@ -846,11 +835,7 @@ void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Polygon &poly, d
 {
   if (m_as_edges) {
     for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
-      if (prop_id != 0) {
-        target->insert (db::EdgeWithProperties ((*e).transformed (trans), prop_id));
-      } else {
-        target->insert ((*e).transformed (trans));
-      }
+      target->insert ((*e).transformed (trans), prop_id);
     }
   }
 }
@@ -865,11 +850,7 @@ EdgePairBuildingHierarchyBuilderShapeReceiver::EdgePairBuildingHierarchyBuilderS
 void EdgePairBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box & /*region*/, const db::RecursiveShapeReceiver::box_tree_type * /*complex_region*/, db::Shapes *target)
 {
   if (shape.is_edge_pair ()) {
-    if (prop_id != 0) {
-      target->insert (db::EdgePairWithProperties (shape.edge_pair ().transformed (trans), prop_id));
-    } else {
-      target->insert (shape.edge_pair ().transformed (trans));
-    }
+    target->insert (shape.edge_pair ().transformed (trans), prop_id);
   }
 }
 
@@ -887,11 +868,7 @@ void TextBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, db
     //  NOTE: we intentionally skip all the text attributes (font etc.) here because in the context
     //  of a text collections we're only interested in the locations.
     db::Text t (shape.text_string (), shape.text_trans ());
-    if (prop_id != 0) {
-      target->insert (db::TextRefWithProperties (db::TextRef (t.transformed (trans), mp_layout->shape_repository ()), prop_id));
-    } else {
-      target->insert (db::TextRef (t.transformed (trans), mp_layout->shape_repository ()));
-    }
+    target->insert (db::TextRef (t.transformed (trans), mp_layout->shape_repository ()), prop_id);
   }
 }
 

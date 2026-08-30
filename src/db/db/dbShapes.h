@@ -920,6 +920,28 @@ public:
   }
 
   /**
+   *  @brief Insert a shape of the given type with an optional property
+   *
+   *  This inserts a shape of the given kind into the collection.
+   *  If the property ID is not zero, a corresponding object_with_properties is
+   *  created.
+   *
+   *  @param sh The shape to insert (copy)
+   *  @param prop_id The properties Id
+   *
+   *  @return A reference to the object created
+   */
+  template <class Sh>
+  shape_type insert (const Sh &sh, db::properties_id_type prop_id)
+  {
+    if (prop_id != 0) {
+      return this->insert<db::object_with_properties<Sh> > (db::object_with_properties<Sh> (sh, prop_id));
+    } else {
+      return this->insert<Sh> (sh);
+    }
+  }
+
+  /**
    *  @brief Insert a shape sequence
    *
    *  It is not allowed to insert arrays in editable mode this way, because these are not expanded in editable mode.

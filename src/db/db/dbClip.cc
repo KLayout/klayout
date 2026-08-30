@@ -359,11 +359,7 @@ clip_cell (const db::Layout &layout,
 
             db::Box new_box = sh->box () & clip_box;
             if (! new_box.empty () && new_box.width () > 0 && new_box.height () > 0) {
-              if (sh->has_prop_id ()) {
-                target_cell.shapes (l).insert (db::BoxWithProperties (new_box, sh->prop_id ()));
-              } else {
-                target_cell.shapes (l).insert (new_box);
-              }
+              target_cell.shapes (l).insert (new_box, sh->prop_id ());
             }
 
           } else if (sh->is_path () && sh->bbox ().inside (clip_box)) {
@@ -371,11 +367,7 @@ clip_cell (const db::Layout &layout,
             db::Path path;
             sh->path (path);
 
-            if (sh->has_prop_id ()) {
-              target_cell.shapes (l).insert (db::PathRefWithProperties (db::PathRef (path, target_layout.shape_repository ()), sh->prop_id ()));
-            } else {
-              target_cell.shapes (l).insert (db::PathRef (path, target_layout.shape_repository ()));
-            }
+            target_cell.shapes (l).insert (db::PathRef (path, target_layout.shape_repository ()), sh->prop_id ());
 
           } else if (sh->is_simple_polygon () || sh->is_path ()) {
 
@@ -393,18 +385,10 @@ clip_cell (const db::Layout &layout,
               std::vector <db::SimplePolygon> clipped_polygons;
               clip_poly (poly, clip_box, clipped_polygons);
               for (std::vector <db::SimplePolygon>::const_iterator cp = clipped_polygons.begin (); cp != clipped_polygons.end (); ++cp) {
-                if (sh->has_prop_id ()) {
-                  target_cell.shapes (l).insert (db::SimplePolygonRefWithProperties (db::SimplePolygonRef (*cp, target_layout.shape_repository ()), sh->prop_id ()));
-                } else {
-                  target_cell.shapes (l).insert (db::SimplePolygonRef (*cp, target_layout.shape_repository ()));
-                }
+                target_cell.shapes (l).insert (db::SimplePolygonRef (*cp, target_layout.shape_repository ()), sh->prop_id ());
               }
             } else {
-              if (sh->has_prop_id ()) {
-                target_cell.shapes (l).insert (db::SimplePolygonRefWithProperties (db::SimplePolygonRef (poly, target_layout.shape_repository ()), sh->prop_id ()));
-              } else {
-                target_cell.shapes (l).insert (db::SimplePolygonRef (poly, target_layout.shape_repository ()));
-              }
+              target_cell.shapes (l).insert (db::SimplePolygonRef (poly, target_layout.shape_repository ()), sh->prop_id ());
             }
 
           } else if (sh->is_polygon ()) {
@@ -416,18 +400,10 @@ clip_cell (const db::Layout &layout,
               std::vector <db::Polygon> clipped_polygons;
               clip_poly (poly, clip_box, clipped_polygons);
               for (std::vector <db::Polygon>::const_iterator cp = clipped_polygons.begin (); cp != clipped_polygons.end (); ++cp) {
-                if (sh->has_prop_id ()) {
-                  target_cell.shapes (l).insert (db::PolygonRefWithProperties (db::PolygonRef (*cp, target_layout.shape_repository ()), sh->prop_id ()));
-                } else {
-                  target_cell.shapes (l).insert (db::PolygonRef (*cp, target_layout.shape_repository ()));
-                }
+                target_cell.shapes (l).insert (db::PolygonRef (*cp, target_layout.shape_repository ()), sh->prop_id ());
               }
             } else {
-              if (sh->has_prop_id ()) {
-                target_cell.shapes (l).insert (db::PolygonRefWithProperties (db::PolygonRef (poly, target_layout.shape_repository ()), sh->prop_id ()));
-              } else {
-                target_cell.shapes (l).insert (db::PolygonRef (poly, target_layout.shape_repository ()));
-              }
+              target_cell.shapes (l).insert (db::PolygonRef (poly, target_layout.shape_repository ()), sh->prop_id ());
             }
 
           } else if (sh->is_text ()) {
@@ -435,11 +411,7 @@ clip_cell (const db::Layout &layout,
             if (sh->bbox ().inside (clip_box)) {
               db::Text text;
               sh->text (text);
-              if (sh->has_prop_id ()) {
-                target_cell.shapes (l).insert (db::TextRefWithProperties (db::TextRef (text, target_layout.shape_repository ()), sh->prop_id ()));
-              } else {
-                target_cell.shapes (l).insert (db::TextRef (text, target_layout.shape_repository ()));
-              }
+              target_cell.shapes (l).insert (db::TextRef (text, target_layout.shape_repository ()), sh->prop_id ());
             }
 
           } else {

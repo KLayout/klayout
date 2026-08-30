@@ -47,6 +47,7 @@ SOURCES = \
   dbLayerMapping.cc \
   dbLayerProperties.cc \
   dbLayout.cc \
+  dbLayoutConnectivity.cc \
   dbLayoutLayers.cc \
   dbLayoutContextHandler.cc \
   dbLayoutDiff.cc \
@@ -138,6 +139,7 @@ SOURCES = \
   gsiDeclDbInstElement.cc \
   gsiDeclDbLayerMapping.cc \
   gsiDeclDbLayout.cc \
+  gsiDeclDbLayoutConnectivity.cc \
   gsiDeclDbLayoutUtils.cc \
   gsiDeclDbLayoutQuery.cc \
   gsiDeclDbLibrary.cc \
@@ -292,6 +294,7 @@ HEADERS = \
   dbLayer.h \
   dbLayerMapping.h \
   dbLayerProperties.h \
+  dbLayoutConnectivity.h \
   dbLayoutDiff.h \
   dbLayout.h \
   dbLayoutLayers.h \

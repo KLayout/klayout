@@ -70,6 +70,17 @@ DB_PUBLIC size_t hash_for_properties_id (properties_id_type id);
 DB_PUBLIC bool properties_id_less (properties_id_type a, properties_id_type b);
 
 /**
+ *  @brief A compare function for property name IDs
+ */
+struct ComparePropertiesNameIds
+{
+  bool operator() (property_names_id_type a, property_names_id_type b) const
+  {
+    return db::property_name (a).less (db::property_name (b));
+  }
+};
+
+/**
  *  @brief A compare function for property IDs
  */
 struct ComparePropertiesIds

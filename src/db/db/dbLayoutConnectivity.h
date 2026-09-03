@@ -1,4 +1,4 @@
-
+﻿
 /*
 
   KLayout Layout Viewer
@@ -26,10 +26,34 @@
 
 #include "dbCommon.h"
 #include "dbPropertiesRepository.h"
+#include "dbShape.h"
+#include "dbInstances.h"
 #include "tlString.h"
+#include "tlSList.h"
 
 namespace db
 {
+
+/**
+ *  @brief Encodes pin information
+ *
+ *  The value is a LayoutPin object.
+ */
+extern DB_PUBLIC db::property_names_id_type pin_property_name_id;
+
+/**
+ *  @brief Encodes instance connectivity information
+ *
+ *  The value is a LayoutInstanceConnections object.
+ */
+extern DB_PUBLIC db::property_names_id_type instance_connections_property_name_id;
+
+/**
+ *  @brief Encodes shape net information
+ *
+ *  The value is the net name
+ */
+extern DB_PUBLIC db::property_names_id_type shape_net_property_name_id;
 
 /**
  *  @brief Describes a layout pin
@@ -96,12 +120,6 @@ private:
   bool m_must_connect;
 };
 
-/**
- *  @brief Encodes pin information
- *
- *  The value is a LayoutPin object.
- */
-extern DB_PUBLIC db::property_names_id_type pin_property_name_id;
 
 /**
  *  @brief Describes instance connectivity
@@ -122,6 +140,9 @@ extern DB_PUBLIC db::property_names_id_type pin_property_name_id;
 class DB_PUBLIC LayoutInstanceConnections
 {
 public:
+  typedef std::map<db::property_names_id_type, db::property_names_id_type, db::ComparePropertiesNameIds> connections_map;
+  typedef connections_map::const_iterator connections_iterator;
+
   LayoutInstanceConnections ();
 
   /**
@@ -183,6 +204,23 @@ public:
   db::property_names_id_type net_id_for_pin (db::property_names_id_type pin_name_id) const;
 
   /**
+   *  @brief Connections iterator (begin)
+   *  The value is a pair of pin name ID and net name ID
+   */
+  connections_iterator begin () const
+  {
+    return m_connections.begin ();
+  }
+
+  /**
+   *  @brief Connections iterator (end)
+   */
+  connections_iterator end () const
+  {
+    return m_connections.end ();
+  }
+
+  /**
    *  @brief Converts the instance connectivity information to a string for serialization
    */
   std::string to_string () const;
@@ -193,15 +231,215 @@ public:
   bool parse (tl::Extractor &ex);
 
 private:
-  std::map<db::property_names_id_type, db::property_names_id_type> m_connections;
+  std::map<db::property_names_id_type, db::property_names_id_type, db::ComparePropertiesNameIds> m_connections;
 };
 
 /**
- *  @brief Encodes instance connectivity information
+ *  @brief Represents a single pin in a cell
  *
- *  The value is a LayoutInstanceConnections object.
+ *  A pin can have multiple shapes.
  */
-extern DB_PUBLIC db::property_names_id_type instance_connections_property_name_id;
+class DB_PUBLIC LayoutConnectivityPin
+{
+public:
+  /**
+   *  Default constructor
+   */
+  LayoutConnectivityPin ()
+    : must_connect (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief A flag indicating whether the pins must be connected
+   *  Pins which are not connected inside the child cell need to
+   *  have this flag to indicate that they need to be connected
+   *  further up in the hierarchy.
+   */
+  bool must_connect;
+
+  /**
+   *  @brief The shapes (layer, shape reference) making the pins
+   */
+  tl::slist<std::pair<unsigned int, db::Shape> > pin_shapes;
+};
+
+/**
+ *  @brief Provides the net information for the per-cell connectivity information
+ *
+ *  This object is used inside the layout connectivity index to represent a net.
+ */
+class DB_PUBLIC LayoutConnectivityNet
+{
+public:
+  /**
+   *  @brief Represents a pin connecting an instance to a net
+   */
+  struct InstancePin
+  {
+  public:
+    /**
+     *  @brief The instance connected by the pin
+     */
+    db::Instance instance;
+
+    /**
+     *  @brief Name of the pin the referenced cell
+     */
+    db::property_names_id_type pin_name;
+  };
+
+  /**
+   *  Default constructor
+   */
+  LayoutConnectivityNet ()
+    : net_name_id (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Keeps the net name
+   */
+  db::property_names_id_type net_name_id;
+
+  /**
+   *  @brief The pin shapes on that net
+   *  The values are pairs of layer index and shape reference.
+   *  Pins are ordinary shapes with LayoutPin information attached through properties.
+   *  These are the pins leading upwards to parent cells. Pins leading to subcells
+   *  are represented by "instance_pins".
+   */
+  tl::slist<std::pair<unsigned int, db::Shape> > pins;
+
+  /**
+   *  @brief The ordinary shapes on the net
+   *  The values are pairs of layer index and shape reference.
+   */
+  tl::slist<std::pair<unsigned int, db::Shape> > shapes;
+
+  /**
+   *  @brief The instances (subcircuits or devices) on the net
+   */
+  tl::slist<InstancePin> instance_pins;
+};
+
+/**
+ *  @brief Provides the per-cell connectivity information
+ *
+ *  This object is attached to a cell and keeps the connectivity index.
+ *  The connectivity index is net-centric and keeps all shapes and instances
+ *  connected to a net.
+ *
+ *  In addition to the nets, the connectivity index keeps the pins.
+ *
+ *  A connectivity index has three possible states:
+ *  * not existing - no index is built
+ *  * pins - the pins are listed
+ *  * nets - the pins and nets are listed
+ *
+ *  "ensure_pins" will make sure the pin list is made.
+ *  "ensure_nets" will make sure, pin and net list is made.
+ *  These methods are typically called automatically.
+ */
+class DB_PUBLIC LayoutConnectivityIndex
+{
+public:
+  typedef std::map<db::property_names_id_type, db::LayoutConnectivityNet, db::ComparePropertiesNameIds> nets_container;
+  typedef std::map<db::property_names_id_type, db::LayoutConnectivityPin, db::ComparePropertiesNameIds> pins_container;
+
+  typedef nets_container::const_iterator net_iterator;
+  typedef pins_container::const_iterator pin_iterator;
+
+  /**
+   *  @brief Creates a connectivity index for the given cell
+   *  The index will not register itself on the cell.
+   */
+  LayoutConnectivityIndex (const db::Cell *cell);
+
+  /**
+   *  @brief Gets the cell the index is associated with
+   */
+  const db::Cell *cell () const
+  {
+    return mp_cell;
+  }
+
+  /**
+   *  @brief Clears the connectivity index
+   */
+  void clear ();
+
+  /**
+   *  @brief Ensures the pins are listed
+   *  This method is called automatically when pin information is requested.
+   */
+  void ensure_pins () const;
+
+  /**
+   *  @brief Ensure that pins and nets are listed
+   *  If not available yet, this information is collected from the
+   *  shape and instance properties.
+   *  This method is called automatically when net information is requested.
+   */
+  void ensure_nets () const;
+
+  /**
+   *  @brief Gets the net information for a net with the given name
+   *  This method returns a null pointer if no net information is available for
+   *  a net with the given name.
+   */
+  const LayoutConnectivityNet *net_by_name (const std::string &name) const;
+
+  /**
+   *  @brief Gets the net information for a net with the given name (by properties name ID)
+   *  This method returns a null pointer if no net information is available for
+   *  a net with the given name.
+   */
+  const LayoutConnectivityNet *net_by_name (db::property_names_id_type name_id) const;
+
+  /**
+   *  @brief Net iterator (begin)
+   *  The iterator delivers a pair of net name ID and LayoutConnectivityNet information
+   */
+  net_iterator begin_nets () const;
+
+  /**
+   *  @brief Net iterator (end)
+   */
+  net_iterator end_nets () const;
+
+  /**
+   *  @brief Gets the pins for a given pin name
+   *  This method returns a null pointer if there is no pin with the given name.
+   */
+  const LayoutConnectivityPin *pin_by_name (const std::string &name) const;
+
+  /**
+   *  @brief Gets the pins for a given pin name (by ID)
+   *  This method returns a null pointer if there is no pin with the given name.
+   */
+  const LayoutConnectivityPin *pin_by_name (db::property_names_id_type name_id) const;
+
+  /**
+   *  @brief Pin iterator (begin)
+   *  The iterator delivers a pair of pin name ID and LayoutConnectivityPin information
+   */
+  pin_iterator begin_pins () const;
+
+  /**
+   *  @brief Pin iterator (end)
+   */
+  pin_iterator end_pins () const;
+
+private:
+  mutable nets_container m_nets;
+  mutable pins_container m_pins;
+  const db::Cell *mp_cell;
+  mutable bool m_pins_available;
+  mutable bool m_nets_available;
+};
 
 }
 

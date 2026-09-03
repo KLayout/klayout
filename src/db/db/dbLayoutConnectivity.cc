@@ -22,6 +22,8 @@
 
 
 #include "dbLayoutConnectivity.h"
+#include "dbLayout.h"
+#include "dbShapes.h"
 #include "tlVariant.h"
 
 namespace db
@@ -30,6 +32,7 @@ namespace db
 //  TODO: use an ID to indicate an internal use?
 db::property_names_id_type pin_property_name_id = db::property_names_id ("klayout:pin");
 db::property_names_id_type instance_connections_property_name_id = db::property_names_id ("klayout:instance-connections");
+db::property_names_id_type shape_net_property_name_id = db::property_names_id ("klayout:net");
 
 // ---------------------------------------------------------------------------
 //  LayoutPin class
@@ -217,6 +220,184 @@ LayoutInstanceConnections::parse (tl::Extractor &ex)
   }
 
   return true;
+}
+
+// ---------------------------------------------------------------------------
+//  LayoutConnectivityIndex class
+
+LayoutConnectivityIndex::LayoutConnectivityIndex (const db::Cell *cell)
+  : mp_cell (cell), m_pins_available (false), m_nets_available (false)
+{
+  //  .. nothing yet ..
+}
+
+void
+LayoutConnectivityIndex::clear ()
+{
+  m_pins_available = m_nets_available = false;
+  m_pins.clear ();
+  m_nets.clear ();
+}
+
+void
+LayoutConnectivityIndex::ensure_pins () const
+{
+  if (m_pins_available) {
+    return;
+  }
+
+  m_pins_available = true;
+
+  const db::Layout *layout = mp_cell ? mp_cell->layout () : 0;
+  if (! layout) {
+    return;
+  }
+
+  for (auto l = layout->begin_layers (); l != layout->end_layers (); ++l) {
+
+    unsigned int li = (*l).first;
+    for (auto s = mp_cell->shapes (li).begin (db::ShapeIterator::AllWithProperties); ! s.at_end (); ++s) {
+
+      const tl::Variant &v = db::properties (s->prop_id ()) [pin_property_name_id];
+      if (v.is_user<db::LayoutPin> ()) {
+
+        const db::LayoutPin &pin = v.to_user<db::LayoutPin> ();
+        if (pin.name_id () != 0) {
+
+          db::LayoutConnectivityPin &pin_info = m_pins [pin.name_id ()];
+          if (pin.must_connect ()) {
+            pin_info.must_connect = true;
+          }
+          pin_info.pin_shapes.push_front (std::make_pair (li, *s));
+
+        }
+
+      }
+
+    }
+
+  }
+}
+
+void
+LayoutConnectivityIndex::ensure_nets () const
+{
+  if (m_nets_available && m_pins_available) {
+    return;
+  }
+
+  ensure_pins ();
+
+  m_nets_available = true;
+
+  const db::Layout *layout = mp_cell ? mp_cell->layout () : 0;
+  if (! layout) {
+    return;
+  }
+
+  for (auto l = layout->begin_layers (); l != layout->end_layers (); ++l) {
+
+    unsigned int li = (*l).first;
+    for (auto s = mp_cell->shapes (li).begin (db::ShapeIterator::AllWithProperties); ! s.at_end (); ++s) {
+
+      const db::PropertiesSet &ps = db::properties (s->prop_id ());
+
+      const tl::Variant &v = ps [shape_net_property_name_id];
+      if (! v.is_nil ()) {
+
+        db::property_names_id_type net_name_id = db::property_names_id (v);
+        db::LayoutConnectivityNet &net_info = m_nets [net_name_id];
+
+        if (ps.has_value (pin_property_name_id)) {
+          net_info.pins.push_back (std::make_pair (li, *s));
+        } else {
+          net_info.shapes.push_back (std::make_pair (li, *s));
+        }
+
+      }
+
+    }
+
+  }
+
+  for (auto i = mp_cell->begin (); ! i.at_end (); ++i) {
+
+    const tl::Variant &v = db::properties (i->prop_id ()) [instance_connections_property_name_id];
+    if (v.is_user<db::LayoutInstanceConnections> ()) {
+
+      const db::LayoutInstanceConnections &ic = v.to_user<db::LayoutInstanceConnections> ();
+      for (auto c = ic.begin (); c != ic.end (); ++c) {
+        LayoutConnectivityNet::InstancePin ip;
+        ip.instance = *i;
+        ip.pin_name = c->first;
+        m_nets [c->second].instance_pins.push_front (ip);
+      }
+
+    }
+
+  }
+}
+
+const LayoutConnectivityNet *
+LayoutConnectivityIndex::net_by_name (const std::string &name) const
+{
+  return net_by_name (db::property_names_id (name));
+}
+
+const LayoutConnectivityNet *
+LayoutConnectivityIndex::net_by_name (db::property_names_id_type name_id) const
+{
+  auto i = m_nets.find (name_id);
+  if (i != m_nets.end ()) {
+    return &i->second;
+  } else {
+    return 0;
+  }
+}
+
+db::LayoutConnectivityIndex::net_iterator
+LayoutConnectivityIndex::begin_nets () const
+{
+  ensure_nets ();
+  return m_nets.begin ();
+}
+
+db::LayoutConnectivityIndex::net_iterator
+LayoutConnectivityIndex::end_nets () const
+{
+  ensure_nets ();
+  return m_nets.end ();
+}
+
+const LayoutConnectivityPin *
+LayoutConnectivityIndex::pin_by_name (const std::string &name) const
+{
+  return pin_by_name (db::property_names_id (name));
+}
+
+const LayoutConnectivityPin *
+LayoutConnectivityIndex::pin_by_name (db::property_names_id_type name_id) const
+{
+  auto i = m_pins.find (name_id);
+  if (i != m_pins.end ()) {
+    return &i->second;
+  } else {
+    return 0;
+  }
+}
+
+db::LayoutConnectivityIndex::pin_iterator
+LayoutConnectivityIndex::begin_pins () const
+{
+  ensure_pins ();
+  return m_pins.begin ();
+}
+
+db::LayoutConnectivityIndex::pin_iterator
+LayoutConnectivityIndex::end_pins () const
+{
+  ensure_pins ();
+  return m_pins.end ();
 }
 
 }

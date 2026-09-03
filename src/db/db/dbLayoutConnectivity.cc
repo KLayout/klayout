@@ -295,6 +295,8 @@ LayoutConnectivityIndex::ensure_nets () const
     return;
   }
 
+  //  search for annotated shapes and sort into pin shapes and ordinary shapes
+
   for (auto l = layout->begin_layers (); l != layout->end_layers (); ++l) {
 
     unsigned int li = (*l).first;
@@ -319,6 +321,8 @@ LayoutConnectivityIndex::ensure_nets () const
     }
 
   }
+
+  //  fill in the instance connections from the instance annotations
 
   for (auto i = mp_cell->begin (); ! i.at_end (); ++i) {
 

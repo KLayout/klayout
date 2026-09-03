@@ -50,33 +50,158 @@ public:
   LayoutPin ();
   LayoutPin (const std::string &name, bool must_connect = false);
 
+  /**
+   *  @brief Sets the name of the pin
+   */
   void set_name (const std::string &n);
-  const std::string &name () const
+
+  /**
+   *  @brief Gets the name of the pin
+   */
+  const char *name () const;
+
+  /**
+   *  @brief Gets the pin name ID (in property name ID space)
+   */
+  db::property_names_id_type name_id () const
   {
     return m_name;
   }
 
+  /**
+   *  @brief Sets a value indicating that all pins with the same name need to connect
+   */
   void set_must_connect (bool mc);
+
+  /**
+   *  @brief Gets a value indicating that all pins with the same name need to connect
+   */
   bool must_connect () const
   {
     return m_must_connect;
   }
 
+  /**
+   *  @brief Converts the pin information to a string for serialization
+   */
   std::string to_string () const;
+
+  /**
+   *  @brief Reads the pin information from a string for de-serialization
+   */
   bool parse (tl::Extractor &ex);
 
 private:
-  std::string m_name;
+  db::property_names_id_type m_name;
   bool m_must_connect;
 };
-
 
 /**
  *  @brief Encodes pin information
  *
- *  The value is LayoutPin object.
+ *  The value is a LayoutPin object.
  */
 extern DB_PUBLIC db::property_names_id_type pin_property_name_id;
+
+/**
+ *  @brief Describes instance connectivity
+ *
+ *  Instance connectivity connects pin names to nets.
+ *  This object is attached to an instance through a
+ *  property with name connectivity_property_name_id
+ *  to an instance with a LayoutInstanceConnections
+ *  object as a value.
+ *
+ *  The object keeps all connections for an instance.
+ *  Connections are pin-to-net relations. Unconnected
+ *  pins are not listed.
+ *
+ *  Instances can be cirtuits for devices. In case of devices,
+ *  the pin name is the terminal name.
+ */
+class DB_PUBLIC LayoutInstanceConnections
+{
+public:
+  LayoutInstanceConnections ();
+
+  /**
+   *  @brief Clears all connections
+   */
+  void clear ();
+
+  /**
+   *  @brief Creates a connection
+   *  @param pin_name The pin to connect
+   *  @param net The name of the net to connect
+   */
+  void add_connection (const std::string &pin_name, const std::string &net);
+
+  /**
+   *  @brief Creates a connection
+   *  @param pin_name_id The pin to connect
+   *  @param net_id The name of the net to connect
+   */
+  void add_connection (db::property_names_id_type pin_name_id, db::property_names_id_type net_id);
+
+  /**
+   *  @brief Sets all connections from an iterator
+   */
+  template <class Iter>
+  void set_connections (Iter b, Iter e)
+  {
+    clear ();
+    for (auto i = b; i != e; ++i) {
+      add_connection (i->first, i->second);
+    }
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the given pin is attached to a net
+   */
+  bool has_pin (const std::string &pin_name) const;
+
+  /**
+   *  @brief Gets a value indicating whether the given pin (by name ID) is attached to a net
+   */
+  bool has_pin (db::property_names_id_type pin_name_id) const;
+
+  /**
+   *  @brief Gets the net name for a pin
+   *
+   *  If no net is connected to the given pin, a null pointer is returned.
+   */
+  const char *net_for_pin (const std::string &pin_name) const;
+
+  /**
+   *  @brief Gets the net name ID for a pin
+   */
+  db::property_names_id_type net_id_for_pin (const std::string &pin_name) const;
+
+  /**
+   *  @brief Gets the net name ID for a pin name ID
+   */
+  db::property_names_id_type net_id_for_pin (db::property_names_id_type pin_name_id) const;
+
+  /**
+   *  @brief Converts the instance connectivity information to a string for serialization
+   */
+  std::string to_string () const;
+
+  /**
+   *  @brief Reads the instance connectivity information from a string for de-serialization
+   */
+  bool parse (tl::Extractor &ex);
+
+private:
+  std::map<db::property_names_id_type, db::property_names_id_type> m_connections;
+};
+
+/**
+ *  @brief Encodes instance connectivity information
+ *
+ *  The value is a LayoutInstanceConnections object.
+ */
+extern DB_PUBLIC db::property_names_id_type instance_connections_property_name_id;
 
 }
 
@@ -86,6 +211,7 @@ extern DB_PUBLIC db::property_names_id_type pin_property_name_id;
 
 namespace tl
 {
+
   template<> inline bool test_extractor_impl (tl::Extractor &ex, db::LayoutPin &lp)
   {
     return lp.parse (ex);
@@ -95,6 +221,18 @@ namespace tl
   {
     if (! test_extractor_impl (ex, lp)) {
       ex.error (tl::to_string (tr ("Expected a LayoutPin specification")));
+    }
+  }
+
+  template<> inline bool test_extractor_impl (tl::Extractor &ex, db::LayoutInstanceConnections &lp)
+  {
+    return lp.parse (ex);
+  }
+
+  template<> inline void extractor_impl (tl::Extractor &ex, db::LayoutInstanceConnections &lp)
+  {
+    if (! test_extractor_impl (ex, lp)) {
+      ex.error (tl::to_string (tr ("Expected a LayoutInstanceConnections specification")));
     }
   }
 

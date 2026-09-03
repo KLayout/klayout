@@ -76,4 +76,58 @@ TEST(2_LayoutPinVariantCompatibility)
   EXPECT_EQ (pin2.must_connect (), false);
 }
 
+TEST(10_LayoutInstanceConnectionsBasic)
+{
+  db::LayoutInstanceConnections conn;
+
+  conn.add_connection ("A", "net");
+  EXPECT_EQ (conn.net_for_pin ("A"), "net");
+  EXPECT_EQ (conn.net_id_for_pin (db::property_names_id ("A")), db::property_names_id ("net"));
+  EXPECT_EQ (conn.net_id_for_pin ("A"), db::property_names_id ("net"));
+  EXPECT_EQ (conn.has_pin ("A"), true);
+  EXPECT_EQ (conn.has_pin (db::property_names_id ("A")), true);
+  EXPECT_EQ (conn.net_for_pin ("B"), 0);
+  EXPECT_EQ (conn.net_id_for_pin (db::property_names_id ("B")), db::property_names_id_type (0));
+  EXPECT_EQ (conn.net_id_for_pin ("B"), db::property_names_id_type (0));
+  EXPECT_EQ (conn.has_pin ("B"), false);
+  EXPECT_EQ (conn.has_pin (db::property_names_id ("B")), false);
+
+  conn.add_connection ("B", "net2");
+  EXPECT_EQ (conn.net_for_pin ("A"), "net");
+  EXPECT_EQ (conn.net_id_for_pin (db::property_names_id ("A")), db::property_names_id ("net"));
+  EXPECT_EQ (conn.net_id_for_pin ("A"), db::property_names_id ("net"));
+  EXPECT_EQ (conn.has_pin ("A"), true);
+  EXPECT_EQ (conn.has_pin (db::property_names_id ("A")), true);
+  EXPECT_EQ (conn.net_for_pin ("B"), "net2");
+  EXPECT_EQ (conn.net_id_for_pin (db::property_names_id ("B")), db::property_names_id ("net2"));
+  EXPECT_EQ (conn.net_id_for_pin ("B"), db::property_names_id ("net2"));
+  EXPECT_EQ (conn.has_pin ("B"), true);
+  EXPECT_EQ (conn.has_pin (db::property_names_id ("B")), true);
+
+  conn.clear ();
+  EXPECT_EQ (conn.has_pin ("A"), false);
+  EXPECT_EQ (conn.has_pin ("B"), false);
+}
+
+TEST(11_LayoutInstanceConnectionsVariantCompatibility)
+{
+  db::LayoutInstanceConnections conn;
+  conn.add_connection ("A", "net");
+  conn.add_connection ("B", "net2");
+
+  std::string s = tl::Variant (conn).to_parsable_string ();
+  EXPECT_EQ (s, "[layoutinstanceconnections:{'connections'=>{'A'=>'net','B'=>'net2'}}]");
+
+  tl::Variant v;
+  tl::Extractor ex (s.c_str ());
+
+  ex.read (v);
+  EXPECT_EQ (v.is_user (), true);
+
+  db::LayoutInstanceConnections conn2;
+  conn2 = v.to_user<db::LayoutInstanceConnections> ();
+
+  EXPECT_EQ (tl::Variant (conn2).to_parsable_string (), s);
+}
+
 }

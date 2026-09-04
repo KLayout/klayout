@@ -99,6 +99,24 @@ public:
   }
 
   /**
+   *  @brief Sets the net name the pin is connected to
+   */
+  void set_net_name (const std::string &n);
+
+  /**
+   *  @brief Gets the net name of the pin is connected to
+   */
+  const char *net_name () const;
+
+  /**
+   *  @brief Gets the net name of the pin is connected to
+   */
+  db::property_names_id_type net_name_id () const
+  {
+    return m_net_name;
+  }
+
+  /**
    *  @brief Sets a value indicating that all pins with the same name need to connect
    */
   void set_must_connect (bool mc);
@@ -126,7 +144,7 @@ public:
    */
   bool operator== (const LayoutPin &other) const
   {
-    return m_must_connect == other.m_must_connect && m_name == other.m_name;
+    return m_must_connect == other.m_must_connect && m_name == other.m_name && m_net_name == other.m_net_name;
   }
 
   /**
@@ -139,11 +157,19 @@ public:
     }
 
     db::ComparePropertiesNameIds comp;
+
+    if (comp (m_net_name, other.m_net_name)) {
+      return true;
+    } else if (comp (other.m_net_name, m_net_name)) {
+      return false;
+    }
+
     return comp (m_name, other.m_name);
   }
 
 private:
   db::property_names_id_type m_name;
+  db::property_names_id_type m_net_name;
   bool m_must_connect;
 };
 

@@ -59,6 +59,12 @@ Class<db::LayoutPin> decl_LayoutPin ("db", "LayoutPin",
   method ("PinPropertyName", &layout_pin_property_name,
     "@brief Gets the name (key) of the property to store the pin information with a shape."
   ) +
+  method ("net_name=", &db::LayoutPin::set_net_name, gsi::arg ("name"),
+    "@brief Sets the name of the net the pin is attached to\n"
+  ) +
+  method ("net_name", &db::LayoutPin::net_name,
+    "@brief Gets the name of the net the pin is attached to\n"
+  ) +
   method ("name=", &db::LayoutPin::set_name, gsi::arg ("name"),
     "@brief Sets the pins name\n"
   ) +

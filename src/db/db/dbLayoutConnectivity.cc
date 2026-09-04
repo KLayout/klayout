@@ -50,6 +50,26 @@ LayoutPin::LayoutPin (const std::string &name, bool must_connect)
 }
 
 void
+LayoutPin::set_net_name (const std::string &n)
+{
+  if (n.empty ()) {
+    m_net_name = 0;
+  } else {
+    m_net_name = db::property_names_id (n);
+  }
+}
+
+const char *
+LayoutPin::net_name () const
+{
+  if (m_net_name == 0) {
+    return "";  //  or null?
+  } else {
+    return db::property_name (m_net_name).to_string ();
+  }
+}
+
+void
 LayoutPin::set_name (const std::string &n)
 {
   if (n.empty ()) {
@@ -327,24 +347,26 @@ LayoutConnectivityIndex::ensure_nets () const
 
       const db::PropertiesSet &ps = db::properties (s->prop_id ());
 
-      const tl::Variant &v = ps [shape_net_property_name_id];
-      if (! v.is_nil ()) {
+      const auto &pi = ps [pin_property_name_id];
+      if (pi.is_user<db::LayoutPin> ()) {
 
-        db::property_names_id_type net_name_id = db::property_names_id (v);
-        db::LayoutConnectivityNet &net_info = m_nets [net_name_id];
+        const db::LayoutPin &lp = pi.to_user<db::LayoutPin> ();
 
-        const auto &pi = ps [pin_property_name_id];
-        if (pi.is_user<db::LayoutPin> ()) {
+        db::LayoutConnectivityNet &net_info = m_nets [lp.net_name_id ()];
 
-          const db::LayoutPin &lp = pi.to_user<db::LayoutPin> ();
+        db::LayoutConnectivityNet::PinShape pin_shape;
+        pin_shape.layer = li;
+        pin_shape.pin_name = lp.name_id ();
+        pin_shape.shape = *s;
+        net_info.pins.push_back (pin_shape);
 
-          db::LayoutConnectivityNet::PinShape pin_shape;
-          pin_shape.layer = li;
-          pin_shape.pin_name = lp.name_id ();
-          pin_shape.shape = *s;
-          net_info.pins.push_back (pin_shape);
+      } else {
 
-        } else {
+        const tl::Variant &v = ps [shape_net_property_name_id];
+        if (! v.is_nil ()) {
+
+          db::property_names_id_type net_name_id = db::property_names_id (v);
+          db::LayoutConnectivityNet &net_info = m_nets [net_name_id];
 
           db::LayoutConnectivityNet::NetShape net_shape;
           net_shape.layer = li;

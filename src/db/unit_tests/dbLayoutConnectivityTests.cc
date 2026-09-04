@@ -159,13 +159,10 @@ static db::properties_id_type pin_props (const std::string &net_name, const std:
   db::LayoutPin pin_info;
   pin_info.set_name (pin_name);
   pin_info.set_must_connect (must_connect);
+  pin_info.set_net_name (net_name);
 
   db::PropertiesSet ps;
   ps.insert (db::pin_property_name_id, pin_info);
-  if (! net_name.empty ()) {
-    ps.insert (db::shape_net_property_name_id, net_name);
-  }
-
   return db::properties_id (ps);
 }
 

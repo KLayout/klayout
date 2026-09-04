@@ -65,6 +65,11 @@ Class<db::LayoutPin> decl_LayoutPin ("db", "LayoutPin",
   method ("name", &db::LayoutPin::name,
     "@brief Gets the pins name\n"
   ) +
+  method ("basic_name", &db::LayoutPin::basic_name,
+    "@brief Gets the pin's basic name\n"
+    "The basic name is the name minus the disambiguator. For example, the name 'G$1' renders "
+    "a basic name of 'G'."
+  ) +
   method ("must_connect=", &db::LayoutPin::set_must_connect, gsi::arg ("must_connect"),
     "@brief Sets the 'must connect' flag\n"
     "See the class description for an explanation of this attribute."
@@ -84,9 +89,15 @@ Class<db::LayoutPin> decl_LayoutPin ("db", "LayoutPin",
   "shape a pin. Pins are used to indicate where connections are supposed to be made "
   "to subcircuits or devices.\n"
   "\n"
-  "The 'must_connect' attribute indicates that all pins with the same name "
+  "The name of the pin must be unique across all pins inside a cell. The name can be composed "
+  "of a basic name and a disambiguator formed from a '$' character and an integer number. "
+  "For example, 'G$1' is pin 'G' with '$1' being the disambiguator.\n"
+  "\n"
+  "The 'must_connect' attribute indicates that all pins with the same basic name "
   "need to be connected. If this attribute is false on all the pin shapes, "
-  "a single connection is enough.\n"
+  "a single connection is enough. For example, if two pins are given as 'G$1' and 'G$2' with "
+  "'must_connect' false on both, it is enough to connect either 'G$1' or 'G$2'. If 'must_connect' "
+  "is true on one of them, you need to connect both 'G$1' and 'G$2' - preferably to the same net.\n"
   "\n"
   "This class has been introduced in version 0.31.0."
 );

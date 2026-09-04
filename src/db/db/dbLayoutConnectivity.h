@@ -64,8 +64,9 @@ extern DB_PUBLIC db::property_names_id_type shape_net_property_name_id;
  *  adding a LayoutPin object as a value.
  *
  *  A pin has:
- *  * A name
- *  * A flag indicating whether all pins of the same
+ *  * A name: This is a basic name followed by an optional
+ *    disambiguator in form of $n, where n is an integer number.
+ *  * A flag indicating whether all pins of the same basic
  *    name need to be connected ("must_connect")
  */
 class DB_PUBLIC LayoutPin
@@ -83,6 +84,11 @@ public:
    *  @brief Gets the name of the pin
    */
   const char *name () const;
+
+  /**
+   *  @brief Gets the basic name of the pin
+   */
+  std::string basic_name () const;
 
   /**
    *  @brief Gets the pin name ID (in property name ID space)
@@ -115,11 +121,31 @@ public:
    */
   bool parse (tl::Extractor &ex);
 
+  /**
+   *  @brief Equality
+   */
+  bool operator== (const LayoutPin &other) const
+  {
+    return m_must_connect == other.m_must_connect && m_name == other.m_name;
+  }
+
+  /**
+   *  @brief Less operator
+   */
+  bool operator< (const LayoutPin &other) const
+  {
+    if (m_must_connect != other.m_must_connect) {
+      return m_must_connect < other.m_must_connect;
+    }
+
+    db::ComparePropertiesNameIds comp;
+    return comp (m_name, other.m_name);
+  }
+
 private:
   db::property_names_id_type m_name;
   bool m_must_connect;
 };
-
 
 /**
  *  @brief Describes instance connectivity
@@ -230,6 +256,22 @@ public:
    */
   bool parse (tl::Extractor &ex);
 
+  /**
+   *  @brief Equality
+   */
+  bool operator== (const LayoutInstanceConnections &other) const
+  {
+    return m_connections == other.m_connections;
+  }
+
+  /**
+   *  @brief Less operator
+   */
+  bool operator< (const LayoutInstanceConnections &other) const
+  {
+    return m_connections < other.m_connections;
+  }
+
 private:
   std::map<db::property_names_id_type, db::property_names_id_type, db::ComparePropertiesNameIds> m_connections;
 };
@@ -291,6 +333,45 @@ public:
   };
 
   /**
+   *  @brief Represents a pin shape
+   */
+  struct PinShape
+  {
+  public:
+    /**
+     *  @brief The layer the pin is on
+     */
+    unsigned int layer;
+
+    /**
+     *  @brief The shape representing the pin
+     */
+    db::Shape shape;
+
+    /**
+     *  @brief Name of the pin the referenced cell
+     */
+    db::property_names_id_type pin_name;
+  };
+
+  /**
+   *  @brief Represents a net shape
+   */
+  struct NetShape
+  {
+  public:
+    /**
+     *  @brief The layer the pin is on
+     */
+    unsigned int layer;
+
+    /**
+     *  @brief The shape representing the pin
+     */
+    db::Shape shape;
+  };
+
+  /**
    *  Default constructor
    */
   LayoutConnectivityNet ()
@@ -311,13 +392,13 @@ public:
    *  These are the pins leading upwards to parent cells. Pins leading to subcells
    *  are represented by "instance_pins".
    */
-  tl::slist<std::pair<unsigned int, db::Shape> > pins;
+  tl::slist<PinShape> pins;
 
   /**
    *  @brief The ordinary shapes on the net
    *  The values are pairs of layer index and shape reference.
    */
-  tl::slist<std::pair<unsigned int, db::Shape> > shapes;
+  tl::slist<NetShape> shapes;
 
   /**
    *  @brief The instances (subcircuits or devices) on the net

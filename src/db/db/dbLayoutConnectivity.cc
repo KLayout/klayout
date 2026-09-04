@@ -69,6 +69,28 @@ LayoutPin::name () const
   }
 }
 
+std::string
+LayoutPin::basic_name () const
+{
+  const char *n = name ();
+  const char *cp = n;
+  while (*cp) {
+    if (*cp == '$') {
+      const char *eos = cp;
+      do {
+        ++cp;
+      } while (*cp && isdigit (*cp));
+      if (! *cp) {
+        return std::string (n, eos - n);
+      }
+    } else {
+      ++cp;
+    }
+  }
+
+  return std::string (n, cp - n);
+}
+
 void
 LayoutPin::set_must_connect (bool mc)
 {
@@ -264,7 +286,8 @@ LayoutConnectivityIndex::ensure_pins () const
         const db::LayoutPin &pin = v.to_user<db::LayoutPin> ();
         if (pin.name_id () != 0) {
 
-          db::LayoutConnectivityPin &pin_info = m_pins [pin.name_id ()];
+          auto name_id = db::property_names_id (pin.basic_name ());
+          db::LayoutConnectivityPin &pin_info = m_pins [name_id];
           if (pin.must_connect ()) {
             pin_info.must_connect = true;
           }
@@ -310,10 +333,24 @@ LayoutConnectivityIndex::ensure_nets () const
         db::property_names_id_type net_name_id = db::property_names_id (v);
         db::LayoutConnectivityNet &net_info = m_nets [net_name_id];
 
-        if (ps.has_value (pin_property_name_id)) {
-          net_info.pins.push_back (std::make_pair (li, *s));
+        const auto &pi = ps [pin_property_name_id];
+        if (pi.is_user<db::LayoutPin> ()) {
+
+          const db::LayoutPin &lp = pi.to_user<db::LayoutPin> ();
+
+          db::LayoutConnectivityNet::PinShape pin_shape;
+          pin_shape.layer = li;
+          pin_shape.pin_name = lp.name_id ();
+          pin_shape.shape = *s;
+          net_info.pins.push_back (pin_shape);
+
         } else {
-          net_info.shapes.push_back (std::make_pair (li, *s));
+
+          db::LayoutConnectivityNet::NetShape net_shape;
+          net_shape.layer = li;
+          net_shape.shape = *s;
+          net_info.shapes.push_back (net_shape);
+
         }
 
       }

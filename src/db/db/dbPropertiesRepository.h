@@ -505,6 +505,28 @@ private:
 };
 
 /**
+ *  @brief Installs a temporary repository instance for testing
+ *
+ *  By using a temp instance, we do not disturb other tests.
+ */
+class TempPropertiesRepository
+{
+public:
+  TempPropertiesRepository ()
+  {
+    db::PropertiesRepository::replace_instance_temporarily (&m_temp);
+  }
+
+  ~TempPropertiesRepository ()
+  {
+    db::PropertiesRepository::replace_instance_temporarily (0);
+  }
+
+private:
+  db::PropertiesRepository m_temp;
+};
+
+/**
  *  @brief A map for selecting/translating properties
  *
  *  The following rules apply:

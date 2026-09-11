@@ -25,6 +25,7 @@
 #include "tlInternational.h"
 #include "tlString.h"
 #include "tlHash.h"
+#include "tlUnknownUserClass.h"
 
 #include <string.h>
 #include <limits>
@@ -2687,10 +2688,16 @@ Variant::to_parsable_string () const
     return tl::to_quoted_string (s) + "c";
   } else if (is_id ()) {
     return "[id" + tl::to_string (m_var.m_id) + "]";
+  } else if (is_user<tl::UnknownUserClass> ()) {
+    const tl::UnknownUserClass &uk = to_user<tl::UnknownUserClass> ();
+    return "[" + uk.class_name ()+ ":" + uk.payload () + "]";
   } else if (is_user ()) {
-    if (user_cls ()) {
+    const void *uk = to_user ();
+    if (! uk) {
+      return "nil";
+    } else if (user_cls ()) {
       //  for downward compatibility we use lower case name + do a translation
-      return "[" + tl::VariantUserClassBase::translate_class_name (tl::to_lower_case (user_cls ()->name ())) + ":" + user_cls ()->to_string (to_user ()) + "]";
+      return "[" + tl::VariantUserClassBase::translate_class_name (tl::to_lower_case (user_cls ()->name ())) + ":" + user_cls ()->to_string (uk) + "]";
     } else {
       return "[unknown_user_type]";
     }
@@ -3063,16 +3070,37 @@ TL_PUBLIC bool test_extractor_impl (tl::Extractor &ex, tl::Variant &v)
 
     std::string cls;
     ex.read_word_or_quoted (cls);
+    ex.test (":");
 
     const VariantUserClassBase *ccls = tl::VariantUserClassBase::find_cls_by_name (cls);
     if (ccls) {
+
       void *obj = ccls->create ();
       v.set_user (obj, ccls, true);
-      ex.test (":");
       ccls->read (obj, ex);
+
+    } else {
+
+      //  create a placeholder using tl::UnknownUserClass
+      const char *pl = ex.get ();
+      const char *ple = pl;
+      for (const char *cp = pl; *cp; ++cp) {
+        if (*cp == ']') {
+          ple = cp;
+        }
+      }
+      ex = tl::Extractor (ple);
+
+      //  Note: this class is provided by GSI in gsiDeclTl.cc
+      const VariantUserClassBase *ccls = tl::VariantUserClassBase::find_cls_by_name ("UnknownUserClass");
+      if (ccls) {
+        v.set_user (new tl::UnknownUserClass (cls, std::string (pl, ple - pl)), ccls, true);
+      }
+
     }
 
     ex.test ("]");
+
     return true;
 
   } else if (ex.test ("(")) {

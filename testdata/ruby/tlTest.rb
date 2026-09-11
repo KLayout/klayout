@@ -312,6 +312,15 @@ class Tl_TestClass < TestBase
 
   end
 
+  # UnknownUserClass
+  def test_5_UnknownUserClass
+
+    uk = RBA::UnknownUserClass::new("abc", "...")
+    assert_equal(uk.class_name, "abc")
+    assert_equal(uk.payload, "...")
+
+  end
+
 end
 
 load("test_epilogue.rb")

@@ -28,6 +28,7 @@
 #include "tlExpression.h"
 #include "tlGlobPattern.h"
 #include "tlRecipe.h"
+#include "tlUnknownUserClass.h"
 
 // ----------------------------------------------------------------
 //  Logger binding
@@ -755,6 +756,31 @@ Class<Recipe_Impl> decl_Recipe_Impl ("tl", "Recipe",
   "Parameters are kept as a generic key/value map.\n"
   "\n"
   "This class has been introduced in version 0.26."
+);
+
+static tl::UnknownUserClass *make_unknown_user_class (const std::string &cls_name, const std::string &payload)
+{
+  return new tl::UnknownUserClass (cls_name, payload);
+}
+
+Class<tl::UnknownUserClass> decl_UnknownUserClass ("tl", "UnknownUserClass",
+  gsi::constructor ("new", &make_unknown_user_class, gsi::arg ("class_name"), gsi::arg ("payload"),
+    "@brief Creates an object with the given class name and payload string"
+  ) +
+  gsi::method ("class_name", &tl::UnknownUserClass::class_name,
+    "@brief Gets the class name attribute"
+  ) +
+  gsi::method ("payload", &tl::UnknownUserClass::payload,
+    "@brief Gets the payload string"
+  ),
+  "@brief A placeholder object to allow maintaining the serialization of objects of unknown type\n"
+  "\n"
+  "This class is used to generate objects from properties for example, when the property has an object "
+  "value and uses a class unknown to this version of KLayout.\n"
+  "\n"
+  "If provides the class name string (as used for serialization) and the payload string.\n"
+  "\n"
+  "This class has been introduced in version 0.30.13."
 );
 
 }

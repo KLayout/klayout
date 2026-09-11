@@ -37,6 +37,7 @@ SOURCES = \
     tlStream.cc \
     tlString.cc \
     tlTimer.cc \
+    tlUnknownUserClass.cc \
     tlVariant.cc \
     tlFileUtils.cc \
     tlArch.cc \
@@ -98,6 +99,7 @@ HEADERS = \
     tlString.h \
     tlTimer.h \
     tlTypeTraits.h \
+    tlUnknownUserClass.h \
     tlUtils.h \
     tlVariant.h \
     tlVariantUserClasses.h \

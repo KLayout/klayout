@@ -27,6 +27,7 @@
 #include "tlObject.h"
 #include "tlTypeTraits.h"
 #include "tlUnitTest.h"
+#include "tlUnknownUserClass.h"
 
 #include <cstdio>
 #include <memory>
@@ -1576,6 +1577,24 @@ TEST(14)
   EXPECT_EQ (ba2_var.less (tl::Variant ("ABCD")), false);
   EXPECT_EQ (tl::Variant ("ABCD").equal (ba2_var), true);
   EXPECT_EQ (tl::Variant ("ABCD").less (ba2_var), false);
+}
+
+//  Serialization of unknown types
+TEST(15)
+{
+  tl::Variant v;
+
+  std::string s = "[abc:{payload=[]}]";
+  tl::Extractor ex (s.c_str ());
+  ex.read (v);
+  ex.expect_end ();
+
+  EXPECT_EQ (v.is_user<tl::UnknownUserClass> (), true);
+  const auto &uk = v.to_user<tl::UnknownUserClass> ();
+
+  EXPECT_EQ (uk.payload (), "{payload=[]}");
+  EXPECT_EQ (uk.class_name (), "abc");
+  EXPECT_EQ (v.to_parsable_string (), "[abc:{payload=[]}]");
 }
 
 }

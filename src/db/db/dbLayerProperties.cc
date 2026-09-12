@@ -63,11 +63,7 @@ LayerProperties::log_equal (const LayerProperties &b) const
 {
   if (is_null () != b.is_null ()) {
     return false;
-  }
-  if (is_named () != b.is_named ()) {
-    return false;
-  }
-  if (is_named ()) {
+  } else if (is_named () || b.is_named ()) {
     return name == b.name;
   } else {
     return layer == b.layer && datatype == b.datatype;

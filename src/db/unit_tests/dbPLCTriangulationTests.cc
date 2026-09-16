@@ -773,7 +773,7 @@ TEST(triangulate_basic)
   EXPECT_LT (plc.num_polygons (), size_t (150));
 
   //  for debugging:
-  //  tri.dump ("debug.gds");
+  //  plc.dump ("debug.gds");
 
   param.min_b = 1.0;
   param.max_area = 0.1;
@@ -885,7 +885,7 @@ TEST(triangulate_geo)
   EXPECT_EQ (tri.check (false), true);
 
   //  for debugging:
-  //  tri.dump ("debug.gds");
+  //  plc.dump ("debug.gds");
 
   size_t n_skinny = 0;
   for (auto t = plc.begin (); t != plc.end (); ++t) {
@@ -944,7 +944,7 @@ TEST(triangulate_analytic)
   EXPECT_EQ (tri.check (false), true);
 
   //  for debugging:
-  //  tri.dump ("debug.gds");
+  //  plc.dump ("debug.gds");
 
   for (auto t = plc.begin (); t != plc.end (); ++t) {
     EXPECT_LE (t->area (), param.max_area);
@@ -985,7 +985,7 @@ TEST(triangulate_problematic)
   EXPECT_EQ (tri.check (false), true);
 
   //  for debugging:
-  //  tri.dump ("debug.gds");
+  //  plc.dump ("debug.gds");
 
   for (auto t = plc.begin (); t != plc.end (); ++t) {
     EXPECT_LE (t->area (), param.max_area);
@@ -1031,7 +1031,7 @@ TEST(triangulate_thin)
   EXPECT_EQ (tri.check (false), true);
 
   //  for debugging:
-  //  tri.dump ("debug.gds");
+  //  plc.dump ("debug.gds");
 
   for (auto t = plc.begin (); t != plc.end (); ++t) {
     EXPECT_GE (t->b (), param.min_b);
@@ -1067,7 +1067,7 @@ TEST(triangulate_issue1996)
   EXPECT_EQ (tri.check (false), true);
 
   //  for debugging:
-  //  tri.dump ("debug.gds");
+  //  plc.dump ("debug.gds");
 
   for (auto t = plc.begin (); t != plc.end (); ++t) {
     EXPECT_LE (t->area (), param.max_area);
@@ -1129,7 +1129,7 @@ TEST(triangulate_issue_2429)
     EXPECT_EQ (tri.check (false), true);
 
     //  for debugging:
-    //  tri.dump ("debug.gds");
+    //  plc.dump ("debug.gds");
 
     for (auto t = plc.begin (); t != plc.end (); ++t) {
       EXPECT_GE (t->b (), param.min_b);
@@ -1152,7 +1152,7 @@ TEST(triangulate_issue_2429)
     EXPECT_EQ (tri.check (false), true);
 
     //  for debugging:
-    //  tri.dump ("debug.gds");
+    //  plc.dump ("debug.gds");
 
     for (auto t = plc.begin (); t != plc.end (); ++t) {
       EXPECT_GE (t->b (), param.min_b);
@@ -1175,7 +1175,7 @@ TEST(triangulate_issue_2429)
     EXPECT_EQ (tri.check (false), true);
 
     //  for debugging:
-    //  tri.dump ("debug.gds");
+    //  plc.dump ("debug.gds");
 
     for (auto t = plc.begin (); t != plc.end (); ++t) {
       EXPECT_GE (t->b (), param.min_b);
@@ -1281,3 +1281,75 @@ TEST(triangulate_with_vertexes)
   }
 }
 
+TEST(triangulate_issue_2443)
+{
+  db::DPoint contour[] = {
+    db::DPoint ( -2002.95900, -13656.95000 ),
+    db::DPoint ( -2002.95900, -13655.14950 ),
+    db::DPoint ( -2207.79100, -13655.14950 ),
+    db::DPoint ( -2207.79100, -13656.14950 ),
+    db::DPoint ( -3127.59850, -13656.14950 ),
+    db::DPoint ( -3127.59850, -13654.14950 ),
+    db::DPoint ( -2209.79100, -13654.14950 ),
+    db::DPoint ( -2209.79100, -13653.14950 ),
+    db::DPoint ( -2000.95900, -13653.14950 ),
+    db::DPoint ( -2000.95900, -13654.95000 ),
+    db::DPoint ( -1099.08400, -13654.95000 ),
+    db::DPoint ( -1099.08400, -13653.14900 ),
+    db::DPoint ( -950.95900, -13653.14900 ),
+    db::DPoint ( -950.95900, -13654.94950 ),
+    db::DPoint ( -697.23850, -13654.94950 ),
+    db::DPoint ( -697.23850, -13656.94950 ),
+    db::DPoint ( -952.95900, -13656.94950 ),
+    db::DPoint ( -952.95900, -13655.14900 ),
+    db::DPoint ( -1097.08400, -13655.14900 ),
+    db::DPoint ( -1097.08400, -13656.95000 )
+  };
+
+  db::DPolygon poly;
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+
+  double dbu = 1.0;
+
+  {
+    db::plc::TriangulationParameters param;
+    param.min_b = 0.0;
+    param.max_area = 0.0;
+
+    db::plc::Graph plc;
+    TestableTriangulation tri (&plc);
+    db::DCplxTrans trans = db::DCplxTrans (dbu) * db::DCplxTrans (db::DTrans (db::DPoint () - poly.box ().center ()));
+    tri.triangulate (trans * poly, param);
+
+    //  for debugging:
+    //  plc.dump ("debug.gds");
+
+    for (auto t = plc.begin (); t != plc.end (); ++t) {
+      EXPECT_GE (t->b (), param.min_b);
+    }
+
+    EXPECT_GE (plc.num_polygons (), size_t (20));
+    EXPECT_LE (plc.num_polygons (), size_t (22));
+  }
+
+  {
+    db::plc::TriangulationParameters param;
+    param.min_b = 0.0;
+    param.max_area = 4.0;
+
+    db::plc::Graph plc;
+    TestableTriangulation tri (&plc);
+    db::DCplxTrans trans = db::DCplxTrans (dbu) * db::DCplxTrans (db::DTrans (db::DPoint () - poly.box ().center ()));
+    tri.triangulate (trans * poly, param);
+
+    //  for debugging:
+    //  plc.dump ("debug.gds");
+
+    for (auto t = plc.begin (); t != plc.end (); ++t) {
+      EXPECT_GE (t->b (), param.min_b);
+    }
+
+    EXPECT_GE (plc.num_polygons (), size_t (1410));
+    EXPECT_LE (plc.num_polygons (), size_t (1430));
+  }
+}

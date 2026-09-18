@@ -127,7 +127,7 @@ DXFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
   double sf = options.scale_factor () * layout.dbu ();
 
   std::vector <std::pair <unsigned int, db::LayerProperties> > layers;
-  options.get_valid_layers (layout, layers, db::SaveLayoutOptions::LP_AssignName);
+  options.get_valid_layers (layout, layers, m_options.use_layer_names ? db::SaveLayoutOptions::LP_AssignNameWithPriority : db::SaveLayoutOptions::LP_AssignName);
 
   std::set <db::cell_index_type> cell_set;
   options.get_cells (layout, cell_set, layers);

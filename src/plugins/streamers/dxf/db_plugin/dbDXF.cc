@@ -165,8 +165,9 @@ public:
 
   virtual tl::XMLElementBase *xml_writer_options_element () const
   {
-    return new db::WriterOptionsXMLElement<db::DXFWriterOptions> ("cif",
-      tl::make_member (&db::DXFWriterOptions::polygon_mode, "polygon-mode")
+    return new db::WriterOptionsXMLElement<db::DXFWriterOptions> ("dxf",
+      tl::make_member (&db::DXFWriterOptions::polygon_mode, "polygon-mode") +
+      tl::make_member (&db::DXFWriterOptions::use_layer_names, "use-layer-names")
     );
   }
 };

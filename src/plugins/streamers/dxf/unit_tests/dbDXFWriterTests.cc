@@ -290,3 +290,51 @@ TEST(FullSpinWithLayer0)
   std::string fn_au = tl::testdata () + std::string ("/dxf/") + "dxf5_au.dxf";
   compare_text_files (tmp2, fn_au);
 }
+
+TEST(LayerNames)
+{
+  db::Layout l;
+  db::cell_index_type top = l.add_cell ("TOP");
+
+  unsigned int l1 = l.insert_layer (db::LayerProperties (18, 0, "PAD"));
+  unsigned int l2 = l.insert_layer (db::LayerProperties (19, 0));
+
+  l.cell (top).shapes (l1).insert (db::Box (0, 0, 1000, 1000));
+  l.cell (top).shapes (l2).insert (db::Box (1000, 1000, 2000, 2000));
+
+  // Test 1: default (use_layer_names = false): layer 18/0 with name "PAD" becomes L18D0_PAD
+  {
+    std::string tmp = tmp_file ("tmp_default.dxf");
+    db::SaveLayoutOptions options;
+    options.set_format ("DXF");
+
+    tl::OutputStream stream (tmp);
+    db::Writer writer (options);
+    writer.write (l, stream);
+
+    tl::InputStream is (tmp);
+    std::string content = is.read_all ();
+    EXPECT_EQ (content.find ("L18D0_PAD") != std::string::npos, true);
+    EXPECT_EQ (content.find ("L19D0") != std::string::npos, true);
+  }
+
+  // Test 2: use_layer_names = true: layer 18/0 with name "PAD" becomes PAD
+  {
+    std::string tmp = tmp_file ("tmp_named.dxf");
+    db::SaveLayoutOptions options;
+    db::DXFWriterOptions dxf_opt;
+    dxf_opt.use_layer_names = true;
+    options.set_options (new db::DXFWriterOptions (dxf_opt));
+    options.set_format ("DXF");
+
+    tl::OutputStream stream (tmp);
+    db::Writer writer (options);
+    writer.write (l, stream);
+
+    tl::InputStream is (tmp);
+    std::string content = is.read_all ();
+    EXPECT_EQ (content.find ("\nPAD\n") != std::string::npos || content.find ("\r\nPAD\r\n") != std::string::npos, true);
+    EXPECT_EQ (content.find ("L18D0_PAD") == std::string::npos, true);
+    EXPECT_EQ (content.find ("L19D0") != std::string::npos, true);
+  }
+}

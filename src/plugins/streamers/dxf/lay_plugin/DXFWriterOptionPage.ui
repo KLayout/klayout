@@ -80,6 +80,13 @@
         </item>
        </widget>
       </item>
+      <item row="1" column="0" colspan="3" >
+       <widget class="QCheckBox" name="use_layer_names_cbx" >
+        <property name="text" >
+         <string>Use layer names (don't prefix with layer/datatype numbers)</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

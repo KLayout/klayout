@@ -155,6 +155,7 @@ private:
   std::string m_magic_tech;
 
   int m_dxf_polygon_mode;
+  bool m_dxf_use_layer_names;
 
   int m_lstream_compression_level;
   bool m_lstream_recompress;

@@ -63,6 +63,7 @@
 #include "tlUri.h"
 #include "dbMemStatistics.h"
 #include "dbManager.h"
+#include "dbLayerProperties.h"
 #include "dbStream.h"
 #include "dbSaveLayoutOptions.h"
 #include "dbClipboard.h"
@@ -121,14 +122,6 @@ const int max_dirty_files = 15;
 // -------------------------------------------------------------
 
 static MainWindow *mw_instance = 0;
-
-struct LayerIdentityLess
-{
-  bool operator() (const db::LayerProperties &a, const db::LayerProperties &b) const
-  {
-    return a.log_less (b);
-  }
-};
 
 static db::LayerProperties
 layer_identity (lay::LayoutView *view, const lay::LayerPropertiesConstIterator &layer)
@@ -2616,7 +2609,7 @@ MainWindow::do_synchronize_layers ()
 void
 MainWindow::synchronize_layers (lay::LayoutView *source, lay::LayoutView *target, db::Manager::transaction_id_t join_with)
 {
-  std::map<db::LayerProperties, bool, LayerIdentityLess> visibility;
+  std::map<db::LayerProperties, bool, db::LPLogicalLessFunc> visibility;
   for (lay::LayerPropertiesConstIterator l = source->begin_layers (); ! l.at_end (); ++l) {
     if (l->has_children () || ! l->is_standard_layer ()) {
       continue;

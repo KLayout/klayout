@@ -38,6 +38,9 @@
 #include <QMimeData>
 #include <QClipboard>
 #include <map>
+#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+#include <optional>
+#endif
 #if QT_VERSION >= 0x050000
 #  include <QGuiApplication>
 #endif
@@ -2636,14 +2639,20 @@ MainWindow::synchronize_layers (lay::LayoutView *source, lay::LayoutView *target
     }
   }
 
+#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+  std::optional<db::Transaction> transaction;
+#else
   std::unique_ptr<db::Transaction> transaction;
+#endif
   auto set_visible = [&] (const lay::LayerPropertiesConstIterator &layer, bool visible) {
     if (! transaction && ! m_manager.transacting () && ! m_manager.replaying ()) {
-      if (join_with && m_manager.last_transaction_id () == join_with && m_manager.transaction_id_for_undo () == join_with) {
-        transaction.reset (new db::Transaction (&m_manager, "", join_with));
-      } else {
-        transaction.reset (new db::Transaction (&m_manager, tl::to_string (QObject::tr ("Synchronize layers"))));
-      }
+      bool join = join_with && m_manager.last_transaction_id () == join_with && m_manager.transaction_id_for_undo () == join_with;
+      std::string description = join ? std::string () : tl::to_string (QObject::tr ("Synchronize layers"));
+#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+      transaction.emplace (&m_manager, description, join ? join_with : 0);
+#else
+      transaction.reset (new db::Transaction (&m_manager, description, join ? join_with : 0));
+#endif
     }
     lay::LayerProperties props (*layer);
     props.set_visible (visible);

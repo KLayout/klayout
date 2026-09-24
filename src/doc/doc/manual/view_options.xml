@@ -41,6 +41,11 @@
       different views for clarity, but identical regions need to be inspected.
     </li>
     <li>
+      <b>Synchronized Layers</b>: matching layers in different views (tabs) share their visibility.
+      Visibility changes in the active view are copied to other open views. Layers present in only one
+      view keep their own visibility. Layer colors and other display properties remain independent.
+    </li>
+    <li>
       <b>Select Top Level Objects</b>: this menu item gives a quick access to the respective editor
       option. If this option is checked, only objects from the top level are selected. This is 
       in particular important for editing because editing a subcell can cause effects in other 
@@ -58,6 +63,5 @@
   </ul>
 
 </doc>
-
 
 

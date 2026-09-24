@@ -67,7 +67,78 @@ class LAYMainWindow_TestClass < TestBase
 
   end
 
+  def test_3
+
+    if !RBA.constants.member?(:Application)
+      return
+    end
+
+    mw = RBA::Application.instance.main_window
+    synchronized_layers = mw.get_config("synchronized-layers").to_s
+    mw.set_config("synchronized-layers", "false")
+    mw.close_all
+
+    begin
+      path = ENV["TESTSRC"] + "/testdata/gds/t11.gds"
+      mw.load_layout(path, 1)
+      first = mw.current_view
+      mw.load_layout(path, 1)
+      second = mw.current_view
+      first.clear_layers
+      second.clear_layers
+
+      indexed = RBA::LayerProperties::new
+      indexed_source = "%#{first.cellview(0).layout.layer(1, 0)}@1"
+      indexed.source = indexed_source
+      first.insert_layer(first.end_layers, indexed)
+
+      second.insert_layer(second.end_layers, RBA::LayerProperties::new)
+      group = second.begin_layers
+      matched = RBA::LayerProperties::new
+      matched.source = "1/0@1"
+      group.current.add_child(matched)
+      unique = RBA::LayerProperties::new
+      unique.source = "2/0@1"
+      group.current.add_child(unique)
+      group.current.visible = false
+
+      mw.current_view_index = 0
+      mw.set_config("synchronized-layers", "true")
+      assert_equal(group.first_child.current.visible?(true), true)
+      sibling = group.first_child
+      sibling.next_sibling(1)
+      assert_equal(sibling.current.visible?(true), false)
+
+      first.transaction("Hide layer")
+      hidden = RBA::LayerProperties::new
+      hidden.source = indexed_source
+      hidden.visible = false
+      first.set_layer_properties(first.begin_layers, hidden)
+      first.commit
+
+      mw.cm_undo
+      assert_equal(first.begin_layers.current.visible?(true), true)
+      assert_equal(group.first_child.current.visible?(true), true)
+      mw.cm_redo
+      assert_equal(first.begin_layers.current.visible?(true), false)
+      assert_equal(group.first_child.current.visible?(true), false)
+      assert_equal(sibling.current.visible?(true), false)
+
+      first.transaction("Show layer")
+      shown = RBA::LayerProperties::new
+      shown.source = indexed_source
+      first.set_layer_properties(first.begin_layers, shown)
+      first.commit
+      mw.current_view_index = 1
+      assert_equal(group.first_child.current.visible?(true), true)
+      assert_equal(sibling.current.visible?(true), false)
+    ensure
+      mw.set_config("synchronized-layers", synchronized_layers)
+      mw.close_all
+    end
+
+  end
+
 end
 
 load("test_epilogue.rb")
-

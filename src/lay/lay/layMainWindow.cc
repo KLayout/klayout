@@ -37,6 +37,7 @@
 #include <QUrl>
 #include <QMimeData>
 #include <QClipboard>
+#include <map>
 #if QT_VERSION >= 0x050000
 #  include <QGuiApplication>
 #endif
@@ -118,6 +119,14 @@ const int max_dirty_files = 15;
 
 static MainWindow *mw_instance = 0;
 
+struct LayerIdentityLess
+{
+  bool operator() (const db::LayerProperties &a, const db::LayerProperties &b) const
+  {
+    return a.log_less (b);
+  }
+};
+
 MainWindow *
 MainWindow::instance ()
 {
@@ -183,6 +192,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
       m_default_grids_updated (true),
       m_new_layout_current_panel (false),
       m_synchronized_views (false),
+      m_synchronized_layers (false),
       m_synchronous (false),
       m_busy (false),
       mp_app (app),
@@ -1221,6 +1231,20 @@ MainWindow::configure (const std::string &name, const std::string &value)
     bool flag = false;
     tl::from_string (value, flag);
     m_synchronized_views = flag;
+    return true;
+
+  } else if (name == cfg_synchronized_layers) {
+
+    bool flag = false;
+    tl::from_string (value, flag);
+    m_synchronized_layers = flag;
+    if (flag && current_view ()) {
+      for (int i = 0; i < int (views ()); ++i) {
+        if (view (i) != current_view ()) {
+          synchronize_layers (current_view (), view (i));
+        }
+      }
+    }
     return true;
 
   } else if (name == cfg_layout_file_watcher_enabled) {
@@ -2470,6 +2494,10 @@ MainWindow::select_view (int index)
       box = current_view ()->viewport ().box ();
     }
 
+    if (m_synchronized_layers && current_view () && view (index) != current_view ()) {
+      synchronize_layers (current_view (), view (index));
+    }
+
     view (index)->set_current ();
 
     if (current_view ()) {
@@ -2501,6 +2529,68 @@ MainWindow::select_view (int index)
   } catch (...) {
     m_disable_tab_selected = dis;
     throw;
+  }
+}
+
+void
+MainWindow::active_layers_changed (lay::LayoutView *source, int flags)
+{
+  if (! m_synchronized_layers || source != current_view () || ! (flags & 3)) {
+    return;
+  }
+
+  for (int i = 0; i < int (views ()); ++i) {
+    if (view (i) != source) {
+      synchronize_layers (source, view (i));
+    }
+  }
+}
+
+void
+MainWindow::active_layer_list_changed (lay::LayoutView *source, int)
+{
+  active_layers_changed (source, 1);
+}
+
+void
+MainWindow::synchronize_layers (lay::LayoutView *source, lay::LayoutView *target)
+{
+  std::map<db::LayerProperties, bool, LayerIdentityLess> visibility;
+  for (lay::LayerPropertiesConstIterator l = source->begin_layers (); ! l.at_end (); ++l) {
+    if (l->has_children () || ! l->is_standard_layer ()) {
+      continue;
+    }
+    db::LayerProperties key = l->source (true).layer_props ();
+    if (! key.is_null ()) {
+      visibility [key] = visibility [key] || l->visible (true);
+    }
+  }
+
+  for (lay::LayerPropertiesConstIterator l = target->begin_layers (); ! l.at_end (); ++l) {
+    if (l->has_children () || ! l->is_standard_layer ()) {
+      continue;
+    }
+    db::LayerProperties key = l->source (true).layer_props ();
+    std::map<db::LayerProperties, bool, LayerIdentityLess>::const_iterator v = visibility.find (key);
+    if (v == visibility.end ()) {
+      continue;
+    }
+
+    if (v->second) {
+      for (lay::LayerPropertiesConstIterator p = l.parent (); ! p.is_null (); p = p.parent ()) {
+        if (! p->visible (false)) {
+          lay::LayerProperties props (*p);
+          props.set_visible (true);
+          target->set_properties (p, props);
+        }
+      }
+    }
+
+    if (l->visible (false) != v->second) {
+      lay::LayerProperties props (*l);
+      props.set_visible (v->second);
+      target->set_properties (l, props);
+    }
   }
 }
 
@@ -3505,6 +3595,8 @@ MainWindow::create_layout (const std::string &technology, int mode)
 void
 MainWindow::add_view (lay::LayoutViewWidget *view)
 {
+  view->view ()->layer_list_changed_event.add (this, &MainWindow::active_layers_changed, view->view ());
+  view->view ()->current_layer_list_changed_event.add (this, &MainWindow::active_layer_list_changed, view->view ());
   connect (view, SIGNAL (title_changed (lay::LayoutView *)), this, SLOT (view_title_changed (lay::LayoutView *)));
   connect (view, SIGNAL (dirty_changed (lay::LayoutView *)), this, SLOT (view_title_changed (lay::LayoutView *)));
   connect (view, SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
@@ -3551,10 +3643,15 @@ MainWindow::do_create_view ()
 int
 MainWindow::create_view ()
 {
+  lay::LayoutView *previous_view = current_view ();
+
   //  create a new view
   int view_index = do_create_view ();
 
   //  add a new tab and make the new view the current one
+  if (m_synchronized_layers && previous_view) {
+    synchronize_layers (previous_view, view (view_index));
+  }
   mp_views.back ()->view ()->set_current ();
 
   mp_view_stack->add_widget (mp_views.back ());
@@ -3582,6 +3679,7 @@ lay::CellViewRef
 MainWindow::create_or_load_layout (const std::string *filename, const db::LoadLayoutOptions *options, const std::string &technology, int mode)
 {
   lay::LayoutView *vw = 0;
+  lay::LayoutView *previous_view = current_view ();
 
   if (! current_view ()) {
     mode = 1;
@@ -3618,6 +3716,9 @@ MainWindow::create_or_load_layout (const std::string *filename, const db::LoadLa
     //  make the new view the current one
     if (mode == 1) {
 
+      if (m_synchronized_layers && previous_view) {
+        synchronize_layers (previous_view, vw);
+      }
       mp_views.back ()->view ()->set_current ();
 
       mp_view_stack->add_widget (mp_views.back ());
@@ -4632,6 +4733,7 @@ public:
     menu_entries.push_back (lay::config_menu_item ("show_ghost_cells", at, tl::to_string (QObject::tr ("Show Unresolved References")), cfg_ghost_cells_visible, "?"));
     menu_entries.push_back (lay::config_menu_item ("no_stipples", at, tl::to_string (QObject::tr ("Show Layers Without Fill")), cfg_no_stipple, "?"));
     menu_entries.push_back (lay::config_menu_item ("synchronized_views", at, tl::to_string (QObject::tr ("Synchronized Views")), cfg_synchronized_views, "?"));
+    menu_entries.push_back (lay::config_menu_item ("synchronized_layers", at, tl::to_string (QObject::tr ("Synchronized Layers")), cfg_synchronized_layers, "?"));
     menu_entries.push_back (lay::config_menu_item ("edit_top_level_selection:edit_mode", at, tl::to_string (QObject::tr ("Select Top Level Objects")), edt::cfg_edit_top_level_selection, "?"));
     menu_entries.push_back (lay::separator ("panels_group", at));
     menu_entries.push_back (lay::config_menu_item ("show_toolbar", at, tl::to_string (QObject::tr ("Toolbar")), cfg_show_toolbar, "?"));
@@ -4675,4 +4777,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new MainWindowPluginDeclaration (), -100, "MainWindowPlugin");
 
 } // namespace lay
-

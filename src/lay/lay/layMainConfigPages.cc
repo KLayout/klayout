@@ -60,6 +60,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_edit_mode, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_custom_macro_paths, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_synchronized_views, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_synchronized_layers, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_default_grids, "0.01,0.005,0.001"));
     options.push_back (std::pair<std::string, std::string> (cfg_mru, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_mru_sessions, ""));
@@ -753,4 +754,3 @@ CustomizeMenuConfigPage::current_changed (QTreeWidgetItem *current, QTreeWidgetI
 }
 
 }
-

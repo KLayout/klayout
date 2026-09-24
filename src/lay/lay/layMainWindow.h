@@ -805,6 +805,7 @@ private:
   std::vector<std::pair<std::string, bool> > m_hidden;
   bool m_new_layout_current_panel;
   bool m_synchronized_views;
+  bool m_synchronized_layers;
   bool m_synchronous;
   bool m_busy;
   QApplication *mp_app;
@@ -883,6 +884,9 @@ private:
   void interactive_close_view (int from, int to, bool invert_range, bool all_cellviews);
   void call_on_current_view (void (lay::LayoutView::*func) (), const std::string &op_desc);
   void current_view_changed ();
+  void active_layers_changed (lay::LayoutView *source, int flags);
+  void active_layer_list_changed (lay::LayoutView *source, int index);
+  void synchronize_layers (lay::LayoutView *source, lay::LayoutView *target);
   void update_window_title ();
   void update_tab_title (int i);
   void add_view (LayoutViewWidget *view);

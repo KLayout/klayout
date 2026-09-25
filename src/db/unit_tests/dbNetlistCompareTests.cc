@@ -5126,3 +5126,64 @@ TEST(32_InverterChain)
   );
 }
 
+//  Logger which records log_entry calls so the limit warnings can be checked.
+class NetlistCompareLogEntryTestLogger
+  : public NetlistCompareTestLogger
+{
+public:
+  virtual void log_entry (db::Severity /*level*/, const std::string &msg)
+  {
+    out ("log_entry " + msg);
+  }
+};
+
+TEST(33_NullLoggerWithExhaustedLimits)
+{
+  const char *nls1 =
+    "circuit BUF ($1=IN,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=INT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $2 (S=VSS,G=IN,D=INT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $3 (S=VDD,G=INT,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=VSS,G=INT,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $5 (S=VDD,G=IN,D=INT2) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $6 (S=VSS,G=IN,D=INT2) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $7 (S=VDD,G=INT2,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $8 (S=VSS,G=INT2,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit BUF ($1=VDD,$2=IN,$3=VSS,$4=OUT);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=$10) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=$10,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $3 (S=VDD,G=IN,D=$11) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $4 (S=VDD,G=$11,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $5 (S=$10,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $6 (S=OUT,G=$10,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $7 (S=$11,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $8 (S=OUT,G=$11,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  //  The two parallel paths form an ambiguity group whose resolution exceeds the
+  //  branch complexity limit. Without a logger this must not dereference a null logger.
+  {
+    db::NetlistComparer comp (0);
+    comp.set_dont_consider_net_names (true);
+    comp.set_max_branch_complexity (1);
+    comp.compare (&nl1, &nl2);
+  }
+
+  //  With a logger the limit warning must be reported, proving the path was taken.
+  {
+    NetlistCompareLogEntryTestLogger logger;
+    db::NetlistComparer comp (&logger);
+    comp.set_dont_consider_net_names (true);
+    comp.set_max_branch_complexity (1);
+    comp.compare (&nl1, &nl2);
+    EXPECT (logger.text ().find ("exhausted") != std::string::npos);
+  }
+}
+

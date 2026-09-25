@@ -1399,10 +1399,12 @@ analyze_nodes_for_close_matches (const std::multimap<size_t, const NetGraphNode 
         double fuzz_factor = double (fuzz) / ne;
         if (fuzz_factor < max_fuzz_factor) {
           std::string msg = tl::to_string (tr ("Net %s from netlist approximately matches net %s from reference netlist (fuzziness %d nodes)"));
-          logger->log_entry (db::Info, tl::sprintf (msg,
-                                  i->second->net ()->expanded_name (),
-                                  j->second->net ()->expanded_name (),
-                                  int (fuzz)));
+          if (logger) {
+            logger->log_entry (db::Info, tl::sprintf (msg,
+                                    i->second->net ()->expanded_name (),
+                                    j->second->net ()->expanded_name (),
+                                    int (fuzz)));
+          }
         }
 
       }
@@ -1418,11 +1420,13 @@ analyze_nodes_for_close_matches (const std::multimap<size_t, const NetGraphNode 
         size_t fuzz = distance3 (*i->second, *j->second, *k->second, g2);
         double fuzz_factor = double (fuzz) / i->first;
         if (fuzz_factor < max_fuzz_factor) {
-          logger->log_entry (db::Info, tl::sprintf (msg,
-                                  (layout2ref ? i : j)->second->net ()->expanded_name (),
-                                  (layout2ref ? j : k)->second->net ()->expanded_name (),
-                                  (layout2ref ? k : i)->second->net ()->expanded_name (),
-                                  int (fuzz)));
+          if (logger) {
+            logger->log_entry (db::Info, tl::sprintf (msg,
+                                    (layout2ref ? i : j)->second->net ()->expanded_name (),
+                                    (layout2ref ? j : k)->second->net ()->expanded_name (),
+                                    (layout2ref ? k : i)->second->net ()->expanded_name (),
+                                    int (fuzz)));
+          }
         }
 
         --tries;
@@ -1496,7 +1500,9 @@ NetlistCompareCore::analyze_failed_matches () const
   }
 
   for (auto i = singular1.begin (); i != singular1.end (); ++i) {
-    logger->log_entry (db::Error, tl::sprintf (tl::to_string (tr ("Net %s is not matching any net from reference netlist")), (*i)->net ()->expanded_name ()));
+    if (logger) {
+      logger->log_entry (db::Error, tl::sprintf (tl::to_string (tr ("Net %s is not matching any net from reference netlist")), (*i)->net ()->expanded_name ()));
+    }
   }
 
   //  attempt some analysis for close matches (including shorts / opens)
@@ -1554,7 +1560,7 @@ NetlistCompareCore::derive_node_identities_from_node_set (std::vector<NodeEdgePa
   }
 
   if (max_depth != std::numeric_limits<size_t>::max() && depth > max_depth) {
-    if (with_log) {
+    if (logger && with_log) {
       logger->log_entry (db::Warning, tl::sprintf (tl::to_string (tr ("Maximum depth exhausted (max depth is %d)")), int (max_depth)));
     }
     if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
@@ -1672,7 +1678,7 @@ NetlistCompareCore::derive_node_identities_from_node_set (std::vector<NodeEdgePa
 
     } else if (max_n_branch != std::numeric_limits<size_t>::max () && double (std::max (nr->num1, nr->num2)) * double (n_branch) > double (max_n_branch)) {
 
-      if (with_log) {
+      if (logger && with_log) {
         logger->log_entry (db::Warning, tl::sprintf (tl::to_string (tr ("Maximum complexity exhausted (max complexity is %s, needs at least %s)")), tl::to_string (max_n_branch), tl::to_string (std::max (nr->num1, nr->num2) * n_branch)));
       }
       if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {

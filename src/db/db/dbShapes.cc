@@ -32,8 +32,13 @@
 #include <limits>
 #include <algorithm>
 
+#if __cplusplus >= 201703L
+  #if __has_include(<execution>)
+    #include <execution>
+  #endif
+#endif
+
 #if defined(__cpp_lib_execution)
-#include <execution>
 #define PARALLEL_EXEC_POLICY std::execution::par,
 #else
 #define PARALLEL_EXEC_POLICY

@@ -37,6 +37,7 @@ namespace lay
 static const std::string cfg_default_grids ("default-grids");
 static const std::string cfg_circle_points ("circle-points");
 static const std::string cfg_synchronized_views ("synchronized-views");
+static const std::string cfg_synchronized_layers ("synchronized-layers");
 static const std::string cfg_edit_mode ("edit-mode");
 static const std::string cfg_custom_macro_paths ("custom-macro-paths");
 static const std::string cfg_mru ("mru");

@@ -788,6 +788,7 @@ private:
   tl::DeferredMethod<MainWindow> dm_do_update_menu;
   tl::DeferredMethod<MainWindow> dm_do_update_grids;
   tl::DeferredMethod<MainWindow> dm_do_update_mru_menus;
+  tl::DeferredMethod<MainWindow> dm_synchronize_layers;
   tl::DeferredMethod<MainWindow> dm_exit;
   QTimer m_message_timer;
   QTimer m_file_changed_timer;
@@ -805,6 +806,9 @@ private:
   std::vector<std::pair<std::string, bool> > m_hidden;
   bool m_new_layout_current_panel;
   bool m_synchronized_views;
+  bool m_synchronized_layers;
+  bool m_pending_layer_sync;
+  db::Manager::transaction_id_t m_pending_layer_sync_transaction_id;
   bool m_synchronous;
   bool m_busy;
   QApplication *mp_app;
@@ -883,6 +887,11 @@ private:
   void interactive_close_view (int from, int to, bool invert_range, bool all_cellviews);
   void call_on_current_view (void (lay::LayoutView::*func) (), const std::string &op_desc);
   void current_view_changed ();
+  void active_layers_changed (lay::LayoutView *source, int flags);
+  void active_layer_list_changed (lay::LayoutView *source, int index);
+  void flush_pending_layer_sync ();
+  void do_synchronize_layers ();
+  void synchronize_layers (lay::LayoutView *source, lay::LayoutView *target, db::Manager::transaction_id_t join_with = 0);
   void update_window_title ();
   void update_tab_title (int i);
   void add_view (LayoutViewWidget *view);

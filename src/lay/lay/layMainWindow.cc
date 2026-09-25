@@ -37,6 +37,10 @@
 #include <QUrl>
 #include <QMimeData>
 #include <QClipboard>
+#include <map>
+#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+#include <optional>
+#endif
 #if QT_VERSION >= 0x050000
 #  include <QGuiApplication>
 #endif
@@ -59,6 +63,7 @@
 #include "tlUri.h"
 #include "dbMemStatistics.h"
 #include "dbManager.h"
+#include "dbLayerProperties.h"
 #include "dbStream.h"
 #include "dbSaveLayoutOptions.h"
 #include "dbClipboard.h"
@@ -117,6 +122,20 @@ const int max_dirty_files = 15;
 // -------------------------------------------------------------
 
 static MainWindow *mw_instance = 0;
+
+static db::LayerProperties
+layer_identity (lay::LayoutView *view, const lay::LayerPropertiesConstIterator &layer)
+{
+  int cv_index = layer->cellview_index ();
+  int layer_index = layer->layer_index ();
+  if (cv_index >= 0 && cv_index < int (view->cellviews ()) && layer_index >= 0) {
+    const db::Layout &layout = view->cellview (cv_index)->layout ();
+    if (layout.is_valid_layer (layer_index)) {
+      return layout.get_properties (layer_index);
+    }
+  }
+  return layer->source (true).layer_props ();
+}
 
 MainWindow *
 MainWindow::instance ()
@@ -177,12 +196,16 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
       dm_do_update_menu (this, &MainWindow::do_update_menu),
       dm_do_update_grids (this, &MainWindow::do_update_grids),
       dm_do_update_mru_menus (this, &MainWindow::do_update_mru_menus),
+      dm_synchronize_layers (this, &MainWindow::do_synchronize_layers),
       dm_exit (this, &MainWindow::exit),
       m_grid_micron (0.001),
       m_default_grid (0.0),
       m_default_grids_updated (true),
       m_new_layout_current_panel (false),
       m_synchronized_views (false),
+      m_synchronized_layers (false),
+      m_pending_layer_sync (false),
+      m_pending_layer_sync_transaction_id (0),
       m_synchronous (false),
       m_busy (false),
       mp_app (app),
@@ -1223,6 +1246,24 @@ MainWindow::configure (const std::string &name, const std::string &value)
     m_synchronized_views = flag;
     return true;
 
+  } else if (name == cfg_synchronized_layers) {
+
+    bool flag = false;
+    tl::from_string (value, flag);
+    m_synchronized_layers = flag;
+    if (! flag) {
+      dm_synchronize_layers.cancel ();
+      m_pending_layer_sync = false;
+    }
+    if (flag && current_view ()) {
+      for (int i = 0; i < int (views ()); ++i) {
+        if (view (i) != current_view ()) {
+          synchronize_layers (current_view (), view (i));
+        }
+      }
+    }
+    return true;
+
   } else if (name == cfg_layout_file_watcher_enabled) {
 
     bool flag = false;
@@ -1724,6 +1765,7 @@ MainWindow::cm_reset_window_state ()
 void
 MainWindow::cm_undo ()
 {
+  flush_pending_layer_sync ();
   if (current_view () && m_manager.available_undo ().first) {
     for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
       (*vp)->view ()->clear_selection ();
@@ -1736,6 +1778,7 @@ MainWindow::cm_undo ()
 void
 MainWindow::cm_undo_list ()
 {
+  flush_pending_layer_sync ();
   if (current_view () && m_manager.available_undo ().first) {
 
     std::unique_ptr<lay::UndoRedoListForm> dialog (new lay::UndoRedoListForm (this, &m_manager, true));
@@ -1757,6 +1800,7 @@ MainWindow::cm_undo_list ()
 void
 MainWindow::cm_redo ()
 {
+  flush_pending_layer_sync ();
   if (current_view () && m_manager.available_redo ().first) {
     for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
       (*vp)->view ()->clear_selection ();
@@ -1769,6 +1813,7 @@ MainWindow::cm_redo ()
 void
 MainWindow::cm_redo_list ()
 {
+  flush_pending_layer_sync ();
   if (current_view () && m_manager.available_redo ().first) {
 
     std::unique_ptr<lay::UndoRedoListForm> dialog (new lay::UndoRedoListForm (this, &m_manager, false));
@@ -2453,6 +2498,8 @@ MainWindow::view_selected (int index)
 void
 MainWindow::select_view (int index)
 {
+  flush_pending_layer_sync ();
+
   bool dis = m_disable_tab_selected;
   m_disable_tab_selected = true; // prevent recursion
 
@@ -2468,6 +2515,10 @@ MainWindow::select_view (int index)
     db::DBox box;
     if (box_set) {
       box = current_view ()->viewport ().box ();
+    }
+
+    if (m_synchronized_layers && current_view () && view (index) != current_view ()) {
+      synchronize_layers (current_view (), view (index));
     }
 
     view (index)->set_current ();
@@ -2501,6 +2552,133 @@ MainWindow::select_view (int index)
   } catch (...) {
     m_disable_tab_selected = dis;
     throw;
+  }
+}
+
+void
+MainWindow::active_layers_changed (lay::LayoutView *source, int flags)
+{
+  if (! m_synchronized_layers || source != current_view () || ! (flags & 3)) {
+    return;
+  }
+
+  if (m_manager.replaying ()) {
+    // Replay visits intermediate states of every recorded layer change.
+    dm_synchronize_layers.cancel ();
+    m_pending_layer_sync = false;
+    return;
+  }
+
+  m_pending_layer_sync = true;
+  m_pending_layer_sync_transaction_id = m_manager.transacting () ? m_manager.last_transaction_id () : 0;
+  dm_synchronize_layers ();
+}
+
+void
+MainWindow::active_layer_list_changed (lay::LayoutView *source, int)
+{
+  active_layers_changed (source, 1);
+}
+
+void
+MainWindow::flush_pending_layer_sync ()
+{
+  if (m_pending_layer_sync) {
+    dm_synchronize_layers.cancel ();
+    do_synchronize_layers ();
+  }
+}
+
+void
+MainWindow::do_synchronize_layers ()
+{
+  if (! m_pending_layer_sync || ! m_synchronized_layers || ! current_view ()) {
+    return;
+  }
+
+  m_pending_layer_sync = false;
+  db::Manager::transaction_id_t join_with = m_pending_layer_sync_transaction_id;
+  lay::LayoutView *source = current_view ();
+  for (int i = 0; i < int (views ()); ++i) {
+    if (view (i) != source) {
+      synchronize_layers (source, view (i), join_with);
+    }
+  }
+}
+
+void
+MainWindow::synchronize_layers (lay::LayoutView *source, lay::LayoutView *target, db::Manager::transaction_id_t join_with)
+{
+  std::map<db::LayerProperties, bool, db::LPLogicalLessFunc> visibility;
+  for (lay::LayerPropertiesConstIterator l = source->begin_layers (); ! l.at_end (); ++l) {
+    if (l->has_children () || ! l->is_standard_layer ()) {
+      continue;
+    }
+    db::LayerProperties key = layer_identity (source, l);
+    if (! key.is_null ()) {
+      visibility [key] = visibility [key] || l->visible (true);
+    }
+  }
+
+  // Unhiding a group must not reveal layers absent from the source view.
+  std::vector<lay::LayerPropertiesConstIterator> hidden_unmatched;
+  for (lay::LayerPropertiesConstIterator l = target->begin_layers (); ! l.at_end (); ++l) {
+    if (l->has_children () || l->visible (true)) {
+      continue;
+    }
+    db::LayerProperties key = layer_identity (target, l);
+    if (! l->is_standard_layer () || visibility.find (key) == visibility.end ()) {
+      hidden_unmatched.push_back (l);
+    }
+  }
+
+#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+  std::optional<db::Transaction> transaction;
+#else
+  std::unique_ptr<db::Transaction> transaction;
+#endif
+  auto set_visible = [&] (const lay::LayerPropertiesConstIterator &layer, bool visible) {
+    if (! transaction && ! m_manager.transacting () && ! m_manager.replaying ()) {
+      bool join = join_with && m_manager.last_transaction_id () == join_with && m_manager.transaction_id_for_undo () == join_with;
+      std::string description = join ? std::string () : tl::to_string (QObject::tr ("Synchronize layers"));
+#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+      transaction.emplace (&m_manager, description, join ? join_with : 0);
+#else
+      transaction.reset (new db::Transaction (&m_manager, description, join ? join_with : 0));
+#endif
+    }
+    lay::LayerProperties props (*layer);
+    props.set_visible (visible);
+    target->set_properties (layer, props);
+  };
+
+  for (lay::LayerPropertiesConstIterator l = target->begin_layers (); ! l.at_end (); ++l) {
+    if (l->has_children () || ! l->is_standard_layer ()) {
+      continue;
+    }
+    db::LayerProperties key = layer_identity (target, l);
+    auto v = visibility.find (key);
+    if (v == visibility.end ()) {
+      continue;
+    }
+
+    if (v->second) {
+      for (lay::LayerPropertiesConstIterator p = l.parent (); ! p.is_null (); p = p.parent ()) {
+        if (! p->visible (false)) {
+          set_visible (p, true);
+        }
+      }
+    }
+
+    if (l->visible (false) != v->second) {
+      set_visible (l, v->second);
+    }
+  }
+
+  for (const auto &layer : hidden_unmatched) {
+    if (layer->visible (true)) {
+      set_visible (layer, false);
+    }
   }
 }
 
@@ -2976,6 +3154,10 @@ void
 MainWindow::close_view (int index)
 {
   if (view (index)) {
+
+    if (m_pending_layer_sync && view (index) == current_view ()) {
+      flush_pending_layer_sync ();
+    }
 
     cancel ();
 
@@ -3505,6 +3687,10 @@ MainWindow::create_layout (const std::string &technology, int mode)
 void
 MainWindow::add_view (lay::LayoutViewWidget *view)
 {
+  flush_pending_layer_sync ();
+
+  view->view ()->layer_list_changed_event.add (this, &MainWindow::active_layers_changed, view->view ());
+  view->view ()->current_layer_list_changed_event.add (this, &MainWindow::active_layer_list_changed, view->view ());
   connect (view, SIGNAL (title_changed (lay::LayoutView *)), this, SLOT (view_title_changed (lay::LayoutView *)));
   connect (view, SIGNAL (dirty_changed (lay::LayoutView *)), this, SLOT (view_title_changed (lay::LayoutView *)));
   connect (view, SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
@@ -3551,10 +3737,15 @@ MainWindow::do_create_view ()
 int
 MainWindow::create_view ()
 {
+  lay::LayoutView *previous_view = current_view ();
+
   //  create a new view
   int view_index = do_create_view ();
 
   //  add a new tab and make the new view the current one
+  if (m_synchronized_layers && previous_view) {
+    synchronize_layers (previous_view, view (view_index));
+  }
   mp_views.back ()->view ()->set_current ();
 
   mp_view_stack->add_widget (mp_views.back ());
@@ -3582,6 +3773,7 @@ lay::CellViewRef
 MainWindow::create_or_load_layout (const std::string *filename, const db::LoadLayoutOptions *options, const std::string &technology, int mode)
 {
   lay::LayoutView *vw = 0;
+  lay::LayoutView *previous_view = current_view ();
 
   if (! current_view ()) {
     mode = 1;
@@ -3618,6 +3810,9 @@ MainWindow::create_or_load_layout (const std::string *filename, const db::LoadLa
     //  make the new view the current one
     if (mode == 1) {
 
+      if (m_synchronized_layers && previous_view) {
+        synchronize_layers (previous_view, vw);
+      }
       mp_views.back ()->view ()->set_current ();
 
       mp_view_stack->add_widget (mp_views.back ());
@@ -4632,6 +4827,7 @@ public:
     menu_entries.push_back (lay::config_menu_item ("show_ghost_cells", at, tl::to_string (QObject::tr ("Show Unresolved References")), cfg_ghost_cells_visible, "?"));
     menu_entries.push_back (lay::config_menu_item ("no_stipples", at, tl::to_string (QObject::tr ("Show Layers Without Fill")), cfg_no_stipple, "?"));
     menu_entries.push_back (lay::config_menu_item ("synchronized_views", at, tl::to_string (QObject::tr ("Synchronized Views")), cfg_synchronized_views, "?"));
+    menu_entries.push_back (lay::config_menu_item ("synchronized_layers", at, tl::to_string (QObject::tr ("Synchronized Layers")), cfg_synchronized_layers, "?"));
     menu_entries.push_back (lay::config_menu_item ("edit_top_level_selection:edit_mode", at, tl::to_string (QObject::tr ("Select Top Level Objects")), edt::cfg_edit_top_level_selection, "?"));
     menu_entries.push_back (lay::separator ("panels_group", at));
     menu_entries.push_back (lay::config_menu_item ("show_toolbar", at, tl::to_string (QObject::tr ("Toolbar")), cfg_show_toolbar, "?"));
@@ -4675,4 +4871,3 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new MainWindowPluginDeclaration (), -100, "MainWindowPlugin");
 
 } // namespace lay
-

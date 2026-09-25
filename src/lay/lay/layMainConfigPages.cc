@@ -60,6 +60,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_edit_mode, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_custom_macro_paths, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_synchronized_views, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_synchronized_layers, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_default_grids, "0.01,0.005,0.001"));
     options.push_back (std::pair<std::string, std::string> (cfg_mru, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_mru_sessions, ""));
@@ -100,7 +101,7 @@ public:
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Customize Menu")), new CustomizeMenuConfigPage (parent)));
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Units")), new MainConfigPage5 (parent)));
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Circles")), new MainConfigPage6 (parent)));
-    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|Synchronized Views")), new MainConfigPage2 (parent)));
+    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|Synchronization")), new MainConfigPage2 (parent)));
     return pages;
   }
 };
@@ -245,12 +246,15 @@ MainConfigPage2::setup (lay::Dispatcher *root)
   bool flag = false;
   root->config_get (cfg_synchronized_views, flag);
   mp_ui->sync_views_cbx->setChecked (flag);
+  root->config_get (cfg_synchronized_layers, flag);
+  mp_ui->sync_layers_cbx->setChecked (flag);
 }
 
 void 
 MainConfigPage2::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_synchronized_views, mp_ui->sync_views_cbx->isChecked ());
+  root->config_set (cfg_synchronized_layers, mp_ui->sync_layers_cbx->isChecked ());
 }
 
 // -------------------------------------------------------------
@@ -753,4 +757,3 @@ CustomizeMenuConfigPage::current_changed (QTreeWidgetItem *current, QTreeWidgetI
 }
 
 }
-

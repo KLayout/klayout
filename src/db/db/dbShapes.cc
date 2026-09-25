@@ -30,6 +30,19 @@
 #include "dbLayout.h"
 
 #include <limits>
+#include <algorithm>
+
+#if __cplusplus >= 201703L
+  #if __has_include(<execution>)
+    #include <execution>
+  #endif
+#endif
+
+#if defined(__cpp_lib_execution)
+#define PARALLEL_EXEC_POLICY std::execution::par,
+#else
+#define PARALLEL_EXEC_POLICY
+#endif
 
 namespace db
 {
@@ -111,7 +124,7 @@ layer_op<Sh, StableTag>::erase (Shapes *shapes)
     std::vector<bool> done;
     done.resize (m_shapes.size (), false);
 
-    std::sort (m_shapes.begin (), m_shapes.end ());
+    std::sort (PARALLEL_EXEC_POLICY m_shapes.begin (), m_shapes.end ());
 
     typename std::vector<Sh>::const_iterator s_begin = m_shapes.begin ();
     typename std::vector<Sh>::const_iterator s_end = m_shapes.end ();

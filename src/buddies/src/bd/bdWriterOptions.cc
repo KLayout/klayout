@@ -84,6 +84,7 @@ GenericWriterOptions::init_from_options (const db::SaveLayoutOptions &save_optio
   m_magic_lambda = 1.0;
 
   m_dxf_polygon_mode = save_options.get_option_by_name ("dxf_polygon_mode").to_int ();
+  m_dxf_use_layer_names = save_options.get_option_by_name ("dxf_use_layer_names").to_bool ();
 
   m_lstream_compression_level = save_options.get_option_by_name ("lstream_compression_level").to_int ();
   m_lstream_recompress = save_options.get_option_by_name ("lstream_recompress").to_bool ();
@@ -347,6 +348,11 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                     "* 3: create HATCH\n"
                     "* 4: create LINE"
                    )
+        << tl::arg (group +
+                    "#--use-layer-names", &m_dxf_use_layer_names, "Uses layer names instead of numbers",
+                    "If this option is given, the DXF writer will use layer names rather than prepending "
+                    "layer and datatype numbers."
+                   )
       ;
 
   }
@@ -489,6 +495,7 @@ GenericWriterOptions::configure (db::SaveLayoutOptions &save_options, const db::
   save_options.set_option_by_name ("cif_blank_separator", m_cif_blank_separator);
 
   save_options.set_option_by_name ("dxf_polygon_mode", m_dxf_polygon_mode);
+  save_options.set_option_by_name ("dxf_use_layer_names", m_dxf_use_layer_names);
 
   save_options.set_option_by_name ("lstream_compression_level", m_lstream_compression_level);
   save_options.set_option_by_name ("lstream_recompress", m_lstream_recompress);

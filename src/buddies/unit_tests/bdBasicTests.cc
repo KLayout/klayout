@@ -49,6 +49,7 @@ TEST(1)
                    "--dummy-calls",
                    //  DXF
                    "-op=2",
+                   "--use-layer-names",
                    //  GDS2
                    "-ov=250",
                    "--multi-xy-records",
@@ -77,6 +78,7 @@ TEST(1)
   EXPECT_EQ (stream_opt.get_option_by_name ("cif_blank_separator").to_bool (), false);
   EXPECT_EQ (stream_opt.get_option_by_name ("cif_dummy_calls").to_bool (), false);
   EXPECT_EQ (stream_opt.get_option_by_name ("dxf_polygon_mode").to_int (), 0);
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_use_layer_names").to_bool (), false);
   EXPECT_EQ (stream_opt.get_option_by_name ("libname").to_string (), "");
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_max_vertex_count").to_uint (), (unsigned int) 8000);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_multi_xy_records").to_bool (), false);
@@ -105,6 +107,7 @@ TEST(1)
   EXPECT_EQ (stream_opt.get_option_by_name ("cif_blank_separator").to_bool (), true);
   EXPECT_EQ (stream_opt.get_option_by_name ("cif_dummy_calls").to_bool (), true);
   EXPECT_EQ (stream_opt.get_option_by_name ("dxf_polygon_mode").to_int (), 2);
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_use_layer_names").to_bool (), true);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_max_vertex_count").to_uint (), (unsigned int) 250);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_multi_xy_records").to_bool (), true);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_timestamps").to_bool (), false);

@@ -366,6 +366,16 @@ static int get_dxf_polygon_mode (const db::SaveLayoutOptions *options)
   return options->get_options<db::DXFWriterOptions> ().polygon_mode;
 }
 
+static void set_dxf_use_layer_names (db::SaveLayoutOptions *options, bool flag)
+{
+  options->get_options<db::DXFWriterOptions> ().use_layer_names = flag;
+}
+
+static bool get_dxf_use_layer_names (const db::SaveLayoutOptions *options)
+{
+  return options->get_options<db::DXFWriterOptions> ().use_layer_names;
+}
+
 //  extend lay::SaveLayoutOptions with the DXF options
 static
 gsi::ClassExt<db::SaveLayoutOptions> dxf_writer_options (
@@ -379,6 +389,17 @@ gsi::ClassExt<db::SaveLayoutOptions> dxf_writer_options (
     "@brief Specifies how to write polygons.\n"
     "See \\dxf_polygon_mode= for a description of this property.\n"
     "\nThis property has been added in version 0.21.3.\n"
+  ) +
+  gsi::method_ext ("dxf_use_layer_names=", &set_dxf_use_layer_names, gsi::arg ("flag"),
+    "@brief Specifies whether to use layer names.\n"
+    "If this property is set to true, layer names will be used instead of layer/datatype numbers "
+    "when available (e.g. 'PAD' instead of 'L18D0_PAD').\n"
+    "\nThis property has been added in version 0.30.13.\n"
+  ) +
+  gsi::method_ext ("dxf_use_layer_names?|#dxf_use_layer_names", &get_dxf_use_layer_names,
+    "@brief Specifies whether to use layer names.\n"
+    "See \\dxf_use_layer_names= for a description of this property.\n"
+    "\nThis property has been added in version 0.30.13.\n"
   ),
   ""
 );

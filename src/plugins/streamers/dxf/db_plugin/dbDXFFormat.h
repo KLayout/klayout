@@ -201,7 +201,8 @@ public:
    *  @brief The constructor
    */
   DXFWriterOptions ()
-    : polygon_mode (0)
+    : polygon_mode (0),
+      use_layer_names (false)
   {
     //  .. nothing yet ..
   }
@@ -216,6 +217,14 @@ public:
    *  4: create LINE: refer to 'void DXFWriter::write_polygon()' definition
    */
   int polygon_mode;
+
+  /**
+   *  @brief A flag indicating whether to use layer names instead of layer/datatype numbers
+   *
+   *  If this flag is true, the writer will use the layer name (if present) as the DXF layer name
+   *  rather than prepending layer and datatype numbers (e.g., "PAD" instead of "L18D0_PAD").
+   */
+  bool use_layer_names;
 
   /** 
    *  @brief Implementation of FormatSpecificWriterOptions

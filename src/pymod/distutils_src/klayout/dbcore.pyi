@@ -65045,6 +65045,20 @@ class SaveLayoutOptions:
 
     This property has been added in version 0.21.3. '4', in version 0.25.6.
     """
+    dxf_use_layer_names: bool
+    r"""
+    Getter:
+    @brief Specifies whether to use layer names.
+    See \dxf_use_layer_names= for a description of this property.
+
+    This property has been added in version 0.30.13.
+
+    Setter:
+    @brief Specifies whether to use layer names.
+    If this property is set to true, layer names will be used instead of layer/datatype numbers when available (e.g. 'PAD' instead of 'L18D0_PAD').
+
+    This property has been added in version 0.30.13.
+    """
     format: str
     r"""
     Getter:

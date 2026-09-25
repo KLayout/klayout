@@ -89,6 +89,11 @@ class SaveLayoutOptions_TestClass < TestBase
     opt.dxf_polygon_mode = 2
     assert_equal(opt.dxf_polygon_mode, 2)
 
+    opt.dxf_use_layer_names = true
+    assert_equal(opt.dxf_use_layer_names?, true)
+    opt.dxf_use_layer_names = false
+    assert_equal(opt.dxf_use_layer_names?, false)
+
     opt.gds2_libname = "MYLIB"
     assert_equal(opt.gds2_libname, "MYLIB")
 
@@ -135,6 +140,7 @@ class SaveLayoutOptions_TestClass < TestBase
     assert_equal(opt.gds2_write_timestamps?, false)
 
     assert_equal(opt.dxf_polygon_mode, 2)
+    assert_equal(opt.dxf_use_layer_names?, false)
 
     opt.oasis_compression_level = 5
     assert_equal(opt.oasis_compression_level, 5)

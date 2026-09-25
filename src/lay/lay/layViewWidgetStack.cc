@@ -68,6 +68,17 @@ void ViewWidgetStack::remove_widget (size_t index)
   }
 }
 
+void ViewWidgetStack::move_widget (size_t from, size_t to)
+{
+  if (from == to || from >= m_widgets.size () || to >= m_widgets.size ()) {
+    return;
+  }
+
+  LayoutViewWidget *w = m_widgets [from];
+  m_widgets.erase (m_widgets.begin () + from);
+  m_widgets.insert (m_widgets.begin () + to, w);
+}
+
 void ViewWidgetStack::raise_widget (size_t index)
 {
   if (index < m_widgets.size ()) {

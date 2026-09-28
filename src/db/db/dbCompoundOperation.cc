@@ -84,6 +84,8 @@ static void translate (db::Layout *layout, const std::vector<std::unordered_set<
   if (out.size () <= in.size ()) {
     out.resize (in.size ());
   }
+  //  child tasks share the layout, so the shape repository needs guarding
+  tl::MutexLocker locker (&layout->lock ());
   for (std::vector<std::unordered_set<db::PolygonWithProperties> >::const_iterator r = in.begin (); r != in.end (); ++r) {
     std::unordered_set<db::PolygonRefWithProperties> &o = out[r - in.begin ()];
     for (std::unordered_set<db::PolygonWithProperties>::const_iterator p = r->begin (); p != r->end (); ++p) {
@@ -607,6 +609,8 @@ init_edges (db::Edges &ee, const std::unordered_set<db::EdgeWithProperties> &e)
 static void
 write_result (db::Layout *layout, std::unordered_set<db::PolygonRefWithProperties> &results, const db::Region &r)
 {
+  //  child tasks share the layout, so the shape repository needs guarding
+  tl::MutexLocker locker (&layout->lock ());
   for (db::Region::const_iterator p = r.begin (); ! p.at_end (); ++p) {
     results.insert (db::PolygonRefWithProperties (db::PolygonRef (*p, layout->shape_repository ()), p.prop_id ()));
   }
@@ -906,6 +910,8 @@ namespace
 
     void finish (db::Layout *layout)
     {
+      //  sibling tasks may intern into the same layout: lock once per batch
+      tl::MutexLocker locker (&layout->lock ());
       for (size_t i = 0; i < m_intermediate.size (); ++i) {
         for (db::Shapes::shape_iterator s = m_intermediate [i]->begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
           insert (layout, *s, (*mp_results)[i]);
@@ -1346,6 +1352,9 @@ CompoundRegionProcessingOperationNode::processed (db::Layout *layout, const db::
 {
   std::vector<db::PolygonWithProperties> poly;
   mp_proc->process (db::PolygonWithProperties (p.obj ().transformed (p.trans ()), p.properties_id ()), poly);
+
+  //  sibling tasks may intern into the same layout concurrently
+  tl::MutexLocker locker (&layout->lock ());
   for (std::vector<db::PolygonWithProperties>::const_iterator i = poly.begin (); i != poly.end (); ++i) {
     res.push_back (db::PolygonRefWithProperties (db::PolygonRef (*i, layout->shape_repository ()), i->properties_id ()));
   }
@@ -1373,6 +1382,8 @@ CompoundRegionProcessingOperationNode::processed (db::Layout *layout, const db::
 
   if (! poly.empty ()) {
     db::ICplxTrans tri = tr.inverted ();
+    //  sibling tasks may intern into the same layout concurrently
+    tl::MutexLocker locker (&layout->lock ());
     for (std::vector<db::PolygonWithProperties>::const_iterator i = poly.begin (); i != poly.end (); ++i) {
       res.push_back (db::PolygonRefWithProperties (db::PolygonRef (tri * *i, layout->shape_repository ()), i->properties_id ()));
     }
@@ -1520,6 +1531,8 @@ CompoundRegionEdgeToPolygonProcessingOperationNode::processed (db::Layout *layou
   std::vector<db::PolygonWithProperties> polygons;
   mp_proc->process (e, polygons);
 
+  //  sibling tasks may intern into the same layout concurrently
+  tl::MutexLocker locker (&layout->lock ());
   for (std::vector<db::PolygonWithProperties>::const_iterator p = polygons.begin (); p != polygons.end (); ++p) {
     res.push_back (db::PolygonRefWithProperties (db::PolygonRef (*p, layout->shape_repository ()), p->properties_id ()));
   }
@@ -1633,6 +1646,8 @@ CompoundRegionEdgePairToPolygonProcessingOperationNode::processed (db::Layout *l
   std::vector<db::PolygonWithProperties> polygons;
   mp_proc->process (e, polygons);
 
+  //  sibling tasks may intern into the same layout concurrently
+  tl::MutexLocker locker (&layout->lock ());
   for (std::vector<db::PolygonWithProperties>::const_iterator p = polygons.begin (); p != polygons.end (); ++p) {
     res.push_back (db::PolygonRefWithProperties (db::PolygonRef (*p, layout->shape_repository ()), p->properties_id ()));
   }

@@ -226,10 +226,7 @@ Cell::shapes (unsigned int index) const
   } else {
     //  Because of a gcc bug it seems to be not possible
     //  to instantiate a simple static object here:
-    static const shapes_type *empty_shapes = 0;
-    if (! empty_shapes) {
-      empty_shapes = new shapes_type ();
-    }
+    static const shapes_type *empty_shapes = new shapes_type ();
     return *empty_shapes;
   }
 }

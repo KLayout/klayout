@@ -764,6 +764,7 @@ DeepRegion::ensure_merged_polygons_valid () const
       db::Connectivity conn;
       conn.connect (deep_layer ());
       hc.set_base_verbosity (base_verbosity () + 10);
+      hc.set_threads (deep_layer ().store () ? unsigned (deep_layer ().store ()->threads ()) : 0);
       hc.build (layout, deep_layer ().initial_cell (), conn, 0, deep_layer ().breakout_cells (), ! join_properties_on_merge ());
 
       //  collect the clusters and merge them into big polygons
@@ -2045,6 +2046,7 @@ DeepRegion::merged (bool min_coherence, unsigned int min_wc, bool join_propertie
   db::Connectivity conn;
   conn.connect (deep_layer ());
   hc.set_base_verbosity (base_verbosity () + 10);
+  hc.set_threads (deep_layer ().store () ? unsigned (deep_layer ().store ()->threads ()) : 0);
   hc.build (layout, deep_layer ().initial_cell (), conn, 0, 0, ! join_properties_on_merge);
 
   //  collect the clusters and merge them into big polygons

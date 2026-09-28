@@ -40,6 +40,10 @@
 #include <set>
 #include <limits>
 
+//  Feature macro for code (unit tests, benchmarks) which must also compile
+//  against versions of this header without hier_clusters::set_threads
+#define DB_HIER_CLUSTERS_HAS_THREADS 1
+
 namespace tl {
   class RelativeProgress;
 }
@@ -1390,6 +1394,19 @@ public:
   void set_base_verbosity (int bv);
 
   /**
+   *  @brief Sets the number of threads to use for the local cluster builds
+   *
+   *  0 or 1 means serial execution (the default). Used as the team size for the
+   *  parallel per-cell local cluster builds.
+   */
+  void set_threads (unsigned int n);
+
+  /**
+   *  @brief Gets the number of threads to use for the local cluster builds
+   */
+  unsigned int threads () const;
+
+  /**
    *  @brief A constant indicating the top cell for the equivalence cluster key
    */
   static const db::cell_index_type top_cell_index;
@@ -1447,6 +1464,7 @@ private:
 
   std::map<db::cell_index_type, connected_clusters<T> > m_per_cell_clusters;
   int m_base_verbosity;
+  unsigned int m_threads;
 };
 
 /**

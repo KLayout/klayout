@@ -212,6 +212,7 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
 
   //  the big part: actually extract the nets
 
+  mp_clusters->set_threads (dss.threads () > 0 ? unsigned (dss.threads ()) : 0);
   mp_clusters->build (*mp_layout, *mp_cell, conn, &net_name_equivalence);
 
   //  reverse lookup for Circuit vs. cell index

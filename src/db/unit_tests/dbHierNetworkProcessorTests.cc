@@ -32,6 +32,10 @@
 #include "dbStream.h"
 #include "dbCommonReader.h"
 
+#if defined(_OPENMP)
+#  include <omp.h>
+#endif
+
 static std::string l2s (db::Connectivity::layer_iterator b, db::Connectivity::layer_iterator e)
 {
   std::string s;
@@ -1565,5 +1569,173 @@ TEST(201_issue1126)
 
   //  detailed test:
   run_hc_test (_this, "issue-1126.gds.gz", "issue-1126_au.gds");
+}
+
+//  A canonical dump of the hierarchical clusters: cluster IDs, root status, shapes, the
+//  connections down into the child cells and the net (root cluster) count per cell.
+//  Cluster IDs of connector clusters depend on the insertion order, so this dumps the
+//  full of what a schedule-dependent build could change.
+static std::string hier_clusters_to_string (const db::Layout &ly, const db::hier_clusters<db::PolygonRef> &hc, const db::Connectivity &conn)
+{
+  std::string res;
+  for (db::Layout::top_down_const_iterator td = ly.begin_top_down (); td != ly.end_top_down (); ++td) {
+
+    const db::connected_clusters<db::PolygonRef> &cc = hc.clusters_per_cell (*td);
+
+    std::string cell_res;
+    for (db::connected_clusters<db::PolygonRef>::all_iterator c = cc.begin_all (); ! c.at_end (); ++c) {
+
+      if (! cell_res.empty ()) {
+        cell_res += "\n";
+      }
+
+      cell_res += "#" + tl::to_string (*c);
+      cell_res += cc.is_root (*c) ? "R" : "C";
+      cell_res += local_cluster_to_string (cc.cluster_by_id (*c), conn);
+
+      const db::connected_clusters<db::PolygonRef>::connections_type &x = cc.connections_for_cluster (*c);
+      for (db::connected_clusters<db::PolygonRef>::connections_type::const_iterator i = x.begin (); i != x.end (); ++i) {
+        cell_res += " (" + std::string (ly.cell_name (i->inst_cell_index ())) + "@" + i->inst_trans ().to_string () + ":" + tl::to_string (i->id ()) + ")";
+      }
+
+      const std::set<size_t> &down = cc.downward_soft_connections (*c);
+      for (std::set<size_t>::const_iterator i = down.begin (); i != down.end (); ++i) {
+        cell_res += " (#" + tl::to_string (*i) + "->#" + tl::to_string (*c) + ")";
+      }
+
+    }
+
+    if (cc.begin_all ().at_end ()) {
+      continue;
+    }
+
+    if (! res.empty ()) {
+      res += "\n";
+    }
+    res += std::string (ly.cell_name (*td)) + " nets=" + tl::to_string (root_nets (cc)) + ":\n" + cell_res;
+
+  }
+  return res;
+}
+
+//  Many parents in one bottom-up wave, all sharing the same few child cells. The wave
+//  is where several workers write into each other's cells: the child clusters are
+//  connected through all parents, and the per-parent displacements create more than 20
+//  variants for the same child pair in the instance interaction cache.
+#if defined(_OPENMP)
+//  RAII guard restoring the OpenMP thread count for the tests following after this one
+struct ScopedOmpNumThreads
+{
+  ScopedOmpNumThreads ()
+    : m_max_threads (omp_get_max_threads ())
+  {
+    omp_set_dynamic (0);
+  }
+
+  ~ScopedOmpNumThreads ()
+  {
+    omp_set_num_threads (m_max_threads);
+  }
+
+private:
+  int m_max_threads;
+};
+#endif
+
+TEST(210_HierClustersSharedChildrenDeterministic)
+{
+#if defined(_OPENMP)
+  ScopedOmpNumThreads omp_guard;
+#endif
+
+  const int nparents = 32;
+
+  db::Layout ly;
+  unsigned int l1 = ly.insert_layer (db::LayerProperties (1, 0));
+
+  db::Cell &top = ly.cell (ly.add_cell ("TOP"));
+
+  std::vector<db::cell_index_type> children;
+  for (int j = 0; j < 3; ++j) {
+    db::Cell &child = ly.cell (ly.add_cell (tl::sprintf ("CHILD_%d", j).c_str ()));
+    children.push_back (child.cell_index ());
+    for (int b = 0; b < 4; ++b) {
+      //  a chain of overlapping boxes - one cluster per child cell
+      child.shapes (l1).insert (make_box (ly, db::Box (b * 20, 0, b * 20 + 40, 40)));
+    }
+  }
+
+  std::vector<db::cell_index_type> parents;
+  for (int p = 0; p < nparents; ++p) {
+    db::Cell &parent = ly.cell (ly.add_cell (tl::sprintf ("PARENT_%d", p).c_str ()));
+    parents.push_back (parent.cell_index ());
+    for (int j = 0; j < 3; ++j) {
+      //  two overlapping instances of the same child. The displacement of the second one is
+      //  different in every parent (13 is coprime to 100), so the 32 parents create more than
+      //  20 transformation variants for the same child pair - enough to drive the eviction of
+      //  the shared interaction cache.
+      int dx = (p * 13) % 100 + 10;
+      parent.insert (db::CellInstArray (db::CellInst (children [j]), db::Trans (0, false, db::Vector (0, j * 100))));
+      parent.insert (db::CellInstArray (db::CellInst (children [j]), db::Trans (0, false, db::Vector (dx, j * 100 + 17))));
+    }
+    //  a local shape connecting to the first child instance: local-cluster-to-instance
+    //  propagation on top of the instance-to-instance case
+    parent.shapes (l1).insert (make_box (ly, db::Box (-20, -20, 20, 20)));
+    top.insert (db::CellInstArray (db::CellInst (parent.cell_index ()), db::Trans (0, false, db::Vector (p * 1000, 0))));
+  }
+
+  db::Connectivity conn;
+  conn.connect (l1, l1);
+
+  std::string reference;
+  std::vector<size_t> reference_child_nets;
+
+  {
+#if defined(_OPENMP)
+    omp_set_dynamic (0);
+    omp_set_num_threads (1);
+#endif
+    db::hier_clusters<db::PolygonRef> hc;
+    hc.build (ly, top, conn);
+    reference = hier_clusters_to_string (ly, hc, conn);
+    for (size_t j = 0; j < children.size (); ++j) {
+      reference_child_nets.push_back (root_nets (hc.clusters_per_cell (children [j])));
+    }
+  }
+
+  //  sanity: the dump is not trivial
+  EXPECT_EQ (reference.empty (), false);
+  EXPECT_EQ (reference.find ("PARENT_") != std::string::npos, true);
+  EXPECT_EQ (reference.find ("CHILD_") != std::string::npos, true);
+
+  //  netlist-level result: the clusters of the shared children are connected from every
+  //  parent, so no child cell contributes a net of its own
+  for (size_t j = 0; j < children.size (); ++j) {
+    EXPECT_EQ (reference_child_nets [j], size_t (0));
+  }
+
+  //  the same build at different thread counts must reproduce the 1-thread dump exactly
+  for (int nt = 1; nt <= 8; nt *= 2) {
+
+#if defined(_OPENMP)
+    omp_set_dynamic (0);
+    omp_set_num_threads (nt);
+    const int repeats = nt == 1 ? 3 : 30;
+#else
+    const int repeats = 3;
+#endif
+
+    for (int r = 0; r < repeats; ++r) {
+      db::hier_clusters<db::PolygonRef> hc;
+      hc.build (ly, top, conn);
+      std::string dump = hier_clusters_to_string (ly, hc, conn);
+      if (dump != reference) {
+        EXPECT_EQ (dump, reference);
+        break;
+      }
+    }
+
+  }
+
 }
 

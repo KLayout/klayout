@@ -36,6 +36,9 @@
 #include "tlTimer.h"
 #include "tlInternational.h"
 
+#include <atomic>
+#include <exception>
+
 // ---------------------------------------------------------------------------------------------
 //  Cronology debugging support (TODO: experimental)
 
@@ -1258,9 +1261,27 @@ local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, T
         try {
 #if defined(_OPENMP)
           int nthreads = threads();
+          //  exceptions must not leave the parallel region (std::terminate), so collect and rethrow
+          std::exception_ptr first_error;
+          std::atomic<bool> has_error (false);
+          tl::Mutex error_lock;
           #pragma omp parallel for num_threads(nthreads) schedule(dynamic)
           for (long long i = 0; i < (long long)tasks.size(); ++i) {
-            tasks[i]->perform();
+            if (has_error.load ()) {
+              continue;
+            }
+            try {
+              tasks[i]->perform();
+            } catch (...) {
+              tl::MutexLocker locker (& error_lock);
+              if (! first_error) {
+                first_error = std::current_exception ();
+                has_error.store (true);
+              }
+            }
+          }
+          if (first_error) {
+            std::rethrow_exception (first_error);
           }
 #else
           std::unique_ptr<tl::Job<local_processor_result_computation_worker<TS, TI, TR> > > rc_job (new tl::Job<local_processor_result_computation_worker<TS, TI, TR> > (threads ()));

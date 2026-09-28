@@ -1739,3 +1739,109 @@ TEST(210_HierClustersSharedChildrenDeterministic)
 
 }
 
+
+//  The local clusters are built for all called cells in parallel. Every cell only
+//  contributes its own clusters, so the result must not depend on the thread count.
+TEST(211_LocalClustersParallelDeterministic)
+{
+#if defined(_OPENMP)
+  ScopedOmpNumThreads thread_count_guard;
+#endif
+
+  const int ncells = 200;
+
+  db::Layout ly;
+  unsigned int l1 = ly.insert_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.insert_layer (db::LayerProperties (2, 0));
+
+  db::Cell &top = ly.cell (ly.add_cell ("TOP"));
+
+  std::vector<db::cell_index_type> leaves;
+  leaves.reserve (size_t (ncells));
+  for (int c = 0; c < ncells; ++c) {
+    db::Cell &leaf = ly.cell (ly.add_cell (tl::sprintf ("LEAF_%d", c).c_str ()));
+    leaves.push_back (leaf.cell_index ());
+
+    //  a chain of overlapping metal boxes with a via on top of each of them:
+    //  one connected cluster per cell
+    for (int b = 0; b < 8; ++b) {
+      leaf.shapes (l1).insert (make_box (ly, db::Box (b * 40, 0, b * 40 + 60, 100)));
+      leaf.shapes (l2).insert (make_box (ly, db::Box (b * 40 + 10, 10, b * 40 + 50, 90)));
+    }
+
+    //  two isolated boxes with different attributes: joined into one cluster for every
+    //  third cell by the attribute equivalence below ("by cell index" lookup)
+    leaf.shapes (l1).insert (db::PolygonRefWithProperties (make_box (ly, db::Box (-100, -100, -20, -20)), 5));
+    leaf.shapes (l1).insert (db::PolygonRefWithProperties (make_box (ly, db::Box (600, -100, 700, -20)), 6));
+
+    //  a text label on a connectivity layer: not a polygon, but it is on a scanned layer
+    leaf.shapes (l1).insert (db::Text ("LABEL", db::Trans (db::Vector (0, 200))));
+
+    top.insert (db::CellInstArray (db::CellInst (leaf.cell_index ()), db::Trans (0, false, db::Vector (c * 1000, 0))));
+  }
+
+  db::Connectivity conn;
+  conn.connect (l1, l1);
+  conn.connect (l1, l2);
+
+  std::map<db::cell_index_type, tl::equivalence_clusters<size_t> > attr_equivalence;
+  for (size_t i = 0; i < leaves.size (); i += 3) {
+    attr_equivalence [leaves [i]].same (size_t (5), size_t (6));
+  }
+  //  the "top_cell_index" entry is looked for when the top cell is resolved
+  attr_equivalence [db::hier_clusters<db::PolygonRef>::top_cell_index].same (size_t (5), size_t (6));
+
+  std::string reference;
+
+  {
+#if defined(_OPENMP)
+    omp_set_dynamic (0);
+    omp_set_num_threads (1);
+#endif
+    db::hier_clusters<db::PolygonRef> hc;
+#if defined(DB_HIER_CLUSTERS_HAS_THREADS)
+    hc.set_threads (1);
+#endif
+    hc.build (ly, top, conn, &attr_equivalence);
+    reference = hier_clusters_to_string (ly, hc, conn);
+  }
+
+  //  sanity: the dump is not trivial and covers labels, attributes and joined clusters
+  EXPECT_EQ (reference.empty (), false);
+  EXPECT_EQ (reference.find ("LEAF_") != std::string::npos, true);
+  EXPECT_EQ (reference.find ("%") != std::string::npos, true);
+
+  //  the same build at different thread counts must reproduce the 1-thread dump exactly
+#if defined(_OPENMP)
+  for (int nt = 1; nt <= 8; nt *= 2) {
+
+    omp_set_num_threads (nt);
+    const int repeats = 10;
+
+    for (int r = 0; r < repeats; ++r) {
+      db::hier_clusters<db::PolygonRef> hc;
+#if defined(DB_HIER_CLUSTERS_HAS_THREADS)
+      hc.set_threads (unsigned (nt));
+#endif
+      hc.build (ly, top, conn, &attr_equivalence);
+      std::string dump = hier_clusters_to_string (ly, hc, conn);
+      if (dump != reference) {
+        EXPECT_EQ (dump, reference);
+        break;
+      }
+    }
+
+  }
+#else
+  for (int r = 0; r < 10; ++r) {
+    db::hier_clusters<db::PolygonRef> hc;
+    hc.build (ly, top, conn, &attr_equivalence);
+    std::string dump = hier_clusters_to_string (ly, hc, conn);
+    if (dump != reference) {
+      EXPECT_EQ (dump, reference);
+      break;
+    }
+  }
+#endif
+}
+

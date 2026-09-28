@@ -381,6 +381,171 @@ TEST(2)
   run_test2(_this, 10000, 2, 10000);
 }
 
+//  deterministic LCG so the tests are reproducible;
+//  use the high bits since the low bits of an LCG have short periods
+uint32_t bs_test_rand (uint32_t &state)
+{
+  state = state * 1664525u + 1013904223u;
+  return state >> 13;
+}
+
+std::vector<db::Box> bs_test_boxes (size_t n, int box_size, int spread, uint32_t seed)
+{
+  std::vector<db::Box> bb;
+  bb.reserve (n);
+  uint32_t state = seed;
+  for (size_t i = 0; i < n; ++i) {
+    db::Coord x = db::Coord (bs_test_rand (state) % uint32_t (spread));
+    db::Coord y = db::Coord (bs_test_rand (state) % uint32_t (spread));
+    bb.push_back (db::Box (x, y, x + db::Coord (box_size), y + db::Coord (box_size)));
+  }
+  return bb;
+}
+
+struct BoxScannerPairRecorder
+{
+  BoxScannerPairRecorder () : n_adds (0), n_finish (0) { }
+
+  void finish (const db::Box *, size_t) { ++n_finish; }
+  bool stop () const { return false; }
+  void initialize () { }
+  void finalize (bool) { }
+
+  void add (const db::Box * /*b1*/, size_t p1, const db::Box * /*b2*/, size_t p2)
+  {
+    ++n_adds;
+    interactions.insert (std::make_pair (p1, p2));
+    interactions.insert (std::make_pair (p2, p1));
+  }
+
+  size_t n_adds, n_finish;
+  std::set<std::pair<size_t, size_t> > interactions;
+};
+
+//  compares the sorted list of pairs reported by the scanner against a brute-force
+//  overlap check ("touches" like above), for a deterministic random population
+void run_test3 (tl::TestBase *_this, size_t n, int box_size, int spread, double ff)
+{
+  const std::vector<db::Box> bb = bs_test_boxes (n, box_size, spread, 12345u);
+
+  db::box_scanner<db::Box, size_t> bs;
+  for (size_t i = 0; i < bb.size (); ++i) {
+    bs.insert (&bb [i], i);
+  }
+
+  BoxScannerPairRecorder tr;
+  bs.set_fill_factor (ff);
+  db::box_convert<db::Box> bc;
+  bs.set_scanner_threshold (0);
+  EXPECT_EQ (bs.process (tr, 1, bc), true);
+
+  std::set<std::pair<size_t, size_t> > interactions;
+  for (size_t i = 0; i < bb.size (); ++i) {
+    for (size_t j = i + 1; j < bb.size (); ++j) {
+      if (bb [i].touches (bb [j])) {
+        interactions.insert (std::make_pair (i, j));
+        interactions.insert (std::make_pair (j, i));
+      }
+    }
+  }
+
+  EXPECT_EQ (interactions == tr.interactions, true);
+  //  every pair must be reported exactly once
+  EXPECT_EQ (tr.n_adds, interactions.size () / 2);
+  //  every object must be finished exactly once
+  EXPECT_EQ (tr.n_finish, bb.size ());
+}
+
+TEST(3)
+{
+  //  sparse: most boxes see 0 or 1 neighbours ("lonely pairs")
+  run_test3 (_this, 600, 20, 1550, 0.0);
+  run_test3 (_this, 600, 20, 1550, 2.0);
+  //  dense: some 50 overlaps per box
+  run_test3 (_this, 600, 20, 139, 0.0);
+  run_test3 (_this, 600, 20, 139, 2.0);
+  //  very dense: boxes much larger than their spacing
+  run_test3 (_this, 200, 50, 82, 0.0);
+  run_test3 (_this, 200, 50, 82, 2.0);
+}
+
+struct BoxScannerPairRecorderTwo
+{
+  BoxScannerPairRecorderTwo () : n_adds (0), n_finish1 (0), n_finish2 (0) { }
+
+  void finish1 (const db::Box *, size_t) { ++n_finish1; }
+  void finish2 (const db::SimplePolygon *, int) { ++n_finish2; }
+  bool stop () const { return false; }
+  void initialize () { }
+  void finalize (bool) { }
+
+  void add (const db::Box * /*b1*/, size_t p1, const db::SimplePolygon * /*b2*/, int p2)
+  {
+    ++n_adds;
+    interactions.insert (std::make_pair (p1, p2));
+  }
+
+  size_t n_adds, n_finish1, n_finish2;
+  std::set<std::pair<size_t, int> > interactions;
+};
+
+//  same as run_test3, but for the twofold scanner
+void run_test3_two (tl::TestBase *_this, size_t n1, size_t n2, int box_size, int spread, double ff)
+{
+  const std::vector<db::Box> bb = bs_test_boxes (n1, box_size, spread, 12345u);
+  const std::vector<db::Box> boxes2 = bs_test_boxes (n2, box_size, spread, 54321u);
+  std::vector<db::SimplePolygon> bb2;
+  bb2.reserve (boxes2.size ());
+  for (size_t i = 0; i < boxes2.size (); ++i) {
+    bb2.push_back (db::SimplePolygon (boxes2 [i]));
+  }
+
+  db::box_scanner2<db::Box, size_t, db::SimplePolygon, int> bs;
+  for (size_t i = 0; i < bb.size (); ++i) {
+    bs.insert1 (&bb [i], i);
+  }
+  for (size_t i = 0; i < bb2.size (); ++i) {
+    bs.insert2 (&bb2 [i], int (i));
+  }
+
+  BoxScannerPairRecorderTwo tr;
+  bs.set_fill_factor (ff);
+  db::box_convert<db::Box> bc1;
+  db::box_convert<db::SimplePolygon> bc2;
+  bs.set_scanner_threshold (0);
+  bs.set_scanner_threshold1 (0);
+  EXPECT_EQ (bs.process (tr, 1, bc1, bc2), true);
+
+  std::set<std::pair<size_t, int> > interactions;
+  for (size_t i = 0; i < bb.size (); ++i) {
+    for (size_t j = 0; j < bb2.size (); ++j) {
+      if (bb [i].touches (bb2 [j].box ())) {
+        interactions.insert (std::make_pair (i, int (j)));
+      }
+    }
+  }
+
+  EXPECT_EQ (interactions == tr.interactions, true);
+  //  every pair must be reported exactly once
+  EXPECT_EQ (tr.n_adds, interactions.size ());
+  //  every object must be finished exactly once
+  EXPECT_EQ (tr.n_finish1, bb.size ());
+  EXPECT_EQ (tr.n_finish2, bb2.size ());
+}
+
+TEST(two_3)
+{
+  //  sparse
+  run_test3_two (_this, 300, 300, 20, 980, 0.0);
+  run_test3_two (_this, 300, 300, 20, 980, 2.0);
+  //  dense
+  run_test3_two (_this, 300, 300, 20, 98, 0.0);
+  run_test3_two (_this, 300, 300, 20, 98, 2.0);
+  //  very dense
+  run_test3_two (_this, 150, 150, 40, 57, 0.0);
+  run_test3_two (_this, 150, 150, 40, 57, 2.0);
+}
+
 
 struct TestCluster
   : public db::cluster<db::Box, size_t>

@@ -17,6 +17,7 @@ SOURCES = \
   dbPLCConvexDecompositionTests.cc \
   dbPLCGraphTests.cc \
   dbPLCTests.cc \
+  dbParallelTests.cc \
   dbPLCTriangulationTests.cc \
   dbPolygonNeighborhoodTests.cc \
   dbPropertiesFilterTests.cc \

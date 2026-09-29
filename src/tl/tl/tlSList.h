@@ -313,7 +313,11 @@ public:
     node_type *n = at.mp_p->next;
     if (n) {
       at.mp_p->next = n->next;
+      if (n == mp_last) {
+        mp_last = at.mp_p;
+      }
       delete n;
+      --m_size;
     }
   }
 

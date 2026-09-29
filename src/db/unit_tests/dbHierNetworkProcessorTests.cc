@@ -1567,3 +1567,104 @@ TEST(201_issue1126)
   run_hc_test (_this, "issue-1126.gds.gz", "issue-1126_au.gds");
 }
 
+//  GlobalNetClusterMaker::add repoints the map entry of one net only when it
+//  merges two entries, so the other nets of the erased entry keep a stale
+//  iterator into the freed list node.  Drives add({G1,G2}), add({G3,G4}),
+//  add({G1,G3}), add({G4}) through 4 instances of TOP: the third call merges
+//  the two entries, the fourth dereferences the stale iterator for G4.
+TEST(202_global_net_cluster_merge)
+{
+  db::Layout ly;
+  unsigned int l1 = ly.insert_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.insert_layer (db::LayerProperties (2, 0));
+  unsigned int l3 = ly.insert_layer (db::LayerProperties (3, 0));
+  unsigned int l4 = ly.insert_layer (db::LayerProperties (4, 0));
+
+  db::Cell &top = ly.cell (ly.add_cell ("TOP"));
+  db::Cell &c1 = ly.cell (ly.add_cell ("C1"));
+  c1.shapes (l1).insert (make_box (ly, db::Box (0, 0, 100, 100)));
+  c1.shapes (l2).insert (make_box (ly, db::Box (100, 0, 200, 100)));
+
+  db::Cell &c2 = ly.cell (ly.add_cell ("C2"));
+  c2.shapes (l3).insert (make_box (ly, db::Box (0, 0, 100, 100)));
+  c2.shapes (l4).insert (make_box (ly, db::Box (100, 0, 200, 100)));
+
+  db::Cell &c3 = ly.cell (ly.add_cell ("C3"));
+  c3.shapes (l1).insert (make_box (ly, db::Box (0, 0, 100, 100)));
+  c3.shapes (l3).insert (make_box (ly, db::Box (100, 0, 200, 100)));
+
+  db::Cell &c4 = ly.cell (ly.add_cell ("C4"));
+  c4.shapes (l4).insert (make_box (ly, db::Box (0, 0, 100, 100)));
+
+  //  instances are fed to GlobalNetClusterMaker in this (x-ascending) order
+  top.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), db::Trans ()));
+  top.insert (db::CellInstArray (db::CellInst (c2.cell_index ()), db::Trans (db::Vector (1000, 0))));
+  top.insert (db::CellInstArray (db::CellInst (c3.cell_index ()), db::Trans (db::Vector (2000, 0))));
+  top.insert (db::CellInstArray (db::CellInst (c4.cell_index ()), db::Trans (db::Vector (3000, 0))));
+
+  db::Connectivity conn;
+  conn.connect (l1, l1);
+  conn.connect (l2, l2);
+  conn.connect (l3, l3);
+  conn.connect (l4, l4);
+  conn.connect (l1, l2);  //  joins the two shapes of C1
+  conn.connect (l3, l4);  //  joins the two shapes of C2
+  conn.connect (l1, l3);  //  joins the two shapes of C3
+
+  EXPECT_EQ (conn.connect_global (l1, "G1"), size_t (0));
+  EXPECT_EQ (conn.connect_global (l2, "G2"), size_t (1));
+  EXPECT_EQ (conn.connect_global (l3, "G3"), size_t (2));
+  EXPECT_EQ (conn.connect_global (l4, "G4"), size_t (3));
+
+  db::hier_clusters<db::PolygonRef> hc;
+  hc.build (ly, top, conn);
+
+  //  all four global nets pull their clusters into one net in TOP
+  const db::connected_clusters<db::PolygonRef> &tc = hc.clusters_per_cell (top.cell_index ());
+  EXPECT_EQ (root_nets (tc), size_t (1));
+
+  size_t root_id = 0;
+  for (db::connected_clusters<db::PolygonRef>::all_iterator c = tc.begin_all (); ! c.at_end (); ++c) {
+    if (tc.is_root (*c)) {
+      root_id = *c;
+    }
+  }
+
+  const db::local_cluster<db::PolygonRef>::global_nets &gn = tc.cluster_by_id (root_id).get_global_nets ();
+  std::string gns;
+  for (db::local_cluster<db::PolygonRef>::global_nets_iterator g = gn.begin (); g != gn.end (); ++g) {
+    if (! gns.empty ()) {
+      gns += ",";
+    }
+    gns += conn.global_net_name (*g);
+  }
+  EXPECT_EQ (gns, "G1,G2,G3,G4");
+
+  //  the TOP net must carry one downward connection into each child cell
+  //  (child cells keep the emptied, joined-away cluster as a formal root, so
+  //  root counts of child cells are not a usable invariant here)
+  const db::connected_clusters<db::PolygonRef>::connections_type &root_connections = tc.connections_for_cluster (root_id);
+  std::set<db::cell_index_type> connected_child_cells;
+  for (db::connected_clusters<db::PolygonRef>::connections_type::const_iterator i = root_connections.begin (); i != root_connections.end (); ++i) {
+    connected_child_cells.insert (i->inst_cell_index ());
+  }
+  EXPECT_EQ (connected_child_cells.size (), size_t (4));
+  EXPECT_EQ (connected_child_cells.count (c1.cell_index ()), size_t (1));
+  EXPECT_EQ (connected_child_cells.count (c2.cell_index ()), size_t (1));
+  EXPECT_EQ (connected_child_cells.count (c3.cell_index ()), size_t (1));
+  EXPECT_EQ (connected_child_cells.count (c4.cell_index ()), size_t (1));
+
+  //  and all 7 shapes are reachable from the TOP root cluster
+  size_t n = 0;
+  for (db::recursive_cluster_iterator<db::PolygonRef> rc (hc, top.cell_index (), root_id); ! rc.at_end (); ++rc) {
+    const db::connected_clusters<db::PolygonRef> &cc = hc.clusters_per_cell (rc.cell_index ());
+    const db::local_cluster<db::PolygonRef> &lc = cc.cluster_by_id (rc.cluster_id ());
+    for (db::Connectivity::all_layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
+      for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (*l); ! s.at_end (); ++s) {
+        ++n;
+      }
+    }
+  }
+  EXPECT_EQ (n, size_t (7));
+}
+

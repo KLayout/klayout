@@ -181,7 +181,7 @@ BoxService::do_mouse_move (const db::DPoint &p)
 
     if (snap_details_y.object_snap != lay::PointSnapToObjectResult::NoObject) {
       if (snap_square) {
-        double dy = fabs (snap_details_y.snapped_point.x () - m_p1.y ());
+        double dy = fabs (snap_details_y.snapped_point.y () - m_p1.y ());
         ps = db::DPoint (m_p1.x () + (ps.x () < m_p1.x () ? -dy : dy), snap_details_y.snapped_point.y ());
       } else {
         ps = db::DPoint (ps.x (), snap_details_y.snapped_point.y ());

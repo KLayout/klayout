@@ -4,12 +4,12 @@
 
 #include <iterator>
 #include <algorithm>
+#include <utility>
 
 /*
- *  This header is a copy of the gcc STL "stl_algo" and "stl_algobase"
- *  functionality where performance enhancements were required.
- *  Such enhancements were necessary for example to use the swap
- *  operation where possible.
+ *  This header originally held a copy of the gcc STL "stl_algo" functionality.
+ *  What remains is the tl::sort introsort and the heapsort fallback it relies on;
+ *  the heap API and nth_element now forward to the standard library.
  */
 
 namespace tl
@@ -74,31 +74,30 @@ namespace tl
 
   template<typename _RandomAccessIter, typename _Tp>
   void
-  __unguarded_linear_insert(_RandomAccessIter __last, const _Tp &__val)
+  __unguarded_linear_insert(_RandomAccessIter __last, _Tp __val)
   {
     _RandomAccessIter __next = __last;
     --__next;
     while (__val < *__next) {
-      *__last = *__next;
+      *__last = std::move(*__next);
       __last = __next;
       --__next;
     }
-    *__last = __val;
+    *__last = std::move(__val);
   }
 
   template<typename _RandomAccessIter, typename _Tp, typename _Compare>
   void
-  __unguarded_linear_insert(_RandomAccessIter __last, const _Tp &__val, 
-                            _Compare __comp)
+  __unguarded_linear_insert(_RandomAccessIter __last, _Tp __val, _Compare __comp)
   {
     _RandomAccessIter __next = __last;
     --__next;
     while (__comp(__val, *__next)) {
-      *__last = *__next;
+      *__last = std::move(*__next);
       __last = __next;
       --__next;
     }
-    *__last = __val;
+    *__last = std::move(__val);
   }
 
   template<typename _RandomAccessIter>
@@ -109,13 +108,13 @@ namespace tl
 
     for (_RandomAccessIter __i = __first + 1; __i != __last; ++__i)
     {
-      typename std::iterator_traits<_RandomAccessIter>::value_type __val = *__i;
+      typename std::iterator_traits<_RandomAccessIter>::value_type __val = std::move(*__i);
       if (__val < *__first) {
-        std::copy_backward(__first, __i, __i + 1);
-        *__first = __val;
+        std::move_backward(__first, __i, __i + 1);
+        *__first = std::move(__val);
       }
       else
-        tl::__unguarded_linear_insert(__i, __val);
+        tl::__unguarded_linear_insert(__i, std::move(__val));
     }
   }
 
@@ -128,13 +127,13 @@ namespace tl
 
     for (_RandomAccessIter __i = __first + 1; __i != __last; ++__i)
     {
-      typename std::iterator_traits<_RandomAccessIter>::value_type __val = *__i;
+      typename std::iterator_traits<_RandomAccessIter>::value_type __val = std::move(*__i);
       if (__comp(__val, *__first)) {
-        std::copy_backward(__first, __i, __i + 1);
-        *__first = __val;
+        std::move_backward(__first, __i, __i + 1);
+        *__first = std::move(__val);
       }
       else
-        tl::__unguarded_linear_insert(__i, __val, __comp);
+        tl::__unguarded_linear_insert(__i, std::move(__val), __comp);
     }
   }
 
@@ -145,7 +144,7 @@ namespace tl
     typedef typename std::iterator_traits<_RandomAccessIter>::value_type _ValueType;
 
     for (_RandomAccessIter __i = __first; __i != __last; ++__i)
-      tl::__unguarded_linear_insert(__i, _ValueType(*__i));
+      tl::__unguarded_linear_insert(__i, _ValueType(std::move(*__i)));
   }
 
   template<typename _RandomAccessIter, typename _Compare>
@@ -156,7 +155,7 @@ namespace tl
     typedef typename std::iterator_traits<_RandomAccessIter>::value_type _ValueType;
 
     for (_RandomAccessIter __i = __first; __i != __last; ++__i)
-      tl::__unguarded_linear_insert(__i, _ValueType(*__i), __comp);
+      tl::__unguarded_linear_insert(__i, _ValueType(std::move(*__i)), __comp);
   }
 
   template<typename _RandomAccessIter>
@@ -234,21 +233,10 @@ namespace tl
     *(__first + __holeIndex) = __v;
   }
 
-  template<typename _RandomAccessIterator>
-  inline void 
-  push_heap(_RandomAccessIterator __first, _RandomAccessIterator __last)
-  {
-    typedef typename std::iterator_traits<_RandomAccessIterator>::value_type _ValueType;
-    typedef typename std::iterator_traits<_RandomAccessIterator>::difference_type _DistanceType;
-
-    tl::__push_heap(__first, _DistanceType((__last - __first) - 1), _DistanceType(0), 
-        _ValueType(*(__last - 1)));
-  }
-
-  template<typename _RandomAccessIterator, typename _Distance, typename _Tp, 
+  template<typename _RandomAccessIterator, typename _Distance, typename _Tp,
          typename _Compare>
   void
-  __push_heap(_RandomAccessIterator __first, _Distance __holeIndex, 
+  __push_heap(_RandomAccessIterator __first, _Distance __holeIndex,
               _Distance __topIndex, const _Tp &__v, _Compare __comp)
   {
     _Distance __parent = (__holeIndex - 1) / 2;
@@ -260,20 +248,8 @@ namespace tl
     *(__first + __holeIndex) = __v;
   }
 
-  template<typename _RandomAccessIterator, typename _Compare>
-  inline void 
-  push_heap(_RandomAccessIterator __first, _RandomAccessIterator __last,
-            _Compare __comp)
-  {
-    typedef typename std::iterator_traits<_RandomAccessIterator>::value_type _ValueType;
-    typedef typename std::iterator_traits<_RandomAccessIterator>::difference_type _DistanceType;
-
-    tl::__push_heap(__first, _DistanceType((__last - __first) - 1), _DistanceType(0), 
-        _ValueType(*(__last - 1)), __comp);
-  }
-
   template<typename _RandomAccessIterator, typename _Distance, typename _Tp>
-  void 
+  void
   __adjust_heap(_RandomAccessIterator __first, _Distance __holeIndex,
                 _Distance __len, const _Tp &__v)
   {
@@ -303,18 +279,10 @@ namespace tl
     tl::__adjust_heap(__first, _Distance(0), _Distance(__last - __first), __v);
   }
 
-  template<typename _RandomAccessIterator>
-  inline void
-  pop_heap(_RandomAccessIterator __first, _RandomAccessIterator __last)
-  {
-    typedef typename std::iterator_traits<_RandomAccessIterator>::value_type _ValueType;
-    tl::__pop_heap(__first, __last - 1, __last - 1, _ValueType(*(__last - 1)));
-  }
-
   template<typename _RandomAccessIterator, typename _Distance,
      typename _Tp, typename _Compare>
   void
-  __adjust_heap(_RandomAccessIterator __first, _Distance __holeIndex, 
+  __adjust_heap(_RandomAccessIterator __first, _Distance __holeIndex,
                 _Distance __len, const _Tp &__v, _Compare __comp)
   {
     _Distance __topIndex = __holeIndex;
@@ -344,18 +312,9 @@ namespace tl
           __v, __comp);
   }
 
-  template<typename _RandomAccessIterator, typename _Compare>
-  inline void 
-  pop_heap(_RandomAccessIterator __first,
-           _RandomAccessIterator __last, _Compare __comp)
-  {
-    typedef typename std::iterator_traits<_RandomAccessIterator>::value_type _ValueType;
-    tl::__pop_heap(__first, __last - 1, __last - 1, _ValueType(*(__last - 1)), __comp);
-  }
-
   template<typename _RandomAccessIterator>
-  void 
-  make_heap(_RandomAccessIterator __first, _RandomAccessIterator __last)
+  void
+  __make_heap(_RandomAccessIterator __first, _RandomAccessIterator __last)
   {
     typedef typename std::iterator_traits<_RandomAccessIterator>::value_type _ValueType;
     typedef typename std::iterator_traits<_RandomAccessIterator>::difference_type _DistanceType;
@@ -373,7 +332,7 @@ namespace tl
 
   template<typename _RandomAccessIterator, typename _Compare>
   inline void 
-  make_heap(_RandomAccessIterator __first, _RandomAccessIterator __last,
+  __make_heap(_RandomAccessIterator __first, _RandomAccessIterator __last,
             _Compare __comp)
   {
     typedef typename std::iterator_traits<_RandomAccessIterator>::value_type _ValueType;
@@ -393,19 +352,91 @@ namespace tl
 
   template<typename _RandomAccessIterator>
   void
-  sort_heap(_RandomAccessIterator __first, _RandomAccessIterator __last)
+  __sort_heap(_RandomAccessIterator __first, _RandomAccessIterator __last)
   {
-    while (__last - __first > 1)
-      tl::pop_heap(__first, __last--);
+    typedef typename std::iterator_traits<_RandomAccessIterator>::value_type _ValueType;
+    while (__last - __first > 1) {
+      --__last;
+      tl::__pop_heap(__first, __last, __last, _ValueType(*(__last)));
+    }
   }
 
   template<typename _RandomAccessIterator, typename _Compare>
   void 
-  sort_heap(_RandomAccessIterator __first, _RandomAccessIterator __last, 
+  __sort_heap(_RandomAccessIterator __first, _RandomAccessIterator __last, 
             _Compare __comp)
   {
-    while (__last - __first > 1)
-      tl::pop_heap(__first, __last--, __comp);
+    typedef typename std::iterator_traits<_RandomAccessIterator>::value_type _ValueType;
+    while (__last - __first > 1) {
+      --__last;
+      tl::__pop_heap(__first, __last, __last, _ValueType(*(__last)), __comp);
+    }
+  }
+
+  //  Public heap API, forwarded to the standard library. The __make_heap/__sort_heap
+  //  helpers above are kept only because tl::partial_sort needs the custom pop that
+  //  writes the root to an arbitrary position (std::pop_heap always writes last - 1)
+  //  and because tl::partial_sort is the heapsort fallback of tl::sort whose tie
+  //  order must not change.
+
+  template<typename _RandomAccessIterator>
+  inline void
+  push_heap(_RandomAccessIterator __first, _RandomAccessIterator __last)
+  {
+    std::push_heap(__first, __last);
+  }
+
+  template<typename _RandomAccessIterator, typename _Compare>
+  inline void
+  push_heap(_RandomAccessIterator __first, _RandomAccessIterator __last,
+            _Compare __comp)
+  {
+    std::push_heap(__first, __last, __comp);
+  }
+
+  template<typename _RandomAccessIterator>
+  inline void
+  pop_heap(_RandomAccessIterator __first, _RandomAccessIterator __last)
+  {
+    std::pop_heap(__first, __last);
+  }
+
+  template<typename _RandomAccessIterator, typename _Compare>
+  inline void
+  pop_heap(_RandomAccessIterator __first, _RandomAccessIterator __last,
+           _Compare __comp)
+  {
+    std::pop_heap(__first, __last, __comp);
+  }
+
+  template<typename _RandomAccessIterator>
+  inline void
+  make_heap(_RandomAccessIterator __first, _RandomAccessIterator __last)
+  {
+    std::make_heap(__first, __last);
+  }
+
+  template<typename _RandomAccessIterator, typename _Compare>
+  inline void
+  make_heap(_RandomAccessIterator __first, _RandomAccessIterator __last,
+            _Compare __comp)
+  {
+    std::make_heap(__first, __last, __comp);
+  }
+
+  template<typename _RandomAccessIterator>
+  inline void
+  sort_heap(_RandomAccessIterator __first, _RandomAccessIterator __last)
+  {
+    std::sort_heap(__first, __last);
+  }
+
+  template<typename _RandomAccessIterator, typename _Compare>
+  inline void
+  sort_heap(_RandomAccessIterator __first, _RandomAccessIterator __last,
+            _Compare __comp)
+  {
+    std::sort_heap(__first, __last, __comp);
   }
 
 
@@ -417,11 +448,11 @@ namespace tl
   {
     typedef typename std::iterator_traits<_RandomAccessIter>::value_type _ValueType;
 
-    tl::make_heap(__first, __middle);
+    tl::__make_heap(__first, __middle);
     for (_RandomAccessIter __i = __middle; __i < __last; ++__i)
       if (*__i < *__first)
         tl::__pop_heap(__first, __middle, __i, _ValueType(*__i));
-    tl::sort_heap(__first, __middle);
+    tl::__sort_heap(__first, __middle);
   }
 
   template<typename _RandomAccessIter, typename _Compare>
@@ -433,11 +464,11 @@ namespace tl
   {
     typedef typename std::iterator_traits<_RandomAccessIter>::value_type _ValueType;
 
-    tl::make_heap(__first, __middle, __comp);
+    tl::__make_heap(__first, __middle, __comp);
     for (_RandomAccessIter __i = __middle; __i < __last; ++__i)
       if (__comp(*__i, *__first))
         tl::__pop_heap(__first, __middle, __i, _ValueType(*__i), __comp);
-    tl::sort_heap(__first, __middle, __comp);
+    tl::__sort_heap(__first, __middle, __comp);
   }
 
   template<typename _RandomAccessIter, typename _Size>
@@ -546,26 +577,15 @@ namespace tl
     }
   }
 
+  //  nth_element is forwarded to the standard library. The forked version had no
+  //  introselect fallback, so it degraded to quadratic behavior in the worst case.
   template<typename _RandomAccessIter>
   void
   nth_element(_RandomAccessIter __first,
               _RandomAccessIter __nth,
               _RandomAccessIter __last)
   {
-    typedef typename std::iterator_traits<_RandomAccessIter>::value_type _ValueType;
-
-    while (__last - __first > 3) {
-      _RandomAccessIter __cut =
-        tl::__unguarded_partition(__first, __last,
-                  _ValueType(tl::__median(*__first,
-                              *(__first + (__last - __first)/2),
-                              *(__last - 1))));
-      if (__cut <= __nth)
-        __first = __cut;
-      else
-        __last = __cut;
-    }
-    tl::__insertion_sort(__first, __last);
+    std::nth_element(__first, __nth, __last);
   }
 
   /**
@@ -591,22 +611,7 @@ namespace tl
               _RandomAccessIter __last,
               _Compare __comp)
   {
-    typedef typename std::iterator_traits<_RandomAccessIter>::value_type _ValueType;
-
-    while (__last - __first > 3) {
-      _RandomAccessIter __cut =
-        tl::__unguarded_partition(__first, __last,
-                  _ValueType(tl::__median(*__first,
-                              *(__first + (__last - __first)/2),
-                              *(__last - 1),
-                              __comp)),
-                  __comp);
-      if (__cut <= __nth)
-        __first = __cut;
-      else
-        __last = __cut;
-    }
-    tl::__insertion_sort(__first, __last, __comp);
+    std::nth_element(__first, __nth, __last, __comp);
   }
 
 }

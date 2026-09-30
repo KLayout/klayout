@@ -657,7 +657,7 @@ Variant::Variant (const Variant &v)
   operator= (v);
 }
 
-Variant::Variant (Variant &&v)
+Variant::Variant (Variant &&v) noexcept
   : m_type (t_nil), m_string (0)
 {
   swap (v);
@@ -947,7 +947,7 @@ Variant::operator= (__int128 l)
 #endif
 
 Variant &
-Variant::operator= (Variant &&v)
+Variant::operator= (Variant &&v) noexcept
 {
   swap (v);
   return *this;

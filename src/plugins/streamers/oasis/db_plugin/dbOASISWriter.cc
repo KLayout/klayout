@@ -28,6 +28,9 @@
 #include "tlMath.h"
 #include "tlUniqueName.h"
 
+#include <cstring>
+#include <limits>
+#include <type_traits>
 #include <math.h>
 
 namespace db
@@ -721,7 +724,11 @@ void
 OASISWriter::write (int64_t n)
 {
   if (n < 0) {
-    write (((uint64_t) (-n) << 1) | 1);
+    //  the magnitude of the minimum value does not fit next to the sign bit
+    if (n == std::numeric_limits<int64_t>::min ()) {
+      throw tl::Exception (tl::to_string (tr ("Integer value out of range for an OASIS signed integer")));
+    }
+    write (((uint64_t (0) - uint64_t (n)) << 1) | 1);
   } else {
     write ((uint64_t) n << 1);
   }
@@ -745,76 +752,54 @@ OASISWriter::write (uint64_t n)
   write_bytes (buffer, bptr - buffer);
 }
 
+template <class T>
 void
-OASISWriter::write (float d) 
+OASISWriter::write_real (T d)
 {
-  if (fabs (d) >= 0.5 && fabs (floor (d + 0.5) - d) < 1e-6 && fabs (d) < double (std::numeric_limits<int64_t>::max ())) {
+  static_assert (std::is_floating_point<T>::value && (sizeof (T) == 4 || sizeof (T) == 8), "write_real needs an IEEE float or double");
+
+  //  4-byte floats and 8-byte doubles only differ in the tolerance and the type code
+  using U = typename std::conditional<sizeof (T) == 4, uint32_t, uint64_t>::type;
+  const double tol = (sizeof (T) == 4) ? 1e-6 : 1e-10;
+
+  if (fabs (d) >= 0.5 && fabs (floor (d + 0.5) - d) < tol && fabs (d) < double (std::numeric_limits<int64_t>::max ())) {
 
     //  whole number (negative or positive)
     if (d < 0.0) {
       write_byte (1);
-      write ((uint64_t) floor (-d + 0.5));
-    } else { 
+      write (static_cast<uint64_t> (floor (-d + 0.5)));
+    } else {
       write_byte (0);
-      write ((uint64_t) floor (d + 0.5));
+      write (static_cast<uint64_t> (floor (d + 0.5)));
     }
 
   } else {
 
-    write_byte (6);
+    write_byte (char ((sizeof (T) == 4) ? 6 : 7));
 
-    //  4-Byte IEEE real
-    union {
-      float d;
-      uint32_t i;
-    } f2i;
-
-    f2i.d = d;
-    uint32_t i = f2i.i;
-    char b[sizeof (f2i.i)];
-    for (size_t n = 0; n < sizeof (f2i.i); n++) {
-      b[n] = char (i & 0xff); 
+    //  IEEE real, stored little endian
+    U i;
+    memcpy (&i, &d, sizeof (i));
+    char b[sizeof (i)];
+    for (size_t n = 0; n < sizeof (i); n++) {
+      b[n] = char (i & 0xff);
       i >>= 8;
     }
-    write_bytes (b, sizeof (f2i.i));
+    write_bytes (b, sizeof (i));
 
   }
 }
 
 void
-OASISWriter::write (double d) 
+OASISWriter::write (float d)
 {
-  if (fabs (d) >= 0.5 && fabs (floor (d + 0.5) - d) < 1e-10 && fabs (d) < double (std::numeric_limits<int64_t>::max ())) {
+  write_real (d);
+}
 
-    //  whole number (negative or positive)
-    if (d < 0.0) {
-      write_byte (1);
-      write ((uint64_t) floor (-d + 0.5));
-    } else { 
-      write_byte (0);
-      write ((uint64_t) floor (d + 0.5));
-    }
-
-  } else {
-
-    write_byte (7);
-
-    //  8-Byte IEEE real
-    union {
-      double d;
-      uint64_t i;
-    } f2i;
-
-    f2i.d = d;
-    uint64_t i = f2i.i;
-    char b[sizeof (f2i.i)];
-    for (unsigned int n = 0; n < sizeof (f2i.i); n++) {
-      b[n] = char (i & 0xff); 
-      i >>= 8;
-    }
-    write_bytes (b, sizeof (f2i.i));
-
-  }
+void
+OASISWriter::write (double d)
+{
+  write_real (d);
 }
 
 void 

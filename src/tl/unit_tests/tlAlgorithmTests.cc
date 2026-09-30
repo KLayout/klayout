@@ -22,6 +22,7 @@
 
 
 #include "tlAlgorithm.h"
+#include "tlHash.h"
 #include "tlString.h"
 #include "tlTimer.h"
 #include "tlUnitTest.h"
@@ -29,6 +30,8 @@
 #include <cstring>
 #include <string>
 #include <algorithm>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 std::string to_string (const std::vector<std::string> &v) 
@@ -218,3 +221,51 @@ TEST(3)
   }
 }
 
+
+TEST (hashUnorderedSet)
+{
+  std::unordered_set<int> a, b, c;
+
+  for (int i = 0; i < 50; ++i) {
+    a.insert (i);
+  }
+  for (int i = 49; i >= 0; --i) {
+    b.insert (i);
+  }
+  c.reserve (1000);
+  for (int i = 0; i < 50; ++i) {
+    c.insert (i);
+  }
+
+  //  bug: hfunc used to fold the element hashes in iteration order
+  EXPECT_EQ (tl::hfunc (a), tl::hfunc (b));
+  EXPECT_EQ (tl::hfunc (a), tl::hfunc (c));
+
+  std::unordered_set<int> d = a;
+  d.erase (20);
+  EXPECT_NE (tl::hfunc (a), tl::hfunc (d));
+}
+
+TEST (hashUnorderedMap)
+{
+  std::unordered_map<int, std::string> a, b, c;
+
+  for (int i = 0; i < 50; ++i) {
+    a.insert (std::make_pair (i, tl::sprintf ("%d", i)));
+  }
+  for (int i = 49; i >= 0; --i) {
+    b.insert (std::make_pair (i, tl::sprintf ("%d", i)));
+  }
+  c.reserve (1000);
+  for (int i = 0; i < 50; ++i) {
+    c.insert (std::make_pair (i, tl::sprintf ("%d", i)));
+  }
+
+  //  bug: hfunc used to fold the element hashes in iteration order
+  EXPECT_EQ (tl::hfunc (a), tl::hfunc (b));
+  EXPECT_EQ (tl::hfunc (a), tl::hfunc (c));
+
+  std::unordered_map<int, std::string> d = a;
+  d.erase (20);
+  EXPECT_NE (tl::hfunc (a), tl::hfunc (d));
+}

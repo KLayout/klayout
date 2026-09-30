@@ -547,3 +547,40 @@ TEST(7)
   EXPECT_EQ (w.s, "eight");
   EXPECT_EQ (w.r, "ref2");
 }
+
+//  events with 5 and 6 arguments, plain and with_data receivers
+TEST(8_more_arguments)
+{
+  MultiArgObserver y, w, other;
+
+  tl::event<int, double, std::string, const std::string &, MultiArgObserver *> ev5;
+  tl::event<int, double, std::string, const std::string &, MultiArgObserver *, int> ev6;
+
+  ev5.add (&y, &MultiArgObserver::recv5);
+  ev6.add (&y, &MultiArgObserver::recv6);
+  ev5.add (&w, &MultiArgObserver::recv_d5, 15);
+  ev6.add (&w, &MultiArgObserver::recv_d6, 16);
+
+  ev5 (5, 5.5, std::string ("five"), std::string ("r5"), &other);
+  EXPECT_EQ (y.events, 1);
+  EXPECT_EQ (y.i, 5);
+  EXPECT_EQ (y.d, 5.5);
+  EXPECT_EQ (y.s, "five");
+  EXPECT_EQ (y.r, "r5");
+  EXPECT_EQ (y.p == &other, true);
+  EXPECT_EQ (w.events, 1);
+  EXPECT_EQ (w.data, 15);
+  EXPECT_EQ (w.i, 5);
+  EXPECT_EQ (w.p == &other, true);
+
+  ev6 (6, 6.5, std::string ("six"), std::string ("r6"), &y, 66);
+  EXPECT_EQ (y.events, 2);
+  EXPECT_EQ (y.i, 6);
+  EXPECT_EQ (y.extra, 66);
+  EXPECT_EQ (y.p == &y, true);
+  EXPECT_EQ (w.events, 2);
+  EXPECT_EQ (w.data, 16);
+  EXPECT_EQ (w.extra, 66);
+  EXPECT_EQ (w.s, "six");
+  EXPECT_EQ (w.r, "r6");
+}

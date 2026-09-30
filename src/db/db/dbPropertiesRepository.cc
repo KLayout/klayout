@@ -126,30 +126,35 @@ PropertiesSet::PropertiesSet ()
 }
 
 PropertiesSet::PropertiesSet (const PropertiesSet &other)
-  : m_map (other.m_map), m_hash (other.m_hash)
+  : m_map (other.m_map), m_hash (other.m_hash.load (std::memory_order_relaxed))
 {
   //  .. nothing yet ..
 }
 
-PropertiesSet::PropertiesSet (const PropertiesSet &&other)
-  : m_map (std::move (other.m_map)), m_hash (other.m_hash)
+PropertiesSet::PropertiesSet (PropertiesSet &&other) noexcept
+  : m_map (std::move (other.m_map)), m_hash (other.m_hash.load (std::memory_order_relaxed))
 {
-  //  .. nothing yet ..
+  //  make the moved-from state deterministic: an empty set with no cached hash
+  other.m_map.clear ();
+  other.m_hash.store (0, std::memory_order_relaxed);
 }
 
 PropertiesSet &
 PropertiesSet::operator= (const PropertiesSet &other)
 {
   m_map = other.m_map;
-  m_hash = other.m_hash;
+  m_hash.store (other.m_hash.load (std::memory_order_relaxed), std::memory_order_relaxed);
   return *this;
 }
 
 PropertiesSet &
-PropertiesSet::operator= (const PropertiesSet &&other)
+PropertiesSet::operator= (PropertiesSet &&other) noexcept
 {
   m_map = std::move (other.m_map);
-  m_hash = other.m_hash;
+  m_hash.store (other.m_hash.load (std::memory_order_relaxed), std::memory_order_relaxed);
+  //  make the moved-from state deterministic: an empty set with no cached hash
+  other.m_map.clear ();
+  other.m_hash.store (0, std::memory_order_relaxed);
   return *this;
 }
 
@@ -207,6 +212,7 @@ void
 PropertiesSet::clear ()
 {
   m_map.clear ();
+  m_hash.store (0, std::memory_order_relaxed);
 }
 
 void
@@ -221,6 +227,7 @@ PropertiesSet::erase (const tl::Variant &name)
   if (i != ii) {
     m_map.erase (ii, i);
   }
+  m_hash.store (0, std::memory_order_relaxed);
 }
 
 void
@@ -234,30 +241,35 @@ PropertiesSet::erase (db::property_names_id_type nid)
   if (i != ii) {
     m_map.erase (ii, i);
   }
+  m_hash.store (0, std::memory_order_relaxed);
 }
 
 void
 PropertiesSet::insert (const tl::Variant &name, const tl::Variant &value)
 {
   m_map.insert (std::make_pair (db::property_names_id (name), db::property_values_id (value)));
+  m_hash.store (0, std::memory_order_relaxed);
 }
 
 void
 PropertiesSet::insert (db::property_names_id_type nid, const tl::Variant &value)
 {
   m_map.insert (std::make_pair (nid, db::property_values_id (value)));
+  m_hash.store (0, std::memory_order_relaxed);
 }
 
 void
 PropertiesSet::insert_by_id (db::property_names_id_type nid, db::property_values_id_type vid)
 {
   m_map.insert (std::make_pair (nid, vid));
+  m_hash.store (0, std::memory_order_relaxed);
 }
 
 void
 PropertiesSet::merge (const db::PropertiesSet &other)
 {
   m_map.insert (other.m_map.begin (), other.m_map.end ());
+  m_hash.store (0, std::memory_order_relaxed);
 }
 
 void
@@ -328,22 +340,18 @@ PropertiesSet::hash () const
     return 0;
   }
 
-  if (! m_hash) {
+  size_t h = m_hash.load (std::memory_order_relaxed);
 
-    static tl::Mutex lock;
-    tl::MutexLocker locker (&lock);
-
-    if (! m_hash) {
-      m_hash = tl::hfunc (to_map ());
-      if (! m_hash) {
-        //  avoid 0 value as this is reserved for "not computed yet"
-        m_hash = size_t (1);
-      }
+  if (! h) {
+    h = tl::hfunc (to_map ());
+    if (! h) {
+      //  avoid 0 value as this is reserved for "not computed yet"
+      h = size_t (1);
     }
-
+    m_hash.store (h, std::memory_order_relaxed);
   }
 
-  return m_hash;
+  return h;
 }
 
 // ----------------------------------------------------------------------------------

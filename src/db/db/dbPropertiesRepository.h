@@ -35,6 +35,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <atomic>
 
 namespace db
 {
@@ -108,7 +109,7 @@ public:
   /**
    *  @brief Move constructor
    */
-  PropertiesSet (const PropertiesSet &&other);
+  PropertiesSet (PropertiesSet &&other) noexcept;
 
   /**
    *  @brief Constructor from tl::Variant pair iterator
@@ -130,7 +131,7 @@ public:
   /**
    *  @brief Move assignment
    */
-  PropertiesSet &operator= (const PropertiesSet &&other);
+  PropertiesSet &operator= (PropertiesSet &&other) noexcept;
 
   /**
    *  @brief Equality
@@ -156,6 +157,9 @@ public:
   void swap (PropertiesSet &other)
   {
     m_map.swap (other.m_map);
+    size_t h = m_hash.load (std::memory_order_relaxed);
+    m_hash.store (other.m_hash.load (std::memory_order_relaxed), std::memory_order_relaxed);
+    other.m_hash.store (h, std::memory_order_relaxed);
   }
 
   /**
@@ -302,7 +306,7 @@ public:
 
 private:
   map_type m_map;
-  mutable size_t m_hash;
+  mutable std::atomic<size_t> m_hash;
 };
 
 /**

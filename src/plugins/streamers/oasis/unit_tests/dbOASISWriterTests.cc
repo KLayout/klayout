@@ -32,6 +32,7 @@
 #include "tlUnitTest.h"
 
 #include <cstdlib>
+#include <limits>
 
 void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int compr, bool recompress, bool tables_at_end)
 {
@@ -2099,4 +2100,98 @@ TEST(140)
 
     db::compare_layouts (_this, gg, tl::testdata () + "/oasis/dbOASISWriter40_au.gds", db::NoNormalization);
   }
+}
+
+//  round trip of 32/64 bit varint and IEEE real extremes through OASIS
+TEST(VarintAndRealExtremes)
+{
+  db::Layout layout_org (false);
+
+  unsigned int layer = layout_org.insert_layer (db::LayerProperties (1, 0));
+  db::Cell &top = layout_org.cell (layout_org.add_cell ("TOP"));
+
+  //  box coordinates covering the 32 bit varint widths
+  {
+    static const long long coords[] = { 0, 1, 127, 128, 16383, 16384, 1073741824LL, 2147483647LL };
+    for (size_t i = 0; i < sizeof (coords) / sizeof (coords[0]); ++i) {
+      db::Coord c = db::Coord (coords[i]);
+      top.shapes (layer).insert (db::Box (c - 1, c - 1, c, c));
+    }
+  }
+
+  //  integer property values covering the 32 and 64 bit varint widths, INT64_MIN has its own test below
+  {
+    static const long long int_values[] = {
+      0LL, 1LL, 127LL, 128LL, 16383LL, 16384LL, 2147483647LL, 4294967296LL, 9007199254740993LL,
+      std::numeric_limits<long long>::max (), std::numeric_limits<long long>::min () + 1
+    };
+    for (size_t i = 0; i < sizeof (int_values) / sizeof (int_values[0]); ++i) {
+      db::PropertiesSet ps;
+      ps.insert (db::property_names_id (tl::Variant (std::string ("int") + tl::to_string (i))), tl::Variant (int_values[i]));
+      db::Coord x = db::Coord (1000 + 10 * (long long) i);
+      top.shapes (layer).insert (db::BoxWithProperties (db::Box (x, 0, x + 5, 5), db::properties_id (ps)));
+    }
+  }
+
+  //  IEEE real property values including zeros, subnormals and extreme exponents
+  {
+    static const double real_values[] = {
+      0.0, -0.0, 1e-300, 1e300, double (1.5f),
+      double (std::numeric_limits<float>::denorm_min ()),
+      std::numeric_limits<double>::denorm_min ()
+    };
+    for (size_t i = 0; i < sizeof (real_values) / sizeof (real_values[0]); ++i) {
+      db::PropertiesSet ps;
+      ps.insert (db::property_names_id (tl::Variant (std::string ("real") + tl::to_string (i))), tl::Variant (real_values[i]));
+      db::Coord x = db::Coord (2000 + 10 * (long long) i);
+      top.shapes (layer).insert (db::BoxWithProperties (db::Box (x, 100, x + 5, 105), db::properties_id (ps)));
+    }
+  }
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_dbOASISWriterVarintExtremes.oas");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::SaveLayoutOptions options;
+    db::OASISWriter writer;
+    writer.write (layout_org, out, options);
+  }
+
+  db::Layout layout_read;
+
+  {
+    tl::InputStream in (tmp_file);
+    db::OASISReader reader (in);
+    reader.set_warnings_as_errors (true);
+    reader.read (layout_read);
+  }
+
+  EXPECT_EQ (db::compare_layouts (layout_org, layout_read, db::layout_diff::f_verbose, 0), true);
+}
+
+//  INT64_MIN has no OASIS signed integer representation and must not be written as "-0"
+TEST(VarintInt64MinIsRejected)
+{
+  db::Layout layout (false);
+
+  unsigned int layer = layout.insert_layer (db::LayerProperties (1, 0));
+  db::Cell &top = layout.cell (layout.add_cell ("TOP"));
+
+  db::PropertiesSet ps;
+  ps.insert (db::property_names_id (tl::Variant (std::string ("v"))), tl::Variant (std::numeric_limits<long long>::min ()));
+  top.shapes (layer).insert (db::BoxWithProperties (db::Box (0, 0, 5, 5), db::properties_id (ps)));
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_dbOASISWriterInt64Min.oas");
+
+  bool rejected = false;
+  try {
+    tl::OutputStream out (tmp_file);
+    db::SaveLayoutOptions options;
+    db::OASISWriter writer;
+    writer.write (layout, out, options);
+  } catch (tl::Exception &) {
+    rejected = true;
+  }
+
+  EXPECT_EQ (rejected, true);
 }

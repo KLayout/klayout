@@ -305,13 +305,24 @@ public:
     // .. nothing yet ..
   }
 
-  /** 
+  /**
    *  @brief Copy constructor
    */
   text (const text &d)
     : mp_ptr (0), m_trans (), m_size (0), m_font (NoFont), m_halign (NoHAlign), m_valign (NoVAlign)
   {
     operator= (d);
+  }
+
+  /**
+   *  @brief Move constructor
+   *
+   *  Takes over the string storage including the StringRef reference count (no additional reference is taken).
+   */
+  text (text &&d) noexcept
+    : mp_ptr (d.mp_ptr), m_trans (d.m_trans), m_size (d.m_size), m_font (d.m_font), m_halign (d.m_halign), m_valign (d.m_valign)
+  {
+    d.mp_ptr = 0;
   }
 
   /**
@@ -354,6 +365,29 @@ public:
       } else if (d.mp_ptr) {
         set_string_internal (d.mp_ptr);
       }
+
+    }
+
+    return *this;
+  }
+
+  /**
+   *  @brief Move assignment
+   */
+  text &operator= (text &&d) noexcept
+  {
+    if (&d != this) {
+
+      cleanup ();
+
+      mp_ptr = d.mp_ptr;
+      d.mp_ptr = 0;
+
+      m_trans = d.m_trans;
+      m_size = d.m_size;
+      m_font = d.m_font;
+      m_halign = d.m_halign;
+      m_valign = d.m_valign;
 
     }
 
@@ -774,10 +808,16 @@ private:
     mp_ptr = 0;
   }
 
+  void set_string_internal (const char *s)
+  {
+    size_t n = strlen (s);
+    mp_ptr = new char[n + 1];
+    strncpy (mp_ptr, s, n + 1);
+  }
+
   void set_string_internal (const std::string &s)
   {
-    mp_ptr = new char[s.size() + 1];
-    strncpy (mp_ptr, s.c_str (), s.size () + 1);
+    set_string_internal (s.c_str ());
   }
 
   bool text_less (const text<C> &b) const

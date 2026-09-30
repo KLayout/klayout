@@ -29,6 +29,7 @@
 
 #include <algorithm> 
 #include <limits> 
+#include <type_traits>
 #include <vector> 
 
 #include "dbTypes.h"
@@ -1445,12 +1446,9 @@ struct array_iterator
    *  @brief The copy constructor
    */
   array_iterator (const array_iterator &d)
-    : m_trans (d.m_trans), mp_base (0), m_done (d.m_done)
+    : m_trans (d.m_trans), mp_base (d.mp_base ? d.mp_base->clone () : 0), m_done (d.m_done)
   {
-    if (mp_base) {
-      delete mp_base;
-    }
-    mp_base = d.mp_base ? d.mp_base->clone () : 0;
+    // .. nothing yet ..
   }
 
   /**
@@ -1465,6 +1463,36 @@ struct array_iterator
         delete mp_base;
       }
       mp_base = d.mp_base ? d.mp_base->clone () : 0;
+    }
+    return *this;
+  }
+
+  /**
+   *  @brief The move constructor
+   *
+   *  Takes over the owned basic_array_iterator object.
+   */
+  array_iterator (array_iterator &&d) noexcept
+    : m_trans (d.m_trans), mp_base (d.mp_base), m_done (d.m_done)
+  {
+    d.mp_base = 0;
+    d.m_done = true;
+  }
+
+  /**
+   *  @brief The move assignment operator
+   */
+  array_iterator &operator= (array_iterator &&d) noexcept
+  {
+    if (&d != this) {
+      if (mp_base) {
+        delete mp_base;
+      }
+      m_trans = d.m_trans;
+      mp_base = d.mp_base;
+      m_done = d.m_done;
+      d.mp_base = 0;
+      d.m_done = true;
     }
     return *this;
   }
@@ -1882,6 +1910,36 @@ struct array
       } else {
         mp_base = 0;
       }
+    }
+    return *this;
+  }
+
+  /**
+   *  @brief The move constructor
+   *
+   *  Takes over the base object. Repository-managed arrays do not share it like
+   *  the copy constructor does: the repository stays the owner and the
+   *  moved-from array is left without a base object.
+   */
+  array (array &&d) noexcept (std::is_nothrow_move_constructible<Obj>::value)
+    : m_obj (std::move (d.m_obj)), m_trans (d.m_trans), mp_base (d.mp_base)
+  {
+    d.mp_base = 0;
+  }
+
+  /**
+   *  @brief The move assignment operator
+   */
+  array &operator= (array &&d) noexcept (std::is_nothrow_move_assignable<Obj>::value)
+  {
+    if (&d != this) {
+      if (mp_base && ! mp_base->in_repository) {
+        delete mp_base;
+      }
+      m_obj = std::move (d.m_obj);
+      m_trans = d.m_trans;
+      mp_base = d.mp_base;
+      d.mp_base = 0;
     }
     return *this;
   }

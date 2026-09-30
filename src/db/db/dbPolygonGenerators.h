@@ -33,6 +33,7 @@
 #include "dbPolygon.h"
 #include "dbObjectWithProperties.h"
 
+#include <memory>
 #include <vector>
 
 namespace db
@@ -171,7 +172,7 @@ public:
   static void enable_compression_global (bool enable) { ms_compress = enable; }
 
 private:
-  PGContourList *mp_contours;
+  std::unique_ptr<PGContourList> mp_contours;
   open_map_type m_open;
   db::Coord m_y;
   open_map_iterator_type m_open_pos;
@@ -189,8 +190,8 @@ private:
   void produce_poly (const PGPolyContour &c);
   void eliminate_hole ();
 
-  PolygonGenerator &operator= (const PolygonGenerator &);
-  PolygonGenerator (const PolygonGenerator &);
+  PolygonGenerator &operator= (const PolygonGenerator &) = delete;
+  PolygonGenerator (const PolygonGenerator &) = delete;
 };
 
 /**

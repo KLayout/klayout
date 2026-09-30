@@ -37,6 +37,13 @@ namespace db
 // -------------------------------------------------------------------------------
 
 LayerBase::LayerBase ()
+  : m_tag (0)
+{
+  //  .. nothing yet ..
+}
+
+LayerBase::LayerBase (const void *tag)
+  : m_tag (tag)
 {
   //  .. nothing yet ..
 }

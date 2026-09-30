@@ -31,16 +31,107 @@
 #include "dbBox.h"
 #include "dbMemStatistics.h"
 
+#include "tlHash.h"
+
 #include <set>
+#include <unordered_set>
 
 namespace db {
 
 template <class C> class polygon;
+template <class C> class polygon_contour;
 template <class C> class simple_polygon;
 template <class C> class path;
 template <class C> class edge;
 template <class C> class text;
 template <class C> class user_object;
+
+/**
+ *  @brief Hash functions for the shape types kept in a repository
+ *
+ *  The hash value must be consistent with shape equality: equal shapes have to deliver
+ *  the same value, otherwise the repository would keep more entries than the ordered
+ *  set did. Hence only fields which take part in the comparison are hashed (the
+ *  "round" flag of a path for example is not). Collisions are resolved by the equality
+ *  operator of the shapes.
+ *
+ *  NOTE: the hash functions from dbHash.h cannot be used here, because dbHash.h includes
+ *  the shape headers and these include this file. The path hash function of dbHash.h
+ *  in addition includes "round" which is not part of path equality.
+ */
+
+//  works for points and vectors
+template <class P>
+inline size_t hash_coord_pair (const P &p)
+{
+  return tl::hcombine (tl::hfunc (p.x ()), tl::hfunc (p.y ()));
+}
+
+template <class Iter>
+inline size_t hash_point_range (Iter from, size_t n, size_t h)
+{
+  //  Just a sample of about 20 points spread over the whole contour. Hashing all of them is more
+  //  expensive than needed, but hashing only the leading ones lets shapes which differ at the
+  //  end collide.
+  size_t stride = n / 20 + 1;
+  for (size_t i = 0; i < n; ++i, ++from) {
+    if (i % stride == 0) {
+      h = tl::hcombine (h, hash_coord_pair (*from));
+    }
+  }
+  return h;
+}
+
+template <class C>
+inline size_t shape_hash_value (const db::simple_polygon<C> &shape)
+{
+  return hash_point_range (shape.hull ().begin (), size_t (shape.hull ().size ()), size_t (shape.hull ().size ()));
+}
+
+template <class C>
+inline size_t shape_hash_value (const db::polygon<C> &shape)
+{
+  size_t h = tl::hcombine (size_t (shape.holes ()), size_t (shape.hull ().size ()));
+  h = hash_point_range (shape.hull ().begin (), size_t (shape.hull ().size ()), h);
+  for (size_t i = 0; i < shape.holes (); ++i) {
+    const db::polygon_contour<C> &hole = shape.hole (int (i));
+    h = tl::hcombine (h, hash_point_range (hole.begin (), size_t (hole.size ()), h));
+  }
+  return h;
+}
+
+template <class C>
+inline size_t shape_hash_value (const db::path<C> &shape)
+{
+  size_t h = tl::hcombine (tl::hfunc (shape.width ()), tl::hfunc (shape.bgn_ext ()));
+  h = tl::hcombine (h, tl::hfunc (shape.end_ext ()));
+  h = tl::hcombine (h, size_t (shape.points ()));
+  return hash_point_range (shape.begin (), size_t (shape.points ()), h);
+}
+
+template <class C>
+inline size_t shape_hash_value (const db::text<C> &shape)
+{
+  size_t h = tl::hfunc (std::string (shape.string ()));
+  h = tl::hcombine (h, tl::hfunc (shape.trans ().rot ()));
+  h = tl::hcombine (h, hash_coord_pair (shape.trans ().disp ()));
+  h = tl::hcombine (h, tl::hfunc (shape.size ()));
+  h = tl::hcombine (h, size_t (shape.font ()));
+  h = tl::hcombine (h, size_t (shape.halign ()));
+  return tl::hcombine (h, size_t (shape.valign ()));
+}
+
+/**
+ *  @brief A hash function for the shape types kept in a repository
+ */
+template <class Sh>
+struct shape_hash
+{
+  size_t operator() (const Sh &shape) const
+  {
+    return shape_hash_value (shape);
+  }
+};
 
 /**
  *  @brief A repository for a certain shape type
@@ -55,7 +146,7 @@ class repository
 {
 public:
   typedef typename Sh::coord_type coord_type;
-  typedef std::set<Sh> set_type;
+  typedef std::unordered_set<Sh, shape_hash<Sh>, std::equal_to<Sh> > set_type;
   typedef typename set_type::const_iterator iterator;
 
   /** 
@@ -76,7 +167,7 @@ public:
    */
   const Sh *insert (const Sh &shape)
   {
-    typename std::set<Sh>::iterator f = m_set.insert (shape).first;
+    typename set_type::iterator f = m_set.insert (shape).first;
     return &(*f);
   }
 
@@ -106,7 +197,16 @@ public:
 
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
-    db::mem_stat (stat, purpose, cat, m_set, no_self, parent);
+    //  the mem_stat overload for std::unordered_set only applies to the default hash
+    //  function, so the entries are collected here
+    if (! no_self) {
+      //  per node: next pointer and cached hash code
+      size_t size = sizeof (m_set) + m_set.bucket_count () * sizeof (void *) + m_set.size () * 2 * sizeof (void *);
+      stat->add (typeid (m_set), (void *) &m_set, size, size, parent, purpose, cat);
+    }
+    for (iterator i = m_set.begin (); i != m_set.end (); ++i) {
+      db::mem_stat (stat, purpose, cat, *i, false, (void *) &m_set);
+    }
   }
 
 private:

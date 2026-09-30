@@ -220,7 +220,7 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
 
   size_t n = 0;
   for (std::set<db::cell_index_type>::const_iterator ci = called_cells.begin (); ci != called_cells.end (); ++ci) {
-    db::connected_clusters<shape_type> cc = device_clusters.clusters_per_cell (*ci);
+    const db::connected_clusters<shape_type> &cc = device_clusters.clusters_per_cell (*ci);
     for (db::connected_clusters<shape_type>::all_iterator c = cc.begin_all (); !c.at_end(); ++c) {
       if (cc.is_root (*c)) {
         ++n;
@@ -253,7 +253,7 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
     }
 
     //  investigate each cluster
-    db::connected_clusters<shape_type> cc = device_clusters.clusters_per_cell (*ci);
+    const db::connected_clusters<shape_type> &cc = device_clusters.clusters_per_cell (*ci);
     for (db::connected_clusters<shape_type>::all_iterator c = cc.begin_all (); !c.at_end(); ++c) {
 
       //  take only root clusters - others have upward connections and are not "whole"

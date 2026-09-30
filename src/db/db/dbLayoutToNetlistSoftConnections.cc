@@ -307,7 +307,7 @@ void SoftConnectionInfo::build_graphs_for_circuit (const db::Circuit *circuit, c
         //  direct soft connections to other nets
 
         for (int up = 0; up < 2; ++up) {
-          std::set<size_t> next = up ? shape_clusters.upward_soft_connections (*cc) : shape_clusters.downward_soft_connections (*cc);
+          const std::set<size_t> &next = up ? shape_clusters.upward_soft_connections (*cc) : shape_clusters.downward_soft_connections (*cc);
           if (! next.empty () || net_has_up_or_down_subcircuit_connections (net, up)) {
             dir |= up ? SoftConnectionPinDir::up () : SoftConnectionPinDir::down ();
           }

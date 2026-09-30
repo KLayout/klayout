@@ -25,6 +25,7 @@
 #include "tlReuseVector.h"
 
 #include <string>
+#include <utility>
 #include <vector>
 #include <cstdio>
 
@@ -370,5 +371,64 @@ TEST(5)
   }
   EXPECT_EQ (v.size (), size_t (0));
   EXPECT_EQ (v.empty (), true);
+}
+
+namespace {
+
+struct MoveCounted
+{
+  static int copies;
+  static int moves;
+  static void reset () { copies = moves = 0; }
+
+  MoveCounted () : x (0) { }
+  explicit MoveCounted (int n) : x (n) { }
+  MoveCounted (const MoveCounted &d) : x (d.x) { ++copies; }
+  MoveCounted (MoveCounted &&d) noexcept : x (d.x) { ++moves; }
+  MoveCounted &operator= (const MoveCounted &d) { x = d.x; ++copies; return *this; }
+  MoveCounted &operator= (MoveCounted &&d) noexcept { x = d.x; ++moves; return *this; }
+
+  int x;
+};
+
+int MoveCounted::copies = 0;
+int MoveCounted::moves = 0;
+
+}
+
+//  growth must move elements with a noexcept move constructor instead of copying them
+TEST(6)
+{
+  MoveCounted::reset ();
+
+  tl::reuse_vector<MoveCounted> v;
+  for (int i = 0; i < 20; ++i) {
+    v.insert (MoveCounted (i));
+  }
+
+  EXPECT_EQ (v.size (), size_t (20));
+  EXPECT_EQ (v.begin ()->x, 0);
+
+  //  the original code copied every element on reallocation, so no move happened
+  EXPECT (MoveCounted::moves > 0);
+}
+
+//  move assignment must release the elements it owns (the original code leaked them)
+TEST(7)
+{
+  tl::reuse_vector<A> a, b;
+  a.insert (A (1));
+  a.insert (A (2));
+  b.insert (A (3));
+  b.insert (A (4));
+  b.insert (A (5));
+
+  A::reset ();
+  b = std::move (a);
+
+  EXPECT_EQ (A::dc, 3);
+  EXPECT_EQ (b.size (), size_t (2));
+  EXPECT_EQ (b.begin ()->x, 1);
+  EXPECT_EQ (a.size (), size_t (0));
 }
 

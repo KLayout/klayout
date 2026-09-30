@@ -22,7 +22,11 @@
 
 
 #include "dbTrans.h"
+#include "dbBox.h"
+#include "dbEdge.h"
 #include "tlUnitTest.h"
+
+#include <type_traits>
 
 TEST(1) 
 {
@@ -441,4 +445,40 @@ TEST(16_issue2362)
   ex.read (tt);
 
   EXPECT_EQ (ts, tt.to_string ());
+}
+
+//  Bug: user provided copy ctor/assignment for the transformation and shape types
+//  made them non-trivially-copyable
+TEST(17_trivially_copyable)
+{
+  EXPECT_EQ (std::is_trivially_copyable<db::Trans>::value, true);
+  EXPECT_EQ (std::is_trivially_copyable<db::Box>::value, true);
+  EXPECT_EQ (std::is_trivially_copyable<db::Edge>::value, true);
+
+  db::Trans t (1, false, db::Vector (100, -200));
+  db::Trans tc (t);
+  EXPECT_EQ (tc, t);
+  db::Trans ta;
+  ta = t;
+  EXPECT_EQ (ta, t);
+  ta = db::Trans ();
+  EXPECT_EQ (tc, t);
+
+  db::Box b (db::Point (10, 20), db::Point (30, 40));
+  db::Box bc (b);
+  EXPECT_EQ (bc, b);
+  db::Box ba;
+  ba = b;
+  EXPECT_EQ (ba, b);
+  ba = db::Box ();
+  EXPECT_EQ (bc, b);
+
+  db::Edge e (db::Point (10, 20), db::Point (30, 40));
+  db::Edge ec (e);
+  EXPECT_EQ (ec, e);
+  db::Edge ea;
+  ea = e;
+  EXPECT_EQ (ea, e);
+  ea = db::Edge ();
+  EXPECT_EQ (ec, e);
 }

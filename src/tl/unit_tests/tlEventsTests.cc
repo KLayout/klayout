@@ -25,6 +25,7 @@
 #include "tlUnitTest.h"
 
 #include <memory>
+#include <string>
 
 //  Object with event
 class Observed
@@ -425,3 +426,124 @@ TEST(6)
   EXPECT_EQ (d.calls, 0);
 }
 
+//  Receiver recording the arguments it got, for events of varying arity
+class MultiArgObserver : public tl::Object
+{
+public:
+  MultiArgObserver () : events (0), data (0), i (0), d (0), extra (0), p (0) { }
+
+  void recv0 () { events += 1; }
+  void recv1 (int a) { events += 1; i = a; }
+  void recv2 (int a, double b) { events += 1; i = a; d = b; }
+  void recv3 (int a, double b, std::string c) { events += 1; i = a; d = b; s = c; }
+  void recv4 (int a, double b, std::string c, const std::string &e) { events += 1; i = a; d = b; s = c; r = e; }
+  void recv5 (int a, double b, std::string c, const std::string &e, MultiArgObserver *q) { events += 1; i = a; d = b; s = c; r = e; p = q; }
+  void recv6 (int a, double b, std::string c, const std::string &e, MultiArgObserver *q, int f) { events += 1; i = a; d = b; s = c; r = e; p = q; extra = f; }
+
+  void recv_d0 (int dd) { events += 1; data = dd; }
+  void recv_d1 (int dd, int a) { events += 1; data = dd; i = a; }
+  void recv_d2 (int dd, int a, double b) { events += 1; data = dd; i = a; d = b; }
+  void recv_d3 (int dd, int a, double b, std::string c) { events += 1; data = dd; i = a; d = b; s = c; }
+  void recv_d4 (int dd, int a, double b, std::string c, const std::string &e) { events += 1; data = dd; i = a; d = b; s = c; r = e; }
+  void recv_d5 (int dd, int a, double b, std::string c, const std::string &e, MultiArgObserver *q) { events += 1; data = dd; i = a; d = b; s = c; r = e; p = q; }
+  void recv_d6 (int dd, int a, double b, std::string c, const std::string &e, MultiArgObserver *q, int f) { events += 1; data = dd; i = a; d = b; s = c; r = e; p = q; extra = f; }
+
+  int events;
+  int data;
+  int i;
+  double d;
+  int extra;
+  MultiArgObserver *p;
+  std::string s;
+  std::string r;
+};
+
+//  events with 0 to 4 arguments of mixed types, plain and with_data receivers
+TEST(7)
+{
+  MultiArgObserver y, z;
+
+  tl::event<> ev0;
+  tl::event<int> ev1;
+  tl::event<int, double> ev2;
+  tl::event<int, double, std::string> ev3;
+  tl::event<int, double, std::string, const std::string &> ev4;
+
+  ev0.add (&y, &MultiArgObserver::recv0);
+  ev1.add (&y, &MultiArgObserver::recv1);
+  ev2.add (&y, &MultiArgObserver::recv2);
+  ev3.add (&y, &MultiArgObserver::recv3);
+  ev4.add (&y, &MultiArgObserver::recv4);
+
+  ev0.add (&z, &MultiArgObserver::recv0);
+  ev1.add (&z, &MultiArgObserver::recv1);
+
+  ev1 (42);
+  EXPECT_EQ (y.events, 1);
+  EXPECT_EQ (y.i, 42);
+  EXPECT_EQ (z.events, 1);
+  EXPECT_EQ (z.i, 42);
+
+  ev2 (2, 2.5);
+  EXPECT_EQ (y.events, 2);
+  EXPECT_EQ (y.i, 2);
+  EXPECT_EQ (y.d, 2.5);
+
+  ev3 (3, 3.5, std::string ("three"));
+  EXPECT_EQ (y.events, 3);
+  EXPECT_EQ (y.i, 3);
+  EXPECT_EQ (y.d, 3.5);
+  EXPECT_EQ (y.s, "three");
+
+  ev4 (4, 4.5, std::string ("four"), std::string ("ref"));
+  EXPECT_EQ (y.events, 4);
+  EXPECT_EQ (y.i, 4);
+  EXPECT_EQ (y.d, 4.5);
+  EXPECT_EQ (y.s, "four");
+  EXPECT_EQ (y.r, "ref");
+
+  //  remove a receiver
+  ev1.remove (&z, &MultiArgObserver::recv1);
+  ev1 (43);
+  EXPECT_EQ (y.events, 5);
+  EXPECT_EQ (y.i, 43);
+  EXPECT_EQ (z.events, 1);
+  EXPECT_EQ (z.i, 42);
+
+  //  with_data receivers
+  MultiArgObserver w;
+  ev0.add (&w, &MultiArgObserver::recv_d0, 10);
+  ev1.add (&w, &MultiArgObserver::recv_d1, 11);
+  ev2.add (&w, &MultiArgObserver::recv_d2, 12);
+  ev3.add (&w, &MultiArgObserver::recv_d3, 13);
+  ev4.add (&w, &MultiArgObserver::recv_d4, 14);
+
+  ev0 ();
+  EXPECT_EQ (w.events, 1);
+  EXPECT_EQ (w.data, 10);
+
+  ev1 (5);
+  EXPECT_EQ (w.events, 2);
+  EXPECT_EQ (w.data, 11);
+  EXPECT_EQ (w.i, 5);
+
+  ev2 (6, 6.5);
+  EXPECT_EQ (w.events, 3);
+  EXPECT_EQ (w.data, 12);
+  EXPECT_EQ (w.i, 6);
+  EXPECT_EQ (w.d, 6.5);
+
+  ev3 (7, 7.5, std::string ("seven"));
+  EXPECT_EQ (w.events, 4);
+  EXPECT_EQ (w.data, 13);
+  EXPECT_EQ (w.i, 7);
+  EXPECT_EQ (w.s, "seven");
+
+  ev4 (8, 8.5, std::string ("eight"), std::string ("ref2"));
+  EXPECT_EQ (w.events, 5);
+  EXPECT_EQ (w.data, 14);
+  EXPECT_EQ (w.i, 8);
+  EXPECT_EQ (w.d, 8.5);
+  EXPECT_EQ (w.s, "eight");
+  EXPECT_EQ (w.r, "ref2");
+}

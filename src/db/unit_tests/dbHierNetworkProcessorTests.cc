@@ -997,6 +997,172 @@ TEST(31_LocalConnectedClustersBigNetJoin)
   EXPECT_EQ (v100 [51] == db::ClusterInstance (61, db::InstElement (insts [59])), true);
 }
 
+//  joining several clusters at once must reproduce the original algorithm:
+//  duplicates against the target and inside the joined lists are dropped, the
+//  order follows the joined lists
+TEST(32_LocalConnectedClustersJoinClustersWith)
+{
+  db::Layout layout;
+  db::cell_index_type ci_top = layout.add_cell ("TOP");
+  db::cell_index_type ci_child = layout.add_cell ("CHILD");
+
+  std::vector<db::Instance> insts;
+  for (int i = 0; i < 200; ++i) {
+    layout.cell (ci_top).insert (db::CellInstArray (db::CellInst (ci_child), db::Trans (db::Vector (i * 100, 0))));
+  }
+  //  collect the handles only after inserting: in non-editable mode they are invalidated by further inserts
+  for (db::Cell::const_iterator i = layout.cell (ci_top).begin (); ! i.at_end (); ++i) {
+    insts.push_back (*i);
+  }
+
+  db::connected_clusters<db::PolygonRef> cc;
+
+  //  a target beyond the size where join dedupe needs to stay efficient
+  for (int i = 0; i < 40; ++i) {
+    cc.add_connection (1, db::ClusterInstance (size_t (100 + i), db::InstElement (insts [size_t (i)])));
+  }
+
+  //  the first list has an internal duplicate
+  cc.add_connection (2, db::ClusterInstance (201, db::InstElement (insts [60])));
+  cc.add_connection (2, db::ClusterInstance (201, db::InstElement (insts [60])));
+
+  //  the second list duplicates one connection of the target and brings a new one
+  cc.add_connection (3, db::ClusterInstance (100, db::InstElement (insts [0])));
+  cc.add_connection (3, db::ClusterInstance (310, db::InstElement (insts [61])));
+
+  //  the third list duplicates the connection joined through the second list and brings a new one
+  cc.add_connection (4, db::ClusterInstance (310, db::InstElement (insts [61])));
+  cc.add_connection (4, db::ClusterInstance (420, db::InstElement (insts [62])));
+
+  std::set<db::connected_clusters<db::PolygonRef>::id_type> with;
+  with.insert (2);
+  with.insert (3);
+  with.insert (4);
+  cc.join_clusters_with (1, with.begin (), with.end ());
+
+  std::vector<db::ClusterInstance> v = connections_as_vector (cc, 1);
+
+  std::vector<db::ClusterInstance> expected;
+  for (int i = 0; i < 40; ++i) {
+    expected.push_back (db::ClusterInstance (size_t (100 + i), db::InstElement (insts [size_t (i)])));
+  }
+  expected.push_back (db::ClusterInstance (201, db::InstElement (insts [60])));
+  expected.push_back (db::ClusterInstance (310, db::InstElement (insts [61])));
+  expected.push_back (db::ClusterInstance (420, db::InstElement (insts [62])));
+
+  EXPECT_EQ (v.size (), size_t (43));
+  EXPECT_EQ (v == expected, true);
+
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (201, db::InstElement (insts [60]))), size_t (1));
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (420, db::InstElement (insts [62]))), size_t (1));
+
+  //  a joined list with more elements than the scan limit takes the set-based path:
+  //  like the original algorithm it drops the duplicate of the target but keeps both
+  //  occurrences of the internal duplicate (appended connections are not entered into
+  //  the set built over the target)
+  cc.add_connection (5, db::ClusterInstance (100, db::InstElement (insts [0])));  //  duplicates the target
+  for (int i = 0; i < 97; ++i) {
+    cc.add_connection (5, db::ClusterInstance (size_t (600 + i), db::InstElement (insts [size_t (i)])));
+  }
+  cc.add_connection (5, db::ClusterInstance (600, db::InstElement (insts [0])));  //  internal duplicate
+
+  cc.join_cluster_with (1, 5);
+
+  v = connections_as_vector (cc, 1);
+
+  EXPECT_EQ (v.size (), size_t (141));
+  EXPECT_EQ (v [43] == db::ClusterInstance (600, db::InstElement (insts [0])), true);
+  EXPECT_EQ (v [139] == db::ClusterInstance (696, db::InstElement (insts [96])), true);
+  EXPECT_EQ (v [140] == db::ClusterInstance (600, db::InstElement (insts [0])), true);
+}
+
+//  renames interacting with joins: a join drops the renamed connection when it is
+//  already present in the target and appends it when not; the remove path of a
+//  rename leaves a valid list which takes up new connections again
+TEST(33_LocalConnectedClustersRenameAndJoin)
+{
+  db::Layout layout;
+  db::cell_index_type ci_top = layout.add_cell ("TOP");
+  db::cell_index_type ci_child = layout.add_cell ("CHILD");
+
+  std::vector<db::Instance> insts;
+  for (int i = 0; i < 100; ++i) {
+    layout.cell (ci_top).insert (db::CellInstArray (db::CellInst (ci_child), db::Trans (db::Vector (i * 100, 0))));
+  }
+  //  collect the handles only after inserting: in non-editable mode they are invalidated by further inserts
+  for (db::Cell::const_iterator i = layout.cell (ci_top).begin (); ! i.at_end (); ++i) {
+    insts.push_back (*i);
+  }
+
+  db::connected_clusters<db::PolygonRef> cc;
+
+  for (int i = 0; i < 10; ++i) {
+    cc.add_connection (1, db::ClusterInstance (size_t (500 + i), db::InstElement (insts [size_t (i)])));
+  }
+
+  //  rename 710 -> 720 inside cluster 2: the renamed connection is not in the target,
+  //  so the join appends it
+  cc.add_connection (2, db::ClusterInstance (700, db::InstElement (insts [30])));
+  cc.add_connection (2, db::ClusterInstance (710, db::InstElement (insts [31])));
+  cc.rename_connection (db::ClusterInstance (710, db::InstElement (insts [31])), 720);
+
+  std::vector<db::ClusterInstance> v = connections_as_vector (cc, 2);
+  EXPECT_EQ (v.size (), size_t (2));
+  EXPECT_EQ (v [1] == db::ClusterInstance (720, db::InstElement (insts [31])), true);
+
+  cc.join_cluster_with (1, 2);
+
+  v = connections_as_vector (cc, 1);
+  EXPECT_EQ (v.size (), size_t (12));
+  EXPECT_EQ (v [10] == db::ClusterInstance (700, db::InstElement (insts [30])), true);
+  EXPECT_EQ (v [11] == db::ClusterInstance (720, db::InstElement (insts [31])), true);
+
+  //  rename 810 -> 820 inside cluster 3 and take the renamed connection into the
+  //  target as well: the join keeps the target's element and does not append again
+  cc.add_connection (3, db::ClusterInstance (800, db::InstElement (insts [40])));
+  cc.add_connection (3, db::ClusterInstance (810, db::InstElement (insts [41])));
+  cc.rename_connection (db::ClusterInstance (810, db::InstElement (insts [41])), 820);
+
+  cc.add_connection (1, db::ClusterInstance (820, db::InstElement (insts [41])));
+
+  cc.join_cluster_with (1, 3);
+
+  v = connections_as_vector (cc, 1);
+  EXPECT_EQ (v.size (), size_t (14));
+  EXPECT_EQ (v [12] == db::ClusterInstance (820, db::InstElement (insts [41])), true);
+  EXPECT_EQ (v [13] == db::ClusterInstance (800, db::InstElement (insts [40])), true);
+
+  //  remove the last element of cluster 4 through the rename's remove path (the new
+  //  ID is connected elsewhere): the list must stay intact and take up new
+  //  connections again
+  cc.add_connection (4, db::ClusterInstance (900, db::InstElement (insts [50])));
+  cc.add_connection (4, db::ClusterInstance (910, db::InstElement (insts [51])));
+  cc.add_connection (1, db::ClusterInstance (911, db::InstElement (insts [51])));
+
+  cc.rename_connection (db::ClusterInstance (910, db::InstElement (insts [51])), 911);
+
+  v = connections_as_vector (cc, 4);
+  EXPECT_EQ (v.size (), size_t (1));
+  EXPECT_EQ (v [0] == db::ClusterInstance (900, db::InstElement (insts [50])), true);
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (910, db::InstElement (insts [51]))), size_t (0));
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (911, db::InstElement (insts [51]))), size_t (1));
+
+  cc.add_connection (4, db::ClusterInstance (920, db::InstElement (insts [52])));
+
+  v = connections_as_vector (cc, 4);
+  EXPECT_EQ (v.size (), size_t (2));
+  EXPECT_EQ (v [0] == db::ClusterInstance (900, db::InstElement (insts [50])), true);
+  EXPECT_EQ (v [1] == db::ClusterInstance (920, db::InstElement (insts [52])), true);
+
+  cc.join_cluster_with (1, 4);
+
+  v = connections_as_vector (cc, 1);
+  EXPECT_EQ (v.size (), size_t (17));
+  EXPECT_EQ (v [14] == db::ClusterInstance (911, db::InstElement (insts [51])), true);
+  EXPECT_EQ (v [15] == db::ClusterInstance (900, db::InstElement (insts [50])), true);
+  EXPECT_EQ (v [16] == db::ClusterInstance (920, db::InstElement (insts [52])), true);
+}
+
 TEST(40_HierClustersBasic)
 {
   db::hier_clusters<db::PolygonRef> hc;

@@ -26,6 +26,8 @@
 #include "tlString.h"
 #include "tlUnitTest.h"
 
+#include <utility>
+
 namespace {
 
 /**
@@ -471,6 +473,113 @@ TEST(PropertiesSetHash)
 
   EXPECT_EQ (ps2.hash (), h1);
   EXPECT_EQ (db::hash_for_properties_id (rp.properties_id (ps2)), h1);
+}
+
+TEST(PropertiesSetSwapHash)
+{
+  db::PropertiesSet a, b;
+  a.insert (tl::Variant (1), tl::Variant ("a"));
+  a.insert (tl::Variant (2), tl::Variant ("b"));
+  b.insert (tl::Variant (2), tl::Variant ("b"));
+  b.insert (tl::Variant (1), tl::Variant ("a"));
+
+  size_t h = a.hash ();
+  EXPECT_EQ (b.hash (), h);
+
+  a.swap (b);
+
+  db::PropertiesSet ref;
+  ref.insert (tl::Variant (1), tl::Variant ("a"));
+  ref.insert (tl::Variant (2), tl::Variant ("b"));
+
+  EXPECT_EQ (a.hash (), b.hash ());
+  EXPECT_EQ (a.hash (), ref.hash ());
+
+  //  swapping sets with different content must exchange the cached hashes as well
+  db::PropertiesSet c, d;
+  c.insert (tl::Variant (1), tl::Variant ("a"));
+  c.insert (tl::Variant (2), tl::Variant ("b"));
+  d.insert (tl::Variant (3), tl::Variant ("c"));
+
+  size_t hc = c.hash ();
+  size_t hd = d.hash ();
+  EXPECT (hc != hd);
+
+  c.swap (d);
+
+  db::PropertiesSet ref_c, ref_d;
+  ref_c.insert (tl::Variant (1), tl::Variant ("a"));
+  ref_c.insert (tl::Variant (2), tl::Variant ("b"));
+  ref_d.insert (tl::Variant (3), tl::Variant ("c"));
+
+  EXPECT_EQ (c.hash (), ref_d.hash ());
+  EXPECT_EQ (d.hash (), ref_c.hash ());
+}
+
+TEST(PropertiesSetHashInvalidation)
+{
+  //  after a cached hash, every mutation must reset it
+  db::PropertiesSet ps;
+  ps.insert (tl::Variant (1), tl::Variant ("a"));
+  ps.insert (tl::Variant (2), tl::Variant ("b"));
+  size_t h = ps.hash ();
+
+  ps.insert (tl::Variant (3), tl::Variant ("c"));
+  db::PropertiesSet ref_insert;
+  ref_insert.insert (tl::Variant (1), tl::Variant ("a"));
+  ref_insert.insert (tl::Variant (2), tl::Variant ("b"));
+  ref_insert.insert (tl::Variant (3), tl::Variant ("c"));
+  EXPECT_EQ (ps.hash (), ref_insert.hash ());
+  EXPECT (ps.hash () != h);
+
+  ps.erase (tl::Variant (3));
+  db::PropertiesSet ref_erase;
+  ref_erase.insert (tl::Variant (1), tl::Variant ("a"));
+  ref_erase.insert (tl::Variant (2), tl::Variant ("b"));
+  EXPECT_EQ (ps.hash (), ref_erase.hash ());
+
+  ps.clear ();
+  EXPECT_EQ (ps.hash (), size_t (0));
+}
+
+TEST(PropertiesSetMove)
+{
+  db::PropertiesSet a;
+  a.insert (tl::Variant (1), tl::Variant ("a"));
+  a.insert (tl::Variant (2), tl::Variant ("b"));
+
+  db::PropertiesSet copy (a);
+  size_t h = a.hash ();
+  EXPECT_EQ (copy.hash (), h);
+
+  db::PropertiesSet b (std::move (a));
+  EXPECT_EQ (b == copy, true);
+  EXPECT_EQ (b.hash (), h);
+  EXPECT_EQ (a.empty (), true);
+  EXPECT_EQ (a.hash (), size_t (0));
+
+  db::PropertiesSet c;
+  c.insert (tl::Variant (9), tl::Variant ("z"));
+  c = std::move (b);
+  EXPECT_EQ (c == copy, true);
+  EXPECT_EQ (c.hash (), h);
+  EXPECT_EQ (b.empty (), true);
+  EXPECT_EQ (b.hash (), size_t (0));
+}
+
+TEST(PropertiesSetCopyHash)
+{
+  db::PropertiesSet a;
+  a.insert (tl::Variant (1), tl::Variant ("a"));
+  size_t h = a.hash ();
+
+  db::PropertiesSet b (a);
+  EXPECT_EQ (b.hash (), h);
+
+  db::PropertiesSet c;
+  c.insert (tl::Variant (9), tl::Variant ("z"));
+  c = a;
+  EXPECT_EQ (c.hash (), h);
 }
 
 TEST(SameValueDifferentTypes)

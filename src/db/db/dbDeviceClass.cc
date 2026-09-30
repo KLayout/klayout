@@ -25,6 +25,8 @@
 #include "dbNetlist.h"
 #include "tlClassRegistry.h"
 
+#include <algorithm>
+
 namespace db
 {
 
@@ -129,15 +131,9 @@ bool EqualDeviceParameters::less (const db::Device &a, const db::Device &b) cons
 
   //  compare the remaining parameters with a default precision
 
-  std::set<size_t> seen;
-  for (std::vector<std::pair<size_t, std::pair<double, double> > >::const_iterator c = m_compare_set.begin (); c != m_compare_set.end (); ++c) {
-    seen.insert (c->first);
-  }
-
-  const std::vector<db::DeviceParameterDefinition> &pd = primary_device_class (a, b)->parameter_definitions ();
-  for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
-    if (p->is_primary () && seen.find (p->id ()) == seen.end ()) {
-      int cmp = compare_parameters (a.parameter_value (p->id ()), b.parameter_value (p->id ()));
+  for (const auto &p : primary_device_class (a, b)->parameter_definitions ()) {
+    if (p.is_primary () && ! is_in_compare_set (p.id ())) {
+      const int cmp = compare_parameters (a.parameter_value (p.id ()), b.parameter_value (p.id ()));
       if (cmp != 0) {
         return cmp < 0;
       }
@@ -145,6 +141,14 @@ bool EqualDeviceParameters::less (const db::Device &a, const db::Device &b) cons
   }
 
   return false;
+}
+
+bool EqualDeviceParameters::is_in_compare_set (size_t parameter_id) const
+{
+  //  the compare set is small, so a linear search is cheaper than building a set
+  return std::any_of (m_compare_set.begin (), m_compare_set.end (), [parameter_id] (const std::pair<size_t, std::pair<double, double> > &c) {
+    return c.first == parameter_id;
+  });
 }
 
 EqualDeviceParameters &EqualDeviceParameters::operator+= (const EqualDeviceParameters &other)
@@ -309,30 +313,37 @@ size_t DeviceClass::terminal_id_for_name (const std::string &name) const
 //  The default compare delegate
 static EqualDeviceParameters default_compare;
 
-bool DeviceClass::less (const db::Device &a, const db::Device &b)
+static const db::DeviceParameterCompareDelegate *
+compare_delegate (const db::Device &a, const db::Device &b)
 {
   tl_assert (a.device_class () != 0);
   tl_assert (b.device_class () != 0);
 
   const db::DeviceParameterCompareDelegate *pcd = primary_device_class (a, b)->parameter_compare_delegate ();
-  if (! pcd) {
-    pcd = &default_compare;
-  }
+  return pcd ? pcd : &default_compare;
+}
 
-  return pcd->less (a, b);
+bool DeviceClass::less (const db::Device &a, const db::Device &b)
+{
+  return compare_delegate (a, b)->less (a, b);
 }
 
 bool DeviceClass::equal (const db::Device &a, const db::Device &b)
 {
-  tl_assert (a.device_class () != 0);
-  tl_assert (b.device_class () != 0);
-
-  const db::DeviceParameterCompareDelegate *pcd = primary_device_class (a, b)->parameter_compare_delegate ();
-  if (! pcd) {
-    pcd = &default_compare;
-  }
-
+  const auto *pcd = compare_delegate (a, b);
   return ! pcd->less (a, b) && ! pcd->less (b, a);
+}
+
+int DeviceClass::compare (const db::Device &a, const db::Device &b)
+{
+  const auto *pcd = compare_delegate (a, b);
+  if (pcd->less (a, b)) {
+    return -1;
+  } else if (pcd->less (b, a)) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 // --------------------------------------------------------------------------------

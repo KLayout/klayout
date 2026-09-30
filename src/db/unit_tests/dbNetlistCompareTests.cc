@@ -438,6 +438,128 @@ TEST(0_EqualDeviceParameters)
   EXPECT_EQ (dc.less (d2, d1), false);
 }
 
+//  a compare delegate with a fixed "less" result, independent of the parameters
+//  (like GenericDeviceParameterCompare, it overrides EqualDeviceParameters::less)
+class FixedLessCompare
+  : public db::EqualDeviceParameters
+{
+public:
+  FixedLessCompare (const db::Device *first, bool less_first_second, bool less_second_first)
+    : m_first (first), m_less_first_second (less_first_second), m_less_second_first (less_second_first)
+  { }
+
+  virtual bool less (const db::Device &a, const db::Device &b) const
+  {
+    return &a == m_first ? m_less_first_second : m_less_second_first;
+  }
+
+private:
+  const db::Device *m_first;
+  bool m_less_first_second, m_less_second_first;
+};
+
+//  asserts that compare, less and equal agree on the delegate's "less" answers
+static void expect_compare (tl::TestBase *_this, const db::Device &a, const db::Device &b, bool less_ab, bool less_ba)
+{
+  EXPECT_EQ (db::DeviceClass::compare (a, b), less_ab ? -1 : (less_ba ? 1 : 0));
+  EXPECT_EQ (db::DeviceClass::compare (b, a), less_ba ? -1 : (less_ab ? 1 : 0));
+  EXPECT_EQ (db::DeviceClass::less (a, b), less_ab);
+  EXPECT_EQ (db::DeviceClass::less (b, a), less_ba);
+  EXPECT_EQ (db::DeviceClass::equal (a, b), ! less_ab && ! less_ba);
+  EXPECT_EQ (db::DeviceClass::equal (b, a), ! less_ab && ! less_ba);
+}
+
+TEST(0_DeviceClassCompare)
+{
+  db::DeviceClassMOS3Transistor dc;
+
+  db::Device d1 (&dc);
+  db::Device d2 (&dc);
+
+  //  default delegate: primary parameters only, default tolerance
+
+  d1.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 40.0);
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 40.0);
+  d1.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 20.0);
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 20.0);
+
+  //  non-primary parameters are not compared, and neither are parameters beyond the parameter definitions
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 1.0);
+  d1.set_parameter_value (100, 5.0);
+
+  expect_compare (_this, d1, d2, false, false);
+
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 21.0);
+  expect_compare (_this, d1, d2, true, false);
+
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 20.0);
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 41.0);
+  expect_compare (_this, d1, d2, true, false);
+
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 39.0);
+  expect_compare (_this, d1, d2, false, true);
+
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 40.0);
+
+  //  explicit delegate with a tolerance and an ignored parameter
+
+  db::EqualDeviceParameters *eqp = new db::EqualDeviceParameters ();
+  *eqp += db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 0.5, 0.0);
+  *eqp += db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_W, true);  //  ignore W
+  dc.set_parameter_compare_delegate (eqp);
+
+  //  W is ignored
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 30.0);
+  expect_compare (_this, d1, d2, false, false);
+
+  //  L is inside the absolute tolerance
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 40.4);
+  expect_compare (_this, d1, d2, false, false);
+
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 40.6);
+  expect_compare (_this, d1, d2, true, false);
+
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 39.4);
+  expect_compare (_this, d1, d2, false, true);
+
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 40.0);
+
+  //  a non-primary parameter is compared when listed in the compare set
+  *eqp += db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_AD, 0.0, 0.0);
+
+  expect_compare (_this, d1, d2, true, false);
+
+  d1.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 1.0);
+  expect_compare (_this, d1, d2, false, false);
+
+  //  a parameter beyond the parameter definitions can be put into the compare set
+  //  (d1 carries 5.0 there, d2 the default value 0.0)
+  *eqp += db::EqualDeviceParameters (100, 0.25, 0.0);
+
+  expect_compare (_this, d1, d2, false, true);
+
+  d2.set_parameter_value (100, 5.1);
+  expect_compare (_this, d1, d2, false, false);
+
+  d2.set_parameter_value (100, 5.4);
+  expect_compare (_this, d1, d2, true, false);
+
+  //  a delegate subclass overriding "less" (like GenericDeviceParameterCompare does)
+
+  dc.set_parameter_compare_delegate (new FixedLessCompare (&d1, false, false));
+  expect_compare (_this, d1, d2, false, false);
+
+  dc.set_parameter_compare_delegate (new FixedLessCompare (&d1, true, false));
+  expect_compare (_this, d1, d2, true, false);
+
+  dc.set_parameter_compare_delegate (new FixedLessCompare (&d1, false, true));
+  expect_compare (_this, d1, d2, false, true);
+
+  //  "less" in both directions: compare takes the first one, so equal is false
+  dc.set_parameter_compare_delegate (new FixedLessCompare (&d1, true, true));
+  expect_compare (_this, d1, d2, true, true);
+}
+
 TEST(0_NetNameEquivalence)
 {
   db::Netlist a, b;

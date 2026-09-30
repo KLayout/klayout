@@ -88,19 +88,14 @@ public:
    *
    *  @param d The source from which to copy
    */
-  point (const point<C> &d) : m_x (d.x ()), m_y (d.y ()) { }
+  point (const point<C> &d) = default;
 
   /**
    *  @brief Assignment
    *
    *  @param d The source from which to take the data
    */
-  point &operator= (const point<C> &d) 
-  {
-    m_x = d.x ();
-    m_y = d.y ();
-    return *this;
-  }
+  point &operator= (const point<C> &d) = default;
 
   /**
    *  @brief The copy constructor that also converts

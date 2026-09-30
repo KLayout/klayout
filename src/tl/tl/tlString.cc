@@ -399,7 +399,13 @@ static double local_strtod (const char *cp, const char *&cp_new)
     }
     int en = 0;
     while (safe_isdigit (*cp)) {
-      en = en * 10 + int (*cp - '0');
+      //  cap the exponent to avoid a signed overflow on absurd inputs like "1e9999999999"
+      if (en < 100000) {
+        en = en * 10 + int (*cp - '0');
+        if (en > 100000) {
+          en = 100000;
+        }
+      }
       ++cp;
     }
     if (! epos) {
@@ -890,13 +896,30 @@ template <class T>
 static void
 convert_string_to_int (const std::string &s, T &v, bool eval)
 {
+  //  Try an exact integer conversion first; the double based fallback below cannot represent
+  //  integers beyond 2^53 exactly
+  try {
+    tl::Extractor ex (s);
+    T x = 0;
+    if (ex.try_read (x) && ex.at_end ()) {
+      v = x;
+      return;
+    }
+  } catch (...) {
+    //  overflow or range error: fall back to the double based conversion
+  }
+
   double x;
-  // HACK: this should be some real string-to-int conversion
   tl::from_string_numeric (s, x, eval);
-  if (x < std::numeric_limits <T>::min ()) {
+
+  int digits = std::numeric_limits <T>::digits;
+  double min_value = std::numeric_limits <T>::is_signed ? -ldexp (1.0, digits) : 0.0;
+  double max_value = ldexp (1.0, digits);
+
+  if (x < min_value) {
     throw tl::Exception (tl::to_string (tr ("Range underflow: ")) + s);
   }
-  if (x > std::numeric_limits <T>::max ()) {
+  if (x >= max_value) {
     throw tl::Exception (tl::to_string (tr ("Range overflow: ")) + s);
   }
   v = T (x);

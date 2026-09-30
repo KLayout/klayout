@@ -33,6 +33,9 @@
 #include "tlString.h"
 #include "tlClassRegistry.h"
 
+#include <limits>
+#include <type_traits>
+
 namespace db
 {
 
@@ -110,40 +113,112 @@ OASISReader::init (const db::LoadLayoutOptions &options)
   m_expect_strict_mode = oasis_options.expect_strict_mode;
 }
 
+//  C++20 branch hints where the compiler has them
+#if __cplusplus >= 202002L && defined(__has_cpp_attribute)
+#  if __has_cpp_attribute(likely)
+#    define OASIS_LIKELY [[likely]]
+#  endif
+#endif
+#if !defined(OASIS_LIKELY)
+#  define OASIS_LIKELY
+#endif
+
+template <class T>
+inline T
+OASISReader::get_unsigned (const char *type_name)
+{
+  static_assert (std::numeric_limits<T>::is_integer && ! std::numeric_limits<T>::is_signed, "get_unsigned needs an unsigned integer type");
+
+  //  a base-128 varint of T has at most max_bytes bytes; the last one may only carry the remaining high bits
+  constexpr unsigned int digits = std::numeric_limits<T>::digits;
+  constexpr unsigned int max_bytes = (digits + 6) / 7;
+  constexpr unsigned int last_byte_max = (1u << (digits - 7 * (max_bytes - 1))) - 1;
+
+  //  fast path: with max_bytes contiguous bytes buffered, a terminated varint is decoded without per-byte stream calls
+  size_t navail = 0;
+  const unsigned char *b = (const unsigned char *) m_stream.peek (navail);
+  if (b && navail >= max_bytes) OASIS_LIKELY {
+
+    T v = 0;
+    for (unsigned int i = 0; i < max_bytes; ++i) {
+      const unsigned int c = b [i];
+      if ((c & 0x80) == 0) {
+        if (i == max_bytes - 1 && (c & 0x7f) > last_byte_max) {
+          m_stream.skip (max_bytes);
+          error (tl::sprintf (tl::to_string (tr ("%s value overflow")), type_name));
+          return 0;
+        }
+        v += T (c & 0x7f) << (7 * i);
+        m_stream.skip (i + 1);
+        return v;
+      }
+      v += T (c & 0x7f) << (7 * i);
+    }
+
+    //  no terminator within max_bytes: the byte-wise path below reports this the same way as always
+
+  }
+
+  T v = 0;
+  T vm = 1;
+  unsigned int c;
+
+  do {
+    const unsigned char *bb = (const unsigned char *) m_stream.get (1);
+    if (! bb) {
+      error (tl::to_string (tr ("Unexpected end-of-file")));
+      return 0;
+    }
+    c = *bb;
+    if (vm > std::numeric_limits<T>::max () / 128 &&
+        T (c & 0x7f) > (std::numeric_limits<T>::max () / vm)) {
+      error (tl::sprintf (tl::to_string (tr ("%s value overflow")), type_name));
+    }
+    v += T (c & 0x7f) * vm;
+    vm <<= 7;
+  } while ((c & 0x80) != 0);
+
+  return v;
+}
+
+template <class S>
+inline S
+OASISReader::get_signed (const char *type_name)
+{
+  static_assert (std::numeric_limits<S>::is_integer && std::numeric_limits<S>::is_signed, "get_signed needs a signed integer type");
+
+  //  the sign is carried in the lowest bit
+  typedef typename std::make_unsigned<S>::type U;
+  const U u = get_unsigned<U> (type_name);
+  if ((u & 1) != 0) {
+    return -S (u >> 1);
+  } else {
+    return S (u >> 1);
+  }
+}
+
 inline int64_t
 OASISReader::get_int64 ()
 {
-  uint64_t u = get_uint64 ();
-  if ((u & 1) != 0) {
-    return -(int64_t) (u >> 1);
-  } else {
-    return (int64_t) (u >> 1);
-  }
+  return get_signed<int64_t> ("uint64");
 }
 
 inline uint64_t
 OASISReader::get_uint64 ()
 {
-  uint64_t v = 0;
-  uint64_t vm = 1;
-  char c;
+  return get_unsigned<uint64_t> ("uint64");
+}
 
-  do {
-    unsigned char *b = (unsigned char *) m_stream.get (1);
-    if (! b) {
-      error (tl::to_string (tr ("Unexpected end-of-file")));
-      return 0;
-    }
-    c = *b;
-    if (vm > std::numeric_limits <uint64_t>::max () / 128 &&
-        (uint64_t) (c & 0x7f) > (std::numeric_limits <uint64_t>::max () / vm)) {
-      error (tl::to_string (tr ("uint64 value overflow")));
-    }
-    v += (uint64_t) (c & 0x7f) * vm;
-    vm <<= 7;
-  } while ((c & 0x80) != 0);
+inline int32_t
+OASISReader::get_int32 ()
+{
+  return get_signed<int32_t> ("uint32");
+}
 
-  return v;
+inline uint32_t
+OASISReader::get_uint32 ()
+{
+  return get_unsigned<uint32_t> ("uint32");
 }
 
 inline uint64_t
@@ -154,42 +229,6 @@ OASISReader::get_uint64_for_divider ()
     error (tl::to_string (tr ("Divider must not be zero")));
   }
   return l;
-}
-
-inline int32_t
-OASISReader::get_int32 ()
-{
-  uint32_t u = get_uint32 ();
-  if ((u & 1) != 0) {
-    return -int32_t (u >> 1);
-  } else {
-    return int32_t (u >> 1);
-  }
-}
-
-inline uint32_t
-OASISReader::get_uint32 ()
-{
-  uint32_t v = 0;
-  uint32_t vm = 1;
-  char c;
-
-  do {
-    unsigned char *b = (unsigned char *) m_stream.get (1);
-    if (! b) {
-      error (tl::to_string (tr ("Unexpected end-of-file")));
-      return 0;
-    }
-    c = *b;
-    if (vm > std::numeric_limits <uint32_t>::max () / 128 &&
-        (uint32_t) (c & 0x7f) > (std::numeric_limits <uint32_t>::max () / vm)) {
-      error (tl::to_string (tr ("uin32 value overflow")));
-    }
-    v += (uint32_t) (c & 0x7f) * vm;
-    vm <<= 7;
-  } while ((c & 0x80) != 0);
-
-  return v;
 }
 
 std::string
@@ -1011,12 +1050,14 @@ OASISReader::do_read (db::Layout &layout)
         error (tl::sprintf (tl::to_string (tr ("Invalid CBLOCK compression type %d")), type));
       }
 
-      uint64_t dummy = 0;
-      get (dummy);  // uncomp-byte-count - not needed
-      get (dummy);  // comp-byte-count - not needed
+      uint64_t uncomp_byte_count = 0;
+      get (uncomp_byte_count);  //  uncomp-byte-count
 
-      //  put the stream into deflating mode
-      m_stream.inflate ();
+      uint64_t comp_byte_count = 0;
+      get (comp_byte_count);  //  comp-byte-count
+
+      //  put the stream into block-deflating mode
+      m_stream.inflate_block (size_t (comp_byte_count), size_t (uncomp_byte_count));
 
     } else {
       error (tl::sprintf (tl::to_string (tr ("Invalid record type on global level %d")), int (r)));
@@ -1491,12 +1532,14 @@ OASISReader::read_element_properties (bool ignore_special)
         error (tl::sprintf (tl::to_string (tr ("Invalid CBLOCK compression type %d")), type));
       }
 
-      uint64_t dummy = 0;
-      get (dummy);  // uncomp-byte-count - not needed
-      get (dummy);  // comp-byte-count - not needed
+      uint64_t uncomp_byte_count = 0;
+      get (uncomp_byte_count);  //  uncomp-byte-count
 
-      //  put the stream into deflating mode
-      m_stream.inflate ();
+      uint64_t comp_byte_count = 0;
+      get (comp_byte_count);  //  comp-byte-count
+
+      //  put the stream into block-deflating mode
+      m_stream.inflate_block (size_t (comp_byte_count), size_t (uncomp_byte_count));
 
     } else if (m == 28 /*PROPERTY*/) {
 
@@ -3596,12 +3639,14 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
         error (tl::sprintf (tl::to_string (tr ("Invalid CBLOCK compression type %d")), type));
       }
 
-      uint64_t dummy = 0;
-      get (dummy);  // uncomp-byte-count - not needed
-      get (dummy);  // comp-byte-count - not needed
+      uint64_t uncomp_byte_count = 0;
+      get (uncomp_byte_count);  //  uncomp-byte-count
 
-      //  put the stream into deflating mode
-      m_stream.inflate ();
+      uint64_t comp_byte_count = 0;
+      get (comp_byte_count);  //  comp-byte-count
+
+      //  put the stream into block-deflating mode
+      m_stream.inflate_block (size_t (comp_byte_count), size_t (uncomp_byte_count));
 
     } else {
       //  put the byte back into the stream

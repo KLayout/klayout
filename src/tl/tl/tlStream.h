@@ -26,6 +26,7 @@
 
 #include "tlCommon.h"
 
+#include "tlAssert.h"
 #include "tlException.h"
 #include "tlString.h"
 
@@ -33,6 +34,8 @@
 #include <sstream>
 #include <cstdio>
 #include <cstring>
+#include <memory>
+#include <vector>
 
 
 namespace tl
@@ -422,22 +425,99 @@ public:
    */
   virtual ~InputStream ();
 
-  /** 
+  /**
    *  @brief This is the outer read method to call
-   *  
-   *  This implementation obtains data through the 
+   *
+   *  This implementation obtains data through the
    *  protected read call and buffers the data accordingly so
    *  a contigious memory block can be returned.
    *  If inline deflating is enabled, the method will return
    *  inflate data unless "bypass_inflate" is set to true.
+   *  The same is true while a block inflated by "inflate_block"
+   *  is being served - the compressed bytes are gone in that case,
+   *  so "bypass_inflate" has no effect there.
    *
    *  @return 0 if not enough data can be obtained
    */
-  const char *get (size_t n, bool bypass_inflate = false);
+  const char *get (size_t n, bool bypass_inflate = false)
+  {
+    //  inline fast path: the bytes are available in the current buffer
+    if (mp_inflate == 0) {
 
-  /** 
+      if (m_block_active) {
+
+        if (n <= m_block_avail) {
+          const char *r = mp_block_ptr;
+          mp_block_ptr += n;
+          m_block_avail -= n;
+          return r;
+        }
+
+      } else if (n <= m_blen) {
+        const char *r = mp_bptr;
+        mp_bptr += n;
+        m_blen -= n;
+        m_pos += n;
+        return r;
+      }
+
+    }
+
+    return get_slow (n, bypass_inflate);
+  }
+
+  /**
+   *  @brief Peek the next contiguous bytes
+   *
+   *  This method delivers read-ahead: it returns a pointer to the bytes
+   *  currently available and reports their count in n. The bytes are not
+   *  consumed - use skip() to consume them, or get() to consume and obtain
+   *  them in one step.
+   *  n is the number of bytes available in the current buffer. The buffer
+   *  is filled when it is empty, but n may still be less than desired.
+   *  Returns 0 if no more bytes are available.
+   *  While a block inflated by "inflate_block" is being served, the bytes
+   *  delivered are decompressed ones. The streaming inflate filter (see
+   *  "inflate") does not support read-ahead.
+   *  NOTE: peek does not end the block mode when the decompressed block is
+   *  exhausted - the next get does. This way a pending unget() into the
+   *  block stays valid across a peek.
+   *  The pointer is valid until the next get, unget, skip or peek call.
+   */
+  const char *peek (size_t &n)
+  {
+    if (mp_inflate == 0) {
+
+      if (m_block_active && m_block_avail > 0) {
+        n = m_block_avail;
+        return mp_block_ptr;
+      } else if (! m_block_active && m_blen > 0) {
+        n = m_blen;
+        return mp_bptr;
+      }
+
+    }
+
+    return peek_slow (n);
+  }
+
+  /**
+   *  @brief Skip n bytes
+   *
+   *  This method consumes n bytes - typically after a peek call.
+   *  n must not be larger than the number of bytes reported by peek.
+   */
+  void skip (size_t n)
+  {
+    if (n > 0) {
+      const char *r = get (n);
+      tl_assert (r != 0);
+    }
+  }
+
+  /**
    *  @brief Undo a previous get call
-   *  
+   *
    *  This call puts back the bytes read by a previous get call.
    *  Only one call can be made undone.
    */
@@ -485,6 +565,27 @@ public:
   void inflate_always ();
 
   /**
+   *  @brief Uncompress a DEFLATE-compressed block of known size
+   *
+   *  This method reads comp_bytes bytes from the raw stream and decompresses
+   *  them in one go into an internal buffer. Subsequent get() calls deliver
+   *  the decompressed bytes. When the buffer is exhausted, reading continues
+   *  with the raw stream right after the compressed bytes: comp_bytes is
+   *  authoritative for that position, bytes between the end of the DEFLATE
+   *  stream and the end of the block are skipped.
+   *  uncomp_bytes is a hint for the initial buffer size only - the buffer
+   *  is grown as needed (up to 1GiB) and exactly the produced bytes are
+   *  served.
+   *  NOTE: pos() stays at the end of the compressed data while the block
+   *  is read.
+   *  The stream must not be in inflate state.
+   *
+   *  comp_bytes == 0 (no compressed data at all) falls back to the
+   *  streaming inflate() mode.
+   */
+  void inflate_block (size_t comp_bytes, size_t uncomp_bytes);
+
+  /**
    *  @brief Obtain the current file position
    */
   size_t pos () const 
@@ -500,7 +601,7 @@ public:
    */
   size_t blen () const
   {
-    return m_blen;
+    return (m_block_active && m_block_avail > 0) ? m_block_avail : m_blen;
   }
 
   /**
@@ -609,6 +710,9 @@ protected:
   }
 
 private:
+  const char *get_slow (size_t n, bool bypass_inflate);
+  const char *peek_slow (size_t &n);
+
   size_t m_pos;
   char *mp_buffer;
   size_t m_bcap;
@@ -620,10 +724,19 @@ private:
   std::string m_suffix;
   bool m_explicit_suffix;
 
-  //  inflate support 
+  //  inflate support
   InflateFilter *mp_inflate;
   bool m_inflate_always;
   bool m_stop_after_inflate;
+
+  //  inflate-block support: buffer holding the decompressed block,
+  //  read pointer and number of bytes left. m_block_active is also true
+  //  when the buffer is exhausted - only a get on the raw stream ends
+  //  the block mode (this keeps unget() working over the block end).
+  std::unique_ptr<char []> m_block_buffer;
+  const char *mp_block_ptr;
+  size_t m_block_avail;
+  bool m_block_active;
 
   //  No copying currently
   InputStream (const InputStream &);

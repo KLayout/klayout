@@ -200,3 +200,26 @@ TEST(2_SpliceAndMove)
 
   EXPECT_EQ (obj_count, size_t (0));
 }
+
+TEST(3_EraseAfter)
+{
+  tl::slist<MyClass1> l;
+  l.push_back (MyClass1 (1));
+  l.push_back (MyClass1 (2));
+  l.push_back (MyClass1 (3));
+
+  l.erase_after (l.begin ());
+  EXPECT_EQ (l2s (l), "1,3");
+  EXPECT_EQ (l.size (), size_t (2));
+
+  //  erasing the last element must keep push_back working
+  l.erase_after (l.begin ());
+  EXPECT_EQ (l2s (l), "1");
+  EXPECT_EQ (l.size (), size_t (1));
+  EXPECT_EQ (l.back ().n, 1);
+
+  l.push_back (MyClass1 (4));
+  EXPECT_EQ (l2s (l), "1,4");
+  EXPECT_EQ (l.size (), size_t (2));
+  EXPECT_EQ (l.back ().n, 4);
+}

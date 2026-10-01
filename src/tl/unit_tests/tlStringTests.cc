@@ -26,6 +26,7 @@
 #include "tlUnitTest.h"
 
 #define _USE_MATH_DEFINES // for MSVC
+#include <cmath>
 #include <math.h>
 #include <clocale>
 
@@ -723,4 +724,84 @@ TEST(17)
   ex_from_string (to_string (ulln), ullnn);
   EXPECT_EQ (ulln, ullnn);
 }
+
+//  exact integer parsing: values beyond 2^53 must not go through double
+TEST(18)
+{
+  long long ll;
+
+  from_string ("9007199254740993", ll);
+  EXPECT_EQ (ll, 9007199254740993LL);
+
+  from_string ("9223372036854775807", ll);
+  EXPECT_EQ (ll, 9223372036854775807LL);
+
+  from_string ("-9223372036854775808", ll);
+  EXPECT_EQ (ll, -9223372036854775807LL - 1);
+
+  bool error = false;
+  try { from_string ("9223372036854775808", ll); } catch (...) { error = true; }
+  EXPECT_EQ (error, true);
+
+  unsigned long long ull;
+  from_string ("18446744073709551615", ull);
+  EXPECT_EQ (ull, 18446744073709551615ULL);
+
+  error = false;
+  try { from_string ("18446744073709551616", ull); } catch (...) { error = true; }
+  EXPECT_EQ (error, true);
+
+  int i;
+  from_string ("2147483647", i);
+  EXPECT_EQ (i, 2147483647);
+
+  error = false;
+  try { from_string ("2147483648", i); } catch (...) { error = true; }
+  EXPECT_EQ (error, true);
+
+  error = false;
+  try { from_string ("-2147483649", i); } catch (...) { error = true; }
+  EXPECT_EQ (error, true);
+
+  from_string ("1e3", i);
+  EXPECT_EQ (i, 1000);
+
+  //  the leading/trailing whitespace handling stays the same
+  from_string ("   12   ", i);
+  EXPECT_EQ (i, 12);
+  from_string ("  -12  ", ll);
+  EXPECT_EQ (ll, -12);
+
+  //  garbage still produces the original message
+  try {
+    from_string ("12abc", i);
+    EXPECT (false);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg (), "Unexpected text after numeric value: '...abc'");
+  }
+}
+
+//  a huge exponent must not overflow the exponent accumulator
+TEST(19)
+{
+  //  an exponent beyond the int range must not wrap around: either an error or infinity is fine
+  double d = 0.0;
+  bool threw = false;
+  try {
+    from_string ("1e99999999999", d);
+  } catch (tl::Exception &) {
+    threw = true;
+  }
+  EXPECT_EQ (threw || std::isinf (d), true);
+
+  d = 1.0;
+  threw = false;
+  try {
+    from_string ("1e-99999999999", d);
+  } catch (tl::Exception &) {
+    threw = true;
+  }
+  EXPECT_EQ (threw || d == 0.0, true);
+}
+
 

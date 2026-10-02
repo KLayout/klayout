@@ -33,6 +33,8 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <unordered_map>
+#include <unordered_set>
 #include <functional>
 #include <memory>
 
@@ -110,9 +112,99 @@ bool bs_boxes_overlap (const Box &b1, const Box &b2, typename Box::coord_type en
 }
 
 /**
+ *  @brief A container holding the pairs which were reported already by the box scanner
+ *
+ *  For every key object the container keeps the partner objects which were reported
+ *  already. A few partners are held inline in a fixed-size array, keys with more
+ *  partners use a hash set instead. Entries are released when the key object leaves
+ *  the scanner band. Compared with a set of all seen pairs, the memory is bound by
+ *  the current band rather than by the total number of interactions, and checking a
+ *  pair is a hash lookup plus a few pointer comparisons.
+ */
+template <class Obj, class Partner>
+class bs_seen
+{
+public:
+  bs_seen () { }
+
+  bs_seen (const bs_seen &) = delete;
+  bs_seen &operator = (const bs_seen &) = delete;
+
+  /**
+   *  @brief Registers the pair (key, partner) and tells whether it was registered before
+   *
+   *  Returns true if the pair was not registered before. In this case the pair is registered.
+   */
+  bool insert (const Obj *key, const Partner *partner)
+  {
+    partners_type &p = m_entries [key];
+
+    for (size_t i = 0; i < p.m_n; ++i) {
+      if (p.m_partners [i] == partner) {
+        return false;
+      }
+    }
+
+    if (p.mp_rest) {
+
+      if (! p.mp_rest->insert (partner).second) {
+        return false;
+      }
+
+    } else if (p.m_n < inline_capacity) {
+      p.m_partners [p.m_n] = partner;
+      ++p.m_n;
+    } else {
+
+      //  promote the key to a hash set; the inline partners stay in place as a fast path
+      p.mp_rest.reset (new partners_set_type ());
+      p.mp_rest->insert (partner);
+
+    }
+
+    return true;
+  }
+
+  /**
+   *  @brief Releases all pairs with the given key object
+   *
+   *  Call this when the key object leaves the scanner band. The partners are not
+   *  released individually: a pair can only be tested again while both objects are in
+   *  the band.
+   */
+  void erase (const Obj *key)
+  {
+    m_entries.erase (key);
+  }
+
+private:
+  enum { inline_capacity = 4 };
+
+  typedef std::unordered_set<const Partner *> partners_set_type;
+
+  struct partners_type
+  {
+    partners_type () : m_n (0)
+    {
+      for (size_t i = 0; i < inline_capacity; ++i) {
+        m_partners [i] = 0;
+      }
+    }
+
+    const Partner *m_partners [inline_capacity];
+    size_t m_n;
+    std::unique_ptr<partners_set_type> mp_rest;
+  };
+
+  typedef std::unordered_map<const Obj *, partners_type> entries_type;
+
+  entries_type m_entries;
+};
+
+/**
  *  @brief A template for the box scanner output receiver
  *
- *  This template specifies the methods or provides a default implementation for them 
+ *  This template specifies the methods or provides a default implementation for them
  *  for use as the output receiver of the box scanner.
  */
 template <class Obj, class Prop>
@@ -394,7 +486,7 @@ private:
 
     } else {
 
-      std::set<std::pair<const Obj *, const Obj *> > seen;
+      bs_seen<Obj, Obj> seen;
 
       std::sort (m_pp.begin (), m_pp.end (), bottom_side_compare_func (bc));
 
@@ -419,12 +511,7 @@ private:
 
         while (cc != current) {
           rec.finish (cc->first, cc->second);
-          auto s = seen.lower_bound (std::make_pair (cc->first, (const Obj *)0));
-          auto s0 = s;
-          while (s != seen.end () && s->first == cc->first) {
-            ++s;
-          }
-          seen.erase (s0, s);
+          seen.erase (cc->first);
           ++cc;
         }
 
@@ -469,12 +556,11 @@ private:
           for (iterator_type i = f0; i != f; ++i) {
             for (iterator_type j = c; j < i; ++j) {
               if (bs_boxes_overlap (bc (*i), bc (*j), enl)) {
-                std::pair<const Obj *, const Obj *> k (i->first, j->first);
-                if (k.first < k.second) {
-                  std::swap (k.first, k.second);
+                const Obj *k1 = i->first, *k2 = j->first;
+                if (k1 < k2) {
+                  std::swap (k1, k2);
                 }
-                if (seen.find (k) == seen.end ()) {
-                  seen.insert (k);
+                if (seen.insert (k1, k2)) {
                   rec.add (i->first, i->second, j->first, j->second);
                   if (rec.stop ()) {
                     return false;
@@ -895,8 +981,7 @@ private:
 
     } else {
 
-      std::set<std::pair<const Obj1 *, const Obj2 *> > seen1;
-      std::set<std::pair<const Obj2 *, const Obj1 *> > seen2;
+      bs_seen<Obj1, Obj2> seen1;
 
       std::sort (m_pp1.begin (), m_pp1.end (), bottom_side_compare_func1 (bc1));
       std::sort (m_pp2.begin (), m_pp2.end (), bottom_side_compare_func2 (bc2));
@@ -926,23 +1011,12 @@ private:
 
         while (cc1 != current1) {
           rec.finish1 (cc1->first, cc1->second);
-          auto s = seen1.lower_bound (std::make_pair (cc1->first, (const Obj2 *)0));
-          auto s0 = s;
-          while (s != seen1.end () && s->first == cc1->first) {
-            ++s;
-          }
-          seen1.erase (s0, s);
+          seen1.erase (cc1->first);
           ++cc1;
         }
 
         while (cc2 != current2) {
           rec.finish2 (cc2->first, cc2->second);
-          auto s = seen2.lower_bound (std::make_pair (cc2->first, (const Obj1 *)0));
-          auto s0 = s;
-          while (s != seen2.end () && s->first == cc2->first) {
-            ++s;
-          }
-          seen2.erase (s0, s);
           ++cc2;
         }
 
@@ -1005,8 +1079,7 @@ private:
               for (iterator_type1 i = c1; i != f1; ++i) {
                 for (iterator_type2 j = c2; j < f2; ++j) {
                   if (bs_boxes_overlap (bc1 (*i), bc2 (*j), enl)) {
-                    if (seen1.insert (std::make_pair (i->first, j->first)).second) {
-                      seen2.insert (std::make_pair (j->first, i->first));
+                    if (seen1.insert (i->first, j->first)) {
                       rec.add (i->first, i->second, j->first, j->second);
                       if (rec.stop ()) {
                         return false;

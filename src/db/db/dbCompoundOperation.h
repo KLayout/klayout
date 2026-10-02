@@ -40,7 +40,9 @@
 #include "gsiObject.h"
 #include "tlObject.h"
 
+#include <atomic>
 #include <memory>
+#include <thread>
 
 namespace db
 {
@@ -56,45 +58,106 @@ class CompoundRegionOperationNode;
  *
  *  This cache is important to avoid duplicate evaluation of the same node in
  *  a diamond-graph structure of nodes.
+ *
+ *  Each entry carries a state so a second caller for the same node only reads
+ *  the results after the first caller has published them completely.
  */
 #include "tlThreads.h"
 
 class DB_PUBLIC CompoundRegionOperationCache
 {
 public:
+  enum State { New, Computing, Ready, Failed };
+
+  struct EntryBase
+  {
+    std::atomic<State> state;
+  };
+
   template <class TR>
-  std::pair<bool, std::vector<std::unordered_set<TR> > *> get (const CompoundRegionOperationNode *node)
+  struct Entry
+    : public EntryBase
+  {
+    std::vector<std::unordered_set<TR> > results;
+  };
+
+  /**
+   *  @brief Fetches the cache entry for a node
+   *  "New" means this call created the entry and the caller has to compute
+   *  the results and publish (or fail) them.
+   */
+  template <class TR>
+  std::pair<State, Entry<TR> *> get (const CompoundRegionOperationNode *node)
   {
     tl::MutexLocker lock (&m_mutex);
-    bool valid = false;
-    std::vector<std::unordered_set<TR> > *cache = 0;
-    get_cache (cache, valid, node);
-    return std::make_pair (valid, cache);
+    State state = New;
+    Entry<TR> *cache = 0;
+    get_cache (cache, state, node);
+    return std::make_pair (state, cache);
+  }
+
+  /**
+   *  @brief Waits for a computing entry to become ready or failed
+   *  A "Computing" entry always has a started task behind it which finishes
+   *  on its own thread, so a plain poll is safe. Yield to let that thread
+   *  make progress instead of hammering the cache mutex.
+   */
+  State wait (EntryBase *entry)
+  {
+    for (;;) {
+      State s = entry->state.load (std::memory_order_acquire);
+      if (s != Computing) {
+        return s;
+      }
+      std::this_thread::yield ();
+    }
+  }
+
+  /**
+   *  @brief Publishes the results of a "New" entry
+   *  The results go in first, then the state becomes ready with release
+   *  semantics, so waiters never see a partially built value.
+   */
+  template <class TR>
+  void publish (Entry<TR> *entry, std::vector<std::unordered_set<TR> > &results)
+  {
+    entry->results.swap (results);
+    entry->state.store (Ready, std::memory_order_release);
+  }
+
+  /**
+   *  @brief Marks a "New" entry as failed so waiters do not hang
+   */
+  void fail (EntryBase *entry)
+  {
+    entry->state.store (Failed, std::memory_order_release);
   }
 
 private:
   tl::Mutex m_mutex;
-  std::map<const CompoundRegionOperationNode *, std::vector<std::unordered_set<db::PolygonRefWithProperties> > > m_cache_polyref_wp;
-  std::map<const CompoundRegionOperationNode *, std::vector<std::unordered_set<db::PolygonWithProperties> > > m_cache_poly_wp;
-  std::map<const CompoundRegionOperationNode *, std::vector<std::unordered_set<db::EdgeWithProperties> > > m_cache_edge_wp;
-  std::map<const CompoundRegionOperationNode *, std::vector<std::unordered_set<db::EdgePairWithProperties> > > m_cache_edge_pair_wp;
+  std::map<const CompoundRegionOperationNode *, Entry<db::PolygonRefWithProperties> > m_cache_polyref_wp;
+  std::map<const CompoundRegionOperationNode *, Entry<db::PolygonWithProperties> > m_cache_poly_wp;
+  std::map<const CompoundRegionOperationNode *, Entry<db::EdgeWithProperties> > m_cache_edge_wp;
+  std::map<const CompoundRegionOperationNode *, Entry<db::EdgePairWithProperties> > m_cache_edge_pair_wp;
 
   template <class TR>
-  void get_cache_generic (std::map<const CompoundRegionOperationNode *, std::vector<std::unordered_set<TR> > > &caches, std::vector<std::unordered_set<TR> > *&cache_ptr, bool &valid, const CompoundRegionOperationNode *node)
+  void get_cache_generic (std::map<const CompoundRegionOperationNode *, Entry<TR> > &caches, Entry<TR> *&cache_ptr, State &state, const CompoundRegionOperationNode *node)
   {
-    typename std::map<const CompoundRegionOperationNode *, std::vector<std::unordered_set<TR> > >::iterator c = caches.find (node);
+    typename std::map<const CompoundRegionOperationNode *, Entry<TR> >::iterator c = caches.find (node);
     if (c != caches.end ()) {
-      valid = true;
+      state = c->second.state.load (std::memory_order_acquire);
       cache_ptr = &c->second;
     } else {
       cache_ptr = &caches [node];
+      cache_ptr->state.store (Computing, std::memory_order_relaxed);
+      state = New;
     }
   }
 
-  void get_cache (std::vector<std::unordered_set<db::PolygonRefWithProperties> > *&cache_ptr, bool &valid, const CompoundRegionOperationNode *node) { get_cache_generic (m_cache_polyref_wp, cache_ptr, valid, node); }
-  void get_cache (std::vector<std::unordered_set<db::PolygonWithProperties> > *&cache_ptr, bool &valid, const CompoundRegionOperationNode *node)    { get_cache_generic (m_cache_poly_wp, cache_ptr, valid, node); }
-  void get_cache (std::vector<std::unordered_set<db::EdgeWithProperties> > *&cache_ptr, bool &valid, const CompoundRegionOperationNode *node)       { get_cache_generic (m_cache_edge_wp, cache_ptr, valid, node); }
-  void get_cache (std::vector<std::unordered_set<db::EdgePairWithProperties> > *&cache_ptr, bool &valid, const CompoundRegionOperationNode *node)   { get_cache_generic (m_cache_edge_pair_wp, cache_ptr, valid, node); }
+  void get_cache (Entry<db::PolygonRefWithProperties> *&cache_ptr, State &state, const CompoundRegionOperationNode *node) { get_cache_generic (m_cache_polyref_wp, cache_ptr, state, node); }
+  void get_cache (Entry<db::PolygonWithProperties> *&cache_ptr, State &state, const CompoundRegionOperationNode *node)    { get_cache_generic (m_cache_poly_wp, cache_ptr, state, node); }
+  void get_cache (Entry<db::EdgeWithProperties> *&cache_ptr, State &state, const CompoundRegionOperationNode *node)       { get_cache_generic (m_cache_edge_wp, cache_ptr, state, node); }
+  void get_cache (Entry<db::EdgePairWithProperties> *&cache_ptr, State &state, const CompoundRegionOperationNode *node)   { get_cache_generic (m_cache_edge_pair_wp, cache_ptr, state, node); }
 };
 
 /**
@@ -284,22 +347,41 @@ private:
 
     if (wants_caching ()) {
 
-      std::pair<bool, std::vector<std::unordered_set<TR> > *> cp = cache->get<TR> (this);
+      std::pair<CompoundRegionOperationCache::State, CompoundRegionOperationCache::Entry<TR> *> cp = cache->get<TR> (this);
 
-      if (! cp.first) {
+      if (cp.first == CompoundRegionOperationCache::Computing) {
+        //  another caller is computing this node: use its published result
+        cp.first = cache->wait (cp.second);
+      }
 
-        std::vector<std::unordered_set<TR> > uncached_results;
-        uncached_results.resize (results.size ());
+      if (cp.first == CompoundRegionOperationCache::Failed) {
+        //  the other caller failed: recompute here without using the cache
+        do_compute_local (cache, layout, cell, interactions, results, proc);
+        return;
+      }
 
-        do_compute_local (cache, layout, cell, interactions, uncached_results, proc);
+      if (cp.first == CompoundRegionOperationCache::New) {
 
-        cp.second->swap (uncached_results);
+        //  everything that can throw goes in here, so the entry is left
+        //  Failed, never Computing, if we bail out
+        try {
+          std::vector<std::unordered_set<TR> > uncached_results;
+          uncached_results.resize (results.size ());
+          do_compute_local (cache, layout, cell, interactions, uncached_results, proc);
+          cache->publish (cp.second, uncached_results);
+        } catch (...) {
+          //  Failed, not Computing, so waiters recompute themselves; note
+          //  that an exception escaping an OpenMP task region terminates
+          //  the process, so this mainly covers non-task callers
+          cache->fail (cp.second);
+          throw;
+        }
 
       }
 
-      tl_assert (results.size () == cp.second->size ());
+      tl_assert (results.size () == cp.second->results.size ());
       for (size_t r = 0; r < results.size (); ++r) {
-        results[r].insert ((*cp.second)[r].begin (), (*cp.second)[r].end ());
+        results[r].insert (cp.second->results[r].begin (), cp.second->results[r].end ());
       }
 
     } else {

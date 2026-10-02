@@ -35,7 +35,10 @@
 
 #include "tlStream.h"
 
+#include <algorithm>
 #include <cstdio>
+#include <string>
+#include <vector>
 
 static void prep_layer (db::Layout &ly, int gds_layer, db::Region &r, db::DeepShapeStore &dss, bool deep)
 {
@@ -913,4 +916,105 @@ TEST(16_JoinAndMerged)
 TEST(16d_JoinAndMerged)
 {
   run_test16 (_this, true);
+}
+
+//  a canonical, order-independent representation of a region
+static std::vector<std::string> region_signature (const db::Region &r)
+{
+  std::vector<std::string> sig;
+  for (db::Region::const_iterator p = r.begin (); ! p.at_end (); ++p) {
+    sig.push_back (p->to_string ());
+  }
+  std::sort (sig.begin (), sig.end ());
+  return sig;
+}
+
+//  a comb-shaped polygon with many vertices: sizing it is real work, so the
+//  two tasks for the shared node actually overlap in time
+static db::Polygon comb_polygon (int teeth)
+{
+  std::vector<db::Point> pts;
+  for (int i = 0; i < teeth; ++i) {
+    pts.push_back (db::Point (i * 10, (i % 2) * 2));
+  }
+  for (int i = teeth - 1; i >= 0; --i) {
+    pts.push_back (db::Point (i * 10, 200 + (i % 2) * 2));
+  }
+  db::Polygon p;
+  p.assign_hull (pts.begin (), pts.end ());
+  return p;
+}
+
+//  an OR whose branches share one child node object: the branches are computed
+//  as separate tasks which race for the same cache entry of the shared node
+static std::vector<std::string> diamond_or_signature (db::Region &r)
+{
+  db::CompoundRegionOperationPrimaryNode *primary = new db::CompoundRegionOperationPrimaryNode ();
+  db::CompoundRegionSizeOperationNode *shared = new db::CompoundRegionSizeOperationNode (20, 2, primary);
+  db::CompoundRegionGeometricalBoolOperationNode geo_or (db::CompoundRegionGeometricalBoolOperationNode::Or, shared, shared);
+  return region_signature (r.cop_to_region (geo_or));
+}
+
+void run_test17 (tl::TestBase *_this, bool deep)
+{
+  db::Layout ly;
+  const db::cell_index_type top = ly.add_cell ("TOP");
+  const unsigned int l1 = ly.insert_layer (db::LayerProperties (1, 0));
+
+  db::Polygon comb = comb_polygon (64);
+  for (int c = 0; c < 64; ++c) {
+    db::Cell &leaf = ly.cell (ly.add_cell (tl::sprintf ("LEAF_%d", c).c_str ()));
+    ly.cell (top).insert (db::CellInstArray (db::CellInst (leaf.cell_index ()), db::Trans (0, false, db::Vector ((c / 8) * 1000, (c % 8) * 3000))));
+    for (int b = 0; b < 8; ++b) {
+      leaf.shapes (l1).insert (db::PolygonRef (comb, ly.shape_repository ()));
+      //  stack the combs vertically inside the leaf
+      comb.transform (db::Trans (db::Vector (0, 300)));
+    }
+  }
+
+  db::DeepShapeStore dss;
+
+  db::Region r;
+  prep_layer (ly, 1, r, dss, deep);
+
+  if (! deep) {
+    //  the flat path never runs tasks (AsIfFlatRegion keeps threads at 0),
+    //  so this variant is just a single serial correctness run
+    EXPECT (! diamond_or_signature (r).empty ());
+    return;
+  }
+
+  dss.set_threads (0);
+  const std::vector<std::string> expected = diamond_or_signature (r);
+  EXPECT (expected.size () >= size_t (64 * 8));
+
+  const int thread_counts[] = { 1, 2, 4, 8 };
+  for (size_t tc = 0; tc < sizeof (thread_counts) / sizeof (thread_counts[0]); ++tc) {
+
+    dss.set_threads (thread_counts[tc]);
+
+    //  repeat the multi-thread runs to give a race a chance to show
+    for (int i = 0; i < 50; ++i) {
+
+      std::vector<std::string> sig = diamond_or_signature (r);
+
+      EXPECT_EQ (sig.size (), expected.size ());
+      if (sig != expected) {
+        CHECKPOINT ();
+        EXPECT (sig == expected);
+      }
+
+    }
+
+  }
+}
+
+TEST(17_ParallelDiamondCache)
+{
+  run_test17 (_this, false);
+}
+
+TEST(17d_ParallelDiamondCache)
+{
+  run_test17 (_this, true);
 }

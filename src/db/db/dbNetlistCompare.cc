@@ -1200,12 +1200,16 @@ static void
 analyze_pin_mismatch (const db::Pin *pin1, const db::Circuit *c1, const db::Pin *pin2, const db::Circuit * /*c2*/, db::NetlistCompareLogger *logger)
 {
   if (! pin1) {
-    logger->log_entry (db::Error, tl::sprintf (tl::to_string (tr ("No equivalent pin %s from reference netlist found in netlist.\nThis is an indication that a physical connection is not made to the subcircuit.")), pin2->expanded_name ()));
+    if (logger) {
+      logger->log_entry (db::Error, tl::sprintf (tl::to_string (tr ("No equivalent pin %s from reference netlist found in netlist.\nThis is an indication that a physical connection is not made to the subcircuit.")), pin2->expanded_name ()));
+    }
   }
 
   if (! pin2) {
 
-    logger->log_entry (db::Error, tl::sprintf (tl::to_string (tr ("No equivalent pin %s from netlist found in reference netlist.\nThis is an indication that additional physical connections are made to the subcircuit cell.")), pin1->expanded_name ()));
+    if (logger) {
+      logger->log_entry (db::Error, tl::sprintf (tl::to_string (tr ("No equivalent pin %s from netlist found in reference netlist.\nThis is an indication that additional physical connections are made to the subcircuit cell.")), pin1->expanded_name ()));
+    }
 
     //  attempt to identify pins which are creating invalid connections
     for (auto p = c1->begin_parents (); p != c1->end_parents (); ++p) {
@@ -1214,7 +1218,9 @@ analyze_pin_mismatch (const db::Pin *pin1, const db::Circuit *c1, const db::Pin 
         if (sc.circuit_ref () == c1) {
           const db::Net *net = sc.net_for_pin (pin1->id ());
           if (net && (net->subcircuit_pin_count () > 1 || net->terminal_count () > 0 || net->pin_count () > 0)) {
-            logger->log_entry (db::Info, tl::sprintf (tl::to_string (tr ("Potential invalid connection in circuit %s, subcircuit cell reference at %s")), p->name (), sc.trans ().to_string ()));
+            if (logger) {
+              logger->log_entry (db::Info, tl::sprintf (tl::to_string (tr ("Potential invalid connection in circuit %s, subcircuit cell reference at %s")), p->name (), sc.trans ().to_string ()));
+            }
           }
         }
       }

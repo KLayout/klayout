@@ -665,6 +665,7 @@ DeepEdges::ensure_merged_edges_valid () const
       db::Connectivity conn;
       conn.connect (deep_layer ());
       hc.set_base_verbosity (base_verbosity() + 10);
+      hc.set_threads (deep_layer ().store () ? unsigned (deep_layer ().store ()->threads ()) : 0);
       hc.build (layout, deep_layer ().initial_cell (), conn, 0, deep_layer ().breakout_cells ());
 
       //  collect the clusters and merge them into larger edges
@@ -1403,6 +1404,7 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
     db::Connectivity conn (db::Connectivity::EdgesConnectByPoints);
     conn.connect (edges);
     hc.set_base_verbosity (base_verbosity () + 10);
+    hc.set_threads (edges.store () ? unsigned (edges.store ()->threads ()) : 0);
     hc.build (layout, edges.initial_cell (), conn, 0, edges.breakout_cells ());
 
     //  TODO: iterate only over the called cells?

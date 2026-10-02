@@ -150,6 +150,7 @@ void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layo
 
   }
 
+  clusters.set_threads (dss.threads () > 0 ? unsigned (dss.threads ()) : 0);
   extract_without_initialize (dss.layout (layout_index), dss.initial_cell (layout_index), clusters, layers, device_scaling, dss.breakout_cells (layout_index));
 }
 

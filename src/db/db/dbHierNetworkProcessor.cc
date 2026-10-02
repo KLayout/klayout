@@ -32,12 +32,22 @@
 #include "tlProgress.h"
 #include "tlLog.h"
 #include "tlTimer.h"
+#include "tlThreads.h"
 
 #include <vector>
 #include <map>
 #include <list>
 #include <set>
 #include <cstring>
+#include <algorithm>
+#include <atomic>
+#include <exception>
+#include <functional>
+#include <utility>
+
+#if defined(_OPENMP)
+#  include <omp.h>
+#endif
 
 namespace db
 {
@@ -1842,7 +1852,7 @@ const db::cell_index_type hier_clusters<T>::top_cell_index = std::numeric_limits
 
 template <class T>
 hier_clusters<T>::hier_clusters ()
-  : m_base_verbosity (20)
+  : m_base_verbosity (20), m_threads (0)
 {
   //  .. nothing yet ..
 }
@@ -1851,6 +1861,18 @@ template <class T>
 void hier_clusters<T>::set_base_verbosity (int bv)
 {
   m_base_verbosity = bv;
+}
+
+template <class T>
+void hier_clusters<T>::set_threads (unsigned int n)
+{
+  m_threads = n;
+}
+
+template <class T>
+unsigned int hier_clusters<T>::threads () const
+{
+  return m_threads;
 }
 
 template <class T>
@@ -2857,30 +2879,133 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
     tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 10, tl::to_string (tr ("Computing local shape clusters")));
     tl::RelativeProgress progress (tl::to_string (tr ("Computing local clusters")), called.size (), 1);
 
-    for (std::set<db::cell_index_type>::const_iterator c = called.begin (); c != called.end (); ++c) {
+    //  serial pre-pass: fix the cell order (deterministic), resolve the per-cell attribute
+    //  equivalences and create the per-cell cluster entries. The workers then only ever
+    //  write into their own entry - never into the map.
+    std::vector<db::cell_index_type> cells (called.begin (), called.end ());
+
+    //  largest cells first: the dynamic schedule then fills the tail with the small cells.
+    //  The order is deterministic and the result does not depend on it.
+    {
+      std::vector<std::pair<size_t, db::cell_index_type> > cells_by_size;
+      cells_by_size.reserve (cells.size ());
+      for (size_t i = 0; i < cells.size (); ++i) {
+        size_t n = 0;
+        const db::Cell &c = layout.cell (cells [i]);
+        for (db::Connectivity::all_layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
+          n += c.shapes (*l).size ();
+        }
+        cells_by_size.push_back (std::make_pair (n, cells [i]));
+      }
+
+      std::sort (cells_by_size.begin (), cells_by_size.end (), std::greater<std::pair<size_t, db::cell_index_type> > ());
+      for (size_t i = 0; i < cells_by_size.size (); ++i) {
+        cells [i] = cells_by_size [i].second;
+      }
+    }
+
+    std::vector<const tl::equivalence_clusters<size_t> *> ecs;
+    std::vector<connected_clusters<T> *> locals;
+    ecs.reserve (cells.size ());
+    locals.reserve (cells.size ());
+
+    for (size_t i = 0; i < cells.size (); ++i) {
 
       //  look for the net label joining spec - for the top cell the "top_cell_index" entry is looked for.
       //  If there is no such entry or the cell is not the top cell, look for the entry by cell index.
       std::map<db::cell_index_type, tl::equivalence_clusters<size_t> >::const_iterator ae;
       const tl::equivalence_clusters<size_t> *ec = 0;
       if (attr_equivalence) {
-        if (*c == cell.cell_index ()) {
+        if (cells [i] == cell.cell_index ()) {
           ae = attr_equivalence->find (top_cell_index);
           if (ae != attr_equivalence->end ()) {
             ec = &ae->second;
           }
         }
         if (! ec) {
-          ae = attr_equivalence->find (*c);
+          ae = attr_equivalence->find (cells [i]);
           if (ae != attr_equivalence->end ()) {
             ec = &ae->second;
           }
         }
       }
 
-      build_local_cluster (layout, layout.cell (*c), conn, ec, separate_attributes);
+      ecs.push_back (ec);
+      locals.push_back (&m_per_cell_clusters [cells [i]]);
 
-      ++progress;
+    }
+
+    bool parallel = false;
+#if defined(_OPENMP)
+    //  progress and log objects must not be created or used on worker threads, so the
+    //  per-cell builds run without progress reporting in the parallel path and the
+    //  progress object is only fed from the thread which created it.
+    parallel = (cells.size () > 1 && threads () > 1);
+#endif
+
+    if (parallel) {
+
+#if defined(_OPENMP)
+      //  an exception escaping the OpenMP region would terminate the process, so record
+      //  the first one and let the remaining iterations skip their work
+      std::atomic<bool> failed (false);
+      std::atomic<size_t> done_count (0);
+      tl::Mutex error_mutex;
+      std::exception_ptr error;
+      const int nthreads = int (threads ());
+
+      #pragma omp parallel for num_threads (nthreads) schedule (dynamic)
+      for (long long i = 0; i < (long long) cells.size (); ++i) {
+
+        if (failed.load ()) {
+          continue;
+        }
+
+        try {
+
+          //  no per-cell logging and no progress reporting from a worker thread
+          locals [size_t (i)]->build_clusters (layout.cell (cells [size_t (i)]), conn, ecs [size_t (i)], false, separate_attributes);
+          ++done_count;
+
+        } catch (...) {
+
+          tl::MutexLocker locker (&error_mutex);
+          if (! error) {
+            error = std::current_exception ();
+          }
+          failed.store (true);
+
+        }
+
+        //  only the master thread may feed the progress object; it throws on cancellation,
+        //  which is treated like any other exception
+        if (omp_get_thread_num () == 0) {
+          try {
+            progress.set (done_count.load ());
+          } catch (...) {
+            tl::MutexLocker locker (&error_mutex);
+            if (! error) {
+              error = std::current_exception ();
+            }
+            failed.store (true);
+          }
+        }
+
+      }
+
+      if (error) {
+        std::rethrow_exception (error);
+      }
+
+      progress.set (called.size ());
+#endif
+
+    } else {
+
+      for (size_t i = 0; i < cells.size (); ++i) {
+        build_local_cluster (layout, layout.cell (cells [i]), conn, ecs [i], separate_attributes);
+        ++progress;
+      }
 
     }
   }

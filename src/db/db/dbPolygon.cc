@@ -130,17 +130,16 @@ compute_normals (const db::vector<C> &d, C dx, C dy, int nsign, db::DVector &ed,
 
 /**
  *  @brief Provides a special DVector vprod sign for the purpose of representing integer-coordinate vectors
- *  The "zero" criterion is somewhat tighter than that of the normal integer value vectors.
- *  Hence, parallelity is somewhat more strict which makes the size function produce a
- *  better approximation to the desired target contour.
+ *  "a" and "b" are unit vectors, "d" is the characteristic length of one involved edge.
+ *  The implementation allows an endpoint slack of one DBU for an involved edge length larger than 100 DBU.
  */
 static inline int
-vprod_sign_for (const db::DVector &a, const db::DVector &b, const db::Vector &)
+vprod_sign_for (const db::DVector &a, const db::DVector &b, const db::Vector &d)
 {
-  double vp = db::vprod (a, b);
-  if (vp <= -1e-2) {
+  double vp = db::vprod (a, b) * std::max (db::Vector::distance_type (100), d.length ());
+  if (vp <= -1.0 - db::epsilon) {
     return -1;
-  } else if (vp < 1e-2) {
+  } else if (vp < 1.0 + db::epsilon) {
     return 0;
   } else {
     return 1;
@@ -158,17 +157,16 @@ vprod_sign_for (const db::DVector &a, const db::DVector &b, const db::DVector &)
 
 /**
  *  @brief Provides a special DVector sprod sign for the purpose of representing integer-coordinate vectors
- *  The "zero" criterion is somewhat tighter than that of the normal integer value vectors.
- *  Hence, orthogonality is somewhat more strict which makes the size function produce a
- *  better approximation to the desired target contour.
+ *  "a" and "b" are unit vectors, "d" is the characteristic length of one involved edge.
+ *  The implementation allows an endpoint slack of one DBU for an involved edge length larger than 100 DBU.
  */
 static inline int
-sprod_sign_for (const db::DVector &a, const db::DVector &b, const db::Vector &)
+sprod_sign_for (const db::DVector &a, const db::DVector &b, const db::Vector &d)
 {
-  double sp = db::sprod (a, b);
-  if (sp <= -1e-2) {
+  double sp = db::sprod (a, b) * std::max (db::Vector::distance_type (100), d.length ());;
+  if (sp <= -1.0 - db::epsilon) {
     return -1;
-  } else if (sp < 1e-2) {
+  } else if (sp < 1.0 + db::epsilon) {
     return 0;
   } else {
     return 1;

@@ -163,11 +163,9 @@ void Device::connect_terminal (size_t terminal_id, Net *net)
   }
 }
 
-double Device::parameter_value (size_t param_id) const
+double Device::parameter_default_value (size_t param_id) const
 {
-  if (m_parameters.size () > param_id) {
-    return m_parameters [param_id];
-  } else if (mp_device_class) {
+  if (mp_device_class) {
     const db::DeviceParameterDefinition *pd = mp_device_class->parameter_definition (param_id);
     if (pd) {
       return pd->default_value ();

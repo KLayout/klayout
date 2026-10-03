@@ -298,7 +298,8 @@ public:
 }
 
 InputStream::InputStream (InputStreamBase &delegate)
-  : m_pos (0), mp_bptr (0), mp_delegate (&delegate), m_owns_delegate (false), mp_inflate (0), m_inflate_always (false), m_stop_after_inflate (false)
+  : m_pos (0), mp_bptr (0), mp_delegate (&delegate), m_owns_delegate (false), mp_inflate (0), m_inflate_always (false), m_stop_after_inflate (false),
+    m_block_buffer (), mp_block_ptr (0), m_block_avail (0), m_block_active (false)
 { 
   m_bcap = 4096; // initial buffer capacity
   m_blen = 0;
@@ -309,7 +310,8 @@ InputStream::InputStream (InputStreamBase &delegate)
 }
 
 InputStream::InputStream (InputStreamBase *delegate)
-  : m_pos (0), mp_bptr (0), mp_delegate (delegate), m_owns_delegate (true), mp_inflate (0), m_inflate_always (false), m_stop_after_inflate (false)
+  : m_pos (0), mp_bptr (0), mp_delegate (delegate), m_owns_delegate (true), mp_inflate (0), m_inflate_always (false), m_stop_after_inflate (false),
+    m_block_buffer (), mp_block_ptr (0), m_block_avail (0), m_block_active (false)
 {
   m_bcap = 4096; // initial buffer capacity
   m_blen = 0;
@@ -322,7 +324,8 @@ InputStream::InputStream (InputStreamBase *delegate)
 }
 
 InputStream::InputStream (const std::string &abstract_path_in, bool allow_explicit_suffix)
-  : m_pos (0), mp_bptr (0), mp_delegate (0), m_owns_delegate (false), mp_inflate (0), m_inflate_always (false), m_stop_after_inflate (false)
+  : m_pos (0), mp_bptr (0), mp_delegate (0), m_owns_delegate (false), mp_inflate (0), m_inflate_always (false), m_stop_after_inflate (false),
+    m_block_buffer (), mp_block_ptr (0), m_block_avail (0), m_block_active (false)
 { 
   m_bcap = 4096; // initial buffer capacity
   m_blen = 0;
@@ -570,7 +573,7 @@ std::string InputStream::relative_path (const std::string &path1, const std::str
 }
 
 const char *
-InputStream::get (size_t n, bool bypass_inflate)
+InputStream::get_slow (size_t n, bool bypass_inflate)
 {
   //  if deflating, employ the deflate filter to get the data
   if (mp_inflate && ! bypass_inflate) {
@@ -591,6 +594,24 @@ InputStream::get (size_t n, bool bypass_inflate)
       mp_inflate = 0;
 
     }
+  }
+
+  if (m_block_active) {
+
+    if (m_block_avail > 0) {
+
+      //  the data must not reach over the end of the decompressed block -
+      //  the streaming inflate filter behaves the same way
+      throw tl::Exception (tl::to_string (tr ("Unexpected end of file (DEFLATE implementation)")));
+
+    } else {
+      //  the decompressed block is exhausted: continue with the raw stream
+      //  and release the block buffer
+      m_block_active = false;
+      m_block_buffer.reset ();
+      mp_block_ptr = 0;
+    }
+
   }
 
   if (m_blen < n) {
@@ -642,6 +663,12 @@ InputStream::unget (size_t n)
     //  TODO: this will not work if mp_inflate just got destroyed
     //  (no unget into previous compressed block)
     mp_inflate->unget (n);
+  } else if (m_block_active) {
+    //  NOTE: same restriction - no unget into a compressed block that has
+    //  been left already (m_block_active is cleared by the first raw get)
+    tl_assert (mp_block_ptr - n >= m_block_buffer.get ());
+    mp_block_ptr -= n;
+    m_block_avail += n;
   } else {
     tl_assert (mp_buffer + n <= mp_bptr);
     mp_bptr -= n;
@@ -670,6 +697,15 @@ InputStream::read_all (size_t max_count)
     }
 
   } else {
+
+    //  first, take what is left of the decompressed block
+    if (m_block_active && m_block_avail > 0) {
+      size_t nb = std::min (max_count, m_block_avail);
+      const char *b = get (nb);
+      tl_assert (b != 0);
+      str += std::string (b, nb);
+      max_count -= nb;
+    }
 
     while (max_count > 0) {
       size_t n = std::min (max_count, std::max (size_t (1), m_blen));
@@ -707,6 +743,14 @@ InputStream::read_all ()
 
   } else {
 
+    //  first, take what is left of the decompressed block
+    if (m_block_active && m_block_avail > 0) {
+      size_t nb = m_block_avail;
+      const char *b = get (nb);
+      tl_assert (b != 0);
+      str += std::string (b, nb);
+    }
+
     while (true) {
       size_t n = std::max (size_t (1), m_blen);
       const char *b = get (n);
@@ -736,8 +780,144 @@ void
 InputStream::inflate (bool stop_after)
 {
   tl_assert (mp_inflate == 0);
+  tl_assert (! m_block_active);
   mp_inflate = new tl::InflateFilter (*this);
   m_stop_after_inflate = stop_after;
+}
+
+void
+InputStream::inflate_block (size_t comp_bytes, size_t uncomp_bytes)
+{
+  tl_assert (mp_inflate == 0);
+  tl_assert (! m_block_active);
+
+  //  NOTE: pos() stays at the end of the compressed data while the block
+  //  is read - the compressed bytes are consumed up front.
+
+  //  comp-byte-count 0 means there is no compressed data at all - a case
+  //  we cannot handle here: use the streaming decoder which takes the
+  //  data from the raw stream
+  if (comp_bytes == 0) {
+    inflate ();
+    return;
+  }
+
+  //  uncomp_bytes is a hint only and must not be trusted for the allocation:
+  //  start small and grow the buffer as needed
+  const size_t max_block_bytes = 0x40000000;  //  1GiB
+  size_t cap = std::min (std::max (uncomp_bytes, size_t (4096)), size_t (1 << 20));
+  std::unique_ptr<char []> block (new char [cap]);
+
+  z_stream zs = z_stream ();
+  if (inflateInit2 (&zs, -15 /* == raw DEFLATE data */) != Z_OK) {
+    throw tl::Exception (tl::to_string (tr ("Unable to initialize the DEFLATE decompressor")));
+  }
+  std::unique_ptr<z_stream, int (*) (z_streamp)> cleanup (&zs, &inflateEnd);
+
+  //  takes up to "max" raw bytes; the delegate may deliver less than requested (e.g. pipes), a real EOF is an error
+  auto next_raw_chunk = [this] (size_t max, size_t &chunk) -> const char * {
+    chunk = std::min (max, size_t (65536));
+    const char *b = get (chunk, true /*bypass_inflate*/);
+    if (! b) {
+      chunk = std::min (m_blen, max);
+      if (chunk == 0) {
+        throw tl::Exception (tl::to_string (tr ("Unexpected end of file (DEFLATE implementation)")));
+      }
+      b = get (chunk, true /*bypass_inflate*/);
+      tl_assert (b != 0);
+    }
+    return b;
+  };
+
+  size_t produced = 0;
+  size_t to_read = comp_bytes;
+  bool stream_end = false;
+
+  while (! stream_end) {
+
+    //  feed the next chunk of compressed data
+    if (zs.avail_in == 0) {
+
+      if (to_read == 0) {
+        //  the compressed block ends here, but the DEFLATE stream does not
+        throw tl::Exception (tl::to_string (tr ("Unexpected end of file (DEFLATE implementation)")));
+      }
+
+      size_t chunk = 0;
+      const char *b = next_raw_chunk (to_read, chunk);
+
+      zs.next_in = (Bytef *) b;
+      zs.avail_in = (uInt) chunk;
+      to_read -= chunk;
+
+    }
+
+    while (zs.avail_in > 0 && ! stream_end) {
+
+      zs.next_out = (Bytef *) (block.get () + produced);
+      zs.avail_out = (uInt) (cap - produced);
+
+      int err = ::inflate (&zs, Z_NO_FLUSH);
+
+      produced = cap - zs.avail_out;
+
+      if (err == Z_STREAM_END) {
+        stream_end = true;
+      } else if (err == Z_BUF_ERROR && zs.avail_out == 0) {
+        //  the output buffer is full, but the stream is not finished yet
+        if (cap >= max_block_bytes) {
+          throw tl::Exception (tl::sprintf (tl::to_string (tr ("DEFLATE block expands to more than the maximum of %ld bytes")), max_block_bytes));
+        }
+        size_t new_cap = std::min (cap * 2, max_block_bytes);
+        std::unique_ptr<char []> grown (new char [new_cap]);
+        std::memcpy (grown.get (), block.get (), produced);
+        block.swap (grown);
+        cap = new_cap;
+      } else if (err != Z_OK) {
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Error in DEFLATE decompression: %s")), zs.msg ? zs.msg : "unknown"));
+      }
+
+    }
+
+  }
+
+  //  comp_bytes is authoritative for the start of the next record: skip over
+  //  padding between the end of the DEFLATE stream and the end of the block
+  //  (input left over in the current chunk is gone from the stream anyway)
+  while (to_read > 0) {
+
+    size_t chunk = 0;
+    next_raw_chunk (to_read, chunk);
+    to_read -= chunk;
+
+  }
+
+  m_block_buffer.swap (block);
+  mp_block_ptr = m_block_buffer.get ();
+  m_block_avail = produced;
+  m_block_active = true;
+}
+
+const char *
+InputStream::peek_slow (size_t &n)
+{
+  if (mp_inflate) {
+    //  the streaming inflate filter does not support read-ahead
+    n = 0;
+    return 0;
+  }
+
+  //  NOTE: an exhausted decompressed block is deliberately not ended here -
+  //  that would invalidate a pending unget() into the block. The next get()
+  //  ends the block mode.
+
+  if (m_blen == 0 && mp_delegate) {
+    mp_bptr = mp_buffer;
+    m_blen = mp_delegate->read (mp_buffer, m_bcap);
+  }
+
+  n = m_blen;
+  return m_blen > 0 ? mp_bptr : 0;
 }
 
 void
@@ -755,14 +935,20 @@ InputStream::close ()
   }
 }
 
-void 
+void
 InputStream::reset ()
 {
   //  stop inflate
   if (mp_inflate) {
     delete mp_inflate;
     mp_inflate = 0;
-  } 
+  }
+
+  //  discard a decompressed block
+  m_block_buffer.reset ();
+  mp_block_ptr = 0;
+  m_block_avail = 0;
+  m_block_active = false; 
 
   //  optimize for a reset in the first m_bcap bytes
   //  -> this reduces the reset calls on mp_delegate which may not support this

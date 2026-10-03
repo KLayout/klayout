@@ -743,3 +743,65 @@ TEST(CBlockLargePropertyString)
 
   }
 }
+
+//  CBLOCK-compressed OASIS, read plain and through a gz stream
+TEST(CBlockGzip)
+{
+  db::Layout layout_org (false);
+
+  unsigned int layer = layout_org.insert_layer (db::LayerProperties (1, 0));
+  db::Cell &top = layout_org.cell (layout_org.add_cell ("TOP"));
+  db::Cell &child = layout_org.cell (layout_org.add_cell ("CHILD"));
+
+  child.shapes (layer).insert (db::Box (0, 0, 100, 100));
+  child.shapes (layer).insert (db::Box (-200, -100, 300, 500));
+  top.shapes (layer).insert (db::Box (-50, -50, 50, 50));
+  top.insert (db::CellInstArray (child.cell_index (), db::Trans (db::Vector (10, 20))));
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_OASISReaderCBlockGzip.oas");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::SaveLayoutOptions options;
+    db::OASISWriterOptions &oasis_options = options.get_options<db::OASISWriterOptions> ();
+    oasis_options.write_cblocks = true;
+    oasis_options.strict_mode = false;
+    db::OASISWriter writer;
+    writer.write (layout_org, out, options);
+  }
+
+  db::Layout layout_read;
+
+  {
+    tl::InputStream in (tmp_file);
+    db::OASISReader reader (in);
+    reader.read (layout_read);
+  }
+
+  EXPECT_EQ (db::compare_layouts (layout_org, layout_read, db::layout_diff::f_verbose, 0), true);
+
+  //  same file wrapped into a gz stream: the CBLOCK data is read through
+  //  a gz-decompressing delegate
+  std::string tmp_file_gz = tl::TestBase::tmp_file ("tmp_OASISReaderCBlockGzip.oas.gz");
+
+  {
+    tl::OutputStream out (tmp_file_gz, tl::OutputStream::OM_Zlib);
+    db::SaveLayoutOptions options;
+    db::OASISWriterOptions &oasis_options = options.get_options<db::OASISWriterOptions> ();
+    oasis_options.write_cblocks = true;
+    oasis_options.strict_mode = false;
+    db::OASISWriter writer;
+    writer.write (layout_org, out, options);
+  }
+
+  db::Layout layout_read_gz;
+
+  {
+    tl::InputStream in (tmp_file_gz);
+    db::OASISReader reader (in);
+    reader.read (layout_read_gz);
+  }
+
+  EXPECT_EQ (db::compare_layouts (layout_org, layout_read_gz, db::layout_diff::f_verbose, 0), true);
+  EXPECT_EQ (db::compare_layouts (layout_read, layout_read_gz, db::layout_diff::f_verbose, 0), true);
+}

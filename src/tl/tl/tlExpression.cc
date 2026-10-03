@@ -29,6 +29,7 @@
 #include "tlEnv.h"
 
 #include <map>
+#include <utility>
 #include <vector>
 #include <sstream>
 #include <iostream>
@@ -229,9 +230,15 @@ public:
     }
   }
 
-  void set (const tl::Variant &v) 
+  void set (const tl::Variant &v)
   {
     m_rvalue = v;
+    mp_lvalue = 0;
+  }
+
+  void set (tl::Variant &&v)
+  {
+    m_rvalue = std::move (v);
     mp_lvalue = 0;
   }
 

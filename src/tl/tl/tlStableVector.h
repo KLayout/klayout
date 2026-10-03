@@ -28,6 +28,7 @@
 #include <stddef.h>
 #include <vector>
 #include <iterator>
+#include <utility>
 
 namespace tl 
 {
@@ -588,10 +589,16 @@ public:
     //  .. nothing yet ..
   }
 
-  stable_vector (const stable_vector<X> &d) 
+  stable_vector (const stable_vector<X> &d)
     : m_objects ()
   {
     operator= (d);
+  }
+
+  stable_vector (stable_vector<X> &&d) noexcept
+    : m_objects (std::move (d.m_objects))
+  {
+    //  .. nothing yet ..
   }
 
   ~stable_vector ()
@@ -612,6 +619,15 @@ public:
       for (typename std::vector <X *>::const_iterator c = d.m_objects.begin (); c != d.m_objects.end (); ++c) {
         m_objects.push_back (new X (**c));
       }
+    }
+    return *this;
+  }
+
+  stable_vector &operator= (stable_vector<X> &&d) noexcept
+  {
+    if (&d != this) {
+      delete_objects ();
+      m_objects = std::move (d.m_objects);
     }
     return *this;
   }

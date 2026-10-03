@@ -399,7 +399,8 @@ static double local_strtod (const char *cp, const char *&cp_new)
     }
     int en = 0;
     while (safe_isdigit (*cp)) {
-      en = en * 10 + int (*cp - '0');
+      //  cap the exponent to avoid a signed overflow on absurd inputs like "1e9999999999"
+      en = std::min (100000, en * 10 + int (*cp - '0'));
       ++cp;
     }
     if (! epos) {
@@ -410,7 +411,7 @@ static double local_strtod (const char *cp, const char *&cp_new)
 
   cp_new = cp;
 
-  return s * mant * pow(10.0, exponent);
+  return s * mant * pow (10.0, exponent);
 }
 
 // -------------------------------------------------------------------------
@@ -859,134 +860,114 @@ from_string (const std::string &s, const unsigned char * &result)
   result = (unsigned char *) s.c_str ();
 }
 
+/**
+ *  @brief Gets a numeric value (supports floating-point and integers) from a string
+ */
+template <class T>
 static void
-from_string_numeric (const std::string &s, double &v, bool eval)
+from_string_numeric (const std::string &s, T &v, bool eval)
 {
-  const char *cp = s.c_str ();
-  while (safe_isspace (*cp)) {
-    ++cp;
-  }
-  if (! *cp) {
+  tl::Extractor ex (s.c_str ());
+
+  if (ex.at_end ()) {
     throw tl::Exception (tl::to_string (tr ("Got empty string where a real number was expected")));
   }
 
-  const char *cp_end = cp;
-  v = local_strtod (cp, cp_end);
-  while (safe_isspace (*cp_end)) {
-    ++cp_end;
+  if (ex.try_read (v) && ex.at_end ()) {
+    return;
   }
-  if (*cp_end) {
-    if (eval) {
-      //  try using an expression (using a clean environment disables all global features and leaves
-      //  only some static functions)
-      v = tl::Eval (0, 0, false).parse (s).execute ().to_double ();
-    } else {
-      throw tl::Exception (tl::to_string (tr ("Unexpected text after numeric value: '...")) + cp_end + "'");
-    }
-  }
-}
 
-template <class T>
-static void
-convert_string_to_int (const std::string &s, T &v, bool eval)
-{
-  double x;
-  // HACK: this should be some real string-to-int conversion
-  tl::from_string_numeric (s, x, eval);
-  if (x < std::numeric_limits <T>::min ()) {
-    throw tl::Exception (tl::to_string (tr ("Range underflow: ")) + s);
-  }
-  if (x > std::numeric_limits <T>::max ()) {
-    throw tl::Exception (tl::to_string (tr ("Range overflow: ")) + s);
-  }
-  v = T (x);
-  if (x != v) {
-    throw tl::Exception (tl::to_string (tr ("Number cannot be represented precisely: ")) + s);
+  if (eval) {
+    //  try using an expression (using a clean environment disables all global features and leaves
+    //  only some static functions)
+    v = tl::Eval (0, 0, false).parse (s).execute ().to<T> ();
+  } else {
+    throw tl::Exception (tl::to_string (tr ("Unexpected text after numeric value: '...")) + ex.get () + "'");
   }
 }
 
 void
 from_string (const std::string &s, double &v)
 {
-  return from_string_numeric (s, v, false);
+  from_string_numeric (s, v, false);
 }
 
 void
 from_string (const std::string &s, int &v)
 {
-  convert_string_to_int (s, v, false);
+  from_string_numeric (s, v, false);
 }
 
 void
 from_string (const std::string &s, long &v)
 {
-  convert_string_to_int (s, v, false);
+  from_string_numeric (s, v, false);
 }
 
 void
 from_string (const std::string &s, long long &v)
 {
-  convert_string_to_int (s, v, false);
+  from_string_numeric (s, v, false);
 }
 
 void
 from_string (const std::string &s, unsigned int &v)
 {
-  convert_string_to_int (s, v, false);
+  from_string_numeric (s, v, false);
 }
 
 void
 from_string (const std::string &s, unsigned long &v)
 {
-  convert_string_to_int (s, v, false);
+  from_string_numeric (s, v, false);
 }
 
 void
 from_string (const std::string &s, unsigned long long &v)
 {
-  convert_string_to_int (s, v, false);
+  from_string_numeric (s, v, false);
 }
 
 void
 from_string_ext (const std::string &s, double &v)
 {
-  return from_string_numeric (s, v, true);
+  from_string_numeric (s, v, true);
 }
 
 void
 from_string_ext (const std::string &s, int &v)
 {
-  convert_string_to_int (s, v, true);
+  from_string_numeric (s, v, true);
 }
 
 void
 from_string_ext (const std::string &s, long &v)
 {
-  convert_string_to_int (s, v, true);
+  from_string_numeric (s, v, true);
 }
 
 void
 from_string_ext (const std::string &s, long long &v)
 {
-  convert_string_to_int (s, v, true);
+  from_string_numeric (s, v, true);
 }
 
 void
 from_string_ext (const std::string &s, unsigned int &v)
 {
-  convert_string_to_int (s, v, true);
+  from_string_numeric (s, v, true);
 }
 
 void
 from_string_ext (const std::string &s, unsigned long &v)
 {
-  convert_string_to_int (s, v, true);
+  from_string_numeric (s, v, true);
 }
 
 void
 from_string_ext (const std::string &s, unsigned long long &v)
 {
-  convert_string_to_int (s, v, true);
+  from_string_numeric (s, v, true);
 }
 
 void

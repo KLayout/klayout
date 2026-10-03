@@ -201,33 +201,26 @@ JobBase::log_error (const std::string &s)
 {
   tl::error << tl::to_string (tr ("Worker thread: ")) << s;
 
-  m_lock.lock ();
+  tl::MutexLocker locker (&m_lock);
   if (m_error_messages.size () == max_errors) {
     m_error_messages.push_back (tl::to_string (tr ("Error list abbreviated (more errors were ignored)")));
   } else if (m_error_messages.size () < max_errors) {
     m_error_messages.push_back (s);
   }
-  m_lock.unlock ();
 }
 
 bool
-JobBase::has_error () 
+JobBase::has_error ()
 {
-  bool r;
-  m_lock.lock ();
-  r = ! m_error_messages.empty ();
-  m_lock.unlock ();
-  return r;
+  tl::MutexLocker locker (&m_lock);
+  return ! m_error_messages.empty ();
 }
 
 std::vector<std::string>
-JobBase::error_messages () 
+JobBase::error_messages ()
 {
-  std::vector<std::string> r;
-  m_lock.lock ();
-  r = m_error_messages;
-  m_lock.unlock ();
-  return r;
+  tl::MutexLocker locker (&m_lock);
+  return m_error_messages;
 }
 
 void
@@ -252,39 +245,39 @@ JobBase::set_num_workers (int nworkers)
 void 
 JobBase::start ()
 {
-  m_lock.lock ();
+  {
+    tl::MutexLocker locker (&m_lock);
 
-  m_error_messages.clear ();
+    m_error_messages.clear ();
 
-  tl_assert (! m_running);
+    tl_assert (! m_running);
 
-  m_running = true;
-  
-  //  Add a start task for each worker
-  //  This serves as a synchronization measure such that each task gets called once and
-  //  the empty queue detection works properly.
-  for (int i = 0; i < m_nworkers; ++i) {
-    mp_per_worker_task_lists[i].put_front (new StartTask ());
+    m_running = true;
+
+    //  Add a start task for each worker
+    //  This serves as a synchronization measure such that each task gets called once and
+    //  the empty queue detection works properly.
+    for (int i = 0; i < m_nworkers; ++i) {
+      mp_per_worker_task_lists[i].put_front (new StartTask ());
+    }
+
+    m_task_available_condition.wakeAll ();
+
+    while (m_nworkers > int (mp_workers.size ())) {
+      mp_workers.push_back (create_worker ());
+      mp_workers.back ()->start (this, int (mp_workers.size ()) - 1);
+    }
+
+    while (m_nworkers < int (mp_workers.size ())) {
+      delete mp_workers.back ();
+      mp_workers.pop_back ();
+    }
+
+    for (int i = 0; i < int (mp_workers.size ()); ++i) {
+      setup_worker (mp_workers [i]);
+      mp_workers [i]->reset_stop_request ();
+    }
   }
-
-  m_task_available_condition.wakeAll ();
-
-  while (m_nworkers > int (mp_workers.size ())) {
-    mp_workers.push_back (create_worker ());
-    mp_workers.back ()->start (this, int (mp_workers.size ()) - 1);
-  }
-
-  while (m_nworkers < int (mp_workers.size ())) {
-    delete mp_workers.back ();
-    mp_workers.pop_back ();
-  }
-
-  for (int i = 0; i < int (mp_workers.size ()); ++i) {
-    setup_worker (mp_workers [i]);
-    mp_workers [i]->reset_stop_request ();
-  }
-
-  m_lock.unlock ();
 
   if (mp_workers.empty ()) {
 
@@ -424,21 +417,21 @@ JobBase::terminate ()
 
   if (! mp_workers.empty ()) {
 
-    m_lock.lock ();
+    {
+      tl::MutexLocker locker (&m_lock);
 
-    //  Add a stop task for each worker and request a stop
-    for (int i = 0; i < int (mp_workers.size ()); ++i) {
-      mp_workers [i]->stop_request ();
-      mp_per_worker_task_lists[i].put (new ExitTask ());
+      //  Add a stop task for each worker and request a stop
+      for (int i = 0; i < int (mp_workers.size ()); ++i) {
+        mp_workers [i]->stop_request ();
+        mp_per_worker_task_lists[i].put (new ExitTask ());
+      }
+
+      //  signal that we have new tasks
+      m_task_available_condition.wakeAll ();
+
+      //  Unless new tasks are scheduled, we can be sure that now all workers
+      //  are terminating.
     }
-
-    //  signal that we have new tasks
-    m_task_available_condition.wakeAll ();
-
-    //  Unless new tasks are scheduled, we can be sure that now all workers
-    //  are terminating.
-
-    m_lock.unlock ();
 
     //  Wait for the threads to complete
     for (int i = 0; i < int (mp_workers.size ()); ++i) {
@@ -457,7 +450,7 @@ JobBase::terminate ()
 void 
 JobBase::schedule (Task *task)
 {
-  m_lock.lock ();
+  tl::MutexLocker locker (&m_lock);
 
   if (m_stopping) {
 
@@ -474,8 +467,6 @@ JobBase::schedule (Task *task)
     }
 
   }
-
-  m_lock.unlock ();
 }
 
 Task *

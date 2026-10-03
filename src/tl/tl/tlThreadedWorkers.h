@@ -30,6 +30,7 @@
 #include <set>
 #include <vector>
 #include <string>
+#include <atomic>
 
 namespace tl
 {
@@ -285,8 +286,8 @@ private:
 
   int m_nworkers;
   int m_idle_workers;
-  bool m_stopping;
-  bool m_running;
+  std::atomic<bool> m_stopping;
+  std::atomic<bool> m_running;
 
   tl::Mutex m_lock;
   tl::WaitCondition m_task_available_condition;
@@ -410,8 +411,8 @@ private:
 
   JobBase *mp_job;
   int m_worker_index;
-  bool m_stop_requested;
-  bool m_is_idle;
+  std::atomic<bool> m_stop_requested;
+  std::atomic<bool> m_is_idle;
 };
 
 /**

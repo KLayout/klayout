@@ -607,7 +607,7 @@ TEST(28)
   }
 }
 
-TEST(29) 
+TEST(29)
 {
   tl::SelfTimer timer ("0 threads, 500 self-scheduled iterations with waiting");
   MyJob job (0);
@@ -627,6 +627,64 @@ TEST(29)
 
     EXPECT_EQ (s_sum[0].sum () + s_sum[1].sum() + s_sum[2].sum() + s_sum[3].sum () == 10000, true);
 
+  }
+}
+
+class TrivialTask : public tl::Task
+{
+public:
+  TrivialTask (int n) : m_n (n) { }
+  int m_n;
+};
+
+static tl::Mutex s_count_lock;
+static int s_count = 0;
+
+class CountingWorker : public tl::Worker
+{
+protected:
+  void perform_task (tl::Task *task)
+  {
+    TrivialTask *t = dynamic_cast<TrivialTask *> (task);
+    if (t) {
+      tl::MutexLocker locker (&s_count_lock);
+      s_count += t->m_n;
+    }
+  }
+};
+
+class CountingJob : public tl::Job<CountingWorker>
+{
+public:
+  CountingJob (int w) : tl::Job<CountingWorker> (w) { }
+};
+
+//  start, stop and restart a job many times with trivial tasks and check the count each time
+TEST(30_restart)
+{
+  CountingJob job (1);
+
+  for (int i = 0; i < 200; ++i) {
+
+    {
+      tl::MutexLocker locker (&s_count_lock);
+      s_count = 0;
+    }
+
+    for (int k = 0; k < 10; ++k) {
+      job.schedule (new TrivialTask (1));
+    }
+
+    job.start ();
+    EXPECT_EQ (job.wait (5000), true);
+    EXPECT_EQ (job.is_running (), false);
+
+    {
+      tl::MutexLocker locker (&s_count_lock);
+      EXPECT_EQ (s_count, 10);
+    }
+
+    job.terminate ();
   }
 }
 

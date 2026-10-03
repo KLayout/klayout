@@ -304,3 +304,124 @@ TEST(5)
   EXPECT_EQ (yp->obj == &x1, true);
 }
 
+//  Receiver doing the various actions for the nested emission test
+class ReentrantObserver : public tl::Object
+{
+public:
+  ReentrantObserver () : event (0), role (0), calls (0) { }
+
+  void receives (int a)
+  {
+    ++calls;
+    if (a == 1 && role == 1) {
+      //  nested (re-entrant) emission of the same event
+      (*event) (2);
+    } else if (a == 2 && role == 2) {
+      //  delete the event while it is still emitting
+      delete event;
+      event = 0;
+    }
+  }
+
+  tl::event<int> *event;
+  int role;
+  int calls;
+};
+
+//  Receiver which deletes the event and then fails
+class DeleteAndThrowObserver : public tl::Object
+{
+public:
+  DeleteAndThrowObserver () : event (0) { }
+
+  void receives (int)
+  {
+    delete event;
+    event = 0;
+    throw tl::Exception ("receiver failed");
+  }
+
+  tl::event<int> *event;
+};
+
+//  event destroyed by a receiver which throws afterwards
+TEST(destroy_then_throw)
+{
+  tl::event<int> *ev = new tl::event<int> ();
+
+  DeleteAndThrowObserver a;
+  ReentrantObserver b;
+  a.event = ev;
+  b.role = 3;
+
+  ev->add (&a, &DeleteAndThrowObserver::receives);
+  ev->add (&b, &ReentrantObserver::receives);
+
+  (*ev) (1);
+
+  //  the emission stops after the deletion even though the receiver threw
+  EXPECT_EQ (b.calls, 0);
+  EXPECT_EQ (a.event == 0, true);
+}
+
+//  copying an event while it is emitting does not affect the original emission
+TEST(copy_during_emission)
+{
+  tl::event<int> *ev = new tl::event<int> ();
+  tl::event<int> *copy = 0;
+
+  ReentrantObserver a, b;
+  a.role = 3;
+  b.role = 3;
+
+  struct Copier : public tl::Object
+  {
+    Copier () : src (0), copy (0) { }
+    void receives (int) { copy = new tl::event<int> (*src); }
+    tl::event<int> *src;
+    tl::event<int> *copy;
+  } copier;
+  copier.src = ev;
+
+  ev->add (&copier, &Copier::receives);
+  ev->add (&a, &ReentrantObserver::receives);
+  ev->add (&b, &ReentrantObserver::receives);
+
+  (*ev) (1);
+  copy = copier.copy;
+
+  //  destroying the copy must not mark anything of the original
+  delete copy;
+  EXPECT_EQ (a.calls, 1);
+  EXPECT_EQ (b.calls, 1);
+
+  delete ev;
+}
+
+// event destroyed during a nested emission
+TEST(6)
+{
+  tl::event<int> *ev = new tl::event<int> ();
+
+  ReentrantObserver a, b, c, d;
+  a.event = ev;
+  b.event = ev;
+  c.event = ev;
+  d.event = ev;
+  a.role = 0;
+  b.role = 1;  //  re-emits on value 1
+  c.role = 2;  //  deletes the event on value 2
+  d.role = 3;  //  counts
+
+  ev->add (&a, &ReentrantObserver::receives);
+  ev->add (&b, &ReentrantObserver::receives);
+  ev->add (&c, &ReentrantObserver::receives);
+  ev->add (&d, &ReentrantObserver::receives);
+
+  (*ev) (1);
+
+  //  The deletion happened in the nested emission; the outer emission must stop too,
+  //  so D is never reached. On the old code the outer loop kept calling D.
+  EXPECT_EQ (d.calls, 0);
+}
+

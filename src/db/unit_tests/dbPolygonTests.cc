@@ -9,7 +9,7 @@
   the Free Software Foundation; either version 2 of the License, or
   (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
+  This program is distributed in the hope tchamfered_box it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
@@ -1432,4 +1432,62 @@ TEST(29)
 
   EXPECT_EQ (sb.is_empty (), true);
   EXPECT_EQ (sb == db::SimplePolygon (), true);
+}
+
+static db::Polygon wedge (double angle, double l)
+{
+  double dy = l * tan (angle * M_PI / 180.0);
+
+  db::Point points[3] = {
+    db::Point (0, 0),
+    db::Point (-l, dy),
+    db::Point (-l, -dy)
+  };
+
+  db::Polygon poly;
+  poly.assign_hull (points + 0, points + 3);
+  return poly;
+}
+
+static db::Polygon chamfered_box (double angle, double l)
+{
+  db::Coord yy = db::coord_traits<db::Coord>::rounded (l + l * 0.5 * tan (angle * M_PI / 180.0));
+
+  db::Point points[5] = {
+    db::Point (-l * 0.5, 0),
+    db::Point (-l * 0.5, l),
+    db::Point (0, yy),
+    db::Point (l * 0.5, yy),
+    db::Point (l * 0.5, 0)
+  };
+
+  db::Polygon poly;
+  poly.assign_hull (points + 0, points + 5);
+  return poly;
+}
+
+//  issue #2469
+//  Sizing of acute-corner polygons
+TEST(30)
+{
+  EXPECT_EQ (wedge (20.0, 10000.0).sized (10).to_string (), "(-10006,-3653;-10010,-3650;-10010,3650;-10006,3653;13,6;13,-6)");
+  EXPECT_EQ (wedge (2.0, 10000.0).sized (10).to_string (), "(-10010,-359;-10010,359;10,10;10,-10)");
+  EXPECT_EQ (wedge (0.6, 10000.0).sized (10).to_string (), "(-10010,-115;-10010,115;10,10;10,-10)");
+  EXPECT_EQ (wedge (0.58, 10000.0).sized (10).to_string (), "(-10010,-111;-10010,111;10,10;10,-10)");
+  EXPECT_EQ (wedge (0.56, 10000.0).sized (10).to_string (), "(-10010,-108;-10010,108;10,10;10,-10)");
+  EXPECT_EQ (wedge (0.2, 10000.0).sized (10).to_string (), "(-10010,-45;-10010,45;10,10;10,-10)");
+
+  EXPECT_EQ (wedge (20.0, 20.0).sized (10).to_string (), "(-26,-20;-30,-17;-30,17;-26,20;13,6;13,-6)");
+  EXPECT_EQ (wedge (5.0, 20.0).sized (10).to_string (), "(-29,-13;-30,-12;-30,12;-29,13;11,9;11,-9)");
+  EXPECT_EQ (wedge (2.0, 20.0).sized (10).to_string (), "(-30,-11;-30,11;-29,11;10,9;10,-9;-29,-11)");
+
+  EXPECT_EQ (chamfered_box (20.0, 10000.0).sized (10).to_string (), "(-5010,-10;-5010,10007;-2,11830;5010,11830;5010,-10)");
+  EXPECT_EQ (chamfered_box (2.0, 10000.0).sized (10).to_string (), "(-5010,-10;-5010,10010;0,10185;5010,10185;5010,-10)");
+  EXPECT_EQ (chamfered_box (0.6, 10000.0).sized (10).to_string (), "(-5010,-10;-5010,10010;0,10062;5010,10062;5010,-10)");
+  EXPECT_EQ (chamfered_box (0.2, 10000.0).sized (10).to_string (), "(-5010,-10;-5010,10010;0,10027;5010,10027;5010,-10)");
+  EXPECT_EQ (chamfered_box (0.01, 10000.0).sized (10).to_string (), "(-5010,-10;-5010,10010;0,10011;5010,10011;5010,-10)");
+
+  EXPECT_EQ (chamfered_box (20.0, 20.0).sized (10).to_string (), "(-20,-10;-20,27;-2,34;20,34;20,-10)");
+  EXPECT_EQ (chamfered_box (10.0, 20.0).sized (10).to_string (), "(-20,-10;-20,28;-1,32;20,32;20,-10)");
+  EXPECT_EQ (chamfered_box (5.0, 20.0).sized (10).to_string (), "(-20,-10;-20,29;0,31;20,31;20,-10)");
 }

@@ -2999,12 +2999,16 @@ public:
 
       } else if (k->second != j->second) {
 
-        //  joining required
-        k->second->first.insert (j->second->first.begin (), j->second->first.end ());
-        k->second->second.insert (j->second->second.begin (), j->second->second.end ());
+        //  joining required: every net of the absorbed entry has to be redirected, not just this one
+        const entry_list::iterator absorbed = j->second;
+        k->second->first.insert (absorbed->first.begin (), absorbed->first.end ());
+        k->second->second.insert (absorbed->second.begin (), absorbed->second.end ());
 
-        m_entries.erase (j->second);
-        j->second = k->second;
+        for (size_t net : absorbed->first) {
+          m_global_net_to_entries [net] = k->second;
+        }
+
+        m_entries.erase (absorbed);
 
       }
 

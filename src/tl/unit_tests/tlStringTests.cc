@@ -763,7 +763,10 @@ TEST(18)
   try { from_string ("-2147483649", i); } catch (...) { error = true; }
   EXPECT_EQ (error, true);
 
-  from_string ("1e3", i);
+  //  no longer supported and does not make sense:
+  //  from_string ("1e3", i);
+  //  instead, works with evaluation:
+  from_string_ext ("1e3", i);
   EXPECT_EQ (i, 1000);
 
   //  the leading/trailing whitespace handling stays the same

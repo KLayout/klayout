@@ -33,6 +33,8 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <unordered_map>
+#include <unordered_set>
 #include <functional>
 #include <memory>
 
@@ -394,7 +396,7 @@ private:
 
     } else {
 
-      std::set<std::pair<const Obj *, const Obj *> > seen;
+      std::unordered_map<const Obj *, std::unordered_set<const Obj *> > seen;
 
       std::sort (m_pp.begin (), m_pp.end (), bottom_side_compare_func (bc));
 
@@ -419,12 +421,7 @@ private:
 
         while (cc != current) {
           rec.finish (cc->first, cc->second);
-          auto s = seen.lower_bound (std::make_pair (cc->first, (const Obj *)0));
-          auto s0 = s;
-          while (s != seen.end () && s->first == cc->first) {
-            ++s;
-          }
-          seen.erase (s0, s);
+          seen.erase (cc->first);
           ++cc;
         }
 
@@ -469,12 +466,13 @@ private:
           for (iterator_type i = f0; i != f; ++i) {
             for (iterator_type j = c; j < i; ++j) {
               if (bs_boxes_overlap (bc (*i), bc (*j), enl)) {
-                std::pair<const Obj *, const Obj *> k (i->first, j->first);
-                if (k.first < k.second) {
-                  std::swap (k.first, k.second);
+                const Obj *k1 = i->first, *k2 = j->first;
+                if (k1 < k2) {
+                  std::swap (k1, k2);
                 }
-                if (seen.find (k) == seen.end ()) {
-                  seen.insert (k);
+                std::unordered_set<const Obj *> &sk = seen [k1];
+                if (sk.find (k2) == sk.end ()) {
+                  sk.insert (k2);
                   rec.add (i->first, i->second, j->first, j->second);
                   if (rec.stop ()) {
                     return false;
@@ -895,8 +893,8 @@ private:
 
     } else {
 
-      std::set<std::pair<const Obj1 *, const Obj2 *> > seen1;
-      std::set<std::pair<const Obj2 *, const Obj1 *> > seen2;
+      std::unordered_map<const Obj1 *, std::unordered_set<const Obj2 *> > seen1;
+      std::unordered_map<const Obj2 *, std::unordered_set<const Obj1 *> > seen2;
 
       std::sort (m_pp1.begin (), m_pp1.end (), bottom_side_compare_func1 (bc1));
       std::sort (m_pp2.begin (), m_pp2.end (), bottom_side_compare_func2 (bc2));
@@ -926,23 +924,13 @@ private:
 
         while (cc1 != current1) {
           rec.finish1 (cc1->first, cc1->second);
-          auto s = seen1.lower_bound (std::make_pair (cc1->first, (const Obj2 *)0));
-          auto s0 = s;
-          while (s != seen1.end () && s->first == cc1->first) {
-            ++s;
-          }
-          seen1.erase (s0, s);
+          seen1.erase (cc1->first);
           ++cc1;
         }
 
         while (cc2 != current2) {
           rec.finish2 (cc2->first, cc2->second);
-          auto s = seen2.lower_bound (std::make_pair (cc2->first, (const Obj1 *)0));
-          auto s0 = s;
-          while (s != seen2.end () && s->first == cc2->first) {
-            ++s;
-          }
-          seen2.erase (s0, s);
+          seen2.erase (cc2->first);
           ++cc2;
         }
 
@@ -1005,8 +993,8 @@ private:
               for (iterator_type1 i = c1; i != f1; ++i) {
                 for (iterator_type2 j = c2; j < f2; ++j) {
                   if (bs_boxes_overlap (bc1 (*i), bc2 (*j), enl)) {
-                    if (seen1.insert (std::make_pair (i->first, j->first)).second) {
-                      seen2.insert (std::make_pair (j->first, i->first));
+                    if (seen1 [i->first].insert (j->first).second) {
+                      seen2 [j->first].insert (i->first);
                       rec.add (i->first, i->second, j->first, j->second);
                       if (rec.stop ()) {
                         return false;

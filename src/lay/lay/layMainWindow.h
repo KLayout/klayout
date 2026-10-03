@@ -865,6 +865,8 @@ private:
   void cm_new_panel ();
   void cm_new_layout ();
   void cm_clone ();
+  void cm_prev_panel ();
+  void cm_next_panel ();
   void cm_close_all ();
   void cm_close ();
   void cm_packages ();

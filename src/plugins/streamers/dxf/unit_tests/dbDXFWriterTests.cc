@@ -308,9 +308,11 @@ TEST(LayerNames)
     db::SaveLayoutOptions options;
     options.set_format ("DXF");
 
-    tl::OutputStream stream (tmp);
-    db::Writer writer (options);
-    writer.write (l, stream);
+    {
+      tl::OutputStream stream (tmp);
+      db::Writer writer (options);
+      writer.write (l, stream);
+    }
 
     tl::InputStream is (tmp);
     std::string content = is.read_all ();
@@ -327,9 +329,11 @@ TEST(LayerNames)
     options.set_options (new db::DXFWriterOptions (dxf_opt));
     options.set_format ("DXF");
 
-    tl::OutputStream stream (tmp);
-    db::Writer writer (options);
-    writer.write (l, stream);
+    {
+      tl::OutputStream stream (tmp);
+      db::Writer writer (options);
+      writer.write (l, stream);
+    }
 
     tl::InputStream is (tmp);
     std::string content = is.read_all ();

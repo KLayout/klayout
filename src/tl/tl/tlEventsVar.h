@@ -176,24 +176,37 @@ public:
 #endif
 
   event ()
-    : mp_destroyed_sentinel (0)
+    : mp_top_frame (0)
   {
     //  .. nothing yet ..
   }
 
+  event (const event &d)
+    : mp_top_frame (0), m_receivers (d.m_receivers)
+  {
+    //  a copy does not take part in the emissions of the original
+  }
+
+  event &operator= (const event &d)
+  {
+    if (this != &d) {
+      m_receivers = d.m_receivers;
+    }
+    return *this;
+  }
+
   ~event ()
   {
-    if (mp_destroyed_sentinel) {
-      *mp_destroyed_sentinel = true;
+    //  mark all active emissions (including outer ones of nested emissions) as destroyed
+    for (emission_frame *f = mp_top_frame; f; f = f->prev) {
+      f->destroyed = true;
     }
-    mp_destroyed_sentinel = 0;
+    mp_top_frame = 0;
   }
 
   void operator() (_CALLARGLIST)
   {
-    bool was_destroyed = false;
-    bool *org_sentinel = mp_destroyed_sentinel;
-    mp_destroyed_sentinel = &was_destroyed;
+    emission_frame frame (&mp_top_frame);
 
     //  Issue the events. Because inside the call, other receivers might be added, we make a copy
     //  first. This way added events won't be called now.
@@ -202,10 +215,6 @@ public:
       if (r->first.get ()) {
         try {
           r->second->call (_JOIN(r->first.get (), _CALLARGS));
-          if (was_destroyed) {
-            //  during the call something deleted us. Stop immediately.
-            return;
-          }
         } catch (tl::Exception &ex) {
           handle_event_exception (ex);
         } catch (std::exception &ex) {
@@ -213,10 +222,12 @@ public:
         } catch (...) {
           //  Unknown exceptions are ignored
         }
+        if (frame.destroyed) {
+          //  during the call something deleted us (and maybe threw). Stop immediately and don't touch any member.
+          return;
+        }
       }
     }
-
-    mp_destroyed_sentinel = org_sentinel;
 
     //  Clean up expired entries afterwards (the call may have expired them)
     receivers_iterator w = m_receivers.begin ();
@@ -363,7 +374,28 @@ public:
   }
 
 private:
-  bool *mp_destroyed_sentinel;
+  struct emission_frame
+  {
+    emission_frame (emission_frame **top)
+      : destroyed (false), prev (*top), mp_top (top)
+    {
+      *top = this;
+    }
+
+    ~emission_frame ()
+    {
+      //  the event is gone if it was destroyed during the emission
+      if (! destroyed) {
+        *mp_top = prev;
+      }
+    }
+
+    bool destroyed;
+    emission_frame *prev;
+    emission_frame **mp_top;
+  };
+
+  emission_frame *mp_top_frame;
   receivers m_receivers;
 };
 

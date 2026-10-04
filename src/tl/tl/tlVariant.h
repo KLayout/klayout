@@ -208,7 +208,7 @@ public:
   /**
    *  @brief Move ctor
    */
-  Variant (tl::Variant &&d);
+  Variant (tl::Variant &&d) noexcept;
 
   /**
    *  @brief Initialize the Variant with a std::vector<char>
@@ -582,7 +582,7 @@ public:
   /**
    *  @brief Assignment (move)
    */
-  Variant &operator= (Variant &&v);
+  Variant &operator= (Variant &&v) noexcept;
 
   /**
    *  @brief Assignment of a string

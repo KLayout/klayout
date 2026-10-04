@@ -30,6 +30,7 @@
 
 #include <cstdio>
 #include <memory>
+#include <utility>
 
 #define _USE_MATH_DEFINES // for MSVC
 #include <math.h>
@@ -1577,4 +1578,18 @@ TEST(14)
   EXPECT_EQ (tl::Variant ("ABCD").less (ba2_var), false);
 }
 
+}
+
+//  the move ctor and assignment must be noexcept so that std::vector growth moves
+TEST(15)
+{
+  tl::Variant a ("hello");
+
+  EXPECT_EQ (noexcept (tl::Variant (std::move (a))), true);
+  EXPECT_EQ (noexcept (std::declval<tl::Variant &> () = std::declval<tl::Variant &&> ()), true);
+
+  tl::Variant b (std::move (a));
+
+  EXPECT_EQ (b.to_string (), std::string ("hello"));
+  EXPECT_EQ (a.is_nil (), true);
 }

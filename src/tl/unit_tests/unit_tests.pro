@@ -45,6 +45,7 @@ SOURCES = \
   tlListTests.cc \
   tlSListTests.cc \
   tlEquivalenceClustersTests.cc \
+  tlVectorTests.cc \
   tlUniqueNameTests.cc \
   tlGlobPatternTests.cc \
   tlRecipeTests.cc \

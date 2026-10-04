@@ -903,7 +903,7 @@ Graph::bbox () const
 }
 
 db::Layout *
-Graph::to_layout (bool decompose_by_id, double dbu) const
+Graph::to_layout (bool decompose_by_id, double dbu, double xscale, double yscale) const
 {
   db::Layout *layout = new db::Layout ();
   layout->dbu (dbu);
@@ -922,7 +922,8 @@ Graph::to_layout (bool decompose_by_id, double dbu) const
   for (auto t = mp_polygons.begin (); t != mp_polygons.end (); ++t) {
     pts.clear ();
     for (int i = 0; i < int (t->size ()); ++i) {
-      pts.push_back (dbu_trans * *t->vertex (i));
+      db::DPoint v = *t->vertex (i);
+      pts.push_back (dbu_trans * db::DPoint (v.x () * xscale, v.y () * yscale));
     }
     db::Polygon poly;
     poly.assign_hull (pts.begin (), pts.end (), false, false);
@@ -950,9 +951,9 @@ Graph::to_layout (bool decompose_by_id, double dbu) const
 }
 
 void
-Graph::dump (const std::string &path, bool decompose_by_id, double dbu) const
+Graph::dump (const std::string &path, bool decompose_by_id, double dbu, double xscale, double yscale) const
 {
-  std::unique_ptr<db::Layout> ly (to_layout (decompose_by_id, dbu));
+  std::unique_ptr<db::Layout> ly (to_layout (decompose_by_id, dbu, xscale, yscale));
 
   tl::OutputStream stream (path);
 

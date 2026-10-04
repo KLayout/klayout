@@ -1434,6 +1434,99 @@ TEST(29)
   EXPECT_EQ (sb == db::SimplePolygon (), true);
 }
 
+//  is_rectilinear/is_halfmanhattan must mask the two tag bits out of mp_points.
+//  An uncompressed hole carries the hole tag (bit 1), so unmasked indexing reads
+//  2 bytes off and past the end of the point array.
+TEST(30)
+{
+  std::vector<db::Point> hull;
+  hull.push_back (db::Point (0, 0));
+  hull.push_back (db::Point (0, 1000));
+  hull.push_back (db::Point (100, 1000));
+  hull.push_back (db::Point (100, 0));
+
+  std::vector<db::Point> rect_hole;
+  rect_hole.push_back (db::Point (10, 10));
+  rect_hole.push_back (db::Point (10, 390));
+  rect_hole.push_back (db::Point (90, 390));
+  rect_hole.push_back (db::Point (90, 10));
+
+  std::vector<db::Point> diag_hole;
+  diag_hole.push_back (db::Point (10, 10));
+  diag_hole.push_back (db::Point (50, 50));
+  diag_hole.push_back (db::Point (90, 10));
+
+  //  control: with compression the rectilinear hole takes the tag early-exit,
+  //  and the same ring as a hull or on a simple polygon has no hole tag
+  {
+    db::Polygon p;
+    p.assign_hull (hull.begin (), hull.end ());
+    p.insert_hole (rect_hole.begin (), rect_hole.end ());
+    EXPECT_EQ (p.is_rectilinear (), true);
+    EXPECT_EQ (p.is_halfmanhattan (), true);
+
+    db::Polygon ph;
+    ph.assign_hull (diag_hole.begin (), diag_hole.end ());
+    EXPECT_EQ (ph.is_rectilinear (), false);
+    EXPECT_EQ (ph.is_halfmanhattan (), true);
+
+    db::SimplePolygon sp;
+    sp.assign_hull (diag_hole.begin (), diag_hole.end ());
+    EXPECT_EQ (sp.is_rectilinear (), false);
+    EXPECT_EQ (sp.is_halfmanhattan (), true);
+  }
+
+  //  rectilinear hole stored uncompressed: compress=false keeps raw points plus the hole tag
+  {
+    db::Polygon p;
+    p.assign_hull (hull.begin (), hull.end ());
+    p.insert_hole (rect_hole.begin (), rect_hole.end (), false);
+    EXPECT_EQ (p.to_string (), std::string ("(0,0;0,1000;100,1000;100,0/10,10;90,10;90,390;10,390)"));
+    EXPECT_EQ (p.is_rectilinear (), true);
+    EXPECT_EQ (p.is_halfmanhattan (), true);
+  }
+
+  //  the same after a transform with compress=false (the re-insert path)
+  {
+    db::Polygon p;
+    p.assign_hull (hull.begin (), hull.end ());
+    p.insert_hole (rect_hole.begin (), rect_hole.end ());
+    p.transform (db::Trans (1, false, db::Vector (1, 1)), false);
+    EXPECT_EQ (p.is_rectilinear (), true);
+    EXPECT_EQ (p.is_halfmanhattan (), true);
+  }
+
+  //  non-rectilinear hole: stored raw - not compressed - even with compress=true
+  {
+    db::Polygon p;
+    p.assign_hull (hull.begin (), hull.end ());
+    p.insert_hole (diag_hole.begin (), diag_hole.end ());
+    EXPECT_EQ (p.is_rectilinear (), false);
+    EXPECT_EQ (p.is_halfmanhattan (), true);
+  }
+
+  //  DPolygon holes are never compressed (default compression is off for doubles)
+  {
+    std::vector<db::DPoint> dhull;
+    dhull.push_back (db::DPoint (0, 0));
+    dhull.push_back (db::DPoint (0, 1000));
+    dhull.push_back (db::DPoint (100, 1000));
+    dhull.push_back (db::DPoint (100, 0));
+
+    std::vector<db::DPoint> dhole;
+    dhole.push_back (db::DPoint (10, 10));
+    dhole.push_back (db::DPoint (10, 390));
+    dhole.push_back (db::DPoint (90, 390));
+    dhole.push_back (db::DPoint (90, 10));
+
+    db::DPolygon dp;
+    dp.assign_hull (dhull.begin (), dhull.end ());
+    dp.insert_hole (dhole.begin (), dhole.end ());
+    EXPECT_EQ (dp.is_rectilinear (), true);
+    EXPECT_EQ (dp.is_halfmanhattan (), true);
+  }
+}
+
 static db::Polygon wedge (double angle, double l)
 {
   double dy = l * tan (angle * M_PI / 180.0);
@@ -1468,7 +1561,7 @@ static db::Polygon chamfered_box (double angle, double l)
 
 //  issue #2469
 //  Sizing of acute-corner polygons
-TEST(30)
+TEST(31)
 {
   EXPECT_EQ (wedge (20.0, 10000.0).sized (10).to_string (), "(-10006,-3653;-10010,-3650;-10010,3650;-10006,3653;13,6;13,-6)");
   EXPECT_EQ (wedge (2.0, 10000.0).sized (10).to_string (), "(-10010,-359;-10010,359;10,10;10,-10)");
@@ -1491,3 +1584,4 @@ TEST(30)
   EXPECT_EQ (chamfered_box (10.0, 20.0).sized (10).to_string (), "(-20,-10;-20,28;-1,32;20,32;20,-10)");
   EXPECT_EQ (chamfered_box (5.0, 20.0).sized (10).to_string (), "(-20,-10;-20,29;0,31;20,31;20,-10)");
 }
+

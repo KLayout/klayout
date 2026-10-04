@@ -342,3 +342,52 @@ TEST(4_wakeOne)
   EXPECT_EQ (thr1.value (), 10000000);
   EXPECT_EQ (thr2.value (), 10000000);
 }
+
+//  Bug: ThreadStorageObjectList::add () did m_objects.find (holder) instead of
+//  find (index), so a second add for the same storage kept the old holder and leaked
+//  the new one.
+#if !defined(HAVE_QT) || defined(HAVE_PTHREADS)
+
+class CountedValue
+{
+public:
+  CountedValue (int v = 0) : m_value (v) { ++s_live; }
+  CountedValue (const CountedValue &other) : m_value (other.m_value) { ++s_live; }
+  CountedValue &operator= (const CountedValue &other) { m_value = other.m_value; return *this; }
+  ~CountedValue () { --s_live; }
+
+  int value () const { return m_value; }
+  static int live () { return s_live; }
+
+private:
+  int m_value;
+  static int s_live;
+};
+
+int CountedValue::s_live = 0;
+
+//  exposes ThreadStorageBase::add so the second add for the same storage can be reached
+class TestStorage : public tl::ThreadStorage<CountedValue>
+{
+public:
+  void assign (const CountedValue &v)
+  {
+    add (new tl::ThreadStorageHolder<CountedValue> (new CountedValue (v)));
+  }
+};
+
+TEST(5_thread_storage_replace)
+{
+  TestStorage storage;
+
+  storage.assign (CountedValue (1));
+  EXPECT_EQ (storage.localData ().value (), 1);
+  EXPECT_EQ (CountedValue::live (), 1);
+
+  //  the second assignment replaces the holder and deletes the previous one
+  storage.assign (CountedValue (2));
+  EXPECT_EQ (storage.localData ().value (), 2);
+  EXPECT_EQ (CountedValue::live (), 1);
+}
+
+#endif

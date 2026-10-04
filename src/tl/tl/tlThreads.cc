@@ -27,6 +27,7 @@
 #include "tlLog.h"
 #include "tlInternational.h"
 
+#include <atomic>
 #include <map>
 
 #if !defined(HAVE_QT) || defined(HAVE_PTHREADS)
@@ -245,9 +246,9 @@ public:
   }
 
   pthread_t pthread;
-  bool initialized;
+  std::atomic<bool> initialized;
   void *return_code;
-  bool running;
+  std::atomic<bool> running;
 };
 
 void *start_thread (void *data)
@@ -321,6 +322,7 @@ void Thread::start ()
   mp_data->initialized = true;
   mp_data->running = true;
   if (pthread_create (&mp_data->pthread, NULL, &start_thread, (void *) this) != 0) {
+    mp_data->running = false;
     tl::error << tr ("Failed to create thread");
   }
 }
@@ -411,7 +413,7 @@ public:
 
   void add (void *index, ThreadStorageHolderBase *holder)
   {
-    std::map<void *, ThreadStorageHolderBase *>::iterator h = m_objects.find (holder);
+    std::map<void *, ThreadStorageHolderBase *>::iterator h = m_objects.find (index);
     if (h != m_objects.end ()) {
       delete h->second;
       h->second = holder;

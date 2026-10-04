@@ -24,6 +24,8 @@
 #include "tlUnitTest.h"
 #include "tlString.h"
 
+#include <utility>
+
 namespace
 {
 
@@ -467,6 +469,109 @@ TEST(3_Insert)
   l1.erase (i1, l1.end ());
   EXPECT_EQ (l2s (l1), "42");
   EXPECT_EQ (l1.size (), size_t (1));
+}
+
+//  move construction steals the elements and leaves the source empty but usable
+TEST(4_Move)
+{
+  obj_count = 0;
+
+  tl::list<MyClass1> l1;
+  l1.push_back (new MyClass1 (1));
+  l1.push_back (new MyClass1 (2));
+  l1.push_back (new MyClass1 (3));
+  EXPECT_EQ (l2s (l1), "1,2,3");
+  EXPECT_EQ (obj_count, size_t (3));
+
+  tl::list<MyClass1> l2 (std::move (l1));
+
+  EXPECT_EQ (l2s (l2), "1,2,3");
+  EXPECT_EQ (l2.size (), size_t (3));
+  EXPECT_EQ (l1.empty (), true);
+  EXPECT_EQ (l1.size (), size_t (0));
+  EXPECT_EQ (obj_count, size_t (3));
+
+  //  the source can be used again
+  l1.push_back (new MyClass1 (4));
+  EXPECT_EQ (l2s (l1), "4");
+  EXPECT_EQ (obj_count, size_t (4));
+
+  l1.clear ();
+  l2.clear ();
+  EXPECT_EQ (obj_count, size_t (0));
+}
+
+//  move construction from an empty list
+TEST(5_MoveEmpty)
+{
+  obj_count = 0;
+
+  tl::list<MyClass1> l1;
+  tl::list<MyClass1> l2 (std::move (l1));
+
+  EXPECT_EQ (l2.empty (), true);
+  EXPECT_EQ (l2.size (), size_t (0));
+  EXPECT_EQ (l1.empty (), true);
+  EXPECT_EQ (l1.size (), size_t (0));
+
+  //  both lists are usable
+  l1.push_back (new MyClass1 (1));
+  l2.push_back (new MyClass1 (2));
+  EXPECT_EQ (l2s (l1), "1");
+  EXPECT_EQ (l2s (l2), "2");
+
+  l1.clear ();
+  l2.clear ();
+  EXPECT_EQ (obj_count, size_t (0));
+}
+
+//  move assignment releases the elements the target owns exactly once
+TEST(6_MoveAssign)
+{
+  obj_count = 0;
+
+  tl::list<MyClass1> l1;
+  l1.push_back (new MyClass1 (1));
+  l1.push_back (new MyClass1 (2));
+
+  tl::list<MyClass1> l2;
+  l2.push_back (new MyClass1 (7));
+  l2.push_back (new MyClass1 (8));
+  l2.push_back (new MyClass1 (9));
+  EXPECT_EQ (obj_count, size_t (5));
+
+  l2 = std::move (l1);
+
+  //  the three old elements are gone, exactly the source's two remain
+  EXPECT_EQ (obj_count, size_t (2));
+  EXPECT_EQ (l2s (l2), "1,2");
+  EXPECT_EQ (l2.size (), size_t (2));
+  EXPECT_EQ (l1.empty (), true);
+  EXPECT_EQ (l1.size (), size_t (0));
+
+  l2.clear ();
+  EXPECT_EQ (obj_count, size_t (0));
+}
+
+//  self move assignment leaves the list unchanged
+TEST(7_SelfMove)
+{
+  obj_count = 0;
+
+  tl::list<MyClass1> l1;
+  l1.push_back (new MyClass1 (1));
+  l1.push_back (new MyClass1 (2));
+  l1.push_back (new MyClass1 (3));
+
+  tl::list<MyClass1> &r = l1;
+  l1 = std::move (r);
+
+  EXPECT_EQ (l2s (l1), "1,2,3");
+  EXPECT_EQ (l1.size (), size_t (3));
+  EXPECT_EQ (obj_count, size_t (3));
+
+  l1.clear ();
+  EXPECT_EQ (obj_count, size_t (0));
 }
 
 

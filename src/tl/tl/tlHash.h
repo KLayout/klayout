@@ -100,7 +100,12 @@ namespace tl
   template <class T>
   size_t hfunc (const std::unordered_set <T> &o, size_t h)
   {
-    return hfunc_iterable (o, h);
+    //  sum of element hashes is independent of the iteration order
+    size_t sum = 0;
+    for (const T &e : o) {
+      sum += hfunc (e);
+    }
+    return hcombine (h, hcombine (sum, o.size ()));
   }
 
   template <class T>
@@ -196,10 +201,12 @@ namespace tl
   template <class T1, class T2>
   size_t hfunc (const std::unordered_map<T1, T2> &o, size_t h)
   {
-    for (typename std::unordered_map<T1, T2>::const_iterator i = o.begin (); i != o.end (); ++i) {
-      h = hfunc (i->first, hfunc (i->second, h));
+    //  sum of element hashes is independent of the iteration order
+    size_t sum = 0;
+    for (const auto &e : o) {
+      sum += hfunc (e.first, hfunc (e.second));
     }
-    return h;
+    return hcombine (h, hcombine (sum, o.size ()));
   }
 
   template <class T1, class T2>

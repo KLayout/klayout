@@ -30,6 +30,7 @@
 #include <vector>
 #include <cwctype>
 #include <algorithm>
+#include <type_traits>
 
 #include "tlString.h"
 #include "tlExpression.h"
@@ -463,64 +464,120 @@ to_string (float d, int prec)
   return os.str ();
 }
 
+//  Shared implementation of the integer to_string conversions. The digits are
+//  generated into a local buffer and the magnitude is computed in the unsigned
+//  domain, so the minimum value never has to be negated.
+
+template <class T> struct integer_to_string_traits
+{
+  using unsigned_type = typename std::make_unsigned<T>::type;
+  static const bool is_signed = std::numeric_limits<T>::is_signed;
+  static const size_t buf_size = std::numeric_limits<T>::digits10 + 3;
+};
+
+#if defined(HAVE_64BIT_COORD)
+//  std::make_unsigned and std::numeric_limits are not reliable for __int128 in strict C++11 mode
+template <> struct integer_to_string_traits<__int128>
+{
+  using unsigned_type = unsigned __int128;
+  static const bool is_signed = true;
+  static const size_t buf_size = 41;
+};
+
+template <> struct integer_to_string_traits<unsigned __int128>
+{
+  using unsigned_type = unsigned __int128;
+  static const bool is_signed = false;
+  static const size_t buf_size = 41;
+};
+#endif
+
+template <class T> static
+typename integer_to_string_traits<T>::unsigned_type
+integer_magnitude (T v, bool &neg, std::true_type)
+{
+  using U = typename integer_to_string_traits<T>::unsigned_type;
+  if (v < 0) {
+    neg = true;
+    return U (0) - U (v);
+  } else {
+    neg = false;
+    return U (v);
+  }
+}
+
+template <class T> static
+typename integer_to_string_traits<T>::unsigned_type
+integer_magnitude (T v, bool &neg, std::false_type)
+{
+  neg = false;
+  return typename integer_to_string_traits<T>::unsigned_type (v);
+}
+
+template <class T> static
+std::string
+integer_to_string (T v)
+{
+  using U = typename integer_to_string_traits<T>::unsigned_type;
+
+  bool neg = false;
+  U x = integer_magnitude (v, neg, std::integral_constant<bool, integer_to_string_traits<T>::is_signed> ());
+
+  //  digits plus sign plus terminating zero
+  char buf[integer_to_string_traits<T>::buf_size];
+  char *p = buf + sizeof (buf);
+  *--p = '\0';
+  do {
+    *--p = char ('0' + int (x % 10));
+    x /= 10;
+  } while (x > 0);
+  if (neg) {
+    *--p = '-';
+  }
+
+  return std::string (p);
+}
+
 template <>
 std::string
 to_string (const int &d)
 {
-  std::ostringstream os;
-  os.imbue (c_locale);
-  os << d;
-  return os.str ();
+  return integer_to_string (d);
 }
 
 template <>
 std::string
 to_string (const unsigned int &d)
 {
-  std::ostringstream os;
-  os.imbue (c_locale);
-  os << d;
-  return os.str ();
+  return integer_to_string (d);
 }
 
 template <>
 std::string
 to_string (const long &d)
 {
-  std::ostringstream os;
-  os.imbue (c_locale);
-  os << d;
-  return os.str ();
+  return integer_to_string (d);
 }
 
 template <>
 std::string
 to_string (const long long &d)
 {
-  std::ostringstream os;
-  os.imbue (c_locale);
-  os << d;
-  return os.str ();
+  return integer_to_string (d);
 }
 
 template <>
 std::string
 to_string (const unsigned long &d)
 {
-  std::ostringstream os;
-  os.imbue (c_locale);
-  os << d;
-  return os.str ();
+  return integer_to_string (d);
 }
 
 template <>
 std::string
 to_string (const unsigned long long &d)
 {
-  std::ostringstream os;
-  os.imbue (c_locale);
-  os << d;
-  return os.str ();
+  return integer_to_string (d);
 }
 
 #if defined(HAVE_64BIT_COORD)
@@ -529,45 +586,14 @@ template <>
 std::string
 to_string (const __int128 &d)
 {
-  if (d < 0 ) {
-    return "-" + tl::to_string(static_cast<unsigned __int128> (-d));
-  } else {
-    return tl::to_string(static_cast<unsigned __int128> (d));
-  }
+  return integer_to_string (d);
 }
 
 template <>
 std::string
-to_string (const unsigned __int128 &_x)
+to_string (const unsigned __int128 &d)
 {
-  std::string r;
-  unsigned __int128 x = _x;
-
-  //  this is the max. power of 10 that can be represented with __int128
-  unsigned __int128 m = (unsigned long long) 0x4b3b4ca85a86c47a;
-  m <<= 64;
-  m |= (unsigned long long) 0x98a224000000000;
-
-  if (x == 0) {
-    return "0";
-  }
-
-  bool first = true;
-  while (m > 1) {
-    int d = 0;
-    while (x >= m) {
-      d += 1;
-      x -= m;
-    }
-    if (d > 0 || !first) {
-      r += char ('0' + d);
-      first = false;
-    }
-    m /= 10;
-  }
-
-  r += char('0' + int(x));
-  return r;
+  return integer_to_string (d);
 }
 
 #endif

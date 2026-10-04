@@ -25,6 +25,7 @@
 #define HDR_tlVector
 
 #include <vector>
+#include <utility>
 #include "tlTypeTraits.h"
 
 namespace tl 
@@ -63,7 +64,7 @@ public:
   /**
    *  @brief Move constructor
    */
-  explicit vector (const tl::vector<T> &&d) : base (d) { }
+  vector (tl::vector<T> &&d) noexcept : base (std::move (d)) { }
 
   /**
    *  @brief Assignment
@@ -79,10 +80,10 @@ public:
   /**
    *  @brief Assignment (Move)
    */
-  vector &operator= (const tl::vector<T> &&d)
+  vector &operator= (tl::vector<T> &&d) noexcept
   {
     if (&d != this) {
-      base::operator= (d);
+      base::operator= (std::move (d));
     }
     return *this;
   }

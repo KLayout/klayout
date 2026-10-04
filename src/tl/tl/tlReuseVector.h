@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 #include <vector>
 #include <cstring>
 
@@ -546,7 +547,7 @@ public:
    *
    *  See operator= for a description of the copy operation.
    */
-  reuse_vector (reuse_vector &&d)
+  reuse_vector (reuse_vector &&d) noexcept
   {
     mp_start = d.mp_start; d.mp_start = 0;
     mp_finish = d.mp_finish; d.mp_finish = 0;
@@ -584,9 +585,10 @@ public:
   /**
    *  @brief Assignment (move)
    */
-  reuse_vector &operator= (reuse_vector &&d)
+  reuse_vector &operator= (reuse_vector &&d) noexcept
   {
     if (&d != this) {
+      release ();
       mp_start = d.mp_start; d.mp_start = 0;
       mp_finish = d.mp_finish; d.mp_finish = 0;
       mp_capacity = d.mp_capacity; d.mp_capacity = 0;
@@ -997,7 +999,7 @@ private:
       size_type l = last ();
       for (size_type i = first (); i < l; ++i) {
         if (is_used (i)) {
-          new (new_start + i) value_type (item (i));
+          new (new_start + i) value_type (std::move_if_noexcept (item (i)));
           item (i).~value_type ();
         }
       }

@@ -85,6 +85,17 @@
   </p>
 
   <p>
+  The "Box" and "Ellipse" rulers are two-click types like the normal ruler,
+  but show a box or an ellipse spanned by the two points. For these rulers,
+  the Shift and Ctrl keys have a different meaning while you move the
+  second point: with the Shift key pressed, the first point becomes the
+  center of the box or ellipse. With the Ctrl key pressed, the box is
+  confined to a square and the ellipse to a circle. Both keys can be
+  combined. The same applies to all rulers using the "box" or "ellipse"
+  outline style.
+  </p>
+
+  <p>
   Rulers can be configured in manifold ways. Use "Rulers And Annotations Setup" 
   in the "Edit" menu to open the ruler configuration dialog. 
   A ruler can be
@@ -99,6 +110,8 @@
   can be overridden with the Shift and Ctrl keys: pressing Shift while moving the
   mouse will enforce orthogonal constraint, Ctrl will enforce diagonal constraint 
   while pressing both will release any direction constraint.
+  When drawing box or ellipse rulers, these keys center the ruler or
+  confine it to a square or circle instead (see above).
   </p>
 
   <p>

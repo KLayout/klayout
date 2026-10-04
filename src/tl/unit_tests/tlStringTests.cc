@@ -29,6 +29,7 @@
 #include <cmath>
 #include <math.h>
 #include <clocale>
+#include <cstdio>
 
 using namespace tl;
 
@@ -807,4 +808,74 @@ TEST(19)
   EXPECT_EQ (threw || d == 0.0, true);
 }
 
+//  the minimum values are checked explicitly: negating them would overflow
+TEST(to_string_integers)
+{
+  char ref[64];
+
+  static const int int_values[] = {
+    0, 1, -1, 9, 10, 99, 100,
+    std::numeric_limits<int>::min (), std::numeric_limits<int>::max ()
+  };
+  for (size_t i = 0; i < sizeof (int_values) / sizeof (int_values[0]); ++i) {
+    snprintf (ref, sizeof (ref), "%d", int_values[i]);
+    EXPECT_EQ (tl::to_string (int_values[i]), std::string (ref));
+  }
+
+  static const unsigned int uint_values[] = {
+    0, 1, (unsigned int) -1, 9, 10, 99, 100,
+    std::numeric_limits<unsigned int>::min (), std::numeric_limits<unsigned int>::max ()
+  };
+  for (size_t i = 0; i < sizeof (uint_values) / sizeof (uint_values[0]); ++i) {
+    snprintf (ref, sizeof (ref), "%u", uint_values[i]);
+    EXPECT_EQ (tl::to_string (uint_values[i]), std::string (ref));
+  }
+
+  static const long long_values[] = {
+    0, 1, -1, 9, 10, 99, 100,
+    std::numeric_limits<long>::min (), std::numeric_limits<long>::max ()
+  };
+  for (size_t i = 0; i < sizeof (long_values) / sizeof (long_values[0]); ++i) {
+    snprintf (ref, sizeof (ref), "%ld", long_values[i]);
+    EXPECT_EQ (tl::to_string (long_values[i]), std::string (ref));
+  }
+
+  static const unsigned long ulong_values[] = {
+    0, 1, (unsigned long) -1, 9, 10, 99, 100,
+    std::numeric_limits<unsigned long>::min (), std::numeric_limits<unsigned long>::max ()
+  };
+  for (size_t i = 0; i < sizeof (ulong_values) / sizeof (ulong_values[0]); ++i) {
+    snprintf (ref, sizeof (ref), "%lu", ulong_values[i]);
+    EXPECT_EQ (tl::to_string (ulong_values[i]), std::string (ref));
+  }
+
+  static const long long llong_values[] = {
+    0, 1, -1, 9, 10, 99, 100,
+    -9223372036854775807LL - 1, 9223372036854775807LL,
+    2147483648LL, 4294967296LL, 9007199254740993LL
+  };
+  for (size_t i = 0; i < sizeof (llong_values) / sizeof (llong_values[0]); ++i) {
+    snprintf (ref, sizeof (ref), "%lld", llong_values[i]);
+    EXPECT_EQ (tl::to_string (llong_values[i]), std::string (ref));
+  }
+
+  static const unsigned long long ullong_values[] = {
+    0, 1, (unsigned long long) -1, 9, 10, 99, 100,
+    std::numeric_limits<unsigned long long>::max (),
+    2147483648ULL, 4294967296ULL, 9007199254740993ULL
+  };
+  for (size_t i = 0; i < sizeof (ullong_values) / sizeof (ullong_values[0]); ++i) {
+    snprintf (ref, sizeof (ref), "%llu", ullong_values[i]);
+    EXPECT_EQ (tl::to_string (ullong_values[i]), std::string (ref));
+  }
+
+#if defined(HAVE_64BIT_COORD)
+  const __int128 int128_max = (__int128) (((unsigned __int128) -1) >> 1);
+  const __int128 int128_min = -int128_max - 1;
+  EXPECT_EQ (tl::to_string (int128_min), "-170141183460469231731687303715884105728");
+  EXPECT_EQ (tl::to_string (int128_max), "170141183460469231731687303715884105727");
+  EXPECT_EQ (tl::to_string ((__int128) 0), "0");
+  EXPECT_EQ (tl::to_string ((__int128) -1), "-1");
+#endif
+}
 

@@ -730,18 +730,9 @@ public:
     if (((size_t) mp_points & 1) != 0) {
       return true;
     }
-    if (m_size < 2) {
-      return false;
-    }
-    point_type pl = mp_points [m_size - 1];
-    for (size_t i = 0; i < m_size; ++i) {
-      point_type p = mp_points [i];
-      if (! coord_traits::equals (p.x (), pl.x ()) && ! coord_traits::equals (p.y (), pl.y ())) {
-        return false;
-      }
-      pl = p;
-    }
-    return true;
+    return all_edges ([] (const point_type &pl, const point_type &p) {
+      return coord_traits::equals (p.x (), pl.x ()) || coord_traits::equals (p.y (), pl.y ());
+    });
   }
   
   /**
@@ -752,18 +743,9 @@ public:
     if (((size_t) mp_points & 1) != 0) {
       return true;
     }
-    if (m_size < 2) {
-      return false;
-    }
-    point_type pl = mp_points [m_size - 1];
-    for (size_t i = 0; i < m_size; ++i) {
-      point_type p = mp_points [i];
-      if (! coord_traits::equals (p.x (), pl.x ()) && ! coord_traits::equals (p.y (), pl.y ()) && ! coord_traits::equals (std::abs (p.x () - pl.x ()), std::abs (p.y () - pl.y ()))) {
-        return false;
-      }
-      pl = p;
-    }
-    return true;
+    return all_edges ([] (const point_type &pl, const point_type &p) {
+      return coord_traits::equals (p.x (), pl.x ()) || coord_traits::equals (p.y (), pl.y ()) || coord_traits::equals (std::abs (p.x () - pl.x ()), std::abs (p.y () - pl.y ()));
+    });
   }
 
   /**
@@ -1084,6 +1066,24 @@ public:
   }
 
 private:
+  //  true if pred (previous point, point) holds for every edge of an uncompressed contour
+  //  with at least two points; the pointer tag bits are cleared like in the other accessors
+  template <class Pred>
+  bool all_edges (Pred pred) const
+  {
+    if (m_size < 2) {
+      return false;
+    }
+    const point_type *pts = reinterpret_cast<const point_type *> (reinterpret_cast<size_t> (mp_points) & ~size_t (3));
+    const point_type *pl = pts + (m_size - 1);
+    for (const point_type *p = pts; p != pts + m_size; pl = p++) {
+      if (! pred (*pl, *p)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   point_type *mp_points;
   size_type m_size;
 

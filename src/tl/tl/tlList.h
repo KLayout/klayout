@@ -30,6 +30,7 @@
 #include <iterator>
 #include <algorithm>
 #include <type_traits>
+#include <utility>
 
 namespace tl
 {
@@ -220,15 +221,17 @@ public:
     m_back.mp_prev = &m_head;
   }
 
-  list_impl (const list_impl &&other)
+  list_impl (list_impl &&other) noexcept
+    : m_head (), m_back ()
   {
-    swap (other);
+    steal (other);
   }
 
-  list_impl &operator= (const list_impl &&other)
+  list_impl &operator= (list_impl &&other) noexcept
   {
     if (&other != this) {
-      swap (other);
+      clear ();
+      steal (other);
     }
     return *this;
   }
@@ -415,6 +418,25 @@ protected:
 private:
   list_node<C> m_head, m_back;
 
+  //  takes over the elements of other and leaves it empty
+  void steal (list_impl &other)
+  {
+    m_head.mp_next = other.m_head.mp_next;
+    m_back.mp_prev = other.m_back.mp_prev;
+    if (m_head.mp_next != &other.m_back) {
+      m_head.mp_next->mp_prev = &m_head;
+    } else {
+      m_head.mp_next = &m_back;
+    }
+    if (m_back.mp_prev != &other.m_head) {
+      m_back.mp_prev->mp_next = &m_back;
+    } else {
+      m_back.mp_prev = &m_head;
+    }
+    other.m_head.mp_next = &other.m_back;
+    other.m_back.mp_prev = &other.m_head;
+  }
+
   C *insert_impl (C *after, C *new_obj, bool owned)
   {
     list_node<C> *after_node = after;
@@ -483,6 +505,12 @@ public:
     operator= (other);
   }
 
+  list_impl (list_impl &&other) noexcept
+    : list_impl<C, false> (std::move (other))
+  {
+    //  .. nothing yet ..
+  }
+
   list_impl &operator= (const list_impl &other)
   {
     if (this != &other) {
@@ -491,6 +519,12 @@ public:
         push_back (*p);
       }
     }
+    return *this;
+  }
+
+  list_impl &operator= (list_impl &&other) noexcept
+  {
+    list_impl<C, false>::operator= (std::move (other));
     return *this;
   }
 
@@ -587,10 +621,17 @@ public:
 
   list () { }
   list (const list &other) : list_impl<C, CanCopy> (other) { }
+  list (list &&other) noexcept : list_impl<C, CanCopy> (std::move (other)) { }
 
   list &operator= (const list &other)
   {
     list_impl<C, CanCopy>::operator= (other);
+    return *this;
+  }
+
+  list &operator= (list &&other) noexcept
+  {
+    list_impl<C, CanCopy>::operator= (std::move (other));
     return *this;
   }
 

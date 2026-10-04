@@ -26,6 +26,8 @@
 #include "tlAlgorithm.h"
 #include "tlUnitTest.h"
 
+#include <utility>
+
 std::string to_string (const tl::stable_vector<std::string> &v) 
 {
   std::string t;
@@ -211,5 +213,64 @@ TEST(3)
   v.push_back (12);
   EXPECT_EQ (*i1, 123);
   EXPECT_EQ (*i2, 123);
+}
+
+namespace {
+
+struct MoveCounted
+{
+  static int copies;
+  static void reset () { copies = 0; }
+
+  MoveCounted () : x (0) { }
+  explicit MoveCounted (int n) : x (n) { }
+  MoveCounted (const MoveCounted &d) : x (d.x) { ++copies; }
+  MoveCounted &operator= (const MoveCounted &d) { x = d.x; ++copies; return *this; }
+
+  int x;
+};
+
+int MoveCounted::copies = 0;
+
+}
+
+//  move constructor must steal the elements (the original code deep-copied them)
+TEST(4)
+{
+  tl::stable_vector<MoveCounted> a;
+  a.push_back (MoveCounted (1));
+  a.push_back (MoveCounted (2));
+  a.push_back (MoveCounted (3));
+
+  MoveCounted::reset ();
+
+  tl::stable_vector<MoveCounted> b (std::move (a));
+
+  EXPECT_EQ (MoveCounted::copies, 0);
+  EXPECT_EQ (a.size (), size_t (0));
+  EXPECT_EQ (b.size (), size_t (3));
+  EXPECT_EQ (b [0].x, 1);
+  EXPECT_EQ (b [2].x, 3);
+}
+
+//  move assignment must steal the elements (the original code deep-copied them)
+TEST(5)
+{
+  tl::stable_vector<MoveCounted> a;
+  a.push_back (MoveCounted (1));
+  a.push_back (MoveCounted (2));
+
+  tl::stable_vector<MoveCounted> b;
+  b.push_back (MoveCounted (9));
+
+  MoveCounted::reset ();
+
+  b = std::move (a);
+
+  EXPECT_EQ (MoveCounted::copies, 0);
+  EXPECT_EQ (a.size (), size_t (0));
+  EXPECT_EQ (b.size (), size_t (2));
+  EXPECT_EQ (b [0].x, 1);
+  EXPECT_EQ (b [1].x, 2);
 }
 

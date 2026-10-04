@@ -28,6 +28,7 @@
 #include "tlCommon.h"
 
 #include <iostream>
+#include <utility>
 
 namespace tl
 {
@@ -59,7 +60,7 @@ public:
   {}
 
   explicit optional (T &&value) :
-    m_value (value),
+    m_value (std::move (value)),
     m_is_valid (true)
   {}
 
@@ -72,7 +73,7 @@ public:
 
   optional &operator= (T &&value)
   {
-    m_value = value;
+    m_value = std::move (value);
     m_is_valid = true;
     return *this;
   }

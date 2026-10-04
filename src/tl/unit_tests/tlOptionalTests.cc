@@ -23,6 +23,8 @@
 #include "tlOptional.h"
 #include "tlUnitTest.h"
 
+#include <utility>
+
 namespace
 {
 
@@ -94,4 +96,52 @@ TEST(1_Basic)
   EXPECT_EQ (opt != tl::optional<int> (), false);
 }
 
+}
+
+namespace {
+
+struct MoveCounter
+{
+  static int copies;
+  static int moves;
+  static void reset () { copies = moves = 0; }
+
+  MoveCounter () : x (0) { }
+  explicit MoveCounter (int n) : x (n) { }
+  MoveCounter (const MoveCounter &d) : x (d.x) { ++copies; }
+  MoveCounter (MoveCounter &&d) noexcept : x (d.x) { ++moves; }
+  MoveCounter &operator= (const MoveCounter &d) { x = d.x; ++copies; return *this; }
+  MoveCounter &operator= (MoveCounter &&d) noexcept { x = d.x; ++moves; return *this; }
+
+  int x;
+};
+
+int MoveCounter::copies = 0;
+int MoveCounter::moves = 0;
+
+}
+
+//  the T&& constructor and assignment must move (the original code copied)
+TEST(2_Move)
+{
+  MoveCounter::reset ();
+
+  MoveCounter v (17);
+  tl::optional<MoveCounter> opt (std::move (v));
+
+  EXPECT_EQ (opt.has_value (), true);
+  EXPECT_EQ (opt.value ().x, 17);
+  EXPECT_EQ (MoveCounter::copies, 0);
+  EXPECT_EQ (MoveCounter::moves, 1);
+
+  MoveCounter::reset ();
+
+  MoveCounter w (42);
+  tl::optional<MoveCounter> opt2;
+  opt2 = std::move (w);
+
+  EXPECT_EQ (opt2.has_value (), true);
+  EXPECT_EQ (opt2.value ().x, 42);
+  EXPECT_EQ (MoveCounter::copies, 0);
+  EXPECT_EQ (MoveCounter::moves, 1);
 }

@@ -33,7 +33,6 @@
 #include <vector>
 #include <map>
 #include <set>
-#include <functional>
 #include <memory>
 
 namespace db
@@ -44,9 +43,6 @@ namespace db
  */
 template <class BoxConvertAdaptor, class Obj, class Prop, class SideOp>
 struct bs_side_compare_func
-#if __cplusplus < 201703L
-  : std::binary_function<std::pair<const Obj *, Prop>, std::pair<const Obj *, Prop>, bool>
-#endif
 {
   typedef typename BoxConvertAdaptor::box_type box_type;
 
@@ -71,9 +67,6 @@ private:
  */
 template <class BoxConvertAdaptor, class Obj, class Prop, class SideOp>
 struct bs_side_compare_vs_const_func
-#if __cplusplus < 201703L
-        : std::unary_function<std::pair<const Obj *, Prop>, bool>
-#endif
 {
   typedef typename BoxConvertAdaptor::box_type box_type;
   typedef typename box_type::coord_type coord_type;

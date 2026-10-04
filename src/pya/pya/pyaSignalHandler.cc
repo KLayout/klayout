@@ -63,16 +63,34 @@ PythonRef CallbackFunction::callable () const
 {
   if (m_callable && m_weak_self) {
 
+#if PY_MAJOR_VERSION < 3
     PyObject *self = PyWeakref_GetObject (m_weak_self.get ());
     if (self == Py_None) {
       //  object expired - no callback possible
       return PythonRef ();
     }
 
-#if PY_MAJOR_VERSION < 3
     return PythonRef (PyMethod_New (m_callable.get (), self, m_class.get ()));
-#else
+#elif PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION < 15
+    PyObject *self = PyWeakref_GetObject (m_weak_self.get ());
+    if (self == Py_None) {
+      //  object expired - no callback possible
+      return PythonRef ();
+    }
+
     return PythonRef (PyMethod_New (m_callable.get (), self));
+#else
+    PyObject *ptr;
+    int res = PyWeakref_GetRef (m_weak_self.get (), &ptr);
+    if (res < 0) {
+      PyErr_Clear ();
+      return PythonRef ();
+    } else if (res == 0) {
+      return PythonRef ();
+    } else {
+      PythonRef self (ptr);
+      return PythonRef (PyMethod_New (m_callable.get (), self.get ()));
+    }
 #endif
 
   } else {
@@ -87,7 +105,24 @@ bool CallbackFunction::is_instance_method () const
 
 PyObject *CallbackFunction::self_ref () const
 {
+#if PY_MAJOR_VERSION < 3 || (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION < 15)
   return PyWeakref_GetObject (m_weak_self.get ());
+#else
+  PyObject *res;
+  int ret = PyWeakref_GetRef (m_weak_self.get (), &res);
+  if (ret < 0) {
+    PyErr_Clear ();
+    return NULL;
+  } else if (ret == 0) {
+    return NULL;
+  } else {
+    //  Emulate the behavior of Python <3.15 and return a borrowed reference.
+    //  Usually we should not do that, but we only use the result of that method
+    //  for pointer comparison.
+    Py_DECREF (res);
+    return res;
+  }
+#endif
 }
 
 PyObject *CallbackFunction::callable_ref () const

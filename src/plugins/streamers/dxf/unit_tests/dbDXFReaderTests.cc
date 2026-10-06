@@ -127,7 +127,7 @@ TEST(5)
 
 TEST(6)
 {
-  run_test (_this, "t6.dxf.gz", "t6_au.gds.gz");
+  run_test (_this, "t6.dxf.gz", "t6_au_2.gds.gz");
 }
 
 TEST(7)
@@ -363,7 +363,7 @@ TEST(27d)
   opt.unit = 1;
   opt.polyline_mode = 3;
   opt.circle_points = 10;
-  run_test (_this, "t27.dxf.gz", "t27d_au.gds.gz", opt);
+  run_test (_this, "t27.dxf.gz", "t27d_au_2.gds.gz", opt);
 }
 
 TEST(27e)
@@ -373,7 +373,7 @@ TEST(27e)
   opt.unit = 1;
   opt.polyline_mode = 4;
   opt.circle_points = 10;
-  run_test (_this, "t27.dxf.gz", "t27e_au.gds.gz", opt);
+  run_test (_this, "t27.dxf.gz", "t27e_au_2.gds.gz", opt);
 }
 
 TEST(28)

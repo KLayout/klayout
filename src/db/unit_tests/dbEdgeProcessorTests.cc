@@ -2864,7 +2864,7 @@ TEST(138)
 }
 
 //  issue #2441
-//  performance, many holes
+//  two holes
 TEST(139)
 {
   int n = 2;
@@ -2895,5 +2895,40 @@ TEST(139)
 
   tl_assert (! out.empty ());
   EXPECT_EQ (out.size (), size_t (1));
-  EXPECT_EQ (out.front ().to_string (), "...");
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,3000;6000,3000;6000,1000;9000,1000;9000,3000;8000,3000;8000,2000;7000,2000;7000,3000;3000,3000;3000,2000;2000,2000;2000,3000;0,3000;0,4000;10000,4000;10000,0)");
+}
+
+//  issue #2441
+//  two holes, non-horizontal closing edges
+TEST(140)
+{
+  int n = 2;
+
+  db::Polygon p (db::Box (db::Point (0, 0), db::Point (n * 5000, 4000)));
+  for (int i = 0; i < n; ++i) {
+    db::Point pts[] = {
+      db::Point (1000 + i * 5000, 1000),
+      db::Point (4000 + i * 5000, 1000),
+      db::Point (4000 + i * 5000, 2800),
+      db::Point (3000 + i * 5000, 3000),
+      db::Point (3000 + i * 5000, 2000),
+      db::Point (2000 + i * 5000, 2000),
+      db::Point (2000 + i * 5000, 2800),
+      db::Point (1000 + i * 5000, 3000)
+    };
+    p.insert_hole (pts + 0, pts + sizeof (pts) / sizeof (pts[0]));
+  }
+
+  db::EdgeProcessor ep;
+  ep.insert (p);
+
+  std::vector<db::Polygon> out;
+  db::PolygonContainer pc (out);
+  db::PolygonGenerator pg2 (pc, true /*resolve holes*/, false /*max. coherence*/);
+  db::SimpleMerge op (1 /*wc>0*/);
+  ep.process (pg2, op);
+
+  tl_assert (! out.empty ());
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,3000;6000,3000;6000,1000;9000,1000;9000,2800;8000,3000;8000,2000;7000,2000;7000,2800;6000,3000;3000,3000;3000,2000;2000,2000;2000,2800;1000,3000;0,3000;0,4000;10000,4000;10000,0)");
 }

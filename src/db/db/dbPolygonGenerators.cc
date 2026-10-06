@@ -29,7 +29,8 @@
 #include <deque>
 #include <memory>
 
-// #define DEBUG_POLYGON_GENERATOR
+//  enables verbose debug output
+//  #define DEBUG_POLYGON_GENERATOR
 
 //  enables the enhanced stitching algorithm that avoids producing too many
 //  overlapping edges during the stitch line generation
@@ -923,16 +924,16 @@ PolygonGenerator::join_contours (db::Coord x)
           ++insert_from;
         }
 
-        auto insert_first = insert_from;
-        for (auto i = insert_from + 1; i != c1.end (); ++i) {
-          if (i->y () == m_y && i->x () <= insert_first->x ()) {
+        auto insert_first = c1.end ();
+        for (auto i = insert_from; i != c1.end (); ++i) {
+          if (i->y () == m_y && (insert_first == c1.end () || i->x () <= insert_first->x ())) {
             insert_first = i;
           }
         }
-        tl_assert (insert_first->y () == m_y);
+        tl_assert (insert_first != c1.end ());
 
         auto insert_last = insert_first;
-        for (auto i = insert_from + 1; i != c1.end (); ++i) {
+        for (auto i = insert_from; i != c1.end (); ++i) {
           if (i->y () == m_y && i->x () > insert_last->x ()) {
             insert_last = i;
           }

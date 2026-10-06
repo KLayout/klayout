@@ -2819,14 +2819,28 @@ TEST(136)
   db::compare_layouts (_this, lr, au_fn);
 }
 
-//  issue #2441
-//  resolution of holes without generating too many coincident edges for the hole insertion
-TEST(137)
+static db::Polygon make_test_polygon (int n, int y1, int y2, int y3, int y4)
 {
-  tl::Extractor ex ("(0,0;0,4000;5000,4000;5000,0/1000,1000;4000,1000;4000,3000;3000,3000;3000,2000;2000,2000;2000,3000;1000,3000)");
-  db::Polygon p;
-  ex.read (p);
+  db::Polygon p (db::Box (db::Point (0, 0), db::Point (n * 5000, 4000)));
+  for (int i = 0; i < n; ++i) {
+    db::Point pts[] = {
+      db::Point (1000 + i * 5000, 1000),
+      db::Point (4000 + i * 5000, 1000),
+      db::Point (4000 + i * 5000, y4),
+      db::Point (3000 + i * 5000, y3),
+      db::Point (3000 + i * 5000, 2000),
+      db::Point (2000 + i * 5000, 2000),
+      db::Point (2000 + i * 5000, y2),
+      db::Point (1000 + i * 5000, y1)
+    };
+    p.insert_hole (pts + 0, pts + sizeof (pts) / sizeof (pts[0]));
+  }
 
+  return p;
+}
+
+static std::vector<db::Polygon> resolve_holes (const db::Polygon &p)
+{
   db::EdgeProcessor ep;
   ep.insert (p);
 
@@ -2836,9 +2850,43 @@ TEST(137)
   db::SimpleMerge op (1 /*wc>0*/);
   ep.process (pg2, op);
 
+  return out;
+}
+
+//  issue #2441
+//  resolution of holes without generating too many coincident edges for the hole insertion
+TEST(137)
+{
+  db::Polygon p;
+  std::vector<db::Polygon> out;
+
+  p = make_test_polygon (1, 3000, 3000, 3000, 3000);
+  out = resolve_holes (p);
+
   tl_assert (! out.empty ());
   EXPECT_EQ (out.size (), size_t (1));
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,3000;3000,3000;3000,2000;2000,2000;2000,3000;0,3000;0,4000;5000,4000;5000,0)");
+
+  p = make_test_polygon (1, 3000, 2800, 3000, 2800);
+  out = resolve_holes (p);
+
+  tl_assert (! out.empty ());
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,3000;3000,2000;2000,2000;2000,2800;1000,3000;0,3000;0,4000;5000,4000;5000,0)");
+
+  p = make_test_polygon (1, 3000, 3000, 2800, 2800);
+  out = resolve_holes (p);
+
+  tl_assert (! out.empty ());
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,2800;3000,2000;2000,2000;2000,3000;0,3000;0,4000;5000,4000;5000,0)");
+
+  p = make_test_polygon (1, 3000, 2800, 2800, 2800);
+  out = resolve_holes (p);
+
+  tl_assert (! out.empty ());
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,2800;3000,2000;2000,2000;2000,2800;1000,3000;0,3000;0,4000;5000,4000;5000,0)");
 }
 
 //  issue #2441

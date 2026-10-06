@@ -925,10 +925,12 @@ PolygonGenerator::join_contours (db::Coord x)
 
         auto insert_first = insert_from;
         for (auto i = insert_from + 1; i != c1.end (); ++i) {
-          if (i->y () == m_y && i->x () < insert_first->x ()) {
+          if (i->y () == m_y && i->x () <= insert_first->x ()) {
             insert_first = i;
           }
         }
+        tl_assert (insert_first->y () == m_y);
+
         auto insert_last = insert_first;
         for (auto i = insert_from + 1; i != c1.end (); ++i) {
           if (i->y () == m_y && i->x () > insert_last->x ()) {
@@ -940,9 +942,15 @@ PolygonGenerator::join_contours (db::Coord x)
         //  of the contour piece formed by the cyclic interval [insert_from, insert_from)
         size_t n1 = std::distance (insert_from, insert_first);
         size_t n2 = std::distance (insert_from, insert_last);
-        size_t n_after_stitch = (n1 >= n2 ? n1 - n2 : c1.size () - std::distance (c1.begin (), insert_from) - n2 + n1) - 1;
 
-        db::Point incoming_support = *insert_first;
+        size_t n_after_stitch = 0;
+        if (n1 > n2) {
+          n_after_stitch = n1 - n2 - 1;
+        } else if (n2 > n1) {
+          n_after_stitch = c1.size () - std::distance (c1.begin (), insert_from) - n2 + n1 - 1;
+        }
+
+        db::Point first = *insert_first;
 
         //  splice the other contour into this contour
         if (insert_first == insert_from) {
@@ -955,14 +963,10 @@ PolygonGenerator::join_contours (db::Coord x)
         //  locate the new stitch point where we place stitch lines to next holes
         auto new_stitch_point = ins - n_after_stitch;
 
-        //  insert a redundant point if it is needed to support the incoming stitch
-        //  line
-        {
-          bool need_support = ((ins - 1)->y () != m_y);
-          if (need_support) {
-            ins = cprev.insert (ins, incoming_support);
-            ++ins;
-          }
+        //  insert a redundant point if it is needed to support the incoming stitch line
+        if ((ins - 1)->y () != m_y) {
+          ins = cprev.insert (ins, first);
+          ++ins;
         }
 
         if (n_after_stitch > 0) {

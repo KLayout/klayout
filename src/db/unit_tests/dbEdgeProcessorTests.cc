@@ -2820,9 +2820,24 @@ TEST(136)
   db::compare_layouts (_this, lr, au_fn);
 }
 
-static db::Polygon make_test_polygon (int n, int y1, int y2, int y3, int y4)
+static db::Polygon make_test_polygon (int n, int y1, int y2, int y3, int y4, int step = 0)
 {
-  db::Polygon p (db::Box (db::Point (0, 0), db::Point (n * 5000, 4000)));
+  db::Polygon p;
+
+  if (step != 0) {
+    db::Point pts[] = {
+      db::Point (0, 0),
+      db::Point (0, 3000),
+      db::Point (step, 3000),
+      db::Point (step, 4000),
+      db::Point (n * 5000, 4000),
+      db::Point (n * 5000, 0)
+    };
+    p.assign_hull (pts + 0, pts + sizeof (pts) / sizeof (pts[0]));
+  } else {
+    p = db::Polygon (db::Box (db::Point (0, 0), db::Point (n * 5000, 4000)));
+  }
+
   for (int i = 0; i < n; ++i) {
     db::Point pts[] = {
       db::Point (1000 + i * 5000, 1000),
@@ -3025,10 +3040,57 @@ TEST(138)
   EXPECT_EQ (same_polygons (p, out.front ()), true);
 }
 
+//  issue #2441
+//  hull with a step at location of the stitch line
+TEST(139)
+{
+  db::Polygon p;
+  std::vector<db::Polygon> out;
+
+  p = make_test_polygon (1, 3000, 3000, 3000, 3000, 100);
+  out = resolve_holes (p);
+
+  tl_assert (! out.empty ());
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,3000;3000,3000;3000,2000;2000,2000;2000,3000;100,3000;100,4000;5000,4000;5000,0)");
+  EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
+  EXPECT_EQ (same_polygons (p, out.front ()), true);
+
+  p = make_test_polygon (2, 3000, 2800, 3000, 2800, 100);
+  out = resolve_holes (p);
+
+  tl_assert (! out.empty ());
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,3000;6000,3000;6000,1000;9000,1000;9000,2800;8000,3000;8000,2000;7000,2000;7000,2800;6000,3000;3000,3000;3000,2000;2000,2000;2000,2800;1000,3000;100,3000;100,4000;10000,4000;10000,0)");
+  EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
+  EXPECT_EQ (same_polygons (p, out.front ()), true);
+
+  p = make_test_polygon (1, 3000, 3000, 3000, 3000, -100);
+  out = resolve_holes (p);
+
+  tl_assert (! out.empty ());
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,3000;3000,3000;3000,2000;2000,2000;2000,3000;-100,3000;-100,4000;5000,4000;5000,0)");
+  EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
+  EXPECT_EQ (same_polygons (p, out.front ()), true);
+
+  p = make_test_polygon (2, 3000, 2800, 3000, 2800, -100);
+  out = resolve_holes (p);
+
+  tl_assert (! out.empty ());
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,3000;6000,3000;6000,1000;9000,1000;9000,2800;8000,3000;8000,2000;7000,2000;7000,2800;6000,3000;3000,3000;3000,2000;2000,2000;2000,2800;1000,3000;-100,3000;-100,4000;10000,4000;10000,0)");
+  EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
+  EXPECT_EQ (same_polygons (p, out.front ()), true);
+}
+
+
+
+
 //  @@@
 //  issue #2441
 //  two holes
-TEST(139)
+TEST(xxx139)
 {
   int n = 2;
 

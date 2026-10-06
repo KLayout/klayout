@@ -905,15 +905,13 @@ PolygonGenerator::join_contours (db::Coord x)
 
         *insm1 = pprev;
 
-        /* @@@ use the stitch point here
         //  remove collinear edges along the cut line so we create the longest possible stitch line
-        //  instead of a fractured one
+        //  instead of a fractured one and avoid reflecting edges
         while (insm1 != cprev.begin () && insm2->y () == m_y && insm1->y () == m_y) {
           ins = cprev.erase (insm1);
           insm1 = insm2;
           --insm2;
         }
-        */
 
 #if 1 // @@@
         auto insert_from = c1.begin ();

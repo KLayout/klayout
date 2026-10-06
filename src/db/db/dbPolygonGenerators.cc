@@ -926,7 +926,7 @@ PolygonGenerator::join_contours (db::Coord x)
 
         auto insert_first = c1.end ();
         for (auto i = insert_from; i != c1.end (); ++i) {
-          if (i->y () == m_y && (insert_first == c1.end () || i->x () <= insert_first->x ())) {
+          if (i->y () == m_y && i->x () >= xprev && (insert_first == c1.end () || i->x () <= insert_first->x ())) {
             insert_first = i;
           }
         }

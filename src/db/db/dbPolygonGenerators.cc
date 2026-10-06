@@ -29,9 +29,11 @@
 #include <deque>
 #include <memory>
 
-#if 0 // @@@
-#define DEBUG_POLYGON_GENERATOR
-#endif
+// #define DEBUG_POLYGON_GENERATOR
+
+//  enables the enhanced stitching algorithm that avoids producing too many
+//  overlapping edges during the stitch line generation
+#define ENHANCED_STITCHING
 
 namespace db
 {
@@ -431,7 +433,7 @@ PolygonGenerator::start ()
 void 
 PolygonGenerator::flush ()
 {
-#ifdef DEBUG_POLYGON_GENERATOR
+#if defined(DEBUG_POLYGON_GENERATOR)
   for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) { 
     printf ("%ld:%s%s%s ", i->contour, i->point.to_string().c_str(), i->first ? "!" : "", i == m_open_pos ? "*" : "");
   } 
@@ -454,7 +456,7 @@ PolygonGenerator::flush ()
 void 
 PolygonGenerator::begin_scanline (db::Coord y)
 {
-#ifdef DEBUG_POLYGON_GENERATOR
+#if defined(DEBUG_POLYGON_GENERATOR)
   printf ("begin y=%d\n", y);
   fflush (stdout);
 #endif
@@ -467,7 +469,7 @@ PolygonGenerator::begin_scanline (db::Coord y)
     c.set_stitch_point (c.end ());
   }
 
-#ifdef DEBUG_POLYGON_GENERATOR
+#if defined(DEBUG_POLYGON_GENERATOR)
   printf ("  m_open=");
   for (open_map_type::const_iterator o = m_open.begin (); o != m_open.end (); ++o) {
     printf ("%ld:%s ", o->contour, o->point.to_string().c_str());
@@ -494,13 +496,13 @@ PolygonGenerator::end_scanline (db::Coord /*y*/)
 }
 
 void 
-#ifdef DEBUG_POLYGON_GENERATOR
+#if defined(DEBUG_POLYGON_GENERATOR)
 PolygonGenerator::crossing_edge (const db::Edge &e)
 #else
 PolygonGenerator::crossing_edge (const db::Edge & /*e*/)
 #endif
 {
-#ifdef DEBUG_POLYGON_GENERATOR
+#if defined(DEBUG_POLYGON_GENERATOR)
   printf ("xing(%s)\n", e.to_string().c_str());
   fflush (stdout);
 #endif
@@ -512,7 +514,7 @@ void
 PolygonGenerator::skip_n (size_t n)
 {
   join_contours (std::numeric_limits<db::Coord>::max ());
-#ifdef DEBUG_POLYGON_GENERATOR
+#if defined(DEBUG_POLYGON_GENERATOR)
   printf ("skip(%ld)\n", n);
   fflush (stdout);
 #endif
@@ -524,7 +526,7 @@ PolygonGenerator::skip_n (size_t n)
 void 
 PolygonGenerator::put (const db::Edge &e)
 {
-#ifdef DEBUG_POLYGON_GENERATOR
+#if defined(DEBUG_POLYGON_GENERATOR)
   printf ("put(%s) y=%d\n  (before) m_open(%ld)=", e.to_string().c_str(), m_y, std::distance (m_open.begin (), m_open_pos));
   for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) { 
     printf ("%ld:%s%s%s ", i->contour, i->point.to_string().c_str(), i->first ? "!" : "", i == m_open_pos ? "*" : "");
@@ -588,7 +590,7 @@ PolygonGenerator::put (const db::Edge &e)
     cnew.push_back (e.p1 ());
     cnew.push_back (e.p2 ());
 
-#ifdef DEBUG_POLYGON_GENERATOR
+#if defined(DEBUG_POLYGON_GENERATOR)
     printf ("  create %s %ld\n", hole ? "hole" : "hull", inew);
     fflush (stdout);
 #endif
@@ -599,7 +601,7 @@ PolygonGenerator::put (const db::Edge &e)
 
   }
 
-#ifdef DEBUG_POLYGON_GENERATOR
+#if defined(DEBUG_POLYGON_GENERATOR)
   printf ("  (after) m_open=");
   for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) { 
     printf ("%ld:%s%s%s ", i->contour, i->point.to_string().c_str(), i->first ? "!" : "", i == m_open_pos ? "*" : "");
@@ -704,7 +706,7 @@ PolygonGenerator::join_contours (db::Coord x)
 
     size_t i1 = m_open_pos->contour;
     size_t i2 = n->contour;
-#ifdef DEBUG_POLYGON_GENERATOR
+#if defined(DEBUG_POLYGON_GENERATOR)
     printf ("  join %ld and %ld\n", i1, i2);
     for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) { 
       printf ("    %ld:%s%s%s%s%s ", i->contour, i->point.to_string().c_str(), i->first ? "!" : "", i == m_open_pos ? "*" : "", i == n ? "+" : "", i == nn ? "#" : "");
@@ -865,7 +867,7 @@ PolygonGenerator::join_contours (db::Coord x)
 
       if (! c1.is_hole ()) {
 
-#ifdef DEBUG_POLYGON_GENERATOR
+#if defined(DEBUG_POLYGON_GENERATOR)
         printf ("    finish %ld (hull)\n", i1);
         fflush (stdout);
 #endif
@@ -913,11 +915,11 @@ PolygonGenerator::join_contours (db::Coord x)
           --insm2;
         }
 
-#if 1 // @@@
+#if defined(ENHANCED_STITCHING)
         auto insert_from = c1.begin ();
 
         //  skip the redundant point that closes the contour
-        if (*insert_from == *(c1.end () - 1)) { // @@@ does this test ever fail?
+        if (*insert_from == *(c1.end () - 1)) {    // TODO Q: does this test ever fail?
           ++insert_from;
         }
 
@@ -1043,7 +1045,7 @@ PolygonGenerator::join_contours (db::Coord x)
       ++m_open_pos;
     }
 
-#ifdef DEBUG_POLYGON_GENERATOR
+#if defined(DEBUG_POLYGON_GENERATOR)
     printf ("    output contours:\n");
     for (size_t j = 0; j < mp_contours->size (); ++j) {
       const auto &c = (*mp_contours)[j];

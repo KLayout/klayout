@@ -29,7 +29,7 @@
 #include <deque>
 #include <memory>
 
-#if 1 // @@@
+#if 0 // @@@
 #define DEBUG_POLYGON_GENERATOR
 #endif
 
@@ -969,6 +969,7 @@ PolygonGenerator::join_contours (db::Coord x)
           ++ins;
         }
 
+        bool stitch_point_at_end = false;
         if (n_after_stitch > 0) {
 
           //  insert a redundant point if it is needed to support the outgoing stitch line
@@ -980,12 +981,18 @@ PolygonGenerator::join_contours (db::Coord x)
           }
 
         } else {
-          new_stitch_point = ins; // @@@???
+
+          stitch_point_at_end = true;
+          new_stitch_point = ins;
+
         }
 
         //  add a endpoint for the outbound stitch line unless we have one already
         if (cprev.stitch_point () == cprev.end ()) {
           ins = cprev.insert (ins, pprev);
+          if (stitch_point_at_end) {
+            new_stitch_point = ins;
+          }
           ++ins;
           if (eprev.p2 () != pprev) {
             cprev.insert (ins, eprev.p2 ());

@@ -28,6 +28,7 @@
 #include "dbPolygonGenerators.h"
 #include "dbLayout.h"
 #include "dbReader.h"
+#include "dbRegion.h"
 #include "dbCommonReader.h"
 #include "dbLayoutDiff.h"
 #include "dbTestSupport.h"
@@ -2853,6 +2854,53 @@ static std::vector<db::Polygon> resolve_holes (const db::Polygon &p)
   return out;
 }
 
+namespace {
+  struct AddOverlapCount
+  {
+    void operator () (int &a, int b) const
+    {
+      a += b;
+    }
+  };
+}
+
+static int max_edge_overlap_at_y (const db::Polygon &p, db::Coord y)
+{
+  tl::interval_map<db::Coord, int> im;
+
+  for (auto e = p.begin_edge (); ! e.at_end (); ++e) {
+    if ((*e).p1 ().y () == y && (*e).p2 ().y () == y) {
+      AddOverlapCount aoc;
+      im.add (std::min ((*e).p1 ().x (), (*e).p2 ().x ()), std::max ((*e).p1 ().x (), (*e).p2 ().x ()), 1, aoc);
+    }
+  }
+
+  int max_count = 0;
+  for (auto i = im.begin (); i != im.end (); ++i) {
+    if (i->second > max_count) {
+      max_count = i->second;
+    }
+  }
+
+  return max_count;
+}
+
+static bool same_polygons (const db::Polygon &p1, const db::Polygon &p2)
+{
+  db::Region r1 (p1), r2 (p2);
+  db::Region rx = r1 ^ r2;
+
+  if (! rx.empty ()) {
+    tl::info << "Polygon comparison failed:";
+    tl::info << "  p1: " << p1.to_string ();
+    tl::info << "  p2: " << p2.to_string ();
+    tl::info << "  p1^p2: " << rx.to_string ();
+    return false;
+  } else {
+    return true;
+  }
+}
+
 //  issue #2441
 //  resolution of holes without generating too many coincident edges for the hole insertion
 TEST(137)
@@ -2866,6 +2914,8 @@ TEST(137)
   tl_assert (! out.empty ());
   EXPECT_EQ (out.size (), size_t (1));
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,3000;3000,3000;3000,2000;2000,2000;2000,3000;0,3000;0,4000;5000,4000;5000,0)");
+  EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
+  EXPECT_EQ (same_polygons (p, out.front ()), true);
 
   p = make_test_polygon (1, 3000, 2800, 3000, 2800);
   out = resolve_holes (p);
@@ -2873,6 +2923,8 @@ TEST(137)
   tl_assert (! out.empty ());
   EXPECT_EQ (out.size (), size_t (1));
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,3000;3000,2000;2000,2000;2000,2800;1000,3000;0,3000;0,4000;5000,4000;5000,0)");
+  EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
+  EXPECT_EQ (same_polygons (p, out.front ()), true);
 
   p = make_test_polygon (1, 3000, 3000, 2800, 2800);
   out = resolve_holes (p);
@@ -2880,6 +2932,8 @@ TEST(137)
   tl_assert (! out.empty ());
   EXPECT_EQ (out.size (), size_t (1));
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,2800;3000,2000;2000,2000;2000,3000;0,3000;0,4000;5000,4000;5000,0)");
+  EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
+  EXPECT_EQ (same_polygons (p, out.front ()), true);
 
   p = make_test_polygon (1, 3000, 2800, 2800, 2800);
   out = resolve_holes (p);
@@ -2887,30 +2941,91 @@ TEST(137)
   tl_assert (! out.empty ());
   EXPECT_EQ (out.size (), size_t (1));
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,2800;3000,2000;2000,2000;2000,2800;1000,3000;0,3000;0,4000;5000,4000;5000,0)");
-}
+  EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
+  EXPECT_EQ (same_polygons (p, out.front ()), true);
 
-//  issue #2441
-//  non-horizontal contour-closing edges
-TEST(138)
-{
-  tl::Extractor ex ("(0,0;0,4000;5000,4000;5000,0/1000,1000;4000,1000;4000,2800;3000,3000;3000,2000;2000,2000;2000,2800;1000,3000)");
-  db::Polygon p;
-  ex.read (p);
-
-  db::EdgeProcessor ep;
-  ep.insert (p);
-
-  std::vector<db::Polygon> out;
-  db::PolygonContainer pc (out);
-  db::PolygonGenerator pg2 (pc, true /*resolve holes*/, false /*max. coherence*/);
-  db::SimpleMerge op (1 /*wc>0*/);
-  ep.process (pg2, op);
+  p = make_test_polygon (1, 2800, 2800, 3000, 2800);
+  out = resolve_holes (p);
 
   tl_assert (! out.empty ());
   EXPECT_EQ (out.size (), size_t (1));
-  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,3000;3000,2000;2000,2000;2000,2800;1000,3000;0,3000;0,4000;5000,4000;5000,0)");
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;3000,3000;3000,2000;2000,2000;2000,2800;1000,2800;1000,1000;4000,1000;4000,2800;3000,3000;0,3000;0,4000;5000,4000;5000,0)");
+  EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
+  EXPECT_EQ (same_polygons (p, out.front ()), true);
+
+  p = make_test_polygon (1, 2800, 2800, 3000, 3000);
+  out = resolve_holes (p);
+
+  tl_assert (! out.empty ());
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;3000,3000;3000,2000;2000,2000;2000,2800;1000,2800;1000,1000;4000,1000;4000,3000;0,3000;0,4000;5000,4000;5000,0)");
+  EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
+  EXPECT_EQ (same_polygons (p, out.front ()), true);
 }
 
+//  issue #2441
+//  resolution of holes without generating too many coincident edges for the hole insertion - two holes
+TEST(138)
+{
+  db::Polygon p;
+  std::vector<db::Polygon> out;
+
+  p = make_test_polygon (2, 3000, 3000, 3000, 3000);
+  out = resolve_holes (p);
+
+  tl_assert (! out.empty ());
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,3000;6000,3000;6000,1000;9000,1000;9000,3000;8000,3000;8000,2000;7000,2000;7000,3000;3000,3000;3000,2000;2000,2000;2000,3000;0,3000;0,4000;10000,4000;10000,0)");
+  EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
+  EXPECT_EQ (same_polygons (p, out.front ()), true);
+
+  p = make_test_polygon (2, 3000, 2800, 3000, 2800);
+  out = resolve_holes (p);
+
+  tl_assert (! out.empty ());
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,3000;6000,3000;6000,1000;9000,1000;9000,2800;8000,3000;8000,2000;7000,2000;7000,2800;6000,3000;3000,3000;3000,2000;2000,2000;2000,2800;1000,3000;0,3000;0,4000;10000,4000;10000,0)");
+  EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
+  EXPECT_EQ (same_polygons (p, out.front ()), true);
+
+  p = make_test_polygon (2, 3000, 3000, 2800, 2800);
+  out = resolve_holes (p);
+
+  tl_assert (! out.empty ());
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,2800;3000,2000;2000,2000;2000,3000;6000,3000;6000,1000;9000,1000;9000,2800;8000,2800;8000,2000;7000,2000;7000,3000;0,3000;0,4000;10000,4000;10000,0)");
+  EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
+  EXPECT_EQ (same_polygons (p, out.front ()), true);
+
+  p = make_test_polygon (2, 3000, 2800, 2800, 2800);
+  out = resolve_holes (p);
+
+  tl_assert (! out.empty ());
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,2800;3000,2000;2000,2000;2000,2800;1000,3000;6000,3000;6000,1000;9000,1000;9000,2800;8000,2800;8000,2000;7000,2000;7000,2800;6000,3000;0,3000;0,4000;10000,4000;10000,0)");
+  EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
+  EXPECT_EQ (same_polygons (p, out.front ()), true);
+
+  p = make_test_polygon (2, 2800, 2800, 3000, 2800);
+  out = resolve_holes (p);
+
+  tl_assert (! out.empty ());
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;3000,3000;3000,2000;2000,2000;2000,2800;1000,2800;1000,1000;4000,1000;4000,2800;3000,3000;8000,3000;8000,2000;7000,2000;7000,2800;6000,2800;6000,1000;9000,1000;9000,2800;8000,3000;0,3000;0,4000;10000,4000;10000,0)");
+  EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
+  EXPECT_EQ (same_polygons (p, out.front ()), true);
+
+  p = make_test_polygon (2, 2800, 2800, 3000, 3000);
+  out = resolve_holes (p);
+
+  tl_assert (! out.empty ());
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;3000,3000;3000,2000;2000,2000;2000,2800;1000,2800;1000,1000;4000,1000;4000,3000;8000,3000;8000,2000;7000,2000;7000,2800;6000,2800;6000,1000;9000,1000;9000,3000;0,3000;0,4000;10000,4000;10000,0)");
+  EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
+  EXPECT_EQ (same_polygons (p, out.front ()), true);
+}
+
+//  @@@
 //  issue #2441
 //  two holes
 TEST(139)

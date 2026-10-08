@@ -29,15 +29,102 @@
 #include <deque>
 #include <memory>
 
+//  for sanity checks:
+#include "dbRegion.h"
+#include "dbEdges.h"
+#include "dbRegionProcessors.h"
+#include "dbEdgesUtils.h"
+#include "tlIntervalMap.h"
+
 //  enables verbose debug output
 //  #define DEBUG_POLYGON_GENERATOR
+// #define DEBUG_POLYGON_GENERATOR // @@@
 
 //  enables the enhanced stitching algorithm that avoids producing too many
 //  overlapping edges during the stitch line generation
 #define ENHANCED_STITCHING
 
+//  enables sanity checks after generation of polygons
+//  #define SANITY_CHECK
+#define SANITY_CHECK // @@@
+
 namespace db
 {
+
+// -------------------------------------------------------------------------------
+//  Some test functions
+
+template <class Poly>
+static bool check_polygon_for_intersecting_edges (const Poly &p)
+{
+  db::Region rp;
+  rp.set_merged_semantics (false);
+  rp.insert (p);
+  db::Edges ec = rp.processed (db::CornersAsDots (-180.0, true, 180.0, true, false, false));
+
+  db::Edges e (p);
+  db::EdgeOrientationFilter h (0.0, false, false);
+  db::EdgeOrientationFilter nh (0.0, true, false);
+  db::Edges ei = e.filtered (h).intersections (e.filtered (nh));
+
+  db::Edges crossings = ei - ec;
+  if (! crossings.empty ()) {
+    tl::info << "Found intersecting horizontal lines in polygon at points:";
+    tl::info << "  " << crossings.to_string ();
+    return false;
+  } else {
+    return true;
+  }
+}
+
+namespace {
+  struct AddOverlapCount
+  {
+    void operator () (int &a, int b) const
+    {
+      a += b;
+    }
+  };
+}
+
+template <class Poly>
+static int max_edge_overlap_at_y (const Poly &p, db::Coord y)
+{
+  tl::interval_map<db::Coord, int> im;
+
+  for (auto e = p.begin_edge (); ! e.at_end (); ++e) {
+    if ((*e).p1 ().y () == y && (*e).p2 ().y () == y) {
+      AddOverlapCount aoc;
+      im.add (std::min ((*e).p1 ().x (), (*e).p2 ().x ()), std::max ((*e).p1 ().x (), (*e).p2 ().x ()), 1, aoc);
+    }
+  }
+
+  int max_count = 0;
+  for (auto i = im.begin (); i != im.end (); ++i) {
+    if (i->second > max_count) {
+      max_count = i->second;
+    }
+  }
+
+  return max_count;
+}
+
+template <class Poly>
+static int max_horizontal_edge_overlap (const Poly &poly)
+{
+  std::set<db::Coord> hy;
+  for (auto e = poly.begin_edge (); ! e.at_end (); ++e) {
+    if ((*e).dy () == 0) {
+      hy.insert ((*e).p1 ().y ());
+    }
+  }
+
+  int mc = 0;
+  for (auto y = hy.begin (); y != hy.end (); ++y) {
+    mc = std::max (mc, max_edge_overlap_at_y (poly, *y));
+  }
+  return mc;
+}
 
 // -------------------------------------------------------------------------------
 //  PolygonGenerator implementation
@@ -103,6 +190,45 @@ public:
 
   iterator stitch_point () const { return m_stitch_point; }
   void set_stitch_point (iterator sp) { m_stitch_point = sp; }
+
+  /**
+   *  @brief Moves the stitch point to a better position if possible
+   *  A better position is one closer to the right side.
+   *  The stitch point is the position before which a stitch line
+   *  for holes is inserted. As holes are inserted from left to right
+   *  a position further right is better for short (and non-overlapping)
+   *  stitch lines.
+   *
+   *  The return value is the number of search steps needed for
+   *  diagnostics.
+   */
+  // @@@
+  unsigned int adjust_stitch_point (iterator search_from, iterator search_to, db::Coord y, db::Coord position_hint = std::numeric_limits<db::Coord>::max ())
+  {
+    auto new_sp = m_stitch_point;
+    tl_assert (new_sp != begin ());
+    --new_sp;
+
+    unsigned int nsteps = 0;
+    for (auto i = search_to; i != search_from; ) {
+      ++nsteps;
+      auto ii = i;
+      --i;
+      if (i->y () < y && ii->y () == y) {
+        if (ii->x () < position_hint && ii->x () > new_sp->x ()) {
+          new_sp = ii;
+        } else if (ii->x () >= position_hint) {
+          break;
+        }
+      }
+    }
+
+    m_stitch_point = ++new_sp;  //  "++" as it is defined to the be position "after"
+    if (nsteps > 0) { tl::info << "@@@ " << nsteps; } // @@@
+
+    return nsteps;
+  }
+  // @@@
 
   const_iterator begin () const { return m_contour.begin (); }
   const_iterator end () const { return m_contour.end (); }
@@ -819,12 +945,18 @@ PolygonGenerator::join_contours (db::Coord x)
 
       } else if (! m_open_pos->first && ! n->first) {
 
+        PGPolyContour::iterator new_from, new_to;
+
         //  remove c1 from list of contours, join with c2
         if (c2.is_hole ()) {
           c1.pop_front ();
+          new_from = c1.begin ();
+          new_to = c2.end ();
           c2.splice (c2.end (), c1);
         } else {
           c1.pop_back ();
+          new_from = c1.begin ();
+          new_to = c2.begin ();
           c2.splice (c2.begin (), c1);
         }
 
@@ -838,14 +970,28 @@ PolygonGenerator::join_contours (db::Coord x)
         o->contour = i2;
         o->first = false;
 
+        unsigned int nsteps = c2.adjust_stitch_point (new_from, new_to, m_y);
+#if defined(DEBUG_POLYGON_GENERATOR)
+        if (nsteps > 0) {
+          printf ("    adjusted stitch position to %ld in %u steps\n", std::distance (c2.begin (), c2.stitch_point ()), nsteps);
+          fflush (stdout);
+        }
+#endif
+
       } else {
+
+        PGPolyContour::iterator new_from, new_to;
 
         //  remove c1 from list of contours, join with c2
         if (c2.is_hole ()) {  // yes! c2 is correct!
           c2.pop_front ();
+          new_from = c2.begin ();
+          new_to = c1.end ();
           c1.splice (c1.end (), c2);
         } else {
           c2.pop_back ();
+          new_from = c2.begin ();
+          new_to = c1.begin ();
           c1.splice (c1.begin (), c2);
         }
 
@@ -861,6 +1007,14 @@ PolygonGenerator::join_contours (db::Coord x)
         if (m_open_pos->first && n->first) {
           o->first = true;
         }
+
+        unsigned int nsteps = c1.adjust_stitch_point (new_from, new_to, m_y);
+#if defined(DEBUG_POLYGON_GENERATOR)
+        if (nsteps > 0) {
+          printf ("    adjusted stitch position to %ld in %u steps\n", std::distance (c1.begin (), c1.stitch_point ()), nsteps);
+          fflush (stdout);
+        }
+#endif
 
       }
 
@@ -889,8 +1043,23 @@ PolygonGenerator::join_contours (db::Coord x)
         size_t iprev = np->contour;
         PGPolyContour &cprev = (*mp_contours) [iprev];
 
+#if defined(DEBUG_POLYGON_GENERATOR)
+        printf ("    stitching hole into %ld ..\n", iprev);
+        fflush (stdout);
+#endif
+
         tl_assert (cprev.size () >= 2);
         tl_assert (c1.size () >= 2);
+
+        if (cprev.stitch_point () == cprev.end ()) {
+          unsigned int nsteps = cprev.adjust_stitch_point (cprev.begin (), cprev.end (), m_y, x);
+#if defined(DEBUG_POLYGON_GENERATOR)
+          if (nsteps > 0) {
+            printf ("    adjusted stitch position to %ld in %u steps\n", std::distance (cprev.begin (), cprev.stitch_point ()), nsteps);
+            fflush (stdout);
+          }
+#endif
+        }
 
         PGPolyContour::iterator ins = cprev.stitch_point ();
 
@@ -1113,6 +1282,12 @@ PolygonGenerator::produce_poly (const PGPolyContour &c)
 
     }
 
+#if defined(SANITY_CHECK)
+    if (m_resolve_holes) {
+      tl_assert (check_polygon_for_intersecting_edges (m_poly) == true);
+      tl_assert (max_horizontal_edge_overlap (m_poly) <= 2);
+    }
+#endif
     mp_psink->put (m_poly);
 
   } 
@@ -1122,6 +1297,10 @@ PolygonGenerator::produce_poly (const PGPolyContour &c)
     tl_assert (n == 0);  //  there should not be holes since we forced resolve_holes to true ...
     m_spoly.assign_hull (c.begin (), c.end (), reduce /*compress*/);
 
+#if defined(SANITY_CHECK)
+    tl_assert (check_polygon_for_intersecting_edges (m_spoly) == true);
+    tl_assert (max_horizontal_edge_overlap (m_spoly) <= 2);
+#endif
     mp_spsink->put (m_spoly);
 
   } 

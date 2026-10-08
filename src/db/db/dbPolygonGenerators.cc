@@ -101,6 +101,9 @@ static int max_edge_overlap_at_y (const Poly &p, db::Coord y)
 
   int max_count = 0;
   for (auto i = im.begin (); i != im.end (); ++i) {
+    if (i->second > 2) {
+      tl::info << "Edge overlap count at y=" << y << " x=" << i->first.first << ".." << i->first.second << " is " << i->second;
+    }
     if (i->second > max_count) {
       max_count = i->second;
     }
@@ -202,33 +205,45 @@ public:
    *  The return value is the number of search steps needed for
    *  diagnostics.
    */
-  // @@@
   unsigned int adjust_stitch_point (iterator search_from, iterator search_to, db::Coord y, db::Coord position_hint = std::numeric_limits<db::Coord>::max ())
   {
-    auto new_sp = m_stitch_point;
-    tl_assert (new_sp != begin ());
-    --new_sp;
+    auto sp = m_stitch_point;
+    tl_assert (sp != begin ());
+    --sp;
+
+    auto xmax = sp->x ();
+
+    //  if needed, correct the horizontal position for edges extending beyond our current y
+    if (sp->y () > y) {
+      tl_assert (sp != begin ());
+      auto spm1 = sp;
+      --spm1;
+      db::Edge e = db::Edge (*spm1, *sp);
+      xmax = db::coord_traits<db::Coord>::rounded (edge_xaty (e, y));
+    }
 
     unsigned int nsteps = 0;
-    for (auto i = search_to; i != search_from; ) {
+
+    auto i = search_to;
+    auto ii = i--;
+    do {
       ++nsteps;
-      auto ii = i;
+      --ii;
       --i;
       if (i->y () < y && ii->y () == y) {
-        if (ii->x () < position_hint && ii->x () > new_sp->x ()) {
-          new_sp = ii;
+        if (ii->x () < position_hint && ii->x () > xmax) {
+          sp = ii;
+          xmax = sp->x ();
         } else if (ii->x () >= position_hint) {
           break;
         }
       }
-    }
+    } while (ii != search_from && i != begin ());
 
-    m_stitch_point = ++new_sp;  //  "++" as it is defined to the be position "after"
-    if (nsteps > 0) { tl::info << "@@@ " << nsteps; } // @@@
+    m_stitch_point = ++sp;  //  "++" as it is defined to the be position "after"
 
     return nsteps;
   }
-  // @@@
 
   const_iterator begin () const { return m_contour.begin (); }
   const_iterator end () const { return m_contour.end (); }
@@ -953,11 +968,13 @@ PolygonGenerator::join_contours (db::Coord x)
           new_from = c1.begin ();
           new_to = c2.end ();
           c2.splice (c2.end (), c1);
+          --new_from;
         } else {
           c1.pop_back ();
           new_from = c1.begin ();
           new_to = c2.begin ();
           c2.splice (c2.begin (), c1);
+          ++new_to;
         }
 
         mp_contours->join (i2, i1);
@@ -970,12 +987,16 @@ PolygonGenerator::join_contours (db::Coord x)
         o->contour = i2;
         o->first = false;
 
-        unsigned int nsteps = c2.adjust_stitch_point (new_from, new_to, m_y);
+#if defined(ENHANCED_STITCHING)
 #if defined(DEBUG_POLYGON_GENERATOR)
+        unsigned int nsteps = c2.adjust_stitch_point (new_from, new_to, m_y);
         if (nsteps > 0) {
           printf ("    adjusted stitch position to %ld in %u steps\n", std::distance (c2.begin (), c2.stitch_point ()), nsteps);
           fflush (stdout);
         }
+#else
+        c2.adjust_stitch_point (new_from, new_to, m_y);
+#endif
 #endif
 
       } else {
@@ -988,11 +1009,13 @@ PolygonGenerator::join_contours (db::Coord x)
           new_from = c2.begin ();
           new_to = c1.end ();
           c1.splice (c1.end (), c2);
+          --new_from;
         } else {
           c2.pop_back ();
           new_from = c2.begin ();
           new_to = c1.begin ();
           c1.splice (c1.begin (), c2);
+          ++new_to;
         }
 
         mp_contours->join (i1, i2);
@@ -1008,12 +1031,16 @@ PolygonGenerator::join_contours (db::Coord x)
           o->first = true;
         }
 
-        unsigned int nsteps = c1.adjust_stitch_point (new_from, new_to, m_y);
+#if defined(ENHANCED_STITCHING)
 #if defined(DEBUG_POLYGON_GENERATOR)
+        unsigned int nsteps = c1.adjust_stitch_point (new_from, new_to, m_y);
         if (nsteps > 0) {
           printf ("    adjusted stitch position to %ld in %u steps\n", std::distance (c1.begin (), c1.stitch_point ()), nsteps);
           fflush (stdout);
         }
+#else
+        c1.adjust_stitch_point (new_from, new_to, m_y);
+#endif
 #endif
 
       }
@@ -1051,6 +1078,7 @@ PolygonGenerator::join_contours (db::Coord x)
         tl_assert (cprev.size () >= 2);
         tl_assert (c1.size () >= 2);
 
+#if 0 // @@@ not needed.
         if (cprev.stitch_point () == cprev.end ()) {
           unsigned int nsteps = cprev.adjust_stitch_point (cprev.begin (), cprev.end (), m_y, x);
 #if defined(DEBUG_POLYGON_GENERATOR)
@@ -1060,6 +1088,7 @@ PolygonGenerator::join_contours (db::Coord x)
           }
 #endif
         }
+#endif
 
         PGPolyContour::iterator ins = cprev.stitch_point ();
 
@@ -1072,7 +1101,7 @@ PolygonGenerator::join_contours (db::Coord x)
         PGPolyContour::iterator insm1 = insm2--;
 
         db::Edge eprev = db::Edge (*insm2, *insm1);
-        db::Coord xprev = db::coord_traits<db::Coord>::rounded (edge_xaty (db::Edge (*insm2, *insm1), m_y));
+        db::Coord xprev = db::coord_traits<db::Coord>::rounded (edge_xaty (eprev, m_y));
         db::Point pprev (xprev, m_y);
 
         *insm1 = pprev;
@@ -1086,6 +1115,21 @@ PolygonGenerator::join_contours (db::Coord x)
         }
 
 #if defined(ENHANCED_STITCHING)
+        //  insert a redundant point if it is needed to support the outgoing stitch line
+        //  to a future next hole to the right
+        if (ins != cprev.end () && ins->y () != m_y) {
+          ins = cprev.insert (ins, *insm1);
+        }
+
+#if 0 // @@@
+printf("@@@cx1 ");
+for (auto i = cprev.begin (); i != cprev.end (); ++i) {
+  printf ("%s%s ", i->to_string().c_str (), i == ins ? "#" : "");
+}
+printf ("\n");
+fflush(stdout);
+#endif // @@@
+
         auto insert_from = c1.begin ();
 
         //  skip the redundant point that closes the contour
@@ -1132,35 +1176,34 @@ PolygonGenerator::join_contours (db::Coord x)
 
         //  locate the new stitch point where we place stitch lines to next holes
         auto new_stitch_point = ins - n_after_stitch;
+#if 0 // @@@
+printf("@@@c0 ");
+for (auto i = cprev.begin (); i != cprev.end (); ++i) {
+  printf ("%s%s ", i->to_string().c_str (), i == new_stitch_point ? "#" : "");
+}
+printf ("\n");
+fflush(stdout);
+#endif // @@@
 
         //  insert a redundant point if it is needed to support the incoming stitch line
         if ((ins - 1)->y () != m_y) {
           ins = cprev.insert (ins, first);
           ++ins;
         }
+#if 0 // @@@
+printf("@@@c1 ");
+for (auto i = cprev.begin (); i != cprev.end (); ++i) {
+  printf ("%s%s ", i->to_string().c_str (), i == new_stitch_point ? "#" : "");
+}
+printf ("\n");
+fflush(stdout);
+#endif // @@@
 
-        bool stitch_point_at_end = false;
-        if (n_after_stitch > 0) {
-
-          //  insert a redundant point if it is needed to support the outgoing stitch line
-          //  to a future next hole to the right
-          db::Point support = *(new_stitch_point - 1);
-          bool need_support = ((new_stitch_point - 2)->y () != m_y);
-          if (need_support) {
-            new_stitch_point = cprev.insert (new_stitch_point, support);
-          }
-
-        } else {
-
-          stitch_point_at_end = true;
-          new_stitch_point = ins;
-
-        }
-
-        //  add a endpoint for the outbound stitch line unless we have one already
+        //  add an endpoint for the outbound stitch line unless we have one already
         if (cprev.stitch_point () == cprev.end ()) {
+          bool at_sp = ins == new_stitch_point;
           ins = cprev.insert (ins, pprev);
-          if (stitch_point_at_end) {
+          if (at_sp) {
             new_stitch_point = ins;
           }
           ++ins;
@@ -1168,6 +1211,14 @@ PolygonGenerator::join_contours (db::Coord x)
             cprev.insert (ins, eprev.p2 ());
           }
         }
+#if 0 // @@@
+printf("@@@c3 ");
+for (auto i = cprev.begin (); i != cprev.end (); ++i) {
+  printf ("%s%s ", i->to_string().c_str (), i == new_stitch_point ? "#" : "");
+}
+printf ("\n");
+fflush(stdout);
+#endif // @@@
 
         cprev.set_stitch_point (new_stitch_point);
 #else
@@ -1284,10 +1335,19 @@ PolygonGenerator::produce_poly (const PGPolyContour &c)
 
 #if defined(SANITY_CHECK)
     if (m_resolve_holes) {
-      tl_assert (check_polygon_for_intersecting_edges (m_poly) == true);
-      tl_assert (max_horizontal_edge_overlap (m_poly) <= 2);
+
+      bool check_polygon_for_intersecting_edges_result = check_polygon_for_intersecting_edges (m_poly);
+      int max_horizontal_edge_overlap_result = max_horizontal_edge_overlap (m_poly);
+      if (! check_polygon_for_intersecting_edges_result ||
+          max_horizontal_edge_overlap_result > 2) {
+        tl::info << "Info: polygon is " << m_poly.to_string ();
+        tl_assert (check_polygon_for_intersecting_edges_result == true);
+        tl_assert (max_horizontal_edge_overlap_result <= 2);
+      }
+
     }
 #endif
+
     mp_psink->put (m_poly);
 
   } 
@@ -1298,8 +1358,14 @@ PolygonGenerator::produce_poly (const PGPolyContour &c)
     m_spoly.assign_hull (c.begin (), c.end (), reduce /*compress*/);
 
 #if defined(SANITY_CHECK)
-    tl_assert (check_polygon_for_intersecting_edges (m_spoly) == true);
-    tl_assert (max_horizontal_edge_overlap (m_spoly) <= 2);
+    bool check_polygon_for_intersecting_edges_result = check_polygon_for_intersecting_edges (m_spoly);
+    int max_horizontal_edge_overlap_result = max_horizontal_edge_overlap (m_spoly);
+    if (! check_polygon_for_intersecting_edges_result ||
+        max_horizontal_edge_overlap_result > 2) {
+      tl::info << "Info: simple polygon is " << m_spoly.to_string ();
+      tl_assert (check_polygon_for_intersecting_edges_result == true);
+      tl_assert (max_horizontal_edge_overlap_result <= 2);
+    }
 #endif
     mp_spsink->put (m_spoly);
 

@@ -22,6 +22,7 @@
 
 #include "utTestConsole.h"
 #include "tlUnitTest.h"
+#include "tlEnv.h"
 
 #if !defined(_MSC_VER)
 #  include <unistd.h>
@@ -203,6 +204,15 @@ const char *ANSI_RESET = "\033[0m";
 TestConsole::TestConsole (FILE *file)
   : m_file (file), m_col (0), m_max_col (400), m_columns (50), m_rows (0), m_file_is_tty (false)
 {
+  std::string max_col_str = tl::get_env ("KLAYOUT_TESTLOG_MAX_COLUMNS", "");
+  if (! max_col_str.empty ()) {
+    try {
+      tl::from_string (max_col_str, m_max_col);
+    } catch (...) {
+      m_max_col = 0;
+    }
+  }
+
   ms_instance = this;
 
   prepare_file ();
@@ -349,9 +359,9 @@ TestConsole::basic_write (const char *s)
           }
           m_col = tl::indent ();
         }
-        if (m_col > m_max_col) {
+        if (m_max_col > 0 && m_col > m_max_col) {
           //  ignore char
-        } else if (m_col == m_max_col) {
+        } else if (m_max_col > 0 && m_col == m_max_col) {
           fputs (" ...", m_file);
           ++m_col;
         } else if (*cp == '\033') {

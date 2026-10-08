@@ -2916,6 +2916,7 @@ static bool check_polygon_for_intersecting_edges (const db::Polygon &p)
   db::Edges ec = rp.processed (db::CornersAsDots (-180.0, true, 180.0, true, false, false));
 
   db::Edges e (p);
+  e.set_merged_semantics (false);
   db::EdgeOrientationFilter h (0.0, false, false);
   db::EdgeOrientationFilter nh (0.0, true, false);
   db::Edges ei = e.filtered (h).intersections (e.filtered (nh));
@@ -3391,3 +3392,48 @@ TEST(144)
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 }
 
+//  issue #2441
+TEST(145)
+{
+  std::vector<db::Point> pts;
+  std::vector<db::Polygon> out;
+  db::Polygon p;
+
+  pts.push_back (db::Point (0, 0));
+  pts.push_back (db::Point (0, 4000));
+  pts.push_back (db::Point (7000, 4000));
+  pts.push_back (db::Point (7000, 0));
+  pts.push_back (db::Point (4000, 0));
+  pts.push_back (db::Point (4000, 2000));
+  pts.push_back (db::Point (3000, 2000));
+  pts.push_back (db::Point (3000, 0));
+
+  p.assign_hull (pts.begin (), pts.end ());
+
+  pts.clear ();
+
+  pts.push_back (db::Point (1000, 1000));
+  pts.push_back (db::Point (2000, 1000));
+  pts.push_back (db::Point (2000, 3000));
+  pts.push_back (db::Point (1000, 3000));
+
+  p.insert_hole (pts.begin (), pts.end ());
+
+  pts.clear ();
+
+  pts.push_back (db::Point (5000, 1000));
+  pts.push_back (db::Point (6000, 1000));
+  pts.push_back (db::Point (6000, 2000));
+  pts.push_back (db::Point (5000, 2000));
+
+  p.insert_hole (pts.begin (), pts.end ());
+
+  out = resolve_holes_in_polygon (p);
+
+  tl_assert (! out.empty ());
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;2000,1000;2000,3000;0,3000;0,4000;7000,4000;7000,0;4000,0;4000,2000;5000,2000;5000,1000;6000,1000;6000,2000;3000,2000;3000,0)");
+  EXPECT_EQ (max_edge_overlap_at_y (out.front (), 2000), 2);
+  EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
+}

@@ -38,7 +38,7 @@
 
 //  enables verbose debug output
 //  #define DEBUG_POLYGON_GENERATOR
-// #define DEBUG_POLYGON_GENERATOR // @@@
+#define DEBUG_POLYGON_GENERATOR // @@@
 
 //  enables the enhanced stitching algorithm that avoids producing too many
 //  overlapping edges during the stitch line generation
@@ -63,6 +63,7 @@ static bool check_polygon_for_intersecting_edges (const Poly &p)
   db::Edges ec = rp.processed (db::CornersAsDots (-180.0, true, 180.0, true, false, false));
 
   db::Edges e (p);
+  e.set_merged_semantics (false);
   db::EdgeOrientationFilter h (0.0, false, false);
   db::EdgeOrientationFilter nh (0.0, true, false);
   db::Edges ei = e.filtered (h).intersections (e.filtered (nh));
@@ -134,11 +135,17 @@ static int max_horizontal_edge_overlap (const Poly &poly)
 
 struct PGPoint
 {
-  PGPoint () : point (), contour (0), first (false) { }
-  PGPoint (const db::Point &p, size_t i, bool f) : point (p), contour (i), first (f) { }
+  PGPoint () : point (), contour (0), hook (false), first (false) { }
+  PGPoint (const db::Point &p, size_t i, bool f) : point (p), contour (i), hook (false), first (f) { }
+
+  bool operator== (const PGPoint &other) const
+  {
+    return point == other.point && contour == other.contour && hook == other.hook;
+  }
 
   db::Point point;
   size_t contour;
+  bool hook;
   bool first;
 };
 
@@ -288,6 +295,11 @@ public:
   {
     ++m_size;
     return m_contour.insert (i, p);
+  }
+
+  bool is_closed () const
+  {
+    return ! empty () && *begin () == *--end ();
   }
 
   bool empty () const { return m_contour.empty (); }
@@ -602,6 +614,7 @@ PolygonGenerator::begin_scanline (db::Coord y)
   printf ("begin y=%d\n", y);
   fflush (stdout);
 #endif
+
   m_open_pos = m_open.begin ();
   m_y = y;
 
@@ -614,7 +627,7 @@ PolygonGenerator::begin_scanline (db::Coord y)
 #if defined(DEBUG_POLYGON_GENERATOR)
   printf ("  m_open=");
   for (open_map_type::const_iterator o = m_open.begin (); o != m_open.end (); ++o) {
-    printf ("%ld:%s ", o->contour, o->point.to_string().c_str());
+    printf ("%ld:%s%s ", o->contour, o->point.to_string().c_str(), o->hook ? "~" : "");
   } 
   printf ("\n");
   printf ("  contours:\n");
@@ -635,6 +648,26 @@ void
 PolygonGenerator::end_scanline (db::Coord /*y*/)
 {
   join_contours (std::numeric_limits<db::Coord>::max ());
+
+  //  eliminate contour hooks (left for stitching) - those are pairs
+  //  of pointers to the same point which sit in between the start
+  //  and end point of the contour and serve as hooks for potential stitch lines.
+  if (m_resolve_holes) {
+
+    for (auto p = m_open.begin (); p != m_open.end (); ) {
+      auto pp = p;
+      ++pp;
+      if (p->hook && pp != m_open.end () && *p == *pp) {
+        m_open.erase (p);
+        p = pp;
+        ++p;
+        m_open.erase (pp);
+      } else {
+        p = pp;
+      }
+    }
+
+  }
 }
 
 void 
@@ -671,7 +704,7 @@ PolygonGenerator::put (const db::Edge &e)
 #if defined(DEBUG_POLYGON_GENERATOR)
   printf ("put(%s) y=%d\n  (before) m_open(%ld)=", e.to_string().c_str(), m_y, std::distance (m_open.begin (), m_open_pos));
   for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) { 
-    printf ("%ld:%s%s%s ", i->contour, i->point.to_string().c_str(), i->first ? "!" : "", i == m_open_pos ? "*" : "");
+    printf ("%ld:%s%s%s%s ", i->contour, i->point.to_string().c_str(), i->hook ? "~" : "", i->first ? "!" : "", i == m_open_pos ? "*" : "");
   } 
   printf ("\n");
   fflush (stdout);
@@ -829,6 +862,8 @@ PolygonGenerator::join_contours (db::Coord x)
     open_map_iterator_type nn = n;
     open_map_iterator_type next = ++nn;
 
+    bool reordered = false;
+
     //  don't join, except -/+ pair (for max. coherence) or +/- pair (for min coherence)
     bool minus0 = (m_open_pos->first == (*mp_contours) [m_open_pos->contour].is_hole ());
     bool minus1 = (n->first == (*mp_contours) [n->contour].is_hole ());
@@ -840,6 +875,7 @@ PolygonGenerator::join_contours (db::Coord x)
         m_open_pos = n;
         n = nn;
         ++nn;
+        reordered = true;
       } else if (m_open_pos->point.x () == x) {
         return;
       }
@@ -851,7 +887,7 @@ PolygonGenerator::join_contours (db::Coord x)
 #if defined(DEBUG_POLYGON_GENERATOR)
     printf ("  join %ld and %ld\n", i1, i2);
     for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) { 
-      printf ("    %ld:%s%s%s%s%s ", i->contour, i->point.to_string().c_str(), i->first ? "!" : "", i == m_open_pos ? "*" : "", i == n ? "+" : "", i == nn ? "#" : "");
+      printf ("    %ld:%s%s%s%s%s%s ", i->contour, i->point.to_string().c_str(), i->hook ? "~" : "", i->first ? "!" : "", i == m_open_pos ? "*" : "", i == n ? "+" : "", i == nn ? "#" : "");
     } 
     printf ("\n");
     printf ("    input contours:\n");
@@ -878,8 +914,13 @@ PolygonGenerator::join_contours (db::Coord x)
 
       tl_assert (! c2.empty ());
       tl_assert (! c1.empty ());
+
+      bool c1_closed = c1.is_closed ();
+      bool c2_closed = c2.is_closed ();
+      bool c1_hole = c1.is_hole ();
+      bool c2_hole = c2.is_hole ();
       
-      if (m_open_contours && !c1.is_hole () && !c2.is_hole ()) {
+      if (m_open_contours && !c1_hole && !c2_hole) {
 
         //  join with next contour by creating a stitch line
         tl_assert (m_open_pos != m_open.begin ());
@@ -963,7 +1004,7 @@ PolygonGenerator::join_contours (db::Coord x)
         PGPolyContour::iterator new_from, new_to;
 
         //  remove c1 from list of contours, join with c2
-        if (c2.is_hole ()) {
+        if (c2_hole) {
           c1.pop_front ();
           new_from = c1.begin ();
           new_to = c2.end ();
@@ -980,10 +1021,13 @@ PolygonGenerator::join_contours (db::Coord x)
         mp_contours->join (i2, i1);
 
         open_map_iterator_type o = m_open_pos;
-        do {
+        o->contour = i2;
+        while (o != m_open.begin () && (o->contour != i1 || o->hook)) {
+          if (o->contour == i1) {
+            o->contour = i2;
+          }
           --o;
-        } while (o != m_open.begin () && o->contour != i1);
-        tl_assert (o != m_open.begin ());
+        }
         o->contour = i2;
         o->first = false;
 
@@ -1004,7 +1048,7 @@ PolygonGenerator::join_contours (db::Coord x)
         PGPolyContour::iterator new_from, new_to;
 
         //  remove c1 from list of contours, join with c2
-        if (c2.is_hole ()) {  // yes! c2 is correct!
+        if (c2_hole) {  // yes! c2 is correct!
           c2.pop_front ();
           new_from = c2.begin ();
           new_to = c1.end ();
@@ -1021,9 +1065,14 @@ PolygonGenerator::join_contours (db::Coord x)
         mp_contours->join (i1, i2);
 
         open_map_iterator_type o = n;
-        do {
+        tl_assert (o != m_open.end ());
+        o->contour = i1;
+        while (o != m_open.end () && (o->contour != i2 || o->hook)) {
+          if (o->contour == i2) {
+            o->contour = i1;
+          }
           ++o;
-        } while (o != m_open.end () && o->contour != i2);
+        }
         tl_assert (o != m_open.end ());
         o->contour = i1;
 
@@ -1043,6 +1092,16 @@ PolygonGenerator::join_contours (db::Coord x)
 #endif
 #endif
 
+      }
+
+      if (m_resolve_holes && ! reordered && ! c1_hole && ! c2_hole && ! c1_closed && ! c2_closed) {
+        //  leave the pair of points as hooks for future stitching - we will clean this up before the next
+        //  scanline starts
+        m_open_pos->hook = true;
+        n->hook = true;
+      } else {
+        m_open.erase (m_open_pos);
+        m_open.erase (n);
       }
 
     } else {
@@ -1101,7 +1160,12 @@ PolygonGenerator::join_contours (db::Coord x)
         PGPolyContour::iterator insm1 = insm2--;
 
         db::Edge eprev = db::Edge (*insm2, *insm1);
-        db::Coord xprev = db::coord_traits<db::Coord>::rounded (edge_xaty (eprev, m_y));
+        db::Coord xprev;
+        if (eprev.dy () != 0) {
+          xprev = db::coord_traits<db::Coord>::rounded (edge_xaty (eprev, m_y));
+        } else {
+          xprev = eprev.p2 ().x ();
+        }
         db::Point pprev (xprev, m_y);
 
         *insm1 = pprev;
@@ -1201,12 +1265,14 @@ fflush(stdout);
 
         //  add an endpoint for the outbound stitch line unless we have one already
         if (cprev.stitch_point () == cprev.end ()) {
-          bool at_sp = ins == new_stitch_point;
-          ins = cprev.insert (ins, pprev);
-          if (at_sp) {
-            new_stitch_point = ins;
+          if (*(ins - 1) != pprev) {
+            bool at_sp = ins == new_stitch_point;
+            ins = cprev.insert (ins, pprev);
+            if (at_sp) {
+              new_stitch_point = ins;
+            }
+            ++ins;
           }
-          ++ins;
           if (eprev.p2 () != pprev) {
             cprev.insert (ins, eprev.p2 ());
           }
@@ -1253,10 +1319,10 @@ fflush(stdout);
 
       }
 
-    }
+      m_open.erase (m_open_pos);
+      m_open.erase (n);
 
-    m_open.erase (m_open_pos);
-    m_open.erase (n);
+    }
 
     m_open_pos = next;
 

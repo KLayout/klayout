@@ -275,6 +275,7 @@ LayoutViewBase::copy_from (lay::LayoutViewBase *source)
   //  set the handle reference and clear all cell related stuff 
   m_cellviews = source->cellview_list ();
   m_hidden_cells = source->m_hidden_cells;
+  m_layer_hidden_cells = source->m_layer_hidden_cells;
 
   //  clear the history, store path and zoom box
   m_display_states.clear ();
@@ -2599,6 +2600,7 @@ LayoutViewBase::clear_cellviews ()
   m_cellviews.clear ();
 
   m_hidden_cells.clear ();
+  m_layer_hidden_cells.clear ();
   m_current_cell_per_cellview.clear ();
 
   //  clear the history, store path and zoom box
@@ -3340,6 +3342,8 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
     update_content ();
     throw;
   }
+
+  m_layer_hidden_cells.clear ();
 
   //  recreate the hidden cell indices from the names
   if (m_hidden_cells.size () > cv_index) {
@@ -4177,6 +4181,10 @@ LayoutViewBase::redraw ()
   for (lay::LayerPropertiesConstIterator l = begin_layers (); !l.at_end (); ++l) {
     if (! l->has_children ()) {
       layers.push_back (RedrawLayerInfo (*l));
+      auto hc = m_layer_hidden_cells.find (l->id ());
+      if (hc != m_layer_hidden_cells.end ()) {
+        layers.back ().hidden_cells = hc->second;
+      }
     }
   }
 
@@ -5439,6 +5447,24 @@ LayoutViewBase::show_all_cells ()
     redraw ();  //  needs redraw
     return;
   }
+}
+
+void
+LayoutViewBase::set_layer_hidden_cells (unsigned int layer_id, const std::vector<cell_index_type> &cells)
+{
+  if (cells.empty ()) {
+    m_layer_hidden_cells.erase (layer_id);
+  } else {
+    m_layer_hidden_cells [layer_id] = std::make_shared<std::vector<cell_index_type> > (cells);
+  }
+  redraw_later ();  //  coalesces bursts of calls into one redraw
+}
+
+std::vector<LayoutViewBase::cell_index_type>
+LayoutViewBase::layer_hidden_cells (unsigned int layer_id) const
+{
+  auto i = m_layer_hidden_cells.find (layer_id);
+  return i != m_layer_hidden_cells.end () ? *i->second : std::vector<cell_index_type> ();
 }
 
 void 

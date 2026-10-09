@@ -1152,6 +1152,20 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (decl_Dispatcher,
     "\n"
     "This variant has been added in version 0.25."
   ) +
+  gsi::method ("set_layer_hidden_cells", &lay::LayoutViewBase::set_layer_hidden_cells, gsi::arg ("layer_id"), gsi::arg ("cell_indexes"),
+    "@brief Hides a single layer within the given cells\n"
+    "\n"
+    "Unlike \\hide_cell, this hides one layer (given by its layer properties node id, see \\LayerPropertiesNode#id) "
+    "inside the given cells and their subtrees only. An empty list clears the restriction for that layer. "
+    "Only leaf layer nodes are considered. The restrictions are dropped when the layout is reloaded.\n"
+    "\n"
+    "This method has been added in version 0.30.13."
+  ) +
+  gsi::method ("layer_hidden_cells", &lay::LayoutViewBase::layer_hidden_cells, gsi::arg ("layer_id"),
+    "@brief Gets the cells hidden for a single layer (see \\set_layer_hidden_cells)\n"
+    "\n"
+    "This method has been added in version 0.30.13."
+  ) +
   gsi::method ("update_content", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::force_update_content),
     "@brief Updates the layout view to the current state\n"
     "\n"

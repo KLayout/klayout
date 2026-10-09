@@ -1010,7 +1010,7 @@ TEST(12)
   ep.insert_sequence (edges.begin (), edges.end (), 0);
   ep.insert_sequence (edges2.begin (), edges2.end (), 1);
   ep.process (anotb, anotb_op);
-  
+
   ep.clear ();
   db::BooleanOp bnota_op (db::BooleanOp::BNotA);
   ep.insert_sequence (edges.begin (), edges.end (), 0);
@@ -2947,7 +2947,6 @@ TEST(137)
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
-  // return; // @@@
 
   p = make_test_polygon (1, 3000, 2800, 3000, 2800);
   out = resolve_holes_in_polygon (p);
@@ -3479,6 +3478,43 @@ TEST(146)
   EXPECT_EQ (out.size (), size_t (1));
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,5000;7000,5000;7000,2000;4000,2000;4000,4000;5000,4000;5000,3000;6000,3000;6000,4000;3000,4000;3000,2000;2000,2000;2000,4000;1000,4000;1000,1000;8000,1000;8000,5000;9000,5000;9000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 4000), 2);
+  EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
+}
+
+//  issue #2441
+TEST(147)
+{
+  std::vector<db::Point> pts;
+  std::vector<db::Polygon> out;
+  db::Polygon p;
+
+  pts.push_back (db::Point (0, 0));
+  pts.push_back (db::Point (0, 3000));
+  pts.push_back (db::Point (1000, 3000));
+  pts.push_back (db::Point (1000, 1000));
+  pts.push_back (db::Point (2000, 1000));
+  pts.push_back (db::Point (2000, 4000));
+  pts.push_back (db::Point (5000, 4000));
+  pts.push_back (db::Point (5000, 0));
+
+  p.assign_hull (pts.begin (), pts.end ());
+
+  pts.clear ();
+
+  pts.push_back (db::Point (3000, 2000));
+  pts.push_back (db::Point (4000, 2000));
+  pts.push_back (db::Point (4000, 3000));
+  pts.push_back (db::Point (3000, 3000));
+
+  p.insert_hole (pts.begin (), pts.end ());
+
+  out = resolve_holes_in_polygon (p);
+
+  tl_assert (! out.empty ());
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;2000,1000;2000,3000;3000,3000;3000,2000;4000,2000;4000,3000;2000,3000;2000,4000;5000,4000;5000,0)");
+  EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 }

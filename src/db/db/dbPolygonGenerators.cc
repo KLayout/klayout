@@ -38,7 +38,7 @@
 
 //  enables verbose debug output
 //  #define DEBUG_POLYGON_GENERATOR
-#define DEBUG_POLYGON_GENERATOR // @@@
+// #define DEBUG_POLYGON_GENERATOR // @@@
 
 //  enables the enhanced stitching algorithm that avoids producing too many
 //  overlapping edges during the stitch line generation
@@ -165,7 +165,7 @@ public:
       mp_open (0),
       m_contour_index (-1)
   {
-    m_stitch_point = m_contour.end ();
+    //  .. nothing yet ..
   }
 
   // @@@ TODO: could avoid that if the ContourList kept managed pointers
@@ -180,20 +180,12 @@ public:
       m_hooks (d.m_hooks),
       m_contour_index (d.m_contour_index)
   {
-    if (d.m_stitch_point == d.end ()) {
-      m_stitch_point = end ();
-    } else {
-      m_stitch_point = begin ();
-      for (auto i = d.begin (); i != d.stitch_point (); ++i) {
-        ++m_stitch_point;
-      }
-    }
+    //  .. nothing yet ..
   }
 
   PGPolyContour &operator= (const PGPolyContour &d)
   {
     if (this != &d) {
-
       mp_open = d.mp_open;
       m_contour = d.m_contour;
       m_contour_index = d.m_contour_index;
@@ -204,16 +196,6 @@ public:
       m_first_pt = d.m_first_pt;
       m_last_pt = d.m_last_pt;
       m_hooks = d.m_hooks;
-
-      if (d.m_stitch_point == d.end ()) {
-        m_stitch_point = end ();
-      } else {
-        m_stitch_point = begin ();
-        for (auto i = d.begin (); i != d.stitch_point (); ++i) {
-          ++m_stitch_point;
-        }
-      }
-
     }
 
     return *this;
@@ -234,98 +216,43 @@ public:
   void set_contour_index (int ci) { m_contour_index = ci; }
   int contour_index () const { return m_contour_index; }
 
-  iterator stitch_point () const { return m_stitch_point; }
-  void set_stitch_point (iterator sp) { m_stitch_point = sp; }
-
   /**
-   *  @brief Moves the stitch point to a better position if possible
-   *  A better position is one closer to the right side.
-   *  The stitch point is the position before which a stitch line
-   *  for holes is inserted. As holes are inserted from left to right
-   *  a position further right is better for short (and non-overlapping)
-   *  stitch lines.
-   *
-   *  The return value is the number of search steps needed for
-   *  diagnostics.
+   *  @brief Returns a good stitch point inserting a hole position x (left coordinate)
    */
-  unsigned int adjust_stitch_point (iterator search_from, iterator search_to, db::Coord y, db::Coord position_hint = std::numeric_limits<db::Coord>::max ())
+  iterator stitch_point (db::Coord x, db::Coord y)
   {
-    auto sp = m_stitch_point;
-    tl_assert (sp != begin ());
-    --sp;
+    db::Coord xmax = std::numeric_limits<db::Coord>::min ();
+    iterator sp = --end ();
 
-    auto xref = std::numeric_limits<db::Coord>::min ();
-    unsigned int nsteps = 0;
+    //  Test end edge
+    iterator pm1 = --end ();
+    iterator p = pm1--;
 
-    if (m_stitch_point == end ()) {
-
-      auto pm1 = sp;
-      auto p = pm1--;
-
-      //  if needed, correct the horizontal position for edges extending beyond our current y
-      if (p->y () > y) {
-        db::Edge e = db::Edge (*pm1, *p);
-        xref = db::coord_traits<db::Coord>::rounded (edge_xaty (e, y));
-      } else if (pm1->y () == p->y () && pm1->x () > p->x ()) {
-        xref = pm1->x ();
-        --sp;
-      } else {
-        xref = p->x ();
-      }
-
-      //  Take care of "looping" contours: well-formed contours run from right to left
-      //  (think of lower side of a hull), so the last x is leftmost. Contours however
-      //  may loop back:
-      //
-      //  well-formed:           looping back:
-      //  ^    +<---+    V       +<---+    V    ^        ------ y
-      //  |    |    |    |       |    |    |    |
-      //  +<---+    +<---+       |    +<---+    |
-      //                         +------------->+
-      //
-      //  Those contours have xend > xstart and correspondingly the leftmost one is the first
-      //  edge. Therefore we search for the first candidate without considering the x bound
-      //  imposed by the last edge.
-
-      do {
-        ++nsteps;
-        --p;
-        --pm1;
-        if (pm1->y () < y && p->y () == y && p->x () < position_hint) {
-          sp = p;
-          xref = sp->x ();
-          break;
-        }
-      } while (pm1 != begin ());
-
+    db::Coord xpos;
+    if (p->y () > y) {
+      db::Edge e = db::Edge (*pm1, *p);
+      xpos = db::coord_traits<db::Coord>::rounded (edge_xaty (e, y));
     } else {
-      xref = sp->x ();
+      xpos = p->x ();
+    }
+    if (xpos <= x) {
+      xmax = xpos;
     }
 
-    auto pm1 = search_to;
-    auto p = pm1--;
+    iterator from = ++begin ();
+    iterator to = --end ();
 
-    //  Using the current x reference for the lower bound, search for the rightmost
-    //  edge approaching y from the bottom in the new interval for the next stitch
-    //  point.
-
-    do {
-      ++nsteps;
-      --p;
-      --pm1;
-      if (pm1->y () < y && p->y () == y) {
-        if (p->x () < position_hint && p->x () > xref) {
-          sp = p;
-          xref = sp->x ();
-        } else if (p->x () >= position_hint) {
-          break;
-        }
+    pm1 = from;
+    --pm1;
+    for (p = from; p != to; ++p, ++pm1) {
+      if (pm1->y () < y && p->y () == y && p->x () <= x && p->x () > xmax) {
+        sp = p;
+        xmax = p->x ();
       }
-    } while (p != search_from && pm1 != begin ());
+    }
 
-    m_stitch_point = ++sp;  //  "++" as the stitch point is defined to the be position "after"
-
-    return nsteps;
+    //  the stitch point if defined one-after
+    return ++sp;
   }
 
   const_iterator begin () const { return m_contour.begin (); }
@@ -417,7 +344,6 @@ public:
     m_next = -1;
     m_prev = -1;
     m_contour.clear ();
-    m_stitch_point = m_contour.end ();
   }
 
   void erase (iterator from, iterator to)
@@ -581,7 +507,6 @@ private:
   long m_next;
   long m_prev;
   size_t m_size;
-  contour_type::iterator m_stitch_point;
   open_map_type *mp_open;
   open_map_iterator_type m_first_pt, m_last_pt;
   std::vector<open_map_iterator_type> m_hooks;
@@ -800,18 +725,12 @@ void
 PolygonGenerator::begin_scanline (db::Coord y)
 {
 #if defined(DEBUG_POLYGON_GENERATOR)
-  printf ("begin y=%d\n", y);
+  printf ("begin y=%d\n", int (y));
   fflush (stdout);
 #endif
 
   m_open_pos = m_open.begin ();
   m_y = y;
-
-  //  reset the stitch point to contour.end() of all contours
-  for (size_t j = 0; j < mp_contours->size (); ++j) {
-    auto &c = (*mp_contours)[j];
-    c.set_stitch_point (c.end ());
-  }
 
 #if defined(DEBUG_POLYGON_GENERATOR)
   printf ("  m_open=");
@@ -1067,18 +986,19 @@ PolygonGenerator::join_contours (db::Coord x)
     size_t i1 = m_open_pos->contour;
     size_t i2 = n->contour;
 #if defined(DEBUG_POLYGON_GENERATOR)
-    printf ("  join %ld and %ld\n", i1, i2);
+    printf ("  join %ld and %ld (x=%d)\n", i1, i2, int (x));
     for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) { 
       printf ("    %ld:%s%s%s%s%s%s ", i->contour, i->point.to_string().c_str(), i->hook ? "~" : "", i->first ? "!" : "", i == m_open_pos ? "*" : "", i == n ? "+" : "", i == nn ? "#" : "");
     } 
     printf ("\n");
     printf ("    input contours:\n");
     for (size_t j = 0; j < mp_contours->size (); ++j) { 
-      const auto &c = (*mp_contours)[j];
+      auto &c = (*mp_contours)[j];
+      auto sp = c.stitch_point (x, m_y);
       if (! c.empty ()) {
         printf ("      c%ld%s: ", j, c.is_hole () ? "H" : "");
         for (auto i = c.begin (); i != c.end (); ++i) {
-          printf ("%s%s ", i->to_string().c_str (), i == c.stitch_point () ? "#" : "");
+          printf ("%s%s ", i->to_string().c_str (), i == sp ? "#" : "");
         }
         printf ("\n");
       }
@@ -1202,21 +1122,13 @@ PolygonGenerator::join_contours (db::Coord x)
 
       } else if (! m_open_pos->first && ! n->first) {
 
-        PGPolyContour::iterator new_from, new_to;
-
         //  remove c1 from list of contours, join with c2
         if (c2_hole) {
           c1.pop_front ();
-          new_from = c1.begin ();
-          new_to = c2.end ();
           c2.splice (c2.end (), c1);
-          --new_from;
         } else {
           c1.pop_back ();
-          new_from = c1.begin ();
-          new_to = c2.begin ();
           c2.splice (c2.begin (), c1);
-          ++new_to;
         }
 
         c1.other_pt (m_open_pos)->first = false;
@@ -1225,35 +1137,15 @@ PolygonGenerator::join_contours (db::Coord x)
         //  will destroy c1:
         mp_contours->join (i2, i1);
 
-#if defined(ENHANCED_STITCHING)
-#if defined(DEBUG_POLYGON_GENERATOR)
-        unsigned int nsteps = c2.adjust_stitch_point (new_from, new_to, m_y);
-        if (nsteps > 0) {
-          printf ("    adjusted stitch position to %ld in %u steps\n", std::distance (c2.begin (), c2.stitch_point ()), nsteps);
-          fflush (stdout);
-        }
-#else
-        c2.adjust_stitch_point (new_from, new_to, m_y);
-#endif
-#endif
-
       } else {
-
-        PGPolyContour::iterator new_from, new_to;
 
         //  remove c1 from list of contours, join with c2
         if (c2_hole) {  // yes! c2 is correct!
           c2.pop_front ();
-          new_from = c2.begin ();
-          new_to = c1.end ();
           c1.splice (c1.end (), c2);
-          --new_from;
         } else {
           c2.pop_back ();
-          new_from = c2.begin ();
-          new_to = c1.begin ();
           c1.splice (c1.begin (), c2);
-          ++new_to;
         }
 
         if (m_open_pos->first && n->first) {
@@ -1263,18 +1155,6 @@ PolygonGenerator::join_contours (db::Coord x)
         c1.merge_with (c2, m_open_pos, n, can_keep_hook);
         //  will destroy c2:
         mp_contours->join (i1, i2);
-
-#if defined(ENHANCED_STITCHING)
-#if defined(DEBUG_POLYGON_GENERATOR)
-        unsigned int nsteps = c1.adjust_stitch_point (new_from, new_to, m_y);
-        if (nsteps > 0) {
-          printf ("    adjusted stitch position to %ld in %u steps\n", std::distance (c1.begin (), c1.stitch_point ()), nsteps);
-          fflush (stdout);
-        }
-#else
-        c1.adjust_stitch_point (new_from, new_to, m_y);
-#endif
-#endif
 
       }
 
@@ -1306,32 +1186,17 @@ PolygonGenerator::join_contours (db::Coord x)
         tl_assert (iprev != m_open_pos->contour);
         PGPolyContour &cprev = (*mp_contours) [iprev];
 
-#if defined(DEBUG_POLYGON_GENERATOR)
-        printf ("    stitching hole into %ld ..\n", iprev);
-        fflush (stdout);
-#endif
-
         tl_assert (cprev.size () >= 2);
         tl_assert (c1.size () >= 2);
 
-#if 1 // @@@ not needed???
-        if (cprev.stitch_point () == cprev.end ()) {
+        PGPolyContour::iterator ins = cprev.stitch_point (c1.begin ()->x (), m_y);
+
 #if defined(DEBUG_POLYGON_GENERATOR)
-          unsigned int nsteps = cprev.adjust_stitch_point (cprev.begin (), cprev.end (), m_y, x);
-          if (nsteps > 0) {
-            printf ("    adjusted stitch position to %ld in %u steps\n", std::distance (cprev.begin (), cprev.stitch_point ()), nsteps);
-            fflush (stdout);
-          }
-#else
-          cprev.adjust_stitch_point (cprev.begin (), cprev.end (), m_y, x);
-#endif
-        }
+        printf ("    stitching hole into %ld at position %d ..\n", iprev, int (std::distance (cprev.begin (), ins)));
+        fflush (stdout);
 #endif
 
-        PGPolyContour::iterator ins = cprev.stitch_point ();
-
-        //  insert the cutline at the end of the sequence of the previous contour -
-        //  this is the left end of that contour.
+        //  insert the cutline at position "ins"
 
         //  compute intersection point with next edge
         PGPolyContour::iterator insm2 = ins;
@@ -1391,7 +1256,7 @@ PolygonGenerator::join_contours (db::Coord x)
         size_t n1 = std::distance (insert_from, insert_first);
         size_t n2 = std::distance (insert_from, insert_last);
 
-        size_t n_after_stitch = 0;
+        size_t n_after_stitch = 0; // @@@ not used
         if (n1 > n2) {
           n_after_stitch = n1 - n2 - 1;
         } else if (n2 > n1) {
@@ -1409,7 +1274,7 @@ PolygonGenerator::join_contours (db::Coord x)
         }
 
         //  locate the new stitch point where we place stitch lines to next holes
-        auto new_stitch_point = ins - n_after_stitch;
+        // @@@ auto new_stitch_point = ins - n_after_stitch;
 
         //  insert a redundant point if it is needed to support the incoming stitch line
         if ((ins - 1)->y () != m_y) {
@@ -1418,13 +1283,9 @@ PolygonGenerator::join_contours (db::Coord x)
         }
 
         //  add an endpoint for the outbound stitch line unless we have one already
-        if (cprev.stitch_point () == cprev.end ()) {
+        if (ins == cprev.end ()) {
           if (*(ins - 1) != pprev) {
-            bool at_sp = ins == new_stitch_point;
             ins = cprev.insert (ins, pprev);
-            if (at_sp) {
-              new_stitch_point = ins;
-            }
             ++ins;
           }
           if (eprev.p2 () != pprev) {
@@ -1432,7 +1293,7 @@ PolygonGenerator::join_contours (db::Coord x)
           }
         }
 
-        cprev.set_stitch_point (new_stitch_point);
+        // @@@ cprev.set_stitch_point (new_stitch_point);
 #else
         auto insert_from = c1.begin ();
 
@@ -1444,9 +1305,8 @@ PolygonGenerator::join_contours (db::Coord x)
         cprev.splice (ins, std::move (c1), insert_from, c1.end ());
 
         //  add a endpoint for the outbound stitch line unless we have one already
-        if (cprev.stitch_point () == cprev.end ()) {
+        if (ins == cprev.end ()) {
           ins = cprev.insert (ins, pprev);
-          cprev.set_stitch_point (ins);
           ++ins;
           if (eprev.p2 () != pprev) {
             cprev.insert (ins, eprev.p2 ());
@@ -1482,11 +1342,12 @@ PolygonGenerator::join_contours (db::Coord x)
 #if defined(DEBUG_POLYGON_GENERATOR)
     printf ("    output contours:\n");
     for (size_t j = 0; j < mp_contours->size (); ++j) {
-      const auto &c = (*mp_contours)[j];
+      auto &c = (*mp_contours)[j];
+      auto sp = c.stitch_point (x, m_y);
       if (! c.empty ()) {
         printf ("      c%ld%s: ", j, c.is_hole () ? "H" : "");
         for (auto i = c.begin (); i != c.end (); ++i) {
-          printf ("%s%s ", i->to_string().c_str (), i == c.stitch_point () ? "#" : "");
+          printf ("%s%s ", i->to_string().c_str (), i == sp ? "#" : "");
         }
         printf ("\n");
       }

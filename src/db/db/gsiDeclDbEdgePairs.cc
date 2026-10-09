@@ -1155,7 +1155,7 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "Starting with version 0.25 the displacement is of vector type."
   ) +
-  method_ext ("move", &move_xy, gsi::arg ("dx"), gsi::arg ("dy"),
+  method_ext ("move", &move_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
     "@brief Moves the edge pair collection\n"
     "\n"
     "Moves the edge pairs by the given offset and returns the \n"

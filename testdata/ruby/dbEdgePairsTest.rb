@@ -121,6 +121,11 @@ class DBEdgePairs_TestClass < TestBase
     assert_equal(rr.data_id != r.data_id, true)
     rr.move(-10, 10)
     assert_equal(rr.to_s, "(-10,10;-10,110)/(-20,10;-30,60)")
+    assert_equal(r.moved(dx: -10, dy: 10).to_s, "(-10,10;-10,110)/(-20,10;-30,60)")
+    assert_equal(r.moved(dy: 10).to_s, "(0,10;0,110)/(-10,10;-20,60)")
+    rr = r.dup
+    rr.move(dy: 10)
+    assert_equal(rr.to_s, "(0,10;0,110)/(-10,10;-20,60)")
     rr = r.dup
     rr.move(RBA::Point::new(-10, 10))
     assert_equal(rr.to_s, "(-10,10;-10,110)/(-20,10;-30,60)")

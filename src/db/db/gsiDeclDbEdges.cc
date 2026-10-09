@@ -2138,7 +2138,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "Starting with version 0.25 the displacement type is a vector."
   ) +
-  method_ext ("moved", &moved_xy, gsi::arg ("dx", 0), gsi::arg ("dv", 0),
+  method_ext ("moved", &moved_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
     "@brief Returns the moved edge collection (does not modify self)\n"
     "\n"
     "Moves the edge collection by the given offset and returns the \n"

@@ -38,7 +38,7 @@
 
 //  enables verbose debug output
 //  #define DEBUG_POLYGON_GENERATOR
-#define DEBUG_POLYGON_GENERATOR // @@@
+// #define DEBUG_POLYGON_GENERATOR // @@@
 
 //  enables the enhanced stitching algorithm that avoids producing too many
 //  overlapping edges during the stitch line generation
@@ -218,36 +218,76 @@ public:
     tl_assert (sp != begin ());
     --sp;
 
-    auto xmax = sp->x ();
-
-    //  if needed, correct the horizontal position for edges extending beyond our current y
-    if (sp->y () > y) {
-      tl_assert (sp != begin ());
-      auto spm1 = sp;
-      --spm1;
-      db::Edge e = db::Edge (*spm1, *sp);
-      xmax = db::coord_traits<db::Coord>::rounded (edge_xaty (e, y));
-    }
-
+    auto xref = std::numeric_limits<db::Coord>::min ();
     unsigned int nsteps = 0;
 
-    auto i = search_to;
-    auto ii = i--;
+    if (m_stitch_point == end ()) {
+
+      auto pm1 = sp;
+      auto p = pm1--;
+
+      //  if needed, correct the horizontal position for edges extending beyond our current y
+      if (p->y () > y) {
+        db::Edge e = db::Edge (*pm1, *p);
+        xref = db::coord_traits<db::Coord>::rounded (edge_xaty (e, y));
+      } else if (pm1->y () == p->y () && pm1->x () > p->x ()) {
+        xref = pm1->x ();
+        --sp;
+      } else {
+        xref = p->x ();
+      }
+
+      //  Take care of "looping" contours: well-formed contours run from right to left
+      //  (think of lower side of a hull), so the last x is leftmost. Contours however
+      //  may loop back:
+      //
+      //  well-formed:           looping back:
+      //  ^    +<---+    V       +<---+    V    ^        ------ y
+      //  |    |    |    |       |    |    |    |
+      //  +<---+    +<---+       |    +<---+    |
+      //                         +------------->+
+      //
+      //  Those contours have xend > xstart and correspondingly the leftmost one is the first
+      //  edge. Therefore we search for the first candidate without considering the x bound
+      //  imposed by the last edge.
+
+      do {
+        ++nsteps;
+        --p;
+        --pm1;
+        if (pm1->y () < y && p->y () == y && p->x () < position_hint) {
+          sp = p;
+          xref = sp->x ();
+          break;
+        }
+      } while (pm1 != begin ());
+
+    } else {
+      xref = sp->x ();
+    }
+
+    auto pm1 = search_to;
+    auto p = pm1--;
+
+    //  Using the current x reference for the lower bound, search for the rightmost
+    //  edge approaching y from the bottom in the new interval for the next stitch
+    //  point.
+
     do {
       ++nsteps;
-      --ii;
-      --i;
-      if (i->y () < y && ii->y () == y) {
-        if (ii->x () < position_hint && ii->x () > xmax) {
-          sp = ii;
-          xmax = sp->x ();
-        } else if (ii->x () >= position_hint) {
+      --p;
+      --pm1;
+      if (pm1->y () < y && p->y () == y) {
+        if (p->x () < position_hint && p->x () > xref) {
+          sp = p;
+          xref = sp->x ();
+        } else if (p->x () >= position_hint) {
           break;
         }
       }
-    } while (ii != search_from && i != begin ());
+    } while (p != search_from && pm1 != begin ());
 
-    m_stitch_point = ++sp;  //  "++" as it is defined to the be position "after"
+    m_stitch_point = ++sp;  //  "++" as the stitch point is defined to the be position "after"
 
     return nsteps;
   }
@@ -1094,7 +1134,7 @@ PolygonGenerator::join_contours (db::Coord x)
 
       }
 
-      if (m_resolve_holes && ! reordered && ! c1_hole && ! c2_hole && ! c1_closed && ! c2_closed) {
+      if (m_resolve_holes && ! reordered && ! c1_closed && ! c2_closed) {
         //  leave the pair of points as hooks for future stitching - we will clean this up before the next
         //  scanline starts
         m_open_pos->hook = true;
@@ -1124,9 +1164,12 @@ PolygonGenerator::join_contours (db::Coord x)
         tl_assert (m_open_pos != m_open.begin ());
 
         open_map_iterator_type np = m_open_pos;
-        --np;
+        do {
+          --np;
+        } while (np != m_open.begin () && np->contour == m_open_pos->contour);
 
         size_t iprev = np->contour;
+        tl_assert (iprev != m_open_pos->contour);
         PGPolyContour &cprev = (*mp_contours) [iprev];
 
 #if defined(DEBUG_POLYGON_GENERATOR)
@@ -1137,14 +1180,16 @@ PolygonGenerator::join_contours (db::Coord x)
         tl_assert (cprev.size () >= 2);
         tl_assert (c1.size () >= 2);
 
-#if 0 // @@@ not needed.
+#if 1 // @@@ not needed???
         if (cprev.stitch_point () == cprev.end ()) {
-          unsigned int nsteps = cprev.adjust_stitch_point (cprev.begin (), cprev.end (), m_y, x);
 #if defined(DEBUG_POLYGON_GENERATOR)
+          unsigned int nsteps = cprev.adjust_stitch_point (cprev.begin (), cprev.end (), m_y, x);
           if (nsteps > 0) {
             printf ("    adjusted stitch position to %ld in %u steps\n", std::distance (cprev.begin (), cprev.stitch_point ()), nsteps);
             fflush (stdout);
           }
+#else
+          cprev.adjust_stitch_point (cprev.begin (), cprev.end (), m_y, x);
 #endif
         }
 #endif

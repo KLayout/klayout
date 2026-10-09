@@ -38,7 +38,7 @@
 
 //  enables verbose debug output
 //  #define DEBUG_POLYGON_GENERATOR
-// #define DEBUG_POLYGON_GENERATOR // @@@
+#define DEBUG_POLYGON_GENERATOR // @@@
 
 //  enables the enhanced stitching algorithm that avoids producing too many
 //  overlapping edges during the stitch line generation
@@ -689,6 +689,7 @@ PolygonGenerator::end_scanline (db::Coord /*y*/)
 {
   join_contours (std::numeric_limits<db::Coord>::max ());
 
+  // @@@  XXX no longer needed?
   //  eliminate contour hooks (left for stitching) - those are pairs
   //  of pointers to the same point which sit in between the start
   //  and end point of the contour and serve as hooks for potential stitch lines.
@@ -809,6 +810,7 @@ PolygonGenerator::put (const db::Edge &e)
     printf ("  create %s %ld\n", hole ? "hole" : "hull", inew);
     fflush (stdout);
 #endif
+    //  @@@  XXX add positions to cnew
     m_open.insert (m_open_pos, PGPoint (hole ? e.p1 () : e.p2 (), inew, true));
     m_open.insert (m_open_pos, PGPoint (hole ? e.p2 () : e.p1 (), inew, false));
 
@@ -1041,6 +1043,8 @@ PolygonGenerator::join_contours (db::Coord x)
 
       } else if (! m_open_pos->first && ! n->first) {
 
+        tl_assert (next == m_open.end () || next->contour != i1);
+
         PGPolyContour::iterator new_from, new_to;
 
         //  remove c1 from list of contours, join with c2
@@ -1060,6 +1064,7 @@ PolygonGenerator::join_contours (db::Coord x)
 
         mp_contours->join (i2, i1);
 
+        // @@@  XXX use open list reference to rename --
         open_map_iterator_type o = m_open_pos;
         o->contour = i2;
         while (o != m_open.begin () && (o->contour != i1 || o->hook)) {
@@ -1085,6 +1090,8 @@ PolygonGenerator::join_contours (db::Coord x)
 
       } else {
 
+        tl_assert (next == m_open.end () || next->contour != i2);
+
         PGPolyContour::iterator new_from, new_to;
 
         //  remove c1 from list of contours, join with c2
@@ -1104,6 +1111,7 @@ PolygonGenerator::join_contours (db::Coord x)
 
         mp_contours->join (i1, i2);
 
+        // @@@  XXX use open list reference to rename --
         open_map_iterator_type o = n;
         tl_assert (o != m_open.end ());
         o->contour = i1;
@@ -1140,11 +1148,14 @@ PolygonGenerator::join_contours (db::Coord x)
         m_open_pos->hook = true;
         n->hook = true;
       } else {
+        //  @@@  XXX remove by stored positions
         m_open.erase (m_open_pos);
         m_open.erase (n);
       }
 
     } else {
+
+      tl_assert (next == m_open.end () || next->contour != i1);
 
       if (! c1.is_hole ()) {
 
@@ -1230,15 +1241,6 @@ PolygonGenerator::join_contours (db::Coord x)
           ins = cprev.insert (ins, *insm1);
         }
 
-#if 0 // @@@
-printf("@@@cx1 ");
-for (auto i = cprev.begin (); i != cprev.end (); ++i) {
-  printf ("%s%s ", i->to_string().c_str (), i == ins ? "#" : "");
-}
-printf ("\n");
-fflush(stdout);
-#endif // @@@
-
         auto insert_from = c1.begin ();
 
         //  skip the redundant point that closes the contour
@@ -1285,28 +1287,12 @@ fflush(stdout);
 
         //  locate the new stitch point where we place stitch lines to next holes
         auto new_stitch_point = ins - n_after_stitch;
-#if 0 // @@@
-printf("@@@c0 ");
-for (auto i = cprev.begin (); i != cprev.end (); ++i) {
-  printf ("%s%s ", i->to_string().c_str (), i == new_stitch_point ? "#" : "");
-}
-printf ("\n");
-fflush(stdout);
-#endif // @@@
 
         //  insert a redundant point if it is needed to support the incoming stitch line
         if ((ins - 1)->y () != m_y) {
           ins = cprev.insert (ins, first);
           ++ins;
         }
-#if 0 // @@@
-printf("@@@c1 ");
-for (auto i = cprev.begin (); i != cprev.end (); ++i) {
-  printf ("%s%s ", i->to_string().c_str (), i == new_stitch_point ? "#" : "");
-}
-printf ("\n");
-fflush(stdout);
-#endif // @@@
 
         //  add an endpoint for the outbound stitch line unless we have one already
         if (cprev.stitch_point () == cprev.end ()) {
@@ -1322,14 +1308,6 @@ fflush(stdout);
             cprev.insert (ins, eprev.p2 ());
           }
         }
-#if 0 // @@@
-printf("@@@c3 ");
-for (auto i = cprev.begin (); i != cprev.end (); ++i) {
-  printf ("%s%s ", i->to_string().c_str (), i == new_stitch_point ? "#" : "");
-}
-printf ("\n");
-fflush(stdout);
-#endif // @@@
 
         cprev.set_stitch_point (new_stitch_point);
 #else
@@ -1364,6 +1342,7 @@ fflush(stdout);
 
       }
 
+      // @@@ XXX use open list references to free --
       m_open.erase (m_open_pos);
       m_open.erase (n);
 

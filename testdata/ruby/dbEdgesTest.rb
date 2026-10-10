@@ -139,6 +139,11 @@ class DBEdges_TestClass < TestBase
 
     assert_equal(r.moved(RBA::Point::new(10, 20)).bbox.to_s, "(20,40;110,220)")
     assert_equal(r.moved(10, 20).bbox.to_s, "(20,40;110,220)")
+    assert_equal(r.moved(dx: 10, dy: 20).bbox.to_s, "(20,40;110,220)")
+    assert_equal(r.moved(dy: 20).bbox.to_s, "(10,40;100,220)")
+    rr = r.dup
+    rr.move(dy: 20)
+    assert_equal(rr.bbox.to_s, "(10,40;100,220)")
     rr = r.dup
     assert_equal(rr.data_id != r.data_id, true)
     rr.move(RBA::Point::new(10, 20))

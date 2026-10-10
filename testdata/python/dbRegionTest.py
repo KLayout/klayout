@@ -106,6 +106,26 @@ class DBRegionTest(unittest.TestCase):
     s = ",".join([ str(trans*i.trans()*i.shape().polygon) for i in it.each() ])
     self.assertEqual(s, "(0,0;0,100;50,100;50,200;200,200;200,50;100,50;100,0)")
 
+  # move and moved with keyword arguments (dx and dy default to 0)
+  def test_move_keyword_args(self):
+
+    r = pya.Region(pya.Box(0, 0, 100, 100))
+    self.assertEqual(str(r.moved(dy = 10)), "(0,10;0,110;100,110;100,10)")
+    self.assertEqual(str(r.dup().move(dy = 10)), "(0,10;0,110;100,110;100,10)")
+
+    e = pya.Edges(pya.Edge(0, 0, 100, 0))
+    self.assertEqual(str(e.moved(dx = 5, dy = 10)), "(5,10;105,10)")
+    self.assertEqual(str(e.moved(dy = 10)), "(0,10;100,10)")
+    self.assertEqual(str(e.dup().move(dy = 10)), "(0,10;100,10)")
+
+    ep = pya.EdgePairs(pya.EdgePair(pya.Edge(0, 0, 100, 0), pya.Edge(0, 20, 100, 20)))
+    self.assertEqual(str(ep.moved(dy = 10)), "(0,10;100,10)/(0,30;100,30)")
+    self.assertEqual(str(ep.dup().move(dy = 10)), "(0,10;100,10)/(0,30;100,30)")
+
+    t = pya.Texts(pya.Text("A", pya.Trans(0, 0)))
+    self.assertEqual(str(t.moved(dy = 10)), "('A',r0 0,10)")
+    self.assertEqual(str(t.dup().move(dy = 10)), "('A',r0 0,10)")
+
 # run unit tests
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(DBRegionTest)

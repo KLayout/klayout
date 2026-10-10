@@ -120,23 +120,14 @@ public:
    *
    *  @param d The source from which to copy
    */
-  vector (const vector<C> &d)
-    : m_x (d.x ()), m_y (d.y ())
-  {
-    //  .. nothing yet ..
-  }
+  vector (const vector<C> &d) = default;
 
   /**
    *  @brief Assignment
    *
    *  @param d The source from which to take the data
    */
-  vector &operator= (const vector<C> &d) 
-  {
-    m_x = d.x ();
-    m_y = d.y ();
-    return *this;
-  }
+  vector &operator= (const vector<C> &d) = default;
 
   /**
    *  @brief The copy constructor that converts also

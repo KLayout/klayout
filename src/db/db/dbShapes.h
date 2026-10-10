@@ -468,12 +468,12 @@ private:
 /**
  *  @brief A helper class for shape generalization
  *
- *  This class serves first as a RTTI token for the 
- *  various shape-specific layer implementations and 
+ *  This class serves first as a RTTI token for the
+ *  various shape-specific layer implementations and
  *  provides some common methods though it's interface
  */
 
-class DB_PUBLIC LayerBase 
+class DB_PUBLIC LayerBase
 {
 public:
   typedef tl::func_delegate_base <db::properties_id_type> pm_delegate_type;
@@ -482,6 +482,11 @@ public:
 
   LayerBase ();
   virtual ~LayerBase ();
+
+  const void *type_tag () const
+  {
+    return m_tag;
+  }
 
   virtual box_type bbox () const = 0;
   virtual void update_bbox () = 0;
@@ -508,6 +513,10 @@ public:
   virtual unsigned int type_mask () const = 0;
 
   virtual void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const;
+
+protected:
+  LayerBase (const void *tag);
+  const void *m_tag;
 };
 
 /**

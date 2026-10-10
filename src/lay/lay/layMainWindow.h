@@ -696,6 +696,7 @@ public slots:
   void close_all_views_right ();
   void clone ();
   void tab_close_requested (int);
+  void tab_moved (int from, int to);
   void open_recent (size_t n);
   void open_recent_session (size_t n);
   void open_recent_layer_properties (size_t n);

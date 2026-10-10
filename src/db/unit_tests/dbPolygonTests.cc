@@ -1585,3 +1585,69 @@ TEST(31)
   EXPECT_EQ (chamfered_box (5.0, 20.0).sized (10).to_string (), "(-20,-10;-20,29;0,31;20,31;20,-10)");
 }
 
+//  contour equality: the byte-compare fast path must give the same verdicts
+//  as the point-by-point comparison, including the tag bits in the pointer
+TEST(32)
+{
+  std::vector<db::Point> pts;
+  for (int i = 0; i < 1000; ++i) {
+    double a = i * 0.01;
+    pts.push_back (db::Point (db::Coord (1000.0 * sin (a) * 10.0), db::Coord (1000.0 * cos (a) * 10.0)));
+  }
+
+  db::Polygon p1;
+  p1.assign_hull (pts.begin (), pts.end ());
+  db::Polygon p2 (p1);
+  EXPECT (p1 == p2);
+  EXPECT (p1.hull () == p2.hull ());
+
+  //  a difference in the last point must be found too
+  std::vector<db::Point> pts2 = pts;
+  pts2.back () += db::Vector (1, 0);
+  db::Polygon p3;
+  p3.assign_hull (pts2.begin (), pts2.end ());
+  EXPECT (p1 != p3);
+  EXPECT (p1.hull () != p3.hull ());
+
+  //  identical contours with the hole flag set on both sides
+  db::Polygon q1, q2;
+  q1.assign_hull (pts.begin (), pts.end ());
+  q1.insert_hole (pts.begin (), pts.end ());
+  q2.assign_hull (pts.begin (), pts.end ());
+  q2.insert_hole (pts.begin (), pts.end ());
+  EXPECT (q1 == q2);
+  EXPECT (q1.hole (0) == q2.hole (0));
+
+  //  same points, but one is a hole and the other is a hull contour
+  EXPECT_EQ (q1.hole (0) == q1.hull (), false);
+
+  //  rectilinear contours carry tag bits in the pointer; they must not
+  //  leak into the comparison
+  db::Point rpts[4] = { db::Point (-10, -20), db::Point (30, -20), db::Point (30, 40), db::Point (-10, 40) };
+  db::Polygon r1, r2;
+  r1.assign_hull (rpts + 0, rpts + 4);
+  r2.assign_hull (rpts + 0, rpts + 4);
+  EXPECT (r1 == r2);
+  EXPECT (r1.hull () == r2.hull ());
+  EXPECT (r1.hull ().is_rectilinear ());
+
+  //  a compressed rectilinear contour with a difference
+  db::Point rpts2[4] = { db::Point (-11, -20), db::Point (30, -20), db::Point (30, 40), db::Point (-11, 40) };
+  db::Polygon r3;
+  r3.assign_hull (rpts2 + 0, rpts2 + 4);
+  EXPECT (r1 != r3);
+  EXPECT (r1.hull () != r3.hull ());
+
+  //  compressed hull with compressed hole on both sides
+  db::Polygon r4, r5;
+  r4.assign_hull (rpts + 0, rpts + 4);
+  r4.insert_hole (rpts + 0, rpts + 4);
+  r5.assign_hull (rpts + 0, rpts + 4);
+  r5.insert_hole (rpts + 0, rpts + 4);
+  EXPECT (r4 == r5);
+  EXPECT (r4.hole (0) == r5.hole (0));
+
+  //  empty contours
+  db::polygon_contour<db::Coord> e1, e2;
+  EXPECT (e1 == e2);
+}

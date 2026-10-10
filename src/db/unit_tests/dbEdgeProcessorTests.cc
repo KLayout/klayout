@@ -2847,7 +2847,7 @@ static db::Polygon make_test_polygon (int n, int y1, int y2, int y3, int y4, int
   return p;
 }
 
-static std::vector<db::Polygon> resolve_holes_in_polygon (const db::Polygon &p)
+static std::vector<db::Polygon> resolve_holes_in_polygon (const db::Polygon &p, bool open_contours = false)
 {
   db::EdgeProcessor ep;
   ep.insert (p);
@@ -2855,6 +2855,7 @@ static std::vector<db::Polygon> resolve_holes_in_polygon (const db::Polygon &p)
   std::vector<db::Polygon> out;
   db::PolygonContainer pc (out);
   db::PolygonGenerator pg2 (pc, true /*resolve holes*/, false /*max. coherence*/);
+  pg2.open_contours (open_contours);
   db::SimpleMerge op (1 /*wc>0*/);
   ep.process (pg2, op);
 
@@ -2908,6 +2909,27 @@ static bool same_polygons (const db::Polygon &p1, const db::Polygon &p2)
   }
 }
 
+static bool same_polygons_for_open_contours (const db::Polygon &p1, const db::Polygon &p2)
+{
+  std::vector<db::Polygon> p1_resolved = resolve_holes_in_polygon (p1, true);
+
+  db::Region r1, r2 (p2);
+  for (auto p = p1_resolved.begin (); p != p1_resolved.end (); ++p) {
+    r1.insert (*p);
+  }
+  db::Region rx = r1 ^ r2;
+
+  if (! rx.empty ()) {
+    tl::info << "Polygon comparison failed:";
+    tl::info << "  p1: " << p1.to_string ();
+    tl::info << "  p2: " << p2.to_string ();
+    tl::info << "  p1^p2: " << rx.to_string ();
+    return false;
+  } else {
+    return true;
+  }
+}
+
 static bool check_polygon_for_intersecting_edges (const db::Polygon &p)
 {
   db::Region rp;
@@ -2946,6 +2968,7 @@ TEST(137)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,3000;3000,3000;3000,2000;2000,2000;2000,3000;0,3000;0,4000;5000,4000;5000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   p = make_test_polygon (1, 3000, 2800, 3000, 2800);
@@ -2956,6 +2979,7 @@ TEST(137)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,3000;3000,2000;2000,2000;2000,2800;1000,3000;0,3000;0,4000;5000,4000;5000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   p = make_test_polygon (1, 3000, 3000, 2800, 2800);
@@ -2966,6 +2990,7 @@ TEST(137)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,2800;3000,2000;2000,2000;2000,3000;0,3000;0,4000;5000,4000;5000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   p = make_test_polygon (1, 3000, 2800, 2800, 2800);
@@ -2976,6 +3001,7 @@ TEST(137)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,2800;3000,2000;2000,2000;2000,2800;1000,3000;0,3000;0,4000;5000,4000;5000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   p = make_test_polygon (1, 2800, 2800, 3000, 2800);
@@ -2986,6 +3012,7 @@ TEST(137)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;3000,3000;3000,2000;2000,2000;2000,2800;1000,2800;1000,1000;4000,1000;4000,2800;3000,3000;0,3000;0,4000;5000,4000;5000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   p = make_test_polygon (1, 2800, 2800, 3000, 3000);
@@ -2996,6 +3023,7 @@ TEST(137)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;3000,3000;3000,2000;2000,2000;2000,2800;1000,2800;1000,1000;4000,1000;4000,3000;0,3000;0,4000;5000,4000;5000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 }
 
@@ -3014,6 +3042,7 @@ TEST(138)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,3000;6000,3000;6000,1000;9000,1000;9000,3000;8000,3000;8000,2000;7000,2000;7000,3000;3000,3000;3000,2000;2000,2000;2000,3000;0,3000;0,4000;10000,4000;10000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   p = make_test_polygon (2, 3000, 2800, 3000, 2800);
@@ -3024,6 +3053,7 @@ TEST(138)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,3000;6000,3000;6000,1000;9000,1000;9000,2800;8000,3000;8000,2000;7000,2000;7000,2800;6000,3000;3000,3000;3000,2000;2000,2000;2000,2800;1000,3000;0,3000;0,4000;10000,4000;10000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   p = make_test_polygon (2, 3000, 3000, 2800, 2800);
@@ -3034,6 +3064,7 @@ TEST(138)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,2800;3000,2000;2000,2000;2000,3000;6000,3000;6000,1000;9000,1000;9000,2800;8000,2800;8000,2000;7000,2000;7000,3000;0,3000;0,4000;10000,4000;10000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   p = make_test_polygon (2, 3000, 2800, 2800, 2800);
@@ -3044,6 +3075,7 @@ TEST(138)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,2800;3000,2000;2000,2000;2000,2800;1000,3000;6000,3000;6000,1000;9000,1000;9000,2800;8000,2800;8000,2000;7000,2000;7000,2800;6000,3000;0,3000;0,4000;10000,4000;10000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   p = make_test_polygon (2, 2800, 2800, 3000, 2800);
@@ -3054,6 +3086,7 @@ TEST(138)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;3000,3000;3000,2000;2000,2000;2000,2800;1000,2800;1000,1000;4000,1000;4000,2800;3000,3000;8000,3000;8000,2000;7000,2000;7000,2800;6000,2800;6000,1000;9000,1000;9000,2800;8000,3000;0,3000;0,4000;10000,4000;10000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   p = make_test_polygon (2, 2800, 2800, 3000, 3000);
@@ -3064,6 +3097,7 @@ TEST(138)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;3000,3000;3000,2000;2000,2000;2000,2800;1000,2800;1000,1000;4000,1000;4000,3000;8000,3000;8000,2000;7000,2000;7000,2800;6000,2800;6000,1000;9000,1000;9000,3000;0,3000;0,4000;10000,4000;10000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 }
 
@@ -3082,6 +3116,7 @@ TEST(139)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,3000;3000,3000;3000,2000;2000,2000;2000,3000;100,3000;100,4000;5000,4000;5000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   p = make_test_polygon (2, 3000, 2800, 3000, 2800, 100);
@@ -3092,6 +3127,7 @@ TEST(139)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,3000;6000,3000;6000,1000;9000,1000;9000,2800;8000,3000;8000,2000;7000,2000;7000,2800;6000,3000;3000,3000;3000,2000;2000,2000;2000,2800;1000,3000;100,3000;100,4000;10000,4000;10000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   p = make_test_polygon (1, 3000, 3000, 3000, 3000, -100);
@@ -3102,6 +3138,7 @@ TEST(139)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,3000;3000,3000;3000,2000;2000,2000;2000,3000;-100,3000;-100,4000;5000,4000;5000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   p = make_test_polygon (2, 3000, 2800, 3000, 2800, -100);
@@ -3112,6 +3149,7 @@ TEST(139)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;4000,1000;4000,2800;3000,3000;6000,3000;6000,1000;9000,1000;9000,2800;8000,3000;8000,2000;7000,2000;7000,2800;6000,3000;3000,3000;3000,2000;2000,2000;2000,2800;1000,3000;-100,3000;-100,4000;10000,4000;10000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 }
 
@@ -3131,6 +3169,7 @@ TEST(140)
   EXPECT_EQ (out.size (), size_t (1));
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   p = make_test_polygon (nholes, 3000, 2800, 3000, 2800);
@@ -3140,6 +3179,7 @@ TEST(140)
   EXPECT_EQ (out.size (), size_t (1));
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   p = make_test_polygon (nholes, 3000, 3000, 2800, 2800);
@@ -3149,6 +3189,7 @@ TEST(140)
   EXPECT_EQ (out.size (), size_t (1));
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   p = make_test_polygon (nholes, 3000, 2800, 2800, 2800);
@@ -3158,6 +3199,7 @@ TEST(140)
   EXPECT_EQ (out.size (), size_t (1));
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   p = make_test_polygon (nholes, 2800, 2800, 3000, 2800);
@@ -3167,6 +3209,7 @@ TEST(140)
   EXPECT_EQ (out.size (), size_t (1));
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   p = make_test_polygon (nholes, 2800, 2800, 3000, 3000);
@@ -3176,6 +3219,7 @@ TEST(140)
   EXPECT_EQ (out.size (), size_t (1));
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 }
 
@@ -3239,6 +3283,7 @@ TEST(142)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,400;100,400;100,100;400,100;400,400;0,400;0,500;2500,500;2500,0;2000,0;2000,400;2100,400;2100,100;2400,100;2400,400;1500,400;1500,0;1000,0;1000,400;1100,400;1100,100;1400,100;1400,400;500,400;500,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 400), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 }
 
@@ -3278,6 +3323,7 @@ TEST(143)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,500;1000,500;1000,0;300,0;300,300;200,400;700,400;600,300;600,100;800,100;800,300;700,400;200,400;100,300;100,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 400), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 }
 
@@ -3319,6 +3365,7 @@ TEST(144)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,4000;1000,4000;1000,1000;4000,1000;4000,3000;5000,3000;5000,1000;6000,1000;6000,3000;3000,3000;3000,2000;2000,2000;2000,4000;7000,4000;7000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   pts.clear ();
@@ -3354,6 +3401,7 @@ TEST(144)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,4000;1000,4000;1000,1000;4000,1000;4000,3000;5000,3000;5000,1000;6000,1000;6000,3000;3000,3000;3000,2000;2000,2000;2000,9000;11000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 
   pts.clear ();
@@ -3388,6 +3436,7 @@ TEST(144)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,4000;1000,4000;1000,1000;4000,1000;4000,3000;5000,3000;5000,1000;6000,1000;6000,3000;3000,3000;3000,2000;2000,2000;7000,12000;7000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 }
 
@@ -3434,6 +3483,7 @@ TEST(145)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;2000,1000;2000,3000;0,3000;0,4000;7000,4000;7000,0;4000,0;4000,2000;5000,2000;5000,1000;6000,1000;6000,2000;3000,2000;3000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 2000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 }
 
@@ -3479,6 +3529,7 @@ TEST(146)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,5000;7000,5000;7000,2000;4000,2000;4000,4000;5000,4000;5000,3000;6000,3000;6000,4000;3000,4000;3000,2000;2000,2000;2000,4000;1000,4000;1000,1000;8000,1000;8000,5000;9000,5000;9000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 4000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 }
 
@@ -3516,5 +3567,6 @@ TEST(147)
   EXPECT_EQ (out.front ().to_string (), "(0,0;0,3000;1000,3000;1000,1000;2000,1000;2000,3000;3000,3000;3000,2000;4000,2000;4000,3000;2000,3000;2000,4000;5000,4000;5000,0)");
   EXPECT_EQ (max_edge_overlap_at_y (out.front (), 3000), 2);
   EXPECT_EQ (same_polygons (p, out.front ()), true);
+  EXPECT_EQ (same_polygons_for_open_contours (p, out.front ()), true);
   EXPECT_EQ (check_polygon_for_intersecting_edges (out.front ()), true);
 }

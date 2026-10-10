@@ -226,7 +226,6 @@ void
 NamedLayerReader::prepare_layers (db::Layout &layout)
 {
   m_new_layers.clear ();
-  m_next_layer_index = m_layer_map.next_index ();
 
   m_layer_map_out.clear ();
   m_multi_mapping_placeholders.clear ();

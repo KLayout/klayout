@@ -34,6 +34,9 @@
 namespace db
 {
 
+//  The layer index where the virtual (placeholder, temp) layers start
+const unsigned int real_layer_limit = std::numeric_limits<unsigned int>::max () / 2;
+
 // ---------------------------------------------------------------
 //  LayerMap
 
@@ -408,6 +411,10 @@ LayerMap::prepare (db::Layout &layout)
 
     } else {
 
+      //  Layer index is a virtual one - i.e. no layer actually existing. Remap the layer
+      //  index either to a placeholder (for example for offset target layers from a range
+      //  of inputs) or a real layout layer.
+
       db::LayerProperties lp = mapping (*l);
       if (lp.is_named () || (db::is_static_ld (lp.layer) && db::is_static_ld (lp.datatype))) {
 
@@ -419,7 +426,7 @@ LayerMap::prepare (db::Layout &layout)
 
       } else {
 
-        //  install a placeholder index
+        //  install a placeholder index for computed layers (i.e. offset layer or datatype)
         m_placeholders.push_back (lp);
         real_layers.insert (std::make_pair (*l, ph--));
 
@@ -711,7 +718,7 @@ LayerMap::mmap_expr (tl::Extractor &ex, unsigned int l)
     throw LayerSpecFormatException (ex.skip ());
   }
 
-  if (l >= m_next_index) {
+  if (l < real_layer_limit && l >= m_next_index) {
     m_next_index = l + 1;
   }
 }
@@ -725,7 +732,7 @@ LayerMap::insert (const std::string &name, unsigned int l, const LayerProperties
 
   m_name_map [name].insert (l);
 
-  if (l >= m_next_index) {
+  if (l < real_layer_limit && l >= m_next_index) {
     m_next_index = l + 1;
   }
 }
@@ -758,7 +765,7 @@ LayerMap::insert (const LDPair &p1, const LDPair &p2, unsigned int l, const Laye
     m_ld_map.add (0, std::numeric_limits<ld_type>::max (), dt, op2);
   }
 
-  if (l >= m_next_index) {
+  if (l < real_layer_limit && l >= m_next_index) {
     m_next_index = l + 1;
   }
 }
@@ -944,7 +951,7 @@ LayerMap::from_string_file_format (const std::string &s)
   //  NOTE: this should be outside the normal layer index range of a Layout and below
   //  the space reserved for placeholders. With numbers like this we don't get messed
   //  up with existing layers.
-  unsigned int l = std::numeric_limits<unsigned int>::max () / 2;
+  unsigned int l = real_layer_limit;
 
   int lnr = 0;
 

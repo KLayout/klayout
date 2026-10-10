@@ -75,8 +75,6 @@ MAGReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 {
   init (options);
 
-  prepare_layers (layout);
-
   mp_klayout_tech = layout.technology ();
 
   const db::MAGReaderOptions &specific_options = options.get_options<db::MAGReaderOptions> ();

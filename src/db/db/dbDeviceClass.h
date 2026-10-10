@@ -356,6 +356,8 @@ public:
   }
 
 private:
+  bool is_in_compare_set (size_t parameter_id) const;
+
   std::vector<std::pair<size_t, std::pair<double, double> > > m_compare_set;
 };
 
@@ -701,6 +703,15 @@ public:
    *  the classes features a delegate, the one with the delegate is employed.
    */
   static bool equal (const db::Device &a, const db::Device &b);
+
+  /**
+   *  @brief Compares the parameters of the devices a and b (three-way)
+   *
+   *  This is the "equal" and "less" operations combined into a single
+   *  call: it returns -1 if a < b, 1 if a > b and 0 if a and b are equal.
+   *  "equal" is the same result as delivered by the "equal" method.
+   */
+  static int compare (const db::Device &a, const db::Device &b);
 
   /**
    *  @brief Registers a compare delegate

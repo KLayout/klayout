@@ -113,10 +113,22 @@ Transition::operator< (const Transition &other) const
     }
 
     if (device () != 0) {
-      DeviceCompare dc;
-      if (! dc.equals (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ()))) {
-        return dc (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ()));
+
+      //  the category decides first - same priority as before, but without
+      //  calling the device class compare for the actual decision
+      if (m_cat != other.m_cat) {
+        return m_cat < other.m_cat;
       }
+
+      //  a single three-way comparison replaces the "equals" plus "less" calls
+      //  and skips the parameter comparison entirely for identical devices
+      if (device () != other.device ()) {
+        int cmp = db::DeviceClass::compare (*device (), *other.device ());
+        if (cmp != 0) {
+          return cmp < 0;
+        }
+      }
+
     }
 
     if (m_id1 != other.m_id1) {
@@ -134,6 +146,12 @@ Transition::operator== (const Transition &other) const
     return false;
   }
 
+  //  the ID comparison is a pure conjunction with the other predicates, so
+  //  do the cheap field first
+  if (m_id1 != other.m_id1) {
+    return false;
+  }
+
   if (is_for_subcircuit ()) {
 
     if ((subcircuit () != 0) != (other.subcircuit () != 0)) {
@@ -147,7 +165,7 @@ Transition::operator== (const Transition &other) const
       }
     }
 
-    return (m_id1 == other.m_id1);
+    return true;
 
   } else {
 
@@ -156,13 +174,19 @@ Transition::operator== (const Transition &other) const
     }
 
     if (device () != 0) {
-      DeviceCompare dc;
-      if (! dc.equals (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ()))) {
+
+      if (m_cat != other.m_cat) {
         return false;
       }
+
+      //  identical devices are equal under any tolerance scheme
+      if (device () != other.device () && db::DeviceClass::compare (*device (), *other.device ()) != 0) {
+        return false;
+      }
+
     }
 
-    return (m_id1 == other.m_id1 && m_id2 == other.m_id2);
+    return m_id2 == other.m_id2;
 
   }
 }

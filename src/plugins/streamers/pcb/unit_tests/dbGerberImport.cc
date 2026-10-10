@@ -294,7 +294,7 @@ TEST(25)
 TEST(26)
 {
   test_is_long_runner ();
-  run_test (_this, "pos-neg");
+  run_test (_this, "pos-neg", "au_2.oas.gz");
 }
 
 TEST(27)

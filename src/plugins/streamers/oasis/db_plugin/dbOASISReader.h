@@ -237,6 +237,8 @@ private:
     }
   }
 
+  template <class T> T get_unsigned (const char *type_name);
+  template <class S> S get_signed (const char *type_name);
   int64_t get_int64 ();
   uint64_t get_uint64 ();
   uint64_t get_uint64_for_divider ();

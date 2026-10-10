@@ -1585,3 +1585,64 @@ TEST(31)
   EXPECT_EQ (chamfered_box (5.0, 20.0).sized (10).to_string (), "(-20,-10;-20,29;0,31;20,31;20,-10)");
 }
 
+static db::Polygon::contour_type make_move_test_contour (bool hole)
+{
+  typedef db::Polygon::contour_type contour_type;
+  typedef db::Point point_type;
+
+  //  a half-manhattan octagon
+  std::vector<point_type> pts;
+  pts.push_back (point_type (0, 100));
+  pts.push_back (point_type (0, 200));
+  pts.push_back (point_type (100, 300));
+  pts.push_back (point_type (200, 300));
+  pts.push_back (point_type (300, 200));
+  pts.push_back (point_type (300, 100));
+  pts.push_back (point_type (200, 0));
+  pts.push_back (point_type (100, 0));
+
+  return contour_type (pts.begin (), pts.end (), hole);
+}
+
+TEST(contour_move)
+{
+  typedef db::Polygon::contour_type contour_type;
+
+  contour_type hull (make_move_test_contour (false));
+  size_t n = hull.size ();
+  bool rect = hull.is_rectilinear ();
+  bool half = hull.is_halfmanhattan ();
+  double a = double (hull.area ());
+
+  EXPECT_EQ (n, size_t (8));
+  EXPECT_EQ (rect, false);
+  EXPECT_EQ (half, true);
+
+  //  move construct steals the points and the tag bits
+  contour_type hull2 (std::move (hull));
+  EXPECT_EQ (hull2.size (), n);
+  EXPECT_EQ (hull2.is_rectilinear (), rect);
+  EXPECT_EQ (hull2.is_halfmanhattan (), half);
+  EXPECT_EQ (hull2.is_hole (), false);
+  EXPECT_EQ (double (hull2.area ()), a);
+  EXPECT_EQ (hull.size (), size_t (0));
+
+  //  move assign
+  contour_type hull3;
+  hull3 = std::move (hull2);
+  EXPECT_EQ (hull3.size (), n);
+  EXPECT_EQ (hull3.is_rectilinear (), rect);
+  EXPECT_EQ (hull3.is_halfmanhattan (), half);
+  EXPECT_EQ (double (hull3.area ()), a);
+  EXPECT_EQ (hull2.size (), size_t (0));
+
+  //  holes carry the tag as well
+  contour_type hole (make_move_test_contour (true));
+  double ah = double (hole.area ());
+  EXPECT_EQ (hole.is_hole (), true);
+
+  contour_type hole2 (std::move (hole));
+  EXPECT_EQ (hole2.is_hole (), true);
+  EXPECT_EQ (double (hole2.area ()), ah);
+  EXPECT_EQ (hole.size (), size_t (0));
+}

@@ -200,3 +200,53 @@ TEST(4)
   EXPECT_EQ (t.to_string (), "('abc',r90 0,0) f=17");
   EXPECT_EQ (string_trip (t), t.to_string ());
 }
+
+TEST(5)
+{
+  db::Text t ("hello world", db::Trans (db::Trans::r90), 150, db::Font (17), db::HAlignLeft, db::VAlignTop);
+  EXPECT_EQ (std::string (t.string ()), "hello world");
+
+  //  copy keeps the string
+  db::Text c (t);
+  EXPECT_EQ (std::string (c.string ()), "hello world");
+  EXPECT_EQ (c.to_string (), t.to_string ());
+
+  //  move steals the storage, the source becomes empty
+  db::Text m (std::move (c));
+  EXPECT_EQ (std::string (m.string ()), "hello world");
+  EXPECT_EQ (m.to_string (), t.to_string ());
+  EXPECT_EQ (std::string (c.string ()), "");
+
+  //  move assignment
+  db::Text m2;
+  m2 = std::move (m);
+  EXPECT_EQ (std::string (m2.string ()), "hello world");
+  EXPECT_EQ (std::string (m.string ()), "");
+}
+
+TEST(6)
+{
+  //  reference counting must stay correct across move
+  size_t n = db::StringRepository::instance ()->size ();
+
+  const db::StringRef *ref = db::StringRepository::instance ()->create_string_ref ();
+  db::StringRepository::change_string_ref (ref, "REF");
+
+  db::Text t (ref, db::Trans ());
+  db::Text tc (t);
+
+  EXPECT_EQ (std::string (t.string ()), "REF");
+  EXPECT_EQ (std::string (tc.string ()), "REF");
+  EXPECT_EQ (db::StringRepository::instance ()->size (), n + size_t (1));
+
+  db::Text tm (std::move (tc));
+  EXPECT_EQ (std::string (tm.string ()), "REF");
+  EXPECT_EQ (std::string (tc.string ()), "");
+  EXPECT_EQ (db::StringRepository::instance ()->size (), n + size_t (1));
+
+  t = db::Text ();
+  EXPECT_EQ (db::StringRepository::instance ()->size (), n + size_t (1));
+
+  tm = db::Text ();
+  EXPECT_EQ (db::StringRepository::instance ()->size (), n);
+}

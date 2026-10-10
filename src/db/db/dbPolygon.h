@@ -151,6 +151,18 @@ public:
   }
 
   /**
+   *  @brief Move ctor
+   *
+   *  Takes over the point storage including the tag bits encoded in the pointer.
+   */
+  polygon_contour (polygon_contour &&d) noexcept
+    : mp_points (d.mp_points), m_size (d.m_size)
+  {
+    d.mp_points = 0;
+    d.m_size = 0;
+  }
+
+  /**
    *  @brief Destructor
    */
   ~polygon_contour ()
@@ -164,8 +176,24 @@ public:
   polygon_contour &operator= (const polygon_contour &d)
   {
     if (&d != this) {
+      //  build the copy first so "this" stays intact if the copy throws
+      polygon_contour tmp (d);
+      swap (tmp);
+    }
+    return *this;
+  }
+
+  /**
+   *  @brief Move assignment
+   */
+  polygon_contour &operator= (polygon_contour &&d) noexcept
+  {
+    if (&d != this) {
       release ();
-      new (this) polygon_contour (d);
+      mp_points = d.mp_points;
+      m_size = d.m_size;
+      d.mp_points = 0;
+      d.m_size = 0;
     }
     return *this;
   }

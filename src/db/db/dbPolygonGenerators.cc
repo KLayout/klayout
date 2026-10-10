@@ -62,24 +62,6 @@ public:
     // ...
   }
 
-  PGPolyContour (const PGPolyContour &d)
-    : m_contour (d.m_contour), m_is_hole (d.m_is_hole), m_next (d.m_next), m_last (d.m_last), m_size (d.m_size)
-  {
-    // ...
-  }
-
-  PGPolyContour &operator= (const PGPolyContour &d)
-  {
-    if (this != &d) {
-      m_contour = d.m_contour;
-      m_is_hole = d.m_is_hole;
-      m_next = d.m_next;
-      m_last = d.m_last;
-      m_size = d.m_size;
-    }
-    return *this;
-  }
-
   const_iterator begin () const { return m_contour.begin (); }
   const_iterator end () const { return m_contour.end (); }
   iterator begin () { return m_contour.begin (); }
@@ -367,8 +349,7 @@ PolygonGenerator::PolygonGenerator (SimplePolygonSink &spsink, bool min_coherenc
 
 PolygonGenerator::~PolygonGenerator ()
 {
-  delete mp_contours;
-  mp_contours = 0;
+  //  .. nothing yet ..
 }
 
 void

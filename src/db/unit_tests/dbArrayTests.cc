@@ -23,6 +23,7 @@
 
 #include "dbArray.h"
 #include "dbBoxConvert.h"
+#include "dbInstElement.h"
 #include "tlUnitTest.h"
 
 typedef db::array <db::Box, db::Trans> BoxArray;
@@ -482,4 +483,42 @@ TEST(12_1dArraysX)
   EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin_touching (db::Box (0, 50, 200, 110), MyBoxConvert ())), "");
   EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin_touching (db::Box (0, 40, 200, 110), MyBoxConvert ())), "0,0");
   EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin_touching (db::Box (31, 40, 210, 130), MyBoxConvert ())), "200,0");
+}
+
+TEST(array_move)
+{
+  BoxArray ba (db::Box (10, 30, 30, 40), db::Trans (db::Vector (0, 0)), new db::regular_array<db::Coord> (db::Vector (0, 0), db::Vector (200, 0), 1, 3));
+
+  BoxArray ba2 (std::move (ba));
+  EXPECT_EQ (positions (ba2, db::Point (0, 0), ba2.begin ()), "0,0;200,0;400,0");
+  EXPECT_EQ (ba.size (), size_t (1));
+
+  BoxArray ba3;
+  ba3 = std::move (ba2);
+  EXPECT_EQ (positions (ba3, db::Point (0, 0), ba3.begin ()), "0,0;200,0;400,0");
+  EXPECT_EQ (ba2.size (), size_t (1));
+
+  //  moving the iterator keeps the position and empties the source
+  BoxArray::iterator i = ba3.begin ();
+  BoxArray::iterator i2 (std::move (i));
+  EXPECT_EQ (positions (ba3, db::Point (0, 0), i2), "0,0;200,0;400,0");
+  EXPECT_EQ (i.is_singular (), true);
+}
+
+TEST(inst_element_move)
+{
+  db::CellInstArray cia (db::CellInst (), db::Trans (), db::Vector (0, 0), db::Vector (200, 0), 1, 3);
+
+  db::InstElement e;
+  e.array_inst = cia.begin ();
+  EXPECT_EQ (e.array_inst.is_singular (), false);
+
+  db::InstElement e2 (std::move (e));
+  EXPECT_EQ (e2.array_inst.is_singular (), false);
+  EXPECT_EQ (e.array_inst.is_singular (), true);
+
+  db::InstElement e3;
+  e3 = std::move (e2);
+  EXPECT_EQ (e3.array_inst.is_singular (), false);
+  EXPECT_EQ (e2.array_inst.is_singular (), true);
 }

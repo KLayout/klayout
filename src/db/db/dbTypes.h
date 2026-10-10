@@ -434,7 +434,7 @@ struct coord_traits<double>
   {
     double dx1 = ax - cx, dy1 = ay - cy;
     double dx2 = bx - cx, dy2 = by - cy;
-    double pa = (sqrt (dx1 * dx1 + dy1 * dy1) + sqrt (dx2 * dx2 + dy2 * dy2)) * db::epsilon;
+    double pa = std::max (1.0, sqrt ((dx1 * dx1 + dy1 * dy1) * (dx2 * dx2 + dy2 * dy2))) * db::epsilon;
     area_type p1 = dx1 * dx2;
     area_type p2 = -dy1 * dy2;
     if (p1 <= p2 - pa) {
@@ -450,7 +450,7 @@ struct coord_traits<double>
   {
     double dx1 = ax - cx, dy1 = ay - cy;
     double dx2 = bx - cx, dy2 = by - cy;
-    double pa = (sqrt (dx1 * dx1 + dy1 * dy1) + sqrt (dx2 * dx2 + dy2 * dy2)) * db::epsilon;
+    double pa = std::max (1.0, sqrt ((dx1 * dx1 + dy1 * dy1) * (dx2 * dx2 + dy2 * dy2))) * db::epsilon;
     area_type p1 = dx1 * dx2;
     area_type p2 = -dy1 * dy2;
     if (p1 <= p2 - pa) {
@@ -473,7 +473,7 @@ struct coord_traits<double>
   {
     double dx1 = ax - cx, dy1 = ay - cy;
     double dx2 = bx - cx, dy2 = by - cy;
-    double pa = (sqrt (dx1 * dx1 + dy1 * dy1) + sqrt (dx2 * dx2 + dy2 * dy2)) * db::epsilon;
+    double pa = std::max (1.0, sqrt ((dx1 * dx1 + dy1 * dy1) * (dx2 * dx2 + dy2 * dy2))) * db::epsilon;
     area_type p1 = dx1 * dy2;
     area_type p2 = dy1 * dx2;
     if (p1 <= p2 - pa) {
@@ -489,7 +489,7 @@ struct coord_traits<double>
   {
     double dx1 = ax - cx, dy1 = ay - cy;
     double dx2 = bx - cx, dy2 = by - cy;
-    double pa = (sqrt (dx1 * dx1 + dy1 * dy1) + sqrt (dx2 * dx2 + dy2 * dy2)) * db::epsilon;
+    double pa = std::max (1.0, sqrt ((dx1 * dx1 + dy1 * dy1) * (dx2 * dx2 + dy2 * dy2))) * db::epsilon;
     area_type p1 = dx1 * dy2;
     area_type p2 = dy1 * dx2;
     if (p1 <= p2 - pa) {

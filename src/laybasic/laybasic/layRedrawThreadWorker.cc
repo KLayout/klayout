@@ -191,6 +191,7 @@ RedrawThreadWorker::perform_task (tl::Task *task)
   m_cell_cache.clear ();
   m_mi_cache.clear ();
   m_mi_text_cache.clear ();
+  m_layer_hidden_cells.clear ();
 
   m_from_level = m_from_level_default;
   m_to_level = m_to_level_default;
@@ -256,6 +257,15 @@ RedrawThreadWorker::perform_task (tl::Task *task)
         mp_layout = &cv->layout ();
         m_cv_index = li.cellview_index;
         db::cell_index_type ci = cv.cell_index ();
+
+        if (li.hidden_cells) {
+          m_layer_hidden_cells.resize (mp_layout->cells (), false);
+          for (auto hc = li.hidden_cells->begin (); hc != li.hidden_cells->end (); ++hc) {
+            if (*hc < m_layer_hidden_cells.size ()) {
+              m_layer_hidden_cells [*hc] = true;
+            }
+          }
+        }
 
         int ctx_path_length = int (m_cellviews [m_cv_index].specific_path ().size ());
 
@@ -1309,10 +1319,8 @@ bool
 RedrawThreadWorker::any_shapes (db::cell_index_type cell_index, unsigned int levels)
 {
   //  if the cell is "hidden", it does not need to be drawn
-  if (int (m_hidden_cells.size ()) > m_cv_index) {
-    if (m_hidden_cells [m_cv_index].find (cell_index) != m_hidden_cells [m_cv_index].end ()) {
-      return false;
-    }
+  if (cell_hidden (cell_index)) {
+    return false;
   }
 
   //  Ghost cells are not drawn either
@@ -1392,10 +1400,8 @@ bool
 RedrawThreadWorker::any_text_shapes (db::cell_index_type cell_index, unsigned int levels)
 {
   //  if the cell is "hidden", it does not need to be drawn
-  if (int (m_hidden_cells.size ()) > m_cv_index) {
-    if (m_hidden_cells [m_cv_index].find (cell_index) != m_hidden_cells [m_cv_index].end ()) {
-      return false;
-    }
+  if (cell_hidden (cell_index)) {
+    return false;
   }
 
   //  Ghost cells are not drawn either
@@ -1503,7 +1509,7 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
 
   } else if (! bbox.empty ()) {
 
-    bool hidden = cell.is_real_ghost_cell () || ((m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ()));
+    bool hidden = cell.is_real_ghost_cell () || cell_hidden (ci);
     bool need_to_dive = (level + 1 < m_to_level) && ! hidden;
 
     db::Box cell_bbox = cell.bbox ();
@@ -1637,7 +1643,7 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
               ++inst;
 
               db::cell_index_type new_ci = cell_inst.object ().cell_index ();
-              bool hidden = mp_layout->cell (new_ci).is_real_ghost_cell () || ((m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (new_ci) != m_hidden_cells [m_cv_index].end ()));
+              bool hidden = mp_layout->cell (new_ci).is_real_ghost_cell () || cell_hidden (new_ci);
 
               db::Box cell_box = mp_layout->cell (new_ci).bbox (m_layer);
               if (! cell_box.empty () && ! hidden) {
@@ -1939,7 +1945,7 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
           ++inst;
 
           db::cell_index_type new_ci = cell_inst.object ().cell_index ();
-          bool hidden = mp_layout->cell (new_ci).is_real_ghost_cell () || ((m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (new_ci) != m_hidden_cells [m_cv_index].end ()));
+          bool hidden = mp_layout->cell (new_ci).is_real_ghost_cell () || cell_hidden (new_ci);
 
           db::Box new_cell_box = mp_layout->cell (new_ci).bbox (m_layer);
           if (! new_cell_box.empty () && ! hidden) {
@@ -2106,8 +2112,7 @@ RedrawThreadWorker::draw_layer (int from_level, int to_level, db::cell_index_typ
   }
 
   //  Don't draw hidden cells
-  bool hidden = (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ());
-  if (hidden) {
+  if (cell_hidden (ci)) {
     return;
   }
 

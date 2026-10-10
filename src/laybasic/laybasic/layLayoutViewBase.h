@@ -2444,6 +2444,18 @@ public:
   void show_all_cells (int cv_index);
 
   /**
+   *  @brief Hides a single layer (given by its layer properties node id) within the given cells and their subtrees
+   *
+   *  An empty list clears the restriction. Only leaf layer nodes are considered.
+   */
+  void set_layer_hidden_cells (unsigned int layer_id, const std::vector<cell_index_type> &cells);
+
+  /**
+   *  @brief Gets the cells hidden for a single layer (see \set_layer_hidden_cells)
+   */
+  std::vector<cell_index_type> layer_hidden_cells (unsigned int layer_id) const;
+
+  /**
    *  @brief Update the layout view to the current state
    *
    *  This method must be called in order to trigger the update of
@@ -3053,6 +3065,7 @@ private:
   std::list <CellView> m_cellviews;
   lay::AnnotationShapes m_annotation_shapes;
   std::vector <std::set <cell_index_type> > m_hidden_cells;
+  std::map <unsigned int, std::shared_ptr<const std::vector <cell_index_type> > > m_layer_hidden_cells;
   std::string m_title;
   std::string m_current_title;
   tl::vector <rdb::Database *> m_rdbs;

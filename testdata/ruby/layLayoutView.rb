@@ -725,6 +725,49 @@ class LAYLayoutView_TestClass < TestBase
 
   end
 
+  # per-layer hidden cells
+  def test_22
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+    a = ly.create_cell("A")
+    b = ly.create_cell("B")
+    l1 = ly.layer(1, 0)
+    a.shapes(l1).insert(RBA::Box::new(0, 0, 1000, 1000))
+    b.shapes(l1).insert(RBA::Box::new(0, 0, 1000, 1000))
+    top.insert(RBA::CellInstArray::new(a.cell_index, RBA::Trans::new(0, 0)))
+    top.insert(RBA::CellInstArray::new(b.cell_index, RBA::Trans::new(2000, 0)))
+
+    lv = RBA::LayoutView::new
+    lv.set_config("background-color", "#000000")
+    lv.show_layout(ly, false)
+    lv.add_missing_layers
+    lv.max_hier
+
+    lp = lv.begin_layers.current
+    lp.fill_color = 0xffffff
+    lp.dither_pattern = 0
+    id = lp.id
+
+    # whether A (around pixel 100,100) and B (around pixel 300,100) are drawn
+    drawn = lambda do
+      img = lv.get_pixels_with_options(400, 200, 1, 1, 1.0, RBA::DBox::new(-0.5, -0.5, 3.5, 1.5))
+      [ img.pixel(100, 100) & 0xffffff != 0, img.pixel(300, 100) & 0xffffff != 0 ]
+    end
+
+    assert_equal(lv.layer_hidden_cells(id), [])
+    assert_equal(drawn.call, [true, true])
+
+    lv.set_layer_hidden_cells(id, [b.cell_index])
+    assert_equal(lv.layer_hidden_cells(id), [b.cell_index])
+    assert_equal(drawn.call, [true, false])
+
+    lv.set_layer_hidden_cells(id, [])
+    assert_equal(lv.layer_hidden_cells(id), [])
+    assert_equal(drawn.call, [true, true])
+
+  end
+
 end
 
 load("test_epilogue.rb")

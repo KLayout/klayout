@@ -1640,14 +1640,18 @@ connected_clusters<T>::rename_connection (const ClusterInstance &inst, typename 
 //  built over the target (cheaper than the scans from roughly this size on)
 static constexpr size_t join_scan_limit = 64;
 
-//  membership test against the target list with the same equivalence criterion
-//  std::set<ClusterInstance> applies
+//  membership test against the first "limit" entries of the target list
 static bool
-connections_contain (const tl::slist<db::ClusterInstance> &connections, const db::ClusterInstance &inst)
+connections_contain (const tl::slist<db::ClusterInstance> &connections, const db::ClusterInstance &inst, size_t limit)
 {
   //  NOTE: no std::any_of - slist iterators do not model the standard iterator requirements (void difference_type)
+  size_t n = 0;
   for (const auto &c : connections) {
-    if (! (c < inst) && ! (inst < c)) {
+    if (n == limit) {
+      break;
+    }
+    ++n;
+    if (c == inst) {
       return true;
     }
   }
@@ -1686,22 +1690,27 @@ connected_clusters<T>::join_cluster_with (typename local_cluster<T>::id_type id,
       //  Join while removing duplicates. The decision is taken against the physical
       //  target list, not against m_rev_connections: the reverse map does not have an
       //  entry for every list element after renames left duplicates behind.
-      //  NOTE: duplicates inside "to_join" are kept, like in the original implementation.
-      std::set<connections_type::value_type> in_target;
       if (to_join.size () <= join_scan_limit) {
+
+        //  small "to_join": one pass is cheaper than the set. The membership
+        //  scan covers the original target only, so duplicates inside
+        //  "to_join" are kept like in the original implementation.
+        const size_t target_size = target.size ();
         for (const auto &c : to_join) {
-          if (connections_contain (target, c)) {
-            in_target.insert (c);
+          if (! connections_contain (target, c, target_size)) {
+            target.push_back (c);
           }
         }
-      } else {
-        in_target.insert (target.begin (), target.end ());
-      }
 
-      for (const auto &c : to_join) {
-        if (in_target.find (c) == in_target.end ()) {
-          target.push_back (c);
+      } else {
+
+        std::set<connections_type::value_type> in_target (target.begin (), target.end ());
+        for (const auto &c : to_join) {
+          if (in_target.find (c) == in_target.end ()) {
+            target.push_back (c);
+          }
         }
+
       }
 
     }

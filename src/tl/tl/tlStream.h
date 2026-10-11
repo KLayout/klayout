@@ -456,8 +456,10 @@ public:
    *  
    *  This call puts back the bytes read by a previous get call.
    *  Only one call can be made undone.
+   *  With "bypass_inflate" the bytes are taken from the raw stream, not from
+   *  the inflate filter - like with get().
    */
-  void unget (size_t n);
+  void unget (size_t n, bool bypass_inflate = false);
 
   /**
    *  @brief Reads all remaining bytes into the string
@@ -505,7 +507,8 @@ public:
    */
   size_t pos () const 
   {
-    return m_pos;
+    //  the inflate filter reads ahead in chunks, the bytes it has not decoded yet do not count
+    return mp_inflate ? m_pos - mp_inflate->input_pending () : m_pos;
   }
 
   /**
@@ -626,7 +629,7 @@ protected:
 
 private:
   //  everything the inline get cannot serve: refill, inflate state changes
-  //  and multi-byte blocks that wrap the inflate ring buffer
+  //  and multi-byte blocks that need more inflated data
   const char *get_slow (size_t n, bool bypass_inflate);
 
   size_t m_pos;

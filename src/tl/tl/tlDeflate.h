@@ -44,90 +44,6 @@ struct z_stream_s;
 namespace tl
 {
 
-class HuffmannDecoder;
-
-/**
- *  @brief A bit stream reader according to the DEFLATE specification
- *
- *  This filter reads bytes from a tl::Stream and delivers bits, taken from
- *  these bytes. The bits are delivered in the order specified by the DEFLATE
- *  format specification (least significant bit first).
- */
-class TL_PUBLIC BitStream
-{
-public:
-  /**
-   *  @brief Constructor
-   *
-   *  Constructs a bit stream filter attached to the given stream
-   */
-  BitStream (tl::InputStream &input)
-    : mp_input (&input),
-      m_mask (0), m_byte (0)
-  {
-    // ...
-  }
-
-  /**
-   *  @brief Get a byte
-   *
-   *  This method simply passes the byte.
-   *  The method expects the next byte to be available.
-   *  Defined in tlDeflate.cc since it needs the full InputStream type.
-   */
-  unsigned char get_byte ();
-
-  /**
-   *  @brief Get a single bit
-   *
-   *  This method gets the next bit available.
-   *  The method expects the next byte to be available, if one needs to be read.
-   */
-  bool get_bit ()
-  {
-    if (m_mask == 0) {
-      m_byte = get_byte ();
-      m_mask = 0x01;
-    } 
-    bool b = ((m_byte & m_mask) != 0);
-    m_mask <<= 1;
-    return b;
-  }
-
-  /**
-   *  @brief Get a sequence of bits
-   *
-   *  This method gets the next n bits and delivers them as a single unsigned int,
-   *  packing the first bit into the least signification bit. This is the specification
-   *  for reading multiple bit values except Huffmann codes.
-   */
-  unsigned int get_bits (unsigned int n)
-  {
-    //  KLUDGE: take directly from the byte for performance.
-    unsigned int r = 0;
-    unsigned int m = 1;
-    while (n-- > 0) {
-      r |= get_bit () ? m : 0;
-      m <<= 1;
-    }
-    return r;
-  }
-
-  /**
-   *  @brief Skip the next bits up to the next byte boundary
-   */
-  void skip_to_byte ()
-  {
-    m_mask = 0;
-  }
-
-private:
-  tl::InputStream *mp_input;
-  unsigned char m_mask;
-  unsigned char m_byte;
-};
-
-
 /**
  *  @brief A Deflating filter, similar to InflateFilter
  *
@@ -213,19 +129,16 @@ public:
    *  @brief Get the next byte(s)
    *  
    *  This method returns a contiguous block of decoded bytes with the given length.
-   *  The maximum size of the block available is half the buffer size.
+   *  The buffer grows as needed, so any length is available.
    */
   const char *get (size_t n);
 
   /**
-   *  @brief Tell whether "get_byte" can deliver the next byte
-   *
-   *  The last ring position is excluded: "get" rotates the buffer there so
-   *  the read pointer does not wrap and "unget" keeps working.
+   *  @brief Tell whether the buffer holds undelivered bytes
    */
   bool can_get_byte () const
   {
-    return m_b_read != m_b_insert && m_b_read + 1 < m_blen && ! m_at_end;
+    return m_b_read != m_b_insert && ! m_at_end;
   }
 
   /**
@@ -248,26 +161,35 @@ public:
   
 
   /**
+   *  @brief The number of compressed bytes fetched from the input, but not decoded yet
+   */
+  size_t input_pending () const
+  {
+    return m_in_avail;
+  }
+
+  /**
    *  @brief Report true, if no more bytes can be delivered
    */
   bool at_end ();
 
 private:
-  BitStream m_input;
+  tl::InputStream *mp_input;
+  z_stream_s *mp_zs;
+
+  //  compressed input fetched from the raw stream, not yet fed to zlib
+  const char *mp_in;
+  size_t m_in_avail;
 
   char *m_buffer;
   size_t m_blen;
-  unsigned int m_b_insert;
-  unsigned int m_b_read;
+  size_t m_b_insert;
+  size_t m_b_read;
   bool m_at_end;
 
-  //  processor state
-  bool m_last_block;
-  int m_uncompressed_length;
-  HuffmannDecoder *mp_lit_decoder, *mp_dist_decoder;
+  //  zlib has reported the end of the DEFLATE stream
+  bool m_z_end;
 
-  void put_byte (char b);
-  void put_byte_dist (unsigned int d);
   bool process ();
 
 };

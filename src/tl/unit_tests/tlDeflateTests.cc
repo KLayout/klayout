@@ -123,8 +123,8 @@ TEST(3)
 
 
 //  Byte-wise reads through InputStream with a get/unget pair per byte, as the
-//  OASIS reader does inside CBLOCKs. The data is larger than the 64k ring buffer,
-//  so bytes are taken from every ring position including the last one.
+//  OASIS reader does inside CBLOCKs. The data is larger than the 64k output
+//  buffer, so this crosses several refills.
 TEST(4)
 {
   std::string data;

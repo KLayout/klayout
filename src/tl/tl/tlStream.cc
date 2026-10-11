@@ -632,13 +632,13 @@ InputStream::get_slow (size_t n, bool bypass_inflate)
 }
 
 void
-InputStream::unget (size_t n)
+InputStream::unget (size_t n, bool bypass_inflate)
 {
   if (n == 0) {
     return;
   }
 
-  if (mp_inflate) {
+  if (mp_inflate && ! bypass_inflate) {
     //  TODO: this will not work if mp_inflate just got destroyed
     //  (no unget into previous compressed block)
     mp_inflate->unget (n);

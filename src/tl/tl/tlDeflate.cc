@@ -22,6 +22,7 @@
 
 
 #include "tlDeflate.h"
+#include "tlStream.h"
 #include "tlException.h"
 #include "tlAssert.h"
 
@@ -218,6 +219,20 @@ private:
   }
 };
 
+
+// ------------------------------------------------------------------------
+//  BitStream implementation
+
+unsigned char
+BitStream::get_byte ()
+{
+  m_mask = 0;
+  const char *c = mp_input->get (1, true /*bypass_deflate*/);
+  if (c == 0) {
+    throw tl::Exception (tl::to_string (tr ("Unexpected end of file (DEFLATE implementation)")));
+  }
+  return *c;
+}
 
 // ------------------------------------------------------------------------
 //  InflateFilter implementation

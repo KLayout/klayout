@@ -570,7 +570,7 @@ std::string InputStream::relative_path (const std::string &path1, const std::str
 }
 
 const char *
-InputStream::get (size_t n, bool bypass_inflate)
+InputStream::get_slow (size_t n, bool bypass_inflate)
 {
   //  if deflating, employ the deflate filter to get the data
   if (mp_inflate && ! bypass_inflate) {

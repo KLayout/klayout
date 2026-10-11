@@ -649,19 +649,32 @@ public:
     }
 
     auto cc = cache_values (m_y_cached);
-    if (cc != m_sp_cache || always_print) {
+
+    //  TODO: care about actual insert position? Does it matter where we stitch into
+    //  exactly on the contour?
+    auto i = cc.begin ();
+    auto j = m_sp_cache.begin ();
+    bool values_equal = true;
+    while (i != cc.end () && j != m_sp_cache.end () && values_equal) {
+      values_equal = (**i++ == **j++);
+    }
+    if (i != cc.end () || j != m_sp_cache.end ()) {
+      values_equal = false;
+    }
+
+    if (! values_equal || always_print) {
       tl::info << "m_y_cached=" << m_y_cached;
       tl::info << "cc: " << tl::noendl;
       for (auto i = cc.begin (); i != cc.end (); ++i) {
-        tl::info << (*i)->x () << " " << tl::noendl;
+        tl::info << (*i)->to_string () << " " << tl::noendl;
       }
       tl::info << "";
       tl::info << "m_sp_cache: " << tl::noendl;
       for (auto i = m_sp_cache.begin (); i != m_sp_cache.end (); ++i) {
-        tl::info << (*i)->x () << " " << tl::noendl;
+        tl::info << (*i)->to_string () << " " << tl::noendl;
       }
       tl::info << "";
-      if (cc != m_sp_cache) {
+      if (! values_equal) {
         tl::info << "Cache value check failed.";
         return 0;
       } else {
@@ -878,6 +891,7 @@ private:
 // -------------------------------------------------------------------------------
 //  PolygonGenerator implementation
 
+#if defined(DEBUG_POLYGON_GENERATOR)
 static std::string open_map_to_string (PolygonGenerator::open_map_type &map, PolygonGenerator::open_map_iterator_type pos = PolygonGenerator::open_map_iterator_type (), PolygonGenerator::open_map_iterator_type n = PolygonGenerator::open_map_iterator_type (), PolygonGenerator::open_map_iterator_type nn = PolygonGenerator::open_map_iterator_type ())
 {
   std::string res;
@@ -904,6 +918,7 @@ static std::string open_map_to_string (PolygonGenerator::open_map_type &map, Pol
   }
   return res;
 }
+#endif
 
 PolygonGenerator::PolygonGenerator (PolygonSink &psink, bool resolve_holes, bool min_coherence) 
   : EdgeSink (), 

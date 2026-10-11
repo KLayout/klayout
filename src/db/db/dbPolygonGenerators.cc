@@ -38,15 +38,13 @@
 
 //  enables verbose debug output
 //  #define DEBUG_POLYGON_GENERATOR
-// #define DEBUG_POLYGON_GENERATOR // @@@
 
 //  enables the enhanced stitching algorithm that avoids producing too many
 //  overlapping edges during the stitch line generation
 #define ENHANCED_STITCHING
-// #undef ENHANCED_STITCHING // @@@
 
 //  enables sanity checks after generation of polygons
-#define SANITY_CHECK  // @@@
+//  #define SANITY_CHECK
 
 namespace db
 {

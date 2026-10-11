@@ -114,19 +114,12 @@ Transition::operator< (const Transition &other) const
 
     if (device () != 0) {
 
-      //  the category decides first - same priority as before, but without
-      //  calling the device class compare for the actual decision
-      if (m_cat != other.m_cat) {
-        return m_cat < other.m_cat;
-      }
-
-      //  a single three-way comparison replaces the "equals" plus "less" calls
-      //  and skips the parameter comparison entirely for identical devices
-      if (device () != other.device ()) {
-        int cmp = db::DeviceClass::compare (*device (), *other.device ());
-        if (cmp != 0) {
-          return cmp < 0;
-        }
+      //  a single three-way comparison replaces the "equals" plus "less"
+      //  calls and skips the parameter comparison entirely for identical devices
+      DeviceCompare dc;
+      int cmp = dc.compare (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ()));
+      if (cmp != 0) {
+        return cmp < 0;
       }
 
     }
@@ -175,12 +168,9 @@ Transition::operator== (const Transition &other) const
 
     if (device () != 0) {
 
-      if (m_cat != other.m_cat) {
-        return false;
-      }
-
-      //  identical devices are equal under any tolerance scheme
-      if (device () != other.device () && db::DeviceClass::compare (*device (), *other.device ()) != 0) {
+      //  a single three-way comparison replaces the "equals" call
+      DeviceCompare dc;
+      if (dc.compare (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ())) != 0) {
         return false;
       }
 

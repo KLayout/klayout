@@ -132,6 +132,15 @@ struct DB_PUBLIC DeviceCompare
 {
   bool operator() (const std::pair<const db::Device *, size_t> &d1, const std::pair<const db::Device *, size_t> &d2) const;
   bool equals (const std::pair<const db::Device *, size_t> &d1, const std::pair<const db::Device *, size_t> &d2) const;
+
+  /**
+   *  @brief Three-way comparison of the devices
+   *
+   *  This combines "equals" and the "less" operation into a single call:
+   *  it returns -1 if d1 < d2, 1 if d1 > d2 and 0 if both are equal
+   *  under the same criterion "equals" applies.
+   */
+  int compare (const std::pair<const db::Device *, size_t> &d1, const std::pair<const db::Device *, size_t> &d2) const;
 };
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -461,8 +461,11 @@ private:
 //  asserts that compare, less and equal agree on the delegate's "less" answers
 static void expect_compare (tl::TestBase *_this, const db::Device &a, const db::Device &b, bool less_ab, bool less_ba)
 {
-  EXPECT_EQ (db::DeviceClass::compare (a, b), less_ab ? -1 : (less_ba ? 1 : 0));
-  EXPECT_EQ (db::DeviceClass::compare (b, a), less_ba ? -1 : (less_ab ? 1 : 0));
+  //  same category on both sides, so the functor takes the pure device decision
+  const size_t cat = 0;
+  db::DeviceCompare dc;
+  EXPECT_EQ (dc.compare (std::make_pair (&a, cat), std::make_pair (&b, cat)), less_ab ? -1 : (less_ba ? 1 : 0));
+  EXPECT_EQ (dc.compare (std::make_pair (&b, cat), std::make_pair (&a, cat)), less_ba ? -1 : (less_ab ? 1 : 0));
   EXPECT_EQ (db::DeviceClass::less (a, b), less_ab);
   EXPECT_EQ (db::DeviceClass::less (b, a), less_ba);
   EXPECT_EQ (db::DeviceClass::equal (a, b), ! less_ab && ! less_ba);

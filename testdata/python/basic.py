@@ -3431,6 +3431,7 @@ class BasicTest(unittest.TestCase):
   # issue-2495
   def test_96(self):
     if sys.version_info >= (3, 4):
+      tracemalloc.clear_traces()
       tracemalloc.start()
 
     self.assertEqual(repr(pya.A.ft_var([ 1, 2, { 1: "one", 2: "two" } ])), "[1, 2, {1: 'one', 2: 'two'}]")
@@ -3440,6 +3441,7 @@ class BasicTest(unittest.TestCase):
       gc.collect()
       mem = tracemalloc.get_traced_memory()[0]
       self.assertEqual(mem, 0)
+      tracemalloc.stop()
 
 # run unit tests
 if __name__ == '__main__':

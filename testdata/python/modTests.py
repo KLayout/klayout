@@ -35,8 +35,8 @@ class ModuleTest(unittest.TestCase):
 if __name__ == '__main__':
   suite = unittest.TestSuite()
   # NOTE: Use this instead of loadTestsfromTestCase to select a specific test:
-  #   suite.addTest(BasicTest("test_26"))
-  suite = unittest.TestLoader().loadTestsFromTestCase(BasicTest)
+  #   suite.addTest(ModuleTest("test_1"))
+  suite = unittest.TestLoader().loadTestsFromTestCase(ModuleTest)
 
   if not unittest.TextTestRunner(verbosity = 1).run(suite).wasSuccessful():
     sys.exit(1)

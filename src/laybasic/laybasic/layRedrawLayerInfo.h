@@ -25,7 +25,6 @@
 #define HDR_layRedrawLayerInfo
 
 #include <vector>
-#include <memory>
 #include "dbTrans.h"
 #include "dbPropertiesRepository.h"
 #include "layParsedLayerSource.h"
@@ -119,9 +118,9 @@ struct RedrawLayerInfo
   bool inverse_prop_sel;
 
   /**
-   *  @brief Cells (by cell index) in which this layer is not drawn, null if none (set by LayoutViewBase::redraw)
+   *  @brief Cells (by cell index) in which this layer is not drawn (set by the constructor)
    */
-  std::shared_ptr<const std::vector<db::cell_index_type> > hidden_cells;
+  std::vector<db::cell_index_type> hidden_cells;
 
   /**
    *  @brief Returns true, if the layer needs to be drawn

@@ -631,3 +631,11 @@ TEST (11)
   EXPECT_EQ (tspath (layout, c1.cell_index (), pt), "+C1(+C2(-C3(-C5+CC3)+C4(+CC4)+CC2)+CC1)");
 }
 
+TEST (12)
+{
+  lay::ParsedLayerSource ps ("1/0@2 -7 -3");
+  EXPECT_EQ (ps.to_string (), "1/0@2 -7 -3");
+  EXPECT_EQ (ps.hidden_cells ().size (), size_t (2));
+  EXPECT_EQ (ps == lay::ParsedLayerSource ("1/0@2"), false);
+  EXPECT_EQ (lay::ParsedLayerSource ("METAL -3").to_string (), "METAL@1 -3");
+}

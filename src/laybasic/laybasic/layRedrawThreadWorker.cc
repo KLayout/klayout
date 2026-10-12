@@ -258,9 +258,9 @@ RedrawThreadWorker::perform_task (tl::Task *task)
         m_cv_index = li.cellview_index;
         db::cell_index_type ci = cv.cell_index ();
 
-        if (li.hidden_cells) {
+        if (! li.hidden_cells.empty ()) {
           m_layer_hidden_cells.resize (mp_layout->cells (), false);
-          for (auto hc = li.hidden_cells->begin (); hc != li.hidden_cells->end (); ++hc) {
+          for (auto hc = li.hidden_cells.begin (); hc != li.hidden_cells.end (); ++hc) {
             if (*hc < m_layer_hidden_cells.size ()) {
               m_layer_hidden_cells [*hc] = true;
             }

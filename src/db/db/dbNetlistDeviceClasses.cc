@@ -304,12 +304,12 @@ class MOS3DeviceCombiner
 public:
   bool combine_devices (Device *a, Device *b) const
   {
-    const db::Net *nas = a->net_for_terminal (0);
-    const db::Net *nag = a->net_for_terminal (1);
-    const db::Net *nad = a->net_for_terminal (2);
-    const db::Net *nbs = b->net_for_terminal (0);
-    const db::Net *nbg = b->net_for_terminal (1);
-    const db::Net *nbd = b->net_for_terminal (2);
+    const db::Net *nas = a->net_for_terminal (DeviceClassMOS3Transistor::terminal_id_S);
+    const db::Net *nag = a->net_for_terminal (DeviceClassMOS3Transistor::terminal_id_G);
+    const db::Net *nad = a->net_for_terminal (DeviceClassMOS3Transistor::terminal_id_D);
+    const db::Net *nbs = b->net_for_terminal (DeviceClassMOS3Transistor::terminal_id_S);
+    const db::Net *nbg = b->net_for_terminal (DeviceClassMOS3Transistor::terminal_id_G);
+    const db::Net *nbd = b->net_for_terminal (DeviceClassMOS3Transistor::terminal_id_D);
 
     //  parallel transistors can be combined into one
     if (((nas == nbs && nad == nbd) || (nas == nbd && nad == nbs)) && nag == nbg) {
@@ -317,17 +317,23 @@ public:
       //  for combination the gate length must be identical
       if (DeviceClassMOS3Transistor::lengths_are_identical (a, b)) {
 
-        combine_parameters (a, b);
-
         if (nas == nbs && nad == nbd) {
-          a->join_terminals (0, b, 0);
-          a->join_terminals (2, b, 2);
+
+          combine_parameters (a, b, false);
+
+          a->join_terminals (DeviceClassMOS3Transistor::terminal_id_S, b, DeviceClassMOS3Transistor::terminal_id_S);
+          a->join_terminals (DeviceClassMOS3Transistor::terminal_id_D, b, DeviceClassMOS3Transistor::terminal_id_D);
+
         } else {
-          a->join_terminals (0, b, 2);
-          a->join_terminals (2, b, 0);
+
+          combine_parameters (a, b, true);
+
+          a->join_terminals (DeviceClassMOS3Transistor::terminal_id_S, b, DeviceClassMOS3Transistor::terminal_id_D);
+          a->join_terminals (DeviceClassMOS3Transistor::terminal_id_D, b, DeviceClassMOS3Transistor::terminal_id_S);
+
         }
 
-        a->join_terminals (1, b, 1);
+        a->join_terminals (DeviceClassMOS3Transistor::terminal_id_G, b, DeviceClassMOS3Transistor::terminal_id_G);
 
         return true;
 
@@ -338,13 +344,25 @@ public:
     return false;
   }
 
-  void combine_parameters (Device *a, Device *b) const
+  void combine_parameters (Device *a, Device *b, bool swap_sd) const
   {
-    a->set_parameter_value (1, a->parameter_value (1) + b->parameter_value (1));
-    a->set_parameter_value (2, a->parameter_value (2) + b->parameter_value (2));
-    a->set_parameter_value (3, a->parameter_value (3) + b->parameter_value (3));
-    a->set_parameter_value (4, a->parameter_value (4) + b->parameter_value (4));
-    a->set_parameter_value (5, a->parameter_value (5) + b->parameter_value (5));
+    a->set_parameter_value (DeviceClassMOS3Transistor::param_id_W, a->parameter_value (DeviceClassMOS3Transistor::param_id_W) + b->parameter_value (DeviceClassMOS3Transistor::param_id_W));
+
+    if (! swap_sd) {
+
+      a->set_parameter_value (DeviceClassMOS3Transistor::param_id_AS, a->parameter_value (DeviceClassMOS3Transistor::param_id_AS) + b->parameter_value (DeviceClassMOS3Transistor::param_id_AS));
+      a->set_parameter_value (DeviceClassMOS3Transistor::param_id_AD, a->parameter_value (DeviceClassMOS3Transistor::param_id_AD) + b->parameter_value (DeviceClassMOS3Transistor::param_id_AD));
+      a->set_parameter_value (DeviceClassMOS3Transistor::param_id_PS, a->parameter_value (DeviceClassMOS3Transistor::param_id_PS) + b->parameter_value (DeviceClassMOS3Transistor::param_id_PS));
+      a->set_parameter_value (DeviceClassMOS3Transistor::param_id_PD, a->parameter_value (DeviceClassMOS3Transistor::param_id_PD) + b->parameter_value (DeviceClassMOS3Transistor::param_id_PD));
+
+    } else {
+
+      a->set_parameter_value (DeviceClassMOS3Transistor::param_id_AS, a->parameter_value (DeviceClassMOS3Transistor::param_id_AS) + b->parameter_value (DeviceClassMOS3Transistor::param_id_AD));
+      a->set_parameter_value (DeviceClassMOS3Transistor::param_id_AD, a->parameter_value (DeviceClassMOS3Transistor::param_id_AD) + b->parameter_value (DeviceClassMOS3Transistor::param_id_AS));
+      a->set_parameter_value (DeviceClassMOS3Transistor::param_id_PS, a->parameter_value (DeviceClassMOS3Transistor::param_id_PS) + b->parameter_value (DeviceClassMOS3Transistor::param_id_PD));
+      a->set_parameter_value (DeviceClassMOS3Transistor::param_id_PD, a->parameter_value (DeviceClassMOS3Transistor::param_id_PD) + b->parameter_value (DeviceClassMOS3Transistor::param_id_PS));
+
+    }
   }
 };
 
@@ -354,14 +372,14 @@ class MOS4DeviceCombiner
 public:
   bool combine_devices (Device *a, Device *b) const
   {
-    const db::Net *nas = a->net_for_terminal (0);
-    const db::Net *nag = a->net_for_terminal (1);
-    const db::Net *nad = a->net_for_terminal (2);
-    const db::Net *nab = a->net_for_terminal (3);
-    const db::Net *nbs = b->net_for_terminal (0);
-    const db::Net *nbg = b->net_for_terminal (1);
-    const db::Net *nbd = b->net_for_terminal (2);
-    const db::Net *nbb = b->net_for_terminal (3);
+    const db::Net *nas = a->net_for_terminal (DeviceClassMOS4Transistor::terminal_id_S);
+    const db::Net *nag = a->net_for_terminal (DeviceClassMOS4Transistor::terminal_id_G);
+    const db::Net *nad = a->net_for_terminal (DeviceClassMOS4Transistor::terminal_id_D);
+    const db::Net *nab = a->net_for_terminal (DeviceClassMOS4Transistor::terminal_id_B);
+    const db::Net *nbs = b->net_for_terminal (DeviceClassMOS4Transistor::terminal_id_S);
+    const db::Net *nbg = b->net_for_terminal (DeviceClassMOS4Transistor::terminal_id_G);
+    const db::Net *nbd = b->net_for_terminal (DeviceClassMOS4Transistor::terminal_id_D);
+    const db::Net *nbb = b->net_for_terminal (DeviceClassMOS4Transistor::terminal_id_B);
 
     //  parallel transistors can be combined into one
     if (((nas == nbs && nad == nbd) || (nas == nbd && nad == nbs)) && nag == nbg && nab == nbb) {
@@ -369,18 +387,24 @@ public:
       //  for combination the gate length must be identical
       if (DeviceClassMOS3Transistor::lengths_are_identical (a, b)) {
 
-        combine_parameters (a, b);
-
         if (nas == nbs && nad == nbd) {
-          a->join_terminals (0, b, 0);
-          a->join_terminals (2, b, 2);
+
+          combine_parameters (a, b, false);
+
+          a->join_terminals (DeviceClassMOS4Transistor::terminal_id_S, b, DeviceClassMOS4Transistor::terminal_id_S);
+          a->join_terminals (DeviceClassMOS4Transistor::terminal_id_D, b, DeviceClassMOS4Transistor::terminal_id_D);
+
         } else {
-          a->join_terminals (0, b, 2);
-          a->join_terminals (2, b, 0);
+
+          combine_parameters (a, b, true);
+
+          a->join_terminals (DeviceClassMOS4Transistor::terminal_id_S, b, DeviceClassMOS4Transistor::terminal_id_D);
+          a->join_terminals (DeviceClassMOS4Transistor::terminal_id_D, b, DeviceClassMOS4Transistor::terminal_id_S);
+
         }
 
-        a->join_terminals (1, b, 1);
-        a->join_terminals (3, b, 3);
+        a->join_terminals (DeviceClassMOS4Transistor::terminal_id_G, b, DeviceClassMOS4Transistor::terminal_id_G);
+        a->join_terminals (DeviceClassMOS4Transistor::terminal_id_B, b, DeviceClassMOS4Transistor::terminal_id_B);
 
         return true;
 

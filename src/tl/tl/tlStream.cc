@@ -1222,7 +1222,7 @@ OutputStream::flush ()
 }
 
 void
-OutputStream::put (const char *b, size_t n)
+OutputStream::put_slow (const char *b, size_t n)
 {
   if (! mp_delegate) {
     return;
@@ -1256,7 +1256,7 @@ OutputStream::put (const char *b, size_t n)
 }
 
 void
-OutputStream::put_raw (const char *b, size_t n)
+OutputStream::put_raw_slow (const char *b, size_t n)
 {
   m_pos += n;
 

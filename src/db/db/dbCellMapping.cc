@@ -27,6 +27,7 @@
 #include "dbLayoutUtils.h"
 #include "dbCellInstanceSetHasher.h"
 #include "dbHash.h"
+#include "dbLibraryProxy.h"
 #include "tlLog.h"
 #include "tlTimer.h"
 
@@ -483,23 +484,23 @@ CellMapping::create_from_names (const db::Layout &layout_a, db::cell_index_type 
 }
 
 std::vector<db::cell_index_type> 
-CellMapping::create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells)
+CellMapping::create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, bool skip_same_library_cells)
 {
   std::vector<db::cell_index_type> new_cells;
-  do_create_missing_mapping (layout_a, layout_b, cell_index_b, exclude_cells, include_cells, &new_cells, 0);
+  do_create_missing_mapping (layout_a, layout_b, cell_index_b, exclude_cells, include_cells, &new_cells, 0, skip_same_library_cells);
   return new_cells;
 }
 
 std::vector<std::pair<db::cell_index_type, db::cell_index_type> >
-CellMapping::create_missing_mapping2 (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells)
+CellMapping::create_missing_mapping2 (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, bool skip_same_library_cells)
 {
   std::vector<std::pair<db::cell_index_type, db::cell_index_type> > cell_pairs;
-  do_create_missing_mapping (layout_a, layout_b, cell_index_b, exclude_cells, include_cells, 0, &cell_pairs);
+  do_create_missing_mapping (layout_a, layout_b, cell_index_b, exclude_cells, include_cells, 0, &cell_pairs, skip_same_library_cells);
   return cell_pairs;
 }
 
 void
-CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, std::vector<db::cell_index_type> *new_cells_ptr, std::vector<std::pair<db::cell_index_type, db::cell_index_type> > *mapped_pairs)
+CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, std::vector<db::cell_index_type> *new_cells_ptr, std::vector<std::pair<db::cell_index_type, db::cell_index_type> > *mapped_pairs, bool skip_same_library_cells)
 {
   std::vector<db::cell_index_type> new_cells_int;
   std::vector<db::cell_index_type> &new_cells = *(new_cells_ptr ? new_cells_ptr : &new_cells_int);
@@ -516,6 +517,44 @@ CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &
   for (std::vector<db::cell_index_type>::const_iterator i = cell_index_b.begin (); i != cell_index_b.end (); ++i) {
     layout_b.cell (*i).collect_called_cells (called_b);
     called_b.insert (*i);
+  }
+
+  //  collect matching library cells if required
+  if (skip_same_library_cells) {
+
+    size_t n_a2b = all_a2b.size ();
+
+    std::map<std::pair<db::lib_id_type, db::cell_index_type>, db::cell_index_type> libcell_to_cell;
+    for (auto c = layout_a.begin (); c != layout_a.end (); ++c) {
+      const db::Cell *cptr = c.operator-> ();
+      const db::LibraryProxy *lib_proxy;
+      if (cptr->is_proxy () && (lib_proxy = dynamic_cast<const db::LibraryProxy *> (cptr)) != 0) {
+        libcell_to_cell.insert (std::make_pair (std::make_pair (lib_proxy->lib_id (), lib_proxy->library_cell_index ()), cptr->cell_index ()));
+      }
+    }
+
+    for (auto c = called_b.begin (); c != called_b.end (); ++c) {
+      const db::Cell *cptr = &layout_b.cell (*c);
+      const db::LibraryProxy *lib_proxy;
+      if (cptr->is_proxy () && (lib_proxy = dynamic_cast<const db::LibraryProxy *> (cptr)) != 0) {
+        auto m = libcell_to_cell.find (std::make_pair (lib_proxy->lib_id (), lib_proxy->library_cell_index ()));
+        if (m != libcell_to_cell.end ()) {
+          all_a2b.push_back (std::make_pair (*c, m->second));
+        }
+      }
+    }
+
+    std::set<db::cell_index_type> called_lib_b;
+    for (auto i = all_a2b.begin () + n_a2b; i != all_a2b.end (); ++i) {
+      layout_b.cell (i->second).collect_called_cells (called_lib_b);
+      called_lib_b.insert (i->second);
+    }
+
+    for (auto i = called_lib_b.begin (); i != called_lib_b.end (); ++i) {
+      called_b.erase (*i);
+      map (*i, db::DropCell);
+    }
+
   }
 
   for (std::set<db::cell_index_type>::const_iterator b = called_b.begin (); b != called_b.end (); ++b) {

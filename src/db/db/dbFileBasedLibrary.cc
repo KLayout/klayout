@@ -24,6 +24,7 @@
 #include "dbFileBasedLibrary.h"
 #include "dbReader.h"
 #include "dbCellMapping.h"
+#include "dbLayoutUtils.h"
 
 #include "tlFileUtils.h"
 #include "tlStream.h"
@@ -138,7 +139,11 @@ FileBasedLibrary::merge_impl (const std::string &path)
   }
 
   db::CellMapping cm;
-  cm.create_multi_mapping_full (layout (), target_cells, ly, source_cells);
+  cm.create_multi_mapping (layout (), target_cells, ly, source_cells);
+
+  //  create a mapping for the missing cells, reusing identical library cells
+  cm.create_missing_mapping (layout (), ly, source_cells, 0, 0, true);
+
   layout ().copy_tree_shapes (ly, cm);
 }
 

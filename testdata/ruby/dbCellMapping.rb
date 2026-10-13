@@ -60,6 +60,31 @@ def mapping_to_s_from_table(ly1, ly2, cm)
   r
 end
 
+class TestLib < RBA::Library
+
+  def initialize  
+  
+    # set the description
+    self.description = "Test lib for cell merging"
+    
+    sb_index = layout.add_cell("StaticBox")
+    hier_index = layout.add_cell("HierBox")
+
+    l1 = layout.insert_layer(RBA::LayerInfo::new(1, 0))
+
+    sb_cell = layout.cell(sb_index)
+    sb_cell.shapes(l1).insert(RBA::Box::new(0, 0, 100, 200))
+    
+    hier_cell = layout.cell(hier_index)
+    hier_cell.insert(RBA::CellInstArray::new(sb_index, RBA::Trans::new(1, 2)))
+    
+    # register us with the name "CellMappingTestLib"
+    register("CellMappingTestLib")
+    
+  end
+
+end
+
 class DBCellMapping_TestClass < TestBase
 
   def test_1
@@ -319,6 +344,247 @@ class DBCellMapping_TestClass < TestBase
     assert_equal(nc.inspect, "[3, 4, 5]")
 
     assert_equal(mapping_to_s(lytdup, ly, cm), "a0=>b0;a1=>b1;a2=>b2;a3=>a3;a4=>a4;a5=>a5")
+
+  end
+
+  # Mapping while skipping library references
+  def test_4
+
+    tl = TestLib::new
+
+    a = RBA::Layout::new
+    l2 = a.layer(2, 0)
+
+    a0 = a.create_cell("a0")
+    a0.shapes(l2).insert(RBA::Box::new(0, 0, 100, 200))
+
+    a1 = a.create_cell("HierBox", tl.name)
+    a0.insert(RBA::CellInstArray::new(a1, RBA::Trans::new))
+
+    a2 = a.create_cell("a2")
+    a2.shapes(l2).insert(RBA::Box::new(10, 20, 110, 120))
+    a0.insert(RBA::CellInstArray::new(a2, RBA::Trans::new(0, 1000)))
+
+    a3 = a.create_cell("a3")
+
+    l1 = a.layer(1, 0)
+
+    assert_equal(RBA::Region::new(a0.begin_shapes_rec(l1)).to_s, "(1,2;1,202;101,202;101,2)")
+    assert_equal(RBA::Region::new(a0.begin_shapes_rec(l2)).to_s, "(0,0;0,200;100,200;100,0);(10,1020;10,1120;110,1120;110,1020)")
+
+    b = RBA::Layout::new
+    l3 = b.layer(3, 0)
+    
+    b0 = b.create_cell("b0")
+    b0.shapes(l3).insert(RBA::Box::new(0, 0, 200, 100))
+
+    b1 = b.create_cell("HierBox", tl.name)
+
+    b0.insert(RBA::CellInstArray::new(b1, RBA::Trans::new(2, 1)))
+
+    l1 = b.layer(1, 0)
+
+    assert_equal(RBA::Region::new(b0.begin_shapes_rec(l1)).to_s, "(3,3;3,203;103,203;103,3)")
+    assert_equal(RBA::Region::new(b0.begin_shapes_rec(l3)).to_s, "(0,0;0,100;200,100;200,0)")
+
+    # Testing mapping of b0 to a0
+
+    adup = a.dup
+    bdup = b.dup
+
+    cm = RBA::CellMapping::new
+    nc = cm.for_single_cell_full(adup, a0.cell_index, bdup, b0.cell_index)
+    assert_equal(nc.inspect, "[5, 6]")
+
+    # This mapping creates new cells for HierBox and StaticBox as the identical library cell is not recognized
+    assert_equal(mapping_to_s(adup, bdup, cm), "b0=>a0;HierBox=>HierBox$1;StaticBox=>StaticBox$1")
+
+    adup.copy_tree_shapes(bdup, cm)
+
+    a0dup = adup.cell(a0.cell_index)
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(1, 0))).to_s, "(1,2;1,202;101,202;101,2);(3,3;3,203;103,203;103,3)")
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(2, 0))).to_s, "(0,0;0,200;100,200;100,0);(10,1020;10,1120;110,1120;110,1020)")
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(3, 0))).to_s, "(0,0;0,100;200,100;200,0)")
+
+    assert_equal(adup.each_cell.collect { |c| c.qname }.sort.join(","), "CellMappingTestLib.HierBox,CellMappingTestLib.StaticBox,HierBox$1,StaticBox$1,a0,a2,a3")
+
+    # Testing mapping with library cell preservation 
+
+    adup = a.dup
+    bdup = b.dup
+
+    cm = RBA::CellMapping::new
+    nc = cm.for_single_cell_full(adup, a0.cell_index, bdup, b0.cell_index, true)
+    assert_equal(nc.inspect, "[]")
+
+    # This mapping creates new cells for HierBox and StaticBox as the identical library cell is not recognized
+    assert_equal(mapping_to_s(adup, bdup, cm), "b0=>a0;HierBox=>(0);StaticBox=>(0)")
+
+    adup.copy_tree_shapes(bdup, cm)
+
+    a0dup = adup.cell(a0.cell_index)
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(1, 0))).to_s, "(1,2;1,202;101,202;101,2);(3,3;3,203;103,203;103,3)")
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(2, 0))).to_s, "(0,0;0,200;100,200;100,0);(10,1020;10,1120;110,1120;110,1020)")
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(3, 0))).to_s, "(0,0;0,100;200,100;200,0)")
+
+    assert_equal(adup.each_cell.collect { |c| c.qname }.sort.join(","), "CellMappingTestLib.HierBox,CellMappingTestLib.StaticBox,a0,a2,a3")
+
+    # Testing mapping with library cell preservation in cell object mode
+
+    adup = a.dup
+    bdup = b.dup
+
+    cm = RBA::CellMapping::new
+    nc = cm.for_single_cell_full(adup.cell(a0.cell_index), bdup.cell(b0.cell_index), true)
+    assert_equal(nc.inspect, "[]")
+
+    # This mapping creates new cells for HierBox and StaticBox as the identical library cell is not recognized
+    assert_equal(mapping_to_s(adup, bdup, cm), "b0=>a0;HierBox=>(0);StaticBox=>(0)")
+
+    adup.copy_tree_shapes(bdup, cm)
+
+    a0dup = adup.cell(a0.cell_index)
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(1, 0))).to_s, "(1,2;1,202;101,202;101,2);(3,3;3,203;103,203;103,3)")
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(2, 0))).to_s, "(0,0;0,200;100,200;100,0);(10,1020;10,1120;110,1120;110,1020)")
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(3, 0))).to_s, "(0,0;0,100;200,100;200,0)")
+
+    assert_equal(adup.each_cell.collect { |c| c.qname }.sort.join(","), "CellMappingTestLib.HierBox,CellMappingTestLib.StaticBox,a0,a2,a3")
+
+    # Testing mapping with library cell preservation and name-based mapper
+
+    adup = a.dup
+    bdup = b.dup
+
+    # makes the names match ...
+    adup.cell(a0.cell_index).name = "b0"
+
+    cm = RBA::CellMapping::new
+    nc = cm.from_names_full(adup, a0.cell_index, bdup, b0.cell_index, true)
+    assert_equal(nc.inspect, "[]")
+
+    # This mapping creates new cells for HierBox and StaticBox as the identical library cell is not recognized
+    assert_equal(mapping_to_s(adup, bdup, cm), "b0=>b0;HierBox=>(0);StaticBox=>(0)")
+
+    adup.copy_tree_shapes(bdup, cm)
+
+    a0dup = adup.cell(a0.cell_index)
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(1, 0))).to_s, "(1,2;1,202;101,202;101,2);(3,3;3,203;103,203;103,3)")
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(2, 0))).to_s, "(0,0;0,200;100,200;100,0);(10,1020;10,1120;110,1120;110,1020)")
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(3, 0))).to_s, "(0,0;0,100;200,100;200,0)")
+
+    assert_equal(adup.each_cell.collect { |c| c.qname }.sort.join(","), "CellMappingTestLib.HierBox,CellMappingTestLib.StaticBox,a2,a3,b0")
+
+    # Testing mapping with library cell preservation and name-based mapper in cell object mode
+
+    adup = a.dup
+    bdup = b.dup
+
+    # makes the names match ...
+    adup.cell(a0.cell_index).name = "b0"
+
+    cm = RBA::CellMapping::new
+    nc = cm.from_names_full(adup.cell(a0.cell_index), bdup.cell(b0.cell_index), true)
+    assert_equal(nc.inspect, "[]")
+
+    # This mapping creates new cells for HierBox and StaticBox as the identical library cell is not recognized
+    assert_equal(mapping_to_s(adup, bdup, cm), "b0=>b0;HierBox=>(0);StaticBox=>(0)")
+
+    adup.copy_tree_shapes(bdup, cm)
+
+    a0dup = adup.cell(a0.cell_index)
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(1, 0))).to_s, "(1,2;1,202;101,202;101,2);(3,3;3,203;103,203;103,3)")
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(2, 0))).to_s, "(0,0;0,200;100,200;100,0);(10,1020;10,1120;110,1120;110,1020)")
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(3, 0))).to_s, "(0,0;0,100;200,100;200,0)")
+
+    assert_equal(adup.each_cell.collect { |c| c.qname }.sort.join(","), "CellMappingTestLib.HierBox,CellMappingTestLib.StaticBox,a2,a3,b0")
+
+    # Testing mapping with library cell preservation and geometry-based mapper
+
+    adup = a.dup
+    bdup = b.dup
+
+    cm = RBA::CellMapping::new
+    nc = cm.from_geometry_full(adup, a0.cell_index, bdup, b0.cell_index, true)
+    assert_equal(nc.inspect, "[]")
+
+    # This mapping creates new cells for HierBox and StaticBox as the identical library cell is not recognized
+    assert_equal(mapping_to_s(adup, bdup, cm), "b0=>a0;HierBox=>(0);StaticBox=>(0)")
+
+    adup.copy_tree_shapes(bdup, cm)
+
+    a0dup = adup.cell(a0.cell_index)
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(1, 0))).to_s, "(1,2;1,202;101,202;101,2);(3,3;3,203;103,203;103,3)")
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(2, 0))).to_s, "(0,0;0,200;100,200;100,0);(10,1020;10,1120;110,1120;110,1020)")
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(3, 0))).to_s, "(0,0;0,100;200,100;200,0)")
+
+    assert_equal(adup.each_cell.collect { |c| c.qname }.sort.join(","), "CellMappingTestLib.HierBox,CellMappingTestLib.StaticBox,a0,a2,a3")
+
+    # Testing mapping with library cell preservation and geometry-based mapper in cell object mode
+
+    adup = a.dup
+    bdup = b.dup
+
+    cm = RBA::CellMapping::new
+    nc = cm.from_geometry_full(adup.cell(a0.cell_index), bdup.cell(b0.cell_index), true)
+    assert_equal(nc.inspect, "[]")
+
+    # This mapping creates new cells for HierBox and StaticBox as the identical library cell is not recognized
+    assert_equal(mapping_to_s(adup, bdup, cm), "b0=>a0;HierBox=>(0);StaticBox=>(0)")
+
+    adup.copy_tree_shapes(bdup, cm)
+
+    a0dup = adup.cell(a0.cell_index)
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(1, 0))).to_s, "(1,2;1,202;101,202;101,2);(3,3;3,203;103,203;103,3)")
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(2, 0))).to_s, "(0,0;0,200;100,200;100,0);(10,1020;10,1120;110,1120;110,1020)")
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(3, 0))).to_s, "(0,0;0,100;200,100;200,0)")
+
+    assert_equal(adup.each_cell.collect { |c| c.qname }.sort.join(","), "CellMappingTestLib.HierBox,CellMappingTestLib.StaticBox,a0,a2,a3")
+
+    # Testing mapping with library cell preservation and multi-cell mapper
+
+    adup = a.dup
+    bdup = b.dup
+
+    cm = RBA::CellMapping::new
+    nc = cm.for_multi_cells_full(adup, [ a0.cell_index ], bdup, [ b0.cell_index ], true)
+    assert_equal(nc.inspect, "[]")
+
+    # This mapping creates new cells for HierBox and StaticBox as the identical library cell is not recognized
+    assert_equal(mapping_to_s(adup, bdup, cm), "b0=>a0;HierBox=>(0);StaticBox=>(0)")
+
+    adup.copy_tree_shapes(bdup, cm)
+
+    a0dup = adup.cell(a0.cell_index)
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(1, 0))).to_s, "(1,2;1,202;101,202;101,2);(3,3;3,203;103,203;103,3)")
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(2, 0))).to_s, "(0,0;0,200;100,200;100,0);(10,1020;10,1120;110,1120;110,1020)")
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(3, 0))).to_s, "(0,0;0,100;200,100;200,0)")
+
+    assert_equal(adup.each_cell.collect { |c| c.qname }.sort.join(","), "CellMappingTestLib.HierBox,CellMappingTestLib.StaticBox,a0,a2,a3")
+
+    # Testing mapping with library cell preservation and multi-cell mapper in cell-object mode
+
+    adup = a.dup
+    bdup = b.dup
+
+    cm = RBA::CellMapping::new
+    nc = cm.for_multi_cells_full([ adup.cell(a0.cell_index) ], [ bdup.cell(b0.cell_index) ], true)
+    assert_equal(nc.inspect, "[]")
+
+    # This mapping creates new cells for HierBox and StaticBox as the identical library cell is not recognized
+    assert_equal(mapping_to_s(adup, bdup, cm), "b0=>a0;HierBox=>(0);StaticBox=>(0)")
+
+    adup.copy_tree_shapes(bdup, cm)
+
+    a0dup = adup.cell(a0.cell_index)
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(1, 0))).to_s, "(1,2;1,202;101,202;101,2);(3,3;3,203;103,203;103,3)")
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(2, 0))).to_s, "(0,0;0,200;100,200;100,0);(10,1020;10,1120;110,1120;110,1020)")
+    assert_equal(RBA::Region::new(a0dup.begin_shapes_rec(adup.layer(3, 0))).to_s, "(0,0;0,100;200,100;200,0)")
+
+    assert_equal(adup.each_cell.collect { |c| c.qname }.sort.join(","), "CellMappingTestLib.HierBox,CellMappingTestLib.StaticBox,a0,a2,a3")
+
+    # cleanup 
+
+    tl._destroy
 
   end
 

@@ -315,6 +315,8 @@ public:
   virtual void render_vertices (std::vector<lay::RenderEdge> &edges, int mode);
 
 private:
+  uint32_t *alloc_scanline (unsigned int n);
+
   unsigned int m_width;
   unsigned int m_height;
   double m_resolution, m_font_resolution;
@@ -392,6 +394,16 @@ Bitmap::last_scanline () const
 {
   return m_last_sl;
 }  
+
+inline uint32_t *
+Bitmap::scanline (unsigned int n)
+{
+  if (! m_scanlines.empty () && m_scanlines [n] != 0) {
+    return m_scanlines [n];
+  } else {
+    return alloc_scanline (n);
+  }
+}
 
 inline const uint32_t *
 Bitmap::scanline (unsigned n) const

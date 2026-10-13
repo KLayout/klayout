@@ -43,21 +43,21 @@ static void create_single_mapping (db::CellMapping *cm, db::Cell &a, const db::C
   cm->create_single_mapping (*a.layout (), a.cell_index (), *b.layout(), b.cell_index ());
 }
 
-static std::vector<db::cell_index_type> create_single_mapping_full (db::CellMapping *cm, db::Cell &a, const db::Cell &b, bool skip_same_library_cells)
+static std::vector<db::cell_index_type> create_single_mapping_full (db::CellMapping *cm, db::Cell &a, const db::Cell &b, bool preserve_library_references)
 {
   tl_assert (a.layout () != 0);
   tl_assert (b.layout () != 0);
   cm->create_single_mapping (*a.layout (), a.cell_index (), *b.layout(), b.cell_index ());
-  return cm->create_missing_mapping (*a.layout (), *b.layout(), b.cell_index (), 0, 0, skip_same_library_cells);
+  return cm->create_missing_mapping (*a.layout (), *b.layout(), b.cell_index (), 0, 0, preserve_library_references);
 }
 
-static std::vector<db::cell_index_type> create_single_mapping_full2 (db::CellMapping *cm, db::Layout &la, db::cell_index_type a, const db::Layout &lb, db::cell_index_type b, bool skip_same_library_cells)
+static std::vector<db::cell_index_type> create_single_mapping_full2 (db::CellMapping *cm, db::Layout &la, db::cell_index_type a, const db::Layout &lb, db::cell_index_type b, bool preserve_library_references)
 {
   cm->create_single_mapping (la, a, lb, b);
-  return cm->create_missing_mapping (la, lb, b, 0, 0, skip_same_library_cells);
+  return cm->create_missing_mapping (la, lb, b, 0, 0, preserve_library_references);
 }
 
-static std::vector<db::cell_index_type> create_multi_mapping_gen (db::CellMapping *cm, const std::vector<db::Cell *> &a, const std::vector<const db::Cell *> &b, bool full, bool skip_same_library_cells)
+static std::vector<db::cell_index_type> create_multi_mapping_gen (db::CellMapping *cm, const std::vector<db::Cell *> &a, const std::vector<const db::Cell *> &b, bool full, bool preserve_library_references)
 {
   db::Layout *lya = 0;
   const db::Layout *lyb = 0;
@@ -87,22 +87,22 @@ static std::vector<db::cell_index_type> create_multi_mapping_gen (db::CellMappin
 
   if (full) {
     cm->create_multi_mapping (*lya, cia, *lyb, cib);
-    return cm->create_missing_mapping (*lya, *lyb, cib, 0, 0, skip_same_library_cells);
+    return cm->create_missing_mapping (*lya, *lyb, cib, 0, 0, preserve_library_references);
   } else {
     cm->create_multi_mapping (*lya, cia, *lyb, cib);
     return std::vector<db::cell_index_type> ();
   }
 }
 
-static std::vector<db::cell_index_type> create_multi_mapping_full (db::CellMapping *cm, const std::vector<db::Cell *> &a, const std::vector<const db::Cell *> &b, bool skip_same_library_cells)
+static std::vector<db::cell_index_type> create_multi_mapping_full (db::CellMapping *cm, const std::vector<db::Cell *> &a, const std::vector<const db::Cell *> &b, bool preserve_library_references)
 {
-  return create_multi_mapping_gen (cm, a, b, true, skip_same_library_cells);
+  return create_multi_mapping_gen (cm, a, b, true, preserve_library_references);
 }
 
-static std::vector<db::cell_index_type> create_multi_mapping_full2 (db::CellMapping *cm, db::Layout &la, const std::vector<db::cell_index_type> &a, const db::Layout &lb, const std::vector<db::cell_index_type> &b, bool skip_same_library_cells)
+static std::vector<db::cell_index_type> create_multi_mapping_full2 (db::CellMapping *cm, db::Layout &la, const std::vector<db::cell_index_type> &a, const db::Layout &lb, const std::vector<db::cell_index_type> &b, bool preserve_library_references)
 {
   cm->create_multi_mapping (la, a, lb, b);
-  return cm->create_missing_mapping (la, lb, b, 0, 0, skip_same_library_cells);
+  return cm->create_missing_mapping (la, lb, b, 0, 0, preserve_library_references);
 }
 
 static void create_multi_mapping (db::CellMapping *cm, const std::vector<db::Cell *> &a, const std::vector<const db::Cell *> &b)
@@ -117,18 +117,18 @@ static void create_from_geometry (db::CellMapping *cm, db::Cell &a, const db::Ce
   cm->create_from_geometry (*a.layout (), a.cell_index (), *b.layout(), b.cell_index ());
 }
 
-static std::vector<db::cell_index_type> create_from_geometry_full (db::CellMapping *cm, db::Cell &a, const db::Cell &b, bool skip_same_library_cells)
+static std::vector<db::cell_index_type> create_from_geometry_full (db::CellMapping *cm, db::Cell &a, const db::Cell &b, bool preserve_library_references)
 {
   tl_assert (a.layout () != 0);
   tl_assert (b.layout () != 0);
   cm->create_from_geometry (*a.layout (), a.cell_index (), *b.layout(), b.cell_index ());
-  return cm->create_missing_mapping (*a.layout (), *b.layout(), b.cell_index (), 0, 0, skip_same_library_cells);
+  return cm->create_missing_mapping (*a.layout (), *b.layout(), b.cell_index (), 0, 0, preserve_library_references);
 }
 
-static std::vector<db::cell_index_type> create_from_geometry_full2 (db::CellMapping *cm, db::Layout &la, db::cell_index_type a, const db::Layout &lb, db::cell_index_type b, bool skip_same_library_cells)
+static std::vector<db::cell_index_type> create_from_geometry_full2 (db::CellMapping *cm, db::Layout &la, db::cell_index_type a, const db::Layout &lb, db::cell_index_type b, bool preserve_library_references)
 {
   cm->create_from_geometry (la, a, lb, b);
-  return cm->create_missing_mapping (la, lb, b, 0, 0, skip_same_library_cells);
+  return cm->create_missing_mapping (la, lb, b, 0, 0, preserve_library_references);
 }
 
 static void create_from_names (db::CellMapping *cm, db::Cell &a, const db::Cell &b)
@@ -138,18 +138,18 @@ static void create_from_names (db::CellMapping *cm, db::Cell &a, const db::Cell 
   cm->create_from_names (*a.layout (), a.cell_index (), *b.layout(), b.cell_index ());
 }
 
-static std::vector<db::cell_index_type> create_from_names_full (db::CellMapping *cm, db::Cell &a, const db::Cell &b, bool skip_same_library_cells)
+static std::vector<db::cell_index_type> create_from_names_full (db::CellMapping *cm, db::Cell &a, const db::Cell &b, bool preserve_library_references)
 {
   tl_assert (a.layout () != 0);
   tl_assert (b.layout () != 0);
   cm->create_from_names (*a.layout (), a.cell_index (), *b.layout(), b.cell_index ());
-  return cm->create_missing_mapping (*a.layout (), *b.layout(), b.cell_index (), 0, 0, skip_same_library_cells);
+  return cm->create_missing_mapping (*a.layout (), *b.layout(), b.cell_index (), 0, 0, preserve_library_references);
 }
 
-static std::vector<db::cell_index_type> create_from_names_full2 (db::CellMapping *cm, db::Layout &la, db::cell_index_type a, const db::Layout &lb, db::cell_index_type b, bool skip_same_library_cells)
+static std::vector<db::cell_index_type> create_from_names_full2 (db::CellMapping *cm, db::Layout &la, db::cell_index_type a, const db::Layout &lb, db::cell_index_type b, bool preserve_library_references)
 {
   cm->create_from_names (la, a, lb, b);
-  return cm->create_missing_mapping (la, lb, b, 0, 0, skip_same_library_cells);
+  return cm->create_missing_mapping (la, lb, b, 0, 0, preserve_library_references);
 }
 
 
@@ -192,14 +192,14 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
     "This is a convenience version which uses cell references instead of layout/cell index combinations. "
     "It has been introduced in version 0.28."
   ) +
-  gsi::method_ext ("for_single_cell_full", &create_single_mapping_full2, gsi::arg ("layout_a"), gsi::arg ("cell_index_a"), gsi::arg ("layout_b"), gsi::arg ("cell_index_b"), gsi::arg ("skip_same_library_cells", false),
+  gsi::method_ext ("for_single_cell_full", &create_single_mapping_full2, gsi::arg ("layout_a"), gsi::arg ("cell_index_a"), gsi::arg ("layout_b"), gsi::arg ("cell_index_b"), gsi::arg ("preserve_library_references", false),
     "@brief Initializes the cell mapping for top-level identity in full mapping mode\n"
     "\n"
     "@param layout_a The target layout.\n"
     "@param cell_index_a The index of the target cell.\n"
     "@param layout_b The source layout.\n"
     "@param cell_index_b The index of the source cell.\n"
-    "@param skip_same_library_cells If set to true, existing references to same library cells in layout_a are reused.\n"
+    "@param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.\n"
     "\n"
     "The cell mapping is created for cell_b to cell_a in the respective layouts. "
     "This method clears the mapping and creates one for the single cell pair. "
@@ -207,14 +207,14 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
     "of cell_b to layout_a and creating the proper instances.\n"
     "\n"
     "This method has been introduced in version 0.23. "
-    "The optional 'skip_same_library_cells' parameter was introduced in version 0.30.13."
+    "The optional 'preserve_library_references' parameter was introduced in version 0.30.13."
   ) +
-  gsi::method_ext ("for_single_cell_full", &create_single_mapping_full, gsi::arg ("cell_a"), gsi::arg ("cell_b"), gsi::arg ("skip_same_library_cells", false),
+  gsi::method_ext ("for_single_cell_full", &create_single_mapping_full, gsi::arg ("cell_a"), gsi::arg ("cell_b"), gsi::arg ("preserve_library_references", false),
     "@brief Initializes the cell mapping for top-level identity in full mapping mode\n"
     "\n"
     "@param cell_a The target cell.\n"
     "@param cell_b The source cell.\n"
-    "@param skip_same_library_cells If set to true, existing references to same library cells in layout_a are reused.\n"
+    "@param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.\n"
     "@return A list of indexes of cells created.\n"
     "\n"
     "This is a convenience version which uses cell references instead of layout/cell index combinations. "
@@ -247,14 +247,14 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
     "This is a convenience version which uses cell references instead of layout/cell index combinations. "
     "It has been introduced in version 0.28."
   ) +
-  gsi::method_ext ("for_multi_cells_full", &create_multi_mapping_full2, gsi::arg ("layout_a"), gsi::arg ("cell_indexes_a"), gsi::arg ("layout_b"), gsi::arg ("cell_indexes_b"), gsi::arg ("skip_same_library_cells", false),
+  gsi::method_ext ("for_multi_cells_full", &create_multi_mapping_full2, gsi::arg ("layout_a"), gsi::arg ("cell_indexes_a"), gsi::arg ("layout_b"), gsi::arg ("cell_indexes_b"), gsi::arg ("preserve_library_references", false),
     "@brief Initializes the cell mapping for top-level identity in full mapping mode\n"
     "\n"
     "@param layout_a The target layout.\n"
     "@param cell_indexes_a A list of cell indexes for the target cells.\n"
     "@param layout_b The source layout.\n"
     "@param cell_indexes_b A list of cell indexes for the source cells (same number of indexes than \\cell_indexes_a).\n"
-    "@param skip_same_library_cells If set to true, existing references to same library cells in layout_a are reused.\n"
+    "@param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.\n"
     "\n"
     "The cell mapping is created for cells from cell_indexes_b to cell from cell_indexes_a in the respective layouts. "
     "This method clears the mapping and creates one for each cell pair from cell_indexes_b vs. cell_indexes_a. "
@@ -262,28 +262,28 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
     "of all cells in cell_indexes_b to layout_a and creating the proper instances.\n"
     "\n"
     "This method has been introduced in version 0.27. "
-    "The optional 'skip_same_library_cells' parameter was introduced in version 0.30.13."
+    "The optional 'preserve_library_references' parameter was introduced in version 0.30.13."
   ) +
-  gsi::method_ext ("for_multi_cells_full", &create_multi_mapping_full, gsi::arg ("cell_a"), gsi::arg ("cell_b"), gsi::arg ("skip_same_library_cells", false),
+  gsi::method_ext ("for_multi_cells_full", &create_multi_mapping_full, gsi::arg ("cell_a"), gsi::arg ("cell_b"), gsi::arg ("preserve_library_references", false),
     "@brief Initializes the cell mapping for top-level identity in full mapping mode\n"
     "\n"
     "@param cell_a A list of target cells.\n"
     "@param cell_b A list of source cells.\n"
-    "@param skip_same_library_cells If set to true, existing references to same library cells in layout_a are reused.\n"
+    "@param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.\n"
     "@return A list of indexes of cells created.\n"
     "\n"
     "This is a convenience version which uses cell references instead of layout/cell index combinations. "
     "It has been introduced in version 0.28. "
-    "The optional 'skip_same_library_cells' parameter was introduced in version 0.30.13."
+    "The optional 'preserve_library_references' parameter was introduced in version 0.30.13."
   ) +
-  gsi::method_ext ("from_geometry_full", &create_from_geometry_full2, gsi::arg ("layout_a"), gsi::arg ("cell_index_a"), gsi::arg ("layout_b"), gsi::arg ("cell_index_b"), gsi::arg ("skip_same_library_cells", false),
+  gsi::method_ext ("from_geometry_full", &create_from_geometry_full2, gsi::arg ("layout_a"), gsi::arg ("cell_index_a"), gsi::arg ("layout_b"), gsi::arg ("cell_index_b"), gsi::arg ("preserve_library_references", false),
     "@brief Initializes the cell mapping using the geometrical identity in full mapping mode\n"
     "\n"
     "@param layout_a The target layout.\n"
     "@param cell_index_a The index of the target starting cell.\n"
     "@param layout_b The source layout.\n"
     "@param cell_index_b The index of the source starting cell.\n"
-    "@param skip_same_library_cells If set to true, existing references to same library cells in layout_a are reused.\n"
+    "@param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.\n"
     "@return A list of indexes of cells created.\n"
     "\n"
     "The cell mapping is created for cells below cell_a and cell_b in the respective layouts. "
@@ -296,19 +296,19 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
     "The returned list will contain the indexes of all cells created for that reason.\n"
     "\n"
     "This method has been introduced in version 0.23. "
-    "The optional 'skip_same_library_cells' parameter was introduced in version 0.30.13."
+    "The optional 'preserve_library_references' parameter was introduced in version 0.30.13."
   ) +
-  gsi::method_ext ("from_geometry_full", &create_from_geometry_full, gsi::arg ("cell_a"), gsi::arg ("cell_b"), gsi::arg ("skip_same_library_cells", false),
+  gsi::method_ext ("from_geometry_full", &create_from_geometry_full, gsi::arg ("cell_a"), gsi::arg ("cell_b"), gsi::arg ("preserve_library_references", false),
     "@brief Initializes the cell mapping using the geometrical identity in full mapping mode\n"
     "\n"
     "@param cell_a The target cell.\n"
     "@param cell_b The source cell.\n"
-    "@param skip_same_library_cells If set to true, existing references to same library cells in layout_a are reused.\n"
+    "@param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.\n"
     "@return A list of indexes of cells created.\n"
     "\n"
     "This is a convenience version which uses cell references instead of layout/cell index combinations. "
     "It has been introduced in version 0.28. "
-    "The optional 'skip_same_library_cells' parameter was introduced in version 0.30.13."
+    "The optional 'preserve_library_references' parameter was introduced in version 0.30.13."
   ) +
   gsi::method ("from_geometry", &db::CellMapping::create_from_geometry, gsi::arg ("layout_a"), gsi::arg ("cell_index_a"), gsi::arg ("layout_b"), gsi::arg ("cell_index_b"),
     "@brief Initializes the cell mapping using the geometrical identity\n"
@@ -359,14 +359,14 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
     "This is a convenience version which uses cell references instead of layout/cell index combinations. "
     "It has been introduced in version 0.28."
   ) +
-  gsi::method_ext ("from_names_full", &create_from_names_full2, gsi::arg ("layout_a"), gsi::arg ("cell_index_a"), gsi::arg ("layout_b"), gsi::arg ("cell_index_b"), gsi::arg ("skip_same_library_cells", false),
+  gsi::method_ext ("from_names_full", &create_from_names_full2, gsi::arg ("layout_a"), gsi::arg ("cell_index_a"), gsi::arg ("layout_b"), gsi::arg ("cell_index_b"), gsi::arg ("preserve_library_references", false),
     "@brief Initializes the cell mapping using the name identity in full mapping mode\n"
     "\n"
     "@param layout_a The target layout.\n"
     "@param cell_index_a The index of the target starting cell.\n"
     "@param layout_b The source layout.\n"
     "@param cell_index_b The index of the source starting cell.\n"
-    "@param skip_same_library_cells If set to true, existing references to same library cells in layout_a are reused.\n"
+    "@param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.\n"
     "@return A list of indexes of cells created.\n"
     "\n"
     "The cell mapping is created for cells below cell_a and cell_b in the respective layouts.\n"
@@ -378,19 +378,19 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
     "The returned list will contain the indexes of all cells created for that reason.\n"
     "\n"
     "This method has been introduced in version 0.23. "
-    "The optional 'skip_same_library_cells' parameter was introduced in version 0.30.13."
+    "The optional 'preserve_library_references' parameter was introduced in version 0.30.13."
   ) +
-  gsi::method_ext ("from_names_full", &create_from_names_full, gsi::arg ("cell_a"), gsi::arg ("cell_b"), gsi::arg ("skip_same_library_cells", false),
+  gsi::method_ext ("from_names_full", &create_from_names_full, gsi::arg ("cell_a"), gsi::arg ("cell_b"), gsi::arg ("preserve_library_references", false),
     "@brief Initializes the cell mapping using the name identity in full mapping mode\n"
     "\n"
     "@param cell_a The target cell.\n"
     "@param cell_b The source cell.\n"
-    "@param skip_same_library_cells If set to true, existing references to same library cells in layout_a are reused.\n"
+    "@param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.\n"
     "@return A list of indexes of cells created.\n"
     "\n"
     "This is a convenience version which uses cell references instead of layout/cell index combinations. "
     "It has been introduced in version 0.28. "
-    "The optional 'skip_same_library_cells' parameter was introduced in version 0.30.13."
+    "The optional 'preserve_library_references' parameter was introduced in version 0.30.13."
   ) +
   gsi::method ("clear", &db::CellMapping::clear,
     "@brief Clears the mapping.\n"

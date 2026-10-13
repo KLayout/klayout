@@ -203,3 +203,64 @@ TEST(2)
 
 }
 
+
+//  Glyph rendering of random texts placed partly outside bitmaps of several widths, at two font
+//  resolutions and all alignments; the hash covers every pixel inside the bitmaps
+TEST(3)
+{
+  unsigned int s = 4711;
+  const unsigned int widths [] = { 20, 45, 100, 333 };
+  const double resolutions [] = { 1.0, 2.0 };
+  const db::HAlign haligns [] = { db::HAlignLeft, db::HAlignCenter, db::HAlignRight };
+  const db::VAlign valigns [] = { db::VAlignBottom, db::VAlignCenter, db::VAlignTop };
+
+  uint64_t hash = 14695981039346656037ull;
+  unsigned int set_pixels = 0;
+
+  for (unsigned int ri = 0; ri < 2; ++ri) {
+    for (unsigned int wi = 0; wi < sizeof (widths) / sizeof (widths [0]); ++wi) {
+
+      const unsigned int w = widths [wi], h = 61;
+      lay::Bitmap bitmap (w, h, 1.0, resolutions [ri]);
+
+      for (unsigned int t = 0; t < 40; ++t) {
+
+        lay::RenderText text;
+        std::string str;
+        s = s * 1103515245u + 12345u;
+        unsigned int len = 1 + (s >> 8) % 9;
+        for (unsigned int k = 0; k < len; ++k) {
+          s = s * 1103515245u + 12345u;
+          unsigned int c = (s >> 8) % 100;
+          str += (c == 0 ? '\n' : char (' ' + c % 95));
+        }
+        text.text = str;
+        text.font = db::DefaultFont;
+        s = s * 1103515245u + 12345u;
+        text.halign = haligns [(s >> 8) % 3];
+        s = s * 1103515245u + 12345u;
+        text.valign = valigns [(s >> 8) % 3];
+        s = s * 1103515245u + 12345u;
+        double x = double (int ((s >> 8) % (w + 160)) - 120) + 0.25;
+        s = s * 1103515245u + 12345u;
+        double y = double (int ((s >> 8) % (h + 60)) - 30) + 0.5;
+        text.b = db::DBox (x, y, x, y);
+
+        bitmap.render_text (text);
+
+      }
+
+      for (unsigned int py = 0; py < h; ++py) {
+        const uint32_t *sl = bitmap.scanline (py);
+        for (unsigned int px = 0; px < w; ++px) {
+          unsigned int bit = (sl [px / 32] >> (px % 32)) & 1;
+          set_pixels += bit;
+          hash = (hash ^ (bit + 2 * px + 1000 * py)) * 1099511628211ull;
+        }
+      }
+
+    }
+  }
+
+  EXPECT_EQ (tl::to_string (set_pixels) + " " + tl::to_string (hash), "5139 16480986320884342220");
+}

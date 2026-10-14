@@ -119,3 +119,43 @@ TEST(3)
   delete[] hello;
 }
 
+
+//  Byte-wise reads through InputStream with a get/unget pair per byte, as the
+//  OASIS reader does inside CBLOCKs. The data is larger than the 64k ring buffer,
+//  so bytes are taken from every ring position including the last one.
+TEST(4)
+{
+  std::string data;
+  size_t r = 1;
+  for (size_t i = 0; i < 300000; ++i) {
+    r *= 12361;
+    r ^= (r >> 8);
+    data += "abcd" [r % 4];
+  }
+
+  tl::OutputStringStream oss;
+  {
+    tl::OutputStream os (oss);
+    tl::DeflateFilter fg (os);
+    fg.put (data.c_str (), data.size ());
+    fg.flush ();
+  }
+
+  std::string deflated = oss.string ();
+  tl::InputMemoryStream ims (deflated.c_str (), deflated.size ());
+  tl::InputStream is (ims);
+  is.inflate (true);
+
+  std::string out;
+  const char *c;
+  while ((c = is.get (1)) != 0) {
+    char ch = *c;
+    is.unget (1);
+    c = is.get (1);
+    EXPECT_EQ (c != 0 && *c == ch, true);
+    out += ch;
+  }
+
+  EXPECT_EQ (out.size (), data.size ());
+  EXPECT_EQ (out == data, true);
+}

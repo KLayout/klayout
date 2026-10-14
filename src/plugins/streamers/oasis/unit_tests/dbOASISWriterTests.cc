@@ -32,6 +32,7 @@
 #include "tlUnitTest.h"
 
 #include <cstdlib>
+#include <set>
 
 void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int compr, bool recompress, bool tables_at_end)
 {
@@ -2098,5 +2099,66 @@ TEST(140)
     reader.read (gg);
 
     db::compare_layouts (_this, gg, tl::testdata () + "/oasis/dbOASISWriter40_au.gds", db::NoNormalization);
+  }
+}
+
+//  long and long long values are not told apart by the properties repository, int and double are
+static std::string
+value_with_kind (const tl::Variant &v)
+{
+  return std::string (v.is_double () ? "d" : "i") + v.to_string ();
+}
+
+//  Issue #2507 (nearly equal property values must not be written as "same as last")
+TEST(141)
+{
+  const tl::Variant values[] = {
+    tl::Variant ((long long) 72057594037927935LL), tl::Variant ((long long) 72057594037927936LL),
+    tl::Variant ((long long) 10000000000000LL), tl::Variant ((long long) 10000000000001LL),
+    tl::Variant ((long long) 5), tl::Variant (5.0),
+    tl::Variant ((long long) 1), tl::Variant ((long long) 2)
+  };
+
+  for (size_t i = 0; i < sizeof (values) / sizeof (values [0]); i += 2) {
+
+    db::Layout layout_org;
+    unsigned int layer = layout_org.insert_layer (db::LayerProperties (1, 0));
+    db::Cell &top = layout_org.cell (layout_org.add_cell ("TOP"));
+
+    std::set<std::string> expected;
+    for (size_t j = i; j < i + 2; ++j) {
+      db::Box box (db::Coord (j * 100), 0, db::Coord (j * 100 + 10), 10);
+      db::PropertiesSet ps;
+      ps.insert (tl::Variant ("v"), values [j]);
+      top.shapes (layer).insert (db::BoxWithProperties (box, db::properties_id (ps)));
+      expected.insert (box.to_string () + "=" + value_with_kind (values [j]));
+    }
+
+    std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter141.oas"));
+
+    {
+      tl::OutputStream out (tmp_file);
+      db::SaveLayoutOptions options;
+      options.set_format ("OASIS");
+      db::Writer writer (options);
+      writer.write (layout_org, out);
+    }
+
+    db::Layout layout_read;
+
+    {
+      tl::InputStream in (tmp_file);
+      db::Reader reader (in);
+      reader.read (layout_read);
+    }
+
+    std::set<std::string> read;
+    const db::Cell &top_read = layout_read.cell (layout_read.cell_by_name ("TOP").second);
+    for (db::ShapeIterator s = top_read.shapes (layout_read.get_layer (db::LayerProperties (1, 0))).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
+      read.insert (s->bbox ().to_string () + "=" + value_with_kind (db::properties (s->prop_id ()).value (tl::Variant ("v"))));
+    }
+
+    EXPECT_EQ (tl::join (read.begin (), read.end (), ","), tl::join (expected.begin (), expected.end (), ","));
+
   }
 }

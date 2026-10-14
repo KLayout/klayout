@@ -27,6 +27,8 @@
 
 #include "zlib.h"
 
+#include <algorithm>
+
 TEST(1) 
 {
   unsigned char data[] = {
@@ -158,4 +160,114 @@ TEST(4)
 
   EXPECT_EQ (out.size (), data.size ());
   EXPECT_EQ (out == data, true);
+}
+
+static std::string
+random_data (size_t n)
+{
+  std::string data;
+  size_t r = 1;
+  for (size_t i = 0; i < n; ++i) {
+    r *= 12361;
+    r ^= (r >> 8);
+    data += "abcd" [r % 4];
+  }
+  return data;
+}
+
+static std::string
+deflate_string (const std::string &data)
+{
+  tl::OutputStringStream oss;
+  {
+    tl::OutputStream os (oss);
+    tl::DeflateFilter fg (os);
+    fg.put (data.c_str (), data.size ());
+    fg.flush ();
+  }
+  return oss.string ();
+}
+
+//  Raw data behind the DEFLATE stream, as in OASIS CBLOCKs: reading continues
+//  exactly behind the compressed block
+TEST(5)
+{
+  std::string data = random_data (300000);
+  std::string deflated = deflate_string (data);
+  std::string tail = "raw tail";
+  std::string all = deflated + tail;
+
+  {
+    tl::InputMemoryStream ims (all.c_str (), all.size ());
+    tl::InputStream is (ims);
+    tl::InflateFilter f (is);
+
+    std::string out;
+    while (! f.at_end ()) {
+      out += f.get (1) [0];
+    }
+
+    EXPECT_EQ (out == data, true);
+    EXPECT_EQ (is.pos (), deflated.size ());
+
+    const char *t = is.get (tail.size ());
+    EXPECT_EQ (t != 0 && std::string (t, tail.size ()) == tail, true);
+    EXPECT_EQ (is.get (1) == 0, true);
+  }
+
+  //  same through InputStream in inflate mode with mixed read sizes
+  {
+    tl::InputMemoryStream ims (all.c_str (), all.size ());
+    tl::InputStream is (ims);
+    is.inflate ();
+
+    std::string out;
+    size_t n = 1;
+    size_t max_pos = 0;
+    while (out.size () < data.size ()) {
+      n = std::min (n % 1000 + 1, data.size () - out.size ());
+      const char *b = is.get (n);
+      EXPECT_EQ (b != 0, true);
+      if (! b) {
+        break;
+      }
+      out += std::string (b, n);
+      max_pos = std::max (max_pos, is.pos ());
+      if (out.size () == n) {
+        //  pos () follows the compressed bytes actually consumed
+        EXPECT_EQ (is.pos () < deflated.size () / 2, true);
+      }
+    }
+
+    EXPECT_EQ (max_pos <= deflated.size (), true);
+
+    EXPECT_EQ (out == data, true);
+
+    const char *t = is.get (tail.size ());
+    EXPECT_EQ (t != 0 && std::string (t, tail.size ()) == tail, true);
+    EXPECT_EQ (is.pos (), all.size ());
+    EXPECT_EQ (is.get (1) == 0, true);
+  }
+}
+
+//  Truncated DEFLATE stream
+TEST(6)
+{
+  std::string deflated = deflate_string (random_data (100000));
+  deflated.resize (deflated.size () / 2);
+
+  tl::InputMemoryStream ims (deflated.c_str (), deflated.size ());
+  tl::InputStream is (ims);
+  tl::InflateFilter f (is);
+
+  bool error = false;
+  try {
+    while (! f.at_end ()) {
+      f.get (1);
+    }
+  } catch (tl::Exception &) {
+    error = true;
+  }
+
+  EXPECT_EQ (error, true);
 }

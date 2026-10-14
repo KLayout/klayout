@@ -2158,11 +2158,26 @@ OASISWriter::write_property_def (const char *name_str, const tl::Variant &pv, bo
   write_property_def (name_str, pvl, sflag);
 }
 
+//  Variant::operator== compares integers as doubles with a tolerance, so use the strict equal here
+static bool
+same_values (const std::vector<tl::Variant> &a, const std::vector<tl::Variant> &b)
+{
+  if (a.size () != b.size ()) {
+    return false;
+  }
+  for (size_t i = 0; i < a.size (); ++i) {
+    if (! a [i].equal (b [i])) {
+      return false;
+    }
+  }
+  return true;
+}
+
 void
 OASISWriter::write_property_def (const char *name_str, const std::vector<tl::Variant> &pvl, bool sflag)
 { 
   bool same_name = (mm_last_property_name == name_str);
-  bool same_value = (mm_last_value_list == pvl);
+  bool same_value = (mm_last_value_list.is_set () && same_values (mm_last_value_list.get (), pvl));
   bool same_sflag = (mm_last_property_is_sprop == sflag);
 
   if (same_name && same_value && same_sflag) {

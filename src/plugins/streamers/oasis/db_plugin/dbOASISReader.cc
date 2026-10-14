@@ -32,6 +32,7 @@
 #include "tlException.h"
 #include "tlString.h"
 #include "tlClassRegistry.h"
+#include "tlCpp.h"
 
 namespace db
 {
@@ -130,13 +131,13 @@ OASISReader::get_uint64 ()
 
   do {
     unsigned char *b = (unsigned char *) m_stream.get (1);
-    if (! b) {
+    TL_IF_UNLIKELY (! b) {
       error (tl::to_string (tr ("Unexpected end-of-file")));
       return 0;
     }
     c = *b;
-    if (vm > std::numeric_limits <uint64_t>::max () / 128 &&
-        (uint64_t) (c & 0x7f) > (std::numeric_limits <uint64_t>::max () / vm)) {
+    TL_IF_UNLIKELY (vm > std::numeric_limits <uint64_t>::max () / 128 &&
+                    (uint64_t) (c & 0x7f) > (std::numeric_limits <uint64_t>::max () / vm)) {
       error (tl::to_string (tr ("uint64 value overflow")));
     }
     v += (uint64_t) (c & 0x7f) * vm;
@@ -150,7 +151,7 @@ inline uint64_t
 OASISReader::get_uint64_for_divider ()
 {
   uint64_t l = get_uint64 ();
-  if (l == 0) {
+  TL_IF_UNLIKELY (l == 0) {
     error (tl::to_string (tr ("Divider must not be zero")));
   }
   return l;
@@ -176,13 +177,13 @@ OASISReader::get_uint32 ()
 
   do {
     unsigned char *b = (unsigned char *) m_stream.get (1);
-    if (! b) {
+    TL_IF_UNLIKELY (! b) {
       error (tl::to_string (tr ("Unexpected end-of-file")));
       return 0;
     }
     c = *b;
-    if (vm > std::numeric_limits <uint32_t>::max () / 128 &&
-        (uint32_t) (c & 0x7f) > (std::numeric_limits <uint32_t>::max () / vm)) {
+    TL_IF_UNLIKELY (vm > std::numeric_limits <uint32_t>::max () / 128 &&
+                    (uint32_t) (c & 0x7f) > (std::numeric_limits <uint32_t>::max () / vm)) {
       error (tl::to_string (tr ("uin32 value overflow")));
     }
     v += (uint32_t) (c & 0x7f) * vm;
@@ -295,7 +296,7 @@ OASISReader::get_ucoord (uint64_t grid)
   uint64_t lx = 0;
   get (lx);
   lx *= grid;
-  if (lx > (uint64_t) (std::numeric_limits <db::Coord>::max ())) {
+  TL_IF_UNLIKELY (lx > (uint64_t) (std::numeric_limits <db::Coord>::max ())) {
     error (tl::to_string (tr ("Coordinate value overflow")));
   }
   return db::Coord (lx);
@@ -307,7 +308,7 @@ OASISReader::get_ucoord_as_distance (uint64_t grid)
   uint64_t lx = 0;
   get (lx);
   lx *= grid;
-  if (lx > (uint64_t) (std::numeric_limits <distance_type>::max ())) {
+  TL_IF_UNLIKELY (lx > (uint64_t) (std::numeric_limits <distance_type>::max ())) {
     error (tl::to_string (tr ("Coordinate value overflow")));
   }
   return distance_type (lx);
@@ -319,8 +320,8 @@ OASISReader::get_coord (int64_t grid)
   int64_t lx = 0;
   get (lx);
   lx *= grid;
-  if (lx < (int64_t) (std::numeric_limits <db::Coord>::min ()) ||
-      lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
+  TL_IF_UNLIKELY (lx < (int64_t) (std::numeric_limits <db::Coord>::min ()) ||
+                  lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
     error (tl::to_string (tr ("Coordinate value overflow")));
   }
   return db::Coord (lx);
@@ -334,7 +335,7 @@ OASISReader::get_2delta (int64_t grid)
 
   int64_t lx = l1 >> 2;
   lx *= grid;
-  if (lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
+  TL_IF_UNLIKELY (lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
     error (tl::to_string (tr ("Coordinate value overflow")));
   }
   db::Coord x = lx;
@@ -360,7 +361,7 @@ OASISReader::get_3delta (int64_t grid)
 
   int64_t lx = l1 >> 3;
   lx *= grid;
-  if (lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
+  TL_IF_UNLIKELY (lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
     error (tl::to_string (tr ("Coordinate value overflow")));
   }
   db::Coord x = lx;
@@ -396,16 +397,16 @@ OASISReader::get_gdelta (int64_t grid)
 
     int64_t lx = ((l1 & 2) == 0 ? (int64_t) (l1 >> 2) : -(int64_t) (l1 >> 2));
     lx *= grid;
-    if (lx < (int64_t) (std::numeric_limits <db::Coord>::min ()) ||
-        lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
+    TL_IF_UNLIKELY (lx < (int64_t) (std::numeric_limits <db::Coord>::min ()) ||
+                    lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
       error (tl::to_string (tr ("Coordinate value overflow")));
     }
 
     int64_t ly;
     get (ly);
     ly *= grid;
-    if (ly < (int64_t) (std::numeric_limits <db::Coord>::min ()) ||
-        ly > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
+    TL_IF_UNLIKELY (ly < (int64_t) (std::numeric_limits <db::Coord>::min ()) ||
+                    ly > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
       error (tl::to_string (tr ("Coordinate value overflow")));
     }
 
@@ -415,7 +416,7 @@ OASISReader::get_gdelta (int64_t grid)
 
     int64_t lx = l1 >> 4;
     lx *= grid;
-    if (lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
+    TL_IF_UNLIKELY (lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
       error (tl::to_string (tr ("Coordinate value overflow")));
     }
     db::Coord x = lx;

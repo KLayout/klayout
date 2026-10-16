@@ -24,6 +24,7 @@
 
 
 #include "layBitmap.h"
+#include "layFixedFont.h"
 #include "tlUnitTest.h"
 
 static std::string 
@@ -263,4 +264,60 @@ TEST(3)
   }
 
   EXPECT_EQ (tl::to_string (set_pixels) + " " + tl::to_string (hash), "5139 16480986320884342220");
+}
+
+TEST(4)
+{
+  for (unsigned int ri = 0; ri < 2; ++ri) {
+
+    //  ff25 has two words per font row, ff1 has one
+    const double fr = (ri == 0 ? 0.2 : 1.0);
+    const lay::FixedFont &ff = lay::FixedFont::get_font (fr);
+    if (ri == 0) {
+      EXPECT (ff.stride () > 1);
+    }
+
+    const unsigned int n = ff.height ();
+    const unsigned int y0 = n + 25;
+    const unsigned int clipped_rows [] = { 1, 10, n - 1, n };
+
+    lay::Bitmap full (100, y0 + 1, 1.0, fr);
+
+    lay::RenderText text;
+    text.text = "AB";
+    text.font = db::DefaultFont;
+    text.halign = db::HAlignLeft;
+    text.valign = db::VAlignTop;
+    text.b = db::DBox (2.0, double (y0), 2.0, double (y0));
+    full.render_text (text);
+
+    for (unsigned int ci = 0; ci < sizeof (clipped_rows) / sizeof (clipped_rows [0]); ++ci) {
+
+      //  the same text with the first k rows pushed out above the top edge
+      const unsigned int k = clipped_rows [ci];
+      const unsigned int hc = y0 - k + 1;
+
+      lay::Bitmap clipped (100, hc, 1.0, fr);
+      clipped.render_text (text);
+
+      //  below the first drawn row the clipped bitmap stays empty, further up
+      //  it shows the same rows as the fully drawn glyph
+      const unsigned int first = (k < n ? hc - (n - k) : hc);
+      for (unsigned int py = 0; py < hc; ++py) {
+        const uint32_t *sl = clipped.scanline (py);
+        if (py >= first) {
+          const uint32_t *slf = full.scanline (py);
+          for (unsigned int px = 0; px < 100; ++px) {
+            EXPECT_EQ ((sl [px / 32] >> (px % 32)) & 1, (slf [px / 32] >> (px % 32)) & 1);
+          }
+        } else {
+          for (unsigned int px = 0; px < 100; ++px) {
+            EXPECT_EQ ((sl [px / 32] >> (px % 32)) & 1, 0);
+          }
+        }
+      }
+
+    }
+
+  }
 }

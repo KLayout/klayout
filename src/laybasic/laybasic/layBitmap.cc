@@ -289,7 +289,7 @@ Bitmap::fill_pattern (int y, int x, const uint32_t *pp, unsigned int stride, uns
         return;
       }
       n -= y - m_height + 1;
-      pp += y - m_height + 1;
+      pp += (y - m_height + 1) * stride;
       y = m_height - 1;
     }
 

@@ -305,14 +305,13 @@ TEST(4)
       const unsigned int first = (k < n ? hc - (n - k) : hc);
       for (unsigned int py = 0; py < hc; ++py) {
         const uint32_t *sl = clipped.scanline (py);
-        if (py >= first) {
-          const uint32_t *slf = full.scanline (py);
-          for (unsigned int px = 0; px < 100; ++px) {
-            EXPECT_EQ ((sl [px / 32] >> (px % 32)) & 1, (slf [px / 32] >> (px % 32)) & 1);
-          }
-        } else {
-          for (unsigned int px = 0; px < 100; ++px) {
-            EXPECT_EQ ((sl [px / 32] >> (px % 32)) & 1, 0);
+        const uint32_t *slf = full.scanline (py);
+        for (unsigned int px = 0; px < 100; ++px) {
+          int bit = (sl [px / 32] >> (px % 32)) & 1;
+          if (py >= first) {
+            EXPECT_EQ (bit, int ((slf [px / 32] >> (px % 32)) & 1));
+          } else {
+            EXPECT_EQ (bit, 0);
           }
         }
       }

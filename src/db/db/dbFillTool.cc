@@ -156,56 +156,36 @@ private:
       return;
     }
 
-    m_area_maps.reserve (m_row_steps * m_column_steps + std::abs (columns_per_rows) * std::abs (rows_per_columns));
+    std::set<db::Vector> offsets;
 
-    db::AreaMap am;
-
-    for (unsigned int ic = 0; ic < m_column_steps; ++ic) {
-
-      for (unsigned int ir = 0; ir < m_row_steps; ++ir) {
-
-        db::Vector dr = m_row_step * long (ir);
-        db::Vector dc = m_column_step * long (ic);
-
-        am.reinitialize (db::Point (ra_left, ra_bottom) + dr + dc, db::Vector (ddx, ddy), m_dim, nx, ny);
-
-        bool any = false;
-        for (auto i = fr.begin (); i != fr.end (); ++i) {
-          if (db::rasterize (*i, am)) {
-            any = true;
-          }
-        }
-        if (any) {
-          m_area_maps.push_back (db::AreaMap ());
-          m_area_maps.back ().swap (am);
-        }
-
+    for (int ic = 0; ic < 2 * int (m_column_steps); ++ic) {
+      for (int ir = 0; ir < 2 * int (m_row_steps); ++ir) {
+        db::Vector d = m_row_step * long (ir) + m_column_step * long (ic);
+        d = db::Vector (d.x () % ddx, d.y () % ddy);
+        //  NOTE: we want to confine d.x to [0..ddx[ and d.y to [0..ddy[,
+        //  hence we need to take care or negative results
+        d = db::Vector (d.x () < 0 ? d.x () + ddx : d.x (), d.y () < 0 ? d.y () + ddy : d.y ());
+        offsets.insert (d);
       }
-
     }
 
-    //  adds the "dead corner" piece
+    m_area_maps.reserve (offsets.size ());
+    db::AreaMap am;
 
-    for (unsigned int ic = 0; ic < (unsigned int) std::abs (columns_per_rows); ++ic) {
+    for (auto o = offsets.begin (); o != offsets.end (); ++o) {
 
-      for (unsigned int ir = 0; ir < (unsigned int) std::abs (rows_per_columns); ++ir) {
+      am.reinitialize (db::Point (ra_left, ra_bottom) + *o, db::Vector (ddx, ddy), m_dim, nx, ny);
 
-        db::Vector dr = m_row_step * long ((rows_per_columns > 0 ? -int (ir + 1) : ir) + m_row_steps);
-        db::Vector dc = m_column_step * long ((columns_per_rows > 0 ? -int (ic + 1) : ic) + m_column_steps);
-
-        am.reinitialize (db::Point (ra_left, ra_bottom) + dr + dc, db::Vector (ddx, ddy), m_dim, nx, ny);
-
-        bool any = false;
-        for (auto i = fr.begin (); i != fr.end (); ++i) {
-          if (db::rasterize (*i, am)) {
-            any = true;
-          }
+      bool any = false;
+      for (auto i = fr.begin (); i != fr.end (); ++i) {
+        if (db::rasterize (*i, am)) {
+          any = true;
         }
-        if (any) {
-          m_area_maps.push_back (db::AreaMap ());
-          m_area_maps.back ().swap (am);
-        }
+      }
 
+      if (any) {
+        m_area_maps.push_back (db::AreaMap ());
+        m_area_maps.back ().swap (am);
       }
 
     }

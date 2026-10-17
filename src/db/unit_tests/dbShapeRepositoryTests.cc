@@ -408,3 +408,68 @@ TEST(4)
 
 }
 
+
+//  Dedup of a larger number of polygon references: the repository keeps one
+//  entry per distinct polygon and equal references share the same entry
+TEST(5)
+{
+  db::Layout layout;
+
+  const unsigned int n = 100000;
+  const unsigned int distinct = 1000;
+
+  std::vector<db::PolygonRef> refs;
+  refs.reserve (n);
+
+  for (unsigned int i = 0; i < n; ++i) {
+    const int k = int (i % distinct);
+    db::Polygon poly (db::Box (k * 100, k * 200, k * 100 + 50 + k, k * 200 + 40 + k));
+    refs.push_back (db::PolygonRef (poly, layout.shape_repository ()));
+  }
+
+  EXPECT_EQ (layout.shape_repository ().repository (db::Polygon::tag ()).size (), size_t (distinct));
+
+  size_t same = 0;
+  for (unsigned int i = 0; i < n; ++i) {
+    if (refs [i].ptr () == refs [i % distinct].ptr ()) {
+      ++same;
+    }
+  }
+  EXPECT_EQ (same, size_t (n));
+}
+
+//  Polygons which only differ in their last vertices must still dedup to one entry each
+TEST(polygons_sharing_leading_vertices)
+{
+  db::Layout layout;
+
+  const unsigned int n = 2000;
+
+  std::vector<db::PolygonRef> refs, again;
+  for (unsigned int i = 0; i < n; ++i) {
+
+    std::vector<db::Point> pts;
+    for (int j = 0; j <= 50; ++j) {
+      pts.push_back (db::Point (j * 10, (j % 2) * 10));
+    }
+    pts.push_back (db::Point (500, 200 + int (i)));
+    pts.push_back (db::Point (0, 200 + int (i)));
+
+    db::Polygon poly;
+    poly.assign_hull (pts.begin (), pts.end (), false /*no compression*/);
+
+    refs.push_back (db::PolygonRef (poly, layout.shape_repository ()));
+    again.push_back (db::PolygonRef (poly, layout.shape_repository ()));
+
+  }
+
+  EXPECT_EQ (layout.shape_repository ().repository (db::Polygon::tag ()).size (), size_t (n));
+
+  size_t same = 0;
+  for (unsigned int i = 0; i < n; ++i) {
+    if (refs [i].ptr () == again [i].ptr ()) {
+      ++same;
+    }
+  }
+  EXPECT_EQ (same, size_t (n));
+}

@@ -292,6 +292,15 @@ TEST(4)
     EXPECT_EQ (fs.selected (db::Edge (db::Point (-1000000000, -1000000000), db::Point (1000000000, 1000000000)), size_t (0)), true);
     EXPECT_EQ (fs.selected (db::Edge (db::Point (-1000000000, -1000000000), db::Point (1000000000, 1000000001)), size_t (0)), false);
   }
+
+  //  issue #2451
+  {
+    db::EdgeOrientationFilter f1 (2.5, true, 7.5, true, false, false);
+
+    db::Edges rr;
+    rr.insert (db::Edge (db::Point (0, 0), db::Point (5, 0)));
+    EXPECT_EQ (db::compare (rr.filtered (f1), ""), true);
+  }
 }
 
 TEST(5) 

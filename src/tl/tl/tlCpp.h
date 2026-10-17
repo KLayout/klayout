@@ -35,6 +35,15 @@
 #define NO_RETURN __declspec(noreturn)
 #endif
 
+//  "TL_IF_UNLIKELY (cond) { ... }" is an if statement whose body is a cold path
+#if defined(__has_cpp_attribute) && __has_cpp_attribute(unlikely) && ((defined(__cplusplus) && __cplusplus >= 202002L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L))
+#  define TL_IF_UNLIKELY(c) if (c) [[unlikely]]
+#elif defined(__GNUC__) || defined(__clang__)
+#  define TL_IF_UNLIKELY(c) if (__builtin_expect (!!(c), 0))
+#else
+#  define TL_IF_UNLIKELY(c) if (c)
+#endif
+
 namespace tl
 {
 

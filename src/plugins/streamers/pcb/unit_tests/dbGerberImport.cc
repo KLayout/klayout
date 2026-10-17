@@ -33,7 +33,7 @@
 
 #include <stdlib.h>
 
-static void run_test (tl::TestBase *_this, const char *dir)
+static void run_test (tl::TestBase *_this, const char *dir, const std::string &au_layout = "au.oas.gz")
 {
   if (! tl::XMLParser::is_available ()) {
     throw tl::CancelException ();
@@ -53,7 +53,7 @@ static void run_test (tl::TestBase *_this, const char *dir)
     reader.read (layout, options);
   }
 
-  db::compare_layouts (_this, layout, tl::testdata_private () + "/pcb/" + dir + "/au.oas.gz", db::WriteOAS, 1);
+  db::compare_layouts (_this, layout, tl::testdata_private () + "/pcb/" + dir + "/" + au_layout, db::WriteOAS, 1);
 }
 
 TEST(0_Metadata)
@@ -162,12 +162,12 @@ TEST(0_Metadata)
 TEST(1)
 {
   test_is_long_runner ();
-  run_test (_this, "microchip-1");
+  run_test (_this, "microchip-1", "au_2.oas.gz");
 }
 
 TEST(2)
 {
-  run_test (_this, "allegro");
+  run_test (_this, "allegro", "au_2.oas.gz");
 }
 
 TEST(3)
@@ -199,13 +199,13 @@ TEST(7)
 TEST(8)
 {
   test_is_long_runner ();
-  run_test (_this, "microchip-2");
+  run_test (_this, "microchip-2", "au_2.oas.gz");
 }
 
 TEST(9)
 {
   test_is_long_runner ();
-  run_test (_this, "microchip-3");
+  run_test (_this, "microchip-3", "au_2.oas.gz");
 }
 
 TEST(10)
@@ -236,7 +236,7 @@ TEST(14)
 
 TEST(15)
 {
-  run_test (_this, "gerbv_examples/polarity");
+  run_test (_this, "gerbv_examples/polarity", "au_2.oas.gz");
 }
 
 TEST(16)
@@ -247,7 +247,7 @@ TEST(16)
 
 TEST(17)
 {
-  run_test (_this, "gerbv_examples/hellboard");
+  run_test (_this, "gerbv_examples/hellboard", "au_2.oas.gz");
 }
 
 TEST(18)
@@ -288,13 +288,13 @@ TEST(24)
 
 TEST(25)
 {
-  run_test (_this, "sr-sample2");
+  run_test (_this, "sr-sample2", "au_2.oas.gz");
 }
 
 TEST(26)
 {
   test_is_long_runner ();
-  run_test (_this, "pos-neg");
+  run_test (_this, "pos-neg", "au_2.oas.gz");
 }
 
 TEST(27)
@@ -334,12 +334,12 @@ TEST(X2_2e)
 
 TEST(X2_2f)
 {
-  run_test (_this, "x2-2f");
+  run_test (_this, "x2-2f", "au_2.oas.gz");
 }
 
 TEST(X2_2g)
 {
-  run_test (_this, "x2-2g");
+  run_test (_this, "x2-2g", "au_2.oas.gz");
 }
 
 TEST(X2_2h)
@@ -364,12 +364,12 @@ TEST(X2_2k)
 
 TEST(X2_3)
 {
-  run_test (_this, "x2-3");
+  run_test (_this, "x2-3", "au_2.oas.gz");
 }
 
 TEST(X2_4)
 {
-  run_test (_this, "x2-4");
+  run_test (_this, "x2-4", "au_2.oas.gz");
 }
 
 TEST(X2_5a)

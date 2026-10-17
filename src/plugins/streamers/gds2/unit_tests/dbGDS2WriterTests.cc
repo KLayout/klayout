@@ -1192,7 +1192,7 @@ TEST(121)
 {
   db::GDS2WriterOptions opt;
   opt.max_vertex_count = 4;
-  run_test (_this, "t121.oas.gz", "t121_au.gds.gz", true, opt);
+  run_test (_this, "t121.oas.gz", "t121_au_3.gds.gz", true, opt);
 }
 
 //  Meta info

@@ -29,61 +29,325 @@
 #include <deque>
 #include <memory>
 
-#if 0
-#define DEBUG_POLYGON_GENERATOR
-#endif
+//  for sanity checks:
+#include "dbRegion.h"
+#include "dbEdges.h"
+#include "dbRegionProcessors.h"
+#include "dbEdgesUtils.h"
+#include "tlIntervalMap.h"
+
+//  enables verbose debug output
+//  #define DEBUG_POLYGON_GENERATOR
+
+//  enables the enhanced stitching algorithm that avoids producing too many
+//  overlapping edges during the stitch line generation
+#define ENHANCED_STITCHING
+
+//  enables sanity checks after generation of polygons
+//  #define SANITY_CHECK
 
 namespace db
 {
 
 // -------------------------------------------------------------------------------
-//  PolygonGenerator implementation
+//  Some test functions
+
+template <class Poly>
+static bool check_polygon_for_intersecting_edges (const Poly &p)
+{
+  db::Region rp;
+  rp.set_merged_semantics (false);
+  rp.insert (p);
+  db::Edges ec = rp.processed (db::CornersAsDots (-180.0, true, 180.0, true, false, false));
+
+  db::Edges e (p);
+  e.set_merged_semantics (false);
+  db::EdgeOrientationFilter h (0.0, false, false);
+  db::EdgeOrientationFilter nh (0.0, true, false);
+  db::Edges ei = e.filtered (h).intersections (e.filtered (nh));
+
+  db::Edges crossings = ei - ec;
+  if (! crossings.empty ()) {
+    tl::info << "Found intersecting horizontal lines in polygon at points:";
+    tl::info << "  " << crossings.to_string ();
+    return false;
+  } else {
+    return true;
+  }
+}
+
+namespace {
+  struct AddOverlapCount
+  {
+    void operator () (int &a, int b) const
+    {
+      a += b;
+    }
+  };
+}
+
+template <class Poly>
+static int max_edge_overlap_at_y (const Poly &p, db::Coord y)
+{
+  tl::interval_map<db::Coord, int> im;
+
+  for (auto e = p.begin_edge (); ! e.at_end (); ++e) {
+    if ((*e).p1 ().y () == y && (*e).p2 ().y () == y) {
+      AddOverlapCount aoc;
+      im.add (std::min ((*e).p1 ().x (), (*e).p2 ().x ()), std::max ((*e).p1 ().x (), (*e).p2 ().x ()), 1, aoc);
+    }
+  }
+
+  int max_count = 0;
+  for (auto i = im.begin (); i != im.end (); ++i) {
+    if (i->second > 2) {
+      tl::info << "Edge overlap count at y=" << y << " x=" << i->first.first << ".." << i->first.second << " is " << i->second;
+    }
+    if (i->second > max_count) {
+      max_count = i->second;
+    }
+  }
+
+  return max_count;
+}
+
+template <class Poly>
+static int max_horizontal_edge_overlap (const Poly &poly)
+{
+  std::set<db::Coord> hy;
+  for (auto e = poly.begin_edge (); ! e.at_end (); ++e) {
+    if ((*e).dy () == 0) {
+      hy.insert ((*e).p1 ().y ());
+    }
+  }
+
+  int mc = 0;
+  for (auto y = hy.begin (); y != hy.end (); ++y) {
+    mc = std::max (mc, max_edge_overlap_at_y (poly, *y));
+  }
+  return mc;
+}
+
+// -------------------------------------------------------------------------------
+//  PGPoint class
 
 struct PGPoint
 {
-  PGPoint () : point (), contour (0), first (false) { }
-  PGPoint (const db::Point &p, size_t i, bool f) : point (p), contour (i), first (f) { }
+  PGPoint () : point (), contour (0), hook (false), first (false) { }
+  PGPoint (const db::Point &p, size_t i, bool f) : point (p), contour (i), hook (false), first (f) { }
+
+  bool operator== (const PGPoint &other) const
+  {
+    return point == other.point && contour == other.contour && hook == other.hook;
+  }
 
   db::Point point;
   size_t contour;
+  bool hook;
   bool first;
 };
+
+// -------------------------------------------------------------------------------
+//  PGPolyContour class
 
 class PGPolyContour
 {
 public:
   typedef std::list <db::Point> contour_type;
-  typedef contour_type::const_iterator const_iterator;
-  typedef contour_type::iterator iterator;
+  typedef contour_type::const_iterator iterator;
+  typedef std::list <PGPoint> open_map_type;
+  typedef open_map_type::iterator open_map_iterator_type;
+
+  struct IteratorXCompare
+  {
+    bool operator() (iterator a, iterator b) const
+    {
+      return a->x () < b->x ();
+    }
+  };
 
   PGPolyContour ()
-    : m_is_hole (false), m_next (-1), m_last (-1), m_size (0)
+    : m_is_hole (false),
+      m_next (-1), m_prev (-1),
+      m_size (0),
+      mp_open (0),
+      m_contour_index (-1),
+      m_y_cached (std::numeric_limits<db::Coord>::min ())
   {
-    // ...
+    //  .. nothing yet ..
   }
 
-  PGPolyContour (const PGPolyContour &d)
-    : m_contour (d.m_contour), m_is_hole (d.m_is_hole), m_next (d.m_next), m_last (d.m_last), m_size (d.m_size)
+  std::string to_string (iterator sp = iterator ())
   {
-    // ...
-  }
-
-  PGPolyContour &operator= (const PGPolyContour &d)
-  {
-    if (this != &d) {
-      m_contour = d.m_contour;
-      m_is_hole = d.m_is_hole;
-      m_next = d.m_next;
-      m_last = d.m_last;
-      m_size = d.m_size;
+    std::string res = "c";
+    res += tl::to_string (contour_index ());
+    if (is_hole ()) {
+      res += "H";
     }
-    return *this;
+    res += ": ";
+    for (auto i = begin (); i != end (); ++i) {
+      res += i->to_string ();
+      if (i == sp) {
+        res += "#";
+      }
+      res += " ";
+    }
+    res += " first->" + tl::to_string (first_pt ()->contour) + ":" + first_pt ()->point.to_string ();
+    res += " last->" + tl::to_string (last_pt ()->contour) + ":" + last_pt ()->point.to_string ();
+    return res;
   }
 
-  const_iterator begin () const { return m_contour.begin (); }
-  const_iterator end () const { return m_contour.end (); }
-  iterator begin () { return m_contour.begin (); }
-  iterator end () { return m_contour.end (); }
+  void set_map (open_map_type *map)
+  {
+    if (map == mp_open) {
+      return;
+    }
+
+    if (mp_open) {
+      remove_all_pointers ();
+    }
+    mp_open = map;
+  }
+
+  void set_contour_index (int ci) { m_contour_index = ci; }
+  int contour_index () const { return m_contour_index; }
+
+  /**
+   *  @brief Returns a good stitch point inserting a hole position x (left coordinate)
+   *
+   *  @param x The right fence - only points left or equal to that value are reported
+   *  @param y The scan line y
+   *  @return An iterator pointing past a suitable stitch point or end() if no such point can be found
+   *
+   *  Suitable stitch points are ones for which
+   *  - the x position where the incoming edge crosses the y line is left (or equal to) the x input
+   *  - this x position is closest to the given x value (x value is maximal)
+   *  - the incoming edge is pointing vertically up (is not horizontal)
+   *
+   *  Note that only the first and last point of a contour may be >y.
+   */
+  iterator stitch_point (db::Coord x, db::Coord y)
+  {
+    iterator s1 = stitch_point_cached (x, y);
+#if defined(SANITY_CHECK)
+    iterator s2 = stitch_point_uncached (x, y);
+    if (s1 != s2) {
+      tl::info << "Cache consistency problem on x=" << x << ", y=" << y << " - details follow.";
+      tl::info << "  Problem contour: " << contour_index ();
+      tl::info << "  Contour dump:" << tl::endl << "  " << to_string ();
+      tl::info << "  Cached position: " << std::distance (begin (), s1);
+      tl::info << "  Uncached position: " << std::distance (begin (), s2);
+      check_cache_values (true);
+    }
+    tl_assert (s1 == s2);
+#endif
+    return s1;
+  }
+
+  iterator stitch_point_cached (db::Coord x, db::Coord y)
+  {
+    if (m_y_cached != y) {
+      invalidate_cache ();
+    }
+    if (m_y_cached == std::numeric_limits<db::Coord>::min ()) {
+      m_y_cached = y;
+      update_cache (begin (), end ());
+    }
+
+    contour_type tmp;
+    tmp.push_back (db::Point (x == std::numeric_limits<db::Coord>::max () ? x : x + 1, y));
+
+    auto sp = end ();
+    db::Coord xmax = std::numeric_limits<db::Coord>::min ();
+
+    //  find in cache
+    auto ic = m_sp_cache.lower_bound (tmp.begin ());
+    if (ic != m_sp_cache.begin ()) {
+      sp = *--ic;
+      xmax = sp->x ();
+      //  the stitch point if defined one-after
+      ++sp;
+    }
+
+    //  test end edge: the end edge is special because it may be above
+    //  the scanline and needs x interpolation. Als, it may be part of
+    //  a direct hole/hull connection, hence we need to consider it when
+    //  last.x(maybe interpolated) == x too.
+    iterator pm1 = --end ();
+    iterator p = pm1--;
+
+    db::Coord xpos_last;
+    if (p->y () >= y) {
+      db::Edge e = db::Edge (*pm1, *p);
+      xpos_last = db::coord_traits<db::Coord>::rounded (edge_xaty (e, y));
+      if (xpos_last <= x && xpos_last >= xmax) {
+        sp = p;
+        //  the stitch point if defined one-after
+        ++sp;
+      }
+    }
+
+    return sp;
+  }
+
+#if defined(SANITY_CHECK)
+  iterator stitch_point_uncached (db::Coord x, db::Coord y)
+  {
+    db::Coord xmax = std::numeric_limits<db::Coord>::min ();
+    iterator sp = --end ();
+
+    //  Test end edge
+    iterator pm1 = --end ();
+    iterator p = pm1--;
+
+    db::Coord xpos;
+    if (p->y () > y) {
+      db::Edge e = db::Edge (*pm1, *p);
+      xpos = db::coord_traits<db::Coord>::rounded (edge_xaty (e, y));
+    } else {
+      xpos = p->x ();
+    }
+    if (xpos <= x) {
+      xmax = xpos;
+    }
+
+    iterator from = ++begin ();
+    iterator to = --end ();
+
+    pm1 = from;
+    --pm1;
+    for (p = from; p != to; ++p, ++pm1) {
+      if (pm1->y () < y && p->y () == y && p->x () <= x && p->x () > xmax) {
+        sp = p;
+        xmax = p->x ();
+      }
+    }
+
+    //  the stitch point if defined one-after
+    return ++sp;
+  }
+
+  std::set<iterator, IteratorXCompare> cache_values (db::Coord y) const
+  {
+    std::set<iterator, IteratorXCompare> cache;
+
+    iterator from = ++begin ();
+    iterator to = end ();
+
+    auto pm1 = from;
+    --pm1;
+    for (auto p = from; p != to; ++p, ++pm1) {
+      if (pm1->y () < y && p->y () == y) {
+        cache.insert (p);
+      }
+    }
+
+    return cache;
+  }
+#endif
+
+  iterator begin () const { return m_contour.begin (); }
+  iterator end () const { return m_contour.end (); }
   const db::Point &front () const { return m_contour.front (); }
   db::Point &front () { return m_contour.front (); }
   const db::Point &back () const { return m_contour.back (); }
@@ -93,28 +357,40 @@ public:
   {
     m_contour.push_back (p);
     ++m_size;
+
+    auto at = end ();
+    update_cache (--at, end ());
   }
 
   void push_front (const db::Point &p)
   {
     m_contour.push_front (p);
     ++m_size;
+
+    auto at = begin ();
+    update_cache (begin (), ++at);
   }
 
   void pop_back ()
   {
+    invalidate_cache ();
+
     m_contour.pop_back ();
     --m_size;
   }
 
   void pop_front ()
   {
+    invalidate_cache ();
+
     m_contour.pop_front ();
     --m_size;
   }
 
   iterator erase (iterator i)
   {
+    invalidate_cache ();
+
     --m_size;
     return m_contour.erase (i);
   }
@@ -122,20 +398,64 @@ public:
   iterator insert (iterator i, const db::Point &p)
   {
     ++m_size;
-    return m_contour.insert (i, p);
+    auto from = m_contour.insert (i, p);
+
+    update_cache (from, i);
+    return from;
+  }
+
+  template <class I>
+  iterator insert (iterator at, I from, I to)
+  {
+    //  NOTE: in some STL m_contour.insert already returns the new iterator
+    //  For CentOS7 we compute the result explicitly
+    m_size += std::distance (from, to);
+    if (at == m_contour.begin ()) {
+
+      auto ins = m_contour.insert (at, from, to);
+      update_cache (ins, at);
+
+      return m_contour.begin ();
+
+    } else {
+
+      iterator prev = at;
+      --prev;
+
+      auto ins = m_contour.insert (at, from, to);
+      update_cache (ins, at);
+
+      return ++prev;
+
+    }
+  }
+
+  void replace_point (iterator at, const db::Point &pt)
+  {
+    db::Point &dest = const_cast<db::Point &> (*at);
+    dest = pt;
+
+    iterator n = at;
+    ++n;
+    update_cache (at, n);
+  }
+
+  bool is_closed () const
+  {
+    return ! empty () && *begin () == *--end ();
   }
 
   bool empty () const { return m_contour.empty (); }
   size_t size () const { return m_size; }
 
-  void last (long n) 
+  void prev (long n)
   {
-    m_last = n;
+    m_prev = n;
   }
 
-  long last () const
+  long prev () const
   {
-    return m_last;
+    return m_prev;
   }
 
   void next (long n) 
@@ -162,71 +482,279 @@ public:
   { 
     m_size = 0;
     m_next = -1;
-    m_last = -1;
+    m_prev = -1;
     m_contour.clear ();
+    invalidate_cache ();
   }
 
   void erase (iterator from, iterator to)
   {
     m_size -= std::distance (from, to);
     m_contour.erase (from, to);
+
+    invalidate_cache ();
   }
 
-  void splice (iterator at, PGPolyContour &contour)
+  void splice (iterator before, PGPolyContour &contour)
   {
+    auto from = contour.begin ();
+
     m_size += contour.size ();
     contour.m_size = 0;
-    m_contour.splice (at, contour.m_contour);
+    m_contour.splice (before, contour.m_contour);
+
+    update_cache (from, before);
   }
 
-  template <class I>
-  iterator insert (iterator at, I from, I to)
+  void splice (iterator before, PGPolyContour &&contour)
   {
-    //  NOTE: in some STL m_contour.insert already returns the new iterator
-    //  For CentOS7 we compute the result explicitly
-    m_size += std::distance (from, to);
-    if (at == m_contour.begin ()) {
-      m_contour.insert (at, from, to);
-      return m_contour.begin ();
+    auto from = contour.begin ();
+
+    m_size += contour.size ();
+    contour.m_size = 0;
+    m_contour.splice (before, std::move (contour.m_contour));
+
+    update_cache (from, before);
+  }
+
+  void splice (iterator before, PGPolyContour &contour, iterator from, iterator to)
+  {
+    size_t n = std::distance (from, to);
+    m_size += n;
+    contour.m_size -= n;
+    m_contour.splice (before, contour.m_contour, from, to);
+
+    update_cache (from, before);
+  }
+
+  void splice (iterator before, PGPolyContour &&contour, iterator from, iterator to)
+  {
+    size_t n = std::distance (from, to);
+    m_size += n;
+    contour.m_size -= n;
+    m_contour.splice (before, std::move (contour.m_contour), from, to);
+
+    update_cache (from, before);
+  }
+
+  open_map_iterator_type first_pt () const { return m_first_pt; }
+  void set_first_pt (const open_map_iterator_type &i) { m_first_pt = i; }
+  void reset_first_pt () { m_first_pt = mp_open->end (); }
+
+  open_map_iterator_type last_pt () const { return m_last_pt; }
+  void set_last_pt (const open_map_iterator_type &i) { m_last_pt = i; }
+  void reset_last_pt () { m_last_pt = mp_open->end (); }
+
+  open_map_iterator_type other_pt (const open_map_iterator_type &i) const
+  {
+    if (i == m_first_pt) {
+      return m_last_pt;
+    } else if (i == m_last_pt) {
+      return m_first_pt;
     } else {
-      iterator prev = at;
-      --prev;
-      m_contour.insert (at, from, to);
-      return ++prev;
+      tl_assert (false);
     }
   }
+
+  void add_hook (const open_map_iterator_type &i)
+  {
+    m_hooks.push_back (i);
+  }
+
+  void remove_hooks ()
+  {
+    if (mp_open) {
+      for (auto h = m_hooks.begin (); h != m_hooks.end (); ++h) {
+        mp_open->erase (*h);
+      }
+    }
+    m_hooks.clear ();
+  }
+
+  void remove_all_pointers ()
+  {
+    if (mp_open) {
+      if (m_first_pt != mp_open->end ()) {
+        mp_open->erase (m_first_pt);
+      }
+      if (m_last_pt != mp_open->end ()) {
+        mp_open->erase (m_last_pt);
+      }
+      m_first_pt = mp_open->end ();
+      m_last_pt = mp_open->end ();
+    }
+    remove_hooks ();
+  }
+
+  void merge_with (PGPolyContour &other, open_map_iterator_type p1, open_map_iterator_type p2, bool keep_hook)
+  {
+    tl_assert (contour_index () != other.contour_index ());
+
+    if ((int) p1->contour != contour_index ()) {
+      std::swap (p1, p2);
+    }
+    tl_assert ((int) p1->contour == contour_index ());
+    tl_assert ((int) p2->contour == other.contour_index ());
+
+    if (p1 == m_last_pt) {
+      m_last_pt = other.other_pt (p2);
+      m_last_pt->contour = contour_index();
+    } else {
+      tl_assert (p1 == m_first_pt);
+      m_first_pt = other.other_pt (p2);
+      m_first_pt->contour = contour_index ();
+    }
+
+    if (keep_hook) {
+      m_hooks.push_back (p1);
+      m_hooks.push_back (p2);
+      p1->hook = true;
+      p2->contour = contour_index ();
+      p2->hook = true;
+    } else {
+      mp_open->erase (p1);
+      mp_open->erase (p2);
+    }
+
+    other.reset_last_pt ();
+    other.reset_first_pt ();
+
+    while (! other.m_hooks.empty ()) {
+      auto h = other.m_hooks.back ();
+      other.m_hooks.pop_back ();
+      h->contour = contour_index ();
+      m_hooks.push_back (h);
+    }
+  }
+
+  void integrate (PGPolyContour &other)
+  {
+    while (! other.m_hooks.empty ()) {
+      auto h = other.m_hooks.back ();
+      other.m_hooks.pop_back ();
+      h->contour = contour_index ();
+      m_hooks.push_back (h);
+    }
+
+    other.remove_all_pointers ();
+  }
+
+#if defined(SANITY_CHECK)
+  int check_cache_values (bool always_print = false) const
+  {
+    if (m_y_cached == std::numeric_limits<db::Coord>::min ()) {
+      return -1;
+    }
+
+    auto cc = cache_values (m_y_cached);
+
+    //  TODO: care about actual insert position? Does it matter where we stitch into
+    //  exactly on the contour?
+    auto i = cc.begin ();
+    auto j = m_sp_cache.begin ();
+    bool values_equal = true;
+    while (i != cc.end () && j != m_sp_cache.end () && values_equal) {
+      values_equal = (**i++ == **j++);
+    }
+    if (i != cc.end () || j != m_sp_cache.end ()) {
+      values_equal = false;
+    }
+
+    if (! values_equal || always_print) {
+      tl::info << "m_y_cached=" << m_y_cached;
+      tl::info << "cc: " << tl::noendl;
+      for (auto i = cc.begin (); i != cc.end (); ++i) {
+        tl::info << (*i)->to_string () << " " << tl::noendl;
+      }
+      tl::info << "";
+      tl::info << "m_sp_cache: " << tl::noendl;
+      for (auto i = m_sp_cache.begin (); i != m_sp_cache.end (); ++i) {
+        tl::info << (*i)->to_string () << " " << tl::noendl;
+      }
+      tl::info << "";
+      if (! values_equal) {
+        tl::info << "Cache value check failed.";
+        return 0;
+      } else {
+        tl::info << "Cache value check successful.";
+        return 1;
+      }
+    } else {
+      return 1;
+    }
+  }
+#endif
 
 private:
   contour_type m_contour;
   bool m_is_hole;
   long m_next;
-  long m_last;
+  long m_prev;
   size_t m_size;
-};
+  open_map_type *mp_open;
+  open_map_iterator_type m_first_pt, m_last_pt;
+  std::vector<open_map_iterator_type> m_hooks;
+  int m_contour_index;
+  db::Coord m_y_cached;
+  std::set<iterator, IteratorXCompare> m_sp_cache;
 
-static inline
-PGPolyContour::const_iterator operator+ (PGPolyContour::const_iterator i, int n)
-{
-  while (n-- > 0) {
-    ++i;
+  void invalidate_cache ()
+  {
+    m_y_cached = std::numeric_limits<db::Coord>::min ();
+    m_sp_cache.clear ();
   }
-  return i;
-}
+
+  void update_cache (iterator from, iterator to)
+  {
+    if (m_y_cached == std::numeric_limits<db::Coord>::min ()) {
+      return;
+    }
+    if (from == to) {
+      return;
+    }
+
+    //  include last element, because we may turn it into a stitch point
+    //  while inserting
+    if (to != end ()) {
+      ++to;
+    }
+
+    //  the last element is past our inserted sequence - we may turn
+    //  it into a non-stitching point by inserting. So we first remove it.
+    auto last = to;
+    --last;
+    auto lc = m_sp_cache.find (last);
+    if (lc != m_sp_cache.end () && *lc == last) {
+      m_sp_cache.erase (lc);
+    }
+
+    if (from == begin ()) {
+      ++from;
+    }
+
+    auto ii = from;
+    --ii;
+    for (auto i = from; i != to; ++i, ++ii) {
+      if (i->y () == m_y_cached && ii->y () < m_y_cached) {
+        m_sp_cache.insert (i);
+      }
+    }
+
+#if defined(SANITY_CHECK)
+    tl_assert (check_cache_values () != 0);
+#endif
+  }
+
+  //  no copying
+  PGPolyContour (const PGPolyContour &d);
+  PGPolyContour &operator= (const PGPolyContour &d);
+};
 
 static inline
 PGPolyContour::iterator operator+ (PGPolyContour::iterator i, int n)
 {
   while (n-- > 0) {
     ++i;
-  }
-  return i;
-}
-
-static inline
-PGPolyContour::const_iterator operator- (PGPolyContour::const_iterator i, int n)
-{
-  while (n-- > 0) {
-    --i;
   }
   return i;
 }
@@ -240,6 +768,9 @@ PGPolyContour::iterator operator- (PGPolyContour::iterator i, int n)
   return i;
 }
 
+// -------------------------------------------------------------------------------
+//  PGContourList class
+
 class PGContourList
 {
 public:
@@ -247,14 +778,19 @@ public:
     : m_free_contours (-1)
   { }
 
+  ~PGContourList ()
+  {
+    clear ();
+  }
+
   PGPolyContour &operator[] (size_t n) 
   {
-    return m_contours [n];
+    return *m_contours [n];
   }
   
   const PGPolyContour &operator[] (size_t n) const
   {
-    return m_contours [n];
+    return *m_contours [n];
   }
   
   size_t size () const
@@ -262,45 +798,53 @@ public:
     return m_contours.size ();
   }
 
-  size_t allocate ()
+  size_t allocate (PGPolyContour::open_map_type *open_map)
   {
     size_t index;
 
     if (m_free_contours >= 0) {
       index = m_free_contours;
-      m_free_contours = m_contours [m_free_contours].next ();
-      m_contours [index].next (-1);
+      m_free_contours = m_contours [m_free_contours]->next ();
+      m_contours [index]->next (-1);
     } else {
       index = m_contours.size ();
-      m_contours.push_back (PGPolyContour ());
+      m_contours.push_back (new PGPolyContour ());
     }
+
+    m_contours [index]->set_map (open_map);
+    m_contours [index]->set_contour_index (index);
 
     return index;
   }
 
   void join (size_t n1, size_t n2)
   {
-    PGPolyContour &c1 = m_contours [n1];
-    PGPolyContour &c2 = m_contours [n2];
+    PGPolyContour &c1 = *m_contours [n1];
+    PGPolyContour &c2 = *m_contours [n2];
 
     if (c1.next () < 0) {
       c1.next (c2.next ());
-      c1.last (c2.last ());
+      c1.prev (c2.prev ());
     } else if (c2.next () >= 0) {
-      m_contours [c1.last ()].next (c2.next ());
-      c1.last (c2.last ());
+      m_contours [c1.prev ()]->next (c2.next ());
+      c1.prev (c2.prev ());
     }
 
     c2.clear ();
+    c2.set_map (0);
+    c2.set_contour_index (-1);
     c2.next (m_free_contours);
+
     m_free_contours = long (n2);
   }
 
   void free (size_t n)
   {
-    PGPolyContour &c = m_contours [n];
+    PGPolyContour &c = *m_contours [n];
 
     c.clear ();
+    c.set_map (0);
+    c.set_contour_index (-1);
     c.next (m_free_contours);
     m_free_contours = long (n);
   }
@@ -309,7 +853,7 @@ public:
   {
     long i = long (n);
     do {
-      long ii = m_contours [i].next ();
+      long ii = m_contours [i]->next ();
       free (i);
       i = ii;
     } while (i >= 0);
@@ -318,22 +862,61 @@ public:
   void clear ()
   {
     m_free_contours = -1;
+
+    for (auto c = m_contours.begin (); c != m_contours.end (); ++c) {
+      delete *c;
+    }
     m_contours.clear ();
   }
 
   void append (size_t what, size_t to)
   {
-    m_contours [m_contours [to].next () < 0 ? long (to) : m_contours [to].last ()].next (long (what));
+    m_contours [m_contours [to]->next () < 0 ? long (to) : m_contours [to]->prev ()]->next (long (what));
 
-    long l = m_contours [what].last ();
-    m_contours [to].last (l < 0 ? long (what) : l);
+    long l = m_contours [what]->prev ();
+    m_contours [to]->prev (l < 0 ? long (what) : l);
   }
 
 private:
   long m_free_contours;
-  std::vector <PGPolyContour> m_contours;
+  std::vector <PGPolyContour *> m_contours;
+
+  //  no copying
+  PGContourList (const PGContourList &);
+  PGContourList &operator= (const PGContourList &);
 };
 
+// -------------------------------------------------------------------------------
+//  PolygonGenerator implementation
+
+#if defined(DEBUG_POLYGON_GENERATOR)
+static std::string open_map_to_string (PolygonGenerator::open_map_type &map, PolygonGenerator::open_map_iterator_type pos = PolygonGenerator::open_map_iterator_type (), PolygonGenerator::open_map_iterator_type n = PolygonGenerator::open_map_iterator_type (), PolygonGenerator::open_map_iterator_type nn = PolygonGenerator::open_map_iterator_type ())
+{
+  std::string res;
+  for (PolygonGenerator::open_map_iterator_type i = map.begin (); i != map.end (); ++i) {
+    res += tl::to_string (i->contour);
+    res += ":";
+    res += i->point.to_string ();
+    if (i->hook) {
+      res += "~";
+    }
+    if (i->first) {
+      res += "!";
+    }
+    if (i == pos) {
+      res += "*";
+    }
+    if (i == n) {
+      res += "+";
+    }
+    if (i == nn) {
+      res += "#";
+    }
+    res += " ";
+  }
+  return res;
+}
+#endif
 
 PolygonGenerator::PolygonGenerator (PolygonSink &psink, bool resolve_holes, bool min_coherence) 
   : EdgeSink (), 
@@ -374,6 +957,9 @@ PolygonGenerator::~PolygonGenerator ()
 void
 PolygonGenerator::start ()
 {
+#if defined(DEBUG_POLYGON_GENERATOR)
+  tl::info << "start ()";
+#endif
   if (mp_psink) {
     mp_psink->start ();
   }
@@ -385,11 +971,8 @@ PolygonGenerator::start ()
 void 
 PolygonGenerator::flush ()
 {
-#ifdef DEBUG_POLYGON_GENERATOR
-  for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) { 
-    printf ("%ld:%s%c%c ", i->contour, i->point.to_string().c_str(), i->first ? '!' : ' ', i == m_open_pos ? '*' : ' ');
-  } 
-  printf ("\n");
+#if defined(DEBUG_POLYGON_GENERATOR)
+  tl::info << "flush() open_list=" << open_map_to_string (m_open, m_open_pos);
 #endif
   tl_assert (m_open.empty ());
 
@@ -407,25 +990,40 @@ PolygonGenerator::flush ()
 void 
 PolygonGenerator::begin_scanline (db::Coord y)
 {
-#ifdef DEBUG_POLYGON_GENERATOR
-  printf ("begin y=%d\n", y);
+#if defined(DEBUG_POLYGON_GENERATOR)
+  tl::info << "begin y=" << y;
 #endif
+
   m_open_pos = m_open.begin ();
   m_y = y;
 
-#ifdef DEBUG_POLYGON_GENERATOR
-  printf ("m_open=");
-  for (open_map_type::const_iterator o = m_open.begin (); o != m_open.end (); ++o) {
-    printf ("%ld:%s ", o->contour, o->point.to_string().c_str());
-  } 
-  printf ("\n");
-  printf ("contours:\n"); 
-  for (size_t j = 0; j < mp_contours->size (); ++j) { 
-    printf ("c%ld%s: ", j, (*mp_contours)[j].is_hole () ? "H" : "");
-    for (size_t i = 0; i < (*mp_contours)[j].size (); ++i) { 
-      printf ("%s ", ((*mp_contours)[j].begin () + i)->to_string().c_str ()); 
-    } 
-    printf ("\n"); 
+#if defined(DEBUG_POLYGON_GENERATOR)
+  tl::info << "  open_list=" << open_map_to_string (m_open);
+  tl::info << "  contours:";
+  for (size_t j = 0; j < mp_contours->size (); ++j) {
+    auto &c = (*mp_contours)[j];
+    if (! c.empty ()) {
+      tl::info << "    " << c.to_string ();
+    }
+  }
+#endif
+#if defined(SANITY_CHECK)
+  for (size_t j = 0; j < mp_contours->size (); ++j) {
+    auto &c = (*mp_contours)[j];
+    if (! c.empty ()) {
+      //  do some checking
+      if (c.first_pt () != m_open.end () && c.last_pt () != m_open.end ()) {
+        tl_assert (c.first_pt ()->contour == j);
+        tl_assert (c.first_pt ()->point == *c.begin ());
+        size_t n1 = std::distance (m_open.begin (), c.first_pt ());
+        tl_assert (c.last_pt ()->contour == j);
+        tl_assert (c.last_pt ()->point == *--c.end ());
+        size_t n2 = std::distance (m_open.begin (), c.last_pt ());
+        tl_assert (c.is_hole () ? n1 < n2 : n2 < n1);
+      } else {
+        tl_assert (c.first_pt () == m_open.end () && c.last_pt () == m_open.end ());
+      }
+    }
   }
 #endif
 }
@@ -434,17 +1032,29 @@ void
 PolygonGenerator::end_scanline (db::Coord /*y*/)
 {
   join_contours (std::numeric_limits<db::Coord>::max ());
+
+  //  eliminate contour hooks (left for stitching) - those are pairs
+  //  of pointers to the same point which sit in between the start
+  //  and end point of the contour and serve as hooks for potential stitch lines.
+  if (m_resolve_holes) {
+    for (size_t j = 0; j < mp_contours->size (); ++j) {
+      auto &c = (*mp_contours)[j];
+      if (! c.empty ()) {
+        c.remove_hooks ();
+      }
+    }
+  }
 }
 
 void 
-#ifdef DEBUG_POLYGON_GENERATOR
+#if defined(DEBUG_POLYGON_GENERATOR)
 PolygonGenerator::crossing_edge (const db::Edge &e)
 #else
 PolygonGenerator::crossing_edge (const db::Edge & /*e*/)
 #endif
 {
-#ifdef DEBUG_POLYGON_GENERATOR
-  printf ("xing(%s)\n", e.to_string().c_str());
+#if defined(DEBUG_POLYGON_GENERATOR)
+  tl::info << "xing(" << e.to_string () << ")";
 #endif
   join_contours (std::numeric_limits<db::Coord>::max ());
   ++m_open_pos;
@@ -454,8 +1064,8 @@ void
 PolygonGenerator::skip_n (size_t n)
 {
   join_contours (std::numeric_limits<db::Coord>::max ());
-#ifdef DEBUG_POLYGON_GENERATOR
-  printf ("skip(%ld)\n", n);
+#if defined(DEBUG_POLYGON_GENERATOR)
+  tl::info << "skip(" << n << ")";
 #endif
   while (n-- > 0) {
     ++m_open_pos;
@@ -465,12 +1075,9 @@ PolygonGenerator::skip_n (size_t n)
 void 
 PolygonGenerator::put (const db::Edge &e)
 {
-#ifdef DEBUG_POLYGON_GENERATOR
-  printf ("put(%s) y=%d m_open(%ld)=", e.to_string().c_str(),m_y,std::distance (m_open.begin (), m_open_pos));
-  for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) { 
-    printf ("%ld:%s%c%c ", i->contour, i->point.to_string().c_str(), i->first ? '!' : ' ', i == m_open_pos ? '*' : ' ');
-  } 
-  printf ("\n");
+#if defined(DEBUG_POLYGON_GENERATOR)
+  tl::info << "put(" << e.to_string() << ") y=" << m_y;
+  tl::info << "  open_list(before)=" << open_map_to_string (m_open, m_open_pos);
 #endif
 
   if (m_open_pos != m_open.end ()) {
@@ -496,6 +1103,9 @@ PolygonGenerator::put (const db::Edge &e)
 
     if (e.p2 ().y () > m_y) {
       if (m_open_contours) {
+#if defined(DEBUG_POLYGON_GENERATOR)
+        tl::info << "  eliminating hole";
+#endif
         eliminate_hole ();
       }
       ++m_open_pos;
@@ -512,6 +1122,9 @@ PolygonGenerator::put (const db::Edge &e)
 
     if (e.p1 ().y () > m_y) {
       if (m_open_contours) {
+#if defined(DEBUG_POLYGON_GENERATOR)
+        tl::info << "  eliminating hole";
+#endif
         eliminate_hole ();
       }
       ++m_open_pos;
@@ -521,30 +1134,39 @@ PolygonGenerator::put (const db::Edge &e)
 
     bool hole = (e.dy () < 0);
 
-    size_t inew = mp_contours->allocate ();
+    size_t inew = mp_contours->allocate (&m_open);
     PGPolyContour &cnew = (*mp_contours) [inew];
 
     cnew.is_hole (hole);
     cnew.push_back (e.p1 ());
     cnew.push_back (e.p2 ());
 
-#ifdef DEBUG_POLYGON_GENERATOR
-    printf ("create %s %ld\n", hole ? "hole" : "hull", inew);
+#if defined(DEBUG_POLYGON_GENERATOR)
+    tl::info << "  create " << (hole ? "hole" : "hull") << " " << inew;
 #endif
-    m_open.insert (m_open_pos, PGPoint (hole ? e.p1 () : e.p2 (), inew, true));
-    m_open.insert (m_open_pos, PGPoint (hole ? e.p2 () : e.p1 (), inew, false));
+
+    if (hole) {
+      cnew.set_first_pt (m_open.insert (m_open_pos, PGPoint (e.p1 (), inew, true)));
+      cnew.set_last_pt (m_open.insert (m_open_pos, PGPoint (e.p2 (), inew, false)));
+    } else {
+      cnew.set_last_pt (m_open.insert (m_open_pos, PGPoint (e.p2 (), inew, true)));
+      cnew.set_first_pt (m_open.insert (m_open_pos, PGPoint (e.p1 (), inew, false)));
+    }
 
     --m_open_pos;
 
   }
 
-#ifdef DEBUG_POLYGON_GENERATOR
-  for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) { 
-    printf ("%ld:%s%c%c ", i->contour, i->point.to_string().c_str(), i->first ? '!' : ' ', i == m_open_pos ? '*' : ' ');
-  } 
-  printf ("\n");
+#if defined(DEBUG_POLYGON_GENERATOR)
+  tl::info << "  open_list(after)=" << open_map_to_string (m_open, m_open_pos);
+  tl::info << "  output contours:";
+  for (size_t j = 0; j < mp_contours->size (); ++j) {
+    auto &c = (*mp_contours)[j];
+    if (! c.empty ()) {
+      tl::info << "    " << c.to_string ();
+    }
+  }
 #endif
-
 }
 
 void PolygonGenerator::eliminate_hole ()
@@ -578,10 +1200,7 @@ void PolygonGenerator::eliminate_hole ()
   db::Point pprev (xprev, m_y);
 
   //  Build a separate contour that continues the contours to the left of the hole
-  PGPolyContour cc = c;
-  cc.clear ();
-
-  cc.is_hole (false);
+  std::vector<db::Point> cc;
   cc.push_back (c.front ());
   cc.push_back (*(c.begin () + 1));
   if (pprev != cc.back ()) {
@@ -597,9 +1216,12 @@ void PolygonGenerator::eliminate_hole ()
   }
   cprev.insert (cprev.end (), c.end () - 2, c.end ());
 
-  c = cc;
+  c.is_hole (false);
+  c.clear ();
+  c.insert (c.end (), cc.begin (), cc.end ());
 
   m_open_pos->contour = ic;
+  c.set_last_pt (m_open_pos);
   ++m_open_pos;
 
   m_open_pos->first = false;
@@ -607,6 +1229,7 @@ void PolygonGenerator::eliminate_hole ()
 
   m_open_pos->first = true;
   m_open_pos->contour = iprev;
+  cprev.set_last_pt (m_open_pos);
 }
 
 void
@@ -623,6 +1246,8 @@ PolygonGenerator::join_contours (db::Coord x)
     open_map_iterator_type nn = n;
     open_map_iterator_type next = ++nn;
 
+    bool reordered = false;
+
     //  don't join, except -/+ pair (for max. coherence) or +/- pair (for min coherence)
     bool minus0 = (m_open_pos->first == (*mp_contours) [m_open_pos->contour].is_hole ());
     bool minus1 = (n->first == (*mp_contours) [n->contour].is_hole ());
@@ -634,6 +1259,7 @@ PolygonGenerator::join_contours (db::Coord x)
         m_open_pos = n;
         n = nn;
         ++nn;
+        reordered = true;
       } else if (m_open_pos->point.x () == x) {
         return;
       }
@@ -642,19 +1268,15 @@ PolygonGenerator::join_contours (db::Coord x)
 
     size_t i1 = m_open_pos->contour;
     size_t i2 = n->contour;
-#ifdef DEBUG_POLYGON_GENERATOR
-    printf ("join %ld and %ld\n", i1, i2);
-    for (open_map_iterator_type i = m_open.begin (); i != m_open.end (); ++i) { 
-      printf ("%ld:%s%c%c%c%c ", i->contour, i->point.to_string().c_str(), i->first ? '!' : ' ', i == m_open_pos ? '*' : ' ', i == n ? '+' : ' ', i == nn ? '#' : ' ');
-    } 
-    printf ("\n");
-    printf ("--> input contours:\n"); 
+#if defined(DEBUG_POLYGON_GENERATOR)
+    tl::info << "  join " << i1 << " and " << i2 << " (x=" << x << ")";
+    tl::info << "    open_list(before)=" << open_map_to_string (m_open, m_open_pos, n, nn);
+    tl::info << "    input contours:";
     for (size_t j = 0; j < mp_contours->size (); ++j) { 
-      printf ("--> c%ld%s: ", j, (*mp_contours)[j].is_hole () ? "H" : "");
-      for (size_t i = 0; i < (*mp_contours)[j].size (); ++i) { 
-        printf ("%s ", ((*mp_contours)[j].begin () + i)->to_string().c_str ()); 
-      } 
-      printf ("\n"); 
+      auto &c = (*mp_contours)[j];
+      if (! c.empty ()) {
+        tl::info << "      " << c.to_string ();
+      }
     }
 #endif
 
@@ -668,8 +1290,17 @@ PolygonGenerator::join_contours (db::Coord x)
 
       tl_assert (! c2.empty ());
       tl_assert (! c1.empty ());
+
+      bool c1_closed = c1.is_closed ();
+      bool c2_closed = c2.is_closed ();
+      bool c1_hole = c1.is_hole ();
+      bool c2_hole = c2.is_hole ();
+
+      //  leave the pair of points as hooks for future stitching - we will clean this up before the next
+      //  scanline starts
+      bool can_keep_hook = (m_resolve_holes && ! m_open_contours && ! reordered && ! c1_closed && ! c2_closed);
       
-      if (m_open_contours && !c1.is_hole () && !c2.is_hole ()) {
+      if (m_open_contours && !c1_hole && !c2_hole) {
 
         //  join with next contour by creating a stitch line
         tl_assert (m_open_pos != m_open.begin ());
@@ -705,11 +1336,30 @@ PolygonGenerator::join_contours (db::Coord x)
 
           produce_poly (cprev);
 
+          cprev.reset_first_pt ();
+          cprev.reset_last_pt ();
+
+          mp_contours->free_all (iprev);
+
         } else {
+
+          tl_assert (c1.first_pt () == m_open_pos);
+          tl_assert (cprev.last_pt () == np);
 
           cprev.splice (cprev.end (), c1);
           cprev.is_hole (false);
+          if (! np->first) {
+            cprev.first_pt ()->first = m_open_pos->first;
+          }
 
+          cprev.set_last_pt (c1.last_pt ());
+          cprev.last_pt ()->contour = iprev;
+          tl_assert (c1.first_pt () == m_open_pos);
+
+          c1.reset_first_pt ();
+          c1.reset_last_pt ();
+
+          //  will destroy c1:
           mp_contours->join (iprev, i1);
 
         }
@@ -720,38 +1370,19 @@ PolygonGenerator::join_contours (db::Coord x)
           c2.push_back (pprev);
         }
         c2.push_back (np->point);
-
-        if (!np->first) {
-
-          open_map_iterator_type o = np;
-          while (o != m_open.begin ()) {
-            --o;
-            if (o->contour == iprev) {
-              break;
-            }
-          }
-          tl_assert (o->contour == iprev);
-          o->first = m_open_pos->first;
-
-          o = np;
-          while (o != m_open.begin ()) {
-            --o;
-            if (o->contour == i1) {
-              break;
-            }
-          }
-          tl_assert (o->contour == i1);
-          o->contour = iprev;
-
-        }
+        tl_assert (c2.last_pt () == n);
+        c2.set_last_pt (np);
 
         np->contour = i2;
         np->first = n->first;
 
+        m_open.erase (m_open_pos);
+        m_open.erase (n);
+
       } else if (! m_open_pos->first && ! n->first) {
 
         //  remove c1 from list of contours, join with c2
-        if (c2.is_hole ()) {
+        if (c2_hole) {
           c1.pop_front ();
           c2.splice (c2.end (), c1);
         } else {
@@ -759,20 +1390,16 @@ PolygonGenerator::join_contours (db::Coord x)
           c2.splice (c2.begin (), c1);
         }
 
-        mp_contours->join (i2, i1);
+        c1.other_pt (m_open_pos)->first = false;
 
-        open_map_iterator_type o = m_open_pos;
-        do {
-          --o;
-        } while (o != m_open.begin () && o->contour != i1);
-        tl_assert (o != m_open.begin ());
-        o->contour = i2;
-        o->first = false;
+        c2.merge_with (c1, m_open_pos, n, can_keep_hook);
+        //  will destroy c1:
+        mp_contours->join (i2, i1);
 
       } else {
 
         //  remove c1 from list of contours, join with c2
-        if (c2.is_hole ()) {  // yes! c2 is correct!
+        if (c2_hole) {  // yes! c2 is correct!
           c2.pop_front ();
           c1.splice (c1.end (), c2);
         } else {
@@ -780,18 +1407,13 @@ PolygonGenerator::join_contours (db::Coord x)
           c1.splice (c1.begin (), c2);
         }
 
-        mp_contours->join (i1, i2);
-
-        open_map_iterator_type o = n;
-        do {
-          ++o;
-        } while (o != m_open.end () && o->contour != i2);
-        tl_assert (o != m_open.end ());
-        o->contour = i1;
-
         if (m_open_pos->first && n->first) {
-          o->first = true;
+          c2.other_pt (n)->first = true;
         }
+
+        c1.merge_with (c2, m_open_pos, n, can_keep_hook);
+        //  will destroy c2:
+        mp_contours->join (i1, i2);
 
       }
 
@@ -799,8 +1421,8 @@ PolygonGenerator::join_contours (db::Coord x)
 
       if (! c1.is_hole ()) {
 
-#ifdef DEBUG_POLYGON_GENERATOR
-        printf ("finish %ld (hull)\n", i1);
+#if defined(DEBUG_POLYGON_GENERATOR)
+        tl::info << "    finish " << i1 << " (hull)";
 #endif
 
         produce_poly (c1);
@@ -814,63 +1436,125 @@ PolygonGenerator::join_contours (db::Coord x)
         tl_assert (m_open_pos != m_open.begin ());
 
         open_map_iterator_type np = m_open_pos;
-        --np;
+        do {
+          --np;
+        } while (np != m_open.begin () && np->contour == m_open_pos->contour);
 
         size_t iprev = np->contour;
+        tl_assert (iprev != m_open_pos->contour);
         PGPolyContour &cprev = (*mp_contours) [iprev];
 
         tl_assert (cprev.size () >= 2);
         tl_assert (c1.size () >= 2);
 
-        PGPolyContour::iterator ins = cprev.end ();
-        db::Coord xprev = 0;
-        db::Edge eprev;
+        PGPolyContour::iterator ins = cprev.stitch_point (c1.begin ()->x (), m_y);
 
-#if 1
-        //  shallow analysis: insert the cutline at the end of the sequence - this may
-        //  cut lines collinear with contour edges
+#if defined(DEBUG_POLYGON_GENERATOR)
+        tl::info << "    stitching hole into " << iprev << " at position " << std::distance (cprev.begin (), ins) << " ..";
+#endif
 
-        eprev = db::Edge (*(ins - 2), *(ins - 1));
-        xprev = db::coord_traits<db::Coord>::rounded (edge_xaty (db::Edge (*(ins - 2), *(ins - 1)), m_y));
-#else
-        //  deep analysis: determine insertion point: pick the one where the cutline is shortest
+        //  insert the cutline at position "ins"
 
-        for (PGPolyContour::iterator i = ins; i > cprev.begin () + 1; --i) {
+        //  compute intersection point with next edge
+        PGPolyContour::iterator insm2 = ins;
+        --insm2;
+        PGPolyContour::iterator insm1 = insm2--;
 
-          db::Edge ecut (i[-2], i[-1]);
-          db::Coord xcut = db::coord_traits<db::Coord>::rounded (edge_xaty (db::Edge (i[-2], i[-1]), m_y));
+        db::Edge eprev = db::Edge (*insm2, *insm1);
+        db::Coord xprev;
+        if (eprev.dy () != 0) {
+          xprev = db::coord_traits<db::Coord>::rounded (edge_xaty (eprev, m_y));
+        } else {
+          xprev = eprev.p2 ().x ();
+        }
+        db::Point pprev (xprev, m_y);
 
-          if (ins == i || (i[-1].y () >= m_y && i[-2].y () < m_y && xcut < c1.back ().x () && xcut > xprev)) {
-            xprev = xcut;
-            eprev = ecut;
-            ins = i;
+        cprev.replace_point (insm1, pprev);
+
+        //  remove collinear edges along the cut line so we create the longest possible stitch line
+        //  instead of a fractured one and avoid reflecting edges
+        while (insm1 != cprev.begin () && insm2->y () == m_y && insm1->y () == m_y) {
+          ins = cprev.erase (insm1);
+          insm1 = insm2;
+          --insm2;
+        }
+
+#if defined(ENHANCED_STITCHING)
+        //  insert a redundant point if it is needed to support the outgoing stitch line
+        //  to a future next hole to the right
+        if (ins != cprev.end () && ins->y () != m_y) {
+          ins = cprev.insert (ins, *insm1);
+        }
+
+        auto insert_from = c1.begin ();
+
+        //  skip the redundant point that closes the contour
+        if (*insert_from == *(c1.end () - 1)) {    // TODO Q: does this test ever fail?
+          ++insert_from;
+        }
+
+        auto insert_first = c1.end ();
+        for (auto i = insert_from; i != c1.end (); ++i) {
+          if (i->y () == m_y && i->x () >= xprev && (insert_first == c1.end () || i->x () <= insert_first->x ())) {
+            insert_first = i;
           }
+        }
+        tl_assert (insert_first != c1.end ());
 
+        auto insert_last = insert_first;
+        for (auto i = insert_from; i != c1.end (); ++i) {
+          if (i->y () == m_y && i->x () > insert_last->x ()) {
+            insert_last = i;
+          }
+        }
+
+        db::Point first = *insert_first;
+
+        //  splice the other contour into this contour
+        if (insert_first == insert_from) {
+          cprev.splice (ins, std::move (c1), insert_from, c1.end ());
+        } else {
+          cprev.splice (ins, c1, insert_first, c1.end ());
+          cprev.splice (ins, c1, insert_from, c1.end ());
+        }
+
+        //  insert a redundant point if it is needed to support the incoming stitch line
+        if ((ins - 1)->y () != m_y) {
+          ins = cprev.insert (ins, first);
+          ++ins;
+        }
+
+        //  add an endpoint for the outbound stitch line unless we have one already
+        if (ins == cprev.end ()) {
+          if (*(ins - 1) != pprev) {
+            ins = cprev.insert (ins, pprev);
+            ++ins;
+          }
+          if (eprev.p2 () != pprev) {
+            cprev.insert (ins, eprev.p2 ());
+          }
+        }
+#else
+        auto insert_from = c1.begin ();
+
+        if ((insert_from + 1)->y () == m_y) {
+          //  skip the first point if it closes the contour
+          ++insert_from;
+        }
+
+        cprev.splice (ins, std::move (c1), insert_from, c1.end ());
+
+        //  add a endpoint for the outbound stitch line unless we have one already
+        if (ins == cprev.end ()) {
+          ins = cprev.insert (ins, pprev);
+          ++ins;
+          if (eprev.p2 () != pprev) {
+            cprev.insert (ins, eprev.p2 ());
+          }
         }
 #endif
 
-        //  compute intersection point with next edge
-        db::Point pprev (xprev, m_y);
-
-        //  remove collinear edges along the cut line
-        *(ins - 1) = pprev;
-        while (ins - 1 != cprev.begin () && (ins - 2)->y () == m_y && (ins - 1)->y () == m_y) {
-          ins = cprev.erase (ins - 1);
-        }
-
-        if ((c1.begin () + 1)->y () == m_y) {
-          ins = cprev.insert (ins, c1.begin () + 1, c1.end ());
-          ins = ins + (c1.size () - 1);
-        } else {
-          ins = cprev.insert (ins, c1.begin (), c1.end ());
-          ins = ins + c1.size ();
-        }
-
-        ins = cprev.insert (ins, pprev);
-        ++ins;
-        if (eprev.p2 () != pprev) {
-          cprev.insert (ins, eprev.p2 ());
-        }
+        cprev.integrate (c1);
 
         mp_contours->free (i1);
 
@@ -879,14 +1563,13 @@ PolygonGenerator::join_contours (db::Coord x)
         //  join with next contour by inserting as a hole
         tl_assert (nn != m_open.end ());
 
+        c1.remove_all_pointers ();
+
         mp_contours->append (i1, nn->contour);
 
       }
 
     }
-
-    m_open.erase (m_open_pos);
-    m_open.erase (n);
 
     m_open_pos = next;
 
@@ -896,14 +1579,14 @@ PolygonGenerator::join_contours (db::Coord x)
       ++m_open_pos;
     }
 
-#ifdef DEBUG_POLYGON_GENERATOR
-    printf ("--> output contours:\n"); 
-    for (size_t j = 0; j < mp_contours->size (); ++j) { 
-      printf ("--> c%ld%s: ", j, (*mp_contours)[j].is_hole () ? "H" : "");
-      for (size_t i = 0; i < (*mp_contours)[j].size (); ++i) { 
-        printf ("%s ", ((*mp_contours)[j].begin () + i)->to_string().c_str ()); 
-      } 
-      printf ("\n"); 
+#if defined(DEBUG_POLYGON_GENERATOR)
+    tl::info << "    open_list(after)=" << open_map_to_string (m_open, m_open_pos);
+    tl::info << "    output contours:";
+    for (size_t j = 0; j < mp_contours->size (); ++j) {
+      auto &c = (*mp_contours)[j];
+      if (! c.empty ()) {
+        tl::info << "      " << c.to_string ();
+      }
     }
 #endif
 
@@ -925,8 +1608,8 @@ PolygonGenerator::produce_poly (const PGPolyContour &c)
 
   if (mp_psink) {
 
-    PGPolyContour::const_iterator p0 = c.begin ();
-    PGPolyContour::const_iterator p1 = c.end ();
+    PGPolyContour::iterator p0 = c.begin ();
+    PGPolyContour::iterator p1 = c.end ();
     // remove duplicate point at end
     tl_assert (p0 != p1);
     --p1;
@@ -944,8 +1627,8 @@ PolygonGenerator::produce_poly (const PGPolyContour &c)
 
         tl_assert ((*mp_contours) [inext].is_hole ());
 
-        PGPolyContour::const_iterator p0 = (*mp_contours) [inext].begin ();
-        PGPolyContour::const_iterator p1 = (*mp_contours) [inext].end ();
+        PGPolyContour::iterator p0 = (*mp_contours) [inext].begin ();
+        PGPolyContour::iterator p1 = (*mp_contours) [inext].end ();
         // remove duplicate point at end
         tl_assert (p0 != p1);
         --p1;
@@ -959,6 +1642,21 @@ PolygonGenerator::produce_poly (const PGPolyContour &c)
 
     }
 
+#if defined(SANITY_CHECK)
+    if (m_resolve_holes) {
+
+      bool check_polygon_for_intersecting_edges_result = check_polygon_for_intersecting_edges (m_poly);
+      int max_horizontal_edge_overlap_result = max_horizontal_edge_overlap (m_poly);
+      if (! check_polygon_for_intersecting_edges_result ||
+          max_horizontal_edge_overlap_result > 2) {
+        tl::info << "Info: polygon is " << m_poly.to_string ();
+        tl_assert (check_polygon_for_intersecting_edges_result == true);
+        tl_assert (max_horizontal_edge_overlap_result <= 2);
+      }
+
+    }
+#endif
+
     mp_psink->put (m_poly);
 
   } 
@@ -968,6 +1666,16 @@ PolygonGenerator::produce_poly (const PGPolyContour &c)
     tl_assert (n == 0);  //  there should not be holes since we forced resolve_holes to true ...
     m_spoly.assign_hull (c.begin (), c.end (), reduce /*compress*/);
 
+#if defined(SANITY_CHECK)
+    bool check_polygon_for_intersecting_edges_result = check_polygon_for_intersecting_edges (m_spoly);
+    int max_horizontal_edge_overlap_result = max_horizontal_edge_overlap (m_spoly);
+    if (! check_polygon_for_intersecting_edges_result ||
+        max_horizontal_edge_overlap_result > 2) {
+      tl::info << "Info: simple polygon is " << m_spoly.to_string ();
+      tl_assert (check_polygon_for_intersecting_edges_result == true);
+      tl_assert (max_horizontal_edge_overlap_result <= 2);
+    }
+#endif
     mp_spsink->put (m_spoly);
 
   } 

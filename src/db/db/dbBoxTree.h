@@ -30,6 +30,7 @@
 #include "dbMemStatistics.h"
 
 #include <limits>
+#include <type_traits>
 #include <vector>
 
 namespace db
@@ -763,14 +764,14 @@ public:
   /**
    *  @brief Move constructor
    */
-  box_tree (box_tree &&b)
-    : m_objects (b.m_objects), m_elements (b.m_elements), mp_root (b.mp_root)
+  box_tree (box_tree &&b) noexcept (std::is_nothrow_move_constructible<obj_vector_type>::value && std::is_nothrow_move_constructible<element_vector_type>::value)
+    : m_objects (std::move (b.m_objects)), m_elements (std::move (b.m_elements)), mp_root (b.mp_root)
   {
     b.mp_root = 0;
   }
 
   /**
-   *  @brief Assignment 
+   *  @brief Assignment
    */
   box_tree &operator= (const box_tree &b)
   {
@@ -786,12 +787,12 @@ public:
   /**
    *  @brief Assignment (move)
    */
-  box_tree &operator= (box_tree &&b)
+  box_tree &operator= (box_tree &&b) noexcept (std::is_nothrow_move_assignable<obj_vector_type>::value && std::is_nothrow_move_assignable<element_vector_type>::value)
   {
-    clear ();
-    m_objects = b.m_objects;
-    m_elements = b.m_elements;
-    if (b.mp_root) {
+    if (this != &b) {
+      clear ();
+      m_objects = std::move (b.m_objects);
+      m_elements = std::move (b.m_elements);
       mp_root = b.mp_root;
       b.mp_root = 0;
     }
@@ -1759,14 +1760,14 @@ public:
   /**
    *  @brief Move constructor
    */
-  unstable_box_tree (unstable_box_tree &&b)
-    : m_objects (b.m_objects), mp_root (b.mp_root)
+  unstable_box_tree (unstable_box_tree &&b) noexcept (std::is_nothrow_move_constructible<obj_vector_type>::value)
+    : m_objects (std::move (b.m_objects)), mp_root (b.mp_root)
   {
     b.mp_root = 0;
   }
 
   /**
-   *  @brief Assignment 
+   *  @brief Assignment
    */
   unstable_box_tree &operator= (const unstable_box_tree &b)
   {
@@ -1781,11 +1782,11 @@ public:
   /**
    *  @brief Assignment (move)
    */
-  unstable_box_tree &operator= (unstable_box_tree &&b)
+  unstable_box_tree &operator= (unstable_box_tree &&b) noexcept (std::is_nothrow_move_assignable<obj_vector_type>::value)
   {
-    clear ();
-    m_objects = b.m_objects;
-    if (b.mp_root) {
+    if (this != &b) {
+      clear ();
+      m_objects = std::move (b.m_objects);
       mp_root = b.mp_root;
       b.mp_root = 0;
     }

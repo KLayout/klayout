@@ -78,6 +78,16 @@ struct DB_PUBLIC InstElement
   }
 
   /**
+   *  @brief Move ctor
+   */
+  InstElement (InstElement &&d) noexcept
+    : inst_ptr (std::move (d.inst_ptr)),
+      array_inst (std::move (d.array_inst))
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
    *  @brief Compute the bounding box of the instance path element 
    *
    *  If the instance path element is a whole array, the bounding box is computed for the array, 
@@ -108,11 +118,23 @@ struct DB_PUBLIC InstElement
   /**
    *  @brief Assignment
    */
-  InstElement &operator= (const InstElement &d) 
+  InstElement &operator= (const InstElement &d)
   {
     if (&d != this) {
       inst_ptr = d.inst_ptr;
       array_inst = d.array_inst;
+    }
+    return *this;
+  }
+
+  /**
+   *  @brief Assignment (move)
+   */
+  InstElement &operator= (InstElement &&d) noexcept
+  {
+    if (&d != this) {
+      inst_ptr = std::move (d.inst_ptr);
+      array_inst = std::move (d.array_inst);
     }
     return *this;
   }

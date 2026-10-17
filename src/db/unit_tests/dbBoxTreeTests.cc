@@ -1120,3 +1120,57 @@ TEST(7U)
     EXPECT_EQ (n, t.size () * 10);
   }
 }
+
+TEST(move_tree)
+{
+  Box2Box conv;
+
+  TestTree t;
+  for (int i = 0; i < 200; ++i) {
+    t.insert (db::Box (i * 10, 0, i * 10 + 5, 5));
+  }
+  t.sort (conv);
+
+  TestTree t2 (std::move (t));
+  EXPECT_EQ (t2.size (), size_t (200));
+
+  TestTree t3;
+  t3 = std::move (t2);
+  EXPECT_EQ (t3.size (), size_t (200));
+
+  //  self move assignment must keep the contents
+  TestTree &t3_ref = t3;
+  t3 = std::move (t3_ref);
+  EXPECT_EQ (t3.size (), size_t (200));
+
+  size_t n = 0;
+  TestTree::touching_iterator it = t3.begin_touching (db::Box (db::Point (-1, -1), db::Point (10000, 100)), conv);
+  while (!it.at_end ()) {
+    ++it;
+    ++n;
+  }
+  EXPECT_EQ (n, size_t (200));
+}
+
+TEST(move_unstable_tree)
+{
+  Box2Box conv;
+
+  UnstableTestTree t;
+  for (int i = 0; i < 200; ++i) {
+    t.insert (db::Box (i * 10, 0, i * 10 + 5, 5));
+  }
+  t.sort (conv);
+
+  UnstableTestTree t2 (std::move (t));
+  EXPECT_EQ (t2.size (), size_t (200));
+
+  UnstableTestTree t3;
+  t3 = std::move (t2);
+  EXPECT_EQ (t3.size (), size_t (200));
+
+  //  self move assignment must keep the contents
+  UnstableTestTree &t3_ref = t3;
+  t3 = std::move (t3_ref);
+  EXPECT_EQ (t3.size (), size_t (200));
+}

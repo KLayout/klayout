@@ -169,7 +169,7 @@ public:
   /**
    *  @brief Add a cell mapping
    *
-   *  @param cell_index_b The index of the cell in layout_a (the source of the mapping)
+   *  @param cell_index_b The index of the cell in layout_b (the source of the mapping)
    *  @param cell_index_a The index of the cell in layout_a (the target of the mapping)
    */
   void map (db::cell_index_type cell_index_b, db::cell_index_type cell_index_a)
@@ -232,19 +232,22 @@ public:
    *  If given, "include_cells" can specify a list of cells which are included in the
    *  cell tree to create. Cells not in the "include_cells" list are ignored.
    *
+   *  If "skip_same_library_cells" is set to true, proxy cells that represent the
+   *  same library cell in the target and source layout are reused from the target layout.
+   *
    *  The returned vector lists the new cells.
    */
-  std::vector<db::cell_index_type> create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells = 0, const std::set<db::cell_index_type> *include_cells = 0);
+  std::vector<db::cell_index_type> create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells = 0, const std::set<db::cell_index_type> *include_cells = 0, bool skip_same_library_cells = false);
 
   /**
    *  @brief A convenience version of create_missing_mappings which takes a single cell for cell_index_a and cell_index_b.
    */
-  std::vector<db::cell_index_type> create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells = 0, const std::set<db::cell_index_type> *include_cells = 0)
+  std::vector<db::cell_index_type> create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells = 0, const std::set<db::cell_index_type> *include_cells = 0, bool skip_same_library_cells = false)
   {
     std::vector<db::cell_index_type> cib;
     cib.reserve (1);
     cib.push_back (cell_index_b);
-    return create_missing_mapping (layout_a, layout_b, cib, exclude_cells, include_cells);
+    return create_missing_mapping (layout_a, layout_b, cib, exclude_cells, include_cells, skip_same_library_cells);
   }
 
   /**
@@ -252,21 +255,29 @@ public:
    *
    *  The first cell index of the pair is the old cell in layout_a, the second cell index
    *  is the new cell in layout_b.
+   *
+   *  Cells mapped to existing library cells when using "skip_same_library_cells" are
+   *  not included in the returned mapping list. Only cells freshly created by this
+   *  call are listed.
    */
-  std::vector<std::pair<db::cell_index_type, db::cell_index_type> > create_missing_mapping2 (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells = 0, const std::set<db::cell_index_type> *include_cells = 0);
+  std::vector<std::pair<db::cell_index_type, db::cell_index_type> > create_missing_mapping2 (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells = 0, const std::set<db::cell_index_type> *include_cells = 0, bool skip_same_library_cells = false);
 
   /**
    *  @brief Like create_missing_mapping, but returns the newly mapped pairs (single-cell version)
    *
    *  The first cell index of the pair is the old cell in layout_a, the second cell index
    *  is the new cell in layout_b.
+   *
+   *  Cells mapped to existing library cells when using "skip_same_library_cells" are
+   *  not included in the returned mapping list. Only cells freshly created by this
+   *  call are listed.
    */
-  std::vector<std::pair<db::cell_index_type, db::cell_index_type> > create_missing_mapping2 (db::Layout &layout_a, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells = 0, const std::set<db::cell_index_type> *include_cells = 0)
+  std::vector<std::pair<db::cell_index_type, db::cell_index_type> > create_missing_mapping2 (db::Layout &layout_a, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells = 0, const std::set<db::cell_index_type> *include_cells = 0, bool skip_same_library_cells = false)
   {
     std::vector<db::cell_index_type> cib;
     cib.reserve (1);
     cib.push_back (cell_index_b);
-    return create_missing_mapping2 (layout_a, layout_b, cib, exclude_cells, include_cells);
+    return create_missing_mapping2 (layout_a, layout_b, cib, exclude_cells, include_cells, skip_same_library_cells);
   }
 
 private:
@@ -277,7 +288,7 @@ private:
   void dump_mapping (const std::map <db::cell_index_type, std::vector<db::cell_index_type> > &candidates, 
                      const db::Layout &layout_a, const db::Layout &layout_b);
 
-  void do_create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, std::vector<db::cell_index_type> *new_cells, std::vector<std::pair<db::cell_index_type, db::cell_index_type> > *mapped_pairs);
+  void do_create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, std::vector<db::cell_index_type> *new_cells, std::vector<std::pair<db::cell_index_type, db::cell_index_type> > *mapped_pairs, bool skip_same_library_cells);
 
   std::map <db::cell_index_type, db::cell_index_type> m_b2a_mapping;
 };

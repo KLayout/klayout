@@ -26,6 +26,8 @@
 #include "layFixedFont.h"
 #include "tlAlgorithm.h"
 
+#include <algorithm>
+
 namespace lay {
 
 Bitmap::Bitmap ()
@@ -90,7 +92,7 @@ Bitmap::~Bitmap ()
 }
 
 uint32_t *
-Bitmap::scanline (unsigned int n)
+Bitmap::alloc_scanline (unsigned int n)
 {
   if (m_scanlines.empty ()) {
     m_scanlines.resize (m_height, 0);
@@ -287,50 +289,47 @@ Bitmap::fill_pattern (int y, int x, const uint32_t *pp, unsigned int stride, uns
         return;
       }
       n -= y - m_height + 1;
-      pp += y - m_height + 1;
+      pp += (y - m_height + 1) * stride;
       y = m_height - 1;
     }
 
-    while (n > 0 && y >= 0) {
+    if (y < 0) {
+      return;
+    }
 
-      for (unsigned int s = 0; s < stride; ++s, pp++) {
+    //  rows go down from y, so only the rows down to scanline 0 are drawn
+    const unsigned int rows = std::min (n, static_cast<unsigned int> (y) + 1);
 
-        uint32_t p = *pp;
+    //  column by column: the horizontal clipping and shifts are the same for every row of a column
+    for (unsigned int s = 0; s < stride; ++s) {
 
-        int x1 = x + s * 32;
-        if (x1 <= -32 || x1 >= (int)m_width) {
-          continue;
-        } else if (x1 < 0) {
-          p >>= (unsigned int)-x1;
-          x1 = 0;
-        }
-
-        if (p) {
-
-          unsigned int bx = ((unsigned int) x1) & ~(32 - 1);
-
-          uint32_t *sl = scanline (y);
-          sl += bx / 32;
-
-          *sl |= (p << ((unsigned int)x1 - bx));
-
-          if ((unsigned int)x1 > bx) {
-
-            bx += 32;
-            ++sl;
-
-            if (bx < m_width) {
-              *sl |= (p >> (bx - (unsigned int)x1));
-            }
-
-          }
-
-        }
-
+      int x1 = x + int (s * 32);
+      //  a column that starts left of the bitmap loses its first -x1 pixels
+      unsigned int clip = 0;
+      if (x1 <= -32 || x1 >= int (m_width)) {
+        continue;
+      } else if (x1 < 0) {
+        clip = static_cast<unsigned int> (-x1);
+        x1 = 0;
       }
 
-      --n;
-      --y;
+      const unsigned int bx = static_cast<unsigned int> (x1) & ~(32u - 1);
+      const unsigned int shift = static_cast<unsigned int> (x1) - bx;
+      //  a column that is not word aligned also covers the next word, unless that word is past the bitmap edge
+      const bool spill = shift > 0 && bx + 32 < m_width;
+      const unsigned int word = bx / 32;
+
+      const uint32_t *ps = pp + s;
+      for (unsigned int r = 0; r < rows; ++r, ps += stride) {
+        uint32_t p = *ps >> clip;
+        if (p) {
+          uint32_t *sl = scanline (y - r) + word;
+          sl [0] |= (p << shift);
+          if (spill) {
+            sl [1] |= (p >> (32 - shift));
+          }
+        }
+      }
 
     }
 

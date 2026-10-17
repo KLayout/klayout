@@ -3761,3 +3761,77 @@ TEST(101)
   EXPECT_EQ (& qr2.obj () == &qr2_obj, true);
 }
 
+
+template <class Sh, class StableTag, class Make>
+void check_layer_order (tl::TestBase *_this, const db::Shapes &s, const Make &make, size_t n)
+{
+  size_t k = 0;
+  for (typename db::layer<Sh, StableTag>::iterator i = s.begin (typename Sh::tag (), StableTag ()); i != s.end (typename Sh::tag (), StableTag ()); ++i, ++k) {
+    EXPECT_EQ (*i == make (k), true);
+  }
+  EXPECT_EQ (k, n);
+}
+
+//  The per-type layer lookup used to do a dynamic_cast per layer. The tag based
+//  version must find the same layer and preserve the insertion order of stable
+//  layers (the MRU swap must not change that).
+TEST(layer_lookup_by_type)
+{
+  for (int editable = 0; editable <= 1; ++editable) {
+
+    db::Manager m (true);
+    db::Shapes s (&m, 0, editable != 0);
+
+    for (int i = 0; i < 5000; ++i) {
+      s.insert (db::Box (i, 0, i + 1, 1));
+      s.insert (db::Polygon (db::Box (i, 0, i + 1, 1)));
+      s.insert (db::Edge (i, 0, i + 1, 1));
+      db::Point pts[] = { db::Point (i, 0), db::Point (i + 1, 1) };
+      s.insert (db::Path (&pts[0], &pts[0] + 2, 1));
+      s.insert (db::Text (tl::to_string (i), db::Trans (db::Vector (i, 0))));
+    }
+
+    db::Shapes s2 (s);
+
+    size_t n = 5000;
+
+    if (editable) {
+
+      EXPECT_EQ (s.size (db::Box::tag (), db::stable_layer_tag ()), n);
+      EXPECT_EQ (s.size (db::Polygon::tag (), db::stable_layer_tag ()), n);
+      EXPECT_EQ (s.size (db::Edge::tag (), db::stable_layer_tag ()), n);
+      EXPECT_EQ (s.size (db::Path::tag (), db::stable_layer_tag ()), n);
+      EXPECT_EQ (s.size (db::Text::tag (), db::stable_layer_tag ()), n);
+
+      check_layer_order<db::Box, db::stable_layer_tag> (_this, s, [] (size_t i) -> db::Box { return db::Box (int (i), 0, int (i) + 1, 1); }, n);
+      check_layer_order<db::Polygon, db::stable_layer_tag> (_this, s, [] (size_t i) -> db::Polygon { return db::Polygon (db::Box (int (i), 0, int (i) + 1, 1)); }, n);
+      check_layer_order<db::Edge, db::stable_layer_tag> (_this, s, [] (size_t i) -> db::Edge { return db::Edge (int (i), 0, int (i) + 1, 1); }, n);
+      check_layer_order<db::Path, db::stable_layer_tag> (_this, s, [] (size_t i) -> db::Path { db::Point pts[] = { db::Point (int (i), 0), db::Point (int (i) + 1, 1) }; return db::Path (&pts[0], &pts[0] + 2, 1); }, n);
+      check_layer_order<db::Text, db::stable_layer_tag> (_this, s, [] (size_t i) -> db::Text { return db::Text (tl::to_string (i), db::Trans (db::Vector (int (i), 0))); }, n);
+
+      EXPECT_EQ (s2.size (db::Box::tag (), db::stable_layer_tag ()), n);
+      EXPECT_EQ (s2.size (db::Polygon::tag (), db::stable_layer_tag ()), n);
+      EXPECT_EQ (s2.size (db::Edge::tag (), db::stable_layer_tag ()), n);
+      EXPECT_EQ (s2.size (db::Path::tag (), db::stable_layer_tag ()), n);
+      EXPECT_EQ (s2.size (db::Text::tag (), db::stable_layer_tag ()), n);
+
+      check_layer_order<db::Box, db::stable_layer_tag> (_this, s2, [] (size_t i) -> db::Box { return db::Box (int (i), 0, int (i) + 1, 1); }, n);
+      check_layer_order<db::Text, db::stable_layer_tag> (_this, s2, [] (size_t i) -> db::Text { return db::Text (tl::to_string (i), db::Trans (db::Vector (int (i), 0))); }, n);
+
+    } else {
+
+      EXPECT_EQ (s.size (db::Box::tag (), db::unstable_layer_tag ()), n);
+      EXPECT_EQ (s.size (db::Polygon::tag (), db::unstable_layer_tag ()), n);
+      EXPECT_EQ (s.size (db::Edge::tag (), db::unstable_layer_tag ()), n);
+      EXPECT_EQ (s.size (db::Path::tag (), db::unstable_layer_tag ()), n);
+      EXPECT_EQ (s.size (db::Text::tag (), db::unstable_layer_tag ()), n);
+
+      EXPECT_EQ (s2.size (db::Box::tag (), db::unstable_layer_tag ()), n);
+      EXPECT_EQ (s2.size (db::Polygon::tag (), db::unstable_layer_tag ()), n);
+      EXPECT_EQ (s2.size (db::Edge::tag (), db::unstable_layer_tag ()), n);
+      EXPECT_EQ (s2.size (db::Path::tag (), db::unstable_layer_tag ()), n);
+      EXPECT_EQ (s2.size (db::Text::tag (), db::unstable_layer_tag ()), n);
+
+    }
+  }
+}

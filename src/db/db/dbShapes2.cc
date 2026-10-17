@@ -901,6 +901,9 @@ layer_class<Sh, StableTag>::type_mask () const
   return iterator_type_mask (typename Sh::tag ());
 }
 
+template <class Sh, class StableTag>
+const char layer_class<Sh, StableTag>::s_type_tag = 0;
+
 //  explicit instantiations
 
 template class layer_class<db::Shape::polygon_type, db::stable_layer_tag>;

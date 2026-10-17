@@ -98,8 +98,20 @@ public:
   typedef LayerBase::coord_type coord_type;
 
   layer_class ()
-    : LayerBase (), m_layer () 
+    : LayerBase (class_type_tag ()), m_layer ()
   { }
+
+  /**
+   *  @brief A unique tag identifying this layer type
+   *
+   *  The address of the static is unique to the layer type, so it identifies the type
+   *  without a dynamic_cast. The static is defined together with the explicit
+   *  instantiations in dbShapes2.cc, so there is exactly one per layer type.
+   */
+  static const void *class_type_tag ()
+  {
+    return &s_type_tag;
+  }
 
   layer_type &layer () 
   {
@@ -175,6 +187,8 @@ public:
 
 private:
   layer_type m_layer;
+
+  static const char s_type_tag;
 };
 
 template <class Sh, class Stable>

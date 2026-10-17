@@ -71,10 +71,11 @@ Shapes::get_layer () const
 {
   typedef layer_class<Sh, StableTag> lay_cls;
 
+  const void *tag = lay_cls::class_type_tag ();
+
   for (typename tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-    const lay_cls *lc = dynamic_cast <const lay_cls *> (*l);
-    if (lc) {
-      return lc->layer ();
+    if ((*l)->type_tag () == tag) {
+      return static_cast <const lay_cls *> (*l)->layer ();
     }
   }
 
@@ -94,9 +95,11 @@ Shapes::get_layer ()
   typedef layer_class<Sh, StableTag> lay_cls;
   lay_cls *lc;
 
+  const void *tag = lay_cls::class_type_tag ();
+
   for (typename tl::vector<LayerBase *>::iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-    lc = dynamic_cast <lay_cls *> (*l);
-    if (lc) {
+    if ((*l)->type_tag () == tag) {
+      lc = static_cast <lay_cls *> (*l);
       //  this is what optimizes access times for another access
       //  with this type
       std::swap (m_layers.front (), *l);

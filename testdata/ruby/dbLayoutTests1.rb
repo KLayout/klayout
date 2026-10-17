@@ -2552,6 +2552,42 @@ class DBLayoutTests1_TestClass < TestBase
 
   end
 
+  # issue #2492, fill produces duplicate instances
+  def test_issue2492
+
+    ly = RBA::Layout::new()
+
+    top = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+    l2 = ly.layer(2, 0)
+
+    fc_name = "FILL_CELL"
+    fill_cell = ly.create_cell(fc_name)
+    fill_shape = RBA::Box::new(-2500, -2500, 2500, 2500)
+    fill_cell.shapes(l2).insert(fill_shape)
+
+    fc_box = RBA::Box::new(-25000, -25000, 25000, 25000)
+    fc_origin = RBA::Point::new(0, 0)
+
+    row_step = RBA::Vector::new(8000, 1600)
+    column_step = RBA::Vector::new(1600, 8000)
+
+    args = [ fc_box, row_step, column_step, fc_origin ]
+
+    fill_region = RBA::Region::new(RBA::Polygon::new(RBA::Box::new(0, 0, 200000, 200000)))
+    top.shapes(l1).insert(fill_region)
+
+    top.fill_region(fill_region, fill_cell.cell_index, *args)
+
+    l2_region = RBA::Region::new(top.begin_shapes_rec(l2))
+
+    assert_equal(l2_region.size, 368)
+
+    # no overlaps
+    assert_equal(l2_region.merged(2).size, 0)
+
+  end
+
 end
 
 load("test_epilogue.rb")

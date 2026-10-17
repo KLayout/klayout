@@ -662,6 +662,8 @@ template <> struct c2python_func<tl::Variant> : public c2python_func<const tl::V
 
 /**
  *  @brief Converts the Python object to the given type
+ *
+ *  The return value is a new reference owned by the caller.
  */
 template <class T>
 inline PyObject *c2python (T t)
@@ -672,7 +674,7 @@ inline PyObject *c2python (T t)
 /**
  *  @brief Converts a C++ object pointer to a Python object
  *  This version transfers ownership over the object to Python. The pointer will
- *  be help by Python and the object will be destroyed when Python no longer needs the
+ *  be held by Python and the object will be destroyed when Python no longer needs the
  *  object. To keep the ownership, use python2c(p).
  *  T must be a registered type.
  */

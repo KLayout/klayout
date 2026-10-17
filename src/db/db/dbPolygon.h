@@ -42,6 +42,8 @@
 
 #include <cstddef>
 #include <cmath>
+#include <cstring>
+#include <limits>
 #include <string>
 #include <vector>
 #include <iterator>
@@ -956,14 +958,28 @@ public:
     if (is_hole () != d.is_hole ()) {
       return false;
     }
-    simple_iterator p1 = begin (), p2 = d.begin ();
-    while (p1 != end ()) {
-      if (*p1 != *p2) {
-        return false;
-      }
-      ++p1; ++p2;
+    if (size () == 0) {
+      return true;
     }
-    return true;
+    //  uncompressed contours with integer coordinates keep the logical points
+    //  in the array 1:1, so equal bytes mean equal points. Compressed contours,
+    //  which reconstruct every second point, and floating point coordinates
+    //  (NaN, negative zero) need the point-by-point comparison.
+    if (((reinterpret_cast<size_t> (mp_points) | reinterpret_cast<size_t> (d.mp_points)) & 1) == 0 && std::numeric_limits<C>::is_integer) {
+      static_assert (sizeof (point_type) == 2 * sizeof (C), "point must be byte-comparable");
+      const void *p1 = reinterpret_cast<const void *> (reinterpret_cast<size_t> (mp_points) & ~size_t (3));
+      const void *p2 = reinterpret_cast<const void *> (reinterpret_cast<size_t> (d.mp_points) & ~size_t (3));
+      return std::memcmp (p1, p2, size () * sizeof (point_type)) == 0;
+    } else {
+      simple_iterator p1 = begin (), p2 = d.begin ();
+      while (p1 != end ()) {
+        if (*p1 != *p2) {
+          return false;
+        }
+        ++p1; ++p2;
+      }
+      return true;
+    }
   }
 
   /**

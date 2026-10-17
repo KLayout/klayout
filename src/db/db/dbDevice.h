@@ -282,8 +282,13 @@ public:
 
   /**
    *  @brief Gets the value for the parameter with the given ID
+   *  NOTE: this is a hot path in the netlist compare - the fast path (parameter
+   *  present in the parameter vector) is inline, the fallback is not.
    */
-  double parameter_value (size_t param_id) const;
+  double parameter_value (size_t param_id) const
+  {
+    return m_parameters.size () > param_id ? m_parameters [param_id] : parameter_default_value (param_id);
+  }
 
   /**
    *  @brief Sets the value for the parameter with the given ID
@@ -396,6 +401,12 @@ public:
 private:
   friend class Circuit;
   friend class Net;
+
+  /**
+   *  @brief Gets the default value of the parameter with the given ID
+   *  Returns 0 if there is no such parameter.
+   */
+  double parameter_default_value (size_t param_id) const;
 
   DeviceClass *mp_device_class;
   DeviceAbstract *mp_device_abstract;

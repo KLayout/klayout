@@ -25,6 +25,8 @@
 #include "dbNetlist.h"
 #include "tlClassRegistry.h"
 
+#include <algorithm>
+
 namespace db
 {
 
@@ -309,29 +311,24 @@ size_t DeviceClass::terminal_id_for_name (const std::string &name) const
 //  The default compare delegate
 static EqualDeviceParameters default_compare;
 
-bool DeviceClass::less (const db::Device &a, const db::Device &b)
+static const db::DeviceParameterCompareDelegate *
+compare_delegate (const db::Device &a, const db::Device &b)
 {
   tl_assert (a.device_class () != 0);
   tl_assert (b.device_class () != 0);
 
   const db::DeviceParameterCompareDelegate *pcd = primary_device_class (a, b)->parameter_compare_delegate ();
-  if (! pcd) {
-    pcd = &default_compare;
-  }
+  return pcd ? pcd : &default_compare;
+}
 
-  return pcd->less (a, b);
+bool DeviceClass::less (const db::Device &a, const db::Device &b)
+{
+  return compare_delegate (a, b)->less (a, b);
 }
 
 bool DeviceClass::equal (const db::Device &a, const db::Device &b)
 {
-  tl_assert (a.device_class () != 0);
-  tl_assert (b.device_class () != 0);
-
-  const db::DeviceParameterCompareDelegate *pcd = primary_device_class (a, b)->parameter_compare_delegate ();
-  if (! pcd) {
-    pcd = &default_compare;
-  }
-
+  const auto *pcd = compare_delegate (a, b);
   return ! pcd->less (a, b) && ! pcd->less (b, a);
 }
 

@@ -113,10 +113,15 @@ Transition::operator< (const Transition &other) const
     }
 
     if (device () != 0) {
+
+      //  a single three-way comparison replaces the "equals" plus "less"
+      //  calls and skips the parameter comparison entirely for identical devices
       DeviceCompare dc;
-      if (! dc.equals (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ()))) {
-        return dc (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ()));
+      int cmp = dc.compare (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ()));
+      if (cmp != 0) {
+        return cmp < 0;
       }
+
     }
 
     if (m_id1 != other.m_id1) {
@@ -134,6 +139,12 @@ Transition::operator== (const Transition &other) const
     return false;
   }
 
+  //  the ID comparison is a pure conjunction with the other predicates, so
+  //  do the cheap field first
+  if (m_id1 != other.m_id1) {
+    return false;
+  }
+
   if (is_for_subcircuit ()) {
 
     if ((subcircuit () != 0) != (other.subcircuit () != 0)) {
@@ -147,7 +158,7 @@ Transition::operator== (const Transition &other) const
       }
     }
 
-    return (m_id1 == other.m_id1);
+    return true;
 
   } else {
 
@@ -156,13 +167,16 @@ Transition::operator== (const Transition &other) const
     }
 
     if (device () != 0) {
+
+      //  a single three-way comparison replaces the "equals" call
       DeviceCompare dc;
-      if (! dc.equals (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ()))) {
+      if (dc.compare (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ())) != 0) {
         return false;
       }
+
     }
 
-    return (m_id1 == other.m_id1 && m_id2 == other.m_id2);
+    return m_id2 == other.m_id2;
 
   }
 }

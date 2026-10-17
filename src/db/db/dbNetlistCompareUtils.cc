@@ -197,7 +197,30 @@ DeviceCompare::equals (const std::pair<const db::Device *, size_t> &d1, const st
   if (d1.second != d2.second) {
     return false;
   }
+  //  identical devices are equal under any tolerance scheme
+  if (d1.first == d2.first) {
+    return true;
+  }
   return db::DeviceClass::equal (*d1.first, *d2.first);
+}
+
+int
+DeviceCompare::compare (const std::pair<const db::Device *, size_t> &d1, const std::pair<const db::Device *, size_t> &d2) const
+{
+  if (d1.second != d2.second) {
+    return d1.second < d2.second ? -1 : 1;
+  }
+  //  identical devices are equal under any tolerance scheme
+  if (d1.first == d2.first) {
+    return 0;
+  }
+  if (db::DeviceClass::less (*d1.first, *d2.first)) {
+    return -1;
+  } else if (db::DeviceClass::less (*d2.first, *d1.first)) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 // --------------------------------------------------------------------------------------------------------------------

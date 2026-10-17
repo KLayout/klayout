@@ -169,6 +169,7 @@ TEST(5)
 //  issue #2438
 TEST(6)
 {
+  tl::set_env ("__TESTSRC_ABSPATH", tl::absolute_file_path (tl::testsrc ()));
   db::LayerMap lm = db::LayerMap::from_string_file_format ("metal1:100/0");
   run_test (_this, tl::testdata (), "gf180mcu_ocd_sram_test/gf180mcu_ocd_sram_top.mag.gz", "issue_2438_one.gds", lm, false, 0.05, 0.005, 0.001, 0, "GDS2", false);
   run_test (_this, tl::testdata (), "gf180mcu_ocd_sram_test/gf180mcu_ocd_sram_top.mag.gz", "issue_2438_all.gds", lm, true, 0.05, 0.005, 0.001, 0, "GDS2", false);

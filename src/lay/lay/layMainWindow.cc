@@ -2658,6 +2658,33 @@ MainWindow::cm_clone ()
 }
 
 void
+MainWindow::cm_prev_panel ()
+{
+  int n = int (views ());
+  int index = current_view_index ();
+  if (index >= 0 && n > 0) {
+    //  avoid select_view for a no-op switch: it would cancel an interactive operation
+    int target = (index + n - 1) % n;
+    if (target != index) {
+      select_view (target);
+    }
+  }
+}
+
+void
+MainWindow::cm_next_panel ()
+{
+  int n = int (views ());
+  int index = current_view_index ();
+  if (index >= 0 && n > 0) {
+    int target = (index + 1) % n;
+    if (target != index) {
+      select_view (target);
+    }
+  }
+}
+
+void
 MainWindow::clone_current_view ()
 {
   lay::LayoutViewWidget *view_widget = 0;
@@ -4103,6 +4130,10 @@ MainWindow::menu_activated (const std::string &symbol)
     cm_new_layout ();
   } else if (symbol == "cm_clone") {
     cm_clone ();
+  } else if (symbol == "cm_prev_panel") {
+    cm_prev_panel ();
+  } else if (symbol == "cm_next_panel") {
+    cm_next_panel ();
   } else if (symbol == "cm_close_all") {
     cm_close_all ();
   } else if (symbol == "cm_close") {
@@ -4587,6 +4618,8 @@ public:
     menu_entries.push_back (lay::menu_item ("cm_close", "close:edit", at, tl::to_string (QObject::tr ("Close(Ctrl+W)"))));
     menu_entries.push_back (lay::menu_item ("cm_close_all", "close_all:edit", at, tl::to_string (QObject::tr ("Close All(Shift+Ctrl+W)"))));
     menu_entries.push_back (lay::menu_item ("cm_clone", "clone", at, tl::to_string (QObject::tr ("Clone Panel"))));
+    menu_entries.push_back (lay::menu_item ("cm_prev_panel", "prev_panel", at, tl::to_string (QObject::tr ("Previous Panel(Ctrl+PgUp)"))));
+    menu_entries.push_back (lay::menu_item ("cm_next_panel", "next_panel", at, tl::to_string (QObject::tr ("Next Panel(Ctrl+PgDown)"))));
     menu_entries.push_back (lay::menu_item ("cm_reload", "reload:edit", at, tl::to_string (QObject::tr ("Reload(Ctrl+R)"))));
     menu_entries.push_back (lay::menu_item ("cm_refresh", "refresh:edit", at, tl::to_string (QObject::tr ("Refresh Libraries"))));
     menu_entries.push_back (lay::menu_item ("cm_pull_in", "pull_in:edit", at, tl::to_string (QObject::tr ("Pull In Other Layout"))));

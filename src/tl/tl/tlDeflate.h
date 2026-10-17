@@ -26,8 +26,17 @@
 
 #include "tlCommon.h"
 
-#include "tlStream.h"
 #include "tlException.h"
+
+//  forward declarations - tlStream.h includes this header for the inline
+//  byte-delivery fast path, so we must not include it here
+namespace tl
+{
+
+class InputStream;
+class OutputStream;
+
+}
 
 //  forware definition of the zlib stream structure - we can omit the zlib header here
 struct z_stream_s;
@@ -64,16 +73,9 @@ public:
    *
    *  This method simply passes the byte.
    *  The method expects the next byte to be available.
+   *  Defined in tlDeflate.cc since it needs the full InputStream type.
    */
-  unsigned char get_byte ()
-  {
-    m_mask = 0;
-    const char *c = mp_input->get (1, true /*bypass_deflate*/);
-    if (c == 0) {
-      throw tl::Exception (tl::to_string (tr ("Unexpected end of file (DEFLATE implementation)")));
-    }
-    return *c;
-  }
+  unsigned char get_byte ();
 
   /**
    *  @brief Get a single bit
@@ -214,6 +216,27 @@ public:
    *  The maximum size of the block available is half the buffer size.
    */
   const char *get (size_t n);
+
+  /**
+   *  @brief Tell whether "get_byte" can deliver the next byte
+   *
+   *  The last ring position is excluded: "get" rotates the buffer there so
+   *  the read pointer does not wrap and "unget" keeps working.
+   */
+  bool can_get_byte () const
+  {
+    return m_b_read != m_b_insert && m_b_read + 1 < m_blen && ! m_at_end;
+  }
+
+  /**
+   *  @brief Get a single byte through the fast path
+   *
+   *  Call this only when "can_get_byte" is true, otherwise use "get".
+   */
+  const char *get_byte ()
+  {
+    return m_buffer + m_b_read++;
+  }
 
   /**
    *  @brief Undo the last "get" operation

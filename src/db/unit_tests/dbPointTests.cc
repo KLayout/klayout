@@ -26,6 +26,8 @@
 #include "tlString.h"
 #include "tlUnitTest.h"
 
+#include <type_traits>
+
 TEST(1) 
 {
   db::Point p;
@@ -67,6 +69,42 @@ TEST(3)
   EXPECT_EQ (ex.try_read (pp), true);
   EXPECT_EQ (pp == p, true);
   EXPECT_EQ (ex.test ("a"), true);
+}
+
+//  Bug: user provided copy ctor/assignment for point and vector made them non-trivially-copyable
+TEST(4_trivially_copyable)
+{
+  EXPECT_EQ (std::is_trivially_copyable<db::Point>::value, true);
+  EXPECT_EQ (std::is_trivially_copyable<db::Vector>::value, true);
+  EXPECT_EQ (std::is_trivially_copyable<db::DPoint>::value, true);
+  EXPECT_EQ (std::is_trivially_copyable<db::DVector>::value, true);
+
+  db::Point p (125, -171);
+  db::Point pc (p);
+  EXPECT_EQ (pc, p);
+  db::Point pa;
+  pa = p;
+  EXPECT_EQ (pa, p);
+  pa.set_x (0);
+  EXPECT_EQ (pc, p);
+
+  db::Vector v (-7, 13);
+  db::Vector vc (v);
+  EXPECT_EQ (vc, v);
+  db::Vector va;
+  va = v;
+  EXPECT_EQ (va, v);
+  va.set_y (0);
+  EXPECT_EQ (vc, v);
+
+  db::DPoint dp (12.5, -17.1);
+  db::DPoint dpc (dp);
+  EXPECT_EQ (dpc, dp);
+  db::DPoint dpa;
+  dpa = dp;
+  EXPECT_EQ (dpa, dp);
+  dpa.set_x (0.0);
+  EXPECT_EQ (dpc, dp);
 }
 
 

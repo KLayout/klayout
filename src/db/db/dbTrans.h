@@ -153,10 +153,7 @@ struct unit_trans
   /**
    *  @brief Copy ctor (which basically does nothing)
    */
-  unit_trans (const unit_trans<C> &)
-  {
-    // .. nothing else ..
-  }
+  unit_trans (const unit_trans<C> &) = default;
 
   /**
    *  @brief Copy ctor (which basically does nothing)
@@ -243,10 +240,7 @@ struct unit_trans
   /**
    *  @brief Assignment (which basically does nothing)
    */
-  unit_trans &operator= (const unit_trans &) 
-  {
-    return *this;
-  }
+  unit_trans &operator= (const unit_trans &) = default;
 
   /**
    *  @brief Assignment (which basically does nothing)
@@ -795,9 +789,7 @@ public:
    *
    *  @param d The source from which to copy
    */
-  disp_trans (const disp_trans<C> &d)
-    : m_u (d.disp ())
-  { }
+  disp_trans (const disp_trans<C> &d) = default;
 
   /**
    *  @brief The copy constructor that converts also
@@ -845,11 +837,7 @@ public:
   /**
    *  @brief Assignment
    */
-  disp_trans &operator= (const disp_trans<C> &d)
-  {
-    m_u = d.disp ();
-    return *this;
-  }
+  disp_trans &operator= (const disp_trans<C> &d) = default;
 
   /**
    *  @brief Assignment with type conversion
@@ -1168,21 +1156,14 @@ public:
    *
    *  @param d The source from which to copy
    */
-  simple_trans (const simple_trans<C> &d)
-    : fixpoint_trans<C> (d.rot ()), m_u (d.disp ())
-  { }
+  simple_trans (const simple_trans<C> &d) = default;
 
   /**
    *  @brief Assignment
    *
    *  @param d The source from which to take the data
    */
-  simple_trans &operator= (const simple_trans<C> &d)
-  { 
-    fixpoint_trans<C>::operator= (d);
-    m_u = d.disp ();
-    return *this;
-  }
+  simple_trans &operator= (const simple_trans<C> &d) = default;
 
   /**
    *  @brief The copy constructor that converts to a different coordinate type also

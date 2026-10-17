@@ -373,12 +373,12 @@ collect_soft_connected_clusters (size_t from_id, const NetlistExtractor::connect
 
   ids.insert (from_id);
 
-  auto upward = clusters.upward_soft_connections (from_id);
+  const auto &upward = clusters.upward_soft_connections (from_id);
   for (auto i = upward.begin (); i != upward.end (); ++i) {
     collect_soft_connected_clusters (*i, clusters, ids);
   }
 
-  auto downward = clusters.downward_soft_connections (from_id);
+  const auto &downward = clusters.downward_soft_connections (from_id);
   for (auto i = downward.begin (); i != downward.end (); ++i) {
     collect_soft_connected_clusters (*i, clusters, ids);
   }

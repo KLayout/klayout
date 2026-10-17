@@ -1485,14 +1485,14 @@ LayoutToNetlist::shapes_of_terminal (const db::NetTerminalRef &terminal, const d
     return result;
   }
 
-  auto cc = m_net_clusters.clusters_per_cell (net->circuit ()->cell_index ());
-  auto c = cc.cluster_by_id (net->cluster_id ());
+  const auto &cc = m_net_clusters.clusters_per_cell (net->circuit ()->cell_index ());
+  const auto &c = cc.cluster_by_id (net->cluster_id ());
 
   double dbu = internal_layout ()->dbu ();
   db::ICplxTrans d_trans = db::CplxTrans (dbu).inverted () * terminal.device ()->trans () * db::CplxTrans (dbu);
 
-  auto cc_other = m_net_clusters.clusters_per_cell (terminal.device ()->device_abstract ()->cell_index ());
-  auto c_other = cc_other.cluster_by_id (terminal.device ()->device_abstract ()->cluster_id_for_terminal (terminal.terminal_id ()));
+  const auto &cc_other = m_net_clusters.clusters_per_cell (terminal.device ()->device_abstract ()->cell_index ());
+  const auto &c_other = cc_other.cluster_by_id (terminal.device ()->device_abstract ()->cluster_id_for_terminal (terminal.terminal_id ()));
 
   std::map<unsigned int, std::vector<const db::NetShape *> > interacting;
   int soft = 0;

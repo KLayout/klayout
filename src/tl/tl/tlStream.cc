@@ -1190,28 +1190,6 @@ OutputStream::set_as_text (bool f)
   m_as_text = f;
 }
 
-inline void fast_copy (char *t, const char *s, size_t n)
-{
-  if (n >= sizeof (unsigned long)) {
-
-    unsigned long *tl = reinterpret_cast<unsigned long *> (t);
-    const unsigned long *sl = reinterpret_cast<const unsigned long *> (s);
-
-    while (n >= sizeof (unsigned long)) {
-      *tl++ = *sl++;
-      n -= sizeof (unsigned long);
-    }
-
-    t = reinterpret_cast<char *> (tl);
-    s = reinterpret_cast<const char *> (sl);
-
-  }
-
-  while (n-- > 0) {
-    *t++ = *s++;
-  }
-}
-
 void
 OutputStream::flush ()
 {
@@ -1222,7 +1200,7 @@ OutputStream::flush ()
 }
 
 void
-OutputStream::put (const char *b, size_t n)
+OutputStream::put_slow (const char *b, size_t n)
 {
   if (! mp_delegate) {
     return;
@@ -1256,7 +1234,7 @@ OutputStream::put (const char *b, size_t n)
 }
 
 void
-OutputStream::put_raw (const char *b, size_t n)
+OutputStream::put_raw_slow (const char *b, size_t n)
 {
   m_pos += n;
 
@@ -1265,7 +1243,7 @@ OutputStream::put_raw (const char *b, size_t n)
     size_t nw = m_buffer_capacity - m_buffer_pos;
     if (nw) {
       n -= nw;
-      fast_copy (mp_buffer + m_buffer_pos, b, nw);
+      memcpy (mp_buffer + m_buffer_pos, b, nw);
       b += nw;
     }
 
@@ -1275,7 +1253,7 @@ OutputStream::put_raw (const char *b, size_t n)
   }
 
   if (n) {
-    fast_copy (mp_buffer + m_buffer_pos, b, n);
+    memcpy (mp_buffer + m_buffer_pos, b, n);
     m_buffer_pos += n;
   }
 } 

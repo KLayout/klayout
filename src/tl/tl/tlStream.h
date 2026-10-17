@@ -1317,14 +1317,32 @@ public:
    *  In text mode, this handles line separator conversion.
    *  In binary mode, this method is equivalent to "put_raw".
    */
-  void put (const char *b, size_t n);
+  void put (const char *b, size_t n)
+  {
+    if (! m_as_text && mp_delegate) {
+      put_raw (b, n);
+    } else {
+      put_slow (b, n);
+    }
+  }
 
   /**
    *  @brief Puts the raw bytes into the stream
    *
    *  This method bypasses the line feed translation.
    */
-  void put_raw (const char *b, size_t n);
+  void put_raw (const char *b, size_t n)
+  {
+    if (m_buffer_pos + n <= m_buffer_capacity) {
+      m_pos += n;
+      if (n) {
+        memcpy (mp_buffer + m_buffer_pos, b, n);
+      }
+      m_buffer_pos += n;
+    } else {
+      put_raw_slow (b, n);
+    }
+  }
 
   /**
    *  @brief Puts a C string (UTF-8) to the output
@@ -1461,6 +1479,8 @@ protected:
   }
 
 private:
+  void put_slow (const char *b, size_t n);
+  void put_raw_slow (const char *b, size_t n);
   size_t m_pos;
   OutputStreamBase *mp_delegate;
   bool m_owns_delegate;

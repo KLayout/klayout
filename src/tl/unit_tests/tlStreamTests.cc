@@ -134,6 +134,38 @@ TEST(TextOutputStream)
   }
 }
 
+TEST(OutputStreamChunks)
+{
+  //  chunk sizes around the 16k buffer size, including empty puts and chunks larger than the buffer
+  std::string fn = tmp_file ("chunks.bin");
+  std::string expected;
+  unsigned int x = 12345;
+
+  {
+    tl::OutputStream os (fn, tl::OutputStream::OM_Plain, false);
+    for (int i = 0; i < 6000; ++i) {
+      x = x * 1103515245u + 12345u;
+      size_t n = (i % 97 == 0) ? 40000 : ((i % 11 == 0) ? 0 : (x >> 16) % 61);
+      std::string chunk;
+      for (size_t k = 0; k < n; ++k) {
+        chunk += char ('a' + (i + k) % 26);
+      }
+      os.put (chunk.c_str (), chunk.size ());
+      expected += chunk;
+      if (i % 5 == 0) {
+        os << char ('A' + i % 26);
+        expected += char ('A' + i % 26);
+      }
+    }
+    EXPECT_EQ (os.pos (), expected.size ());
+  }
+
+  tl::InputStream is (fn);
+  std::string s = is.read_all ();
+  EXPECT_EQ (s.size (), expected.size ());
+  EXPECT_EQ (s == expected, true);
+}
+
 TEST(TextInputStream)
 {
   std::string fn = tmp_file ("test.txt");

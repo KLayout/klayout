@@ -27,6 +27,7 @@
 
 #include <string>
 #include <string.h>
+#include <stdlib.h>
 
 #ifdef _WIN32
 #  include <windows.h>
@@ -40,16 +41,20 @@
 namespace tl
 {
 
-static tl::Mutex *s_env_lock = 0;
+#if defined(_WIN32)
 static std::map<std::string, std::string> s_env_map;
+#endif
+
+//  function-local static for thread-safe lazy init (C++11); intentionally never destroyed
+static tl::Mutex *env_lock ()
+{
+  static tl::Mutex *m = new tl::Mutex ();
+  return m;
+}
 
 std::string get_env (const std::string &name, const std::string &def_value)
 {
-  if (! s_env_lock) {
-    s_env_lock = new tl::Mutex ();
-  }
-
-  tl::MutexLocker env_locker (s_env_lock);
+  tl::MutexLocker env_locker (env_lock ());
 
 #ifdef _WIN32
   std::wstring wname = tl::to_wstring (name);
@@ -71,51 +76,34 @@ std::string get_env (const std::string &name, const std::string &def_value)
 
 void set_env (const std::string &name, const std::string &value)
 {
-  if (! s_env_lock) {
-    s_env_lock = new tl::Mutex ();
-  }
-
-  tl::MutexLocker env_locker (s_env_lock);
-
-  s_env_map [name] = name + "=" + value;
-  const std::string &s = s_env_map [name];
+  tl::MutexLocker env_locker (env_lock ());
 
 #if defined(_WIN32)
+  s_env_map [name] = name + "=" + value;
+  const std::string &s = s_env_map [name];
   _putenv (const_cast<char *> (s.c_str ()));
 #else
-  putenv (const_cast<char *> (s.c_str ()));
+  //  setenv copies the value, so no dangling pointer in environ (unlike putenv)
+  setenv (name.c_str (), value.c_str (), 1);
 #endif
 }
 
 void unset_env (const std::string &name)
 {
-  if (! s_env_lock) {
-    s_env_lock = new tl::Mutex ();
-  }
-
-  tl::MutexLocker env_locker (s_env_lock);
+  tl::MutexLocker env_locker (env_lock ());
 
 #if defined(_WIN32)
   s_env_map [name] = name + "=";
-#else
-  s_env_map [name] = name;
-#endif
   const std::string &s = s_env_map [name];
-
-#if defined(_WIN32)
   _putenv (const_cast<char *> (s.c_str ()));
 #else
-  putenv (const_cast<char *> (s.c_str ()));
+  unsetenv (name.c_str ());
 #endif
 }
 
 bool has_env (const std::string &name)
 {
-  if (! s_env_lock) {
-    s_env_lock = new tl::Mutex ();
-  }
-
-  tl::MutexLocker env_locker (s_env_lock);
+  tl::MutexLocker env_locker (env_lock ());
 
 #ifdef _WIN32
   std::wstring wname = tl::to_wstring (name);

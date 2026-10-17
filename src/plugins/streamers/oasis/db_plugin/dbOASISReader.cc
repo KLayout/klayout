@@ -33,6 +33,9 @@
 #include "tlString.h"
 #include "tlClassRegistry.h"
 
+#include <algorithm>
+#include <cstring>
+
 namespace db
 {
 
@@ -247,41 +250,37 @@ OASISReader::get_real ()
 
   } else if (t == 6) {
 
-    union {
-      float f;
-      uint32_t i;
-    } i2f;
+    uint32_t i = 0;
 
-    unsigned char *b = (unsigned char *) m_stream.get (sizeof (i2f.i));
+    unsigned char *b = (unsigned char *) m_stream.get (sizeof (i));
     if (! b) {
       error (tl::to_string (tr ("Unexpected end-of-file")));
     }
-    i2f.i = 0;
-    b += sizeof (i2f.i);
-    for (unsigned int i = 0; i < sizeof (i2f.i); ++i) {
-      i2f.i = (i2f.i << 8) + uint32_t (*--b);
+    b += sizeof (i);
+    for (unsigned int k = 0; k < sizeof (i); ++k) {
+      i = (i << 8) + uint32_t (*--b);
     }
 
-    return double (i2f.f);
+    float f;
+    memcpy (&f, &i, sizeof (f));
+    return double (f);
 
   } else if (t == 7) {
 
-    union {
-      double d;
-      uint64_t i;
-    } i2f;
+    uint64_t i = 0;
 
-    unsigned char *b = (unsigned char *) m_stream.get (sizeof (i2f.i));
+    unsigned char *b = (unsigned char *) m_stream.get (sizeof (i));
     if (! b) {
       error (tl::to_string (tr ("Unexpected end-of-file")));
     }
-    i2f.i = 0;
-    b += sizeof (i2f.i);
-    for (unsigned int i = 0; i < sizeof (i2f.i); ++i) {
-      i2f.i = (i2f.i << 8) + uint64_t (*--b);
+    b += sizeof (i);
+    for (unsigned int k = 0; k < sizeof (i); ++k) {
+      i = (i << 8) + uint64_t (*--b);
     }
 
-    return double (i2f.d);
+    double d;
+    memcpy (&d, &i, sizeof (d));
+    return d;
 
   } else {
     error (tl::sprintf (tl::to_string (tr ("Invalid real type %d")), t));
@@ -1654,11 +1653,12 @@ OASISReader::read_pointlist (modal_variable <std::vector <db::Point> > &pointlis
   }
 
   pointlist.get_non_const ().clear ();
+  //  cap the reservation: n is file supplied and the vector grows further anyway
   if ((type == 0 || type == 1) && for_polygon) {
     //  because for polygons, the pointlist will be closed implicitly
-    pointlist.get_non_const ().reserve (n + 2);
+    pointlist.get_non_const ().reserve (std::min<size_t> (n + 2, size_t (1) << 16));
   } else {
-    pointlist.get_non_const ().reserve (n + 1);
+    pointlist.get_non_const ().reserve (std::min<size_t> (n + 1, size_t (1) << 16));
   }
 
   pointlist.get_non_const ().push_back (db::Point ());

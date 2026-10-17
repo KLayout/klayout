@@ -275,6 +275,7 @@ private:
   void write_ucoord (db::Coord c);
   void write_ucoord (db::Coord c, double sf);
 
+  template <class T> void write_real (T d);
   void write (double d);
   void write (float d);
   void write (int64_t n);

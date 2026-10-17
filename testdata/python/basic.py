@@ -24,6 +24,11 @@ import gc
 import copy
 import weakref
 
+if sys.version_info >= (3, 4):
+  import gc
+  import tracemalloc
+
+
 # Set this to True to disable some tests involving exceptions
 leak_check = "TEST_LEAK_CHECK" in os.environ
 
@@ -3423,6 +3428,20 @@ class BasicTest(unittest.TestCase):
       m = str(ex)
     self.assertEqual(m, "Value out of range: -2147483649, min value is -2147483648 for argument #1 in A.new_a")
 
+  # issue-2495
+  def test_96(self):
+    if sys.version_info >= (3, 4):
+      tracemalloc.clear_traces()
+      tracemalloc.start()
+
+    self.assertEqual(repr(pya.A.ft_var([ 1, 2, { 1: "one", 2: "two" } ])), "[1, 2, {1: 'one', 2: 'two'}]")
+    self.assertEqual(repr(pya.A.ft_var({ 1: [ 1, 2, 3 ], 2: "hello" })), "{1: [1, 2, 3], 2: 'hello'}")
+
+    if sys.version_info >= (3, 4):
+      gc.collect()
+      mem = tracemalloc.get_traced_memory()[0]
+      self.assertEqual(mem, 0)
+      tracemalloc.stop()
 
 # run unit tests
 if __name__ == '__main__':

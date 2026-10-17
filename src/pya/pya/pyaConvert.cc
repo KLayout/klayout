@@ -480,7 +480,11 @@ PyObject *c2python_func<const tl::Variant &>::operator() (const tl::Variant &c)
 
     PyObject *ret = PyDict_New ();
     for (tl::Variant::const_array_iterator i = c.begin_array (); i != c.end_array (); ++i) {
-      PyDict_SetItem (ret, c2python (i->first), c2python (i->second));
+      //  NOTE: not mentioned in the API doc, but the PyDict_SetItem does not steal a reference to key.
+      //  It also does not steal a reference to the value, but that is documented.
+      PythonRef k (c2python (i->first));
+      PythonRef v (c2python (i->second));
+      PyDict_SetItem (ret, k.get (), v.get ());
     }
     return ret;
 

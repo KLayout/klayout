@@ -1159,9 +1159,10 @@ TEST(21_AntiParallelMOS3Transistors)
   nl.combine_devices ();
   nl.purge ();
 
+  //  NOTE: changed considering issue #2494
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=3,AS=5,AD=7,PS=25,PD=27);\n"
+    "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=3,AS=6,AD=6,PS=26,PD=26);\n"
     "end;\n"
   );
 }
@@ -1452,9 +1453,10 @@ TEST(31_AntiParallelMOS4Transistors)
   nl.combine_devices ();
   nl.purge ();
 
+  //  NOTE: changed considering issue #2494
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
-    "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=3,AS=5,AD=7,PS=25,PD=27);\n"
+    "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=3,AS=6,AD=6,PS=26,PD=26);\n"
     "end;\n"
   );
 }

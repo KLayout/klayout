@@ -599,6 +599,7 @@ PropertySelector::matching (std::set<db::properties_id_type> &ids) const
   }
 }
 
+#if 0 // @@@
 // --------------------------------------------------------------------------
 //  PartialTreeSelector implementation
 
@@ -905,6 +906,7 @@ PartialTreeSelector CellSelector::create_tree_selector (const db::Layout &layout
 
   return pts;
 }
+#endif
 
 // --------------------------------------------------------------------------
 //  ParsedLayerSource implementation
@@ -997,7 +999,7 @@ ParsedLayerSource::operator+= (const ParsedLayerSource &d)
     m_cv_index = d.m_cv_index;
   }
 
-  if (m_cell_sel.is_empty ()) {
+  if (m_cell_sel.empty ()) {
     m_cell_sel = d.m_cell_sel;
   }
 
@@ -1111,12 +1113,12 @@ ParsedLayerSource::to_string () const
     break;
   }
 
-  if (! m_cell_sel.is_empty ()) {
+  if (! m_cell_sel.empty ()) {
     if (! r.empty ()) {
       r += " ";
     }
     r += "{";
-    r += m_cell_sel.to_string ();
+    r += m_cell_sel.original_string ();
     r += "}";
   }
 
@@ -1209,11 +1211,11 @@ ParsedLayerSource::display_string (const lay::LayoutViewBase *view) const
     break;
   }
 
-  if (! m_cell_sel.is_empty ()) {
+  if (! m_cell_sel.empty ()) {
     if (! r.empty ()) {
       r += " ";
     }
-    r += m_cell_sel.to_string ();
+    r += m_cell_sel.original_string ();
   }
 
   if (! m_trans.empty () && (m_trans.size () > 1 || m_trans[0] != db::DCplxTrans ())) {
@@ -1346,7 +1348,7 @@ ParsedLayerSource::parse_from_string (const char *cp)
   m_cv_index = 0;
   m_has_name = false;
   m_trans.clear ();
-  m_cell_sel = CellSelector ();
+  m_cell_sel = db::CellSelector ();
 
   unsigned int v = 0;
 

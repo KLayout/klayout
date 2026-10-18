@@ -24,6 +24,7 @@
 
 #include "dbLayout.h"
 #include "tlGlobPattern.h"
+#include "tlString.h"
 
 namespace db
 {
@@ -32,7 +33,7 @@ namespace db
 //  CellSelector implementation
 
 CellSelector::CellSelector ()
-  : m_start_all (false), m_stop_all (false)
+  : m_start_all (false), m_stop_all (false), m_is_valid (true)
 {
   //  .. nothing yet ..
 }
@@ -56,20 +57,65 @@ CellSelector::clear (bool start_all, bool stop_all)
 }
 
 bool
+CellSelector::operator== (const CellSelector &other) const
+{
+  if (m_is_valid && other.m_is_valid) {
+    return m_start == other.m_start && m_start_all == other.m_start_all && m_start_all_except == other.m_start_all_except &&
+           m_stop == other.m_stop && m_stop_all == other.m_stop_all && m_stop_all_except == other.m_stop_all_except;
+  } else {
+    return m_original_string == other.m_original_string;
+  }
+}
+
+bool
+CellSelector::operator< (const CellSelector &other) const
+{
+  if (m_is_valid && other.m_is_valid) {
+    if (m_start != other.m_start) {
+      return m_start < other.m_start;
+    }
+    if (m_start_all != other.m_start_all) {
+      return m_start_all < other.m_start_all;
+    }
+    if (m_start_all_except != other.m_start_all_except) {
+      return m_start_all_except < other.m_start_all_except;
+    }
+    if (m_stop != other.m_stop) {
+      return m_stop < other.m_stop;
+    }
+    if (m_stop_all != other.m_stop_all) {
+      return m_stop_all < other.m_stop_all;
+    }
+    if (m_stop_all_except != other.m_stop_all_except) {
+      return m_stop_all_except < other.m_stop_all_except;
+    }
+    return false;
+  } else {
+    return m_original_string < other.m_original_string;
+  }
+}
+
+bool
 CellSelector::empty () const
 {
-  return ! m_start_all && m_start.empty () && ! m_stop_all && m_stop.empty ();
+  if (m_is_valid) {
+    return ! m_start_all && m_start.empty () && ! m_stop_all && m_stop.empty ();
+  } else {
+    return m_original_string.empty ();
+  }
 }
 
 bool
 CellSelector::selects_all () const
 {
+  tl_assert (m_is_valid);
   return m_start_all && m_start_all_except.empty ();
 }
 
 bool
 CellSelector::unselects_all () const
 {
+  tl_assert (m_is_valid);
   return m_stop_all && m_stop_all_except.empty ();
 }
 
@@ -164,6 +210,8 @@ CellSelector::select_all_cells ()
 int
 CellSelector::in_selection (db::cell_index_type cell_index) const
 {
+  tl_assert (m_is_valid);
+
   bool in_start;
   if (m_start_all) {
     in_start = (m_start_all_except.find (cell_index) == m_start_all_except.end ());
@@ -185,6 +233,10 @@ CellSelector::in_selection (db::cell_index_type cell_index) const
 std::string
 CellSelector::to_string (const db::Layout *layout) const
 {
+  if (! m_is_valid) {
+    return m_original_string;
+  }
+
   std::string res;
 
   if (m_start_all) {
@@ -264,10 +316,58 @@ CellSelector::to_string (const db::Layout *layout) const
   return res;
 }
 
+CellSelector
+CellSelector::from_string (const std::string &s, const db::Layout *layout, db::cell_index_type top_cell)
+{
+  CellSelector cs;
+  tl::Extractor ex (s.c_str ());
+
+  bool res = cs.parse (ex, layout, top_cell);
+  tl_assert (res);
+  ex.expect_end ();
+
+  return cs;
+}
+
 bool
 CellSelector::parse (tl::Extractor &ex, const db::Layout *layout, db::cell_index_type top_cell)
 {
+  const char *start = ex.skip ();
+
+  m_original_string.clear ();
+
+  bool res = do_parse (ex, layout, top_cell);
+  if (res) {
+    m_original_string = tl::trim (std::string (start, ex.get () - start));
+    if (! m_is_valid) {
+      //  not useful
+      clear (false, false);
+    }
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void
+CellSelector::ensure_valid (const db::Layout *layout, db::cell_index_type top_cell)
+{
+  if (! m_is_valid) {
+
+    tl::Extractor ex (m_original_string.c_str ());
+
+    bool res = do_parse (ex, layout, top_cell);
+    tl_assert (res);
+    tl_assert (m_is_valid);
+
+  }
+}
+
+bool
+CellSelector::do_parse (tl::Extractor &ex, const db::Layout *layout, db::cell_index_type top_cell)
+{
   reset_selection ();
+  m_is_valid = true;
 
   while (! ex.at_end ()) {
 
@@ -296,6 +396,8 @@ CellSelector::parse (tl::Extractor &ex, const db::Layout *layout, db::cell_index
 
       if (top_cell != std::numeric_limits<db::cell_index_type>::max ()) {
         select_or_unselect_cell_exclude (plus, top_cell, exclude);
+      } else {
+        m_is_valid = false;
       }
 
     } else {
@@ -343,6 +445,8 @@ CellSelector::parse (tl::Extractor &ex, const db::Layout *layout, db::cell_index
           if (cell.first) {
             select_or_unselect_cell_exclude (plus, cell.second, exclude);
           }
+        } else {
+          m_is_valid = false;
         }
 
       } else {
@@ -353,6 +457,8 @@ CellSelector::parse (tl::Extractor &ex, const db::Layout *layout, db::cell_index
               select_or_unselect_cell_exclude (plus, c->cell_index (), exclude);
             }
           }
+        } else {
+          m_is_valid = false;
         }
 
       }

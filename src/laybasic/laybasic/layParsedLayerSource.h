@@ -32,6 +32,7 @@
 #include "tlString.h"
 #include "dbTrans.h"
 #include "dbPropertiesRepository.h"
+#include "dbCellSelector.h"
 
 namespace db
 {
@@ -310,6 +311,7 @@ private:
   level_mode_type m_to_mode;
 };
 
+#if 0 // @@@
 /**
  *  @brief An object tracking whether a cell is selected while traversing a tree
  */
@@ -460,6 +462,7 @@ public:
 private:
   std::vector <std::vector <std::pair <bool, std::string> > > m_selectors;
 };
+#endif
 
 /**
  *  @brief A property selector
@@ -808,7 +811,7 @@ public:
   /**
    *  @brief Gets the cell selector
    */
-  const CellSelector &cell_selector () const
+  const db::CellSelector &cell_selector () const
   {
     return m_cell_sel;
   }
@@ -816,7 +819,7 @@ public:
   /**
    *  @brief Sets the cell selector
    */
-  void set_cell_selector (const CellSelector &cs) 
+  void set_cell_selector (const db::CellSelector &cs)
   {
     m_cell_sel = cs;
   }
@@ -898,7 +901,7 @@ private:
   std::string m_name;
   int m_cv_index;
   std::vector<db::DCplxTrans> m_trans;
-  CellSelector m_cell_sel;
+  db::CellSelector m_cell_sel;
   PropertySelector m_property_sel;
   HierarchyLevelSelection m_hier_levels;
 

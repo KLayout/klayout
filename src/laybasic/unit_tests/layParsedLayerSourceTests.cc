@@ -483,6 +483,7 @@ TEST (8)
   EXPECT_EQ (ps1.to_string (), "*/*@1 {-HALLO} (r0 *2 0,0) (r0 *1.5 0,0)");
 }
 
+#if 0 // @@@
 TEST (10)
 {
   lay::CellSelector sel;
@@ -630,4 +631,5 @@ TEST (11)
   pt = selector_from_string("-C3 +CC*").create_tree_selector (layout, c1.cell_index ());
   EXPECT_EQ (tspath (layout, c1.cell_index (), pt), "+C1(+C2(-C3(-C5+CC3)+C4(+CC4)+CC2)+CC1)");
 }
+#endif
 

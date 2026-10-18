@@ -71,6 +71,32 @@ public:
   CellSelector &operator= (const CellSelector &) = default;
 
   /**
+   *  @brief Equality
+   *
+   *  For invalid cell selectors, equality is based on the original string.
+   *  For valid cell selectors is assumed that both cell selectors stem from the
+   *  same layout and cell indexes can be compared.
+   */
+  bool operator== (const CellSelector &other) const;
+
+  /**
+   *  @brief Inequality
+   */
+  bool operator!= (const CellSelector &other) const
+  {
+    return !operator== (other);
+  }
+
+  /**
+   *  @brief Less operator
+   *
+   *  For invalid cell selectors, the less operator is based on the original string
+   *  For valid cell selectors is assumed that both cell selectors stem from the
+   *  same layout and cell indexes can be compared.
+   */
+  bool operator< (const CellSelector &other) const;
+
+  /**
    *  @brief Returns a value indicating whether the cell selector does not select or unselect anything
    */
   bool empty () const;
@@ -161,6 +187,14 @@ public:
   std::string to_string (const db::Layout *layout = 0) const;
 
   /**
+   *  @brief Gets the original string
+   */
+  const std::string &original_string () const
+  {
+    return m_original_string;
+  }
+
+  /**
    *  @brief Reads the selection from a string
    *
    *  Returns true, if the selection could be parsed successfully.
@@ -177,16 +211,47 @@ public:
    *      - '<name>': a plain cell name
    *      - #<n>: a cell by cell index
    *      - @: the top cell, if one is given
+   *
+   *  When not giving a layout or no topcell, the cell selector may be in "invalid" state after
+   *  parsing. In that case, only the original string is valid. Use "ensure_valid" to
+   *  make sure, the state is validated.
    */
   bool parse (tl::Extractor &ex, const db::Layout *layout = 0, db::cell_index_type top_cell = std::numeric_limits<db::cell_index_type>::max ());
+
+  /**
+   *  @brief Creates a CellSelector from a string
+   *
+   *  Note that this method will assert if the string is not well-formed.
+   */
+  static CellSelector from_string (const std::string &s, const db::Layout *layout = 0, db::cell_index_type top_cell = std::numeric_limits<db::cell_index_type>::max ());
+
+  /**
+   *  @brief Gets a value indicating whether the cell selector is valid
+   */
+  bool is_valid () const
+  {
+    return m_is_valid;
+  }
+
+  /**
+   *  @brief Ensures that the cell selector is built
+   *
+   *  If a cell selector is parsed without a layout, it may not
+   *  have all the cells set up properly. Calling this method
+   *  will re-parse the string with the given layout and top cell index
+   */
+  void ensure_valid (const db::Layout *layout, db::cell_index_type top_cell);
 
 private:
   std::set<db::cell_index_type> m_start, m_stop;
   std::set<db::cell_index_type> m_start_all_except, m_stop_all_except;
   bool m_start_all, m_stop_all;
+  std::string m_original_string;
+  bool m_is_valid;
 
   void clear (bool start_all, bool stop_all);
   void select_or_unselect_cell_exclude (bool select, db::cell_index_type cell_index, bool exclude);
+  bool do_parse (tl::Extractor &ex, const db::Layout *layout = 0, db::cell_index_type top_cell = std::numeric_limits<db::cell_index_type>::max ());
 };
 
 }  // namespace db

@@ -36,12 +36,14 @@ TEST(1)
   EXPECT_EQ (sel.selects_all (), false);
   EXPECT_EQ (sel.unselects_all (), false);
   EXPECT_EQ (sel.to_string (), "");
+  EXPECT_EQ (sel.is_valid (), true);
 
   sel.select_cell (1);
   EXPECT_EQ (sel.empty (), false);
   EXPECT_EQ (sel.selects_all (), false);
   EXPECT_EQ (sel.unselects_all (), false);
   EXPECT_EQ (sel.to_string (), "+#1");
+  EXPECT_EQ (sel.is_valid (), true);
 
   EXPECT_EQ (sel.in_selection (1), 1);
   EXPECT_EQ (sel.in_selection (2), 0);
@@ -51,6 +53,7 @@ TEST(1)
   EXPECT_EQ (sel.selects_all (), false);
   EXPECT_EQ (sel.unselects_all (), false);
   EXPECT_EQ (sel.to_string (), "-#1");
+  EXPECT_EQ (sel.is_valid (), true);
 
   EXPECT_EQ (sel.in_selection (1), -1);
   EXPECT_EQ (sel.in_selection (2), 0);
@@ -60,6 +63,7 @@ TEST(1)
   EXPECT_EQ (sel.selects_all (), false);
   EXPECT_EQ (sel.unselects_all (), false);
   EXPECT_EQ (sel.to_string (), "+#2 -#1");
+  EXPECT_EQ (sel.is_valid (), true);
 
   EXPECT_EQ (sel.in_selection (1), -1);
   EXPECT_EQ (sel.in_selection (2), 1);
@@ -69,12 +73,14 @@ TEST(1)
   EXPECT_EQ (sel.selects_all (), false);
   EXPECT_EQ (sel.unselects_all (), false);
   EXPECT_EQ (sel.to_string (), "");
+  EXPECT_EQ (sel.is_valid (), true);
 
   sel.select_all_cells ();
   EXPECT_EQ (sel.empty (), false);
   EXPECT_EQ (sel.selects_all (), true);
   EXPECT_EQ (sel.unselects_all (), false);
   EXPECT_EQ (sel.to_string (), "+*");
+  EXPECT_EQ (sel.is_valid (), true);
 
   EXPECT_EQ (sel.in_selection (1), 1);
   EXPECT_EQ (sel.in_selection (2), 1);
@@ -84,6 +90,7 @@ TEST(1)
   EXPECT_EQ (sel.selects_all (), false);
   EXPECT_EQ (sel.unselects_all (), false);
   EXPECT_EQ (sel.to_string (), "+* +-#5 -#5");
+  EXPECT_EQ (sel.is_valid (), true);
 
   EXPECT_EQ (sel.in_selection (1), 1);
   EXPECT_EQ (sel.in_selection (2), 1);
@@ -94,6 +101,7 @@ TEST(1)
   EXPECT_EQ (sel.selects_all (), true);
   EXPECT_EQ (sel.unselects_all (), false);
   EXPECT_EQ (sel.to_string (), "+*");
+  EXPECT_EQ (sel.is_valid (), true);
 
   EXPECT_EQ (sel.in_selection (1), 1);
   EXPECT_EQ (sel.in_selection (2), 1);
@@ -104,6 +112,7 @@ TEST(1)
   EXPECT_EQ (sel.selects_all (), false);
   EXPECT_EQ (sel.unselects_all (), true);
   EXPECT_EQ (sel.to_string (), "-*");
+  EXPECT_EQ (sel.is_valid (), true);
 
   EXPECT_EQ (sel.in_selection (1), -1);
   EXPECT_EQ (sel.in_selection (2), -1);
@@ -116,6 +125,7 @@ TEST(1)
   EXPECT_EQ (sel.selects_all (), false);
   EXPECT_EQ (sel.unselects_all (), true);
   EXPECT_EQ (sel.to_string (), "-*");
+  EXPECT_EQ (sel.is_valid (), true);
 
   EXPECT_EQ (sel.in_selection (1), -1);
   EXPECT_EQ (sel.in_selection (2), -1);
@@ -126,6 +136,7 @@ TEST(1)
   EXPECT_EQ (sel.selects_all (), false);
   EXPECT_EQ (sel.unselects_all (), false);
   EXPECT_EQ (sel.to_string (), "+#5 -* --#5");
+  EXPECT_EQ (sel.is_valid (), true);
 
   EXPECT_EQ (sel.in_selection (1), -1);
   EXPECT_EQ (sel.in_selection (2), -1);
@@ -136,6 +147,7 @@ TEST(1)
   EXPECT_EQ (sel.selects_all (), false);
   EXPECT_EQ (sel.unselects_all (), true);
   EXPECT_EQ (sel.to_string (), "-*");
+  EXPECT_EQ (sel.is_valid (), true);
 
   EXPECT_EQ (sel.in_selection (1), -1);
   EXPECT_EQ (sel.in_selection (2), -1);
@@ -146,6 +158,7 @@ TEST(1)
   EXPECT_EQ (sel.selects_all (), true);
   EXPECT_EQ (sel.unselects_all (), false);
   EXPECT_EQ (sel.to_string (), "+*");
+  EXPECT_EQ (sel.is_valid (), true);
 
   EXPECT_EQ (sel.in_selection (1), 1);
   EXPECT_EQ (sel.in_selection (2), 1);
@@ -234,9 +247,9 @@ TEST(4)
   db::CellSelector sel;
 
   auto c1 = ly.add_cell ("C1");
-  auto c2 = ly.add_cell ("C2");
-  auto c5 = ly.add_cell ("C+5");
-  auto cstar = ly.add_cell ("C*");
+  /*auto c2 =*/ ly.add_cell ("C2");
+  /*auto c5 =*/ ly.add_cell ("C+5");
+  /*auto cstar =*/ ly.add_cell ("C*");
 
   tl::Extractor ex;
   ex = tl::Extractor ("");
@@ -244,78 +257,193 @@ TEST(4)
   EXPECT_EQ (sel.parse (ex, &ly), true);
   EXPECT_EQ (sel.empty (), true);
   EXPECT_EQ (sel.to_string (&ly), "");
+  EXPECT_EQ (sel.original_string (), "");
+  EXPECT_EQ (sel.is_valid (), true);
 
   ex = tl::Extractor ("**INVALID**");
   EXPECT_EQ (sel.parse (ex, &ly), true);
   EXPECT_EQ (ex.at_end (), false);
   EXPECT_EQ (sel.empty (), true);
   EXPECT_EQ (sel.to_string (&ly), "");
+  EXPECT_EQ (sel.original_string (), "");
+  EXPECT_EQ (sel.is_valid (), true);
 
   ex = tl::Extractor ("+#0 -#1");
   EXPECT_EQ (sel.parse (ex, &ly), true);
   EXPECT_EQ (sel.to_string (&ly), "+C1 -C2");
+  EXPECT_EQ (sel.original_string (), "+#0 -#1");
+  EXPECT_EQ (sel.is_valid (), true);
 
   ex = tl::Extractor ("+C1");
   EXPECT_EQ (sel.parse (ex, &ly), true);
   EXPECT_EQ (sel.to_string (&ly), "+C1");
+  EXPECT_EQ (sel.original_string (), "+C1");
+  EXPECT_EQ (sel.is_valid (), true);
 
   ex = tl::Extractor ("+\"C1\"");
   EXPECT_EQ (sel.parse (ex, &ly), true);
   EXPECT_EQ (sel.to_string (&ly), "+C1");
+  EXPECT_EQ (sel.original_string (), "+\"C1\"");
+  EXPECT_EQ (sel.is_valid (), true);
 
   ex = tl::Extractor ("+\"C+5\"");
   EXPECT_EQ (sel.parse (ex, &ly), true);
   EXPECT_EQ (sel.to_string (&ly), "+'C+5'");
+  EXPECT_EQ (sel.original_string (), "+\"C+5\"");
+  EXPECT_EQ (sel.is_valid (), true);
 
   ex = tl::Extractor ("+'C+5'");
   EXPECT_EQ (sel.parse (ex, &ly), true);
   EXPECT_EQ (sel.to_string (&ly), "+'C+5'");
+  EXPECT_EQ (sel.original_string (), "+'C+5'");
+  EXPECT_EQ (sel.is_valid (), true);
 
   ex = tl::Extractor ("+C*");
   EXPECT_EQ (sel.parse (ex, &ly), true);
   EXPECT_EQ (sel.to_string (&ly), "+C1 +C2 +'C+5' +'C*'");
+  EXPECT_EQ (sel.original_string (), "+C*");
+  EXPECT_EQ (sel.is_valid (), true);
 
   ex = tl::Extractor ("+'C*'");
   EXPECT_EQ (sel.parse (ex, &ly), true);
   EXPECT_EQ (sel.to_string (&ly), "+'C*'");
+  EXPECT_EQ (sel.original_string (), "+'C*'");
+  EXPECT_EQ (sel.is_valid (), true);
 
   ex = tl::Extractor ("+\"C*\"");
   EXPECT_EQ (sel.parse (ex, &ly), true);
   EXPECT_EQ (sel.to_string (&ly), "+C1 +C2 +'C+5' +'C*'");
+  EXPECT_EQ (sel.original_string (), "+\"C*\"");
+  EXPECT_EQ (sel.is_valid (), true);
 
-  ex = tl::Extractor ("+* -C1");
+  ex = tl::Extractor ("+* -C1  ");
   EXPECT_EQ (sel.parse (ex, &ly), true);
   EXPECT_EQ (sel.to_string (&ly), "+* +-C1 -C1");
+  EXPECT_EQ (sel.original_string (), "+* -C1");
+  EXPECT_EQ (sel.is_valid (), true);
 
   ex = tl::Extractor ("+* +-C1");
   EXPECT_EQ (sel.parse (ex, &ly), true);
   EXPECT_EQ (sel.to_string (&ly), "+* +-C1");
+  EXPECT_EQ (sel.original_string (), "+* +-C1");
+  EXPECT_EQ (sel.is_valid (), true);
 
   ex = tl::Extractor ("+-C1");
   EXPECT_EQ (sel.parse (ex, &ly), true);
   EXPECT_EQ (sel.to_string (&ly), "");
+  EXPECT_EQ (sel.original_string (), "+-C1");
+  EXPECT_EQ (sel.is_valid (), true);
 
   ex = tl::Extractor ("-* +C1");
   EXPECT_EQ (sel.parse (ex, &ly), true);
   EXPECT_EQ (sel.to_string (&ly), "+C1 -* --C1");
+  EXPECT_EQ (sel.original_string (), "-* +C1");
+  EXPECT_EQ (sel.is_valid (), true);
 
   ex = tl::Extractor ("-* --C1");
   EXPECT_EQ (sel.parse (ex, &ly), true);
   EXPECT_EQ (sel.to_string (&ly), "-* --C1");
+  EXPECT_EQ (sel.original_string (), "-* --C1");
+  EXPECT_EQ (sel.is_valid (), true);
 
   ex = tl::Extractor ("--C1");
   EXPECT_EQ (sel.parse (ex, &ly), true);
   EXPECT_EQ (sel.to_string (&ly), "");
+  EXPECT_EQ (sel.original_string (), "--C1");
+  EXPECT_EQ (sel.is_valid (), true);
 
   ex = tl::Extractor ("+* -*");
   EXPECT_EQ (sel.parse (ex, &ly), true);
   EXPECT_EQ (sel.to_string (&ly), "-*");
+  EXPECT_EQ (sel.original_string (), "+* -*");
+  EXPECT_EQ (sel.is_valid (), true);
 
   ex = tl::Extractor ("+* -@");
   EXPECT_EQ (sel.parse (ex, &ly), true);
-  EXPECT_EQ (sel.to_string (&ly), "+*");
+  EXPECT_EQ (sel.to_string (&ly), "+* -@");
+  EXPECT_EQ (sel.original_string (), "+* -@");
+  EXPECT_EQ (sel.is_valid (), false);   //  no top cell given
 
   ex = tl::Extractor ("+* -@");
   EXPECT_EQ (sel.parse (ex, &ly, c1), true);
   EXPECT_EQ (sel.to_string (&ly), "+* +-C1 -C1");
+  EXPECT_EQ (sel.original_string (), "+* -@");
+  EXPECT_EQ (sel.is_valid (), true);
+}
+
+//  late validation
+TEST(5)
+{
+  db::Layout ly;
+  db::CellSelector sel;
+
+  auto c1 = ly.add_cell ("C1");
+  /*auto c2 =*/ ly.add_cell ("C2");
+  /*auto c5 =*/ ly.add_cell ("C+5");
+  /*auto cstar =*/ ly.add_cell ("C*");
+
+  tl::Extractor ex;
+  ex = tl::Extractor ("");
+
+  EXPECT_EQ (sel.parse (ex), true);
+  EXPECT_EQ (sel.empty (), true);
+  EXPECT_EQ (sel.to_string (&ly), "");
+  EXPECT_EQ (sel.original_string (), "");
+  EXPECT_EQ (sel.is_valid (), true);
+
+  ex = tl::Extractor ("+#0 -#1");
+  EXPECT_EQ (sel.parse (ex), true);
+  EXPECT_EQ (sel.to_string (&ly), "+C1 -C2");
+  EXPECT_EQ (sel.original_string (), "+#0 -#1");
+  EXPECT_EQ (sel.is_valid (), true);
+
+  ex = tl::Extractor ("+C1");
+  EXPECT_EQ (sel.parse (ex), true);
+  EXPECT_EQ (sel.to_string (&ly), "+C1");
+  EXPECT_EQ (sel.original_string (), "+C1");
+  EXPECT_EQ (sel.is_valid (), false);
+  sel.ensure_valid (&ly, c1);
+  EXPECT_EQ (sel.to_string (&ly), "+C1");
+  EXPECT_EQ (sel.original_string (), "+C1");
+  EXPECT_EQ (sel.is_valid (), true);
+
+  ex = tl::Extractor ("+C*");
+  EXPECT_EQ (sel.parse (ex), true);
+  EXPECT_EQ (sel.to_string (&ly), "+C*");
+  EXPECT_EQ (sel.original_string (), "+C*");
+  EXPECT_EQ (sel.is_valid (), false);
+  sel.ensure_valid (&ly, c1);
+  EXPECT_EQ (sel.to_string (&ly), "+C1 +C2 +'C+5' +'C*'");
+  EXPECT_EQ (sel.original_string (), "+C*");
+  EXPECT_EQ (sel.is_valid (), true);
+
+  ex = tl::Extractor ("+* -C1");
+  EXPECT_EQ (sel.parse (ex), true);
+  EXPECT_EQ (sel.to_string (&ly), "+* -C1");
+  EXPECT_EQ (sel.original_string (), "+* -C1");
+  EXPECT_EQ (sel.is_valid (), false);
+  sel.ensure_valid (&ly, c1);
+  EXPECT_EQ (sel.to_string (&ly), "+* +-C1 -C1");
+  EXPECT_EQ (sel.original_string (), "+* -C1");
+  EXPECT_EQ (sel.is_valid (), true);
+
+  ex = tl::Extractor ("+* -*");
+  EXPECT_EQ (sel.parse (ex), true);
+  EXPECT_EQ (sel.to_string (&ly), "-*");
+  EXPECT_EQ (sel.original_string (), "+* -*");
+  EXPECT_EQ (sel.is_valid (), true);
+  sel.ensure_valid (&ly, c1);  //  does nothing
+  EXPECT_EQ (sel.to_string (&ly), "-*");
+  EXPECT_EQ (sel.original_string (), "+* -*");
+  EXPECT_EQ (sel.is_valid (), true);
+
+  ex = tl::Extractor ("+* -@");
+  EXPECT_EQ (sel.parse (ex), true);
+  EXPECT_EQ (sel.to_string (&ly), "+* -@");
+  EXPECT_EQ (sel.original_string (), "+* -@");
+  EXPECT_EQ (sel.is_valid (), false);
+  sel.ensure_valid (&ly, c1);
+  EXPECT_EQ (sel.to_string (&ly), "+* +-C1 -C1");
+  EXPECT_EQ (sel.original_string (), "+* -@");
+  EXPECT_EQ (sel.is_valid (), true);
 }

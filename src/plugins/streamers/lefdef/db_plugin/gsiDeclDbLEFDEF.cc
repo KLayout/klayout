@@ -1060,9 +1060,9 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
   ) +
   gsi::method ("read_lef_with_def", &db::LEFDEFReaderOptions::read_lef_with_def,
     "@brief Gets a value indicating whether to read all LEF files in the same directory than the DEF file.\n"
-    "If this property is set to true (the default), the DEF reader will automatically consume all LEF files "
-    "next to the DEF file in addition to the LEF files specified with \\lef_files. If set to false, only the "
-    "LEF files specified with \\lef_files will be read.\n"
+    "If this property is set to true (the default) and \\lef_files is empty, the DEF reader will automatically "
+    "consume all LEF files next to the DEF file. If an explicit list is given with \\lef_files, only those "
+    "files will be read. If this property is set to false, automatic LEF discovery is disabled.\n"
     "\n"
     "This property has been added in version 0.27.\n"
   ) +

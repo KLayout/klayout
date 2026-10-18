@@ -673,19 +673,20 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "!--" + m_long_prefix + "lefdef-no-implicit-lef", &m_lefdef_read_lef_with_def, "Disables reading all LEF files together with DEF files",
                     "This option applies when reading DEF files.\n"
                     "\n"
-                    "If this option is given, only the LEF files specified with '--" + m_long_prefix + "lefdef-lef-files' will be read."
+                    "If this option is given, only the LEF files specified with '--" + m_long_prefix + "lefdef-lefs' will be read."
                     "\n"
-                    "If this option is not present, the DEF reader will look for all files with 'LEF' or related extensions "
-                    "in the same place than the DEF file and read these files before the DEF file is read. In addition, it will read the "
-                    "LEF files specified with '--" + m_long_prefix + "lefdef-lef-files'."
+                    "If this option is not present and no LEF files are specified with '--" + m_long_prefix + "lefdef-lefs', "
+                    "the DEF reader will look for all files with 'LEF' or related extensions "
+                    "in the same place as the DEF file and read these files before the DEF file is read. "
+                    "An explicit LEF list disables this automatic discovery."
                    )
         << tl::arg (group +
-                    "--" + m_long_prefix + "lefdef-lefs", &m_lefdef_lef_files, "Specifies which additional LEF files to read",
+                    "--" + m_long_prefix + "lefdef-lefs", &m_lefdef_lef_files, "Specifies which LEF files to read instead of automatic discovery",
                     "This option applies when reading DEF files.\n"
                     "\n"
                     "Use a comma-separated list of file names here to specify which LEF files to read. "
-                    "See also '--" + m_long_prefix + "lefdef-read-lef-with-def' for an option to implicitly read all LEF files in the same "
-                    "place than the DEF file.\n"
+                    "Giving an explicit list disables automatic LEF discovery next to the DEF file. "
+                    "If no list is given, use '--" + m_long_prefix + "lefdef-no-implicit-lef' to disable that discovery.\n"
                    )
         << tl::arg (group +
                     "#--" + m_long_prefix + "lefdef-skip-duplicate-macros", &m_lefdef_skip_duplicate_macros, "Skip duplicate LEF macros",

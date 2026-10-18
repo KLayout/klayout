@@ -185,9 +185,9 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
     }
 
-    //  Additionally read all LEF files next to the DEF file
+    //  Read LEF files next to the DEF file only if no explicit list is given.
 
-    if (effective_options.read_lef_with_def ()) {
+    if (effective_options.read_lef_with_def () && effective_options.begin_lef_files () == effective_options.end_lef_files ()) {
 
       std::string input_dir = tl::absolute_path (m_stream.absolute_file_path ());
 

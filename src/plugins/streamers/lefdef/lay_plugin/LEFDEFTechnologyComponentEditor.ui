@@ -45,7 +45,7 @@
        <item>
         <widget class="QCheckBox" name="read_lef_with_def">
          <property name="text">
-          <string>for DEF: also read all LEF files in the same directory than the DEF file</string>
+          <string>for DEF: read LEF files in the same directory if no explicit LEF files are listed</string>
          </property>
         </widget>
        </item>

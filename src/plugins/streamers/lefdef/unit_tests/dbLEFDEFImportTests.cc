@@ -1250,3 +1250,27 @@ TEST(217_skip_duplicate_macro)
   db::compare_layouts (_this, ly, fn_path + "au.oas", db::WriteOAS);
 }
 
+//  issue-2294: an explicit LEF list suppresses directory scanning.
+TEST(218_explicit_lef_disables_discovery)
+{
+  std::string fn_path (tl::testdata ());
+  fn_path += "/lefdef/masks-1/";
+
+  db::LEFDEFReaderOptions lefdef_opt = default_options ();
+  lefdef_opt.set_single_map_file ("in.map");
+  lefdef_opt.push_lef_file ("hidden/in_tech.lef");
+  EXPECT_EQ (lefdef_opt.read_lef_with_def (), true);
+
+  db::Layout ly;
+  db::LoadLayoutOptions opt;
+  opt.set_options (lefdef_opt);
+
+  {
+    tl::InputStream is (fn_path + "in.def");
+    db::Reader reader (is);
+    reader.read (ly, opt);
+  }
+
+  db::compare_layouts (_this, ly, fn_path + "au_plugin_alt_lef.oas.gz", db::WriteOAS);
+}
+

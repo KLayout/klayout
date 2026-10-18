@@ -906,7 +906,9 @@ ParsedLayerSource::display_string (const lay::LayoutViewBase *view) const
     if (! r.empty ()) {
       r += " ";
     }
+    r += "{";
     r += m_cell_sel.original_string ();
+    r += "}";
   }
 
   if (! m_trans.empty () && (m_trans.size () > 1 || m_trans[0] != db::DCplxTrans ())) {

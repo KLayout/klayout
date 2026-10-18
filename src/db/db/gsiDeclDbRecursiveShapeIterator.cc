@@ -540,7 +540,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
   gsi::method_ext ("unselect_cells", &unselect_cells1, gsi::arg ("cells"),
     "@brief Unselects the given cells.\n"
     "\n"
-    "This method will sets the \"unselected\" mark on the given cells. "
+    "This method sets the \"unselected\" mark on the given cells. "
     "That means that these cells or their child cells will not be visited, unless "
     "they are marked as \"selected\" again with the \\select_cells method.\n"
     "\n"
@@ -553,7 +553,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
   gsi::method_ext ("unselect_cells", &unselect_cells2, gsi::arg ("cells"),
     "@brief Unselects the given cells.\n"
     "\n"
-    "This method will sets the \"unselected\" mark on the given cells. "
+    "This method sets the \"unselected\" mark on the given cells. "
     "That means that these cells or their child cells will not be visited, unless "
     "they are marked as \"selected\" again with the \\select_cells method.\n"
     "\n"
@@ -568,7 +568,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
   gsi::method_ext ("select_cells", &select_cells1, gsi::arg ("cells"),
     "@brief Unselects the given cells.\n"
     "\n"
-    "This method will sets the \"selected\" mark on the given cells. "
+    "This method sets the \"selected\" mark on the given cells. "
     "That means that these cells or their child cells are visited, unless "
     "they are marked as \"unselected\" again with the \\unselect_cells method.\n"
     "\n"
@@ -581,7 +581,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
   gsi::method_ext ("select_cells", &select_cells2, gsi::arg ("cells"),
     "@brief Unselects the given cells.\n"
     "\n"
-    "This method will sets the \"selected\" mark on the given cells. "
+    "This method sets the \"selected\" mark on the given cells. "
     "That means that these cells or their child cells are visited, unless "
     "they are marked as \"unselected\" again with the \\unselect_cells method.\n"
     "\n"

@@ -1338,8 +1338,10 @@ RedrawThreadWorker::any_shapes (bool inactive, db::cell_index_type cell_index, u
     return false;
   }
 
+  MicroCellCacheKey key (inactive, cell_index, levels);
+
   //  the cache contains all cells that are visited already
-  RedrawThreadWorker::micro_instance_cache_t::const_iterator c = m_mi_cache.find (std::make_pair (cell_index, levels));
+  RedrawThreadWorker::micro_instance_cache_t::const_iterator c = m_mi_cache.find (key);
   if (c == m_mi_cache.end ()) {
 
     int ret = false;
@@ -1353,7 +1355,7 @@ RedrawThreadWorker::any_shapes (bool inactive, db::cell_index_type cell_index, u
       }
     }
 
-    c = m_mi_cache.insert (std::make_pair (std::make_pair (cell_index, levels), ret)).first;
+    c = m_mi_cache.insert (std::make_pair (key, ret)).first;
 
   }
 
@@ -1381,8 +1383,10 @@ RedrawThreadWorker::any_cell_box (bool inactive, db::cell_index_type cell_index,
     return true;
   }
 
+  MicroCellCacheKey key (inactive, cell_index, levels);
+
   //  the cache contains all cells that are visited already
-  RedrawThreadWorker::micro_instance_cache_t::const_iterator c = m_mi_cell_box_cache.find (std::make_pair (cell_index, levels));
+  RedrawThreadWorker::micro_instance_cache_t::const_iterator c = m_mi_cell_box_cache.find (key);
   if (c == m_mi_cell_box_cache.end ()) {
 
     int ret = false;
@@ -1394,7 +1398,7 @@ RedrawThreadWorker::any_cell_box (bool inactive, db::cell_index_type cell_index,
       ret = true;
     }
 
-    c = m_mi_cell_box_cache.insert (std::make_pair (std::make_pair (cell_index, levels), ret)).first;
+    c = m_mi_cell_box_cache.insert (std::make_pair (key, ret)).first;
 
   }
 
@@ -1422,8 +1426,10 @@ RedrawThreadWorker::any_text_shapes (bool inactive, db::cell_index_type cell_ind
     return false;
   }
 
+  MicroCellCacheKey key (inactive, cell_index, levels);
+
   //  the cache contains all cells that are visited already
-  RedrawThreadWorker::micro_instance_cache_t::const_iterator c = m_mi_text_cache.find (std::make_pair (cell_index, levels));
+  RedrawThreadWorker::micro_instance_cache_t::const_iterator c = m_mi_text_cache.find (key);
   if (c == m_mi_text_cache.end ()) {
 
     bool ret = false;
@@ -1438,7 +1444,7 @@ RedrawThreadWorker::any_text_shapes (bool inactive, db::cell_index_type cell_ind
       }
     }
 
-    c = m_mi_text_cache.insert (std::make_pair (std::make_pair (cell_index, levels), ret)).first;
+    c = m_mi_text_cache.insert (std::make_pair (key, ret)).first;
 
   }
 
@@ -1550,7 +1556,7 @@ RedrawThreadWorker::draw_text_layer (bool inactive, bool drawing_context, db::ce
       if (m_text_lazy_rendering && ((dbbox_tot.width () < 2.5 && dbbox_tot.height () < 1.5) || 
                                     (dbbox_tot.width () < 1.5 && dbbox_tot.height () < 2.5))) {
 
-        bool anything = true;
+        bool anything = ! inactive;
         if (level == 0 && cell_bbox.inside (vp)) {
           //  Hint: on levels below 0 we enter this procedure only if there is a text 
           //  Hint: don't use any_text_shapes on partially visible cells because that will degrade performance 
@@ -1672,6 +1678,7 @@ RedrawThreadWorker::draw_text_layer (bool inactive, bool drawing_context, db::ce
               ++inst;
 
               db::cell_index_type new_ci = cell_inst.object ().cell_index ();
+              bool new_inactive = child_cell_inactive (inactive, new_ci);
               bool hidden = mp_layout->cell (new_ci).is_real_ghost_cell () || ((m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (new_ci) != m_hidden_cells [m_cv_index].end ()));
 
               db::Box cell_box = mp_layout->cell (new_ci).bbox (m_layer);
@@ -1683,9 +1690,10 @@ RedrawThreadWorker::draw_text_layer (bool inactive, bool drawing_context, db::ce
 
                 if (new_ci != last_ci) {
                   //  Hint: don't use any_text_shapes on partially visible cells because that will degrade performance 
-                  if (cell_box.inside (vp)) {
+                  //  but use it with "inactive", because in that case we need the truth.
+                  if (new_inactive || cell_box.inside (vp)) {
                     last_ci = new_ci;
-                    anything = any_text_shapes (child_cell_inactive (inactive, new_ci), new_ci, m_to_level - (level + 1));
+                    anything = any_text_shapes (new_inactive, new_ci, m_to_level - (level + 1));
                   } else {
                     anything = true;
                   }
@@ -1715,13 +1723,9 @@ RedrawThreadWorker::draw_text_layer (bool inactive, bool drawing_context, db::ce
 
                   //  The array can be simplified ..
 
-                  if (! inactive) {
-
-                    db::Box bbox = cell_inst.bbox (bc);
-                    if (vertex) {
-                      r.draw (bbox, trans, vertex, vertex, 0, 0);
-                    }
-
+                  db::Box bbox = cell_inst.bbox (bc);
+                  if (vertex) {
+                    r.draw (bbox, trans, vertex, vertex, 0, 0);
                   }
 
                 } else if (anything) {
@@ -1733,7 +1737,7 @@ RedrawThreadWorker::draw_text_layer (bool inactive, bool drawing_context, db::ce
 
                       db::ICplxTrans t (cell_inst.complex_trans (*p));
                       db::Box new_vp = safe_transformed_box (*v, t.inverted ());
-                      draw_text_layer (child_cell_inactive (inactive, new_ci), drawing_context, new_ci, trans * t, new_vp, level + 1, fill, frame, vertex, text, opt_bitmap);
+                      draw_text_layer (new_inactive, drawing_context, new_ci, trans * t, new_vp, level + 1, fill, frame, vertex, text, opt_bitmap);
 
                     } 
 
@@ -1979,6 +1983,7 @@ RedrawThreadWorker::draw_layer_wo_cache (bool inactive, int from_level, int to_l
 
           db::cell_index_type new_ci = cell_inst.object ().cell_index ();
           bool hidden = mp_layout->cell (new_ci).is_real_ghost_cell () || ((m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (new_ci) != m_hidden_cells [m_cv_index].end ()));
+          bool new_inactive = child_cell_inactive (inactive, new_ci);
 
           db::Box new_cell_box = mp_layout->cell (new_ci).bbox (m_layer);
           if (! new_cell_box.empty () && ! hidden) {
@@ -1988,10 +1993,11 @@ RedrawThreadWorker::draw_layer_wo_cache (bool inactive, int from_level, int to_l
             bool simplify = false;
 
             if (last_ci != new_ci) {
-              //  Hint: don't use any_text_shapes on partially visible cells because that will degrade performance 
-              if (new_cell_box.inside (*v)) {
+              //  Hint: don't use any_shapes on partially visible cells because that will degrade performance
+              //  but use it with "inactive", because in that case we need the truth.
+              if (new_inactive || new_cell_box.inside (*v)) {
                 last_ci = new_ci;
-                anything = any_shapes (child_cell_inactive (inactive, new_ci), new_ci, to_level - (level + 1));
+                anything = any_shapes (new_inactive, new_ci, to_level - (level + 1));
               } else {
                 anything = true;
               }
@@ -2019,16 +2025,12 @@ RedrawThreadWorker::draw_layer_wo_cache (bool inactive, int from_level, int to_l
 
               //  The array can be simplified ..
 
-              if (! inactive) {
-
-                db::Box bbox = cell_inst.bbox (bc);
-                if (frame) {
-                  r.draw (bbox, trans, frame, frame, 0, 0);
-                }
-                if (vertex) {
-                  r.draw (bbox, trans, vertex, vertex, 0, 0);
-                }
-
+              db::Box bbox = cell_inst.bbox (bc);
+              if (frame) {
+                r.draw (bbox, trans, frame, frame, 0, 0);
+              }
+              if (vertex) {
+                r.draw (bbox, trans, vertex, vertex, 0, 0);
               }
 
             } else if (anything) {
@@ -2042,7 +2044,7 @@ RedrawThreadWorker::draw_layer_wo_cache (bool inactive, int from_level, int to_l
 
                   db::ICplxTrans t (cell_inst.complex_trans (*p));
                   db::Box new_vp = safe_transformed_box (*v, t.inverted ());
-                  draw_layer (child_cell_inactive (inactive, new_ci), from_level, to_level, new_ci, trans * t, new_vp, level + 1, fill, frame, vertex, text, update_snapshot);
+                  draw_layer (new_inactive, from_level, to_level, new_ci, trans * t, new_vp, level + 1, fill, frame, vertex, text, update_snapshot);
 
                   if (p.quad_id () > 0 && p.quad_id () != qid) {
 
@@ -2155,19 +2157,18 @@ RedrawThreadWorker::draw_layer (bool inactive, int from_level, int to_level, db:
   }
 
   //  draw this level
-  if (level >= from_level && level < to_level && ! inactive) {
+  if (level >= from_level && level < to_level) {
 
     //  optimize very small cells
     db::DBox dbbox = trans * bbox;
-    if ((dbbox.width () < 2.5 && dbbox.height () < 1.5) || 
+    if ((dbbox.width () < 2.5 && dbbox.height () < 1.5) ||
         (dbbox.width () < 1.5 && dbbox.height () < 2.5)) {
 
       if (bbox.touches (vp)) {
 
-        bool anything = true;
+        bool anything = ! inactive;
         if (level == 0) {
           //  Hint: on levels below 0 we know that there is anything. Otherwise we would not enter this procedure
-          //  Hint: don't use any_text_shapes on partially visible cells because that will degrade performance
           anything = any_shapes (inactive, ci, m_to_level - level);
         }
 
@@ -2183,7 +2184,7 @@ RedrawThreadWorker::draw_layer (bool inactive, int from_level, int to_level, db:
       //  create a set of boxes to look into
       std::vector<db::Box> vv = search_regions (cell_bbox, vp, level);
 
-      //  use the presence of a lay::Bitmap for the drawing plane as an indicator that we can cache the 
+      //  use the presence of a lay::Bitmap for the drawing plane as an indicator that we can cache the
       //  drawings
       bool can_cache = (m_bitmap_caching && dynamic_cast<lay::Bitmap *> (fill) != 0);
 
@@ -2196,7 +2197,7 @@ RedrawThreadWorker::draw_layer (bool inactive, int from_level, int to_level, db:
       if (can_cache && level > 0) {
         db::Cell::parent_inst_iterator p = cell.begin_parent_insts ();
         size_t n;
-        for (n = 0; !p.at_end () && n < 2; ++n) 
+        for (n = 0; !p.at_end () && n < 2; ++n)
           ;
         if (n <= 1) {
           can_cache = false;
@@ -2209,7 +2210,7 @@ RedrawThreadWorker::draw_layer (bool inactive, int from_level, int to_level, db:
         trans_wo_disp.disp (db::DVector ());
 
         //  if we have the cell cached, use the cached bitmap
-        CellCacheKey key (to_level - level, ci, trans_wo_disp);
+        CellCacheKey key (inactive, to_level - level, ci, trans_wo_disp);
         cell_cache_t::iterator cached_cell = m_cell_cache.find (key);
         if (cached_cell == m_cell_cache.end ()) {
 
@@ -2252,7 +2253,7 @@ RedrawThreadWorker::draw_layer (bool inactive, int from_level, int to_level, db:
         draw_layer_wo_cache (inactive, from_level, to_level, ci, trans, vv, level, fill, frame, vertex, text, update_snapshot);
       }
 
-    } 
+    }
   
   } else {
 

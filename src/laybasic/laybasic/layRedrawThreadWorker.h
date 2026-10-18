@@ -90,21 +90,25 @@ private:
 };
 
 /**
- *  @brief An entry in the drawing cache
+ *  @brief An key for the drawing cache
  */
 struct CellCacheKey 
 {
 public:
-  CellCacheKey (int n, db::cell_index_type c, const db::CplxTrans &t) 
-    : nlevels (n), ci (c), trans (t)
+  CellCacheKey (bool ia, int n, db::cell_index_type c, const db::CplxTrans &t)
+    : inactive (ia), nlevels (n), ci (c), trans (t)
   { }
 
+  bool inactive;
   int nlevels;
   db::cell_index_type ci;
   db::CplxTrans trans;
 
   bool operator< (const CellCacheKey &other) const
   {
+    if (inactive != other.inactive) {
+      return inactive < other.inactive;
+    }
     if (nlevels != other.nlevels) {
       return nlevels < other.nlevels;
     }
@@ -146,6 +150,34 @@ public:
 };
 
 /**
+ *  @brief An entry in the micro instance cache
+ */
+struct MicroCellCacheKey
+{
+  MicroCellCacheKey (bool ia, int n, db::cell_index_type c)
+    : inactive (ia), nlevels (n), ci (c)
+  { }
+
+  bool inactive;
+  int nlevels;
+  db::cell_index_type ci;
+
+  bool operator< (const MicroCellCacheKey &other) const
+  {
+    if (inactive != other.inactive) {
+      return inactive < other.inactive;
+    }
+    if (nlevels != other.nlevels) {
+      return nlevels < other.nlevels;
+    }
+    if (ci != other.ci) {
+      return ci < other.ci;
+    }
+    return false;
+  }
+};
+
+/**
  *  @brief A callback class which is triggered when a snapshot is taken
  */
 class UpdateSnapshotCallback
@@ -164,7 +196,7 @@ class RedrawThreadWorker
 {
 public:
   typedef std::map<CellCacheKey, CellCacheInfo> cell_cache_t;
-  typedef std::map<std::pair<db::cell_index_type, unsigned int>, bool> micro_instance_cache_t;
+  typedef std::map<MicroCellCacheKey, bool> micro_instance_cache_t;
 
   RedrawThreadWorker (RedrawThread *redraw_thread);
   virtual ~RedrawThreadWorker ();

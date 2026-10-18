@@ -742,7 +742,7 @@ echo ""
 
 echo "Installing binaries .."
 cd $BUILD
-$MAKE_PRG install
+$MAKE_PRG install $MAKE_OPT
 cd $CURR_DIR
 echo ""
 echo "Build successfully done."

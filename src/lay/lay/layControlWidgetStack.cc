@@ -127,6 +127,17 @@ void ControlWidgetStack::remove_widget(size_t index)
   update_geometry ();
 }
 
+void ControlWidgetStack::move_widget (size_t from, size_t to)
+{
+  if (from == to || from >= m_widgets.size () || to >= m_widgets.size ()) {
+    return;
+  }
+
+  QWidget *w = m_widgets [from];
+  m_widgets.erase (m_widgets.begin () + from);
+  m_widgets.insert (m_widgets.begin () + to, w);
+}
+
 void ControlWidgetStack::raise_widget(size_t index)
 {
   mp_current_widget = 0;

@@ -43,6 +43,7 @@ public:
 
   void add_widget (lay::LayoutViewWidget *w);
   void remove_widget (size_t index);
+  void move_widget (size_t from, size_t to);
   void raise_widget (size_t index);
   LayoutViewWidget *widget (size_t index);
   QWidget *background_widget ();

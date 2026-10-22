@@ -207,7 +207,7 @@ LibraryManager::register_lib (Library *library)
 
     //  if the new library replaces the old one, remap existing library proxies before deleting the library
     //  (replacement is done only when all technologies are substituted)
-    lib_name_map::iterator l = m_lib_by_name.find (library->get_name ());
+    lib_name_map::iterator l = m_lib_by_name.lower_bound (library->get_name ());
     bool found = false;
     while (l != m_lib_by_name.end () && l->first == library->get_name ()) {
       if (m_libs [l->second] && m_libs [l->second]->get_technologies () == library->get_technologies ()) {

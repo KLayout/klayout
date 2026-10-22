@@ -55,11 +55,11 @@ JoinEdgesCluster::finish ()
     std::multimap<db::Point, iterator>::iterator j0 = objects_by_p1.begin ();
     std::multimap<db::Point, iterator>::iterator j = j0;
     do {
-      std::multimap<db::Point, iterator>::iterator jj = objects_by_p2.find (j->first);
+      std::multimap<db::Point, iterator>::iterator jj = objects_by_p2.lower_bound (j->first);
       if (jj == objects_by_p2.end ()) {
         break;
       } else {
-        j = objects_by_p1.find (jj->second->first->p1 ());
+        j = objects_by_p1.lower_bound (jj->second->first->p1 ());
         tl_assert (j != objects_by_p1.end ());
       }
     } while (j != j0);
@@ -78,7 +78,7 @@ JoinEdgesCluster::finish ()
 
       //  remove the edge as it's taken
       std::multimap<db::Point, iterator>::iterator jj;
-      for (jj = objects_by_p2.find (i->first->p2 ()); jj != objects_by_p2.end () && jj->first == i->first->p2 (); ++jj) {
+      for (jj = objects_by_p2.lower_bound (i->first->p2 ()); jj != objects_by_p2.end () && jj->first == i->first->p2 (); ++jj) {
         if (jj->second == i) {
           break;
         }
@@ -89,7 +89,7 @@ JoinEdgesCluster::finish ()
 
       //  process along the edge to the next one
       //  TODO: this chooses any solution in case of forks. Choose a specific one?
-      j = objects_by_p1.find (i->first->p2 ());
+      j = objects_by_p1.lower_bound (i->first->p2 ());
       if (j != objects_by_p1.end ()) {
         i = j->second;
       } else {

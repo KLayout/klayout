@@ -224,7 +224,7 @@ void MacroCollection::collect_used_nodes (std::set <Macro *> &macros, std::set <
 
 Macro *MacroCollection::macro_by_name (const std::string &name, Macro::Format format)
 {
-  std::multimap <std::string, Macro *>::iterator i = m_macros.find (name);
+  std::multimap <std::string, Macro *>::iterator i = m_macros.lower_bound (name);
   while (i != m_macros.end () && i->first == name) {
     if (format == Macro::NoFormat || i->second->format () == format) {
       return i->second;
@@ -236,7 +236,7 @@ Macro *MacroCollection::macro_by_name (const std::string &name, Macro::Format fo
 
 const Macro *MacroCollection::macro_by_name (const std::string &name, Macro::Format format) const
 {
-  std::multimap <std::string, Macro *>::const_iterator i = m_macros.find (name);
+  std::multimap <std::string, Macro *>::const_iterator i = m_macros.lower_bound (name);
   while (i != m_macros.end () && i->first == name) {
     if (format == Macro::NoFormat || i->second->format () == format) {
       return i->second;
@@ -528,7 +528,7 @@ MacroCollection::create_entry (const std::string &path)
 
     if (Macro::format_from_suffix (path, interpreter, dsl_name, autorun, format)) {
 
-      iterator mm = m_macros.find (n);
+      iterator mm = m_macros.lower_bound (n);
       bool found = false;
       while (mm != m_macros.end () && mm->first == n && ! found) {
         if ((interpreter == Macro::None || mm->second->interpreter () == interpreter) &&
@@ -794,7 +794,7 @@ bool MacroCollection::del ()
 
 void MacroCollection::rename_macro (Macro *macro, const std::string &new_name)
 {
-  iterator m = m_macros.find (macro->name ());
+  iterator m = m_macros.lower_bound (macro->name ());
   while (m != m_macros.end () && m->first == macro->name ()) {
     if (m->second == macro) {
       m_macros.erase (m);

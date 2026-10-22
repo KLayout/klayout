@@ -1391,7 +1391,7 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
       continue;
     }
 
-    std::multimap<size_t, const db::Pin *>::iterator np = net2pin2.find (n.other_net_index ());
+    std::multimap<size_t, const db::Pin *>::iterator np = net2pin2.lower_bound (n.other_net_index ());
     for (db::Net::const_pin_iterator pi = net->begin_pins (); pi != net->end_pins (); ++pi) {
 
       if (np != net2pin2.end () && np->first == n.other_net_index ()) {
@@ -1533,7 +1533,7 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
       bool mapped = true;
       std::vector<std::pair<size_t, size_t> > k = compute_device_key_for_other (*d, g2, device_categorizer.is_strict_device_category (device_cat), mapped);
 
-      auto dm = device_map.find (k);
+      auto dm = device_map.lower_bound (k);
 
       if (! mapped || dm == device_map.end () || dm->first != k) {
 
@@ -1761,7 +1761,7 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
       bool mapped = true, valid = true;
       std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key_for_other (*sc, g2, &c22_circuit_and_pin_mapping, &circuit_pin_mapper, mapped, valid);
 
-      std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> >::iterator scm = subcircuit_map.find (k);
+      std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> >::iterator scm = subcircuit_map.lower_bound (k);
 
       if (! mapped || scm == subcircuit_map.end () || scm->first != k) {
 

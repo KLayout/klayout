@@ -56,11 +56,11 @@ JoinEdgesCluster::finish ()
     std::multimap<db::Point, iterator>::iterator j = j0;
     do {
       std::multimap<db::Point, iterator>::iterator jj = objects_by_p2.lower_bound (j->first);
-      if (jj == objects_by_p2.end ()) {
+      if (jj == objects_by_p2.end () || jj->first != j->first) {
         break;
       } else {
         j = objects_by_p1.lower_bound (jj->second->first->p1 ());
-        tl_assert (j != objects_by_p1.end ());
+        tl_assert (j != objects_by_p1.end () && j->first == jj->second->first->p1 ());
       }
     } while (j != j0);
 
@@ -90,7 +90,7 @@ JoinEdgesCluster::finish ()
       //  process along the edge to the next one
       //  TODO: this chooses any solution in case of forks. Choose a specific one?
       j = objects_by_p1.lower_bound (i->first->p2 ());
-      if (j != objects_by_p1.end ()) {
+      if (j != objects_by_p1.end () && j->first == i->first->p2 ()) {
         i = j->second;
       } else {
         break;

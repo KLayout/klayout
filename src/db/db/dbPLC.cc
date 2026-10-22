@@ -468,7 +468,7 @@ Polygon::init ()
 
     mp_v.push_back (v);
 
-    auto i = v2e.find (v);
+    auto i = v2e.lower_bound (v);
     tl_assert (i != v2e.end () && i->first == v && i->second != mp_e.back ());
     mp_e.push_back (i->second);
     v = i->second->other (v);

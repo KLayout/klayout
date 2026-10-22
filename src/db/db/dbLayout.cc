@@ -3349,7 +3349,7 @@ Layout::register_lib_proxy (db::LibraryProxy *lib_proxy)
 {
   auto key = std::make_pair (lib_proxy->lib_id (), lib_proxy->library_cell_index ());
 
-  auto l = m_lib_proxy_map.find (key);
+  auto l = m_lib_proxy_map.lower_bound (key);
   while (l != m_lib_proxy_map.end () && l->first == key) {
     if (l->second == lib_proxy->Cell::cell_index ()) {
       return;
@@ -3365,7 +3365,7 @@ Layout::unregister_lib_proxy (db::LibraryProxy *lib_proxy)
 {
   auto key = std::make_pair (lib_proxy->lib_id (), lib_proxy->library_cell_index ());
 
-  auto l = m_lib_proxy_map.find (key);
+  auto l = m_lib_proxy_map.lower_bound (key);
   while (l != m_lib_proxy_map.end () && l->first == key) {
     if (l->second == lib_proxy->Cell::cell_index ()) {
       m_lib_proxy_map.erase (l);
@@ -3394,7 +3394,7 @@ Layout::get_lib_proxy (Library *lib, cell_index_type cell_index)
 {
   auto key = std::make_pair (lib->get_id (), cell_index);
 
-  lib_proxy_map::const_iterator lp = m_lib_proxy_map.find (key);
+  lib_proxy_map::const_iterator lp = m_lib_proxy_map.lower_bound (key);
   if (lp != m_lib_proxy_map.end () && lp->first == key) {
 
     return lp->second;
@@ -3432,7 +3432,7 @@ Layout::get_lib_proxy (Library *lib, cell_index_type cell_index)
 void
 Layout::register_cold_proxy (db::ColdProxy *cold_proxy)
 {
-  auto l = m_cold_proxy_map.find (cold_proxy->context_info ());
+  auto l = m_cold_proxy_map.lower_bound (cold_proxy->context_info ());
   while (l != m_cold_proxy_map.end () && l->first == cold_proxy->context_info ()) {
     if (l->second == cold_proxy->Cell::cell_index ()) {
       return;
@@ -3446,7 +3446,7 @@ Layout::register_cold_proxy (db::ColdProxy *cold_proxy)
 void
 Layout::unregister_cold_proxy (db::ColdProxy *cold_proxy)
 {
-  auto l = m_cold_proxy_map.find (cold_proxy->context_info ());
+  auto l = m_cold_proxy_map.lower_bound (cold_proxy->context_info ());
   while (l != m_cold_proxy_map.end () && l->first == cold_proxy->context_info ()) {
     if (l->second == cold_proxy->Cell::cell_index ()) {
       m_cold_proxy_map.erase (l);
@@ -3459,7 +3459,7 @@ Layout::unregister_cold_proxy (db::ColdProxy *cold_proxy)
 std::pair<bool, cell_index_type>
 Layout::find_cold_proxy (const db::LayoutOrCellContextInfo &info)
 {
-  cold_proxy_map::const_iterator lp = m_cold_proxy_map.find (info);
+  cold_proxy_map::const_iterator lp = m_cold_proxy_map.lower_bound (info);
   if (lp != m_cold_proxy_map.end () && lp->first == info) {
     return std::make_pair (true, lp->second);
   } else {
@@ -3470,7 +3470,7 @@ Layout::find_cold_proxy (const db::LayoutOrCellContextInfo &info)
 cell_index_type
 Layout::create_cold_proxy (const db::LayoutOrCellContextInfo &info)
 {
-  cold_proxy_map::const_iterator lp = m_cold_proxy_map.find (info);
+  cold_proxy_map::const_iterator lp = m_cold_proxy_map.lower_bound (info);
   if (lp != m_cold_proxy_map.end () && lp->first == info) {
 
     return lp->second;

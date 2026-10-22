@@ -786,7 +786,7 @@ private:
   void waive_or_unwaive (rdb::id_type cell_id, rdb::id_type cat_id, bool waived)
   {
     auto k = std::make_pair (cell_id, cat_id);
-    auto c = m_cache_by_ids.find (k);
+    auto c = m_cache_by_ids.lower_bound (k);
     while (c != m_cache_by_ids.end () && c->first == k) {
       c->second->waive_or_unwaive (waived);
       ++c;

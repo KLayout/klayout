@@ -1139,7 +1139,8 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
     for (gsi::ClassBase::method_iterator m = classes [n]->begin_methods (); m != classes [n]->end_methods (); ++m) {
       for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
         std::multimap <std::string, std::pair<const gsi::MethodBase *, size_t> >::iterator im;
-        while ((im = mm.find (full_name (*syn))) != mm.end ()) {
+        std::string fn = full_name (*syn);
+        while ((im = mm.lower_bound (fn)) != mm.end () && im->first == fn) {
           mm.erase (im);
         }
       }

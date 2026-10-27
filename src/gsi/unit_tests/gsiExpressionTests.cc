@@ -25,6 +25,7 @@
 #include "gsiDecl.h"
 
 #include "tlUnitTest.h"
+#include "tlVariantUserClasses.h"
 
 #include <stdlib.h>
 #include <math.h>
@@ -913,4 +914,145 @@ TEST(18)
   //  X is a base class of Y
   v = e.parse ("var y=Y.new(); y.is_a(X)").execute ();
   EXPECT_EQ (v.to_string (), std::string ("true"));
+}
+
+namespace
+{
+  static size_t s_xcount = 0;
+
+  class TestClassX : public tl::Object
+  {
+  public:
+    TestClassX () { ++s_xcount; }
+    ~TestClassX () { --s_xcount; }
+  };
+
+  static size_t s_ycount = 0;
+
+  class TestClassY : public gsi::ObjectBase
+  {
+  public:
+    TestClassY () { ++s_ycount; }
+    ~TestClassY () { --s_ycount; }
+  };
+
+  static tl::VariantUserClassImpl<TestClassX> x_class_instance;
+  static gsi::Class<TestClassY> y_class_instance ("TestClassY", "", gsi::Methods ());
+}
+
+//  detaching from objects as references by user_take()
+TEST(19)
+{
+  s_xcount = 0;
+
+  tl::Variant v1 = tl::Variant (new TestClassX (), &x_class_instance, true);
+  EXPECT_EQ (s_xcount, size_t (1));
+  TestClassX *tl_obj = (TestClassX *) v1.to_object ();
+  EXPECT_EQ (tl_obj->ref_count (), size_t (1));
+  tl::Variant v2 = tl::Variant (tl_obj, &x_class_instance, false);
+  EXPECT_EQ (v2.to_object () == tl_obj, true);
+
+  EXPECT_EQ (tl_obj->ref_count (), size_t (2));
+  const auto *cls = v1.user_cls ();
+  void *obj = v1.user_take ();
+  tl_assert (obj == tl_obj);
+  EXPECT_EQ (v1.is_nil (), true);
+
+  //  v2 is still holding a reference
+  EXPECT_EQ (tl_obj->ref_count (), size_t (1));
+  EXPECT_EQ (v2.is_nil (), false);
+
+  cls->destroy (obj);
+
+  //  as tl::Object does not provide a callback to the owner, we only see that the weak reference has been
+  //  turned to null:
+  EXPECT_EQ (v2.is_nil (), false);
+  EXPECT_EQ (v2.to_object () == 0, true);
+
+  EXPECT_EQ (s_xcount, size_t (0));
+}
+
+//  detaching from objects as references
+TEST(20)
+{
+  s_xcount = 0;
+
+  tl::Variant v1 = tl::Variant (new TestClassX (), &x_class_instance, true);
+  EXPECT_EQ (s_xcount, size_t (1));
+  TestClassX *tl_obj = (TestClassX *) v1.to_object ();
+  EXPECT_EQ (tl_obj->ref_count (), size_t (1));
+  tl::Variant v2 = tl::Variant (tl_obj, &x_class_instance, false);
+  EXPECT_EQ (v2.to_object () == tl_obj, true);
+
+  EXPECT_EQ (tl_obj->ref_count (), size_t (2));
+  v1.user_destroy ();
+
+  EXPECT_EQ (v1.is_nil (), true);
+
+  //  as tl::Object does not provide a callback to the owner, we only see that the weak reference has been
+  //  turned to null:
+  EXPECT_EQ (v2.is_nil (), false);
+  EXPECT_EQ (v2.to_object () == 0, true);
+
+  EXPECT_EQ (s_xcount, size_t (0));
+}
+
+//  detaching from gsi objects as references
+TEST(21)
+{
+  s_ycount = 0;
+
+  gsi::Proxy *proxy = new gsi::Proxy (&y_class_instance);
+  proxy->set (new TestClassY (), true, false, true);
+  EXPECT_EQ (s_ycount, size_t (1));
+
+  tl::Variant v1 = tl::Variant (proxy, y_class_instance.var_cls (false), true);
+  gsi::Proxy *tl_obj = dynamic_cast<gsi::Proxy *> (v1.to_object ());
+  EXPECT_EQ (tl_obj->ref_count (), size_t (2));   //  one refcount more because of event binding
+
+  TestClassY *y_obj = (TestClassY *) (v1.to_user ());
+
+  //  adds another reference3
+  tl::Variant v2 = v1;
+  EXPECT_EQ (v2.to_user () == y_obj, true);
+
+  EXPECT_EQ (tl_obj->ref_count (), size_t (3));
+  const auto *cls = v1.user_cls ();
+  void *obj = v1.user_take ();
+  EXPECT_EQ (tl_obj->ref_count (), size_t (1));   //  one refcount left because of event binding
+
+  EXPECT_EQ (v1.is_nil (), true);
+  tl_assert (dynamic_cast<gsi::Proxy *> (v2.to_object ()) != 0);
+  EXPECT_EQ (dynamic_cast<gsi::Proxy *> (v2.to_object ())->destroyed (), true);
+
+  cls->destroy (obj);
+
+  EXPECT_EQ (s_ycount, size_t (0));
+}
+
+//  detaching from gsi objects as references
+TEST(22)
+{
+  s_ycount = 0;
+
+  gsi::Proxy *proxy = new gsi::Proxy (&y_class_instance);
+  proxy->set (new TestClassY (), true, false, true);
+  EXPECT_EQ (s_ycount, size_t (1));
+
+  tl::Variant v1 = tl::Variant (proxy, y_class_instance.var_cls (false), true);
+  gsi::Proxy *tl_obj = dynamic_cast<gsi::Proxy *> (v1.to_object ());
+  EXPECT_EQ (tl_obj->ref_count (), size_t (2));
+
+  TestClassY *y_obj = (TestClassY *) (v1.to_user ());
+  tl::Variant v2 = v1;
+  EXPECT_EQ (v2.to_user () == y_obj, true);
+
+  EXPECT_EQ (tl_obj->ref_count (), size_t (3));
+  v1.user_destroy ();
+
+  EXPECT_EQ (v1.is_nil (), true);
+  tl_assert (dynamic_cast<gsi::Proxy *> (v2.to_object ()) != 0);
+  EXPECT_EQ (dynamic_cast<gsi::Proxy *> (v2.to_object ())->destroyed (), true);
+
+  EXPECT_EQ (s_ycount, size_t (0));
 }

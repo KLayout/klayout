@@ -194,6 +194,14 @@ public:
     }
   }
 
+  void detach_proxy (tl::Object *proxy) const
+  {
+    Proxy *p = dynamic_cast<Proxy *> (proxy);
+    if (p) {
+      p->detach ();
+    }
+  }
+
   virtual bool equal (const void *a, const void *b) const
   {
     return gsi::_var_user_equal_impl<T, tl::has_equal_operator<T>::value>::call ((const T *) a, (const T *) b, this);

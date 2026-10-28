@@ -475,7 +475,7 @@ Polygon::init ()
 
     v2e.erase (i);
 
-    i = v2e.find (v);
+    i = v2e.lower_bound (v);
     while (i != v2e.end () && i->first == v) {
       if (i->second == mp_e.back ()) {
         v2e.erase (i);

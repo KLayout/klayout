@@ -270,7 +270,7 @@ Edge2EdgeCheckBase::add (const db::Edge *o1, size_t p1, const db::Edge *o2, size
       for (unsigned int p = 0; p < 2; ++p) {
 
         std::pair<db::Edge, size_t> k (*o1, p1);
-        for (std::multimap<std::pair<db::Edge, size_t>, size_t>::const_iterator i = m_e2ep.find (k); i != m_e2ep.end () && i->first == k; ++i) {
+        for (std::multimap<std::pair<db::Edge, size_t>, size_t>::const_iterator i = m_e2ep.lower_bound (k); i != m_e2ep.end () && i->first == k; ++i) {
           size_t n = i->second / 2;
           if (n < m_first_pseudo && ! m_ep_discarded [n]) {
             n1.push_back (n);

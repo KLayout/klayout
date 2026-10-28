@@ -275,9 +275,6 @@ public:
 
     basic_repository::iterator f = r->find ((ArrayBase *) &base);
     if (f != r->end ()) {
-      //  Issues with clang 21.1.8: 
-      //    return dynamic_cast <basic_array<Coord> *> (*f);
-      //  Returns a null pointer
       tl_assert ((*f)->type () == base.type ());
       return static_cast <basic_array<Coord> *> (*f);
     } else {

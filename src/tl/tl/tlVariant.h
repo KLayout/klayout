@@ -89,6 +89,7 @@ public:
   virtual const gsi::ClassBase *gsi_cls () const = 0;
   virtual const tl::EvalClass *eval_cls () const = 0;
   virtual void *deref_proxy (tl::Object *proxy) const = 0;
+  virtual void detach_proxy (tl::Object *proxy) const = 0;
   virtual const tl::VariantUserClassBase *change_constness (bool constness) const = 0;
 
   const void *deref_proxy_const (const tl::Object *proxy) const

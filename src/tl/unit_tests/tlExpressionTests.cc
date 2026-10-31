@@ -464,6 +464,7 @@ public:
   virtual bool is_const () const { return false; }
   virtual bool is_ref () const { return false; }
   virtual void *deref_proxy (tl::Object *) const { return 0; }
+  virtual void detach_proxy (tl::Object *) const { }
   virtual const gsi::ClassBase*gsi_cls() const { return 0; }
   virtual const tl::VariantUserClassBase *change_constness (bool) const { return this; }
   static BoxClassClass instance;
@@ -533,6 +534,7 @@ public:
   virtual bool is_const () const { return false; }
   virtual bool is_ref () const { return false; }
   virtual void *deref_proxy (tl::Object *) const { return 0; }
+  virtual void detach_proxy (tl::Object *) const { }
   virtual const gsi::ClassBase*gsi_cls() const { return 0; }
   virtual const tl::VariantUserClassBase *change_constness (bool) const { return this; }
   static EdgeClassClass instance;

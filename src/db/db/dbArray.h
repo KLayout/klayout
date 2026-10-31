@@ -275,7 +275,8 @@ public:
 
     basic_repository::iterator f = r->find ((ArrayBase *) &base);
     if (f != r->end ()) {
-      return dynamic_cast <basic_array<Coord> *> (*f);
+      tl_assert ((*f)->type () == base.type ());
+      return static_cast <basic_array<Coord> *> (*f);
     } else {
       basic_array<Coord> *bb = base.clone ();
       bb->in_repository = true;

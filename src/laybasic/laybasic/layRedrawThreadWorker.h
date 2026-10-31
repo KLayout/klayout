@@ -206,6 +206,13 @@ private:
   bool any_cell_box (db::cell_index_type cell_index, unsigned int levels);
   bool need_draw_box (const db::Layout *layout, const db::Cell &cell, int level, bool for_ghosts);
 
+  //  True if the cell is hidden in the view or for the layer currently being drawn
+  bool cell_hidden (db::cell_index_type ci) const
+  {
+    return (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ()) ||
+           (ci < m_layer_hidden_cells.size () && m_layer_hidden_cells [ci]);
+  }
+
   RedrawThread *mp_redraw_thread;
   std::vector <db::Box> m_redraw_region;
   std::vector <lay::Drawing *> mp_drawings;
@@ -248,6 +255,7 @@ private:
   bool m_xfill;
   const std::set<db::properties_id_type> *mp_prop_sel;
   bool m_inv_prop_sel;
+  std::vector<bool> m_layer_hidden_cells;
   db::DCplxTrans m_vp_trans;
   std::vector<std::pair<unsigned int, lay::CanvasPlane *> > m_buffers;
   unsigned int m_test_count;

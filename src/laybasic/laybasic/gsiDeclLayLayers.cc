@@ -45,6 +45,18 @@ static void set_trans (lay::LayerProperties *n, const std::vector<db::DCplxTrans
   n->set_source (s);
 }
 
+static const std::vector<db::cell_index_type> &get_hidden_cells (const lay::LayerProperties *n)
+{
+  return n->source (true).hidden_cells ();
+}
+
+static void set_hidden_cells (lay::LayerProperties *n, const std::vector<db::cell_index_type> &cells)
+{
+  lay::ParsedLayerSource s (n->source (false));
+  s.set_hidden_cells (cells);
+  n->set_source (s);
+}
+
 static int get_cellview (const lay::LayerProperties *n, bool real)
 {
   return n->source (real).cv_index ();
@@ -800,6 +812,20 @@ Class<lay::LayerProperties> decl_LayerProperties ("lay", "LayerProperties",
     "@brief Sets the transformations that the layer is transformed with\n"
     "\n"
     "See \\trans for a description of the transformations."
+  ) +
+  method_ext ("hidden_cells", &get_hidden_cells,
+    "@brief Gets the cells (by cell index) in which this layer is not drawn\n"
+    "\n"
+    "This method has been added in version 0.30.13."
+  ) +
+  method_ext ("hidden_cells=", &set_hidden_cells, gsi::arg ("cell_indexes"),
+    "@brief Sets the cells (by cell index) in which this layer is not drawn\n"
+    "\n"
+    "Unlike \\LayoutView#hide_cell, this hides the layer inside the given cells and their subtrees only, "
+    "while the cells stay visible on other layers. In the source specification string, each hidden cell "
+    "is given as '-index'. An empty list clears the restriction.\n"
+    "\n"
+    "This method has been added in version 0.30.13."
   ) +
   method_ext ("source_cellview", &get_cellview, gsi::arg ("real"),
     "@brief Gets the cellview index that this layer refers to\n"

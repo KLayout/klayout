@@ -26,6 +26,7 @@
 
 #include "tlCommon.h"
 
+#include "tlDeflate.h"
 #include "tlException.h"
 #include "tlString.h"
 
@@ -38,7 +39,6 @@
 namespace tl
 {
 
-class InflateFilter;
 class DeflateFilter;
 class OutputStream;
 
@@ -433,15 +433,33 @@ public:
    *
    *  @return 0 if not enough data can be obtained
    */
-  const char *get (size_t n, bool bypass_inflate = false);
+  const char *get (size_t n, bool bypass_inflate = false)
+  {
+    //  Byte-wise readers (the varint decoding in the streamers) call this
+    //  once per byte, so serve the buffered cases here without the call.
+    if (! bypass_inflate && mp_inflate) {
+      if (n == 1 && mp_inflate->can_get_byte ()) {
+        return mp_inflate->get_byte ();
+      }
+    } else if (m_blen >= n) {
+      const char *r = mp_bptr;
+      mp_bptr += n;
+      m_blen -= n;
+      m_pos += n;
+      return r;
+    }
+    return get_slow (n, bypass_inflate);
+  }
 
   /** 
    *  @brief Undo a previous get call
    *  
    *  This call puts back the bytes read by a previous get call.
    *  Only one call can be made undone.
+   *  With "bypass_inflate" the bytes are taken from the raw stream, not from
+   *  the inflate filter - like with get().
    */
-  void unget (size_t n);
+  void unget (size_t n, bool bypass_inflate = false);
 
   /**
    *  @brief Reads all remaining bytes into the string
@@ -489,7 +507,8 @@ public:
    */
   size_t pos () const 
   {
-    return m_pos;
+    //  the inflate filter reads ahead in chunks, the bytes it has not decoded yet do not count
+    return mp_inflate ? m_pos - mp_inflate->input_pending () : m_pos;
   }
 
   /**
@@ -609,6 +628,10 @@ protected:
   }
 
 private:
+  //  everything the inline get cannot serve: refill, inflate state changes
+  //  and multi-byte blocks that need more inflated data
+  const char *get_slow (size_t n, bool bypass_inflate);
+
   size_t m_pos;
   char *mp_buffer;
   size_t m_bcap;

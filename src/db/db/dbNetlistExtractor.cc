@@ -268,6 +268,10 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
       circuit = k->second;
     }
 
+    //  join clusters that attach to the same device terminal in case of multi-polygon
+    //  terminals.
+    join_clusters_at_same_device_terminal (per_cell_clusters, circuit);
+
     std::map<size_t, size_t> &c2p = pins_per_cluster_per_cell [*cid];
 
     std::map<std::pair<db::cell_index_type, db::ICplxTrans>, db::SubCircuit *> subcircuits;
@@ -381,6 +385,70 @@ collect_soft_connected_clusters (size_t from_id, const NetlistExtractor::connect
   const auto &downward = clusters.downward_soft_connections (from_id);
   for (auto i = downward.begin (); i != downward.end (); ++i) {
     collect_soft_connected_clusters (*i, clusters, ids);
+  }
+}
+
+void
+NetlistExtractor::join_clusters_at_same_device_terminal (connected_clusters_type &clusters, db::Circuit *circuit)
+{
+  if (! m_terminal_annot_name_id.first) {
+    return;
+  }
+
+  std::map<size_t, std::set<size_t> > to_join;
+  std::map<std::pair<const db::Device *, db::DeviceClass::terminal_id_type>, size_t> primary_cluster_for_terminal;
+
+  for (connected_clusters_type::iterator c = clusters.begin (); c != clusters.end (); ++c) {
+
+    const connected_clusters_type::connections_type &connections = clusters.connections_for_cluster (c->id ());
+    for (connected_clusters_type::connections_type::const_iterator i = connections.begin (); i != connections.end (); ++i) {
+
+      db::cell_index_type inst_cell_index = i->inst_cell_index ();
+      db::properties_id_type inst_prop_id = i->inst_prop_id ();
+
+      //  only consider devices in this pass
+      const db::Device *device = device_from_instance (inst_prop_id, circuit);
+      if (! device) {
+        continue;
+      }
+
+      const db::local_cluster<db::NetShape> &dc = mp_clusters->clusters_per_cell (inst_cell_index).cluster_by_id (i->id ());
+
+      //  connect the net to the terminal of the device: take the terminal ID from the properties on the
+      //  device cluster
+      for (local_cluster_type::attr_iterator a = dc.begin_attr (); a != dc.end_attr (); ++a) {
+
+        if (! db::is_prop_id_attr (*a)) {
+          continue;
+        }
+
+        db::properties_id_type pi = db::prop_id_from_attr (*a);
+
+        const db::PropertiesSet &ps = db::properties (pi);
+        for (db::PropertiesSet::iterator j = ps.begin (); j != ps.end (); ++j) {
+
+          if (j->first == m_terminal_annot_name_id.second) {
+
+            size_t tid = db::property_value (j->second).to<size_t> ();
+            auto prim_id = primary_cluster_for_terminal.find (std::make_pair (device, tid));
+            if (prim_id != primary_cluster_for_terminal.end ()) {
+              to_join [prim_id->second].insert (c->id ());
+            } else {
+              primary_cluster_for_terminal.insert (std::make_pair (std::make_pair (device, tid), c->id ()));
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+
+  for (auto j = to_join.begin (); j != to_join.end (); ++j) {
+    clusters.join_clusters_with (j->first, j->second.begin (), j->second.end ());
   }
 }
 

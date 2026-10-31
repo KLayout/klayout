@@ -235,6 +235,10 @@ private:
    */
   void make_device_abstract_connections (db::DeviceAbstract *dm, connected_clusters_type &clusters);
 
+  /**
+   *  @brief Joins clusters that are indirectly connected through a device with a multi-polygon terminal
+   */
+  void join_clusters_at_same_device_terminal (connected_clusters_type &clusters, Circuit *circuit);
 };
 
 }

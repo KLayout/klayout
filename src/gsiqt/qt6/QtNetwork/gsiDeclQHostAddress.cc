@@ -295,6 +295,21 @@ static void _call_f_isNull_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+// bool QHostAddress::isPrivateUse()
+
+
+static void _init_f_isPrivateUse_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isPrivateUse_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QHostAddress *)cls)->isPrivateUse ());
+}
+
+
 // bool QHostAddress::isSiteLocal()
 
 
@@ -642,6 +657,7 @@ static gsi::Methods methods_QHostAddress () {
   methods += new qt_gsi::GenericMethod ("isLoopback?", "@brief Method bool QHostAddress::isLoopback()\n", true, &_init_f_isLoopback_c0, &_call_f_isLoopback_c0);
   methods += new qt_gsi::GenericMethod ("isMulticast?", "@brief Method bool QHostAddress::isMulticast()\n", true, &_init_f_isMulticast_c0, &_call_f_isMulticast_c0);
   methods += new qt_gsi::GenericMethod ("isNull?", "@brief Method bool QHostAddress::isNull()\n", true, &_init_f_isNull_c0, &_call_f_isNull_c0);
+  methods += new qt_gsi::GenericMethod ("isPrivateUse?", "@brief Method bool QHostAddress::isPrivateUse()\n", true, &_init_f_isPrivateUse_c0, &_call_f_isPrivateUse_c0);
   methods += new qt_gsi::GenericMethod ("isSiteLocal?", "@brief Method bool QHostAddress::isSiteLocal()\n", true, &_init_f_isSiteLocal_c0, &_call_f_isSiteLocal_c0);
   methods += new qt_gsi::GenericMethod ("isUniqueLocalUnicast?", "@brief Method bool QHostAddress::isUniqueLocalUnicast()\n", true, &_init_f_isUniqueLocalUnicast_c0, &_call_f_isUniqueLocalUnicast_c0);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QHostAddress::operator !=(const QHostAddress &address)\n", true, &_init_f_operator_excl__eq__c2518, &_call_f_operator_excl__eq__c2518);

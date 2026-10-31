@@ -35,14 +35,14 @@
 // -----------------------------------------------------------------------
 // class QPartialOrdering
 
-//  bool ::operator==(QPartialOrdering p1, QPartialOrdering p2)
-static bool op_QPartialOrdering_operator_eq__eq__4012(QPartialOrdering *_self, QPartialOrdering p2) {
-  return operator==(*_self, p2);
+//  bool ::operator==(QPartialOrdering lhs, QPartialOrdering rhs)
+static bool op_QPartialOrdering_operator_eq__eq__4012(QPartialOrdering *_self, QPartialOrdering rhs) {
+  return operator==(*_self, rhs);
 }
 
-//  bool ::operator!=(QPartialOrdering p1, QPartialOrdering p2)
-static bool op_QPartialOrdering_operator_excl__eq__4012(QPartialOrdering *_self, QPartialOrdering p2) {
-  return operator!=(*_self, p2);
+//  bool ::operator!=(QPartialOrdering lhs, QPartialOrdering rhs)
+static bool op_QPartialOrdering_operator_excl__eq__4012(QPartialOrdering *_self, QPartialOrdering rhs) {
+  return operator!=(*_self, rhs);
 }
 
 
@@ -51,8 +51,8 @@ namespace gsi
 
 static gsi::Methods methods_QPartialOrdering () {
   gsi::Methods methods;
-  methods += gsi::method_ext("==", &::op_QPartialOrdering_operator_eq__eq__4012, gsi::arg ("p2"), "@brief Operator bool ::operator==(QPartialOrdering p1, QPartialOrdering p2)\nThis is the mapping of the global operator to the instance method.");
-  methods += gsi::method_ext("!=", &::op_QPartialOrdering_operator_excl__eq__4012, gsi::arg ("p2"), "@brief Operator bool ::operator!=(QPartialOrdering p1, QPartialOrdering p2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("==", &::op_QPartialOrdering_operator_eq__eq__4012, gsi::arg ("rhs"), "@brief Operator bool ::operator==(QPartialOrdering lhs, QPartialOrdering rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QPartialOrdering_operator_excl__eq__4012, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(QPartialOrdering lhs, QPartialOrdering rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

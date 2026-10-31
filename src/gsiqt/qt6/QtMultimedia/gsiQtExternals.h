@@ -77,6 +77,10 @@ class QCameraFormat;
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraFormat> &qtdecl_QCameraFormat (); }
 
+class QCapturableWindow;
+
+namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCapturableWindow> &qtdecl_QCapturableWindow (); }
+
 class QImageCapture;
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QImageCapture> &qtdecl_QImageCapture (); }
@@ -109,6 +113,10 @@ class QMediaTimeRange;
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaTimeRange> &qtdecl_QMediaTimeRange (); }
 
+class QScreenCapture;
+
+namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QScreenCapture> &qtdecl_QScreenCapture (); }
+
 class QSoundEffect;
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QSoundEffect> &qtdecl_QSoundEffect (); }
@@ -124,6 +132,10 @@ namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QVideoFrameFormat> &qtdecl_QV
 class QVideoSink;
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QVideoSink> &qtdecl_QVideoSink (); }
+
+class QWindowCapture;
+
+namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QWindowCapture> &qtdecl_QWindowCapture (); }
 
 
 #define QT_EXTERNAL_BASE(X) gsi::qtdecl_##X(),

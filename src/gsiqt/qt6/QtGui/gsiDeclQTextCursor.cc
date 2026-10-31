@@ -754,6 +754,29 @@ static void _call_f_insertList_2612 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
+// void QTextCursor::insertMarkdown(const QString &markdown, QFlags<QTextDocument::MarkdownFeature> features)
+
+
+static void _init_f_insertMarkdown_6049 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("markdown");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("features", true, "QTextDocument::MarkdownDialectGitHub");
+  decl->add_arg<QFlags<QTextDocument::MarkdownFeature> > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_f_insertMarkdown_6049 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QTextDocument::MarkdownFeature> arg2 = args ? gsi::arg_reader<QFlags<QTextDocument::MarkdownFeature> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::MarkdownFeature> >() (QTextDocument::MarkdownDialectGitHub, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QTextCursor *)cls)->insertMarkdown (arg1, arg2);
+}
+
+
 // QTextTable *QTextCursor::insertTable(int rows, int cols, const QTextTableFormat &format)
 
 
@@ -1522,6 +1545,7 @@ static gsi::Methods methods_QTextCursor () {
   methods += new qt_gsi::GenericMethod ("insertImage", "@brief Method void QTextCursor::insertImage(const QImage &image, const QString &name)\n", false, &_init_f_insertImage_3794, &_call_f_insertImage_3794);
   methods += new qt_gsi::GenericMethod ("insertList", "@brief Method QTextList *QTextCursor::insertList(const QTextListFormat &format)\n", false, &_init_f_insertList_2844, &_call_f_insertList_2844);
   methods += new qt_gsi::GenericMethod ("insertList", "@brief Method QTextList *QTextCursor::insertList(QTextListFormat::Style style)\n", false, &_init_f_insertList_2612, &_call_f_insertList_2612);
+  methods += new qt_gsi::GenericMethod ("insertMarkdown", "@brief Method void QTextCursor::insertMarkdown(const QString &markdown, QFlags<QTextDocument::MarkdownFeature> features)\n", false, &_init_f_insertMarkdown_6049, &_call_f_insertMarkdown_6049);
   methods += new qt_gsi::GenericMethod ("insertTable", "@brief Method QTextTable *QTextCursor::insertTable(int rows, int cols, const QTextTableFormat &format)\n", false, &_init_f_insertTable_4238, &_call_f_insertTable_4238);
   methods += new qt_gsi::GenericMethod ("insertTable", "@brief Method QTextTable *QTextCursor::insertTable(int rows, int cols)\n", false, &_init_f_insertTable_1426, &_call_f_insertTable_1426);
   methods += new qt_gsi::GenericMethod ("insertText", "@brief Method void QTextCursor::insertText(const QString &text)\n", false, &_init_f_insertText_2025, &_call_f_insertText_2025);

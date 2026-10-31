@@ -4492,7 +4492,8 @@ static gsi::Enum<QPainter::RenderHint> decl_QPainter_RenderHint_Enum ("QtGui", "
     gsi::enum_const ("TextAntialiasing", QPainter::TextAntialiasing, "@brief Enum constant QPainter::TextAntialiasing") +
     gsi::enum_const ("SmoothPixmapTransform", QPainter::SmoothPixmapTransform, "@brief Enum constant QPainter::SmoothPixmapTransform") +
     gsi::enum_const ("VerticalSubpixelPositioning", QPainter::VerticalSubpixelPositioning, "@brief Enum constant QPainter::VerticalSubpixelPositioning") +
-    gsi::enum_const ("LosslessImageRendering", QPainter::LosslessImageRendering, "@brief Enum constant QPainter::LosslessImageRendering"),
+    gsi::enum_const ("LosslessImageRendering", QPainter::LosslessImageRendering, "@brief Enum constant QPainter::LosslessImageRendering") +
+    gsi::enum_const ("NonCosmeticBrushPatterns", QPainter::NonCosmeticBrushPatterns, "@brief Enum constant QPainter::NonCosmeticBrushPatterns"),
   "@qt\n@brief This class represents the QPainter::RenderHint enum");
 
 static gsi::QFlagsClass<QPainter::RenderHint > decl_QPainter_RenderHint_Enums ("QtGui", "QPainter_QFlags_RenderHint",

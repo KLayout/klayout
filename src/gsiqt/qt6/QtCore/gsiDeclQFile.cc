@@ -28,6 +28,7 @@
 */
 
 #include <QFile>
+#include <QAnyStringView>
 #include <QDateTime>
 #include <QEvent>
 #include <QMetaMethod>
@@ -227,6 +228,28 @@ static void _call_f_open_3621 (const qt_gsi::GenericMethod * /*decl*/, void *cls
   tl::Heap heap;
   QFlags<QIODeviceBase::OpenModeFlag> arg1 = gsi::arg_reader<QFlags<QIODeviceBase::OpenModeFlag> >() (args, heap);
   ret.write<bool > ((bool)((QFile *)cls)->open (arg1));
+}
+
+
+// bool QFile::open(QFlags<QIODeviceBase::OpenModeFlag> flags, QFlags<QFileDevice::Permission> permissions)
+
+
+static void _init_f_open_6883 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("flags");
+  decl->add_arg<QFlags<QIODeviceBase::OpenModeFlag> > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("permissions");
+  decl->add_arg<QFlags<QFileDevice::Permission> > (argspec_1);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_open_6883 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QFlags<QIODeviceBase::OpenModeFlag> arg1 = gsi::arg_reader<QFlags<QIODeviceBase::OpenModeFlag> >() (args, heap);
+  QFlags<QFileDevice::Permission> arg2 = gsi::arg_reader<QFlags<QFileDevice::Permission> >() (args, heap);
+  ret.write<bool > ((bool)((QFile *)cls)->open (arg1, arg2));
 }
 
 
@@ -446,12 +469,12 @@ static void _call_f_exists_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 }
 
 
-// static bool QFile::link(const QString &oldname, const QString &newName)
+// static bool QFile::link(const QString &fileName, const QString &newName)
 
 
 static void _init_f_link_3942 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("oldname");
+  static gsi::ArgSpecBase argspec_0 ("fileName");
   decl->add_arg<const QString & > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("newName");
   decl->add_arg<const QString & > (argspec_1);
@@ -655,6 +678,7 @@ static gsi::Methods methods_QFile () {
   methods += new qt_gsi::GenericMethod ("link", "@brief Method bool QFile::link(const QString &newName)\n", false, &_init_f_link_2025, &_call_f_link_2025);
   methods += new qt_gsi::GenericMethod ("moveToTrash", "@brief Method bool QFile::moveToTrash()\n", false, &_init_f_moveToTrash_0, &_call_f_moveToTrash_0);
   methods += new qt_gsi::GenericMethod ("open", "@brief Method bool QFile::open(QFlags<QIODeviceBase::OpenModeFlag> flags)\nThis is a reimplementation of QIODevice::open", false, &_init_f_open_3621, &_call_f_open_3621);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method bool QFile::open(QFlags<QIODeviceBase::OpenModeFlag> flags, QFlags<QFileDevice::Permission> permissions)\n", false, &_init_f_open_6883, &_call_f_open_6883);
   methods += new qt_gsi::GenericMethod ("permissions", "@brief Method QFlags<QFileDevice::Permission> QFile::permissions()\nThis is a reimplementation of QFileDevice::permissions", true, &_init_f_permissions_c0, &_call_f_permissions_c0);
   methods += new qt_gsi::GenericMethod ("remove", "@brief Method bool QFile::remove()\n", false, &_init_f_remove_0, &_call_f_remove_0);
   methods += new qt_gsi::GenericMethod ("rename", "@brief Method bool QFile::rename(const QString &newName)\n", false, &_init_f_rename_2025, &_call_f_rename_2025);
@@ -675,7 +699,7 @@ static gsi::Methods methods_QFile () {
   methods += new qt_gsi::GenericStaticMethod ("decodeName", "@brief Static method QString QFile::decodeName(const char *localFileName)\nThis method is static and can be called without an instance.", &_init_f_decodeName_1731, &_call_f_decodeName_1731);
   methods += new qt_gsi::GenericStaticMethod ("encodeName", "@brief Static method QByteArray QFile::encodeName(const QString &fileName)\nThis method is static and can be called without an instance.", &_init_f_encodeName_2025, &_call_f_encodeName_2025);
   methods += new qt_gsi::GenericStaticMethod ("exists", "@brief Static method bool QFile::exists(const QString &fileName)\nThis method is static and can be called without an instance.", &_init_f_exists_2025, &_call_f_exists_2025);
-  methods += new qt_gsi::GenericStaticMethod ("link", "@brief Static method bool QFile::link(const QString &oldname, const QString &newName)\nThis method is static and can be called without an instance.", &_init_f_link_3942, &_call_f_link_3942);
+  methods += new qt_gsi::GenericStaticMethod ("link", "@brief Static method bool QFile::link(const QString &fileName, const QString &newName)\nThis method is static and can be called without an instance.", &_init_f_link_3942, &_call_f_link_3942);
   methods += new qt_gsi::GenericStaticMethod ("moveToTrash", "@brief Static method bool QFile::moveToTrash(const QString &fileName, QString *pathInTrash)\nThis method is static and can be called without an instance.", &_init_f_moveToTrash_3251, &_call_f_moveToTrash_3251);
   methods += new qt_gsi::GenericStaticMethod ("permissions", "@brief Static method QFlags<QFileDevice::Permission> QFile::permissions(const QString &filename)\nThis method is static and can be called without an instance.", &_init_f_permissions_2025, &_call_f_permissions_2025);
   methods += new qt_gsi::GenericStaticMethod ("remove", "@brief Static method bool QFile::remove(const QString &fileName)\nThis method is static and can be called without an instance.", &_init_f_remove_2025, &_call_f_remove_2025);

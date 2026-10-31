@@ -30,6 +30,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QActionEvent>
+#include <QAnyStringView>
 #include <QBackingStore>
 #include <QBitmap>
 #include <QChildEvent>
@@ -156,67 +157,6 @@ static void _call_f_activeAction_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// void QMenu::addAction(QAction *action)
-
-
-static void _init_f_addAction_1309 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("action");
-  decl->add_arg<QAction * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_addAction_1309 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMenu *)cls)->addAction (arg1);
-}
-
-
-// QAction *QMenu::addAction(const QString &text)
-
-
-static void _init_f_addAction_2025 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("text");
-  decl->add_arg<const QString & > (argspec_0);
-  decl->set_return<QAction * > ();
-}
-
-static void _call_f_addAction_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  ret.write<QAction * > ((QAction *)((QMenu *)cls)->addAction (arg1));
-}
-
-
-// QAction *QMenu::addAction(const QIcon &icon, const QString &text)
-
-
-static void _init_f_addAction_3704 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("icon");
-  decl->add_arg<const QIcon & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("text");
-  decl->add_arg<const QString & > (argspec_1);
-  decl->set_return<QAction * > ();
-}
-
-static void _call_f_addAction_3704 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
-  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
-  ret.write<QAction * > ((QAction *)((QMenu *)cls)->addAction (arg1, arg2));
-}
-
-
 // QAction *QMenu::addAction(const QString &text, const QObject *receiver, const char *member, const QKeySequence &shortcut)
 
 
@@ -228,7 +168,7 @@ static void _init_f_addAction_7945 (qt_gsi::GenericMethod *decl)
   decl->add_arg<const QObject * > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("member");
   decl->add_arg<const char * > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("shortcut", true, "{}");
+  static gsi::ArgSpecBase argspec_3 ("shortcut");
   decl->add_arg<const QKeySequence & > (argspec_3);
   decl->set_return<QAction * > ();
 }
@@ -240,7 +180,7 @@ static void _call_f_addAction_7945 (const qt_gsi::GenericMethod * /*decl*/, void
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   const QObject *arg2 = gsi::arg_reader<const QObject * >() (args, heap);
   const char *arg3 = gsi::arg_reader<const char * >() (args, heap);
-  const QKeySequence &arg4 = args ? gsi::arg_reader<const QKeySequence & >() (args, heap) : gsi::arg_maker<const QKeySequence & >() ({}, heap);
+  const QKeySequence &arg4 = gsi::arg_reader<const QKeySequence & >() (args, heap);
   ret.write<QAction * > ((QAction *)((QMenu *)cls)->addAction (arg1, arg2, arg3, arg4));
 }
 
@@ -258,7 +198,7 @@ static void _init_f_addAction_9624 (qt_gsi::GenericMethod *decl)
   decl->add_arg<const QObject * > (argspec_2);
   static gsi::ArgSpecBase argspec_3 ("member");
   decl->add_arg<const char * > (argspec_3);
-  static gsi::ArgSpecBase argspec_4 ("shortcut", true, "{}");
+  static gsi::ArgSpecBase argspec_4 ("shortcut");
   decl->add_arg<const QKeySequence & > (argspec_4);
   decl->set_return<QAction * > ();
 }
@@ -271,7 +211,7 @@ static void _call_f_addAction_9624 (const qt_gsi::GenericMethod * /*decl*/, void
   const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   const QObject *arg3 = gsi::arg_reader<const QObject * >() (args, heap);
   const char *arg4 = gsi::arg_reader<const char * >() (args, heap);
-  const QKeySequence &arg5 = args ? gsi::arg_reader<const QKeySequence & >() (args, heap) : gsi::arg_maker<const QKeySequence & >() ({}, heap);
+  const QKeySequence &arg5 = gsi::arg_reader<const QKeySequence & >() (args, heap);
   ret.write<QAction * > ((QAction *)((QMenu *)cls)->addAction (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -946,6 +886,25 @@ static void _call_f_exec_7017 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi
 }
 
 
+// static QMenu *QMenu::menuInAction(const QAction *action)
+
+
+static void _init_f_menuInAction_2004 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("action");
+  decl->add_arg<const QAction * > (argspec_0);
+  decl->set_return<QMenu * > ();
+}
+
+static void _call_f_menuInAction_2004 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QAction *arg1 = gsi::arg_reader<const QAction * >() (args, heap);
+  ret.write<QMenu * > ((QMenu *)QMenu::menuInAction (arg1));
+}
+
+
 // static QString QMenu::tr(const char *s, const char *c, int n)
 
 
@@ -980,9 +939,6 @@ static gsi::Methods methods_QMenu () {
   methods += new qt_gsi::GenericMethod ("actionAt", "@brief Method QAction *QMenu::actionAt(const QPoint &)\n", true, &_init_f_actionAt_c1916, &_call_f_actionAt_c1916);
   methods += new qt_gsi::GenericMethod ("actionGeometry", "@brief Method QRect QMenu::actionGeometry(QAction *)\n", true, &_init_f_actionGeometry_c1309, &_call_f_actionGeometry_c1309);
   methods += new qt_gsi::GenericMethod (":activeAction", "@brief Method QAction *QMenu::activeAction()\n", true, &_init_f_activeAction_c0, &_call_f_activeAction_c0);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method void QMenu::addAction(QAction *action)\n", false, &_init_f_addAction_1309, &_call_f_addAction_1309);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QMenu::addAction(const QString &text)\n", false, &_init_f_addAction_2025, &_call_f_addAction_2025);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QMenu::addAction(const QIcon &icon, const QString &text)\n", false, &_init_f_addAction_3704, &_call_f_addAction_3704);
   methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QMenu::addAction(const QString &text, const QObject *receiver, const char *member, const QKeySequence &shortcut)\n", false, &_init_f_addAction_7945, &_call_f_addAction_7945);
   methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QMenu::addAction(const QIcon &icon, const QString &text, const QObject *receiver, const char *member, const QKeySequence &shortcut)\n", false, &_init_f_addAction_9624, &_call_f_addAction_9624);
   methods += new qt_gsi::GenericMethod ("addMenu", "@brief Method QAction *QMenu::addMenu(QMenu *menu)\n", false, &_init_f_addMenu_1108, &_call_f_addMenu_1108);
@@ -1031,6 +987,7 @@ static gsi::Methods methods_QMenu () {
   methods += gsi::qt_signal<const QString & > ("windowIconTextChanged(const QString &)", "windowIconTextChanged", gsi::arg("iconText"), "@brief Signal declaration for QMenu::windowIconTextChanged(const QString &iconText)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("windowTitleChanged(const QString &)", "windowTitleChanged", gsi::arg("title"), "@brief Signal declaration for QMenu::windowTitleChanged(const QString &title)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("exec", "@brief Static method QAction *QMenu::exec(const QList<QAction *> &actions, const QPoint &pos, QAction *at, QWidget *parent)\nThis method is static and can be called without an instance.", &_init_f_exec_7017, &_call_f_exec_7017);
+  methods += new qt_gsi::GenericStaticMethod ("menuInAction", "@brief Static method QMenu *QMenu::menuInAction(const QAction *action)\nThis method is static and can be called without an instance.", &_init_f_menuInAction_2004, &_call_f_menuInAction_2004);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QMenu::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
 }

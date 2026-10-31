@@ -387,6 +387,25 @@ static void _call_f_setSampleRate_767 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
+// static QAudioFormat::ChannelConfig QAudioFormat::defaultChannelConfigForChannelCount(int channelCount)
+
+
+static void _init_f_defaultChannelConfigForChannelCount_767 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("channelCount");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<qt_gsi::Converter<QAudioFormat::ChannelConfig>::target_type > ();
+}
+
+static void _call_f_defaultChannelConfigForChannelCount_767 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ret.write<qt_gsi::Converter<QAudioFormat::ChannelConfig>::target_type > ((qt_gsi::Converter<QAudioFormat::ChannelConfig>::target_type)qt_gsi::CppToQtAdaptor<QAudioFormat::ChannelConfig>(QAudioFormat::defaultChannelConfigForChannelCount (arg1)));
+}
+
+
 //  bool ::operator==(const QAudioFormat &a, const QAudioFormat &b)
 static bool op_QAudioFormat_operator_eq__eq__4910(const QAudioFormat *_self, const QAudioFormat &b) {
   return operator==(*_self, b);
@@ -423,6 +442,7 @@ static gsi::Methods methods_QAudioFormat () {
   methods += new qt_gsi::GenericMethod ("setChannelCount|channelCount=", "@brief Method void QAudioFormat::setChannelCount(int channelCount)\n", false, &_init_f_setChannelCount_767, &_call_f_setChannelCount_767);
   methods += new qt_gsi::GenericMethod ("setSampleFormat|sampleFormat=", "@brief Method void QAudioFormat::setSampleFormat(QAudioFormat::SampleFormat f)\n", false, &_init_f_setSampleFormat_2975, &_call_f_setSampleFormat_2975);
   methods += new qt_gsi::GenericMethod ("setSampleRate|sampleRate=", "@brief Method void QAudioFormat::setSampleRate(int sampleRate)\n", false, &_init_f_setSampleRate_767, &_call_f_setSampleRate_767);
+  methods += new qt_gsi::GenericStaticMethod ("defaultChannelConfigForChannelCount", "@brief Static method QAudioFormat::ChannelConfig QAudioFormat::defaultChannelConfigForChannelCount(int channelCount)\nThis method is static and can be called without an instance.", &_init_f_defaultChannelConfigForChannelCount_767, &_call_f_defaultChannelConfigForChannelCount_767);
   methods += gsi::method_ext("==", &::op_QAudioFormat_operator_eq__eq__4910, gsi::arg ("b"), "@brief Operator bool ::operator==(const QAudioFormat &a, const QAudioFormat &b)\nThis is the mapping of the global operator to the instance method.");
   methods += gsi::method_ext("!=", &::op_QAudioFormat_operator_excl__eq__4910, gsi::arg ("b"), "@brief Operator bool ::operator!=(const QAudioFormat &a, const QAudioFormat &b)\nThis is the mapping of the global operator to the instance method.");
   return methods;
@@ -453,18 +473,18 @@ static gsi::Enum<QAudioFormat::AudioChannelPosition> decl_QAudioFormat_AudioChan
     gsi::enum_const ("FrontLeftOfCenter", QAudioFormat::FrontLeftOfCenter, "@brief Enum constant QAudioFormat::FrontLeftOfCenter") +
     gsi::enum_const ("FrontRightOfCenter", QAudioFormat::FrontRightOfCenter, "@brief Enum constant QAudioFormat::FrontRightOfCenter") +
     gsi::enum_const ("BackCenter", QAudioFormat::BackCenter, "@brief Enum constant QAudioFormat::BackCenter") +
-    gsi::enum_const ("LFE2", QAudioFormat::LFE2, "@brief Enum constant QAudioFormat::LFE2") +
     gsi::enum_const ("SideLeft", QAudioFormat::SideLeft, "@brief Enum constant QAudioFormat::SideLeft") +
     gsi::enum_const ("SideRight", QAudioFormat::SideRight, "@brief Enum constant QAudioFormat::SideRight") +
-    gsi::enum_const ("TopFrontLeft", QAudioFormat::TopFrontLeft, "@brief Enum constant QAudioFormat::TopFrontLeft") +
-    gsi::enum_const ("TopFrontRight", QAudioFormat::TopFrontRight, "@brief Enum constant QAudioFormat::TopFrontRight") +
-    gsi::enum_const ("TopFrontCenter", QAudioFormat::TopFrontCenter, "@brief Enum constant QAudioFormat::TopFrontCenter") +
     gsi::enum_const ("TopCenter", QAudioFormat::TopCenter, "@brief Enum constant QAudioFormat::TopCenter") +
+    gsi::enum_const ("TopFrontLeft", QAudioFormat::TopFrontLeft, "@brief Enum constant QAudioFormat::TopFrontLeft") +
+    gsi::enum_const ("TopFrontCenter", QAudioFormat::TopFrontCenter, "@brief Enum constant QAudioFormat::TopFrontCenter") +
+    gsi::enum_const ("TopFrontRight", QAudioFormat::TopFrontRight, "@brief Enum constant QAudioFormat::TopFrontRight") +
     gsi::enum_const ("TopBackLeft", QAudioFormat::TopBackLeft, "@brief Enum constant QAudioFormat::TopBackLeft") +
+    gsi::enum_const ("TopBackCenter", QAudioFormat::TopBackCenter, "@brief Enum constant QAudioFormat::TopBackCenter") +
     gsi::enum_const ("TopBackRight", QAudioFormat::TopBackRight, "@brief Enum constant QAudioFormat::TopBackRight") +
+    gsi::enum_const ("LFE2", QAudioFormat::LFE2, "@brief Enum constant QAudioFormat::LFE2") +
     gsi::enum_const ("TopSideLeft", QAudioFormat::TopSideLeft, "@brief Enum constant QAudioFormat::TopSideLeft") +
     gsi::enum_const ("TopSideRight", QAudioFormat::TopSideRight, "@brief Enum constant QAudioFormat::TopSideRight") +
-    gsi::enum_const ("TopBackCenter", QAudioFormat::TopBackCenter, "@brief Enum constant QAudioFormat::TopBackCenter") +
     gsi::enum_const ("BottomFrontCenter", QAudioFormat::BottomFrontCenter, "@brief Enum constant QAudioFormat::BottomFrontCenter") +
     gsi::enum_const ("BottomFrontLeft", QAudioFormat::BottomFrontLeft, "@brief Enum constant QAudioFormat::BottomFrontLeft") +
     gsi::enum_const ("BottomFrontRight", QAudioFormat::BottomFrontRight, "@brief Enum constant QAudioFormat::BottomFrontRight"),
@@ -490,6 +510,8 @@ static gsi::Enum<QAudioFormat::ChannelConfig> decl_QAudioFormat_ChannelConfig_En
     gsi::enum_const ("ChannelConfigMono", QAudioFormat::ChannelConfigMono, "@brief Enum constant QAudioFormat::ChannelConfigMono") +
     gsi::enum_const ("ChannelConfigStereo", QAudioFormat::ChannelConfigStereo, "@brief Enum constant QAudioFormat::ChannelConfigStereo") +
     gsi::enum_const ("ChannelConfig2Dot1", QAudioFormat::ChannelConfig2Dot1, "@brief Enum constant QAudioFormat::ChannelConfig2Dot1") +
+    gsi::enum_const ("ChannelConfig3Dot0", QAudioFormat::ChannelConfig3Dot0, "@brief Enum constant QAudioFormat::ChannelConfig3Dot0") +
+    gsi::enum_const ("ChannelConfig3Dot1", QAudioFormat::ChannelConfig3Dot1, "@brief Enum constant QAudioFormat::ChannelConfig3Dot1") +
     gsi::enum_const ("ChannelConfigSurround5Dot0", QAudioFormat::ChannelConfigSurround5Dot0, "@brief Enum constant QAudioFormat::ChannelConfigSurround5Dot0") +
     gsi::enum_const ("ChannelConfigSurround5Dot1", QAudioFormat::ChannelConfigSurround5Dot1, "@brief Enum constant QAudioFormat::ChannelConfigSurround5Dot1") +
     gsi::enum_const ("ChannelConfigSurround7Dot0", QAudioFormat::ChannelConfigSurround7Dot0, "@brief Enum constant QAudioFormat::ChannelConfigSurround7Dot0") +

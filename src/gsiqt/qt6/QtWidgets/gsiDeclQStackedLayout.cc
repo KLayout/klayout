@@ -28,6 +28,7 @@
 */
 
 #include <QStackedLayout>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QLayout>

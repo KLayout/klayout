@@ -63,7 +63,8 @@ static gsi::Enum<QStringConverterBase::Flag> decl_QStringConverterBase_Flag_Enum
     gsi::enum_const ("Stateless", QStringConverterBase::Flag::Stateless, "@brief Enum constant QStringConverterBase::Flag::Stateless") +
     gsi::enum_const ("ConvertInvalidToNull", QStringConverterBase::Flag::ConvertInvalidToNull, "@brief Enum constant QStringConverterBase::Flag::ConvertInvalidToNull") +
     gsi::enum_const ("WriteBom", QStringConverterBase::Flag::WriteBom, "@brief Enum constant QStringConverterBase::Flag::WriteBom") +
-    gsi::enum_const ("ConvertInitialBom", QStringConverterBase::Flag::ConvertInitialBom, "@brief Enum constant QStringConverterBase::Flag::ConvertInitialBom"),
+    gsi::enum_const ("ConvertInitialBom", QStringConverterBase::Flag::ConvertInitialBom, "@brief Enum constant QStringConverterBase::Flag::ConvertInitialBom") +
+    gsi::enum_const ("UsesIcu", QStringConverterBase::Flag::UsesIcu, "@brief Enum constant QStringConverterBase::Flag::UsesIcu"),
   "@qt\n@brief This class represents the QStringConverterBase::Flag enum");
 
 static gsi::QFlagsClass<QStringConverterBase::Flag > decl_QStringConverterBase_Flag_Enums ("QtCore", "QStringConverterBase_QFlags_Flag",

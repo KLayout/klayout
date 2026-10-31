@@ -29,6 +29,7 @@
 
 #include <QActionGroup>
 #include <QAction>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QIcon>

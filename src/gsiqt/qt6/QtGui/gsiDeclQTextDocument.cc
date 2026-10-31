@@ -29,6 +29,7 @@
 
 #include <QTextDocument>
 #include <QAbstractTextDocumentLayout>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QFont>
@@ -668,6 +669,21 @@ static void _call_f_isEmpty_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
+// bool QTextDocument::isLayoutEnabled()
+
+
+static void _init_f_isLayoutEnabled_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isLayoutEnabled_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QTextDocument *)cls)->isLayoutEnabled ());
+}
+
+
 // bool QTextDocument::isModified()
 
 
@@ -1191,6 +1207,26 @@ static void _call_f_setIndentWidth_1071 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
+// void QTextDocument::setLayoutEnabled(bool b)
+
+
+static void _init_f_setLayoutEnabled_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("b");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setLayoutEnabled_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QTextDocument *)cls)->setLayoutEnabled (arg1);
+}
+
+
 // void QTextDocument::setMarkdown(const QString &markdown, QFlags<QTextDocument::MarkdownFeature> features)
 
 
@@ -1657,6 +1693,7 @@ static gsi::Methods methods_QTextDocument () {
   methods += new qt_gsi::GenericMethod ("idealWidth", "@brief Method double QTextDocument::idealWidth()\n", true, &_init_f_idealWidth_c0, &_call_f_idealWidth_c0);
   methods += new qt_gsi::GenericMethod (":indentWidth", "@brief Method double QTextDocument::indentWidth()\n", true, &_init_f_indentWidth_c0, &_call_f_indentWidth_c0);
   methods += new qt_gsi::GenericMethod ("isEmpty?", "@brief Method bool QTextDocument::isEmpty()\n", true, &_init_f_isEmpty_c0, &_call_f_isEmpty_c0);
+  methods += new qt_gsi::GenericMethod ("isLayoutEnabled?", "@brief Method bool QTextDocument::isLayoutEnabled()\n", true, &_init_f_isLayoutEnabled_c0, &_call_f_isLayoutEnabled_c0);
   methods += new qt_gsi::GenericMethod ("isModified?|:modified", "@brief Method bool QTextDocument::isModified()\n", true, &_init_f_isModified_c0, &_call_f_isModified_c0);
   methods += new qt_gsi::GenericMethod ("isRedoAvailable?", "@brief Method bool QTextDocument::isRedoAvailable()\n", true, &_init_f_isRedoAvailable_c0, &_call_f_isRedoAvailable_c0);
   methods += new qt_gsi::GenericMethod ("isUndoAvailable?", "@brief Method bool QTextDocument::isUndoAvailable()\n", true, &_init_f_isUndoAvailable_c0, &_call_f_isUndoAvailable_c0);
@@ -1686,6 +1723,7 @@ static gsi::Methods methods_QTextDocument () {
   methods += new qt_gsi::GenericMethod ("setDocumentMargin|documentMargin=", "@brief Method void QTextDocument::setDocumentMargin(double margin)\n", false, &_init_f_setDocumentMargin_1071, &_call_f_setDocumentMargin_1071);
   methods += new qt_gsi::GenericMethod ("setHtml", "@brief Method void QTextDocument::setHtml(const QString &html)\n", false, &_init_f_setHtml_2025, &_call_f_setHtml_2025);
   methods += new qt_gsi::GenericMethod ("setIndentWidth|indentWidth=", "@brief Method void QTextDocument::setIndentWidth(double width)\n", false, &_init_f_setIndentWidth_1071, &_call_f_setIndentWidth_1071);
+  methods += new qt_gsi::GenericMethod ("setLayoutEnabled", "@brief Method void QTextDocument::setLayoutEnabled(bool b)\n", false, &_init_f_setLayoutEnabled_864, &_call_f_setLayoutEnabled_864);
   methods += new qt_gsi::GenericMethod ("setMarkdown", "@brief Method void QTextDocument::setMarkdown(const QString &markdown, QFlags<QTextDocument::MarkdownFeature> features)\n", false, &_init_f_setMarkdown_6049, &_call_f_setMarkdown_6049);
   methods += new qt_gsi::GenericMethod ("setMaximumBlockCount|maximumBlockCount=", "@brief Method void QTextDocument::setMaximumBlockCount(int maximum)\n", false, &_init_f_setMaximumBlockCount_767, &_call_f_setMaximumBlockCount_767);
   methods += new qt_gsi::GenericMethod ("setMetaInformation", "@brief Method void QTextDocument::setMetaInformation(QTextDocument::MetaInformation info, const QString &)\n", false, &_init_f_setMetaInformation_5351, &_call_f_setMetaInformation_5351);
@@ -2634,7 +2672,8 @@ namespace qt_gsi
 
 static gsi::Enum<QTextDocument::MetaInformation> decl_QTextDocument_MetaInformation_Enum ("QtGui", "QTextDocument_MetaInformation",
     gsi::enum_const ("DocumentTitle", QTextDocument::DocumentTitle, "@brief Enum constant QTextDocument::DocumentTitle") +
-    gsi::enum_const ("DocumentUrl", QTextDocument::DocumentUrl, "@brief Enum constant QTextDocument::DocumentUrl"),
+    gsi::enum_const ("DocumentUrl", QTextDocument::DocumentUrl, "@brief Enum constant QTextDocument::DocumentUrl") +
+    gsi::enum_const ("CssMedia", QTextDocument::CssMedia, "@brief Enum constant QTextDocument::CssMedia"),
   "@qt\n@brief This class represents the QTextDocument::MetaInformation enum");
 
 static gsi::QFlagsClass<QTextDocument::MetaInformation > decl_QTextDocument_MetaInformation_Enums ("QtGui", "QTextDocument_QFlags_MetaInformation",

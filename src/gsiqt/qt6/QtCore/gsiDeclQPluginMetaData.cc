@@ -50,6 +50,21 @@ static void _call_ctor_QPluginMetaData_0 (const qt_gsi::GenericStaticMethod * /*
 }
 
 
+// static quint8 QPluginMetaData::archRequirements()
+
+
+static void _init_f_archRequirements_0 (qt_gsi::GenericStaticMethod *decl)
+{
+  decl->set_return<quint8 > ();
+}
+
+static void _call_f_archRequirements_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<quint8 > ((quint8)QPluginMetaData::archRequirements ());
+}
+
+
 
 namespace gsi
 {
@@ -57,6 +72,7 @@ namespace gsi
 static gsi::Methods methods_QPluginMetaData () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPluginMetaData::QPluginMetaData()\nThis method creates an object of class QPluginMetaData.", &_init_ctor_QPluginMetaData_0, &_call_ctor_QPluginMetaData_0);
+  methods += new qt_gsi::GenericStaticMethod ("archRequirements", "@brief Static method quint8 QPluginMetaData::archRequirements()\nThis method is static and can be called without an instance.", &_init_f_archRequirements_0, &_call_f_archRequirements_0);
   return methods;
 }
 

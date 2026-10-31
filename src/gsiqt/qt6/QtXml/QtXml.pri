@@ -12,6 +12,7 @@ SOURCES += \
   $$PWD/gsiDeclQDomCharacterData.cc \
   $$PWD/gsiDeclQDomComment.cc \
   $$PWD/gsiDeclQDomDocument.cc \
+  $$PWD/gsiDeclQDomDocument_ParseResult.cc \
   $$PWD/gsiDeclQDomDocumentFragment.cc \
   $$PWD/gsiDeclQDomDocumentType.cc \
   $$PWD/gsiDeclQDomElement.cc \

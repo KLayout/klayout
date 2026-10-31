@@ -29,6 +29,7 @@
 
 #include <QMetaEnum>
 #include <QMetaObject>
+#include <QMetaType>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
 #include <memory>
@@ -204,6 +205,21 @@ static void _call_f_keysToValue_c2673 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
+// QMetaType QMetaEnum::metaType()
+
+
+static void _init_f_metaType_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QMetaType > ();
+}
+
+static void _call_f_metaType_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QMetaType > ((QMetaType)((QMetaEnum *)cls)->metaType ());
+}
+
+
 // const char *QMetaEnum::name()
 
 
@@ -307,6 +323,7 @@ static gsi::Methods methods_QMetaEnum () {
   methods += new qt_gsi::GenericMethod ("keyCount", "@brief Method int QMetaEnum::keyCount()\n", true, &_init_f_keyCount_c0, &_call_f_keyCount_c0);
   methods += new qt_gsi::GenericMethod ("keyToValue", "@brief Method int QMetaEnum::keyToValue(const char *key, bool *ok)\n", true, &_init_f_keyToValue_c2673, &_call_f_keyToValue_c2673);
   methods += new qt_gsi::GenericMethod ("keysToValue", "@brief Method int QMetaEnum::keysToValue(const char *keys, bool *ok)\n", true, &_init_f_keysToValue_c2673, &_call_f_keysToValue_c2673);
+  methods += new qt_gsi::GenericMethod ("metaType", "@brief Method QMetaType QMetaEnum::metaType()\n", true, &_init_f_metaType_c0, &_call_f_metaType_c0);
   methods += new qt_gsi::GenericMethod ("name", "@brief Method const char *QMetaEnum::name()\n", true, &_init_f_name_c0, &_call_f_name_c0);
   methods += new qt_gsi::GenericMethod ("scope", "@brief Method const char *QMetaEnum::scope()\n", true, &_init_f_scope_c0, &_call_f_scope_c0);
   methods += new qt_gsi::GenericMethod ("value", "@brief Method int QMetaEnum::value(int index)\n", true, &_init_f_value_c767, &_call_f_value_c767);

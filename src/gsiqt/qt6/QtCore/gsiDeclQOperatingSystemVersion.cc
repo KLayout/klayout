@@ -36,6 +36,25 @@
 // -----------------------------------------------------------------------
 // class QOperatingSystemVersion
 
+//  Constructor QOperatingSystemVersion::QOperatingSystemVersion(const QOperatingSystemVersionBase &osversion)
+
+
+static void _init_ctor_QOperatingSystemVersion_4097 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("osversion");
+  decl->add_arg<const QOperatingSystemVersionBase & > (argspec_0);
+  decl->set_return_new<QOperatingSystemVersion> ();
+}
+
+static void _call_ctor_QOperatingSystemVersion_4097 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QOperatingSystemVersionBase &arg1 = gsi::arg_reader<const QOperatingSystemVersionBase & >() (args, heap);
+  ret.write<QOperatingSystemVersion *> (new QOperatingSystemVersion (arg1));
+}
+
+
 //  Constructor QOperatingSystemVersion::QOperatingSystemVersion(QOperatingSystemVersion::OSType osType, int vmajor, int vminor, int vmicro)
 
 
@@ -199,32 +218,13 @@ static void _call_f_currentType_0 (const qt_gsi::GenericStaticMethod * /*decl*/,
 }
 
 
-//  bool ::operator>(const QOperatingSystemVersion &lhs, const QOperatingSystemVersion &rhs)
-static bool op_QOperatingSystemVersion_operator_gt__7328(const QOperatingSystemVersion *_self, const QOperatingSystemVersion &rhs) {
-  return operator>(*_self, rhs);
-}
-
-//  bool ::operator>=(const QOperatingSystemVersion &lhs, const QOperatingSystemVersion &rhs)
-static bool op_QOperatingSystemVersion_operator_gt__eq__7328(const QOperatingSystemVersion *_self, const QOperatingSystemVersion &rhs) {
-  return operator>=(*_self, rhs);
-}
-
-//  bool ::operator<(const QOperatingSystemVersion &lhs, const QOperatingSystemVersion &rhs)
-static bool op_QOperatingSystemVersion_operator_lt__7328(const QOperatingSystemVersion *_self, const QOperatingSystemVersion &rhs) {
-  return operator<(*_self, rhs);
-}
-
-//  bool ::operator<=(const QOperatingSystemVersion &lhs, const QOperatingSystemVersion &rhs)
-static bool op_QOperatingSystemVersion_operator_lt__eq__7328(const QOperatingSystemVersion *_self, const QOperatingSystemVersion &rhs) {
-  return operator<=(*_self, rhs);
-}
-
 
 namespace gsi
 {
 
 static gsi::Methods methods_QOperatingSystemVersion () {
   gsi::Methods methods;
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QOperatingSystemVersion::QOperatingSystemVersion(const QOperatingSystemVersionBase &osversion)\nThis method creates an object of class QOperatingSystemVersion.", &_init_ctor_QOperatingSystemVersion_4097, &_call_ctor_QOperatingSystemVersion_4097);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QOperatingSystemVersion::QOperatingSystemVersion(QOperatingSystemVersion::OSType osType, int vmajor, int vminor, int vmicro)\nThis method creates an object of class QOperatingSystemVersion.", &_init_ctor_QOperatingSystemVersion_5514, &_call_ctor_QOperatingSystemVersion_5514);
   methods += new qt_gsi::GenericMethod ("majorVersion", "@brief Method int QOperatingSystemVersion::majorVersion()\n", true, &_init_f_majorVersion_c0, &_call_f_majorVersion_c0);
   methods += new qt_gsi::GenericMethod ("microVersion", "@brief Method int QOperatingSystemVersion::microVersion()\n", true, &_init_f_microVersion_c0, &_call_f_microVersion_c0);
@@ -235,14 +235,12 @@ static gsi::Methods methods_QOperatingSystemVersion () {
   methods += new qt_gsi::GenericMethod ("version", "@brief Method QVersionNumber QOperatingSystemVersion::version()\n", true, &_init_f_version_c0, &_call_f_version_c0);
   methods += new qt_gsi::GenericStaticMethod ("current", "@brief Static method QOperatingSystemVersion QOperatingSystemVersion::current()\nThis method is static and can be called without an instance.", &_init_f_current_0, &_call_f_current_0);
   methods += new qt_gsi::GenericStaticMethod ("currentType", "@brief Static method QOperatingSystemVersion::OSType QOperatingSystemVersion::currentType()\nThis method is static and can be called without an instance.", &_init_f_currentType_0, &_call_f_currentType_0);
-  methods += gsi::method_ext(">", &::op_QOperatingSystemVersion_operator_gt__7328, gsi::arg ("rhs"), "@brief Operator bool ::operator>(const QOperatingSystemVersion &lhs, const QOperatingSystemVersion &rhs)\nThis is the mapping of the global operator to the instance method.");
-  methods += gsi::method_ext(">=", &::op_QOperatingSystemVersion_operator_gt__eq__7328, gsi::arg ("rhs"), "@brief Operator bool ::operator>=(const QOperatingSystemVersion &lhs, const QOperatingSystemVersion &rhs)\nThis is the mapping of the global operator to the instance method.");
-  methods += gsi::method_ext("<", &::op_QOperatingSystemVersion_operator_lt__7328, gsi::arg ("rhs"), "@brief Operator bool ::operator<(const QOperatingSystemVersion &lhs, const QOperatingSystemVersion &rhs)\nThis is the mapping of the global operator to the instance method.");
-  methods += gsi::method_ext("<=", &::op_QOperatingSystemVersion_operator_lt__eq__7328, gsi::arg ("rhs"), "@brief Operator bool ::operator<=(const QOperatingSystemVersion &lhs, const QOperatingSystemVersion &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 
-gsi::Class<QOperatingSystemVersion> decl_QOperatingSystemVersion ("QtCore", "QOperatingSystemVersion",
+gsi::Class<QOperatingSystemVersionUnexported> &qtdecl_QOperatingSystemVersionUnexported ();
+
+gsi::Class<QOperatingSystemVersion> decl_QOperatingSystemVersion (qtdecl_QOperatingSystemVersionUnexported (), "QtCore", "QOperatingSystemVersion",
   methods_QOperatingSystemVersion (),
   "@qt\n@brief Binding of QOperatingSystemVersion");
 

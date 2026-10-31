@@ -953,22 +953,25 @@ static void _call_f_userName_c4267 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// static QString QUrl::fromAce(const QByteArray &)
+// static QString QUrl::fromAce(const QByteArray &domain, QFlags<QUrl::AceProcessingOption> options)
 
 
-static void _init_f_fromAce_2309 (qt_gsi::GenericStaticMethod *decl)
+static void _init_f_fromAce_5788 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("domain");
   decl->add_arg<const QByteArray & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("options", true, "{}");
+  decl->add_arg<QFlags<QUrl::AceProcessingOption> > (argspec_1);
   decl->set_return<QString > ();
 }
 
-static void _call_f_fromAce_2309 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_fromAce_5788 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
-  ret.write<QString > ((QString)QUrl::fromAce (arg1));
+  QFlags<QUrl::AceProcessingOption> arg2 = args ? gsi::arg_reader<QFlags<QUrl::AceProcessingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::AceProcessingOption> >() ({}, heap);
+  ret.write<QString > ((QString)QUrl::fromAce (arg1, arg2));
 }
 
 
@@ -1114,22 +1117,25 @@ static void _call_f_setIdnWhitelist_2437 (const qt_gsi::GenericStaticMethod * /*
 }
 
 
-// static QByteArray QUrl::toAce(const QString &)
+// static QByteArray QUrl::toAce(const QString &domain, QFlags<QUrl::AceProcessingOption> options)
 
 
-static void _init_f_toAce_2025 (qt_gsi::GenericStaticMethod *decl)
+static void _init_f_toAce_5504 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("domain");
   decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("options", true, "{}");
+  decl->add_arg<QFlags<QUrl::AceProcessingOption> > (argspec_1);
   decl->set_return<QByteArray > ();
 }
 
-static void _call_f_toAce_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_toAce_5504 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  ret.write<QByteArray > ((QByteArray)QUrl::toAce (arg1));
+  QFlags<QUrl::AceProcessingOption> arg2 = args ? gsi::arg_reader<QFlags<QUrl::AceProcessingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::AceProcessingOption> >() ({}, heap);
+  ret.write<QByteArray > ((QByteArray)QUrl::toAce (arg1, arg2));
 }
 
 
@@ -1234,7 +1240,7 @@ static gsi::Methods methods_QUrl () {
   methods += new qt_gsi::GenericMethod ("url", "@brief Method QString QUrl::url(QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> options)\n", true, &_init_f_url_c7571, &_call_f_url_c7571);
   methods += new qt_gsi::GenericMethod ("userInfo", "@brief Method QString QUrl::userInfo(QFlags<QUrl::ComponentFormattingOption> options)\n", true, &_init_f_userInfo_c4267, &_call_f_userInfo_c4267);
   methods += new qt_gsi::GenericMethod ("userName", "@brief Method QString QUrl::userName(QFlags<QUrl::ComponentFormattingOption> options)\n", true, &_init_f_userName_c4267, &_call_f_userName_c4267);
-  methods += new qt_gsi::GenericStaticMethod ("fromAce", "@brief Static method QString QUrl::fromAce(const QByteArray &)\nThis method is static and can be called without an instance.", &_init_f_fromAce_2309, &_call_f_fromAce_2309);
+  methods += new qt_gsi::GenericStaticMethod ("fromAce", "@brief Static method QString QUrl::fromAce(const QByteArray &domain, QFlags<QUrl::AceProcessingOption> options)\nThis method is static and can be called without an instance.", &_init_f_fromAce_5788, &_call_f_fromAce_5788);
   methods += new qt_gsi::GenericStaticMethod ("fromEncoded", "@brief Static method QUrl QUrl::fromEncoded(const QByteArray &url, QUrl::ParsingMode mode)\nThis method is static and can be called without an instance.", &_init_f_fromEncoded_4254, &_call_f_fromEncoded_4254);
   methods += new qt_gsi::GenericStaticMethod ("fromLocalFile", "@brief Static method QUrl QUrl::fromLocalFile(const QString &localfile)\nThis method is static and can be called without an instance.", &_init_f_fromLocalFile_2025, &_call_f_fromLocalFile_2025);
   methods += new qt_gsi::GenericStaticMethod ("fromPercentEncoding", "@brief Static method QString QUrl::fromPercentEncoding(const QByteArray &)\nThis method is static and can be called without an instance.", &_init_f_fromPercentEncoding_2309, &_call_f_fromPercentEncoding_2309);
@@ -1242,7 +1248,7 @@ static gsi::Methods methods_QUrl () {
   methods += new qt_gsi::GenericStaticMethod ("fromUserInput", "@brief Static method QUrl QUrl::fromUserInput(const QString &userInput, const QString &workingDirectory, QFlags<QUrl::UserInputResolutionOption> options)\nThis method is static and can be called without an instance.", &_init_f_fromUserInput_8122, &_call_f_fromUserInput_8122);
   methods += new qt_gsi::GenericStaticMethod (":idnWhitelist", "@brief Static method QStringList QUrl::idnWhitelist()\nThis method is static and can be called without an instance.", &_init_f_idnWhitelist_0, &_call_f_idnWhitelist_0);
   methods += new qt_gsi::GenericStaticMethod ("setIdnWhitelist|idnWhitelist=", "@brief Static method void QUrl::setIdnWhitelist(const QStringList &)\nThis method is static and can be called without an instance.", &_init_f_setIdnWhitelist_2437, &_call_f_setIdnWhitelist_2437);
-  methods += new qt_gsi::GenericStaticMethod ("toAce", "@brief Static method QByteArray QUrl::toAce(const QString &)\nThis method is static and can be called without an instance.", &_init_f_toAce_2025, &_call_f_toAce_2025);
+  methods += new qt_gsi::GenericStaticMethod ("toAce", "@brief Static method QByteArray QUrl::toAce(const QString &domain, QFlags<QUrl::AceProcessingOption> options)\nThis method is static and can be called without an instance.", &_init_f_toAce_5504, &_call_f_toAce_5504);
   methods += new qt_gsi::GenericStaticMethod ("toPercentEncoding", "@brief Static method QByteArray QUrl::toPercentEncoding(const QString &, const QByteArray &exclude, const QByteArray &include)\nThis method is static and can be called without an instance.", &_init_f_toPercentEncoding_6427, &_call_f_toPercentEncoding_6427);
   methods += new qt_gsi::GenericStaticMethod ("toStringList", "@brief Static method QStringList QUrl::toStringList(const QList<QUrl> &uris, QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> options)\nThis method is static and can be called without an instance.", &_init_f_toStringList_9779, &_call_f_toStringList_9779);
   return methods;
@@ -1258,6 +1264,26 @@ gsi::Class<QUrl> decl_QUrl ("QtCore", "QUrl",
 
 
 GSI_QTCORE_PUBLIC gsi::Class<QUrl> &qtdecl_QUrl () { return decl_QUrl; }
+
+}
+
+
+//  Implementation of the enum wrapper class for QUrl::AceProcessingOption
+namespace qt_gsi
+{
+
+static gsi::Enum<QUrl::AceProcessingOption> decl_QUrl_AceProcessingOption_Enum ("QtCore", "QUrl_AceProcessingOption",
+    gsi::enum_const ("IgnoreIDNWhitelist", QUrl::IgnoreIDNWhitelist, "@brief Enum constant QUrl::IgnoreIDNWhitelist") +
+    gsi::enum_const ("AceTransitionalProcessing", QUrl::AceTransitionalProcessing, "@brief Enum constant QUrl::AceTransitionalProcessing"),
+  "@qt\n@brief This class represents the QUrl::AceProcessingOption enum");
+
+static gsi::QFlagsClass<QUrl::AceProcessingOption > decl_QUrl_AceProcessingOption_Enums ("QtCore", "QUrl_QFlags_AceProcessingOption",
+  "@qt\n@brief This class represents the QFlags<QUrl::AceProcessingOption> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QUrl> inject_QUrl_AceProcessingOption_Enum_in_parent (decl_QUrl_AceProcessingOption_Enum.defs ());
+static gsi::ClassExt<QUrl> decl_QUrl_AceProcessingOption_Enum_as_child (decl_QUrl_AceProcessingOption_Enum, "AceProcessingOption");
+static gsi::ClassExt<QUrl> decl_QUrl_AceProcessingOption_Enums_as_child (decl_QUrl_AceProcessingOption_Enums, "QFlags_AceProcessingOption");
 
 }
 

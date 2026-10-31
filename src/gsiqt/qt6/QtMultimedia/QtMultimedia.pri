@@ -19,6 +19,7 @@ SOURCES += \
   $$PWD/gsiDeclQCamera.cc \
   $$PWD/gsiDeclQCameraDevice.cc \
   $$PWD/gsiDeclQCameraFormat.cc \
+  $$PWD/gsiDeclQCapturableWindow.cc \
   $$PWD/gsiDeclQImageCapture.cc \
   $$PWD/gsiDeclQMediaCaptureSession.cc \
   $$PWD/gsiDeclQMediaDevices.cc \
@@ -28,11 +29,13 @@ SOURCES += \
   $$PWD/gsiDeclQMediaRecorder.cc \
   $$PWD/gsiDeclQMediaTimeRange.cc \
   $$PWD/gsiDeclQMediaTimeRange_Interval.cc \
+  $$PWD/gsiDeclQScreenCapture.cc \
   $$PWD/gsiDeclQSoundEffect.cc \
   $$PWD/gsiDeclQVideoFrame.cc \
   $$PWD/gsiDeclQVideoFrame_PaintOptions.cc \
   $$PWD/gsiDeclQVideoFrameFormat.cc \
-  $$PWD/gsiDeclQVideoSink.cc
+  $$PWD/gsiDeclQVideoSink.cc \
+  $$PWD/gsiDeclQWindowCapture.cc
 
 HEADERS += gsiQtMultimediaCommon.h
 

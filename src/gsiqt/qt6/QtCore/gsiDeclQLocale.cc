@@ -1931,22 +1931,25 @@ static void _call_f_countryToString_1981 (const qt_gsi::GenericStaticMethod * /*
 }
 
 
-// static QString QLocale::languageToCode(QLocale::Language language)
+// static QString QLocale::languageToCode(QLocale::Language language, QFlags<QLocale::LanguageCodeType> codeTypes)
 
 
-static void _init_f_languageToCode_2029 (qt_gsi::GenericStaticMethod *decl)
+static void _init_f_languageToCode_5443 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("language");
   decl->add_arg<const qt_gsi::Converter<QLocale::Language>::target_type & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("codeTypes", true, "QLocale::AnyLanguageCode");
+  decl->add_arg<QFlags<QLocale::LanguageCodeType> > (argspec_1);
   decl->set_return<QString > ();
 }
 
-static void _call_f_languageToCode_2029 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_languageToCode_5443 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const qt_gsi::Converter<QLocale::Language>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QLocale::Language>::target_type & >() (args, heap);
-  ret.write<QString > ((QString)QLocale::languageToCode (qt_gsi::QtToCppAdaptor<QLocale::Language>(arg1).cref()));
+  QFlags<QLocale::LanguageCodeType> arg2 = args ? gsi::arg_reader<QFlags<QLocale::LanguageCodeType> >() (args, heap) : gsi::arg_maker<QFlags<QLocale::LanguageCodeType> >() (QLocale::AnyLanguageCode, heap);
+  ret.write<QString > ((QString)QLocale::languageToCode (qt_gsi::QtToCppAdaptor<QLocale::Language>(arg1).cref(), arg2));
 }
 
 
@@ -2217,7 +2220,7 @@ static gsi::Methods methods_QLocale () {
   methods += new qt_gsi::GenericStaticMethod ("countriesForLanguage", "@brief Static method QList<QLocale::Country> QLocale::countriesForLanguage(QLocale::Language lang)\nThis method is static and can be called without an instance.", &_init_f_countriesForLanguage_2029, &_call_f_countriesForLanguage_2029);
   methods += new qt_gsi::GenericStaticMethod ("countryToCode", "@brief Static method QString QLocale::countryToCode(QLocale::Country country)\nThis method is static and can be called without an instance.", &_init_f_countryToCode_1981, &_call_f_countryToCode_1981);
   methods += new qt_gsi::GenericStaticMethod ("countryToString", "@brief Static method QString QLocale::countryToString(QLocale::Country country)\nThis method is static and can be called without an instance.", &_init_f_countryToString_1981, &_call_f_countryToString_1981);
-  methods += new qt_gsi::GenericStaticMethod ("languageToCode", "@brief Static method QString QLocale::languageToCode(QLocale::Language language)\nThis method is static and can be called without an instance.", &_init_f_languageToCode_2029, &_call_f_languageToCode_2029);
+  methods += new qt_gsi::GenericStaticMethod ("languageToCode", "@brief Static method QString QLocale::languageToCode(QLocale::Language language, QFlags<QLocale::LanguageCodeType> codeTypes)\nThis method is static and can be called without an instance.", &_init_f_languageToCode_5443, &_call_f_languageToCode_5443);
   methods += new qt_gsi::GenericStaticMethod ("languageToString", "@brief Static method QString QLocale::languageToString(QLocale::Language language)\nThis method is static and can be called without an instance.", &_init_f_languageToString_2029, &_call_f_languageToString_2029);
   methods += new qt_gsi::GenericStaticMethod ("matchingLocales", "@brief Static method QList<QLocale> QLocale::matchingLocales(QLocale::Language language, QLocale::Script script, QLocale::Territory territory)\nThis method is static and can be called without an instance.", &_init_f_matchingLocales_5872, &_call_f_matchingLocales_5872);
   methods += new qt_gsi::GenericStaticMethod ("scriptToCode", "@brief Static method QString QLocale::scriptToCode(QLocale::Script script)\nThis method is static and can be called without an instance.", &_init_f_scriptToCode_1854, &_call_f_scriptToCode_1854);
@@ -2945,6 +2948,19 @@ static gsi::Enum<QLocale::Language> decl_QLocale_Language_Enum ("QtCore", "QLoca
     gsi::enum_const ("Zarma", QLocale::Zarma, "@brief Enum constant QLocale::Zarma") +
     gsi::enum_const ("Zhuang", QLocale::Zhuang, "@brief Enum constant QLocale::Zhuang") +
     gsi::enum_const ("Zulu", QLocale::Zulu, "@brief Enum constant QLocale::Zulu") +
+    gsi::enum_const ("Kaingang", QLocale::Kaingang, "@brief Enum constant QLocale::Kaingang") +
+    gsi::enum_const ("Nheengatu", QLocale::Nheengatu, "@brief Enum constant QLocale::Nheengatu") +
+    gsi::enum_const ("Haryanvi", QLocale::Haryanvi, "@brief Enum constant QLocale::Haryanvi") +
+    gsi::enum_const ("NorthernFrisian", QLocale::NorthernFrisian, "@brief Enum constant QLocale::NorthernFrisian") +
+    gsi::enum_const ("Rajasthani", QLocale::Rajasthani, "@brief Enum constant QLocale::Rajasthani") +
+    gsi::enum_const ("Moksha", QLocale::Moksha, "@brief Enum constant QLocale::Moksha") +
+    gsi::enum_const ("TokiPona", QLocale::TokiPona, "@brief Enum constant QLocale::TokiPona") +
+    gsi::enum_const ("Pijin", QLocale::Pijin, "@brief Enum constant QLocale::Pijin") +
+    gsi::enum_const ("Obolo", QLocale::Obolo, "@brief Enum constant QLocale::Obolo") +
+    gsi::enum_const ("Baluchi", QLocale::Baluchi, "@brief Enum constant QLocale::Baluchi") +
+    gsi::enum_const ("Ligurian", QLocale::Ligurian, "@brief Enum constant QLocale::Ligurian") +
+    gsi::enum_const ("Rohingya", QLocale::Rohingya, "@brief Enum constant QLocale::Rohingya") +
+    gsi::enum_const ("Torwali", QLocale::Torwali, "@brief Enum constant QLocale::Torwali") +
     gsi::enum_const ("Afan", QLocale::Afan, "@brief Enum constant QLocale::Afan") +
     gsi::enum_const ("Bengali", QLocale::Bengali, "@brief Enum constant QLocale::Bengali") +
     gsi::enum_const ("Bhutani", QLocale::Bhutani, "@brief Enum constant QLocale::Bhutani") +
@@ -2974,6 +2990,34 @@ static gsi::QFlagsClass<QLocale::Language > decl_QLocale_Language_Enums ("QtCore
 static gsi::ClassExt<QLocale> inject_QLocale_Language_Enum_in_parent (decl_QLocale_Language_Enum.defs ());
 static gsi::ClassExt<QLocale> decl_QLocale_Language_Enum_as_child (decl_QLocale_Language_Enum, "Language");
 static gsi::ClassExt<QLocale> decl_QLocale_Language_Enums_as_child (decl_QLocale_Language_Enums, "QFlags_Language");
+
+}
+
+
+//  Implementation of the enum wrapper class for QLocale::LanguageCodeType
+namespace qt_gsi
+{
+
+static gsi::Enum<QLocale::LanguageCodeType> decl_QLocale_LanguageCodeType_Enum ("QtCore", "QLocale_LanguageCodeType",
+    gsi::enum_const ("ISO639Part1", QLocale::ISO639Part1, "@brief Enum constant QLocale::ISO639Part1") +
+    gsi::enum_const ("ISO639Part2B", QLocale::ISO639Part2B, "@brief Enum constant QLocale::ISO639Part2B") +
+    gsi::enum_const ("ISO639Part2T", QLocale::ISO639Part2T, "@brief Enum constant QLocale::ISO639Part2T") +
+    gsi::enum_const ("ISO639Part3", QLocale::ISO639Part3, "@brief Enum constant QLocale::ISO639Part3") +
+    gsi::enum_const ("LegacyLanguageCode", QLocale::LegacyLanguageCode, "@brief Enum constant QLocale::LegacyLanguageCode") +
+    gsi::enum_const ("ISO639Part2", QLocale::ISO639Part2, "@brief Enum constant QLocale::ISO639Part2") +
+    gsi::enum_const ("ISO639Alpha2", QLocale::ISO639Alpha2, "@brief Enum constant QLocale::ISO639Alpha2") +
+    gsi::enum_const ("ISO639Alpha3", QLocale::ISO639Alpha3, "@brief Enum constant QLocale::ISO639Alpha3") +
+    gsi::enum_const ("ISO639", QLocale::ISO639, "@brief Enum constant QLocale::ISO639") +
+    gsi::enum_const ("AnyLanguageCode", QLocale::AnyLanguageCode, "@brief Enum constant QLocale::AnyLanguageCode"),
+  "@qt\n@brief This class represents the QLocale::LanguageCodeType enum");
+
+static gsi::QFlagsClass<QLocale::LanguageCodeType > decl_QLocale_LanguageCodeType_Enums ("QtCore", "QLocale_QFlags_LanguageCodeType",
+  "@qt\n@brief This class represents the QFlags<QLocale::LanguageCodeType> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QLocale> inject_QLocale_LanguageCodeType_Enum_in_parent (decl_QLocale_LanguageCodeType_Enum.defs ());
+static gsi::ClassExt<QLocale> decl_QLocale_LanguageCodeType_Enum_as_child (decl_QLocale_LanguageCodeType_Enum, "LanguageCodeType");
+static gsi::ClassExt<QLocale> decl_QLocale_LanguageCodeType_Enums_as_child (decl_QLocale_LanguageCodeType_Enums, "QFlags_LanguageCodeType");
 
 }
 
@@ -3192,6 +3236,7 @@ static gsi::Enum<QLocale::Script> decl_QLocale_Script_Enum ("QtCore", "QLocale_S
     gsi::enum_const ("VaiScript", QLocale::VaiScript, "@brief Enum constant QLocale::VaiScript") +
     gsi::enum_const ("VarangKshitiScript", QLocale::VarangKshitiScript, "@brief Enum constant QLocale::VarangKshitiScript") +
     gsi::enum_const ("YiScript", QLocale::YiScript, "@brief Enum constant QLocale::YiScript") +
+    gsi::enum_const ("HanifiScript", QLocale::HanifiScript, "@brief Enum constant QLocale::HanifiScript") +
     gsi::enum_const ("BengaliScript", QLocale::BengaliScript, "@brief Enum constant QLocale::BengaliScript") +
     gsi::enum_const ("MendeKikakuiScript", QLocale::MendeKikakuiScript, "@brief Enum constant QLocale::MendeKikakuiScript") +
     gsi::enum_const ("OriyaScript", QLocale::OriyaScript, "@brief Enum constant QLocale::OriyaScript") +

@@ -29,6 +29,7 @@
 
 #include <QAbstractEventDispatcher>
 #include <QAbstractNativeEventFilter>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

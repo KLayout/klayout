@@ -33,6 +33,7 @@
 #include <QPaintDevice>
 #include <QRectF>
 #include <QSizeF>
+#include <QTextOption>
 #include "gsiQt.h"
 #include "gsiQtGuiCommon.h"
 #include <memory>
@@ -165,6 +166,28 @@ static void _call_f_boundingRect_c2025 (const qt_gsi::GenericMethod * /*decl*/, 
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QRectF > ((QRectF)((QFontMetricsF *)cls)->boundingRect (arg1));
+}
+
+
+// QRectF QFontMetricsF::boundingRect(const QString &text, const QTextOption &textOption)
+
+
+static void _init_f_boundingRect_c4365 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("text");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("textOption");
+  decl->add_arg<const QTextOption & > (argspec_1);
+  decl->set_return<QRectF > ();
+}
+
+static void _call_f_boundingRect_c4365 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QTextOption &arg2 = gsi::arg_reader<const QTextOption & >() (args, heap);
+  ret.write<QRectF > ((QRectF)((QFontMetricsF *)cls)->boundingRect (arg1, arg2));
 }
 
 
@@ -344,6 +367,28 @@ static void _call_f_horizontalAdvance_c899 (const qt_gsi::GenericMethod * /*decl
   tl::Heap heap;
   const qt_gsi::Converter<QChar>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QChar>::target_type & >() (args, heap);
   ret.write<double > ((double)((QFontMetricsF *)cls)->horizontalAdvance (qt_gsi::QtToCppAdaptor<QChar>(arg1).cref()));
+}
+
+
+// double QFontMetricsF::horizontalAdvance(const QString &string, const QTextOption &textOption)
+
+
+static void _init_f_horizontalAdvance_c4365 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("string");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("textOption");
+  decl->add_arg<const QTextOption & > (argspec_1);
+  decl->set_return<double > ();
+}
+
+static void _call_f_horizontalAdvance_c4365 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QTextOption &arg2 = gsi::arg_reader<const QTextOption & >() (args, heap);
+  ret.write<double > ((double)((QFontMetricsF *)cls)->horizontalAdvance (arg1, arg2));
 }
 
 
@@ -686,6 +731,28 @@ static void _call_f_tightBoundingRect_c2025 (const qt_gsi::GenericMethod * /*dec
 }
 
 
+// QRectF QFontMetricsF::tightBoundingRect(const QString &text, const QTextOption &textOption)
+
+
+static void _init_f_tightBoundingRect_c4365 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("text");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("textOption");
+  decl->add_arg<const QTextOption & > (argspec_1);
+  decl->set_return<QRectF > ();
+}
+
+static void _call_f_tightBoundingRect_c4365 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QTextOption &arg2 = gsi::arg_reader<const QTextOption & >() (args, heap);
+  ret.write<QRectF > ((QRectF)((QFontMetricsF *)cls)->tightBoundingRect (arg1, arg2));
+}
+
+
 // double QFontMetricsF::underlinePos()
 
 
@@ -729,6 +796,7 @@ static gsi::Methods methods_QFontMetricsF () {
   methods += new qt_gsi::GenericMethod ("ascent", "@brief Method double QFontMetricsF::ascent()\n", true, &_init_f_ascent_c0, &_call_f_ascent_c0);
   methods += new qt_gsi::GenericMethod ("averageCharWidth", "@brief Method double QFontMetricsF::averageCharWidth()\n", true, &_init_f_averageCharWidth_c0, &_call_f_averageCharWidth_c0);
   methods += new qt_gsi::GenericMethod ("boundingRect", "@brief Method QRectF QFontMetricsF::boundingRect(const QString &string)\n", true, &_init_f_boundingRect_c2025, &_call_f_boundingRect_c2025);
+  methods += new qt_gsi::GenericMethod ("boundingRect", "@brief Method QRectF QFontMetricsF::boundingRect(const QString &text, const QTextOption &textOption)\n", true, &_init_f_boundingRect_c4365, &_call_f_boundingRect_c4365);
   methods += new qt_gsi::GenericMethod ("boundingRect", "@brief Method QRectF QFontMetricsF::boundingRect(QChar)\n", true, &_init_f_boundingRect_c899, &_call_f_boundingRect_c899);
   methods += new qt_gsi::GenericMethod ("boundingRect", "@brief Method QRectF QFontMetricsF::boundingRect(const QRectF &r, int flags, const QString &string, int tabstops, int *tabarray)\n", true, &_init_f_boundingRect_c5942, &_call_f_boundingRect_c5942);
   methods += new qt_gsi::GenericMethod ("capHeight", "@brief Method double QFontMetricsF::capHeight()\n", true, &_init_f_capHeight_c0, &_call_f_capHeight_c0);
@@ -738,6 +806,7 @@ static gsi::Methods methods_QFontMetricsF () {
   methods += new qt_gsi::GenericMethod ("height", "@brief Method double QFontMetricsF::height()\n", true, &_init_f_height_c0, &_call_f_height_c0);
   methods += new qt_gsi::GenericMethod ("horizontalAdvance", "@brief Method double QFontMetricsF::horizontalAdvance(const QString &string, int length)\n", true, &_init_f_horizontalAdvance_c2684, &_call_f_horizontalAdvance_c2684);
   methods += new qt_gsi::GenericMethod ("horizontalAdvance", "@brief Method double QFontMetricsF::horizontalAdvance(QChar)\n", true, &_init_f_horizontalAdvance_c899, &_call_f_horizontalAdvance_c899);
+  methods += new qt_gsi::GenericMethod ("horizontalAdvance", "@brief Method double QFontMetricsF::horizontalAdvance(const QString &string, const QTextOption &textOption)\n", true, &_init_f_horizontalAdvance_c4365, &_call_f_horizontalAdvance_c4365);
   methods += new qt_gsi::GenericMethod ("inFont", "@brief Method bool QFontMetricsF::inFont(QChar)\n", true, &_init_f_inFont_c899, &_call_f_inFont_c899);
   methods += new qt_gsi::GenericMethod ("inFontUcs4", "@brief Method bool QFontMetricsF::inFontUcs4(unsigned int ucs4)\n", true, &_init_f_inFontUcs4_c1772, &_call_f_inFontUcs4_c1772);
   methods += new qt_gsi::GenericMethod ("leading", "@brief Method double QFontMetricsF::leading()\n", true, &_init_f_leading_c0, &_call_f_leading_c0);
@@ -757,6 +826,7 @@ static gsi::Methods methods_QFontMetricsF () {
   methods += new qt_gsi::GenericMethod ("strikeOutPos", "@brief Method double QFontMetricsF::strikeOutPos()\n", true, &_init_f_strikeOutPos_c0, &_call_f_strikeOutPos_c0);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QFontMetricsF::swap(QFontMetricsF &other)\n", false, &_init_f_swap_1903, &_call_f_swap_1903);
   methods += new qt_gsi::GenericMethod ("tightBoundingRect", "@brief Method QRectF QFontMetricsF::tightBoundingRect(const QString &text)\n", true, &_init_f_tightBoundingRect_c2025, &_call_f_tightBoundingRect_c2025);
+  methods += new qt_gsi::GenericMethod ("tightBoundingRect", "@brief Method QRectF QFontMetricsF::tightBoundingRect(const QString &text, const QTextOption &textOption)\n", true, &_init_f_tightBoundingRect_c4365, &_call_f_tightBoundingRect_c4365);
   methods += new qt_gsi::GenericMethod ("underlinePos", "@brief Method double QFontMetricsF::underlinePos()\n", true, &_init_f_underlinePos_c0, &_call_f_underlinePos_c0);
   methods += new qt_gsi::GenericMethod ("xHeight", "@brief Method double QFontMetricsF::xHeight()\n", true, &_init_f_xHeight_c0, &_call_f_xHeight_c0);
   return methods;

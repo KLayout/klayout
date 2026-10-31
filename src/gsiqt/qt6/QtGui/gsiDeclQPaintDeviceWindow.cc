@@ -29,6 +29,7 @@
 
 #include <QPaintDeviceWindow>
 #include <QAccessibleInterface>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QCloseEvent>
 #include <QCursor>

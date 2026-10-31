@@ -28,6 +28,7 @@
 */
 
 #include <QLine>
+#include <QLineF>
 #include <QPoint>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
@@ -289,6 +290,21 @@ static void _call_f_setPoints_3724 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
+// QLineF QLine::toLineF()
+
+
+static void _init_f_toLineF_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QLineF > ();
+}
+
+static void _call_f_toLineF_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QLineF > ((QLineF)((QLine *)cls)->toLineF ());
+}
+
+
 // void QLine::translate(const QPoint &p)
 
 
@@ -452,6 +468,7 @@ static gsi::Methods methods_QLine () {
   methods += new qt_gsi::GenericMethod ("setP1|p1=", "@brief Method void QLine::setP1(const QPoint &p1)\n", false, &_init_f_setP1_1916, &_call_f_setP1_1916);
   methods += new qt_gsi::GenericMethod ("setP2|p2=", "@brief Method void QLine::setP2(const QPoint &p2)\n", false, &_init_f_setP2_1916, &_call_f_setP2_1916);
   methods += new qt_gsi::GenericMethod ("setPoints", "@brief Method void QLine::setPoints(const QPoint &p1, const QPoint &p2)\n", false, &_init_f_setPoints_3724, &_call_f_setPoints_3724);
+  methods += new qt_gsi::GenericMethod ("toLineF", "@brief Method QLineF QLine::toLineF()\n", true, &_init_f_toLineF_c0, &_call_f_toLineF_c0);
   methods += new qt_gsi::GenericMethod ("translate", "@brief Method void QLine::translate(const QPoint &p)\n", false, &_init_f_translate_1916, &_call_f_translate_1916);
   methods += new qt_gsi::GenericMethod ("translate", "@brief Method void QLine::translate(int dx, int dy)\n", false, &_init_f_translate_1426, &_call_f_translate_1426);
   methods += new qt_gsi::GenericMethod ("translated", "@brief Method QLine QLine::translated(const QPoint &p)\n", true, &_init_f_translated_c1916, &_call_f_translated_c1916);

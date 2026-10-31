@@ -914,6 +914,31 @@ static void _call_f_reset_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
+// QTransform &QTransform::rotate(double a, Qt::Axis axis, double distanceToPlane)
+
+
+static void _init_f_rotate_3080 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("a");
+  decl->add_arg<double > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("axis");
+  decl->add_arg<const qt_gsi::Converter<Qt::Axis>::target_type & > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("distanceToPlane");
+  decl->add_arg<double > (argspec_2);
+  decl->set_return<QTransform & > ();
+}
+
+static void _call_f_rotate_3080 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  const qt_gsi::Converter<Qt::Axis>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::Axis>::target_type & >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  ret.write<QTransform & > ((QTransform &)((QTransform *)cls)->rotate (arg1, qt_gsi::QtToCppAdaptor<Qt::Axis>(arg2).cref(), arg3));
+}
+
+
 // QTransform &QTransform::rotate(double a, Qt::Axis axis)
 
 
@@ -933,6 +958,31 @@ static void _call_f_rotate_2117 (const qt_gsi::GenericMethod * /*decl*/, void *c
   double arg1 = gsi::arg_reader<double >() (args, heap);
   const qt_gsi::Converter<Qt::Axis>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::Axis>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::Axis>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::Axis>(heap, Qt::ZAxis), heap);
   ret.write<QTransform & > ((QTransform &)((QTransform *)cls)->rotate (arg1, qt_gsi::QtToCppAdaptor<Qt::Axis>(arg2).cref()));
+}
+
+
+// QTransform &QTransform::rotateRadians(double a, Qt::Axis axis, double distanceToPlane)
+
+
+static void _init_f_rotateRadians_3080 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("a");
+  decl->add_arg<double > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("axis");
+  decl->add_arg<const qt_gsi::Converter<Qt::Axis>::target_type & > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("distanceToPlane");
+  decl->add_arg<double > (argspec_2);
+  decl->set_return<QTransform & > ();
+}
+
+static void _call_f_rotateRadians_3080 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  const qt_gsi::Converter<Qt::Axis>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::Axis>::target_type & >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  ret.write<QTransform & > ((QTransform &)((QTransform *)cls)->rotateRadians (arg1, qt_gsi::QtToCppAdaptor<Qt::Axis>(arg2).cref(), arg3));
 }
 
 
@@ -1284,7 +1334,9 @@ static gsi::Methods methods_QTransform () {
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QTransform &QTransform::operator=(const QTransform &)\n", false, &_init_f_operator_eq__2350, &_call_f_operator_eq__2350);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QTransform::operator==(const QTransform &)\n", true, &_init_f_operator_eq__eq__c2350, &_call_f_operator_eq__eq__c2350);
   methods += new qt_gsi::GenericMethod ("reset", "@brief Method void QTransform::reset()\n", false, &_init_f_reset_0, &_call_f_reset_0);
+  methods += new qt_gsi::GenericMethod ("rotate", "@brief Method QTransform &QTransform::rotate(double a, Qt::Axis axis, double distanceToPlane)\n", false, &_init_f_rotate_3080, &_call_f_rotate_3080);
   methods += new qt_gsi::GenericMethod ("rotate", "@brief Method QTransform &QTransform::rotate(double a, Qt::Axis axis)\n", false, &_init_f_rotate_2117, &_call_f_rotate_2117);
+  methods += new qt_gsi::GenericMethod ("rotateRadians", "@brief Method QTransform &QTransform::rotateRadians(double a, Qt::Axis axis, double distanceToPlane)\n", false, &_init_f_rotateRadians_3080, &_call_f_rotateRadians_3080);
   methods += new qt_gsi::GenericMethod ("rotateRadians", "@brief Method QTransform &QTransform::rotateRadians(double a, Qt::Axis axis)\n", false, &_init_f_rotateRadians_2117, &_call_f_rotateRadians_2117);
   methods += new qt_gsi::GenericMethod ("scale", "@brief Method QTransform &QTransform::scale(double sx, double sy)\n", false, &_init_f_scale_2034, &_call_f_scale_2034);
   methods += new qt_gsi::GenericMethod ("setMatrix", "@brief Method void QTransform::setMatrix(double m11, double m12, double m13, double m21, double m22, double m23, double m31, double m32, double m33)\n", false, &_init_f_setMatrix_8775, &_call_f_setMatrix_8775);

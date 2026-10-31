@@ -28,6 +28,7 @@
 */
 
 #include <QTextBlockGroup>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

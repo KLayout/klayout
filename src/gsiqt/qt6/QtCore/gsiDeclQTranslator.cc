@@ -28,6 +28,7 @@
 */
 
 #include <QTranslator>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QLocale>

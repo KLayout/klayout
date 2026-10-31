@@ -28,6 +28,7 @@
 */
 
 #include <QRecursiveMutex>
+#include <QDeadlineTimer>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
 #include <memory>
@@ -71,7 +72,7 @@ static void _call_f_lock_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 
 static void _init_f_tryLock_767 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("timeout", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("timeout");
   decl->add_arg<int > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -80,7 +81,26 @@ static void _call_f_tryLock_767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ret.write<bool > ((bool)((QRecursiveMutex *)cls)->tryLock (arg1));
+}
+
+
+// bool QRecursiveMutex::tryLock(QDeadlineTimer timer)
+
+
+static void _init_f_tryLock_1820 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("timer", true, "{}");
+  decl->add_arg<QDeadlineTimer > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_tryLock_1820 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QDeadlineTimer arg1 = args ? gsi::arg_reader<QDeadlineTimer >() (args, heap) : gsi::arg_maker<QDeadlineTimer >() ({}, heap);
   ret.write<bool > ((bool)((QRecursiveMutex *)cls)->tryLock (arg1));
 }
 
@@ -125,6 +145,7 @@ static gsi::Methods methods_QRecursiveMutex () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QRecursiveMutex::QRecursiveMutex()\nThis method creates an object of class QRecursiveMutex.", &_init_ctor_QRecursiveMutex_0, &_call_ctor_QRecursiveMutex_0);
   methods += new qt_gsi::GenericMethod ("lock", "@brief Method void QRecursiveMutex::lock()\n", false, &_init_f_lock_0, &_call_f_lock_0);
   methods += new qt_gsi::GenericMethod ("tryLock", "@brief Method bool QRecursiveMutex::tryLock(int timeout)\n", false, &_init_f_tryLock_767, &_call_f_tryLock_767);
+  methods += new qt_gsi::GenericMethod ("tryLock", "@brief Method bool QRecursiveMutex::tryLock(QDeadlineTimer timer)\n", false, &_init_f_tryLock_1820, &_call_f_tryLock_1820);
   methods += new qt_gsi::GenericMethod ("try_lock", "@brief Method bool QRecursiveMutex::try_lock()\n", false, &_init_f_try_lock_0, &_call_f_try_lock_0);
   methods += new qt_gsi::GenericMethod ("unlock", "@brief Method void QRecursiveMutex::unlock()\n", false, &_init_f_unlock_0, &_call_f_unlock_0);
   return methods;

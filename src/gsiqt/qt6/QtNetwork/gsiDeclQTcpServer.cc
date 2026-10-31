@@ -28,6 +28,7 @@
 */
 
 #include <QTcpServer>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QHostAddress>
@@ -137,6 +138,21 @@ static void _call_f_listen_3510 (const qt_gsi::GenericMethod * /*decl*/, void *c
   const QHostAddress &arg1 = args ? gsi::arg_reader<const QHostAddress & >() (args, heap) : gsi::arg_maker<const QHostAddress & >() (QHostAddress::Any, heap);
   quint16 arg2 = args ? gsi::arg_reader<quint16 >() (args, heap) : gsi::arg_maker<quint16 >() (0, heap);
   ret.write<bool > ((bool)((QTcpServer *)cls)->listen (arg1, arg2));
+}
+
+
+// int QTcpServer::listenBacklogSize()
+
+
+static void _init_f_listenBacklogSize_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<int > ();
+}
+
+static void _call_f_listenBacklogSize_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<int > ((int)((QTcpServer *)cls)->listenBacklogSize ());
 }
 
 
@@ -259,6 +275,26 @@ static void _call_f_serverPort_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<quint16 > ((quint16)((QTcpServer *)cls)->serverPort ());
+}
+
+
+// void QTcpServer::setListenBacklogSize(int size)
+
+
+static void _init_f_setListenBacklogSize_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("size");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setListenBacklogSize_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QTcpServer *)cls)->setListenBacklogSize (arg1);
 }
 
 
@@ -394,6 +430,7 @@ static gsi::Methods methods_QTcpServer () {
   methods += new qt_gsi::GenericMethod ("hasPendingConnections", "@brief Method bool QTcpServer::hasPendingConnections()\n", true, &_init_f_hasPendingConnections_c0, &_call_f_hasPendingConnections_c0);
   methods += new qt_gsi::GenericMethod ("isListening?", "@brief Method bool QTcpServer::isListening()\n", true, &_init_f_isListening_c0, &_call_f_isListening_c0);
   methods += new qt_gsi::GenericMethod ("listen", "@brief Method bool QTcpServer::listen(const QHostAddress &address, quint16 port)\n", false, &_init_f_listen_3510, &_call_f_listen_3510);
+  methods += new qt_gsi::GenericMethod ("listenBacklogSize", "@brief Method int QTcpServer::listenBacklogSize()\n", true, &_init_f_listenBacklogSize_c0, &_call_f_listenBacklogSize_c0);
   methods += new qt_gsi::GenericMethod (":maxPendingConnections", "@brief Method int QTcpServer::maxPendingConnections()\n", true, &_init_f_maxPendingConnections_c0, &_call_f_maxPendingConnections_c0);
   methods += new qt_gsi::GenericMethod ("nextPendingConnection", "@brief Method QTcpSocket *QTcpServer::nextPendingConnection()\n", false, &_init_f_nextPendingConnection_0, &_call_f_nextPendingConnection_0);
   methods += new qt_gsi::GenericMethod ("pauseAccepting", "@brief Method void QTcpServer::pauseAccepting()\n", false, &_init_f_pauseAccepting_0, &_call_f_pauseAccepting_0);
@@ -402,6 +439,7 @@ static gsi::Methods methods_QTcpServer () {
   methods += new qt_gsi::GenericMethod ("serverAddress", "@brief Method QHostAddress QTcpServer::serverAddress()\n", true, &_init_f_serverAddress_c0, &_call_f_serverAddress_c0);
   methods += new qt_gsi::GenericMethod ("serverError", "@brief Method QAbstractSocket::SocketError QTcpServer::serverError()\n", true, &_init_f_serverError_c0, &_call_f_serverError_c0);
   methods += new qt_gsi::GenericMethod ("serverPort", "@brief Method quint16 QTcpServer::serverPort()\n", true, &_init_f_serverPort_c0, &_call_f_serverPort_c0);
+  methods += new qt_gsi::GenericMethod ("setListenBacklogSize", "@brief Method void QTcpServer::setListenBacklogSize(int size)\n", false, &_init_f_setListenBacklogSize_767, &_call_f_setListenBacklogSize_767);
   methods += new qt_gsi::GenericMethod ("setMaxPendingConnections|maxPendingConnections=", "@brief Method void QTcpServer::setMaxPendingConnections(int numConnections)\n", false, &_init_f_setMaxPendingConnections_767, &_call_f_setMaxPendingConnections_767);
   methods += new qt_gsi::GenericMethod ("setProxy|proxy=", "@brief Method void QTcpServer::setProxy(const QNetworkProxy &networkProxy)\n", false, &_init_f_setProxy_2686, &_call_f_setProxy_2686);
   methods += new qt_gsi::GenericMethod ("setSocketDescriptor", "@brief Method bool QTcpServer::setSocketDescriptor(QIntegerForSizeof<void *>::Signed socketDescriptor)\n", false, &_init_f_setSocketDescriptor_3614, &_call_f_setSocketDescriptor_3614);

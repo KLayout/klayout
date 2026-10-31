@@ -13,6 +13,7 @@
 #include <QtGui/QAccessibleInterface>
 #include <QtGui/QAccessibleObject>
 #include <QtGui/QAccessiblePlugin>
+#include <QtGui/QAccessibleSelectionInterface>
 #include <QtGui/QAccessibleStateChangeEvent>
 #include <QtGui/QAccessibleTableCellInterface>
 #include <QtGui/QAccessibleTableInterface>

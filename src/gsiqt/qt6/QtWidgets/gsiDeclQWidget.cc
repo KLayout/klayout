@@ -30,6 +30,7 @@
 #include <QWidget>
 #include <QAction>
 #include <QActionEvent>
+#include <QAnyStringView>
 #include <QBackingStore>
 #include <QBitmap>
 #include <QChildEvent>
@@ -194,6 +195,218 @@ static void _call_f_addAction_1309 (const qt_gsi::GenericMethod * /*decl*/, void
   QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWidget *)cls)->addAction (arg1);
+}
+
+
+// QAction *QWidget::addAction(const QString &text)
+
+
+static void _init_f_addAction_2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("text");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<QAction * > ();
+}
+
+static void _call_f_addAction_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ret.write<QAction * > ((QAction *)((QWidget *)cls)->addAction (arg1));
+}
+
+
+// QAction *QWidget::addAction(const QIcon &icon, const QString &text)
+
+
+static void _init_f_addAction_3704 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("icon");
+  decl->add_arg<const QIcon & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("text");
+  decl->add_arg<const QString & > (argspec_1);
+  decl->set_return<QAction * > ();
+}
+
+static void _call_f_addAction_3704 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  ret.write<QAction * > ((QAction *)((QWidget *)cls)->addAction (arg1, arg2));
+}
+
+
+// QAction *QWidget::addAction(const QString &text, const QObject *receiver, const char *member, Qt::ConnectionType type)
+
+
+static void _init_f_addAction_7636 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("text");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("receiver");
+  decl->add_arg<const QObject * > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("member");
+  decl->add_arg<const char * > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("type", true, "Qt::AutoConnection");
+  decl->add_arg<const qt_gsi::Converter<Qt::ConnectionType>::target_type & > (argspec_3);
+  decl->set_return<QAction * > ();
+}
+
+static void _call_f_addAction_7636 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QObject *arg2 = gsi::arg_reader<const QObject * >() (args, heap);
+  const char *arg3 = gsi::arg_reader<const char * >() (args, heap);
+  const qt_gsi::Converter<Qt::ConnectionType>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::ConnectionType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::ConnectionType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::ConnectionType>(heap, Qt::AutoConnection), heap);
+  ret.write<QAction * > ((QAction *)((QWidget *)cls)->addAction (arg1, arg2, arg3, qt_gsi::QtToCppAdaptor<Qt::ConnectionType>(arg4).cref()));
+}
+
+
+// QAction *QWidget::addAction(const QIcon &icon, const QString &text, const QObject *receiver, const char *member, Qt::ConnectionType type)
+
+
+static void _init_f_addAction_9315 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("icon");
+  decl->add_arg<const QIcon & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("text");
+  decl->add_arg<const QString & > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("receiver");
+  decl->add_arg<const QObject * > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("member");
+  decl->add_arg<const char * > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("type", true, "Qt::AutoConnection");
+  decl->add_arg<const qt_gsi::Converter<Qt::ConnectionType>::target_type & > (argspec_4);
+  decl->set_return<QAction * > ();
+}
+
+static void _call_f_addAction_9315 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QObject *arg3 = gsi::arg_reader<const QObject * >() (args, heap);
+  const char *arg4 = gsi::arg_reader<const char * >() (args, heap);
+  const qt_gsi::Converter<Qt::ConnectionType>::target_type & arg5 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::ConnectionType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::ConnectionType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::ConnectionType>(heap, Qt::AutoConnection), heap);
+  ret.write<QAction * > ((QAction *)((QWidget *)cls)->addAction (arg1, arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<Qt::ConnectionType>(arg5).cref()));
+}
+
+
+// QAction *QWidget::addAction(const QString &text, const QKeySequence &shortcut)
+
+
+static void _init_f_addAction_4433 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("text");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("shortcut");
+  decl->add_arg<const QKeySequence & > (argspec_1);
+  decl->set_return<QAction * > ();
+}
+
+static void _call_f_addAction_4433 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QKeySequence &arg2 = gsi::arg_reader<const QKeySequence & >() (args, heap);
+  ret.write<QAction * > ((QAction *)((QWidget *)cls)->addAction (arg1, arg2));
+}
+
+
+// QAction *QWidget::addAction(const QIcon &icon, const QString &text, const QKeySequence &shortcut)
+
+
+static void _init_f_addAction_6112 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("icon");
+  decl->add_arg<const QIcon & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("text");
+  decl->add_arg<const QString & > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("shortcut");
+  decl->add_arg<const QKeySequence & > (argspec_2);
+  decl->set_return<QAction * > ();
+}
+
+static void _call_f_addAction_6112 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QKeySequence &arg3 = gsi::arg_reader<const QKeySequence & >() (args, heap);
+  ret.write<QAction * > ((QAction *)((QWidget *)cls)->addAction (arg1, arg2, arg3));
+}
+
+
+// QAction *QWidget::addAction(const QString &text, const QKeySequence &shortcut, const QObject *receiver, const char *member, Qt::ConnectionType type)
+
+
+static void _init_f_addAction_10044 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("text");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("shortcut");
+  decl->add_arg<const QKeySequence & > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("receiver");
+  decl->add_arg<const QObject * > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("member");
+  decl->add_arg<const char * > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("type", true, "Qt::AutoConnection");
+  decl->add_arg<const qt_gsi::Converter<Qt::ConnectionType>::target_type & > (argspec_4);
+  decl->set_return<QAction * > ();
+}
+
+static void _call_f_addAction_10044 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QKeySequence &arg2 = gsi::arg_reader<const QKeySequence & >() (args, heap);
+  const QObject *arg3 = gsi::arg_reader<const QObject * >() (args, heap);
+  const char *arg4 = gsi::arg_reader<const char * >() (args, heap);
+  const qt_gsi::Converter<Qt::ConnectionType>::target_type & arg5 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::ConnectionType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::ConnectionType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::ConnectionType>(heap, Qt::AutoConnection), heap);
+  ret.write<QAction * > ((QAction *)((QWidget *)cls)->addAction (arg1, arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<Qt::ConnectionType>(arg5).cref()));
+}
+
+
+// QAction *QWidget::addAction(const QIcon &icon, const QString &text, const QKeySequence &shortcut, const QObject *receiver, const char *member, Qt::ConnectionType type)
+
+
+static void _init_f_addAction_11723 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("icon");
+  decl->add_arg<const QIcon & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("text");
+  decl->add_arg<const QString & > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("shortcut");
+  decl->add_arg<const QKeySequence & > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("receiver");
+  decl->add_arg<const QObject * > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("member");
+  decl->add_arg<const char * > (argspec_4);
+  static gsi::ArgSpecBase argspec_5 ("type", true, "Qt::AutoConnection");
+  decl->add_arg<const qt_gsi::Converter<Qt::ConnectionType>::target_type & > (argspec_5);
+  decl->set_return<QAction * > ();
+}
+
+static void _call_f_addAction_11723 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QKeySequence &arg3 = gsi::arg_reader<const QKeySequence & >() (args, heap);
+  const QObject *arg4 = gsi::arg_reader<const QObject * >() (args, heap);
+  const char *arg5 = gsi::arg_reader<const char * >() (args, heap);
+  const qt_gsi::Converter<Qt::ConnectionType>::target_type & arg6 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::ConnectionType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::ConnectionType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::ConnectionType>(heap, Qt::AutoConnection), heap);
+  ret.write<QAction * > ((QAction *)((QWidget *)cls)->addAction (arg1, arg2, arg3, arg4, arg5, qt_gsi::QtToCppAdaptor<Qt::ConnectionType>(arg6).cref()));
 }
 
 
@@ -4717,6 +4930,14 @@ static gsi::Methods methods_QWidget () {
   methods += new qt_gsi::GenericMethod ("actions", "@brief Method QList<QAction*> QWidget::actions()\n", true, &_init_f_actions_c0, &_call_f_actions_c0);
   methods += new qt_gsi::GenericMethod ("activateWindow", "@brief Method void QWidget::activateWindow()\n", false, &_init_f_activateWindow_0, &_call_f_activateWindow_0);
   methods += new qt_gsi::GenericMethod ("addAction", "@brief Method void QWidget::addAction(QAction *action)\n", false, &_init_f_addAction_1309, &_call_f_addAction_1309);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QWidget::addAction(const QString &text)\n", false, &_init_f_addAction_2025, &_call_f_addAction_2025);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QWidget::addAction(const QIcon &icon, const QString &text)\n", false, &_init_f_addAction_3704, &_call_f_addAction_3704);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QWidget::addAction(const QString &text, const QObject *receiver, const char *member, Qt::ConnectionType type)\n", false, &_init_f_addAction_7636, &_call_f_addAction_7636);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QWidget::addAction(const QIcon &icon, const QString &text, const QObject *receiver, const char *member, Qt::ConnectionType type)\n", false, &_init_f_addAction_9315, &_call_f_addAction_9315);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QWidget::addAction(const QString &text, const QKeySequence &shortcut)\n", false, &_init_f_addAction_4433, &_call_f_addAction_4433);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QWidget::addAction(const QIcon &icon, const QString &text, const QKeySequence &shortcut)\n", false, &_init_f_addAction_6112, &_call_f_addAction_6112);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QWidget::addAction(const QString &text, const QKeySequence &shortcut, const QObject *receiver, const char *member, Qt::ConnectionType type)\n", false, &_init_f_addAction_10044, &_call_f_addAction_10044);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QWidget::addAction(const QIcon &icon, const QString &text, const QKeySequence &shortcut, const QObject *receiver, const char *member, Qt::ConnectionType type)\n", false, &_init_f_addAction_11723, &_call_f_addAction_11723);
   methods += new qt_gsi::GenericMethod ("addActions", "@brief Method void QWidget::addActions(const QList<QAction*> &actions)\n", false, &_init_f_addActions_2657, &_call_f_addActions_2657);
   methods += new qt_gsi::GenericMethod ("adjustSize", "@brief Method void QWidget::adjustSize()\n", false, &_init_f_adjustSize_0, &_call_f_adjustSize_0);
   methods += new qt_gsi::GenericMethod (":autoFillBackground", "@brief Method bool QWidget::autoFillBackground()\n", true, &_init_f_autoFillBackground_c0, &_call_f_autoFillBackground_c0);

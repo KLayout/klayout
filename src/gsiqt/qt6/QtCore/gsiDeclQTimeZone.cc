@@ -58,22 +58,22 @@ static void _call_ctor_QTimeZone_0 (const qt_gsi::GenericStaticMethod * /*decl*/
 }
 
 
-//  Constructor QTimeZone::QTimeZone(const QByteArray &ianaId)
+//  Constructor QTimeZone::QTimeZone(QTimeZone::Initialization spec)
 
 
-static void _init_ctor_QTimeZone_2309 (qt_gsi::GenericStaticMethod *decl)
+static void _init_ctor_QTimeZone_2924 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("ianaId");
-  decl->add_arg<const QByteArray & > (argspec_0);
+  static gsi::ArgSpecBase argspec_0 ("spec");
+  decl->add_arg<const qt_gsi::Converter<QTimeZone::Initialization>::target_type & > (argspec_0);
   decl->set_return_new<QTimeZone> ();
 }
 
-static void _call_ctor_QTimeZone_2309 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_ctor_QTimeZone_2924 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
-  ret.write<QTimeZone *> (new QTimeZone (arg1));
+  const qt_gsi::Converter<QTimeZone::Initialization>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTimeZone::Initialization>::target_type & >() (args, heap);
+  ret.write<QTimeZone *> (new QTimeZone (qt_gsi::QtToCppAdaptor<QTimeZone::Initialization>(arg1).cref()));
 }
 
 
@@ -92,6 +92,25 @@ static void _call_ctor_QTimeZone_767 (const qt_gsi::GenericStaticMethod * /*decl
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   int arg1 = gsi::arg_reader<int >() (args, heap);
+  ret.write<QTimeZone *> (new QTimeZone (arg1));
+}
+
+
+//  Constructor QTimeZone::QTimeZone(const QByteArray &ianaId)
+
+
+static void _init_ctor_QTimeZone_2309 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("ianaId");
+  decl->add_arg<const QByteArray & > (argspec_0);
+  decl->set_return_new<QTimeZone> ();
+}
+
+static void _call_ctor_QTimeZone_2309 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QTimeZone *> (new QTimeZone (arg1));
 }
 
@@ -165,6 +184,21 @@ static void _call_f_abbreviation_c2175 (const qt_gsi::GenericMethod * /*decl*/, 
   tl::Heap heap;
   const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   ret.write<QString > ((QString)((QTimeZone *)cls)->abbreviation (arg1));
+}
+
+
+// QTimeZone QTimeZone::asBackendZone()
+
+
+static void _init_f_asBackendZone_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QTimeZone > ();
+}
+
+static void _call_f_asBackendZone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QTimeZone > ((QTimeZone)((QTimeZone *)cls)->asBackendZone ());
 }
 
 
@@ -267,6 +301,21 @@ static void _call_f_displayName_c6278 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
+// int QTimeZone::fixedSecondsAheadOfUtc()
+
+
+static void _init_f_fixedSecondsAheadOfUtc_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<int > ();
+}
+
+static void _call_f_fixedSecondsAheadOfUtc_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<int > ((int)((QTimeZone *)cls)->fixedSecondsAheadOfUtc ());
+}
+
+
 // bool QTimeZone::hasDaylightTime()
 
 
@@ -328,6 +377,21 @@ static void _call_f_isDaylightTime_c2175 (const qt_gsi::GenericMethod * /*decl*/
   tl::Heap heap;
   const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   ret.write<bool > ((bool)((QTimeZone *)cls)->isDaylightTime (arg1));
+}
+
+
+// bool QTimeZone::isUtcOrFixedOffset()
+
+
+static void _init_f_isUtcOrFixedOffset_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isUtcOrFixedOffset_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QTimeZone *)cls)->isUtcOrFixedOffset ());
 }
 
 
@@ -495,6 +559,21 @@ static void _call_f_territory_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
+// Qt::TimeSpec QTimeZone::timeSpec()
+
+
+static void _init_f_timeSpec_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<qt_gsi::Converter<Qt::TimeSpec>::target_type > ();
+}
+
+static void _call_f_timeSpec_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<qt_gsi::Converter<Qt::TimeSpec>::target_type > ((qt_gsi::Converter<Qt::TimeSpec>::target_type)qt_gsi::CppToQtAdaptor<Qt::TimeSpec>(((QTimeZone *)cls)->timeSpec ()));
+}
+
+
 // QList<QTimeZone::OffsetData> QTimeZone::transitions(const QDateTime &fromDateTime, const QDateTime &toDateTime)
 
 
@@ -570,6 +649,25 @@ static void _call_f_availableTimeZoneIds_767 (const qt_gsi::GenericStaticMethod 
 }
 
 
+// static QTimeZone QTimeZone::fromSecondsAheadOfUtc(int offset)
+
+
+static void _init_f_fromSecondsAheadOfUtc_767 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("offset");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<QTimeZone > ();
+}
+
+static void _call_f_fromSecondsAheadOfUtc_767 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ret.write<QTimeZone > ((QTimeZone)QTimeZone::fromSecondsAheadOfUtc (arg1));
+}
+
+
 // static QByteArray QTimeZone::ianaIdToWindowsId(const QByteArray &ianaId)
 
 
@@ -605,6 +703,25 @@ static void _call_f_isTimeZoneIdAvailable_2309 (const qt_gsi::GenericStaticMetho
   tl::Heap heap;
   const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<bool > ((bool)QTimeZone::isTimeZoneIdAvailable (arg1));
+}
+
+
+// static bool QTimeZone::isUtcOrFixedOffset(Qt::TimeSpec spec)
+
+
+static void _init_f_isUtcOrFixedOffset_1543 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("spec");
+  decl->add_arg<const qt_gsi::Converter<Qt::TimeSpec>::target_type & > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isUtcOrFixedOffset_1543 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<Qt::TimeSpec>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::TimeSpec>::target_type & >() (args, heap);
+  ret.write<bool > ((bool)QTimeZone::isUtcOrFixedOffset (qt_gsi::QtToCppAdaptor<Qt::TimeSpec>(arg1).cref()));
 }
 
 
@@ -742,20 +859,24 @@ namespace gsi
 static gsi::Methods methods_QTimeZone () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTimeZone::QTimeZone()\nThis method creates an object of class QTimeZone.", &_init_ctor_QTimeZone_0, &_call_ctor_QTimeZone_0);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTimeZone::QTimeZone(const QByteArray &ianaId)\nThis method creates an object of class QTimeZone.", &_init_ctor_QTimeZone_2309, &_call_ctor_QTimeZone_2309);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTimeZone::QTimeZone(QTimeZone::Initialization spec)\nThis method creates an object of class QTimeZone.", &_init_ctor_QTimeZone_2924, &_call_ctor_QTimeZone_2924);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTimeZone::QTimeZone(int offsetSeconds)\nThis method creates an object of class QTimeZone.", &_init_ctor_QTimeZone_767, &_call_ctor_QTimeZone_767);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTimeZone::QTimeZone(const QByteArray &ianaId)\nThis method creates an object of class QTimeZone.", &_init_ctor_QTimeZone_2309, &_call_ctor_QTimeZone_2309);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTimeZone::QTimeZone(const QByteArray &zoneId, int offsetSeconds, const QString &name, const QString &abbreviation, QLocale::Territory territory, const QString &comment)\nThis method creates an object of class QTimeZone.", &_init_ctor_QTimeZone_10816, &_call_ctor_QTimeZone_10816);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTimeZone::QTimeZone(const QTimeZone &other)\nThis method creates an object of class QTimeZone.", &_init_ctor_QTimeZone_2205, &_call_ctor_QTimeZone_2205);
   methods += new qt_gsi::GenericMethod ("abbreviation", "@brief Method QString QTimeZone::abbreviation(const QDateTime &atDateTime)\n", true, &_init_f_abbreviation_c2175, &_call_f_abbreviation_c2175);
+  methods += new qt_gsi::GenericMethod ("asBackendZone", "@brief Method QTimeZone QTimeZone::asBackendZone()\n", true, &_init_f_asBackendZone_c0, &_call_f_asBackendZone_c0);
   methods += new qt_gsi::GenericMethod ("comment", "@brief Method QString QTimeZone::comment()\n", true, &_init_f_comment_c0, &_call_f_comment_c0);
   methods += new qt_gsi::GenericMethod ("country", "@brief Method QLocale::Country QTimeZone::country()\n", true, &_init_f_country_c0, &_call_f_country_c0);
   methods += new qt_gsi::GenericMethod ("daylightTimeOffset", "@brief Method int QTimeZone::daylightTimeOffset(const QDateTime &atDateTime)\n", true, &_init_f_daylightTimeOffset_c2175, &_call_f_daylightTimeOffset_c2175);
   methods += new qt_gsi::GenericMethod ("displayName", "@brief Method QString QTimeZone::displayName(const QDateTime &atDateTime, QTimeZone::NameType nameType, const QLocale &locale)\n", true, &_init_f_displayName_c6192, &_call_f_displayName_c6192);
   methods += new qt_gsi::GenericMethod ("displayName", "@brief Method QString QTimeZone::displayName(QTimeZone::TimeType timeType, QTimeZone::NameType nameType, const QLocale &locale)\n", true, &_init_f_displayName_c6278, &_call_f_displayName_c6278);
+  methods += new qt_gsi::GenericMethod ("fixedSecondsAheadOfUtc", "@brief Method int QTimeZone::fixedSecondsAheadOfUtc()\n", true, &_init_f_fixedSecondsAheadOfUtc_c0, &_call_f_fixedSecondsAheadOfUtc_c0);
   methods += new qt_gsi::GenericMethod ("hasDaylightTime", "@brief Method bool QTimeZone::hasDaylightTime()\n", true, &_init_f_hasDaylightTime_c0, &_call_f_hasDaylightTime_c0);
   methods += new qt_gsi::GenericMethod ("hasTransitions", "@brief Method bool QTimeZone::hasTransitions()\n", true, &_init_f_hasTransitions_c0, &_call_f_hasTransitions_c0);
   methods += new qt_gsi::GenericMethod ("id", "@brief Method QByteArray QTimeZone::id()\n", true, &_init_f_id_c0, &_call_f_id_c0);
   methods += new qt_gsi::GenericMethod ("isDaylightTime?", "@brief Method bool QTimeZone::isDaylightTime(const QDateTime &atDateTime)\n", true, &_init_f_isDaylightTime_c2175, &_call_f_isDaylightTime_c2175);
+  methods += new qt_gsi::GenericMethod ("isUtcOrFixedOffset?", "@brief Method bool QTimeZone::isUtcOrFixedOffset()\n", true, &_init_f_isUtcOrFixedOffset_c0, &_call_f_isUtcOrFixedOffset_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QTimeZone::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("nextTransition", "@brief Method QTimeZone::OffsetData QTimeZone::nextTransition(const QDateTime &afterDateTime)\n", true, &_init_f_nextTransition_c2175, &_call_f_nextTransition_c2175);
   methods += new qt_gsi::GenericMethod ("offsetData", "@brief Method QTimeZone::OffsetData QTimeZone::offsetData(const QDateTime &forDateTime)\n", true, &_init_f_offsetData_c2175, &_call_f_offsetData_c2175);
@@ -765,12 +886,15 @@ static gsi::Methods methods_QTimeZone () {
   methods += new qt_gsi::GenericMethod ("standardTimeOffset", "@brief Method int QTimeZone::standardTimeOffset(const QDateTime &atDateTime)\n", true, &_init_f_standardTimeOffset_c2175, &_call_f_standardTimeOffset_c2175);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QTimeZone::swap(QTimeZone &other)\n", false, &_init_f_swap_1510, &_call_f_swap_1510);
   methods += new qt_gsi::GenericMethod ("territory", "@brief Method QLocale::Territory QTimeZone::territory()\n", true, &_init_f_territory_c0, &_call_f_territory_c0);
+  methods += new qt_gsi::GenericMethod ("timeSpec", "@brief Method Qt::TimeSpec QTimeZone::timeSpec()\n", true, &_init_f_timeSpec_c0, &_call_f_timeSpec_c0);
   methods += new qt_gsi::GenericMethod ("transitions", "@brief Method QList<QTimeZone::OffsetData> QTimeZone::transitions(const QDateTime &fromDateTime, const QDateTime &toDateTime)\n", true, &_init_f_transitions_c4242, &_call_f_transitions_c4242);
   methods += new qt_gsi::GenericStaticMethod ("availableTimeZoneIds", "@brief Static method QList<QByteArray> QTimeZone::availableTimeZoneIds()\nThis method is static and can be called without an instance.", &_init_f_availableTimeZoneIds_0, &_call_f_availableTimeZoneIds_0);
   methods += new qt_gsi::GenericStaticMethod ("availableTimeZoneIds", "@brief Static method QList<QByteArray> QTimeZone::availableTimeZoneIds(QLocale::Territory territory)\nThis method is static and can be called without an instance.", &_init_f_availableTimeZoneIds_2205, &_call_f_availableTimeZoneIds_2205);
   methods += new qt_gsi::GenericStaticMethod ("availableTimeZoneIds", "@brief Static method QList<QByteArray> QTimeZone::availableTimeZoneIds(int offsetSeconds)\nThis method is static and can be called without an instance.", &_init_f_availableTimeZoneIds_767, &_call_f_availableTimeZoneIds_767);
+  methods += new qt_gsi::GenericStaticMethod ("fromSecondsAheadOfUtc", "@brief Static method QTimeZone QTimeZone::fromSecondsAheadOfUtc(int offset)\nThis method is static and can be called without an instance.", &_init_f_fromSecondsAheadOfUtc_767, &_call_f_fromSecondsAheadOfUtc_767);
   methods += new qt_gsi::GenericStaticMethod ("ianaIdToWindowsId", "@brief Static method QByteArray QTimeZone::ianaIdToWindowsId(const QByteArray &ianaId)\nThis method is static and can be called without an instance.", &_init_f_ianaIdToWindowsId_2309, &_call_f_ianaIdToWindowsId_2309);
   methods += new qt_gsi::GenericStaticMethod ("isTimeZoneIdAvailable?", "@brief Static method bool QTimeZone::isTimeZoneIdAvailable(const QByteArray &ianaId)\nThis method is static and can be called without an instance.", &_init_f_isTimeZoneIdAvailable_2309, &_call_f_isTimeZoneIdAvailable_2309);
+  methods += new qt_gsi::GenericStaticMethod ("isUtcOrFixedOffset?", "@brief Static method bool QTimeZone::isUtcOrFixedOffset(Qt::TimeSpec spec)\nThis method is static and can be called without an instance.", &_init_f_isUtcOrFixedOffset_1543, &_call_f_isUtcOrFixedOffset_1543);
   methods += new qt_gsi::GenericStaticMethod ("systemTimeZone", "@brief Static method QTimeZone QTimeZone::systemTimeZone()\nThis method is static and can be called without an instance.", &_init_f_systemTimeZone_0, &_call_f_systemTimeZone_0);
   methods += new qt_gsi::GenericStaticMethod ("systemTimeZoneId", "@brief Static method QByteArray QTimeZone::systemTimeZoneId()\nThis method is static and can be called without an instance.", &_init_f_systemTimeZoneId_0, &_call_f_systemTimeZoneId_0);
   methods += new qt_gsi::GenericStaticMethod ("utc", "@brief Static method QTimeZone QTimeZone::utc()\nThis method is static and can be called without an instance.", &_init_f_utc_0, &_call_f_utc_0);
@@ -790,6 +914,26 @@ gsi::Class<QTimeZone> decl_QTimeZone ("QtCore", "QTimeZone",
 
 
 GSI_QTCORE_PUBLIC gsi::Class<QTimeZone> &qtdecl_QTimeZone () { return decl_QTimeZone; }
+
+}
+
+
+//  Implementation of the enum wrapper class for QTimeZone::Initialization
+namespace qt_gsi
+{
+
+static gsi::Enum<QTimeZone::Initialization> decl_QTimeZone_Initialization_Enum ("QtCore", "QTimeZone_Initialization",
+    gsi::enum_const ("LocalTime", QTimeZone::LocalTime, "@brief Enum constant QTimeZone::LocalTime") +
+    gsi::enum_const ("UTC", QTimeZone::UTC, "@brief Enum constant QTimeZone::UTC"),
+  "@qt\n@brief This class represents the QTimeZone::Initialization enum");
+
+static gsi::QFlagsClass<QTimeZone::Initialization > decl_QTimeZone_Initialization_Enums ("QtCore", "QTimeZone_QFlags_Initialization",
+  "@qt\n@brief This class represents the QFlags<QTimeZone::Initialization> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QTimeZone> inject_QTimeZone_Initialization_Enum_in_parent (decl_QTimeZone_Initialization_Enum.defs ());
+static gsi::ClassExt<QTimeZone> decl_QTimeZone_Initialization_Enum_as_child (decl_QTimeZone_Initialization_Enum, "Initialization");
+static gsi::ClassExt<QTimeZone> decl_QTimeZone_Initialization_Enums_as_child (decl_QTimeZone_Initialization_Enums, "QFlags_Initialization");
 
 }
 

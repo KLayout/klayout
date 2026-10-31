@@ -30,6 +30,7 @@
 #include <QRect>
 #include <QMargins>
 #include <QPoint>
+#include <QRectF>
 #include <QSize>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
@@ -1242,6 +1243,21 @@ static void _call_f_size_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
+// QRectF QRect::toRectF()
+
+
+static void _init_f_toRectF_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QRectF > ();
+}
+
+static void _call_f_toRectF_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QRectF > ((QRectF)((QRect *)cls)->toRectF ());
+}
+
+
 // int QRect::top()
 
 
@@ -1558,6 +1574,7 @@ static gsi::Methods methods_QRect () {
   methods += new qt_gsi::GenericMethod ("setX|x=", "@brief Method void QRect::setX(int x)\n", false, &_init_f_setX_767, &_call_f_setX_767);
   methods += new qt_gsi::GenericMethod ("setY|y=", "@brief Method void QRect::setY(int y)\n", false, &_init_f_setY_767, &_call_f_setY_767);
   methods += new qt_gsi::GenericMethod (":size", "@brief Method QSize QRect::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
+  methods += new qt_gsi::GenericMethod ("toRectF", "@brief Method QRectF QRect::toRectF()\n", true, &_init_f_toRectF_c0, &_call_f_toRectF_c0);
   methods += new qt_gsi::GenericMethod (":top", "@brief Method int QRect::top()\n", true, &_init_f_top_c0, &_call_f_top_c0);
   methods += new qt_gsi::GenericMethod (":topLeft", "@brief Method QPoint QRect::topLeft()\n", true, &_init_f_topLeft_c0, &_call_f_topLeft_c0);
   methods += new qt_gsi::GenericMethod (":topRight", "@brief Method QPoint QRect::topRight()\n", true, &_init_f_topRight_c0, &_call_f_topRight_c0);

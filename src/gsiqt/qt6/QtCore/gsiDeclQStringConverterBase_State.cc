@@ -70,6 +70,22 @@ static void _call_f_clear_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
+// void QStringConverterBase::State::reset()
+
+
+static void _init_f_reset_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_f_reset_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QStringConverterBase::State *)cls)->reset ();
+}
+
+
 
 namespace gsi
 {
@@ -78,6 +94,7 @@ static gsi::Methods methods_QStringConverterBase_State () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStringConverterBase::State::State(QFlags<QStringConverterBase::Flag> f)\nThis method creates an object of class QStringConverterBase::State.", &_init_ctor_QStringConverterBase_State_3669, &_call_ctor_QStringConverterBase_State_3669);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QStringConverterBase::State::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
+  methods += new qt_gsi::GenericMethod ("reset", "@brief Method void QStringConverterBase::State::reset()\n", false, &_init_f_reset_0, &_call_f_reset_0);
   return methods;
 }
 

@@ -28,6 +28,7 @@
 */
 
 #include <QSyntaxHighlighter>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QColor>
 #include <QEvent>

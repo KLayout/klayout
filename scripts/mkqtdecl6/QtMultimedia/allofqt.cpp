@@ -11,6 +11,7 @@
 #include <QtMultimedia/QCamera>
 #include <QtMultimedia/QCameraDevice>
 #include <QtMultimedia/QCameraFormat>
+#include <QtMultimedia/QCapturableWindow>
 #include <QtMultimedia/QImageCapture>
 #include <QtMultimedia/QMediaCaptureSession>
 #include <QtMultimedia/QMediaDevices>
@@ -19,6 +20,7 @@
 #include <QtMultimedia/QMediaPlayer>
 #include <QtMultimedia/QMediaRecorder>
 #include <QtMultimedia/QMediaTimeRange>
+#include <QtMultimedia/QScreenCapture>
 #include <QtMultimedia/QSoundEffect>
 //#include <QtMultimedia/QtMultimedia>
 //#include <QtMultimedia/QtMultimediaDepends>
@@ -27,3 +29,4 @@
 #include <QtMultimedia/QVideoFrameFormat>
 #include <QtMultimedia/QVideoSink>
 #include <QtMultimedia/QWaveDecoder>
+#include <QtMultimedia/QWindowCapture>

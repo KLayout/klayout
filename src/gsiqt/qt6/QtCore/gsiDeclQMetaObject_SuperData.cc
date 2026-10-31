@@ -70,6 +70,25 @@ static void _call_ctor_QMetaObject_SuperData_2388 (const qt_gsi::GenericStaticMe
 }
 
 
+//  Constructor QMetaObject::SuperData::SuperData(QMetaObject::SuperData::Getter g)
+
+
+static void _init_ctor_QMetaObject_SuperData_3263 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("g");
+  decl->add_arg<QMetaObject::SuperData::Getter > (argspec_0);
+  decl->set_return_new<QMetaObject::SuperData> ();
+}
+
+static void _call_ctor_QMetaObject_SuperData_3263 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QMetaObject::SuperData::Getter arg1 = gsi::arg_reader<QMetaObject::SuperData::Getter >() (args, heap);
+  ret.write<QMetaObject::SuperData *> (new QMetaObject::SuperData (arg1));
+}
+
+
 // const QMetaObject *QMetaObject::SuperData::operator->()
 
 
@@ -93,6 +112,7 @@ static gsi::Methods methods_QMetaObject_SuperData () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMetaObject::SuperData::SuperData()\nThis method creates an object of class QMetaObject::SuperData.", &_init_ctor_QMetaObject_SuperData_0, &_call_ctor_QMetaObject_SuperData_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMetaObject::SuperData::SuperData(const QMetaObject *mo)\nThis method creates an object of class QMetaObject::SuperData.", &_init_ctor_QMetaObject_SuperData_2388, &_call_ctor_QMetaObject_SuperData_2388);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMetaObject::SuperData::SuperData(QMetaObject::SuperData::Getter g)\nThis method creates an object of class QMetaObject::SuperData.", &_init_ctor_QMetaObject_SuperData_3263, &_call_ctor_QMetaObject_SuperData_3263);
   methods += new qt_gsi::GenericMethod ("->", "@brief Method const QMetaObject *QMetaObject::SuperData::operator->()\n", true, &_init_f_operator_minus__gt__c0, &_call_f_operator_minus__gt__c0);
   return methods;
 }

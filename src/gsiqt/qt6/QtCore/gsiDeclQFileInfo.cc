@@ -31,6 +31,7 @@
 #include <QDateTime>
 #include <QDir>
 #include <QFileDevice>
+#include <QTimeZone>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
 #include <memory>
@@ -213,6 +214,25 @@ static void _call_f_birthTime_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
+// QDateTime QFileInfo::birthTime(const QTimeZone &tz)
+
+
+static void _init_f_birthTime_c2205 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("tz");
+  decl->add_arg<const QTimeZone & > (argspec_0);
+  decl->set_return<QDateTime > ();
+}
+
+static void _call_f_birthTime_c2205 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QTimeZone &arg1 = gsi::arg_reader<const QTimeZone & >() (args, heap);
+  ret.write<QDateTime > ((QDateTime)((QFileInfo *)cls)->birthTime (arg1));
+}
+
+
 // QString QFileInfo::bundleName()
 
 
@@ -382,6 +402,28 @@ static void _call_f_fileTime_c2392 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
+// QDateTime QFileInfo::fileTime(QFileDevice::FileTime time, const QTimeZone &tz)
+
+
+static void _init_f_fileTime_c4489 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("time");
+  decl->add_arg<const qt_gsi::Converter<QFileDevice::FileTime>::target_type & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("tz");
+  decl->add_arg<const QTimeZone & > (argspec_1);
+  decl->set_return<QDateTime > ();
+}
+
+static void _call_f_fileTime_c4489 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QFileDevice::FileTime>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFileDevice::FileTime>::target_type & >() (args, heap);
+  const QTimeZone &arg2 = gsi::arg_reader<const QTimeZone & >() (args, heap);
+  ret.write<QDateTime > ((QDateTime)((QFileInfo *)cls)->fileTime (qt_gsi::QtToCppAdaptor<QFileDevice::FileTime>(arg1).cref(), arg2));
+}
+
+
 // QString QFileInfo::group()
 
 
@@ -424,6 +466,21 @@ static void _call_f_isAbsolute_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<bool > ((bool)((QFileInfo *)cls)->isAbsolute ());
+}
+
+
+// bool QFileInfo::isAlias()
+
+
+static void _init_f_isAlias_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isAlias_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QFileInfo *)cls)->isAlias ());
 }
 
 
@@ -667,6 +724,25 @@ static void _call_f_lastModified_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
+// QDateTime QFileInfo::lastModified(const QTimeZone &tz)
+
+
+static void _init_f_lastModified_c2205 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("tz");
+  decl->add_arg<const QTimeZone & > (argspec_0);
+  decl->set_return<QDateTime > ();
+}
+
+static void _call_f_lastModified_c2205 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QTimeZone &arg1 = gsi::arg_reader<const QTimeZone & >() (args, heap);
+  ret.write<QDateTime > ((QDateTime)((QFileInfo *)cls)->lastModified (arg1));
+}
+
+
 // QDateTime QFileInfo::lastRead()
 
 
@@ -679,6 +755,25 @@ static void _call_f_lastRead_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QDateTime > ((QDateTime)((QFileInfo *)cls)->lastRead ());
+}
+
+
+// QDateTime QFileInfo::lastRead(const QTimeZone &tz)
+
+
+static void _init_f_lastRead_c2205 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("tz");
+  decl->add_arg<const QTimeZone & > (argspec_0);
+  decl->set_return<QDateTime > ();
+}
+
+static void _call_f_lastRead_c2205 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QTimeZone &arg1 = gsi::arg_reader<const QTimeZone & >() (args, heap);
+  ret.write<QDateTime > ((QDateTime)((QFileInfo *)cls)->lastRead (arg1));
 }
 
 
@@ -709,6 +804,25 @@ static void _call_f_metadataChangeTime_c0 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QDateTime > ((QDateTime)((QFileInfo *)cls)->metadataChangeTime ());
+}
+
+
+// QDateTime QFileInfo::metadataChangeTime(const QTimeZone &tz)
+
+
+static void _init_f_metadataChangeTime_c2205 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("tz");
+  decl->add_arg<const QTimeZone & > (argspec_0);
+  decl->set_return<QDateTime > ();
+}
+
+static void _call_f_metadataChangeTime_c2205 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QTimeZone &arg1 = gsi::arg_reader<const QTimeZone & >() (args, heap);
+  ret.write<QDateTime > ((QDateTime)((QFileInfo *)cls)->metadataChangeTime (arg1));
 }
 
 
@@ -807,6 +921,21 @@ static void _call_f_permissions_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QFlags<QFileDevice::Permission> > ((QFlags<QFileDevice::Permission>)((QFileInfo *)cls)->permissions ());
+}
+
+
+// QString QFileInfo::readSymLink()
+
+
+static void _init_f_readSymLink_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QString > ();
+}
+
+static void _call_f_readSymLink_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QString > ((QString)((QFileInfo *)cls)->readSymLink ());
 }
 
 
@@ -1025,6 +1154,7 @@ static gsi::Methods methods_QFileInfo () {
   methods += new qt_gsi::GenericMethod ("absolutePath", "@brief Method QString QFileInfo::absolutePath()\n", true, &_init_f_absolutePath_c0, &_call_f_absolutePath_c0);
   methods += new qt_gsi::GenericMethod ("baseName", "@brief Method QString QFileInfo::baseName()\n", true, &_init_f_baseName_c0, &_call_f_baseName_c0);
   methods += new qt_gsi::GenericMethod ("birthTime", "@brief Method QDateTime QFileInfo::birthTime()\n", true, &_init_f_birthTime_c0, &_call_f_birthTime_c0);
+  methods += new qt_gsi::GenericMethod ("birthTime", "@brief Method QDateTime QFileInfo::birthTime(const QTimeZone &tz)\n", true, &_init_f_birthTime_c2205, &_call_f_birthTime_c2205);
   methods += new qt_gsi::GenericMethod ("bundleName", "@brief Method QString QFileInfo::bundleName()\n", true, &_init_f_bundleName_c0, &_call_f_bundleName_c0);
   methods += new qt_gsi::GenericMethod (":caching", "@brief Method bool QFileInfo::caching()\n", true, &_init_f_caching_c0, &_call_f_caching_c0);
   methods += new qt_gsi::GenericMethod ("canonicalFilePath", "@brief Method QString QFileInfo::canonicalFilePath()\n", true, &_init_f_canonicalFilePath_c0, &_call_f_canonicalFilePath_c0);
@@ -1036,9 +1166,11 @@ static gsi::Methods methods_QFileInfo () {
   methods += new qt_gsi::GenericMethod ("fileName", "@brief Method QString QFileInfo::fileName()\n", true, &_init_f_fileName_c0, &_call_f_fileName_c0);
   methods += new qt_gsi::GenericMethod ("filePath", "@brief Method QString QFileInfo::filePath()\n", true, &_init_f_filePath_c0, &_call_f_filePath_c0);
   methods += new qt_gsi::GenericMethod ("fileTime", "@brief Method QDateTime QFileInfo::fileTime(QFileDevice::FileTime time)\n", true, &_init_f_fileTime_c2392, &_call_f_fileTime_c2392);
+  methods += new qt_gsi::GenericMethod ("fileTime", "@brief Method QDateTime QFileInfo::fileTime(QFileDevice::FileTime time, const QTimeZone &tz)\n", true, &_init_f_fileTime_c4489, &_call_f_fileTime_c4489);
   methods += new qt_gsi::GenericMethod ("group", "@brief Method QString QFileInfo::group()\n", true, &_init_f_group_c0, &_call_f_group_c0);
   methods += new qt_gsi::GenericMethod ("groupId", "@brief Method unsigned int QFileInfo::groupId()\n", true, &_init_f_groupId_c0, &_call_f_groupId_c0);
   methods += new qt_gsi::GenericMethod ("isAbsolute?", "@brief Method bool QFileInfo::isAbsolute()\n", true, &_init_f_isAbsolute_c0, &_call_f_isAbsolute_c0);
+  methods += new qt_gsi::GenericMethod ("isAlias?", "@brief Method bool QFileInfo::isAlias()\n", true, &_init_f_isAlias_c0, &_call_f_isAlias_c0);
   methods += new qt_gsi::GenericMethod ("isBundle?", "@brief Method bool QFileInfo::isBundle()\n", true, &_init_f_isBundle_c0, &_call_f_isBundle_c0);
   methods += new qt_gsi::GenericMethod ("isDir?", "@brief Method bool QFileInfo::isDir()\n", true, &_init_f_isDir_c0, &_call_f_isDir_c0);
   methods += new qt_gsi::GenericMethod ("isExecutable?", "@brief Method bool QFileInfo::isExecutable()\n", true, &_init_f_isExecutable_c0, &_call_f_isExecutable_c0);
@@ -1055,15 +1187,19 @@ static gsi::Methods methods_QFileInfo () {
   methods += new qt_gsi::GenericMethod ("isWritable?", "@brief Method bool QFileInfo::isWritable()\n", true, &_init_f_isWritable_c0, &_call_f_isWritable_c0);
   methods += new qt_gsi::GenericMethod ("junctionTarget", "@brief Method QString QFileInfo::junctionTarget()\n", true, &_init_f_junctionTarget_c0, &_call_f_junctionTarget_c0);
   methods += new qt_gsi::GenericMethod ("lastModified", "@brief Method QDateTime QFileInfo::lastModified()\n", true, &_init_f_lastModified_c0, &_call_f_lastModified_c0);
+  methods += new qt_gsi::GenericMethod ("lastModified", "@brief Method QDateTime QFileInfo::lastModified(const QTimeZone &tz)\n", true, &_init_f_lastModified_c2205, &_call_f_lastModified_c2205);
   methods += new qt_gsi::GenericMethod ("lastRead", "@brief Method QDateTime QFileInfo::lastRead()\n", true, &_init_f_lastRead_c0, &_call_f_lastRead_c0);
+  methods += new qt_gsi::GenericMethod ("lastRead", "@brief Method QDateTime QFileInfo::lastRead(const QTimeZone &tz)\n", true, &_init_f_lastRead_c2205, &_call_f_lastRead_c2205);
   methods += new qt_gsi::GenericMethod ("makeAbsolute", "@brief Method bool QFileInfo::makeAbsolute()\n", false, &_init_f_makeAbsolute_0, &_call_f_makeAbsolute_0);
   methods += new qt_gsi::GenericMethod ("metadataChangeTime", "@brief Method QDateTime QFileInfo::metadataChangeTime()\n", true, &_init_f_metadataChangeTime_c0, &_call_f_metadataChangeTime_c0);
+  methods += new qt_gsi::GenericMethod ("metadataChangeTime", "@brief Method QDateTime QFileInfo::metadataChangeTime(const QTimeZone &tz)\n", true, &_init_f_metadataChangeTime_c2205, &_call_f_metadataChangeTime_c2205);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QFileInfo &QFileInfo::operator=(const QFileInfo &fileinfo)\n", false, &_init_f_operator_eq__2174, &_call_f_operator_eq__2174);
   methods += new qt_gsi::GenericMethod ("owner", "@brief Method QString QFileInfo::owner()\n", true, &_init_f_owner_c0, &_call_f_owner_c0);
   methods += new qt_gsi::GenericMethod ("ownerId", "@brief Method unsigned int QFileInfo::ownerId()\n", true, &_init_f_ownerId_c0, &_call_f_ownerId_c0);
   methods += new qt_gsi::GenericMethod ("path", "@brief Method QString QFileInfo::path()\n", true, &_init_f_path_c0, &_call_f_path_c0);
   methods += new qt_gsi::GenericMethod ("permission", "@brief Method bool QFileInfo::permission(QFlags<QFileDevice::Permission> permissions)\n", true, &_init_f_permission_c3370, &_call_f_permission_c3370);
   methods += new qt_gsi::GenericMethod ("permissions", "@brief Method QFlags<QFileDevice::Permission> QFileInfo::permissions()\n", true, &_init_f_permissions_c0, &_call_f_permissions_c0);
+  methods += new qt_gsi::GenericMethod ("readSymLink", "@brief Method QString QFileInfo::readSymLink()\n", true, &_init_f_readSymLink_c0, &_call_f_readSymLink_c0);
   methods += new qt_gsi::GenericMethod ("refresh", "@brief Method void QFileInfo::refresh()\n", false, &_init_f_refresh_0, &_call_f_refresh_0);
   methods += new qt_gsi::GenericMethod ("setCaching|caching=", "@brief Method void QFileInfo::setCaching(bool on)\n", false, &_init_f_setCaching_864, &_call_f_setCaching_864);
   methods += new qt_gsi::GenericMethod ("setFile", "@brief Method void QFileInfo::setFile(const QString &file)\n", false, &_init_f_setFile_2025, &_call_f_setFile_2025);

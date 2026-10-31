@@ -194,7 +194,7 @@ static void _call_f_staleLockTime_c0 (const qt_gsi::GenericMethod * /*decl*/, vo
 
 static void _init_f_tryLock_767 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("timeout", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("timeout");
   decl->add_arg<int > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -203,7 +203,7 @@ static void _call_f_tryLock_767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QLockFile *)cls)->tryLock (arg1));
 }
 

@@ -28,6 +28,7 @@
 */
 
 #include <QTimeLine>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEasingCurve>
 #include <QEvent>

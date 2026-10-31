@@ -247,6 +247,40 @@ static void _call_f_boundValue_c767 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
+// QString QSqlQuery::boundValueName(int pos)
+
+
+static void _init_f_boundValueName_c767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("pos");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<QString > ();
+}
+
+static void _call_f_boundValueName_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ret.write<QString > ((QString)((QSqlQuery *)cls)->boundValueName (arg1));
+}
+
+
+// QStringList QSqlQuery::boundValueNames()
+
+
+static void _init_f_boundValueNames_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QStringList > ();
+}
+
+static void _call_f_boundValueNames_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QStringList > ((QStringList)((QSqlQuery *)cls)->boundValueNames ());
+}
+
+
 // QVariantList QSqlQuery::boundValues()
 
 
@@ -844,6 +878,8 @@ static gsi::Methods methods_QSqlQuery () {
   methods += new qt_gsi::GenericMethod ("bindValue", "@brief Method void QSqlQuery::bindValue(int pos, const QVariant &val, QFlags<QSql::ParamTypeFlag> type)\n", false, &_init_f_bindValue_5596, &_call_f_bindValue_5596);
   methods += new qt_gsi::GenericMethod ("boundValue", "@brief Method QVariant QSqlQuery::boundValue(const QString &placeholder)\n", true, &_init_f_boundValue_c2025, &_call_f_boundValue_c2025);
   methods += new qt_gsi::GenericMethod ("boundValue", "@brief Method QVariant QSqlQuery::boundValue(int pos)\n", true, &_init_f_boundValue_c767, &_call_f_boundValue_c767);
+  methods += new qt_gsi::GenericMethod ("boundValueName", "@brief Method QString QSqlQuery::boundValueName(int pos)\n", true, &_init_f_boundValueName_c767, &_call_f_boundValueName_c767);
+  methods += new qt_gsi::GenericMethod ("boundValueNames", "@brief Method QStringList QSqlQuery::boundValueNames()\n", true, &_init_f_boundValueNames_c0, &_call_f_boundValueNames_c0);
   methods += new qt_gsi::GenericMethod ("boundValues", "@brief Method QVariantList QSqlQuery::boundValues()\n", true, &_init_f_boundValues_c0, &_call_f_boundValues_c0);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QSqlQuery::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
   methods += new qt_gsi::GenericMethod ("driver", "@brief Method const QSqlDriver *QSqlQuery::driver()\n", true, &_init_f_driver_c0, &_call_f_driver_c0);

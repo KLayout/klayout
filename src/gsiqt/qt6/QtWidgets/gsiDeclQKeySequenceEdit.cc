@@ -30,6 +30,7 @@
 #include <QKeySequenceEdit>
 #include <QAction>
 #include <QActionEvent>
+#include <QAnyStringView>
 #include <QBackingStore>
 #include <QBitmap>
 #include <QChildEvent>
@@ -51,6 +52,7 @@
 #include <QHideEvent>
 #include <QIcon>
 #include <QInputMethodEvent>
+#include <QKeyCombination>
 #include <QKeyEvent>
 #include <QKeySequence>
 #include <QLayout>
@@ -118,6 +120,36 @@ static void _call_f_clear_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
+// QList<QKeyCombination> QKeySequenceEdit::finishingKeyCombinations()
+
+
+static void _init_f_finishingKeyCombinations_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QList<QKeyCombination> > ();
+}
+
+static void _call_f_finishingKeyCombinations_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QList<QKeyCombination> > ((QList<QKeyCombination>)((QKeySequenceEdit *)cls)->finishingKeyCombinations ());
+}
+
+
+// bool QKeySequenceEdit::isClearButtonEnabled()
+
+
+static void _init_f_isClearButtonEnabled_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isClearButtonEnabled_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QKeySequenceEdit *)cls)->isClearButtonEnabled ());
+}
+
+
 // QKeySequence QKeySequenceEdit::keySequence()
 
 
@@ -130,6 +162,61 @@ static void _call_f_keySequence_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QKeySequence > ((QKeySequence)((QKeySequenceEdit *)cls)->keySequence ());
+}
+
+
+// qsizetype QKeySequenceEdit::maximumSequenceLength()
+
+
+static void _init_f_maximumSequenceLength_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<qsizetype > ();
+}
+
+static void _call_f_maximumSequenceLength_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<qsizetype > ((qsizetype)((QKeySequenceEdit *)cls)->maximumSequenceLength ());
+}
+
+
+// void QKeySequenceEdit::setClearButtonEnabled(bool enable)
+
+
+static void _init_f_setClearButtonEnabled_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("enable");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setClearButtonEnabled_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QKeySequenceEdit *)cls)->setClearButtonEnabled (arg1);
+}
+
+
+// void QKeySequenceEdit::setFinishingKeyCombinations(const QList<QKeyCombination> &finishingKeyCombinations)
+
+
+static void _init_f_setFinishingKeyCombinations_3445 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("finishingKeyCombinations");
+  decl->add_arg<const QList<QKeyCombination> & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setFinishingKeyCombinations_3445 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QList<QKeyCombination> &arg1 = gsi::arg_reader<const QList<QKeyCombination> & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QKeySequenceEdit *)cls)->setFinishingKeyCombinations (arg1);
 }
 
 
@@ -150,6 +237,26 @@ static void _call_f_setKeySequence_2516 (const qt_gsi::GenericMethod * /*decl*/,
   const QKeySequence &arg1 = gsi::arg_reader<const QKeySequence & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QKeySequenceEdit *)cls)->setKeySequence (arg1);
+}
+
+
+// void QKeySequenceEdit::setMaximumSequenceLength(qsizetype count)
+
+
+static void _init_f_setMaximumSequenceLength_1442 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("count");
+  decl->add_arg<qsizetype > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setMaximumSequenceLength_1442 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qsizetype arg1 = gsi::arg_reader<qsizetype >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QKeySequenceEdit *)cls)->setMaximumSequenceLength (arg1);
 }
 
 
@@ -185,8 +292,14 @@ static gsi::Methods methods_QKeySequenceEdit () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QKeySequenceEdit::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
+  methods += new qt_gsi::GenericMethod ("finishingKeyCombinations", "@brief Method QList<QKeyCombination> QKeySequenceEdit::finishingKeyCombinations()\n", true, &_init_f_finishingKeyCombinations_c0, &_call_f_finishingKeyCombinations_c0);
+  methods += new qt_gsi::GenericMethod ("isClearButtonEnabled?", "@brief Method bool QKeySequenceEdit::isClearButtonEnabled()\n", true, &_init_f_isClearButtonEnabled_c0, &_call_f_isClearButtonEnabled_c0);
   methods += new qt_gsi::GenericMethod (":keySequence", "@brief Method QKeySequence QKeySequenceEdit::keySequence()\n", true, &_init_f_keySequence_c0, &_call_f_keySequence_c0);
+  methods += new qt_gsi::GenericMethod ("maximumSequenceLength", "@brief Method qsizetype QKeySequenceEdit::maximumSequenceLength()\n", true, &_init_f_maximumSequenceLength_c0, &_call_f_maximumSequenceLength_c0);
+  methods += new qt_gsi::GenericMethod ("setClearButtonEnabled", "@brief Method void QKeySequenceEdit::setClearButtonEnabled(bool enable)\n", false, &_init_f_setClearButtonEnabled_864, &_call_f_setClearButtonEnabled_864);
+  methods += new qt_gsi::GenericMethod ("setFinishingKeyCombinations", "@brief Method void QKeySequenceEdit::setFinishingKeyCombinations(const QList<QKeyCombination> &finishingKeyCombinations)\n", false, &_init_f_setFinishingKeyCombinations_3445, &_call_f_setFinishingKeyCombinations_3445);
   methods += new qt_gsi::GenericMethod ("setKeySequence|keySequence=", "@brief Method void QKeySequenceEdit::setKeySequence(const QKeySequence &keySequence)\n", false, &_init_f_setKeySequence_2516, &_call_f_setKeySequence_2516);
+  methods += new qt_gsi::GenericMethod ("setMaximumSequenceLength", "@brief Method void QKeySequenceEdit::setMaximumSequenceLength(qsizetype count)\n", false, &_init_f_setMaximumSequenceLength_1442, &_call_f_setMaximumSequenceLength_1442);
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QKeySequenceEdit::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QKeySequenceEdit::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("editingFinished()", "editingFinished", "@brief Signal declaration for QKeySequenceEdit::editingFinished()\nYou can bind a procedure to this signal.");
@@ -679,18 +792,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QKeySequenceEdit::focusOutEvent(QFocusEvent *event)
-  void cbs_focusOutEvent_1729_0(QFocusEvent *event)
+  //  [adaptor impl] void QKeySequenceEdit::focusOutEvent(QFocusEvent *)
+  void cbs_focusOutEvent_1729_0(QFocusEvent *arg1)
   {
-    QKeySequenceEdit::focusOutEvent(event);
+    QKeySequenceEdit::focusOutEvent(arg1);
   }
 
-  virtual void focusOutEvent(QFocusEvent *event)
+  virtual void focusOutEvent(QFocusEvent *arg1)
   {
     if (cb_focusOutEvent_1729_0.can_issue()) {
-      cb_focusOutEvent_1729_0.issue<QKeySequenceEdit_Adaptor, QFocusEvent *>(&QKeySequenceEdit_Adaptor::cbs_focusOutEvent_1729_0, event);
+      cb_focusOutEvent_1729_0.issue<QKeySequenceEdit_Adaptor, QFocusEvent *>(&QKeySequenceEdit_Adaptor::cbs_focusOutEvent_1729_0, arg1);
     } else {
-      QKeySequenceEdit::focusOutEvent(event);
+      QKeySequenceEdit::focusOutEvent(arg1);
     }
   }
 
@@ -1592,11 +1705,11 @@ static void _set_callback_cbs_focusNextPrevChild_864_0 (void *cls, const gsi::Ca
 }
 
 
-// void QKeySequenceEdit::focusOutEvent(QFocusEvent *event)
+// void QKeySequenceEdit::focusOutEvent(QFocusEvent *)
 
 static void _init_cbs_focusOutEvent_1729_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("event");
+  static gsi::ArgSpecBase argspec_0 ("arg1");
   decl->add_arg<QFocusEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2498,7 +2611,7 @@ static gsi::Methods methods_QKeySequenceEdit_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*focusNextChild", "@brief Method bool QKeySequenceEdit::focusNextChild()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_focusNextChild_0, &_call_fp_focusNextChild_0);
   methods += new qt_gsi::GenericMethod ("*focusNextPrevChild", "@brief Virtual method bool QKeySequenceEdit::focusNextPrevChild(bool next)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusNextPrevChild_864_0, &_call_cbs_focusNextPrevChild_864_0);
   methods += new qt_gsi::GenericMethod ("*focusNextPrevChild", "@hide", false, &_init_cbs_focusNextPrevChild_864_0, &_call_cbs_focusNextPrevChild_864_0, &_set_callback_cbs_focusNextPrevChild_864_0);
-  methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@brief Virtual method void QKeySequenceEdit::focusOutEvent(QFocusEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0);
+  methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@brief Virtual method void QKeySequenceEdit::focusOutEvent(QFocusEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@hide", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0, &_set_callback_cbs_focusOutEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusPreviousChild", "@brief Method bool QKeySequenceEdit::focusPreviousChild()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_focusPreviousChild_0, &_call_fp_focusPreviousChild_0);
   methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@brief Virtual method bool QKeySequenceEdit::hasHeightForWidth()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hasHeightForWidth_c0_0, &_call_cbs_hasHeightForWidth_c0_0);

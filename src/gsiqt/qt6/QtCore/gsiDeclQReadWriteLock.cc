@@ -28,6 +28,7 @@
 */
 
 #include <QReadWriteLock>
+#include <QDeadlineTimer>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
 #include <memory>
@@ -86,21 +87,6 @@ static void _call_f_lockForWrite_0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// bool QReadWriteLock::tryLockForRead()
-
-
-static void _init_f_tryLockForRead_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<bool > ();
-}
-
-static void _call_f_tryLockForRead_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<bool > ((bool)((QReadWriteLock *)cls)->tryLockForRead ());
-}
-
-
 // bool QReadWriteLock::tryLockForRead(int timeout)
 
 
@@ -120,18 +106,22 @@ static void _call_f_tryLockForRead_767 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// bool QReadWriteLock::tryLockForWrite()
+// bool QReadWriteLock::tryLockForRead(QDeadlineTimer timeout)
 
 
-static void _init_f_tryLockForWrite_0 (qt_gsi::GenericMethod *decl)
+static void _init_f_tryLockForRead_1820 (qt_gsi::GenericMethod *decl)
 {
+  static gsi::ArgSpecBase argspec_0 ("timeout", true, "{}");
+  decl->add_arg<QDeadlineTimer > (argspec_0);
   decl->set_return<bool > ();
 }
 
-static void _call_f_tryLockForWrite_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_tryLockForRead_1820 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<bool > ((bool)((QReadWriteLock *)cls)->tryLockForWrite ());
+  tl::Heap heap;
+  QDeadlineTimer arg1 = args ? gsi::arg_reader<QDeadlineTimer >() (args, heap) : gsi::arg_maker<QDeadlineTimer >() ({}, heap);
+  ret.write<bool > ((bool)((QReadWriteLock *)cls)->tryLockForRead (arg1));
 }
 
 
@@ -150,6 +140,25 @@ static void _call_f_tryLockForWrite_767 (const qt_gsi::GenericMethod * /*decl*/,
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   int arg1 = gsi::arg_reader<int >() (args, heap);
+  ret.write<bool > ((bool)((QReadWriteLock *)cls)->tryLockForWrite (arg1));
+}
+
+
+// bool QReadWriteLock::tryLockForWrite(QDeadlineTimer timeout)
+
+
+static void _init_f_tryLockForWrite_1820 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("timeout", true, "{}");
+  decl->add_arg<QDeadlineTimer > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_tryLockForWrite_1820 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QDeadlineTimer arg1 = args ? gsi::arg_reader<QDeadlineTimer >() (args, heap) : gsi::arg_maker<QDeadlineTimer >() ({}, heap);
   ret.write<bool > ((bool)((QReadWriteLock *)cls)->tryLockForWrite (arg1));
 }
 
@@ -179,10 +188,10 @@ static gsi::Methods methods_QReadWriteLock () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QReadWriteLock::QReadWriteLock(QReadWriteLock::RecursionMode recursionMode)\nThis method creates an object of class QReadWriteLock.", &_init_ctor_QReadWriteLock_3272, &_call_ctor_QReadWriteLock_3272);
   methods += new qt_gsi::GenericMethod ("lockForRead", "@brief Method void QReadWriteLock::lockForRead()\n", false, &_init_f_lockForRead_0, &_call_f_lockForRead_0);
   methods += new qt_gsi::GenericMethod ("lockForWrite", "@brief Method void QReadWriteLock::lockForWrite()\n", false, &_init_f_lockForWrite_0, &_call_f_lockForWrite_0);
-  methods += new qt_gsi::GenericMethod ("tryLockForRead", "@brief Method bool QReadWriteLock::tryLockForRead()\n", false, &_init_f_tryLockForRead_0, &_call_f_tryLockForRead_0);
   methods += new qt_gsi::GenericMethod ("tryLockForRead", "@brief Method bool QReadWriteLock::tryLockForRead(int timeout)\n", false, &_init_f_tryLockForRead_767, &_call_f_tryLockForRead_767);
-  methods += new qt_gsi::GenericMethod ("tryLockForWrite", "@brief Method bool QReadWriteLock::tryLockForWrite()\n", false, &_init_f_tryLockForWrite_0, &_call_f_tryLockForWrite_0);
+  methods += new qt_gsi::GenericMethod ("tryLockForRead", "@brief Method bool QReadWriteLock::tryLockForRead(QDeadlineTimer timeout)\n", false, &_init_f_tryLockForRead_1820, &_call_f_tryLockForRead_1820);
   methods += new qt_gsi::GenericMethod ("tryLockForWrite", "@brief Method bool QReadWriteLock::tryLockForWrite(int timeout)\n", false, &_init_f_tryLockForWrite_767, &_call_f_tryLockForWrite_767);
+  methods += new qt_gsi::GenericMethod ("tryLockForWrite", "@brief Method bool QReadWriteLock::tryLockForWrite(QDeadlineTimer timeout)\n", false, &_init_f_tryLockForWrite_1820, &_call_f_tryLockForWrite_1820);
   methods += new qt_gsi::GenericMethod ("unlock", "@brief Method void QReadWriteLock::unlock()\n", false, &_init_f_unlock_0, &_call_f_unlock_0);
   return methods;
 }

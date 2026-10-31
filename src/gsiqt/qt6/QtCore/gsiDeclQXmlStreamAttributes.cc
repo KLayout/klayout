@@ -28,6 +28,7 @@
 */
 
 #include <QXmlStreamAttributes>
+#include <QAnyStringView>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
 #include <memory>
@@ -99,43 +100,43 @@ static void _call_f_append_3942 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// bool QXmlStreamAttributes::hasAttribute(const QString &qualifiedName)
+// bool QXmlStreamAttributes::hasAttribute(QAnyStringView qualifiedName)
 
 
-static void _init_f_hasAttribute_c2025 (qt_gsi::GenericMethod *decl)
+static void _init_f_hasAttribute_c1855 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("qualifiedName");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   decl->set_return<bool > ();
 }
 
-static void _call_f_hasAttribute_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_hasAttribute_c1855 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   ret.write<bool > ((bool)((QXmlStreamAttributes *)cls)->hasAttribute (arg1));
 }
 
 
-// bool QXmlStreamAttributes::hasAttribute(const QString &namespaceUri, const QString &name)
+// bool QXmlStreamAttributes::hasAttribute(QAnyStringView namespaceUri, QAnyStringView name)
 
 
-static void _init_f_hasAttribute_c3942 (qt_gsi::GenericMethod *decl)
+static void _init_f_hasAttribute_c3602 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("namespaceUri");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("name");
-  decl->add_arg<const QString & > (argspec_1);
+  decl->add_arg<QAnyStringView > (argspec_1);
   decl->set_return<bool > ();
 }
 
-static void _call_f_hasAttribute_c3942 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_hasAttribute_c3602 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
+  QAnyStringView arg2 = gsi::arg_reader<QAnyStringView >() (args, heap);
   ret.write<bool > ((bool)((QXmlStreamAttributes *)cls)->hasAttribute (arg1, arg2));
 }
 
@@ -149,8 +150,8 @@ static gsi::Methods methods_QXmlStreamAttributes () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamAttributes::QXmlStreamAttributes()\nThis method creates an object of class QXmlStreamAttributes.", &_init_ctor_QXmlStreamAttributes_0, &_call_ctor_QXmlStreamAttributes_0);
   methods += new qt_gsi::GenericMethod ("append", "@brief Method void QXmlStreamAttributes::append(const QString &namespaceUri, const QString &name, const QString &value)\n", false, &_init_f_append_5859, &_call_f_append_5859);
   methods += new qt_gsi::GenericMethod ("append", "@brief Method void QXmlStreamAttributes::append(const QString &qualifiedName, const QString &value)\n", false, &_init_f_append_3942, &_call_f_append_3942);
-  methods += new qt_gsi::GenericMethod ("hasAttribute", "@brief Method bool QXmlStreamAttributes::hasAttribute(const QString &qualifiedName)\n", true, &_init_f_hasAttribute_c2025, &_call_f_hasAttribute_c2025);
-  methods += new qt_gsi::GenericMethod ("hasAttribute", "@brief Method bool QXmlStreamAttributes::hasAttribute(const QString &namespaceUri, const QString &name)\n", true, &_init_f_hasAttribute_c3942, &_call_f_hasAttribute_c3942);
+  methods += new qt_gsi::GenericMethod ("hasAttribute", "@brief Method bool QXmlStreamAttributes::hasAttribute(QAnyStringView qualifiedName)\n", true, &_init_f_hasAttribute_c1855, &_call_f_hasAttribute_c1855);
+  methods += new qt_gsi::GenericMethod ("hasAttribute", "@brief Method bool QXmlStreamAttributes::hasAttribute(QAnyStringView namespaceUri, QAnyStringView name)\n", true, &_init_f_hasAttribute_c3602, &_call_f_hasAttribute_c3602);
   return methods;
 }
 

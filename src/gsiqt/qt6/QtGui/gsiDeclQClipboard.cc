@@ -28,6 +28,7 @@
 */
 
 #include <QClipboard>
+#include <QAnyStringView>
 #include <QEvent>
 #include <QImage>
 #include <QMetaMethod>

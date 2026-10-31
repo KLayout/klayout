@@ -28,6 +28,7 @@
 */
 
 #include <QGraphicsEffect>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

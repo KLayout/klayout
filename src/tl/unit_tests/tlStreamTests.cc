@@ -624,3 +624,15 @@ TEST(MatchFormat)
   EXPECT_EQ (tl::match_filename_to_format ("abc.TEXT", "Text files (*.txt *.TXT)"), false);
   EXPECT_EQ (tl::match_filename_to_format ("abc.TEXT", "Text files (*)"), true);
 }
+
+//  issue #2524
+TEST(ManyZLibOutputFiles)
+{
+  std::string tp = tmp_file ("x");
+
+  //  Smoke test: must not leak file descriptors
+  for (size_t i = 0; i < 1000; ++i) {
+    tl::OutputStream os (tp, tl::OutputStream::OM_Zlib);
+    os.put ("blabla\n");
+  }
+}

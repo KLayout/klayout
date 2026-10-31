@@ -1475,13 +1475,24 @@ OutputZLibFile::OutputZLibFile (const std::string &p, int keep_backups)
   if (file == NULL) {
     throw FileOpenErrorException (path (), errno);
   }
-  mp_d->zs = gzdopen (_fileno (file), "wb");
+  //  need to duplicate the file descriptor before we pass it 
+  //  to zlib and call fclose.
+  int fd_for_zlib = _dup (_fileno (file));
+  if (fd_for_zlib == -1) {
+    throw FileOpenErrorException (path (), errno);
+  }
+  fclose (file);
+  mp_d->zs = gzdopen (fd_for_zlib, "wb");
+  if (mp_d->zs == NULL) {
+    _close (fd_for_zlib);
+    throw FileOpenErrorException (path (), errno);
+  }
 #else
   mp_d->zs = gzopen (tl::string_to_system (path ()).c_str (), "wb");
-#endif
   if (mp_d->zs == NULL) {
     throw FileOpenErrorException (path (), errno);
   }
+#endif
 }
 
 OutputZLibFile::~OutputZLibFile ()

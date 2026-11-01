@@ -297,21 +297,6 @@ static void _call_f_createIteratorAtKey_c2699 (const qt_gsi::GenericMethod * /*d
 }
 
 
-// const QtMetaContainerPrivate::QMetaAssociationInterface *QMetaAssociation::iface()
-
-
-static void _init_f_iface_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<const QtMetaContainerPrivate::QMetaAssociationInterface * > ();
-}
-
-static void _call_f_iface_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<const QtMetaContainerPrivate::QMetaAssociationInterface * > ((const QtMetaContainerPrivate::QMetaAssociationInterface *)((QMetaAssociation *)cls)->iface ());
-}
-
-
 // void QMetaAssociation::insertKey(void *container, const void *key)
 
 
@@ -587,7 +572,6 @@ static gsi::Methods methods_QMetaAssociation () {
   methods += new qt_gsi::GenericMethod ("containsKey", "@brief Method bool QMetaAssociation::containsKey(const void *container, const void *key)\n", true, &_init_f_containsKey_c3394, &_call_f_containsKey_c3394);
   methods += new qt_gsi::GenericMethod ("createConstIteratorAtKey", "@brief Method void *QMetaAssociation::createConstIteratorAtKey(const void *container, const void *key)\n", true, &_init_f_createConstIteratorAtKey_c3394, &_call_f_createConstIteratorAtKey_c3394);
   methods += new qt_gsi::GenericMethod ("createIteratorAtKey", "@brief Method void *QMetaAssociation::createIteratorAtKey(void *container, const void *key)\n", true, &_init_f_createIteratorAtKey_c2699, &_call_f_createIteratorAtKey_c2699);
-  methods += new qt_gsi::GenericMethod ("iface", "@brief Method const QtMetaContainerPrivate::QMetaAssociationInterface *QMetaAssociation::iface()\n", true, &_init_f_iface_c0, &_call_f_iface_c0);
   methods += new qt_gsi::GenericMethod ("insertKey", "@brief Method void QMetaAssociation::insertKey(void *container, const void *key)\n", true, &_init_f_insertKey_c2699, &_call_f_insertKey_c2699);
   methods += new qt_gsi::GenericMethod ("keyAtConstIterator", "@brief Method void QMetaAssociation::keyAtConstIterator(const void *iterator, void *key)\n", true, &_init_f_keyAtConstIterator_c2699, &_call_f_keyAtConstIterator_c2699);
   methods += new qt_gsi::GenericMethod ("keyAtIterator", "@brief Method void QMetaAssociation::keyAtIterator(const void *iterator, void *key)\n", true, &_init_f_keyAtIterator_c2699, &_call_f_keyAtIterator_c2699);

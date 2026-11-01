@@ -36,25 +36,6 @@
 // -----------------------------------------------------------------------
 // class QOperatingSystemVersion
 
-//  Constructor QOperatingSystemVersion::QOperatingSystemVersion(const QOperatingSystemVersionBase &osversion)
-
-
-static void _init_ctor_QOperatingSystemVersion_4097 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("osversion");
-  decl->add_arg<const QOperatingSystemVersionBase & > (argspec_0);
-  decl->set_return_new<QOperatingSystemVersion> ();
-}
-
-static void _call_ctor_QOperatingSystemVersion_4097 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QOperatingSystemVersionBase &arg1 = gsi::arg_reader<const QOperatingSystemVersionBase & >() (args, heap);
-  ret.write<QOperatingSystemVersion *> (new QOperatingSystemVersion (arg1));
-}
-
-
 //  Constructor QOperatingSystemVersion::QOperatingSystemVersion(QOperatingSystemVersion::OSType osType, int vmajor, int vminor, int vmicro)
 
 
@@ -224,7 +205,6 @@ namespace gsi
 
 static gsi::Methods methods_QOperatingSystemVersion () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QOperatingSystemVersion::QOperatingSystemVersion(const QOperatingSystemVersionBase &osversion)\nThis method creates an object of class QOperatingSystemVersion.", &_init_ctor_QOperatingSystemVersion_4097, &_call_ctor_QOperatingSystemVersion_4097);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QOperatingSystemVersion::QOperatingSystemVersion(QOperatingSystemVersion::OSType osType, int vmajor, int vminor, int vmicro)\nThis method creates an object of class QOperatingSystemVersion.", &_init_ctor_QOperatingSystemVersion_5514, &_call_ctor_QOperatingSystemVersion_5514);
   methods += new qt_gsi::GenericMethod ("majorVersion", "@brief Method int QOperatingSystemVersion::majorVersion()\n", true, &_init_f_majorVersion_c0, &_call_f_majorVersion_c0);
   methods += new qt_gsi::GenericMethod ("microVersion", "@brief Method int QOperatingSystemVersion::microVersion()\n", true, &_init_f_microVersion_c0, &_call_f_microVersion_c0);

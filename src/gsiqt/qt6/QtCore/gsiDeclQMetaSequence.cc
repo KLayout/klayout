@@ -379,21 +379,6 @@ static void _call_f_eraseValueAtIterator_c2699 (const qt_gsi::GenericMethod * /*
 }
 
 
-// const QtMetaContainerPrivate::QMetaSequenceInterface *QMetaSequence::iface()
-
-
-static void _init_f_iface_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<const QtMetaContainerPrivate::QMetaSequenceInterface * > ();
-}
-
-static void _call_f_iface_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<const QtMetaContainerPrivate::QMetaSequenceInterface * > ((const QtMetaContainerPrivate::QMetaSequenceInterface *)((QMetaSequence *)cls)->iface ());
-}
-
-
 // void QMetaSequence::insertValueAtIterator(void *container, const void *iterator, const void *value)
 
 
@@ -667,7 +652,6 @@ static gsi::Methods methods_QMetaSequence () {
   methods += new qt_gsi::GenericMethod ("canSetValueAtIterator", "@brief Method bool QMetaSequence::canSetValueAtIterator()\n", true, &_init_f_canSetValueAtIterator_c0, &_call_f_canSetValueAtIterator_c0);
   methods += new qt_gsi::GenericMethod ("eraseRangeAtIterator", "@brief Method void QMetaSequence::eraseRangeAtIterator(void *container, const void *iterator1, const void *iterator2)\n", true, &_init_f_eraseRangeAtIterator_c4342, &_call_f_eraseRangeAtIterator_c4342);
   methods += new qt_gsi::GenericMethod ("eraseValueAtIterator", "@brief Method void QMetaSequence::eraseValueAtIterator(void *container, const void *iterator)\n", true, &_init_f_eraseValueAtIterator_c2699, &_call_f_eraseValueAtIterator_c2699);
-  methods += new qt_gsi::GenericMethod ("iface", "@brief Method const QtMetaContainerPrivate::QMetaSequenceInterface *QMetaSequence::iface()\n", true, &_init_f_iface_c0, &_call_f_iface_c0);
   methods += new qt_gsi::GenericMethod ("insertValueAtIterator", "@brief Method void QMetaSequence::insertValueAtIterator(void *container, const void *iterator, const void *value)\n", true, &_init_f_insertValueAtIterator_c4342, &_call_f_insertValueAtIterator_c4342);
   methods += new qt_gsi::GenericMethod ("isSortable?", "@brief Method bool QMetaSequence::isSortable()\n", true, &_init_f_isSortable_c0, &_call_f_isSortable_c0);
   methods += new qt_gsi::GenericMethod ("removeValue", "@brief Method void QMetaSequence::removeValue(void *container)\n", true, &_init_f_removeValue_c1056, &_call_f_removeValue_c1056);

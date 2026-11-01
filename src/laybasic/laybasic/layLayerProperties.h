@@ -809,6 +809,17 @@ public:
   }
 
   /**
+   *  @brief Access to the cell selector
+   *
+   *  This set will define the selected cells.
+   */
+  const db::CellSelector &cell_selector () const
+  {
+    ensure_source_realized ();
+    return m_cell_sel;
+  }
+
+  /**
    *  @brief Access to the "inverse property selection" attribute
    *
    *  This boolean is true, if the prop_sel selection is to be inverted, i.e.
@@ -970,6 +981,7 @@ private:
   mutable std::vector<db::DCplxTrans> m_trans;
   mutable HierarchyLevelSelection m_hier_levels;
   mutable std::set<db::properties_id_type> m_prop_set;
+  mutable db::CellSelector m_cell_sel;
   mutable bool m_inv_prop_set;
 
   void ensure_realized () const;

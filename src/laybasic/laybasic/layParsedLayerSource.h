@@ -32,6 +32,7 @@
 #include "tlString.h"
 #include "dbTrans.h"
 #include "dbPropertiesRepository.h"
+#include "dbCellSelector.h"
 
 namespace db
 {
@@ -308,157 +309,6 @@ private:
   bool m_to_level_relative;
   int m_to_level;
   level_mode_type m_to_mode;
-};
-
-/**
- *  @brief An object tracking whether a cell is selected while traversing a tree
- */
-class LAYBASIC_PUBLIC PartialTreeSelector
-{
-public:
-  /**
-   *  @brief Default constructor
-   */
-  PartialTreeSelector ();
-
-  /**
-   *  @brief Copy constructor
-   */
-  PartialTreeSelector (const PartialTreeSelector &ts);
-
-  /**
-   *  @brief Assignment
-   */
-  PartialTreeSelector &operator= (const PartialTreeSelector &ts);
-
-  /**
-   *  @brief Returns the selected status of the given child cell from the current cell
-   *  The return value indicates whether the given child cell is contained in the selected
-   *  set.
-   *  The value is:
-   *    -1:  The cell is not selected but one indirect child may be
-   *    0:   The cell is not selected and no child of it will be
-   *    1:   The cell is selected, their children may be selected
-   */
-  int is_child_selected (db::cell_index_type child) const;
-
-  /**
-   *  @brief Returns true, if the current cell is selected
-   */
-  bool is_selected () const
-  {
-    return m_selected;
-  }
-
-  /**
-   *  @brief Descend into the given child cell
-   */
-  void descend (db::cell_index_type child);
-
-  /**
-   *  @brief Ascends to the parent we came from with descend
-   */
-  void ascend ();
-
-private:
-  const db::Layout *mp_layout;
-  int m_state;
-  bool m_selected;
-  std::vector <int> m_state_stack;
-  std::vector <bool> m_selected_stack;
-  std::vector <std::map <db::cell_index_type, std::pair<int, int> > > m_state_machine;
-  friend class CellSelector;
-
-  /**
-   *  @brief Constructor
-   */
-  PartialTreeSelector (const db::Layout &layout, bool initially_selected);
-
-  /**
-   *  @brief Adds a cell index to a given state with a target state and a selection state
-   *  The target state may be -1 indicating the decision is final. 
-   *  The selected flag can be -1 (no change), 0 (deselect) and 1 (select).
-   */
-  void add_state_transition (int initial_state, db::cell_index_type cell_index, int target_state, int selected);
-
-  /**
-   *  @brief Adds all cells to a given state with a target state and a selection state
-   *  The target state may be -1 indicating the decision is final. 
-   *  This transition will be performed for every cell.
-   *  The selected flag can be -1 (no change), 0 (deselect) and 1 (select).
-   */
-  void add_state_transition (int initial_state, int target_state, int selected);
-};
-
-/**
- *  @brief A structure describing a cell selection through the hierarchy
- */
-class LAYBASIC_PUBLIC CellSelector
-{
-public:
-  /**
-   *  @brief Constructor
-   *  Creates an empty cell selector.
-   */
-  CellSelector ();
-
-  /**
-   *  @brief Copy constructor
-   */
-  CellSelector (const CellSelector &d);
-
-  /**
-   *  @brief Assignment 
-   */
-  CellSelector &operator= (const CellSelector &d);
-
-  /**
-   *  @brief Equality
-   */
-  bool operator== (const CellSelector &d) const;
-
-  /**
-   *  @brief Inequality
-   */
-  bool operator!= (const CellSelector &d) const
-  {
-    return !operator== (d);
-  }
-
-  /**
-   *  @brief Less operator
-   */
-  bool operator< (const CellSelector &d) const;
-
-  /**
-   *  @brief Parse one additional selector contribution from the extractor
-   *  This method can be called multiple times which will add another 
-   *  contribution to the selector.
-   */
-  void parse (tl::Extractor &ex);
-
-  /**
-   *  @brief Converts the selector to a string
-   */
-  std::string to_string () const;
-
-  /**
-   *  @brief Creates a partial tree selector object 
-   *  This object is the actual selector which can be used to determine whether a 
-   *  cell is selected while traversing the tree.
-   */
-  PartialTreeSelector create_tree_selector (const db::Layout &layout, db::cell_index_type initial_cell) const;
-
-  /**
-   *  @brief Returns true, if the selector selects all
-   */
-  bool is_empty () const
-  {
-    return m_selectors.empty ();
-  }
-
-private:
-  std::vector <std::vector <std::pair <bool, std::string> > > m_selectors;
 };
 
 /**
@@ -808,7 +658,7 @@ public:
   /**
    *  @brief Gets the cell selector
    */
-  const CellSelector &cell_selector () const
+  const db::CellSelector &cell_selector () const
   {
     return m_cell_sel;
   }
@@ -816,7 +666,7 @@ public:
   /**
    *  @brief Sets the cell selector
    */
-  void set_cell_selector (const CellSelector &cs) 
+  void set_cell_selector (const db::CellSelector &cs)
   {
     m_cell_sel = cs;
   }
@@ -898,7 +748,7 @@ private:
   std::string m_name;
   int m_cv_index;
   std::vector<db::DCplxTrans> m_trans;
-  CellSelector m_cell_sel;
+  db::CellSelector m_cell_sel;
   PropertySelector m_property_sel;
   HierarchyLevelSelection m_hier_levels;
 

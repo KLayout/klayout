@@ -292,7 +292,12 @@ public:
    */
   iterator find (db::property_names_id_type name_id) const
   {
-    return m_map.find (name_id);
+    auto i = m_map.lower_bound (name_id);
+    if (i != m_map.end () && i->first != name_id) {
+      return m_map.end ();
+    } else {
+      return i;
+    }
   }
 
   /**

@@ -28,6 +28,7 @@
 */
 
 #include <QImageIOPlugin>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QIODevice>

@@ -38,6 +38,51 @@
 class Qt_Namespace { };
 
 
+//  Implementation of the enum wrapper class for Qt::PenStyle
+namespace qt_gsi
+{
+
+static gsi::Enum<Qt::PenStyle> decl_Qt_PenStyle_Enum ("QtCore", "Qt_PenStyle",
+    gsi::enum_const ("NoPen", Qt::NoPen, "@brief Enum constant Qt::NoPen") +
+    gsi::enum_const ("SolidLine", Qt::SolidLine, "@brief Enum constant Qt::SolidLine") +
+    gsi::enum_const ("DashLine", Qt::DashLine, "@brief Enum constant Qt::DashLine") +
+    gsi::enum_const ("DotLine", Qt::DotLine, "@brief Enum constant Qt::DotLine") +
+    gsi::enum_const ("DashDotLine", Qt::DashDotLine, "@brief Enum constant Qt::DashDotLine") +
+    gsi::enum_const ("DashDotDotLine", Qt::DashDotDotLine, "@brief Enum constant Qt::DashDotDotLine") +
+    gsi::enum_const ("CustomDashLine", Qt::CustomDashLine, "@brief Enum constant Qt::CustomDashLine") +
+    gsi::enum_const ("MPenStyle", Qt::MPenStyle, "@brief Enum constant Qt::MPenStyle"),
+  "@qt\n@brief This class represents the Qt::PenStyle enum");
+
+static gsi::QFlagsClass<Qt::PenStyle > decl_Qt_PenStyle_Enums ("QtCore", "Qt_QFlags_PenStyle",
+  "@qt\n@brief This class represents the QFlags<Qt::PenStyle> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<Qt_Namespace> inject_Qt_PenStyle_Enum_in_parent (decl_Qt_PenStyle_Enum.defs ());
+static gsi::ClassExt<Qt_Namespace> decl_Qt_PenStyle_Enum_as_child (decl_Qt_PenStyle_Enum, "PenStyle");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_PenStyle_Enums_as_child (decl_Qt_PenStyle_Enums, "QFlags_PenStyle");
+
+}
+
+
+//  Implementation of the enum wrapper class for Qt::PermissionStatus
+namespace qt_gsi
+{
+
+static gsi::Enum<Qt::PermissionStatus> decl_Qt_PermissionStatus_Enum ("QtCore", "Qt_PermissionStatus",
+    gsi::enum_const ("Undetermined", Qt::PermissionStatus::Undetermined, "@brief Enum constant Qt::PermissionStatus::Undetermined") +
+    gsi::enum_const ("Granted", Qt::PermissionStatus::Granted, "@brief Enum constant Qt::PermissionStatus::Granted") +
+    gsi::enum_const ("Denied", Qt::PermissionStatus::Denied, "@brief Enum constant Qt::PermissionStatus::Denied"),
+  "@qt\n@brief This class represents the Qt::PermissionStatus enum");
+
+static gsi::QFlagsClass<Qt::PermissionStatus > decl_Qt_PermissionStatus_Enums ("QtCore", "Qt_QFlags_PermissionStatus",
+  "@qt\n@brief This class represents the QFlags<Qt::PermissionStatus> flag set");
+
+static gsi::ClassExt<Qt_Namespace> decl_Qt_PermissionStatus_Enum_as_child (decl_Qt_PermissionStatus_Enum, "PermissionStatus");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_PermissionStatus_Enums_as_child (decl_Qt_PermissionStatus_Enums, "QFlags_PermissionStatus");
+
+}
+
+
 //  Implementation of the enum wrapper class for Qt::ReturnByValueConstant
 namespace qt_gsi
 {
@@ -437,48 +482,6 @@ static gsi::QFlagsClass<Qt::ToolBarArea > decl_Qt_ToolBarArea_Enums ("QtCore", "
 static gsi::ClassExt<Qt_Namespace> inject_Qt_ToolBarArea_Enum_in_parent (decl_Qt_ToolBarArea_Enum.defs ());
 static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolBarArea_Enum_as_child (decl_Qt_ToolBarArea_Enum, "ToolBarArea");
 static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolBarArea_Enums_as_child (decl_Qt_ToolBarArea_Enums, "QFlags_ToolBarArea");
-
-}
-
-
-//  Implementation of the enum wrapper class for Qt::ToolBarAreaSizes
-namespace qt_gsi
-{
-
-static gsi::Enum<Qt::ToolBarAreaSizes> decl_Qt_ToolBarAreaSizes_Enum ("QtCore", "Qt_ToolBarAreaSizes",
-    gsi::enum_const ("NToolBarAreas", Qt::NToolBarAreas, "@brief Enum constant Qt::NToolBarAreas"),
-  "@qt\n@brief This class represents the Qt::ToolBarAreaSizes enum");
-
-static gsi::QFlagsClass<Qt::ToolBarAreaSizes > decl_Qt_ToolBarAreaSizes_Enums ("QtCore", "Qt_QFlags_ToolBarAreaSizes",
-  "@qt\n@brief This class represents the QFlags<Qt::ToolBarAreaSizes> flag set");
-
-//  Inject the declarations into the parent
-static gsi::ClassExt<Qt_Namespace> inject_Qt_ToolBarAreaSizes_Enum_in_parent (decl_Qt_ToolBarAreaSizes_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolBarAreaSizes_Enum_as_child (decl_Qt_ToolBarAreaSizes_Enum, "ToolBarAreaSizes");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolBarAreaSizes_Enums_as_child (decl_Qt_ToolBarAreaSizes_Enums, "QFlags_ToolBarAreaSizes");
-
-}
-
-
-//  Implementation of the enum wrapper class for Qt::ToolButtonStyle
-namespace qt_gsi
-{
-
-static gsi::Enum<Qt::ToolButtonStyle> decl_Qt_ToolButtonStyle_Enum ("QtCore", "Qt_ToolButtonStyle",
-    gsi::enum_const ("ToolButtonIconOnly", Qt::ToolButtonIconOnly, "@brief Enum constant Qt::ToolButtonIconOnly") +
-    gsi::enum_const ("ToolButtonTextOnly", Qt::ToolButtonTextOnly, "@brief Enum constant Qt::ToolButtonTextOnly") +
-    gsi::enum_const ("ToolButtonTextBesideIcon", Qt::ToolButtonTextBesideIcon, "@brief Enum constant Qt::ToolButtonTextBesideIcon") +
-    gsi::enum_const ("ToolButtonTextUnderIcon", Qt::ToolButtonTextUnderIcon, "@brief Enum constant Qt::ToolButtonTextUnderIcon") +
-    gsi::enum_const ("ToolButtonFollowStyle", Qt::ToolButtonFollowStyle, "@brief Enum constant Qt::ToolButtonFollowStyle"),
-  "@qt\n@brief This class represents the Qt::ToolButtonStyle enum");
-
-static gsi::QFlagsClass<Qt::ToolButtonStyle > decl_Qt_ToolButtonStyle_Enums ("QtCore", "Qt_QFlags_ToolButtonStyle",
-  "@qt\n@brief This class represents the QFlags<Qt::ToolButtonStyle> flag set");
-
-//  Inject the declarations into the parent
-static gsi::ClassExt<Qt_Namespace> inject_Qt_ToolButtonStyle_Enum_in_parent (decl_Qt_ToolButtonStyle_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolButtonStyle_Enum_as_child (decl_Qt_ToolButtonStyle_Enum, "ToolButtonStyle");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolButtonStyle_Enums_as_child (decl_Qt_ToolButtonStyle_Enums, "QFlags_ToolButtonStyle");
 
 }
 

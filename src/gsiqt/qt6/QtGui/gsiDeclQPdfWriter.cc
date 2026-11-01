@@ -28,6 +28,7 @@
 */
 
 #include <QPdfWriter>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QIODevice>

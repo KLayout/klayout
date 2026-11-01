@@ -625,7 +625,7 @@ static void _init_f_addDatabase_3942 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("type");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("connectionName", true, "QLatin1String(QSqlDatabase::defaultConnection)");
+  static gsi::ArgSpecBase argspec_1 ("connectionName", true, "QLatin1StringView(QSqlDatabase::defaultConnection)");
   decl->add_arg<const QString & > (argspec_1);
   decl->set_return<QSqlDatabase > ();
 }
@@ -635,7 +635,7 @@ static void _call_f_addDatabase_3942 (const qt_gsi::GenericStaticMethod * /*decl
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QLatin1String(QSqlDatabase::defaultConnection), heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QLatin1StringView(QSqlDatabase::defaultConnection), heap);
   ret.write<QSqlDatabase > ((QSqlDatabase)QSqlDatabase::addDatabase (arg1, arg2));
 }
 
@@ -647,7 +647,7 @@ static void _init_f_addDatabase_3544 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("driver");
   decl->add_arg<QSqlDriver * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("connectionName", true, "QLatin1String(QSqlDatabase::defaultConnection)");
+  static gsi::ArgSpecBase argspec_1 ("connectionName", true, "QLatin1StringView(QSqlDatabase::defaultConnection)");
   decl->add_arg<const QString & > (argspec_1);
   decl->set_return<QSqlDatabase > ();
 }
@@ -657,7 +657,7 @@ static void _call_f_addDatabase_3544 (const qt_gsi::GenericStaticMethod * /*decl
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QSqlDriver *arg1 = gsi::arg_reader<QSqlDriver * >() (args, heap);
-  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QLatin1String(QSqlDatabase::defaultConnection), heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QLatin1StringView(QSqlDatabase::defaultConnection), heap);
   ret.write<QSqlDatabase > ((QSqlDatabase)QSqlDatabase::addDatabase (arg1, arg2));
 }
 
@@ -726,7 +726,7 @@ static void _call_f_connectionNames_0 (const qt_gsi::GenericStaticMethod * /*dec
 
 static void _init_f_contains_2025 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("connectionName", true, "QLatin1String(QSqlDatabase::defaultConnection)");
+  static gsi::ArgSpecBase argspec_0 ("connectionName", true, "QLatin1StringView(QSqlDatabase::defaultConnection)");
   decl->add_arg<const QString & > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -735,7 +735,7 @@ static void _call_f_contains_2025 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QLatin1String(QSqlDatabase::defaultConnection), heap);
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QLatin1StringView(QSqlDatabase::defaultConnection), heap);
   ret.write<bool > ((bool)QSqlDatabase::contains (arg1));
 }
 
@@ -745,7 +745,7 @@ static void _call_f_contains_2025 (const qt_gsi::GenericStaticMethod * /*decl*/,
 
 static void _init_f_database_2781 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("connectionName", true, "QLatin1String(QSqlDatabase::defaultConnection)");
+  static gsi::ArgSpecBase argspec_0 ("connectionName", true, "QLatin1StringView(QSqlDatabase::defaultConnection)");
   decl->add_arg<const QString & > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("open", true, "true");
   decl->add_arg<bool > (argspec_1);
@@ -756,7 +756,7 @@ static void _call_f_database_2781 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QLatin1String(QSqlDatabase::defaultConnection), heap);
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QLatin1StringView(QSqlDatabase::defaultConnection), heap);
   bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   ret.write<QSqlDatabase > ((QSqlDatabase)QSqlDatabase::database (arg1, arg2));
 }

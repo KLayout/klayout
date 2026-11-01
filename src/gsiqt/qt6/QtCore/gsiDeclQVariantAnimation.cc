@@ -29,6 +29,7 @@
 
 #include <QVariantAnimation>
 #include <QAnimationGroup>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEasingCurve>
 #include <QEvent>

@@ -89,6 +89,10 @@ class QHstsPolicy;
 
 namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QHstsPolicy> &qtdecl_QHstsPolicy (); }
 
+class QHttp1Configuration;
+
+namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QHttp1Configuration> &qtdecl_QHttp1Configuration (); }
+
 class QHttp2Configuration;
 
 namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QHttp2Configuration> &qtdecl_QHttp2Configuration (); }
@@ -204,6 +208,10 @@ namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QSslKey> &qtdecl_QSslKey (); }
 class QSslPreSharedKeyAuthenticator;
 
 namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QSslPreSharedKeyAuthenticator> &qtdecl_QSslPreSharedKeyAuthenticator (); }
+
+class QSslServer;
+
+namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QSslServer> &qtdecl_QSslServer (); }
 
 class QSslSocket;
 

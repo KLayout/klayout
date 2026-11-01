@@ -28,6 +28,7 @@
 */
 
 #include <QAnimationDriver>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

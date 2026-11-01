@@ -28,6 +28,7 @@
 */
 
 #include <QGraphicsAnchor>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

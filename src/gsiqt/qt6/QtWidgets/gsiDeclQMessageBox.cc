@@ -31,6 +31,7 @@
 #include <QAbstractButton>
 #include <QAction>
 #include <QActionEvent>
+#include <QAnyStringView>
 #include <QBackingStore>
 #include <QBitmap>
 #include <QCheckBox>
@@ -400,6 +401,21 @@ static void _call_f_open_2925 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+// QFlags<QMessageBox::Option> QMessageBox::options()
+
+
+static void _init_f_options_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QFlags<QMessageBox::Option> > ();
+}
+
+static void _call_f_options_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QFlags<QMessageBox::Option> > ((QFlags<QMessageBox::Option>)((QMessageBox *)cls)->options ());
+}
+
+
 // void QMessageBox::removeButton(QAbstractButton *button)
 
 
@@ -623,6 +639,49 @@ static void _call_f_setInformativeText_2025 (const qt_gsi::GenericMethod * /*dec
 }
 
 
+// void QMessageBox::setOption(QMessageBox::Option option, bool on)
+
+
+static void _init_f_setOption_3028 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("option");
+  decl->add_arg<const qt_gsi::Converter<QMessageBox::Option>::target_type & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("on", true, "true");
+  decl->add_arg<bool > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setOption_3028 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QMessageBox::Option>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMessageBox::Option>::target_type & >() (args, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QMessageBox *)cls)->setOption (qt_gsi::QtToCppAdaptor<QMessageBox::Option>(arg1).cref(), arg2);
+}
+
+
+// void QMessageBox::setOptions(QFlags<QMessageBox::Option> options)
+
+
+static void _init_f_setOptions_2968 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("options");
+  decl->add_arg<QFlags<QMessageBox::Option> > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setOptions_2968 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QFlags<QMessageBox::Option> arg1 = gsi::arg_reader<QFlags<QMessageBox::Option> >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QMessageBox *)cls)->setOptions (arg1);
+}
+
+
 // void QMessageBox::setStandardButtons(QFlags<QMessageBox::StandardButton> buttons)
 
 
@@ -774,6 +833,25 @@ static void _call_f_standardButtons_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QFlags<QMessageBox::StandardButton> > ((QFlags<QMessageBox::StandardButton>)((QMessageBox *)cls)->standardButtons ());
+}
+
+
+// bool QMessageBox::testOption(QMessageBox::Option option)
+
+
+static void _init_f_testOption_c2272 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("option");
+  decl->add_arg<const qt_gsi::Converter<QMessageBox::Option>::target_type & > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_testOption_c2272 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QMessageBox::Option>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMessageBox::Option>::target_type & >() (args, heap);
+  ret.write<bool > ((bool)((QMessageBox *)cls)->testOption (qt_gsi::QtToCppAdaptor<QMessageBox::Option>(arg1).cref()));
 }
 
 
@@ -1043,6 +1121,7 @@ static gsi::Methods methods_QMessageBox () {
   methods += new qt_gsi::GenericMethod (":informativeText", "@brief Method QString QMessageBox::informativeText()\n", true, &_init_f_informativeText_c0, &_call_f_informativeText_c0);
   methods += new qt_gsi::GenericMethod ("open", "@brief Method void QMessageBox::open()\nThis is a reimplementation of QDialog::open", false, &_init_f_open_0, &_call_f_open_0);
   methods += new qt_gsi::GenericMethod ("open", "@brief Method void QMessageBox::open(QObject *receiver, const char *member)\n", false, &_init_f_open_2925, &_call_f_open_2925);
+  methods += new qt_gsi::GenericMethod ("options", "@brief Method QFlags<QMessageBox::Option> QMessageBox::options()\n", true, &_init_f_options_c0, &_call_f_options_c0);
   methods += new qt_gsi::GenericMethod ("removeButton", "@brief Method void QMessageBox::removeButton(QAbstractButton *button)\n", false, &_init_f_removeButton_2159, &_call_f_removeButton_2159);
   methods += new qt_gsi::GenericMethod ("setButtonText", "@brief Method void QMessageBox::setButtonText(int button, const QString &text)\n", false, &_init_f_setButtonText_2684, &_call_f_setButtonText_2684);
   methods += new qt_gsi::GenericMethod ("setCheckBox|checkBox=", "@brief Method void QMessageBox::setCheckBox(QCheckBox *cb)\n", false, &_init_f_setCheckBox_1478, &_call_f_setCheckBox_1478);
@@ -1054,6 +1133,8 @@ static gsi::Methods methods_QMessageBox () {
   methods += new qt_gsi::GenericMethod ("setIcon|icon=", "@brief Method void QMessageBox::setIcon(QMessageBox::Icon)\n", false, &_init_f_setIcon_2032, &_call_f_setIcon_2032);
   methods += new qt_gsi::GenericMethod ("setIconPixmap|iconPixmap=", "@brief Method void QMessageBox::setIconPixmap(const QPixmap &pixmap)\n", false, &_init_f_setIconPixmap_2017, &_call_f_setIconPixmap_2017);
   methods += new qt_gsi::GenericMethod ("setInformativeText|informativeText=", "@brief Method void QMessageBox::setInformativeText(const QString &text)\n", false, &_init_f_setInformativeText_2025, &_call_f_setInformativeText_2025);
+  methods += new qt_gsi::GenericMethod ("setOption", "@brief Method void QMessageBox::setOption(QMessageBox::Option option, bool on)\n", false, &_init_f_setOption_3028, &_call_f_setOption_3028);
+  methods += new qt_gsi::GenericMethod ("setOptions", "@brief Method void QMessageBox::setOptions(QFlags<QMessageBox::Option> options)\n", false, &_init_f_setOptions_2968, &_call_f_setOptions_2968);
   methods += new qt_gsi::GenericMethod ("setStandardButtons|standardButtons=", "@brief Method void QMessageBox::setStandardButtons(QFlags<QMessageBox::StandardButton> buttons)\n", false, &_init_f_setStandardButtons_3788, &_call_f_setStandardButtons_3788);
   methods += new qt_gsi::GenericMethod ("setText|text=", "@brief Method void QMessageBox::setText(const QString &text)\n", false, &_init_f_setText_2025, &_call_f_setText_2025);
   methods += new qt_gsi::GenericMethod ("setTextFormat|textFormat=", "@brief Method void QMessageBox::setTextFormat(Qt::TextFormat format)\n", false, &_init_f_setTextFormat_1787, &_call_f_setTextFormat_1787);
@@ -1062,6 +1143,7 @@ static gsi::Methods methods_QMessageBox () {
   methods += new qt_gsi::GenericMethod ("setWindowTitle|windowTitle=", "@brief Method void QMessageBox::setWindowTitle(const QString &title)\n", false, &_init_f_setWindowTitle_2025, &_call_f_setWindowTitle_2025);
   methods += new qt_gsi::GenericMethod ("standardButton", "@brief Method QMessageBox::StandardButton QMessageBox::standardButton(QAbstractButton *button)\n", true, &_init_f_standardButton_c2159, &_call_f_standardButton_c2159);
   methods += new qt_gsi::GenericMethod (":standardButtons", "@brief Method QFlags<QMessageBox::StandardButton> QMessageBox::standardButtons()\n", true, &_init_f_standardButtons_c0, &_call_f_standardButtons_c0);
+  methods += new qt_gsi::GenericMethod ("testOption", "@brief Method bool QMessageBox::testOption(QMessageBox::Option option)\n", true, &_init_f_testOption_c2272, &_call_f_testOption_c2272);
   methods += new qt_gsi::GenericMethod (":text", "@brief Method QString QMessageBox::text()\n", true, &_init_f_text_c0, &_call_f_text_c0);
   methods += new qt_gsi::GenericMethod (":textFormat", "@brief Method Qt::TextFormat QMessageBox::textFormat()\n", true, &_init_f_textFormat_c0, &_call_f_textFormat_c0);
   methods += new qt_gsi::GenericMethod (":textInteractionFlags", "@brief Method QFlags<Qt::TextInteractionFlag> QMessageBox::textInteractionFlags()\n", true, &_init_f_textInteractionFlags_c0, &_call_f_textInteractionFlags_c0);
@@ -3857,6 +3939,23 @@ static gsi::QFlagsClass<QMessageBox::Icon > decl_QMessageBox_Icon_Enums ("QtWidg
 static gsi::ClassExt<QMessageBox> inject_QMessageBox_Icon_Enum_in_parent (decl_QMessageBox_Icon_Enum.defs ());
 static gsi::ClassExt<QMessageBox> decl_QMessageBox_Icon_Enum_as_child (decl_QMessageBox_Icon_Enum, "Icon");
 static gsi::ClassExt<QMessageBox> decl_QMessageBox_Icon_Enums_as_child (decl_QMessageBox_Icon_Enums, "QFlags_Icon");
+
+}
+
+
+//  Implementation of the enum wrapper class for QMessageBox::Option
+namespace qt_gsi
+{
+
+static gsi::Enum<QMessageBox::Option> decl_QMessageBox_Option_Enum ("QtWidgets", "QMessageBox_Option",
+    gsi::enum_const ("DontUseNativeDialog", QMessageBox::Option::DontUseNativeDialog, "@brief Enum constant QMessageBox::Option::DontUseNativeDialog"),
+  "@qt\n@brief This class represents the QMessageBox::Option enum");
+
+static gsi::QFlagsClass<QMessageBox::Option > decl_QMessageBox_Option_Enums ("QtWidgets", "QMessageBox_QFlags_Option",
+  "@qt\n@brief This class represents the QFlags<QMessageBox::Option> flag set");
+
+static gsi::ClassExt<QMessageBox> decl_QMessageBox_Option_Enum_as_child (decl_QMessageBox_Option_Enum, "Option");
+static gsi::ClassExt<QMessageBox> decl_QMessageBox_Option_Enums_as_child (decl_QMessageBox_Option_Enums, "QFlags_Option");
 
 }
 

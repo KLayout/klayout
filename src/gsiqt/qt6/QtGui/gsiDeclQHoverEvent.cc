@@ -146,6 +146,24 @@ public:
 
   virtual ~QHoverEvent_Adaptor();
 
+  //  [adaptor ctor] QHoverEvent::QHoverEvent(QEvent::Type type, const QPointF &scenePos, const QPointF &globalPos, const QPointF &oldPos, QFlags<Qt::KeyboardModifier> modifiers, const QPointingDevice *device)
+  QHoverEvent_Adaptor(QEvent::Type type, const QPointF &scenePos, const QPointF &globalPos, const QPointF &oldPos) : QHoverEvent(type, scenePos, globalPos, oldPos)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
+  //  [adaptor ctor] QHoverEvent::QHoverEvent(QEvent::Type type, const QPointF &scenePos, const QPointF &globalPos, const QPointF &oldPos, QFlags<Qt::KeyboardModifier> modifiers, const QPointingDevice *device)
+  QHoverEvent_Adaptor(QEvent::Type type, const QPointF &scenePos, const QPointF &globalPos, const QPointF &oldPos, QFlags<Qt::KeyboardModifier> modifiers) : QHoverEvent(type, scenePos, globalPos, oldPos, modifiers)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
+  //  [adaptor ctor] QHoverEvent::QHoverEvent(QEvent::Type type, const QPointF &scenePos, const QPointF &globalPos, const QPointF &oldPos, QFlags<Qt::KeyboardModifier> modifiers, const QPointingDevice *device)
+  QHoverEvent_Adaptor(QEvent::Type type, const QPointF &scenePos, const QPointF &globalPos, const QPointF &oldPos, QFlags<Qt::KeyboardModifier> modifiers, const QPointingDevice *device) : QHoverEvent(type, scenePos, globalPos, oldPos, modifiers, device)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
   //  [adaptor ctor] QHoverEvent::QHoverEvent(QEvent::Type type, const QPointF &pos, const QPointF &oldPos, QFlags<Qt::KeyboardModifier> modifiers, const QPointingDevice *device)
   QHoverEvent_Adaptor(QEvent::Type type, const QPointF &pos, const QPointF &oldPos) : QHoverEvent(type, pos, oldPos)
   {
@@ -247,6 +265,39 @@ public:
 };
 
 QHoverEvent_Adaptor::~QHoverEvent_Adaptor() { }
+
+//  Constructor QHoverEvent::QHoverEvent(QEvent::Type type, const QPointF &scenePos, const QPointF &globalPos, const QPointF &oldPos, QFlags<Qt::KeyboardModifier> modifiers, const QPointingDevice *device) (adaptor class)
+
+static void _init_ctor_QHoverEvent_Adaptor_12890 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("type");
+  decl->add_arg<const qt_gsi::Converter<QEvent::Type>::target_type & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("scenePos");
+  decl->add_arg<const QPointF & > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("globalPos");
+  decl->add_arg<const QPointF & > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("oldPos");
+  decl->add_arg<const QPointF & > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("modifiers", true, "Qt::NoModifier");
+  decl->add_arg<QFlags<Qt::KeyboardModifier> > (argspec_4);
+  static gsi::ArgSpecBase argspec_5 ("device", true, "QPointingDevice::primaryPointingDevice()");
+  decl->add_arg<const QPointingDevice * > (argspec_5);
+  decl->set_return_new<QHoverEvent_Adaptor> ();
+}
+
+static void _call_ctor_QHoverEvent_Adaptor_12890 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg3 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg4 = gsi::arg_reader<const QPointF & >() (args, heap);
+  QFlags<Qt::KeyboardModifier> arg5 = args ? gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap) : gsi::arg_maker<QFlags<Qt::KeyboardModifier> >() (Qt::NoModifier, heap);
+  const QPointingDevice *arg6 = args ? gsi::arg_reader<const QPointingDevice * >() (args, heap) : gsi::arg_maker<const QPointingDevice * >() (QPointingDevice::primaryPointingDevice(), heap);
+  ret.write<QHoverEvent_Adaptor *> (new QHoverEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), arg2, arg3, arg4, arg5, arg6));
+}
+
 
 //  Constructor QHoverEvent::QHoverEvent(QEvent::Type type, const QPointF &pos, const QPointF &oldPos, QFlags<Qt::KeyboardModifier> modifiers, const QPointingDevice *device) (adaptor class)
 
@@ -390,6 +441,7 @@ gsi::Class<QHoverEvent> &qtdecl_QHoverEvent ();
 
 static gsi::Methods methods_QHoverEvent_Adaptor () {
   gsi::Methods methods;
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QHoverEvent::QHoverEvent(QEvent::Type type, const QPointF &scenePos, const QPointF &globalPos, const QPointF &oldPos, QFlags<Qt::KeyboardModifier> modifiers, const QPointingDevice *device)\nThis method creates an object of class QHoverEvent.", &_init_ctor_QHoverEvent_Adaptor_12890, &_call_ctor_QHoverEvent_Adaptor_12890);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QHoverEvent::QHoverEvent(QEvent::Type type, const QPointF &pos, const QPointF &oldPos, QFlags<Qt::KeyboardModifier> modifiers, const QPointingDevice *device)\nThis method creates an object of class QHoverEvent.", &_init_ctor_QHoverEvent_Adaptor_11012, &_call_ctor_QHoverEvent_Adaptor_11012);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@brief Virtual method bool QHoverEvent::isBeginEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@hide", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0, &_set_callback_cbs_isBeginEvent_c0_0);

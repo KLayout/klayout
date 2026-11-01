@@ -28,12 +28,38 @@
 */
 
 #include <QSystemSemaphore>
+#include <QNativeIpcKey>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
 #include <memory>
 
 // -----------------------------------------------------------------------
 // class QSystemSemaphore
+
+//  Constructor QSystemSemaphore::QSystemSemaphore(const QNativeIpcKey &key, int initialValue, QSystemSemaphore::AccessMode)
+
+
+static void _init_ctor_QSystemSemaphore_6334 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<const QNativeIpcKey & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("initialValue", true, "0");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("arg3", true, "QSystemSemaphore::Open");
+  decl->add_arg<const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & > (argspec_2);
+  decl->set_return_new<QSystemSemaphore> ();
+}
+
+static void _call_ctor_QSystemSemaphore_6334 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QNativeIpcKey &arg1 = gsi::arg_reader<const QNativeIpcKey & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSystemSemaphore::AccessMode>(heap, QSystemSemaphore::Open), heap);
+  ret.write<QSystemSemaphore *> (new QSystemSemaphore (arg1, arg2, qt_gsi::QtToCppAdaptor<QSystemSemaphore::AccessMode>(arg3).cref()));
+}
+
 
 //  Constructor QSystemSemaphore::QSystemSemaphore(const QString &key, int initialValue, QSystemSemaphore::AccessMode mode)
 
@@ -120,6 +146,21 @@ static void _call_f_key_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
+// QNativeIpcKey QSystemSemaphore::nativeIpcKey()
+
+
+static void _init_f_nativeIpcKey_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QNativeIpcKey > ();
+}
+
+static void _call_f_nativeIpcKey_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QNativeIpcKey > ((QNativeIpcKey)((QSystemSemaphore *)cls)->nativeIpcKey ());
+}
+
+
 // bool QSystemSemaphore::release(int n)
 
 
@@ -165,6 +206,124 @@ static void _call_f_setKey_5769 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
+// void QSystemSemaphore::setNativeKey(const QNativeIpcKey &key, int initialValue, QSystemSemaphore::AccessMode)
+
+
+static void _init_f_setNativeKey_6334 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<const QNativeIpcKey & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("initialValue", true, "0");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("arg3", true, "QSystemSemaphore::Open");
+  decl->add_arg<const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setNativeKey_6334 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QNativeIpcKey &arg1 = gsi::arg_reader<const QNativeIpcKey & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSystemSemaphore::AccessMode>(heap, QSystemSemaphore::Open), heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QSystemSemaphore *)cls)->setNativeKey (arg1, arg2, qt_gsi::QtToCppAdaptor<QSystemSemaphore::AccessMode>(arg3).cref());
+}
+
+
+// void QSystemSemaphore::setNativeKey(const QString &key, int initialValue, QSystemSemaphore::AccessMode mode, QNativeIpcKey::Type type)
+
+
+static void _init_f_setNativeKey_7908 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("initialValue", true, "0");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("mode", true, "QSystemSemaphore::Open");
+  decl->add_arg<const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("type", true, "QNativeIpcKey::legacyDefaultTypeForOs()");
+  decl->add_arg<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & > (argspec_3);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setNativeKey_7908 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSystemSemaphore::AccessMode>(heap, QSystemSemaphore::Open), heap);
+  const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QNativeIpcKey::Type>(heap, QNativeIpcKey::legacyDefaultTypeForOs()), heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QSystemSemaphore *)cls)->setNativeKey (arg1, arg2, qt_gsi::QtToCppAdaptor<QSystemSemaphore::AccessMode>(arg3).cref(), qt_gsi::QtToCppAdaptor<QNativeIpcKey::Type>(arg4).cref());
+}
+
+
+// static bool QSystemSemaphore::isKeyTypeSupported(QNativeIpcKey::Type type)
+
+
+static void _init_f_isKeyTypeSupported_2247 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("type");
+  decl->add_arg<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isKeyTypeSupported_2247 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & >() (args, heap);
+  ret.write<bool > ((bool)QSystemSemaphore::isKeyTypeSupported (qt_gsi::QtToCppAdaptor<QNativeIpcKey::Type>(arg1).cref()));
+}
+
+
+// static QNativeIpcKey QSystemSemaphore::legacyNativeKey(const QString &key, QNativeIpcKey::Type type)
+
+
+static void _init_f_legacyNativeKey_4164 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("type", true, "QNativeIpcKey::legacyDefaultTypeForOs()");
+  decl->add_arg<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & > (argspec_1);
+  decl->set_return<QNativeIpcKey > ();
+}
+
+static void _call_f_legacyNativeKey_4164 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QNativeIpcKey::Type>(heap, QNativeIpcKey::legacyDefaultTypeForOs()), heap);
+  ret.write<QNativeIpcKey > ((QNativeIpcKey)QSystemSemaphore::legacyNativeKey (arg1, qt_gsi::QtToCppAdaptor<QNativeIpcKey::Type>(arg2).cref()));
+}
+
+
+// static QNativeIpcKey QSystemSemaphore::platformSafeKey(const QString &key, QNativeIpcKey::Type type)
+
+
+static void _init_f_platformSafeKey_4164 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("type", true, "QNativeIpcKey::DefaultTypeForOs");
+  decl->add_arg<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & > (argspec_1);
+  decl->set_return<QNativeIpcKey > ();
+}
+
+static void _call_f_platformSafeKey_4164 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QNativeIpcKey::Type>(heap, QNativeIpcKey::DefaultTypeForOs), heap);
+  ret.write<QNativeIpcKey > ((QNativeIpcKey)QSystemSemaphore::platformSafeKey (arg1, qt_gsi::QtToCppAdaptor<QNativeIpcKey::Type>(arg2).cref()));
+}
+
+
 // static QString QSystemSemaphore::tr(const char *sourceText, const char *disambiguation, int n)
 
 
@@ -196,13 +355,20 @@ namespace gsi
 
 static gsi::Methods methods_QSystemSemaphore () {
   gsi::Methods methods;
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSystemSemaphore::QSystemSemaphore(const QNativeIpcKey &key, int initialValue, QSystemSemaphore::AccessMode)\nThis method creates an object of class QSystemSemaphore.", &_init_ctor_QSystemSemaphore_6334, &_call_ctor_QSystemSemaphore_6334);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSystemSemaphore::QSystemSemaphore(const QString &key, int initialValue, QSystemSemaphore::AccessMode mode)\nThis method creates an object of class QSystemSemaphore.", &_init_ctor_QSystemSemaphore_5769, &_call_ctor_QSystemSemaphore_5769);
   methods += new qt_gsi::GenericMethod ("acquire", "@brief Method bool QSystemSemaphore::acquire()\n", false, &_init_f_acquire_0, &_call_f_acquire_0);
   methods += new qt_gsi::GenericMethod ("error", "@brief Method QSystemSemaphore::SystemSemaphoreError QSystemSemaphore::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QSystemSemaphore::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
   methods += new qt_gsi::GenericMethod (":key", "@brief Method QString QSystemSemaphore::key()\n", true, &_init_f_key_c0, &_call_f_key_c0);
+  methods += new qt_gsi::GenericMethod ("nativeIpcKey", "@brief Method QNativeIpcKey QSystemSemaphore::nativeIpcKey()\n", true, &_init_f_nativeIpcKey_c0, &_call_f_nativeIpcKey_c0);
   methods += new qt_gsi::GenericMethod ("release", "@brief Method bool QSystemSemaphore::release(int n)\n", false, &_init_f_release_767, &_call_f_release_767);
   methods += new qt_gsi::GenericMethod ("setKey", "@brief Method void QSystemSemaphore::setKey(const QString &key, int initialValue, QSystemSemaphore::AccessMode mode)\n", false, &_init_f_setKey_5769, &_call_f_setKey_5769);
+  methods += new qt_gsi::GenericMethod ("setNativeKey", "@brief Method void QSystemSemaphore::setNativeKey(const QNativeIpcKey &key, int initialValue, QSystemSemaphore::AccessMode)\n", false, &_init_f_setNativeKey_6334, &_call_f_setNativeKey_6334);
+  methods += new qt_gsi::GenericMethod ("setNativeKey", "@brief Method void QSystemSemaphore::setNativeKey(const QString &key, int initialValue, QSystemSemaphore::AccessMode mode, QNativeIpcKey::Type type)\n", false, &_init_f_setNativeKey_7908, &_call_f_setNativeKey_7908);
+  methods += new qt_gsi::GenericStaticMethod ("isKeyTypeSupported?", "@brief Static method bool QSystemSemaphore::isKeyTypeSupported(QNativeIpcKey::Type type)\nThis method is static and can be called without an instance.", &_init_f_isKeyTypeSupported_2247, &_call_f_isKeyTypeSupported_2247);
+  methods += new qt_gsi::GenericStaticMethod ("legacyNativeKey", "@brief Static method QNativeIpcKey QSystemSemaphore::legacyNativeKey(const QString &key, QNativeIpcKey::Type type)\nThis method is static and can be called without an instance.", &_init_f_legacyNativeKey_4164, &_call_f_legacyNativeKey_4164);
+  methods += new qt_gsi::GenericStaticMethod ("platformSafeKey", "@brief Static method QNativeIpcKey QSystemSemaphore::platformSafeKey(const QString &key, QNativeIpcKey::Type type)\nThis method is static and can be called without an instance.", &_init_f_platformSafeKey_4164, &_call_f_platformSafeKey_4164);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QSystemSemaphore::tr(const char *sourceText, const char *disambiguation, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
 }

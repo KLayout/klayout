@@ -28,6 +28,7 @@
 */
 
 #include <QNetworkRequest>
+#include <QHttp1Configuration>
 #include <QHttp2Configuration>
 #include <QObject>
 #include <QSslConfiguration>
@@ -164,6 +165,21 @@ static void _call_f_header_c3349 (const qt_gsi::GenericMethod * /*decl*/, void *
   tl::Heap heap;
   const qt_gsi::Converter<QNetworkRequest::KnownHeaders>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QNetworkRequest::KnownHeaders>::target_type & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QNetworkRequest *)cls)->header (qt_gsi::QtToCppAdaptor<QNetworkRequest::KnownHeaders>(arg1).cref()));
+}
+
+
+// QHttp1Configuration QNetworkRequest::http1Configuration()
+
+
+static void _init_f_http1Configuration_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QHttp1Configuration > ();
+}
+
+static void _call_f_http1Configuration_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QHttp1Configuration > ((QHttp1Configuration)((QNetworkRequest *)cls)->http1Configuration ());
 }
 
 
@@ -396,6 +412,26 @@ static void _call_f_setHeader_5360 (const qt_gsi::GenericMethod * /*decl*/, void
   const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkRequest *)cls)->setHeader (qt_gsi::QtToCppAdaptor<QNetworkRequest::KnownHeaders>(arg1).cref(), arg2);
+}
+
+
+// void QNetworkRequest::setHttp1Configuration(const QHttp1Configuration &configuration)
+
+
+static void _init_f_setHttp1Configuration_3227 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("configuration");
+  decl->add_arg<const QHttp1Configuration & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setHttp1Configuration_3227 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QHttp1Configuration &arg1 = gsi::arg_reader<const QHttp1Configuration & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QNetworkRequest *)cls)->setHttp1Configuration (arg1);
 }
 
 
@@ -660,6 +696,7 @@ static gsi::Methods methods_QNetworkRequest () {
   methods += new qt_gsi::GenericMethod (":decompressedSafetyCheckThreshold", "@brief Method qint64 QNetworkRequest::decompressedSafetyCheckThreshold()\n", true, &_init_f_decompressedSafetyCheckThreshold_c0, &_call_f_decompressedSafetyCheckThreshold_c0);
   methods += new qt_gsi::GenericMethod ("hasRawHeader", "@brief Method bool QNetworkRequest::hasRawHeader(const QByteArray &headerName)\n", true, &_init_f_hasRawHeader_c2309, &_call_f_hasRawHeader_c2309);
   methods += new qt_gsi::GenericMethod ("header", "@brief Method QVariant QNetworkRequest::header(QNetworkRequest::KnownHeaders header)\n", true, &_init_f_header_c3349, &_call_f_header_c3349);
+  methods += new qt_gsi::GenericMethod ("http1Configuration", "@brief Method QHttp1Configuration QNetworkRequest::http1Configuration()\n", true, &_init_f_http1Configuration_c0, &_call_f_http1Configuration_c0);
   methods += new qt_gsi::GenericMethod (":http2Configuration", "@brief Method QHttp2Configuration QNetworkRequest::http2Configuration()\n", true, &_init_f_http2Configuration_c0, &_call_f_http2Configuration_c0);
   methods += new qt_gsi::GenericMethod (":maximumRedirectsAllowed", "@brief Method int QNetworkRequest::maximumRedirectsAllowed()\n", true, &_init_f_maximumRedirectsAllowed_c0, &_call_f_maximumRedirectsAllowed_c0);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QNetworkRequest::operator!=(const QNetworkRequest &other)\n", true, &_init_f_operator_excl__eq__c2885, &_call_f_operator_excl__eq__c2885);
@@ -673,6 +710,7 @@ static gsi::Methods methods_QNetworkRequest () {
   methods += new qt_gsi::GenericMethod ("setAttribute", "@brief Method void QNetworkRequest::setAttribute(QNetworkRequest::Attribute code, const QVariant &value)\n", false, &_init_f_setAttribute_5083, &_call_f_setAttribute_5083);
   methods += new qt_gsi::GenericMethod ("setDecompressedSafetyCheckThreshold|decompressedSafetyCheckThreshold=", "@brief Method void QNetworkRequest::setDecompressedSafetyCheckThreshold(qint64 threshold)\n", false, &_init_f_setDecompressedSafetyCheckThreshold_986, &_call_f_setDecompressedSafetyCheckThreshold_986);
   methods += new qt_gsi::GenericMethod ("setHeader", "@brief Method void QNetworkRequest::setHeader(QNetworkRequest::KnownHeaders header, const QVariant &value)\n", false, &_init_f_setHeader_5360, &_call_f_setHeader_5360);
+  methods += new qt_gsi::GenericMethod ("setHttp1Configuration", "@brief Method void QNetworkRequest::setHttp1Configuration(const QHttp1Configuration &configuration)\n", false, &_init_f_setHttp1Configuration_3227, &_call_f_setHttp1Configuration_3227);
   methods += new qt_gsi::GenericMethod ("setHttp2Configuration|http2Configuration=", "@brief Method void QNetworkRequest::setHttp2Configuration(const QHttp2Configuration &configuration)\n", false, &_init_f_setHttp2Configuration_3228, &_call_f_setHttp2Configuration_3228);
   methods += new qt_gsi::GenericMethod ("setMaximumRedirectsAllowed|maximumRedirectsAllowed=", "@brief Method void QNetworkRequest::setMaximumRedirectsAllowed(int maximumRedirectsAllowed)\n", false, &_init_f_setMaximumRedirectsAllowed_767, &_call_f_setMaximumRedirectsAllowed_767);
   methods += new qt_gsi::GenericMethod ("setOriginatingObject|originatingObject=", "@brief Method void QNetworkRequest::setOriginatingObject(QObject *object)\n", false, &_init_f_setOriginatingObject_1302, &_call_f_setOriginatingObject_1302);
@@ -730,6 +768,9 @@ static gsi::Enum<QNetworkRequest::Attribute> decl_QNetworkRequest_Attribute_Enum
     gsi::enum_const ("Http2DirectAttribute", QNetworkRequest::Http2DirectAttribute, "@brief Enum constant QNetworkRequest::Http2DirectAttribute") +
     gsi::enum_const ("ResourceTypeAttribute", QNetworkRequest::ResourceTypeAttribute, "@brief Enum constant QNetworkRequest::ResourceTypeAttribute") +
     gsi::enum_const ("AutoDeleteReplyOnFinishAttribute", QNetworkRequest::AutoDeleteReplyOnFinishAttribute, "@brief Enum constant QNetworkRequest::AutoDeleteReplyOnFinishAttribute") +
+    gsi::enum_const ("ConnectionCacheExpiryTimeoutSecondsAttribute", QNetworkRequest::ConnectionCacheExpiryTimeoutSecondsAttribute, "@brief Enum constant QNetworkRequest::ConnectionCacheExpiryTimeoutSecondsAttribute") +
+    gsi::enum_const ("Http2CleartextAllowedAttribute", QNetworkRequest::Http2CleartextAllowedAttribute, "@brief Enum constant QNetworkRequest::Http2CleartextAllowedAttribute") +
+    gsi::enum_const ("UseCredentialsAttribute", QNetworkRequest::UseCredentialsAttribute, "@brief Enum constant QNetworkRequest::UseCredentialsAttribute") +
     gsi::enum_const ("User", QNetworkRequest::User, "@brief Enum constant QNetworkRequest::User") +
     gsi::enum_const ("UserMax", QNetworkRequest::UserMax, "@brief Enum constant QNetworkRequest::UserMax"),
   "@qt\n@brief This class represents the QNetworkRequest::Attribute enum");

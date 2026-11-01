@@ -29,6 +29,7 @@
 
 #include <QRasterWindow>
 #include <QAccessibleInterface>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QCloseEvent>
 #include <QCursor>
@@ -723,18 +724,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QRasterWindow::resizeEvent(QResizeEvent *)
-  void cbs_resizeEvent_1843_0(QResizeEvent *arg1)
+  //  [adaptor impl] void QRasterWindow::resizeEvent(QResizeEvent *event)
+  void cbs_resizeEvent_1843_0(QResizeEvent *event)
   {
-    QRasterWindow::resizeEvent(arg1);
+    QRasterWindow::resizeEvent(event);
   }
 
-  virtual void resizeEvent(QResizeEvent *arg1)
+  virtual void resizeEvent(QResizeEvent *event)
   {
     if (cb_resizeEvent_1843_0.can_issue()) {
-      cb_resizeEvent_1843_0.issue<QRasterWindow_Adaptor, QResizeEvent *>(&QRasterWindow_Adaptor::cbs_resizeEvent_1843_0, arg1);
+      cb_resizeEvent_1843_0.issue<QRasterWindow_Adaptor, QResizeEvent *>(&QRasterWindow_Adaptor::cbs_resizeEvent_1843_0, event);
     } else {
-      QRasterWindow::resizeEvent(arg1);
+      QRasterWindow::resizeEvent(event);
     }
   }
 
@@ -1721,11 +1722,11 @@ static void _set_callback_cbs_redirected_c1225_0 (void *cls, const gsi::Callback
 }
 
 
-// void QRasterWindow::resizeEvent(QResizeEvent *)
+// void QRasterWindow::resizeEvent(QResizeEvent *event)
 
 static void _init_cbs_resizeEvent_1843_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QResizeEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2205,7 +2206,7 @@ static gsi::Methods methods_QRasterWindow_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QRasterWindow::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*redirected", "@brief Virtual method QPaintDevice *QRasterWindow::redirected(QPoint *)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_redirected_c1225_0, &_call_cbs_redirected_c1225_0);
   methods += new qt_gsi::GenericMethod ("*redirected", "@hide", true, &_init_cbs_redirected_c1225_0, &_call_cbs_redirected_c1225_0, &_set_callback_cbs_redirected_c1225_0);
-  methods += new qt_gsi::GenericMethod ("*resizeEvent", "@brief Virtual method void QRasterWindow::resizeEvent(QResizeEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_resizeEvent_1843_0, &_call_cbs_resizeEvent_1843_0);
+  methods += new qt_gsi::GenericMethod ("*resizeEvent", "@brief Virtual method void QRasterWindow::resizeEvent(QResizeEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_resizeEvent_1843_0, &_call_cbs_resizeEvent_1843_0);
   methods += new qt_gsi::GenericMethod ("*resizeEvent", "@hide", false, &_init_cbs_resizeEvent_1843_0, &_call_cbs_resizeEvent_1843_0, &_set_callback_cbs_resizeEvent_1843_0);
   methods += new qt_gsi::GenericMethod ("*resolveInterface", "@brief Method void *QRasterWindow::resolveInterface(const char *name, int revision)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_resolveInterface_c2390, &_call_fp_resolveInterface_c2390);
   methods += new qt_gsi::GenericMethod ("emit_screenChanged", "@brief Emitter for signal void QRasterWindow::screenChanged(QScreen *screen)\nCall this method to emit this signal.", false, &_init_emitter_screenChanged_1311, &_call_emitter_screenChanged_1311);

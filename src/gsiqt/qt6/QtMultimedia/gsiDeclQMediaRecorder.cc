@@ -28,6 +28,7 @@
 */
 
 #include <QMediaRecorder>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMediaCaptureSession>

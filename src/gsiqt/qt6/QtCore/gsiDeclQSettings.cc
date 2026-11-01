@@ -28,6 +28,7 @@
 */
 
 #include <QSettings>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>
@@ -84,62 +85,62 @@ static void _call_f_applicationName_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// void QSettings::beginGroup(const QString &prefix)
+// void QSettings::beginGroup(QAnyStringView prefix)
 
 
-static void _init_f_beginGroup_2025 (qt_gsi::GenericMethod *decl)
+static void _init_f_beginGroup_1855 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("prefix");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_beginGroup_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_beginGroup_1855 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSettings *)cls)->beginGroup (arg1);
 }
 
 
-// int QSettings::beginReadArray(const QString &prefix)
+// int QSettings::beginReadArray(QAnyStringView prefix)
 
 
-static void _init_f_beginReadArray_2025 (qt_gsi::GenericMethod *decl)
+static void _init_f_beginReadArray_1855 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("prefix");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   decl->set_return<int > ();
 }
 
-static void _call_f_beginReadArray_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_beginReadArray_1855 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   ret.write<int > ((int)((QSettings *)cls)->beginReadArray (arg1));
 }
 
 
-// void QSettings::beginWriteArray(const QString &prefix, int size)
+// void QSettings::beginWriteArray(QAnyStringView prefix, int size)
 
 
-static void _init_f_beginWriteArray_2684 (qt_gsi::GenericMethod *decl)
+static void _init_f_beginWriteArray_2514 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("prefix");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("size", true, "-1");
   decl->add_arg<int > (argspec_1);
   decl->set_return<void > ();
 }
 
-static void _call_f_beginWriteArray_2684 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_beginWriteArray_2514 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSettings *)cls)->beginWriteArray (arg1, arg2);
@@ -192,21 +193,21 @@ static void _call_f_clear_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// bool QSettings::contains(const QString &key)
+// bool QSettings::contains(QAnyStringView key)
 
 
-static void _init_f_contains_c2025 (qt_gsi::GenericMethod *decl)
+static void _init_f_contains_c1855 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   decl->set_return<bool > ();
 }
 
-static void _call_f_contains_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_contains_c1855 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   ret.write<bool > ((bool)((QSettings *)cls)->contains (arg1));
 }
 
@@ -348,21 +349,21 @@ static void _call_f_organizationName_c0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// void QSettings::remove(const QString &key)
+// void QSettings::remove(QAnyStringView key)
 
 
-static void _init_f_remove_2025 (qt_gsi::GenericMethod *decl)
+static void _init_f_remove_1855 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_remove_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_remove_1855 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSettings *)cls)->remove (arg1);
 }
@@ -443,23 +444,23 @@ static void _call_f_setFallbacksEnabled_864 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// void QSettings::setValue(const QString &key, const QVariant &value)
+// void QSettings::setValue(QAnyStringView key, const QVariant &value)
 
 
-static void _init_f_setValue_4036 (qt_gsi::GenericMethod *decl)
+static void _init_f_setValue_3866 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("value");
   decl->add_arg<const QVariant & > (argspec_1);
   decl->set_return<void > ();
 }
 
-static void _call_f_setValue_4036 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_setValue_3866 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSettings *)cls)->setValue (arg1, arg2);
@@ -497,25 +498,44 @@ static void _call_f_sync_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
-// QVariant QSettings::value(const QString &key, const QVariant &defaultValue)
+// QVariant QSettings::value(QAnyStringView key, const QVariant &defaultValue)
 
 
-static void _init_f_value_c4036 (qt_gsi::GenericMethod *decl)
+static void _init_f_value_c3866 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("defaultValue", true, "QVariant()");
+  decl->add_arg<QAnyStringView > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("defaultValue");
   decl->add_arg<const QVariant & > (argspec_1);
   decl->set_return<QVariant > ();
 }
 
-static void _call_f_value_c4036 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_value_c3866 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QVariant &arg2 = args ? gsi::arg_reader<const QVariant & >() (args, heap) : gsi::arg_maker<const QVariant & >() (QVariant(), heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QSettings *)cls)->value (arg1, arg2));
+}
+
+
+// QVariant QSettings::value(QAnyStringView key)
+
+
+static void _init_f_value_c1855 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<QAnyStringView > (argspec_0);
+  decl->set_return<QVariant > ();
+}
+
+static void _call_f_value_c1855 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
+  ret.write<QVariant > ((QVariant)((QSettings *)cls)->value (arg1));
 }
 
 
@@ -613,13 +633,13 @@ static gsi::Methods methods_QSettings () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("allKeys", "@brief Method QStringList QSettings::allKeys()\n", true, &_init_f_allKeys_c0, &_call_f_allKeys_c0);
   methods += new qt_gsi::GenericMethod ("applicationName", "@brief Method QString QSettings::applicationName()\n", true, &_init_f_applicationName_c0, &_call_f_applicationName_c0);
-  methods += new qt_gsi::GenericMethod ("beginGroup", "@brief Method void QSettings::beginGroup(const QString &prefix)\n", false, &_init_f_beginGroup_2025, &_call_f_beginGroup_2025);
-  methods += new qt_gsi::GenericMethod ("beginReadArray", "@brief Method int QSettings::beginReadArray(const QString &prefix)\n", false, &_init_f_beginReadArray_2025, &_call_f_beginReadArray_2025);
-  methods += new qt_gsi::GenericMethod ("beginWriteArray", "@brief Method void QSettings::beginWriteArray(const QString &prefix, int size)\n", false, &_init_f_beginWriteArray_2684, &_call_f_beginWriteArray_2684);
+  methods += new qt_gsi::GenericMethod ("beginGroup", "@brief Method void QSettings::beginGroup(QAnyStringView prefix)\n", false, &_init_f_beginGroup_1855, &_call_f_beginGroup_1855);
+  methods += new qt_gsi::GenericMethod ("beginReadArray", "@brief Method int QSettings::beginReadArray(QAnyStringView prefix)\n", false, &_init_f_beginReadArray_1855, &_call_f_beginReadArray_1855);
+  methods += new qt_gsi::GenericMethod ("beginWriteArray", "@brief Method void QSettings::beginWriteArray(QAnyStringView prefix, int size)\n", false, &_init_f_beginWriteArray_2514, &_call_f_beginWriteArray_2514);
   methods += new qt_gsi::GenericMethod ("childGroups", "@brief Method QStringList QSettings::childGroups()\n", true, &_init_f_childGroups_c0, &_call_f_childGroups_c0);
   methods += new qt_gsi::GenericMethod ("childKeys", "@brief Method QStringList QSettings::childKeys()\n", true, &_init_f_childKeys_c0, &_call_f_childKeys_c0);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QSettings::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
-  methods += new qt_gsi::GenericMethod ("contains", "@brief Method bool QSettings::contains(const QString &key)\n", true, &_init_f_contains_c2025, &_call_f_contains_c2025);
+  methods += new qt_gsi::GenericMethod ("contains", "@brief Method bool QSettings::contains(QAnyStringView key)\n", true, &_init_f_contains_c1855, &_call_f_contains_c1855);
   methods += new qt_gsi::GenericMethod ("endArray", "@brief Method void QSettings::endArray()\n", false, &_init_f_endArray_0, &_call_f_endArray_0);
   methods += new qt_gsi::GenericMethod ("endGroup", "@brief Method void QSettings::endGroup()\n", false, &_init_f_endGroup_0, &_call_f_endGroup_0);
   methods += new qt_gsi::GenericMethod (":fallbacksEnabled", "@brief Method bool QSettings::fallbacksEnabled()\n", true, &_init_f_fallbacksEnabled_c0, &_call_f_fallbacksEnabled_c0);
@@ -629,15 +649,16 @@ static gsi::Methods methods_QSettings () {
   methods += new qt_gsi::GenericMethod ("isAtomicSyncRequired?|:atomicSyncRequired", "@brief Method bool QSettings::isAtomicSyncRequired()\n", true, &_init_f_isAtomicSyncRequired_c0, &_call_f_isAtomicSyncRequired_c0);
   methods += new qt_gsi::GenericMethod ("isWritable?", "@brief Method bool QSettings::isWritable()\n", true, &_init_f_isWritable_c0, &_call_f_isWritable_c0);
   methods += new qt_gsi::GenericMethod ("organizationName", "@brief Method QString QSettings::organizationName()\n", true, &_init_f_organizationName_c0, &_call_f_organizationName_c0);
-  methods += new qt_gsi::GenericMethod ("remove", "@brief Method void QSettings::remove(const QString &key)\n", false, &_init_f_remove_2025, &_call_f_remove_2025);
+  methods += new qt_gsi::GenericMethod ("remove", "@brief Method void QSettings::remove(QAnyStringView key)\n", false, &_init_f_remove_1855, &_call_f_remove_1855);
   methods += new qt_gsi::GenericMethod ("scope", "@brief Method QSettings::Scope QSettings::scope()\n", true, &_init_f_scope_c0, &_call_f_scope_c0);
   methods += new qt_gsi::GenericMethod ("setArrayIndex", "@brief Method void QSettings::setArrayIndex(int i)\n", false, &_init_f_setArrayIndex_767, &_call_f_setArrayIndex_767);
   methods += new qt_gsi::GenericMethod ("setAtomicSyncRequired|atomicSyncRequired=", "@brief Method void QSettings::setAtomicSyncRequired(bool enable)\n", false, &_init_f_setAtomicSyncRequired_864, &_call_f_setAtomicSyncRequired_864);
   methods += new qt_gsi::GenericMethod ("setFallbacksEnabled|fallbacksEnabled=", "@brief Method void QSettings::setFallbacksEnabled(bool b)\n", false, &_init_f_setFallbacksEnabled_864, &_call_f_setFallbacksEnabled_864);
-  methods += new qt_gsi::GenericMethod ("setValue", "@brief Method void QSettings::setValue(const QString &key, const QVariant &value)\n", false, &_init_f_setValue_4036, &_call_f_setValue_4036);
+  methods += new qt_gsi::GenericMethod ("setValue", "@brief Method void QSettings::setValue(QAnyStringView key, const QVariant &value)\n", false, &_init_f_setValue_3866, &_call_f_setValue_3866);
   methods += new qt_gsi::GenericMethod ("status", "@brief Method QSettings::Status QSettings::status()\n", true, &_init_f_status_c0, &_call_f_status_c0);
   methods += new qt_gsi::GenericMethod ("sync", "@brief Method void QSettings::sync()\n", false, &_init_f_sync_0, &_call_f_sync_0);
-  methods += new qt_gsi::GenericMethod ("value", "@brief Method QVariant QSettings::value(const QString &key, const QVariant &defaultValue)\n", true, &_init_f_value_c4036, &_call_f_value_c4036);
+  methods += new qt_gsi::GenericMethod ("value", "@brief Method QVariant QSettings::value(QAnyStringView key, const QVariant &defaultValue)\n", true, &_init_f_value_c3866, &_call_f_value_c3866);
+  methods += new qt_gsi::GenericMethod ("value", "@brief Method QVariant QSettings::value(QAnyStringView key)\n", true, &_init_f_value_c1855, &_call_f_value_c1855);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QSettings::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QSettings::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod (":defaultFormat", "@brief Static method QSettings::Format QSettings::defaultFormat()\nThis method is static and can be called without an instance.", &_init_f_defaultFormat_0, &_call_f_defaultFormat_0);

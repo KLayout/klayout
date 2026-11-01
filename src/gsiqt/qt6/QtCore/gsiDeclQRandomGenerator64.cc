@@ -132,18 +132,18 @@ static void _call_f_generate_0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// quint32 QRandomGenerator64::operator()()
+// quint64 QRandomGenerator64::operator()()
 
 
 static void _init_f_operator_func__0 (qt_gsi::GenericMethod *decl)
 {
-  decl->set_return<quint32 > ();
+  decl->set_return<quint64 > ();
 }
 
 static void _call_f_operator_func__0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<quint32 > ((quint32)((QRandomGenerator64 *)cls)->operator() ());
+  ret.write<quint64 > ((quint64)((QRandomGenerator64 *)cls)->operator() ());
 }
 
 
@@ -162,33 +162,33 @@ static void _call_f_global_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi:
 }
 
 
-// static quint32 QRandomGenerator64::max()
+// static quint64 QRandomGenerator64::max()
 
 
 static void _init_f_max_0 (qt_gsi::GenericStaticMethod *decl)
 {
-  decl->set_return<quint32 > ();
+  decl->set_return<quint64 > ();
 }
 
 static void _call_f_max_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<quint32 > ((quint32)QRandomGenerator64::max ());
+  ret.write<quint64 > ((quint64)QRandomGenerator64::max ());
 }
 
 
-// static quint32 QRandomGenerator64::min()
+// static quint64 QRandomGenerator64::min()
 
 
 static void _init_f_min_0 (qt_gsi::GenericStaticMethod *decl)
 {
-  decl->set_return<quint32 > ();
+  decl->set_return<quint64 > ();
 }
 
 static void _call_f_min_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<quint32 > ((quint32)QRandomGenerator64::min ());
+  ret.write<quint64 > ((quint64)QRandomGenerator64::min ());
 }
 
 
@@ -233,10 +233,10 @@ static gsi::Methods methods_QRandomGenerator64 () {
   methods += new qt_gsi::GenericMethod ("discard", "@brief Method void QRandomGenerator64::discard(unsigned long long int z)\n", false, &_init_f_discard_2924, &_call_f_discard_2924);
   methods += new qt_gsi::GenericMethod ("generate", "@brief Method void QRandomGenerator64::generate(quint32 *begin, quint32 *end)\n", false, &_init_f_generate_2460, &_call_f_generate_2460);
   methods += new qt_gsi::GenericMethod ("generate", "@brief Method quint64 QRandomGenerator64::generate()\n", false, &_init_f_generate_0, &_call_f_generate_0);
-  methods += new qt_gsi::GenericMethod ("()", "@brief Method quint32 QRandomGenerator64::operator()()\n", false, &_init_f_operator_func__0, &_call_f_operator_func__0);
+  methods += new qt_gsi::GenericMethod ("()", "@brief Method quint64 QRandomGenerator64::operator()()\n", false, &_init_f_operator_func__0, &_call_f_operator_func__0);
   methods += new qt_gsi::GenericStaticMethod ("global", "@brief Static method QRandomGenerator64 *QRandomGenerator64::global()\nThis method is static and can be called without an instance.", &_init_f_global_0, &_call_f_global_0);
-  methods += new qt_gsi::GenericStaticMethod ("max", "@brief Static method quint32 QRandomGenerator64::max()\nThis method is static and can be called without an instance.", &_init_f_max_0, &_call_f_max_0);
-  methods += new qt_gsi::GenericStaticMethod ("min", "@brief Static method quint32 QRandomGenerator64::min()\nThis method is static and can be called without an instance.", &_init_f_min_0, &_call_f_min_0);
+  methods += new qt_gsi::GenericStaticMethod ("max", "@brief Static method quint64 QRandomGenerator64::max()\nThis method is static and can be called without an instance.", &_init_f_max_0, &_call_f_max_0);
+  methods += new qt_gsi::GenericStaticMethod ("min", "@brief Static method quint64 QRandomGenerator64::min()\nThis method is static and can be called without an instance.", &_init_f_min_0, &_call_f_min_0);
   methods += new qt_gsi::GenericStaticMethod ("securelySeeded", "@brief Static method QRandomGenerator64 QRandomGenerator64::securelySeeded()\nThis method is static and can be called without an instance.", &_init_f_securelySeeded_0, &_call_f_securelySeeded_0);
   methods += new qt_gsi::GenericStaticMethod ("system", "@brief Static method QRandomGenerator64 *QRandomGenerator64::system()\nThis method is static and can be called without an instance.", &_init_f_system_0, &_call_f_system_0);
   return methods;

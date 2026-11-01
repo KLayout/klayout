@@ -597,6 +597,26 @@ static void _call_f_setValue_4036 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
+// void QSqlRecord::swap(QSqlRecord &other)
+
+
+static void _init_f_swap_1610 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<QSqlRecord & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_swap_1610 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QSqlRecord &arg1 = gsi::arg_reader<QSqlRecord & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QSqlRecord *)cls)->swap (arg1);
+}
+
+
 // QVariant QSqlRecord::value(int i)
 
 
@@ -670,6 +690,7 @@ static gsi::Methods methods_QSqlRecord () {
   methods += new qt_gsi::GenericMethod ("setNull", "@brief Method void QSqlRecord::setNull(const QString &name)\n", false, &_init_f_setNull_2025, &_call_f_setNull_2025);
   methods += new qt_gsi::GenericMethod ("setValue", "@brief Method void QSqlRecord::setValue(int i, const QVariant &val)\n", false, &_init_f_setValue_2778, &_call_f_setValue_2778);
   methods += new qt_gsi::GenericMethod ("setValue", "@brief Method void QSqlRecord::setValue(const QString &name, const QVariant &val)\n", false, &_init_f_setValue_4036, &_call_f_setValue_4036);
+  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QSqlRecord::swap(QSqlRecord &other)\n", false, &_init_f_swap_1610, &_call_f_swap_1610);
   methods += new qt_gsi::GenericMethod ("value", "@brief Method QVariant QSqlRecord::value(int i)\n", true, &_init_f_value_c767, &_call_f_value_c767);
   methods += new qt_gsi::GenericMethod ("value", "@brief Method QVariant QSqlRecord::value(const QString &name)\n", true, &_init_f_value_c2025, &_call_f_value_c2025);
   return methods;

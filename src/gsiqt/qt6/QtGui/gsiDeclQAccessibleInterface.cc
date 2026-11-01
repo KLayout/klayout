@@ -29,6 +29,7 @@
 
 #include <QAccessibleInterface>
 #include <QAccessibleHyperlinkInterface>
+#include <QAccessibleSelectionInterface>
 #include <QAccessibleTableCellInterface>
 #include <QColor>
 #include <QObject>
@@ -289,6 +290,21 @@ static void _call_f_role_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
+// QAccessibleSelectionInterface *QAccessibleInterface::selectionInterface()
+
+
+static void _init_f_selectionInterface_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QAccessibleSelectionInterface * > ();
+}
+
+static void _call_f_selectionInterface_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QAccessibleSelectionInterface * > ((QAccessibleSelectionInterface *)((QAccessibleInterface *)cls)->selectionInterface ());
+}
+
+
 // void QAccessibleInterface::setText(QAccessible::Text t, const QString &text)
 
 
@@ -420,6 +436,7 @@ static gsi::Methods methods_QAccessibleInterface () {
   methods += new qt_gsi::GenericMethod ("rect", "@brief Method QRect QAccessibleInterface::rect()\n", true, &_init_f_rect_c0, &_call_f_rect_c0);
   methods += new qt_gsi::GenericMethod ("relations", "@brief Method QList<QPair<QAccessibleInterface *, QAccessible::Relation> > QAccessibleInterface::relations(QFlags<QAccessible::RelationFlag> match)\n", true, &_init_f_relations_c3543, &_call_f_relations_c3543);
   methods += new qt_gsi::GenericMethod ("role", "@brief Method QAccessible::Role QAccessibleInterface::role()\n", true, &_init_f_role_c0, &_call_f_role_c0);
+  methods += new qt_gsi::GenericMethod ("selectionInterface", "@brief Method QAccessibleSelectionInterface *QAccessibleInterface::selectionInterface()\n", false, &_init_f_selectionInterface_0, &_call_f_selectionInterface_0);
   methods += new qt_gsi::GenericMethod ("setText", "@brief Method void QAccessibleInterface::setText(QAccessible::Text t, const QString &text)\n", false, &_init_f_setText_3977, &_call_f_setText_3977);
   methods += new qt_gsi::GenericMethod ("state", "@brief Method QAccessible::State QAccessibleInterface::state()\n", true, &_init_f_state_c0, &_call_f_state_c0);
   methods += new qt_gsi::GenericMethod ("tableCellInterface", "@brief Method QAccessibleTableCellInterface *QAccessibleInterface::tableCellInterface()\n", false, &_init_f_tableCellInterface_0, &_call_f_tableCellInterface_0);

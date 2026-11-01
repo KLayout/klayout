@@ -289,6 +289,21 @@ static void _call_f_mappedBytes_c767 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
+// bool QVideoFrame::mirrored()
+
+
+static void _init_f_mirrored_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_mirrored_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QVideoFrame *)cls)->mirrored ());
+}
+
+
 // QVideoFrame &QVideoFrame::operator =(const QVideoFrame &other)
 
 
@@ -402,6 +417,21 @@ static void _call_f_planeCount_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
+// QVideoFrame::RotationAngle QVideoFrame::rotationAngle()
+
+
+static void _init_f_rotationAngle_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<qt_gsi::Converter<QVideoFrame::RotationAngle>::target_type > ();
+}
+
+static void _call_f_rotationAngle_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<qt_gsi::Converter<QVideoFrame::RotationAngle>::target_type > ((qt_gsi::Converter<QVideoFrame::RotationAngle>::target_type)qt_gsi::CppToQtAdaptor<QVideoFrame::RotationAngle>(((QVideoFrame *)cls)->rotationAngle ()));
+}
+
+
 // void QVideoFrame::setEndTime(qint64 time)
 
 
@@ -419,6 +449,46 @@ static void _call_f_setEndTime_986 (const qt_gsi::GenericMethod * /*decl*/, void
   qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoFrame *)cls)->setEndTime (arg1);
+}
+
+
+// void QVideoFrame::setMirrored(bool)
+
+
+static void _init_f_setMirrored_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setMirrored_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QVideoFrame *)cls)->setMirrored (arg1);
+}
+
+
+// void QVideoFrame::setRotationAngle(QVideoFrame::RotationAngle)
+
+
+static void _init_f_setRotationAngle_2962 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<const qt_gsi::Converter<QVideoFrame::RotationAngle>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setRotationAngle_2962 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QVideoFrame::RotationAngle>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QVideoFrame::RotationAngle>::target_type & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QVideoFrame *)cls)->setRotationAngle (qt_gsi::QtToCppAdaptor<QVideoFrame::RotationAngle>(arg1).cref());
 }
 
 
@@ -609,13 +679,17 @@ static gsi::Methods methods_QVideoFrame () {
   methods += new qt_gsi::GenericMethod ("map", "@brief Method bool QVideoFrame::map(QVideoFrame::MapMode mode)\n", false, &_init_f_map_2302, &_call_f_map_2302);
   methods += new qt_gsi::GenericMethod ("mapMode", "@brief Method QVideoFrame::MapMode QVideoFrame::mapMode()\n", true, &_init_f_mapMode_c0, &_call_f_mapMode_c0);
   methods += new qt_gsi::GenericMethod ("mappedBytes", "@brief Method int QVideoFrame::mappedBytes(int plane)\n", true, &_init_f_mappedBytes_c767, &_call_f_mappedBytes_c767);
+  methods += new qt_gsi::GenericMethod ("mirrored", "@brief Method bool QVideoFrame::mirrored()\n", true, &_init_f_mirrored_c0, &_call_f_mirrored_c0);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QVideoFrame &QVideoFrame::operator =(const QVideoFrame &other)\n", false, &_init_f_operator_eq__2388, &_call_f_operator_eq__2388);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QVideoFrame::operator!=(const QVideoFrame &other)\n", true, &_init_f_operator_excl__eq__c2388, &_call_f_operator_excl__eq__c2388);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QVideoFrame::operator==(const QVideoFrame &other)\n", true, &_init_f_operator_eq__eq__c2388, &_call_f_operator_eq__eq__c2388);
   methods += new qt_gsi::GenericMethod ("paint", "@brief Method void QVideoFrame::paint(QPainter *painter, const QRectF &rect, const QVideoFrame::PaintOptions &options)\n", false, &_init_f_paint_6832, &_call_f_paint_6832);
   methods += new qt_gsi::GenericMethod ("pixelFormat", "@brief Method QVideoFrameFormat::PixelFormat QVideoFrame::pixelFormat()\n", true, &_init_f_pixelFormat_c0, &_call_f_pixelFormat_c0);
   methods += new qt_gsi::GenericMethod ("planeCount", "@brief Method int QVideoFrame::planeCount()\n", true, &_init_f_planeCount_c0, &_call_f_planeCount_c0);
+  methods += new qt_gsi::GenericMethod ("rotationAngle", "@brief Method QVideoFrame::RotationAngle QVideoFrame::rotationAngle()\n", true, &_init_f_rotationAngle_c0, &_call_f_rotationAngle_c0);
   methods += new qt_gsi::GenericMethod ("setEndTime|endTime=", "@brief Method void QVideoFrame::setEndTime(qint64 time)\n", false, &_init_f_setEndTime_986, &_call_f_setEndTime_986);
+  methods += new qt_gsi::GenericMethod ("setMirrored", "@brief Method void QVideoFrame::setMirrored(bool)\n", false, &_init_f_setMirrored_864, &_call_f_setMirrored_864);
+  methods += new qt_gsi::GenericMethod ("setRotationAngle", "@brief Method void QVideoFrame::setRotationAngle(QVideoFrame::RotationAngle)\n", false, &_init_f_setRotationAngle_2962, &_call_f_setRotationAngle_2962);
   methods += new qt_gsi::GenericMethod ("setStartTime|startTime=", "@brief Method void QVideoFrame::setStartTime(qint64 time)\n", false, &_init_f_setStartTime_986, &_call_f_setStartTime_986);
   methods += new qt_gsi::GenericMethod ("setSubtitleText|subtitleText=", "@brief Method void QVideoFrame::setSubtitleText(const QString &text)\n", false, &_init_f_setSubtitleText_2025, &_call_f_setSubtitleText_2025);
   methods += new qt_gsi::GenericMethod ("size", "@brief Method QSize QVideoFrame::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
@@ -677,6 +751,28 @@ static gsi::QFlagsClass<QVideoFrame::MapMode > decl_QVideoFrame_MapMode_Enums ("
 static gsi::ClassExt<QVideoFrame> inject_QVideoFrame_MapMode_Enum_in_parent (decl_QVideoFrame_MapMode_Enum.defs ());
 static gsi::ClassExt<QVideoFrame> decl_QVideoFrame_MapMode_Enum_as_child (decl_QVideoFrame_MapMode_Enum, "MapMode");
 static gsi::ClassExt<QVideoFrame> decl_QVideoFrame_MapMode_Enums_as_child (decl_QVideoFrame_MapMode_Enums, "QFlags_MapMode");
+
+}
+
+
+//  Implementation of the enum wrapper class for QVideoFrame::RotationAngle
+namespace qt_gsi
+{
+
+static gsi::Enum<QVideoFrame::RotationAngle> decl_QVideoFrame_RotationAngle_Enum ("QtMultimedia", "QVideoFrame_RotationAngle",
+    gsi::enum_const ("Rotation0", QVideoFrame::Rotation0, "@brief Enum constant QVideoFrame::Rotation0") +
+    gsi::enum_const ("Rotation90", QVideoFrame::Rotation90, "@brief Enum constant QVideoFrame::Rotation90") +
+    gsi::enum_const ("Rotation180", QVideoFrame::Rotation180, "@brief Enum constant QVideoFrame::Rotation180") +
+    gsi::enum_const ("Rotation270", QVideoFrame::Rotation270, "@brief Enum constant QVideoFrame::Rotation270"),
+  "@qt\n@brief This class represents the QVideoFrame::RotationAngle enum");
+
+static gsi::QFlagsClass<QVideoFrame::RotationAngle > decl_QVideoFrame_RotationAngle_Enums ("QtMultimedia", "QVideoFrame_QFlags_RotationAngle",
+  "@qt\n@brief This class represents the QFlags<QVideoFrame::RotationAngle> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QVideoFrame> inject_QVideoFrame_RotationAngle_Enum_in_parent (decl_QVideoFrame_RotationAngle_Enum.defs ());
+static gsi::ClassExt<QVideoFrame> decl_QVideoFrame_RotationAngle_Enum_as_child (decl_QVideoFrame_RotationAngle_Enum, "RotationAngle");
+static gsi::ClassExt<QVideoFrame> decl_QVideoFrame_RotationAngle_Enums_as_child (decl_QVideoFrame_RotationAngle_Enums, "QFlags_RotationAngle");
 
 }
 

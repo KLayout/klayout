@@ -28,6 +28,7 @@
 */
 
 #include <QFormLayout>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QLayout>
@@ -567,6 +568,63 @@ static void _call_f_invalidate_0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
+// bool QFormLayout::isRowVisible(int row)
+
+
+static void _init_f_isRowVisible_c767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("row");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isRowVisible_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ret.write<bool > ((bool)((QFormLayout *)cls)->isRowVisible (arg1));
+}
+
+
+// bool QFormLayout::isRowVisible(QWidget *widget)
+
+
+static void _init_f_isRowVisible_c1315 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("widget");
+  decl->add_arg<QWidget * > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isRowVisible_c1315 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  ret.write<bool > ((bool)((QFormLayout *)cls)->isRowVisible (arg1));
+}
+
+
+// bool QFormLayout::isRowVisible(QLayout *layout)
+
+
+static void _init_f_isRowVisible_c1341 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("layout");
+  decl->add_arg<QLayout * > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isRowVisible_c1341 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QLayout *arg1 = gsi::arg_reader<QLayout * >() (args, heap);
+  ret.write<bool > ((bool)((QFormLayout *)cls)->isRowVisible (arg1));
+}
+
+
 // QLayoutItem *QFormLayout::itemAt(int row, QFormLayout::ItemRole role)
 
 
@@ -918,6 +976,75 @@ static void _call_f_setLayout_4368 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
+// void QFormLayout::setRowVisible(int row, bool on)
+
+
+static void _init_f_setRowVisible_1523 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("row");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("on");
+  decl->add_arg<bool > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setRowVisible_1523 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QFormLayout *)cls)->setRowVisible (arg1, arg2);
+}
+
+
+// void QFormLayout::setRowVisible(QWidget *widget, bool on)
+
+
+static void _init_f_setRowVisible_2071 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("widget");
+  decl->add_arg<QWidget * > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("on");
+  decl->add_arg<bool > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setRowVisible_2071 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QFormLayout *)cls)->setRowVisible (arg1, arg2);
+}
+
+
+// void QFormLayout::setRowVisible(QLayout *layout, bool on)
+
+
+static void _init_f_setRowVisible_2097 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("layout");
+  decl->add_arg<QLayout * > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("on");
+  decl->add_arg<bool > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setRowVisible_2097 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QLayout *arg1 = gsi::arg_reader<QLayout * >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QFormLayout *)cls)->setRowVisible (arg1, arg2);
+}
+
+
 // void QFormLayout::setRowWrapPolicy(QFormLayout::RowWrapPolicy policy)
 
 
@@ -1180,6 +1307,9 @@ static gsi::Methods methods_QFormLayout () {
   methods += new qt_gsi::GenericMethod ("insertRow", "@brief Method void QFormLayout::insertRow(int row, QWidget *widget)\n", false, &_init_f_insertRow_1974, &_call_f_insertRow_1974);
   methods += new qt_gsi::GenericMethod ("insertRow", "@brief Method void QFormLayout::insertRow(int row, QLayout *layout)\n", false, &_init_f_insertRow_2000, &_call_f_insertRow_2000);
   methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method void QFormLayout::invalidate()\nThis is a reimplementation of QLayout::invalidate", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
+  methods += new qt_gsi::GenericMethod ("isRowVisible?", "@brief Method bool QFormLayout::isRowVisible(int row)\n", true, &_init_f_isRowVisible_c767, &_call_f_isRowVisible_c767);
+  methods += new qt_gsi::GenericMethod ("isRowVisible?", "@brief Method bool QFormLayout::isRowVisible(QWidget *widget)\n", true, &_init_f_isRowVisible_c1315, &_call_f_isRowVisible_c1315);
+  methods += new qt_gsi::GenericMethod ("isRowVisible?", "@brief Method bool QFormLayout::isRowVisible(QLayout *layout)\n", true, &_init_f_isRowVisible_c1341, &_call_f_isRowVisible_c1341);
   methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QLayoutItem *QFormLayout::itemAt(int row, QFormLayout::ItemRole role)\n", true, &_init_f_itemAt_c3135, &_call_f_itemAt_c3135);
   methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QLayoutItem *QFormLayout::itemAt(int index)\nThis is a reimplementation of QLayout::itemAt", true, &_init_f_itemAt_c767, &_call_f_itemAt_c767);
   methods += new qt_gsi::GenericMethod (":labelAlignment", "@brief Method QFlags<Qt::AlignmentFlag> QFormLayout::labelAlignment()\n", true, &_init_f_labelAlignment_c0, &_call_f_labelAlignment_c0);
@@ -1198,6 +1328,9 @@ static gsi::Methods methods_QFormLayout () {
   methods += new qt_gsi::GenericMethod ("setItem", "@brief Method void QFormLayout::setItem(int row, QFormLayout::ItemRole role, QLayoutItem *item)\n", false, &_init_f_setItem_4767, &_call_f_setItem_4767);
   methods += new qt_gsi::GenericMethod ("setLabelAlignment|labelAlignment=", "@brief Method void QFormLayout::setLabelAlignment(QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_setLabelAlignment_2750, &_call_f_setLabelAlignment_2750);
   methods += new qt_gsi::GenericMethod ("setLayout", "@brief Method void QFormLayout::setLayout(int row, QFormLayout::ItemRole role, QLayout *layout)\n", false, &_init_f_setLayout_4368, &_call_f_setLayout_4368);
+  methods += new qt_gsi::GenericMethod ("setRowVisible", "@brief Method void QFormLayout::setRowVisible(int row, bool on)\n", false, &_init_f_setRowVisible_1523, &_call_f_setRowVisible_1523);
+  methods += new qt_gsi::GenericMethod ("setRowVisible", "@brief Method void QFormLayout::setRowVisible(QWidget *widget, bool on)\n", false, &_init_f_setRowVisible_2071, &_call_f_setRowVisible_2071);
+  methods += new qt_gsi::GenericMethod ("setRowVisible", "@brief Method void QFormLayout::setRowVisible(QLayout *layout, bool on)\n", false, &_init_f_setRowVisible_2097, &_call_f_setRowVisible_2097);
   methods += new qt_gsi::GenericMethod ("setRowWrapPolicy|rowWrapPolicy=", "@brief Method void QFormLayout::setRowWrapPolicy(QFormLayout::RowWrapPolicy policy)\n", false, &_init_f_setRowWrapPolicy_3021, &_call_f_setRowWrapPolicy_3021);
   methods += new qt_gsi::GenericMethod ("setSpacing|spacing=", "@brief Method void QFormLayout::setSpacing(int)\nThis is a reimplementation of QLayout::setSpacing", false, &_init_f_setSpacing_767, &_call_f_setSpacing_767);
   methods += new qt_gsi::GenericMethod ("setVerticalSpacing|verticalSpacing=", "@brief Method void QFormLayout::setVerticalSpacing(int spacing)\n", false, &_init_f_setVerticalSpacing_767, &_call_f_setVerticalSpacing_767);

@@ -28,6 +28,7 @@
 */
 
 #include <QXmlStreamWriter>
+#include <QAnyStringView>
 #include <QIODevice>
 #include <QXmlStreamAttribute>
 #include <QXmlStreamAttributes>
@@ -231,50 +232,50 @@ static void _call_f_setDevice_1447 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// void QXmlStreamWriter::writeAttribute(const QString &qualifiedName, const QString &value)
+// void QXmlStreamWriter::writeAttribute(QAnyStringView qualifiedName, QAnyStringView value)
 
 
-static void _init_f_writeAttribute_3942 (qt_gsi::GenericMethod *decl)
+static void _init_f_writeAttribute_3602 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("qualifiedName");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("value");
-  decl->add_arg<const QString & > (argspec_1);
+  decl->add_arg<QAnyStringView > (argspec_1);
   decl->set_return<void > ();
 }
 
-static void _call_f_writeAttribute_3942 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_writeAttribute_3602 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
+  QAnyStringView arg2 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamWriter *)cls)->writeAttribute (arg1, arg2);
 }
 
 
-// void QXmlStreamWriter::writeAttribute(const QString &namespaceUri, const QString &name, const QString &value)
+// void QXmlStreamWriter::writeAttribute(QAnyStringView namespaceUri, QAnyStringView name, QAnyStringView value)
 
 
-static void _init_f_writeAttribute_5859 (qt_gsi::GenericMethod *decl)
+static void _init_f_writeAttribute_5349 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("namespaceUri");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("name");
-  decl->add_arg<const QString & > (argspec_1);
+  decl->add_arg<QAnyStringView > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("value");
-  decl->add_arg<const QString & > (argspec_2);
+  decl->add_arg<QAnyStringView > (argspec_2);
   decl->set_return<void > ();
 }
 
-static void _call_f_writeAttribute_5859 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_writeAttribute_5349 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
-  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
+  QAnyStringView arg2 = gsi::arg_reader<QAnyStringView >() (args, heap);
+  QAnyStringView arg3 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamWriter *)cls)->writeAttribute (arg1, arg2, arg3);
 }
@@ -320,61 +321,61 @@ static void _call_f_writeAttributes_3382 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// void QXmlStreamWriter::writeCDATA(const QString &text)
+// void QXmlStreamWriter::writeCDATA(QAnyStringView text)
 
 
-static void _init_f_writeCDATA_2025 (qt_gsi::GenericMethod *decl)
+static void _init_f_writeCDATA_1855 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("text");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_writeCDATA_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_writeCDATA_1855 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamWriter *)cls)->writeCDATA (arg1);
 }
 
 
-// void QXmlStreamWriter::writeCharacters(const QString &text)
+// void QXmlStreamWriter::writeCharacters(QAnyStringView text)
 
 
-static void _init_f_writeCharacters_2025 (qt_gsi::GenericMethod *decl)
+static void _init_f_writeCharacters_1855 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("text");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_writeCharacters_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_writeCharacters_1855 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamWriter *)cls)->writeCharacters (arg1);
 }
 
 
-// void QXmlStreamWriter::writeComment(const QString &text)
+// void QXmlStreamWriter::writeComment(QAnyStringView text)
 
 
-static void _init_f_writeComment_2025 (qt_gsi::GenericMethod *decl)
+static void _init_f_writeComment_1855 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("text");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_writeComment_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_writeComment_1855 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamWriter *)cls)->writeComment (arg1);
 }
@@ -400,84 +401,84 @@ static void _call_f_writeCurrentToken_2914 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// void QXmlStreamWriter::writeDTD(const QString &dtd)
+// void QXmlStreamWriter::writeDTD(QAnyStringView dtd)
 
 
-static void _init_f_writeDTD_2025 (qt_gsi::GenericMethod *decl)
+static void _init_f_writeDTD_1855 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("dtd");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_writeDTD_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_writeDTD_1855 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamWriter *)cls)->writeDTD (arg1);
 }
 
 
-// void QXmlStreamWriter::writeDefaultNamespace(const QString &namespaceUri)
+// void QXmlStreamWriter::writeDefaultNamespace(QAnyStringView namespaceUri)
 
 
-static void _init_f_writeDefaultNamespace_2025 (qt_gsi::GenericMethod *decl)
+static void _init_f_writeDefaultNamespace_1855 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("namespaceUri");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_writeDefaultNamespace_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_writeDefaultNamespace_1855 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamWriter *)cls)->writeDefaultNamespace (arg1);
 }
 
 
-// void QXmlStreamWriter::writeEmptyElement(const QString &qualifiedName)
+// void QXmlStreamWriter::writeEmptyElement(QAnyStringView qualifiedName)
 
 
-static void _init_f_writeEmptyElement_2025 (qt_gsi::GenericMethod *decl)
+static void _init_f_writeEmptyElement_1855 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("qualifiedName");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_writeEmptyElement_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_writeEmptyElement_1855 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamWriter *)cls)->writeEmptyElement (arg1);
 }
 
 
-// void QXmlStreamWriter::writeEmptyElement(const QString &namespaceUri, const QString &name)
+// void QXmlStreamWriter::writeEmptyElement(QAnyStringView namespaceUri, QAnyStringView name)
 
 
-static void _init_f_writeEmptyElement_3942 (qt_gsi::GenericMethod *decl)
+static void _init_f_writeEmptyElement_3602 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("namespaceUri");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("name");
-  decl->add_arg<const QString & > (argspec_1);
+  decl->add_arg<QAnyStringView > (argspec_1);
   decl->set_return<void > ();
 }
 
-static void _call_f_writeEmptyElement_3942 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_writeEmptyElement_3602 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
+  QAnyStringView arg2 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamWriter *)cls)->writeEmptyElement (arg1, arg2);
 }
@@ -515,67 +516,67 @@ static void _call_f_writeEndElement_0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// void QXmlStreamWriter::writeEntityReference(const QString &name)
+// void QXmlStreamWriter::writeEntityReference(QAnyStringView name)
 
 
-static void _init_f_writeEntityReference_2025 (qt_gsi::GenericMethod *decl)
+static void _init_f_writeEntityReference_1855 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_writeEntityReference_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_writeEntityReference_1855 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamWriter *)cls)->writeEntityReference (arg1);
 }
 
 
-// void QXmlStreamWriter::writeNamespace(const QString &namespaceUri, const QString &prefix)
+// void QXmlStreamWriter::writeNamespace(QAnyStringView namespaceUri, QAnyStringView prefix)
 
 
-static void _init_f_writeNamespace_3942 (qt_gsi::GenericMethod *decl)
+static void _init_f_writeNamespace_3602 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("namespaceUri");
-  decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("prefix", true, "QString()");
-  decl->add_arg<const QString & > (argspec_1);
+  decl->add_arg<QAnyStringView > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("prefix", true, "{}");
+  decl->add_arg<QAnyStringView > (argspec_1);
   decl->set_return<void > ();
 }
 
-static void _call_f_writeNamespace_3942 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_writeNamespace_3602 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
+  QAnyStringView arg2 = args ? gsi::arg_reader<QAnyStringView >() (args, heap) : gsi::arg_maker<QAnyStringView >() ({}, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamWriter *)cls)->writeNamespace (arg1, arg2);
 }
 
 
-// void QXmlStreamWriter::writeProcessingInstruction(const QString &target, const QString &data)
+// void QXmlStreamWriter::writeProcessingInstruction(QAnyStringView target, QAnyStringView data)
 
 
-static void _init_f_writeProcessingInstruction_3942 (qt_gsi::GenericMethod *decl)
+static void _init_f_writeProcessingInstruction_3602 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("target");
-  decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("data", true, "QString()");
-  decl->add_arg<const QString & > (argspec_1);
+  decl->add_arg<QAnyStringView > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("data", true, "{}");
+  decl->add_arg<QAnyStringView > (argspec_1);
   decl->set_return<void > ();
 }
 
-static void _call_f_writeProcessingInstruction_3942 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_writeProcessingInstruction_3602 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
+  QAnyStringView arg2 = args ? gsi::arg_reader<QAnyStringView >() (args, heap) : gsi::arg_maker<QAnyStringView >() ({}, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamWriter *)cls)->writeProcessingInstruction (arg1, arg2);
 }
@@ -597,136 +598,136 @@ static void _call_f_writeStartDocument_0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// void QXmlStreamWriter::writeStartDocument(const QString &version)
+// void QXmlStreamWriter::writeStartDocument(QAnyStringView version)
 
 
-static void _init_f_writeStartDocument_2025 (qt_gsi::GenericMethod *decl)
+static void _init_f_writeStartDocument_1855 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("version");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_writeStartDocument_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_writeStartDocument_1855 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamWriter *)cls)->writeStartDocument (arg1);
 }
 
 
-// void QXmlStreamWriter::writeStartDocument(const QString &version, bool standalone)
+// void QXmlStreamWriter::writeStartDocument(QAnyStringView version, bool standalone)
 
 
-static void _init_f_writeStartDocument_2781 (qt_gsi::GenericMethod *decl)
+static void _init_f_writeStartDocument_2611 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("version");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("standalone");
   decl->add_arg<bool > (argspec_1);
   decl->set_return<void > ();
 }
 
-static void _call_f_writeStartDocument_2781 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_writeStartDocument_2611 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   bool arg2 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamWriter *)cls)->writeStartDocument (arg1, arg2);
 }
 
 
-// void QXmlStreamWriter::writeStartElement(const QString &qualifiedName)
+// void QXmlStreamWriter::writeStartElement(QAnyStringView qualifiedName)
 
 
-static void _init_f_writeStartElement_2025 (qt_gsi::GenericMethod *decl)
+static void _init_f_writeStartElement_1855 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("qualifiedName");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_writeStartElement_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_writeStartElement_1855 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamWriter *)cls)->writeStartElement (arg1);
 }
 
 
-// void QXmlStreamWriter::writeStartElement(const QString &namespaceUri, const QString &name)
+// void QXmlStreamWriter::writeStartElement(QAnyStringView namespaceUri, QAnyStringView name)
 
 
-static void _init_f_writeStartElement_3942 (qt_gsi::GenericMethod *decl)
+static void _init_f_writeStartElement_3602 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("namespaceUri");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("name");
-  decl->add_arg<const QString & > (argspec_1);
+  decl->add_arg<QAnyStringView > (argspec_1);
   decl->set_return<void > ();
 }
 
-static void _call_f_writeStartElement_3942 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_writeStartElement_3602 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
+  QAnyStringView arg2 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamWriter *)cls)->writeStartElement (arg1, arg2);
 }
 
 
-// void QXmlStreamWriter::writeTextElement(const QString &qualifiedName, const QString &text)
+// void QXmlStreamWriter::writeTextElement(QAnyStringView qualifiedName, QAnyStringView text)
 
 
-static void _init_f_writeTextElement_3942 (qt_gsi::GenericMethod *decl)
+static void _init_f_writeTextElement_3602 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("qualifiedName");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("text");
-  decl->add_arg<const QString & > (argspec_1);
+  decl->add_arg<QAnyStringView > (argspec_1);
   decl->set_return<void > ();
 }
 
-static void _call_f_writeTextElement_3942 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_writeTextElement_3602 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
+  QAnyStringView arg2 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamWriter *)cls)->writeTextElement (arg1, arg2);
 }
 
 
-// void QXmlStreamWriter::writeTextElement(const QString &namespaceUri, const QString &name, const QString &text)
+// void QXmlStreamWriter::writeTextElement(QAnyStringView namespaceUri, QAnyStringView name, QAnyStringView text)
 
 
-static void _init_f_writeTextElement_5859 (qt_gsi::GenericMethod *decl)
+static void _init_f_writeTextElement_5349 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("namespaceUri");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("name");
-  decl->add_arg<const QString & > (argspec_1);
+  decl->add_arg<QAnyStringView > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("text");
-  decl->add_arg<const QString & > (argspec_2);
+  decl->add_arg<QAnyStringView > (argspec_2);
   decl->set_return<void > ();
 }
 
-static void _call_f_writeTextElement_5859 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_writeTextElement_5349 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
-  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
+  QAnyStringView arg2 = gsi::arg_reader<QAnyStringView >() (args, heap);
+  QAnyStringView arg3 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamWriter *)cls)->writeTextElement (arg1, arg2, arg3);
 }
@@ -749,30 +750,30 @@ static gsi::Methods methods_QXmlStreamWriter () {
   methods += new qt_gsi::GenericMethod ("setAutoFormatting|autoFormatting=", "@brief Method void QXmlStreamWriter::setAutoFormatting(bool)\n", false, &_init_f_setAutoFormatting_864, &_call_f_setAutoFormatting_864);
   methods += new qt_gsi::GenericMethod ("setAutoFormattingIndent|autoFormattingIndent=", "@brief Method void QXmlStreamWriter::setAutoFormattingIndent(int spacesOrTabs)\n", false, &_init_f_setAutoFormattingIndent_767, &_call_f_setAutoFormattingIndent_767);
   methods += new qt_gsi::GenericMethod ("setDevice|device=", "@brief Method void QXmlStreamWriter::setDevice(QIODevice *device)\n", false, &_init_f_setDevice_1447, &_call_f_setDevice_1447);
-  methods += new qt_gsi::GenericMethod ("writeAttribute", "@brief Method void QXmlStreamWriter::writeAttribute(const QString &qualifiedName, const QString &value)\n", false, &_init_f_writeAttribute_3942, &_call_f_writeAttribute_3942);
-  methods += new qt_gsi::GenericMethod ("writeAttribute", "@brief Method void QXmlStreamWriter::writeAttribute(const QString &namespaceUri, const QString &name, const QString &value)\n", false, &_init_f_writeAttribute_5859, &_call_f_writeAttribute_5859);
+  methods += new qt_gsi::GenericMethod ("writeAttribute", "@brief Method void QXmlStreamWriter::writeAttribute(QAnyStringView qualifiedName, QAnyStringView value)\n", false, &_init_f_writeAttribute_3602, &_call_f_writeAttribute_3602);
+  methods += new qt_gsi::GenericMethod ("writeAttribute", "@brief Method void QXmlStreamWriter::writeAttribute(QAnyStringView namespaceUri, QAnyStringView name, QAnyStringView value)\n", false, &_init_f_writeAttribute_5349, &_call_f_writeAttribute_5349);
   methods += new qt_gsi::GenericMethod ("writeAttribute", "@brief Method void QXmlStreamWriter::writeAttribute(const QXmlStreamAttribute &attribute)\n", false, &_init_f_writeAttribute_3267, &_call_f_writeAttribute_3267);
   methods += new qt_gsi::GenericMethod ("writeAttributes", "@brief Method void QXmlStreamWriter::writeAttributes(const QXmlStreamAttributes &attributes)\n", false, &_init_f_writeAttributes_3382, &_call_f_writeAttributes_3382);
-  methods += new qt_gsi::GenericMethod ("writeCDATA", "@brief Method void QXmlStreamWriter::writeCDATA(const QString &text)\n", false, &_init_f_writeCDATA_2025, &_call_f_writeCDATA_2025);
-  methods += new qt_gsi::GenericMethod ("writeCharacters", "@brief Method void QXmlStreamWriter::writeCharacters(const QString &text)\n", false, &_init_f_writeCharacters_2025, &_call_f_writeCharacters_2025);
-  methods += new qt_gsi::GenericMethod ("writeComment", "@brief Method void QXmlStreamWriter::writeComment(const QString &text)\n", false, &_init_f_writeComment_2025, &_call_f_writeComment_2025);
+  methods += new qt_gsi::GenericMethod ("writeCDATA", "@brief Method void QXmlStreamWriter::writeCDATA(QAnyStringView text)\n", false, &_init_f_writeCDATA_1855, &_call_f_writeCDATA_1855);
+  methods += new qt_gsi::GenericMethod ("writeCharacters", "@brief Method void QXmlStreamWriter::writeCharacters(QAnyStringView text)\n", false, &_init_f_writeCharacters_1855, &_call_f_writeCharacters_1855);
+  methods += new qt_gsi::GenericMethod ("writeComment", "@brief Method void QXmlStreamWriter::writeComment(QAnyStringView text)\n", false, &_init_f_writeComment_1855, &_call_f_writeComment_1855);
   methods += new qt_gsi::GenericMethod ("writeCurrentToken", "@brief Method void QXmlStreamWriter::writeCurrentToken(const QXmlStreamReader &reader)\n", false, &_init_f_writeCurrentToken_2914, &_call_f_writeCurrentToken_2914);
-  methods += new qt_gsi::GenericMethod ("writeDTD", "@brief Method void QXmlStreamWriter::writeDTD(const QString &dtd)\n", false, &_init_f_writeDTD_2025, &_call_f_writeDTD_2025);
-  methods += new qt_gsi::GenericMethod ("writeDefaultNamespace", "@brief Method void QXmlStreamWriter::writeDefaultNamespace(const QString &namespaceUri)\n", false, &_init_f_writeDefaultNamespace_2025, &_call_f_writeDefaultNamespace_2025);
-  methods += new qt_gsi::GenericMethod ("writeEmptyElement", "@brief Method void QXmlStreamWriter::writeEmptyElement(const QString &qualifiedName)\n", false, &_init_f_writeEmptyElement_2025, &_call_f_writeEmptyElement_2025);
-  methods += new qt_gsi::GenericMethod ("writeEmptyElement", "@brief Method void QXmlStreamWriter::writeEmptyElement(const QString &namespaceUri, const QString &name)\n", false, &_init_f_writeEmptyElement_3942, &_call_f_writeEmptyElement_3942);
+  methods += new qt_gsi::GenericMethod ("writeDTD", "@brief Method void QXmlStreamWriter::writeDTD(QAnyStringView dtd)\n", false, &_init_f_writeDTD_1855, &_call_f_writeDTD_1855);
+  methods += new qt_gsi::GenericMethod ("writeDefaultNamespace", "@brief Method void QXmlStreamWriter::writeDefaultNamespace(QAnyStringView namespaceUri)\n", false, &_init_f_writeDefaultNamespace_1855, &_call_f_writeDefaultNamespace_1855);
+  methods += new qt_gsi::GenericMethod ("writeEmptyElement", "@brief Method void QXmlStreamWriter::writeEmptyElement(QAnyStringView qualifiedName)\n", false, &_init_f_writeEmptyElement_1855, &_call_f_writeEmptyElement_1855);
+  methods += new qt_gsi::GenericMethod ("writeEmptyElement", "@brief Method void QXmlStreamWriter::writeEmptyElement(QAnyStringView namespaceUri, QAnyStringView name)\n", false, &_init_f_writeEmptyElement_3602, &_call_f_writeEmptyElement_3602);
   methods += new qt_gsi::GenericMethod ("writeEndDocument", "@brief Method void QXmlStreamWriter::writeEndDocument()\n", false, &_init_f_writeEndDocument_0, &_call_f_writeEndDocument_0);
   methods += new qt_gsi::GenericMethod ("writeEndElement", "@brief Method void QXmlStreamWriter::writeEndElement()\n", false, &_init_f_writeEndElement_0, &_call_f_writeEndElement_0);
-  methods += new qt_gsi::GenericMethod ("writeEntityReference", "@brief Method void QXmlStreamWriter::writeEntityReference(const QString &name)\n", false, &_init_f_writeEntityReference_2025, &_call_f_writeEntityReference_2025);
-  methods += new qt_gsi::GenericMethod ("writeNamespace", "@brief Method void QXmlStreamWriter::writeNamespace(const QString &namespaceUri, const QString &prefix)\n", false, &_init_f_writeNamespace_3942, &_call_f_writeNamespace_3942);
-  methods += new qt_gsi::GenericMethod ("writeProcessingInstruction", "@brief Method void QXmlStreamWriter::writeProcessingInstruction(const QString &target, const QString &data)\n", false, &_init_f_writeProcessingInstruction_3942, &_call_f_writeProcessingInstruction_3942);
+  methods += new qt_gsi::GenericMethod ("writeEntityReference", "@brief Method void QXmlStreamWriter::writeEntityReference(QAnyStringView name)\n", false, &_init_f_writeEntityReference_1855, &_call_f_writeEntityReference_1855);
+  methods += new qt_gsi::GenericMethod ("writeNamespace", "@brief Method void QXmlStreamWriter::writeNamespace(QAnyStringView namespaceUri, QAnyStringView prefix)\n", false, &_init_f_writeNamespace_3602, &_call_f_writeNamespace_3602);
+  methods += new qt_gsi::GenericMethod ("writeProcessingInstruction", "@brief Method void QXmlStreamWriter::writeProcessingInstruction(QAnyStringView target, QAnyStringView data)\n", false, &_init_f_writeProcessingInstruction_3602, &_call_f_writeProcessingInstruction_3602);
   methods += new qt_gsi::GenericMethod ("writeStartDocument", "@brief Method void QXmlStreamWriter::writeStartDocument()\n", false, &_init_f_writeStartDocument_0, &_call_f_writeStartDocument_0);
-  methods += new qt_gsi::GenericMethod ("writeStartDocument", "@brief Method void QXmlStreamWriter::writeStartDocument(const QString &version)\n", false, &_init_f_writeStartDocument_2025, &_call_f_writeStartDocument_2025);
-  methods += new qt_gsi::GenericMethod ("writeStartDocument", "@brief Method void QXmlStreamWriter::writeStartDocument(const QString &version, bool standalone)\n", false, &_init_f_writeStartDocument_2781, &_call_f_writeStartDocument_2781);
-  methods += new qt_gsi::GenericMethod ("writeStartElement", "@brief Method void QXmlStreamWriter::writeStartElement(const QString &qualifiedName)\n", false, &_init_f_writeStartElement_2025, &_call_f_writeStartElement_2025);
-  methods += new qt_gsi::GenericMethod ("writeStartElement", "@brief Method void QXmlStreamWriter::writeStartElement(const QString &namespaceUri, const QString &name)\n", false, &_init_f_writeStartElement_3942, &_call_f_writeStartElement_3942);
-  methods += new qt_gsi::GenericMethod ("writeTextElement", "@brief Method void QXmlStreamWriter::writeTextElement(const QString &qualifiedName, const QString &text)\n", false, &_init_f_writeTextElement_3942, &_call_f_writeTextElement_3942);
-  methods += new qt_gsi::GenericMethod ("writeTextElement", "@brief Method void QXmlStreamWriter::writeTextElement(const QString &namespaceUri, const QString &name, const QString &text)\n", false, &_init_f_writeTextElement_5859, &_call_f_writeTextElement_5859);
+  methods += new qt_gsi::GenericMethod ("writeStartDocument", "@brief Method void QXmlStreamWriter::writeStartDocument(QAnyStringView version)\n", false, &_init_f_writeStartDocument_1855, &_call_f_writeStartDocument_1855);
+  methods += new qt_gsi::GenericMethod ("writeStartDocument", "@brief Method void QXmlStreamWriter::writeStartDocument(QAnyStringView version, bool standalone)\n", false, &_init_f_writeStartDocument_2611, &_call_f_writeStartDocument_2611);
+  methods += new qt_gsi::GenericMethod ("writeStartElement", "@brief Method void QXmlStreamWriter::writeStartElement(QAnyStringView qualifiedName)\n", false, &_init_f_writeStartElement_1855, &_call_f_writeStartElement_1855);
+  methods += new qt_gsi::GenericMethod ("writeStartElement", "@brief Method void QXmlStreamWriter::writeStartElement(QAnyStringView namespaceUri, QAnyStringView name)\n", false, &_init_f_writeStartElement_3602, &_call_f_writeStartElement_3602);
+  methods += new qt_gsi::GenericMethod ("writeTextElement", "@brief Method void QXmlStreamWriter::writeTextElement(QAnyStringView qualifiedName, QAnyStringView text)\n", false, &_init_f_writeTextElement_3602, &_call_f_writeTextElement_3602);
+  methods += new qt_gsi::GenericMethod ("writeTextElement", "@brief Method void QXmlStreamWriter::writeTextElement(QAnyStringView namespaceUri, QAnyStringView name, QAnyStringView text)\n", false, &_init_f_writeTextElement_5349, &_call_f_writeTextElement_5349);
   return methods;
 }
 

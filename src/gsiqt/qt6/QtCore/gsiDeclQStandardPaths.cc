@@ -269,7 +269,9 @@ static gsi::Enum<QStandardPaths::StandardLocation> decl_QStandardPaths_StandardL
     gsi::enum_const ("GenericCacheLocation", QStandardPaths::GenericCacheLocation, "@brief Enum constant QStandardPaths::GenericCacheLocation") +
     gsi::enum_const ("GenericConfigLocation", QStandardPaths::GenericConfigLocation, "@brief Enum constant QStandardPaths::GenericConfigLocation") +
     gsi::enum_const ("AppDataLocation", QStandardPaths::AppDataLocation, "@brief Enum constant QStandardPaths::AppDataLocation") +
-    gsi::enum_const ("AppConfigLocation", QStandardPaths::AppConfigLocation, "@brief Enum constant QStandardPaths::AppConfigLocation"),
+    gsi::enum_const ("AppConfigLocation", QStandardPaths::AppConfigLocation, "@brief Enum constant QStandardPaths::AppConfigLocation") +
+    gsi::enum_const ("PublicShareLocation", QStandardPaths::PublicShareLocation, "@brief Enum constant QStandardPaths::PublicShareLocation") +
+    gsi::enum_const ("TemplatesLocation", QStandardPaths::TemplatesLocation, "@brief Enum constant QStandardPaths::TemplatesLocation"),
   "@qt\n@brief This class represents the QStandardPaths::StandardLocation enum");
 
 static gsi::QFlagsClass<QStandardPaths::StandardLocation > decl_QStandardPaths_StandardLocation_Enums ("QtCore", "QStandardPaths_QFlags_StandardLocation",

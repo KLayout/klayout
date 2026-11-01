@@ -30,6 +30,7 @@
 #include <QAccessibleWidget>
 #include <QAccessibleHyperlinkInterface>
 #include <QAccessibleInterface>
+#include <QAccessibleSelectionInterface>
 #include <QAccessibleTableCellInterface>
 #include <QColor>
 #include <QObject>

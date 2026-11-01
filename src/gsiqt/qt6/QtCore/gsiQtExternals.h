@@ -85,6 +85,10 @@ struct QBindingStatus;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QBindingStatus> &qtdecl_QBindingStatus (); }
 
+class QBluetoothPermission;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QBluetoothPermission> &qtdecl_QBluetoothPermission (); }
+
 class QBuffer;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QBuffer> &qtdecl_QBuffer (); }
@@ -96,6 +100,14 @@ namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QByteArrayMatcher> &qtdecl_QByteArr
 class QCalendar;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QCalendar> &qtdecl_QCalendar (); }
+
+class QCalendarPermission;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QCalendarPermission> &qtdecl_QCalendarPermission (); }
+
+class QCameraPermission;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QCameraPermission> &qtdecl_QCameraPermission (); }
 
 class QChildEvent;
 
@@ -120,6 +132,10 @@ namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QCommandLineParser> &qtdecl_QComman
 class QConcatenateTablesProxyModel;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QConcatenateTablesProxyModel> &qtdecl_QConcatenateTablesProxyModel (); }
+
+class QContactsPermission;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QContactsPermission> &qtdecl_QContactsPermission (); }
 
 class QCoreApplication;
 
@@ -253,6 +269,10 @@ class QJsonValue;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QJsonValue> &qtdecl_QJsonValue (); }
 
+class QJsonValueConstRef;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QJsonValueConstRef> &qtdecl_QJsonValueConstRef (); }
+
 class QJsonValueRef;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QJsonValueRef> &qtdecl_QJsonValueRef (); }
@@ -260,6 +280,10 @@ namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QJsonValueRef> &qtdecl_QJsonValueRe
 class QKeyCombination;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QKeyCombination> &qtdecl_QKeyCombination (); }
+
+class QLatin1StringMatcher;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QLatin1StringMatcher> &qtdecl_QLatin1StringMatcher (); }
 
 class QLibrary;
 
@@ -280,6 +304,10 @@ namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QLineF> &qtdecl_QLineF (); }
 class QLocale;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QLocale> &qtdecl_QLocale (); }
+
+class QLocationPermission;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QLocationPermission> &qtdecl_QLocationPermission (); }
 
 class QLockFile;
 
@@ -329,6 +357,14 @@ class QMetaMethod;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QMetaMethod> &qtdecl_QMetaMethod (); }
 
+struct QMetaMethodArgument;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QMetaMethodArgument> &qtdecl_QMetaMethodArgument (); }
+
+struct QMetaMethodReturnArgument;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QMetaMethodReturnArgument> &qtdecl_QMetaMethodReturnArgument (); }
+
 struct QMetaObject;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QMetaObject> &qtdecl_QMetaObject (); }
@@ -348,6 +384,10 @@ namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QMetaType> &qtdecl_QMetaType (); }
 struct QMethodRawArguments;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QMethodRawArguments> &qtdecl_QMethodRawArguments (); }
+
+class QMicrophonePermission;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QMicrophonePermission> &qtdecl_QMicrophonePermission (); }
 
 class QMimeData;
 
@@ -377,6 +417,10 @@ class QMutex;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QMutex> &qtdecl_QMutex (); }
 
+class QNativeIpcKey;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QNativeIpcKey> &qtdecl_QNativeIpcKey (); }
+
 class QNoDebug;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QNoDebug> &qtdecl_QNoDebug (); }
@@ -401,6 +445,10 @@ class QPauseAnimation;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QPauseAnimation> &qtdecl_QPauseAnimation (); }
 
+class QPermission;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QPermission> &qtdecl_QPermission (); }
+
 class QPersistentModelIndex;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QPersistentModelIndex> &qtdecl_QPersistentModelIndex (); }
@@ -408,10 +456,6 @@ namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QPersistentModelIndex> &qtdecl_QPer
 class QPluginLoader;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QPluginLoader> &qtdecl_QPluginLoader (); }
-
-struct QPluginMetaData;
-
-namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QPluginMetaData> &qtdecl_QPluginMetaData (); }
 
 class QPoint;
 
@@ -508,6 +552,10 @@ namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QRunnable> &qtdecl_QRunnable (); }
 class QSaveFile;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QSaveFile> &qtdecl_QSaveFile (); }
+
+class QScopedPropertyUpdateGroup;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QScopedPropertyUpdateGroup> &qtdecl_QScopedPropertyUpdateGroup (); }
 
 class QSemaphore;
 

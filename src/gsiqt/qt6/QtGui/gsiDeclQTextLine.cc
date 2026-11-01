@@ -129,6 +129,31 @@ static void _call_f_draw_c3304 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
+// QList<QGlyphRun> QTextLine::glyphRuns(int from, int length, QFlags<QTextLayout::GlyphRunRetrievalFlag> flags)
+
+
+static void _init_f_glyphRuns_c5851 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("from");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("length");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("flags");
+  decl->add_arg<QFlags<QTextLayout::GlyphRunRetrievalFlag> > (argspec_2);
+  decl->set_return<QList<QGlyphRun> > ();
+}
+
+static void _call_f_glyphRuns_c5851 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  QFlags<QTextLayout::GlyphRunRetrievalFlag> arg3 = gsi::arg_reader<QFlags<QTextLayout::GlyphRunRetrievalFlag> >() (args, heap);
+  ret.write<QList<QGlyphRun> > ((QList<QGlyphRun>)((QTextLine *)cls)->glyphRuns (arg1, arg2, arg3));
+}
+
+
 // QList<QGlyphRun> QTextLine::glyphRuns(int from, int length)
 
 
@@ -512,6 +537,7 @@ static gsi::Methods methods_QTextLine () {
   methods += new qt_gsi::GenericMethod ("cursorToX", "@brief Method double QTextLine::cursorToX(int cursorPos, QTextLine::Edge edge)\n", true, &_init_f_cursorToX_c2478, &_call_f_cursorToX_c2478);
   methods += new qt_gsi::GenericMethod ("descent", "@brief Method double QTextLine::descent()\n", true, &_init_f_descent_c0, &_call_f_descent_c0);
   methods += new qt_gsi::GenericMethod ("draw", "@brief Method void QTextLine::draw(QPainter *painter, const QPointF &position)\n", true, &_init_f_draw_c3304, &_call_f_draw_c3304);
+  methods += new qt_gsi::GenericMethod ("glyphRuns", "@brief Method QList<QGlyphRun> QTextLine::glyphRuns(int from, int length, QFlags<QTextLayout::GlyphRunRetrievalFlag> flags)\n", true, &_init_f_glyphRuns_c5851, &_call_f_glyphRuns_c5851);
   methods += new qt_gsi::GenericMethod ("glyphRuns", "@brief Method QList<QGlyphRun> QTextLine::glyphRuns(int from, int length)\n", true, &_init_f_glyphRuns_c1426, &_call_f_glyphRuns_c1426);
   methods += new qt_gsi::GenericMethod ("height", "@brief Method double QTextLine::height()\n", true, &_init_f_height_c0, &_call_f_height_c0);
   methods += new qt_gsi::GenericMethod ("horizontalAdvance", "@brief Method double QTextLine::horizontalAdvance()\n", true, &_init_f_horizontalAdvance_c0, &_call_f_horizontalAdvance_c0);

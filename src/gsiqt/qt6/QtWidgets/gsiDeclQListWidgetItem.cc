@@ -531,6 +531,46 @@ static void _call_f_setTextAlignment_767 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
+// void QListWidgetItem::setTextAlignment(Qt::AlignmentFlag alignment)
+
+
+static void _init_f_setTextAlignment_2054 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("alignment");
+  decl->add_arg<const qt_gsi::Converter<Qt::AlignmentFlag>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setTextAlignment_2054 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<Qt::AlignmentFlag>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::AlignmentFlag>::target_type & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QListWidgetItem *)cls)->setTextAlignment (qt_gsi::QtToCppAdaptor<Qt::AlignmentFlag>(arg1).cref());
+}
+
+
+// void QListWidgetItem::setTextAlignment(QFlags<Qt::AlignmentFlag> alignment)
+
+
+static void _init_f_setTextAlignment_2750 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("alignment");
+  decl->add_arg<QFlags<Qt::AlignmentFlag> > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setTextAlignment_2750 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QFlags<Qt::AlignmentFlag> arg1 = gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QListWidgetItem *)cls)->setTextAlignment (arg1);
+}
+
+
 // void QListWidgetItem::setToolTip(const QString &toolTip)
 
 
@@ -728,6 +768,8 @@ static gsi::Methods methods_QListWidgetItem () {
   methods += new qt_gsi::GenericMethod ("setStatusTip|statusTip=", "@brief Method void QListWidgetItem::setStatusTip(const QString &statusTip)\n", false, &_init_f_setStatusTip_2025, &_call_f_setStatusTip_2025);
   methods += new qt_gsi::GenericMethod ("setText|text=", "@brief Method void QListWidgetItem::setText(const QString &text)\n", false, &_init_f_setText_2025, &_call_f_setText_2025);
   methods += new qt_gsi::GenericMethod ("setTextAlignment|textAlignment=", "@brief Method void QListWidgetItem::setTextAlignment(int alignment)\n", false, &_init_f_setTextAlignment_767, &_call_f_setTextAlignment_767);
+  methods += new qt_gsi::GenericMethod ("setTextAlignment|textAlignment=", "@brief Method void QListWidgetItem::setTextAlignment(Qt::AlignmentFlag alignment)\n", false, &_init_f_setTextAlignment_2054, &_call_f_setTextAlignment_2054);
+  methods += new qt_gsi::GenericMethod ("setTextAlignment|textAlignment=", "@brief Method void QListWidgetItem::setTextAlignment(QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_setTextAlignment_2750, &_call_f_setTextAlignment_2750);
   methods += new qt_gsi::GenericMethod ("setToolTip|toolTip=", "@brief Method void QListWidgetItem::setToolTip(const QString &toolTip)\n", false, &_init_f_setToolTip_2025, &_call_f_setToolTip_2025);
   methods += new qt_gsi::GenericMethod ("setWhatsThis|whatsThis=", "@brief Method void QListWidgetItem::setWhatsThis(const QString &whatsThis)\n", false, &_init_f_setWhatsThis_2025, &_call_f_setWhatsThis_2025);
   methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QListWidgetItem::sizeHint()\n", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);

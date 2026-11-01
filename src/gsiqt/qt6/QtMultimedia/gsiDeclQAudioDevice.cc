@@ -70,6 +70,21 @@ static void _call_ctor_QAudioDevice_2484 (const qt_gsi::GenericStaticMethod * /*
 }
 
 
+// QAudioFormat::ChannelConfig QAudioDevice::channelConfiguration()
+
+
+static void _init_f_channelConfiguration_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<qt_gsi::Converter<QAudioFormat::ChannelConfig>::target_type > ();
+}
+
+static void _call_f_channelConfiguration_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<qt_gsi::Converter<QAudioFormat::ChannelConfig>::target_type > ((qt_gsi::Converter<QAudioFormat::ChannelConfig>::target_type)qt_gsi::CppToQtAdaptor<QAudioFormat::ChannelConfig>(((QAudioDevice *)cls)->channelConfiguration ()));
+}
+
+
 // QString QAudioDevice::description()
 
 
@@ -339,6 +354,7 @@ static gsi::Methods methods_QAudioDevice () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAudioDevice::QAudioDevice()\nThis method creates an object of class QAudioDevice.", &_init_ctor_QAudioDevice_0, &_call_ctor_QAudioDevice_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAudioDevice::QAudioDevice(const QAudioDevice &other)\nThis method creates an object of class QAudioDevice.", &_init_ctor_QAudioDevice_2484, &_call_ctor_QAudioDevice_2484);
+  methods += new qt_gsi::GenericMethod ("channelConfiguration", "@brief Method QAudioFormat::ChannelConfig QAudioDevice::channelConfiguration()\n", true, &_init_f_channelConfiguration_c0, &_call_f_channelConfiguration_c0);
   methods += new qt_gsi::GenericMethod ("description", "@brief Method QString QAudioDevice::description()\n", true, &_init_f_description_c0, &_call_f_description_c0);
   methods += new qt_gsi::GenericMethod ("id", "@brief Method QByteArray QAudioDevice::id()\n", true, &_init_f_id_c0, &_call_f_id_c0);
   methods += new qt_gsi::GenericMethod ("isDefault?", "@brief Method bool QAudioDevice::isDefault()\n", true, &_init_f_isDefault_c0, &_call_f_isDefault_c0);

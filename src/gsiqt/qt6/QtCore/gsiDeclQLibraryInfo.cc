@@ -66,6 +66,21 @@ static void _call_f_isDebugBuild_0 (const qt_gsi::GenericStaticMethod * /*decl*/
 }
 
 
+// static bool QLibraryInfo::isSharedBuild()
+
+
+static void _init_f_isSharedBuild_0 (qt_gsi::GenericStaticMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isSharedBuild_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)QLibraryInfo::isSharedBuild ());
+}
+
+
 // static QString QLibraryInfo::location(QLibraryInfo::LibraryLocation location)
 
 
@@ -146,6 +161,7 @@ static gsi::Methods methods_QLibraryInfo () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("build", "@brief Static method const char *QLibraryInfo::build()\nThis method is static and can be called without an instance.", &_init_f_build_0, &_call_f_build_0);
   methods += new qt_gsi::GenericStaticMethod ("isDebugBuild?", "@brief Static method bool QLibraryInfo::isDebugBuild()\nThis method is static and can be called without an instance.", &_init_f_isDebugBuild_0, &_call_f_isDebugBuild_0);
+  methods += new qt_gsi::GenericStaticMethod ("isSharedBuild?", "@brief Static method bool QLibraryInfo::isSharedBuild()\nThis method is static and can be called without an instance.", &_init_f_isSharedBuild_0, &_call_f_isSharedBuild_0);
   methods += new qt_gsi::GenericStaticMethod ("location", "@brief Static method QString QLibraryInfo::location(QLibraryInfo::LibraryLocation location)\nThis method is static and can be called without an instance.", &_init_f_location_3304, &_call_f_location_3304);
   methods += new qt_gsi::GenericStaticMethod ("path", "@brief Static method QString QLibraryInfo::path(QLibraryInfo::LibraryPath p)\nThis method is static and can be called without an instance.", &_init_f_path_2876, &_call_f_path_2876);
   methods += new qt_gsi::GenericStaticMethod ("platformPluginArguments", "@brief Static method QStringList QLibraryInfo::platformPluginArguments(const QString &platformName)\nThis method is static and can be called without an instance.", &_init_f_platformPluginArguments_2025, &_call_f_platformPluginArguments_2025);

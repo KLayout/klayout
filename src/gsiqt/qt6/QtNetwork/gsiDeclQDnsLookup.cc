@@ -28,6 +28,7 @@
 */
 
 #include <QDnsLookup>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QDnsDomainNameRecord>
 #include <QDnsHostAddressRecord>
@@ -227,6 +228,41 @@ static void _call_f_nameserver_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
+// quint16 QDnsLookup::nameserverPort()
+
+
+static void _init_f_nameserverPort_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<quint16 > ();
+}
+
+static void _call_f_nameserverPort_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<quint16 > ((quint16)((QDnsLookup *)cls)->nameserverPort ());
+}
+
+
+// void QDnsLookup::nameserverPortChanged(quint16 port)
+
+
+static void _init_f_nameserverPortChanged_1100 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("port");
+  decl->add_arg<quint16 > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_nameserverPortChanged_1100 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  quint16 arg1 = gsi::arg_reader<quint16 >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QDnsLookup *)cls)->nameserverPortChanged (arg1);
+}
+
+
 // QList<QDnsDomainNameRecord> QDnsLookup::pointerRecords()
 
 
@@ -294,6 +330,49 @@ static void _call_f_setNameserver_2518 (const qt_gsi::GenericMethod * /*decl*/, 
   const QHostAddress &arg1 = gsi::arg_reader<const QHostAddress & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDnsLookup *)cls)->setNameserver (arg1);
+}
+
+
+// void QDnsLookup::setNameserver(const QHostAddress &nameserver, quint16 port)
+
+
+static void _init_f_setNameserver_3510 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("nameserver");
+  decl->add_arg<const QHostAddress & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("port");
+  decl->add_arg<quint16 > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setNameserver_3510 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QHostAddress &arg1 = gsi::arg_reader<const QHostAddress & >() (args, heap);
+  quint16 arg2 = gsi::arg_reader<quint16 >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QDnsLookup *)cls)->setNameserver (arg1, arg2);
+}
+
+
+// void QDnsLookup::setNameserverPort(quint16 port)
+
+
+static void _init_f_setNameserverPort_1100 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("port");
+  decl->add_arg<quint16 > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setNameserverPort_1100 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  quint16 arg1 = gsi::arg_reader<quint16 >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QDnsLookup *)cls)->setNameserverPort (arg1);
 }
 
 
@@ -389,10 +468,14 @@ static gsi::Methods methods_QDnsLookup () {
   methods += new qt_gsi::GenericMethod (":name", "@brief Method QString QDnsLookup::name()\n", true, &_init_f_name_c0, &_call_f_name_c0);
   methods += new qt_gsi::GenericMethod ("nameServerRecords", "@brief Method QList<QDnsDomainNameRecord> QDnsLookup::nameServerRecords()\n", true, &_init_f_nameServerRecords_c0, &_call_f_nameServerRecords_c0);
   methods += new qt_gsi::GenericMethod (":nameserver", "@brief Method QHostAddress QDnsLookup::nameserver()\n", true, &_init_f_nameserver_c0, &_call_f_nameserver_c0);
+  methods += new qt_gsi::GenericMethod ("nameserverPort", "@brief Method quint16 QDnsLookup::nameserverPort()\n", true, &_init_f_nameserverPort_c0, &_call_f_nameserverPort_c0);
+  methods += new qt_gsi::GenericMethod ("nameserverPortChanged", "@brief Method void QDnsLookup::nameserverPortChanged(quint16 port)\n", false, &_init_f_nameserverPortChanged_1100, &_call_f_nameserverPortChanged_1100);
   methods += new qt_gsi::GenericMethod ("pointerRecords", "@brief Method QList<QDnsDomainNameRecord> QDnsLookup::pointerRecords()\n", true, &_init_f_pointerRecords_c0, &_call_f_pointerRecords_c0);
   methods += new qt_gsi::GenericMethod ("serviceRecords", "@brief Method QList<QDnsServiceRecord> QDnsLookup::serviceRecords()\n", true, &_init_f_serviceRecords_c0, &_call_f_serviceRecords_c0);
   methods += new qt_gsi::GenericMethod ("setName|name=", "@brief Method void QDnsLookup::setName(const QString &name)\n", false, &_init_f_setName_2025, &_call_f_setName_2025);
   methods += new qt_gsi::GenericMethod ("setNameserver|nameserver=", "@brief Method void QDnsLookup::setNameserver(const QHostAddress &nameserver)\n", false, &_init_f_setNameserver_2518, &_call_f_setNameserver_2518);
+  methods += new qt_gsi::GenericMethod ("setNameserver", "@brief Method void QDnsLookup::setNameserver(const QHostAddress &nameserver, quint16 port)\n", false, &_init_f_setNameserver_3510, &_call_f_setNameserver_3510);
+  methods += new qt_gsi::GenericMethod ("setNameserverPort", "@brief Method void QDnsLookup::setNameserverPort(quint16 port)\n", false, &_init_f_setNameserverPort_1100, &_call_f_setNameserverPort_1100);
   methods += new qt_gsi::GenericMethod ("setType|type=", "@brief Method void QDnsLookup::setType(QDnsLookup::Type)\n", false, &_init_f_setType_1978, &_call_f_setType_1978);
   methods += new qt_gsi::GenericMethod ("textRecords", "@brief Method QList<QDnsTextRecord> QDnsLookup::textRecords()\n", true, &_init_f_textRecords_c0, &_call_f_textRecords_c0);
   methods += new qt_gsi::GenericMethod (":type", "@brief Method QDnsLookup::Type QDnsLookup::type()\n", true, &_init_f_type_c0, &_call_f_type_c0);
@@ -455,6 +538,18 @@ public:
 
   //  [adaptor ctor] QDnsLookup::QDnsLookup(QDnsLookup::Type type, const QString &name, const QHostAddress &nameserver, QObject *parent)
   QDnsLookup_Adaptor(QDnsLookup::Type type, const QString &name, const QHostAddress &nameserver, QObject *parent) : QDnsLookup(type, name, nameserver, parent)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
+  //  [adaptor ctor] QDnsLookup::QDnsLookup(QDnsLookup::Type type, const QString &name, const QHostAddress &nameserver, quint16 port, QObject *parent)
+  QDnsLookup_Adaptor(QDnsLookup::Type type, const QString &name, const QHostAddress &nameserver, quint16 port) : QDnsLookup(type, name, nameserver, port)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
+  //  [adaptor ctor] QDnsLookup::QDnsLookup(QDnsLookup::Type type, const QString &name, const QHostAddress &nameserver, quint16 port, QObject *parent)
+  QDnsLookup_Adaptor(QDnsLookup::Type type, const QString &name, const QHostAddress &nameserver, quint16 port, QObject *parent) : QDnsLookup(type, name, nameserver, port, parent)
   {
     qt_gsi::QtObjectBase::init (this);
   }
@@ -682,6 +777,36 @@ static void _call_ctor_QDnsLookup_Adaptor_7499 (const qt_gsi::GenericStaticMetho
   const QHostAddress &arg3 = gsi::arg_reader<const QHostAddress & >() (args, heap);
   QObject *arg4 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QDnsLookup_Adaptor *> (new QDnsLookup_Adaptor (qt_gsi::QtToCppAdaptor<QDnsLookup::Type>(arg1).cref(), arg2, arg3, arg4));
+}
+
+
+//  Constructor QDnsLookup::QDnsLookup(QDnsLookup::Type type, const QString &name, const QHostAddress &nameserver, quint16 port, QObject *parent) (adaptor class)
+
+static void _init_ctor_QDnsLookup_Adaptor_8491 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("type");
+  decl->add_arg<const qt_gsi::Converter<QDnsLookup::Type>::target_type & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("name");
+  decl->add_arg<const QString & > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("nameserver");
+  decl->add_arg<const QHostAddress & > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("port");
+  decl->add_arg<quint16 > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("parent", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_4);
+  decl->set_return_new<QDnsLookup_Adaptor> ();
+}
+
+static void _call_ctor_QDnsLookup_Adaptor_8491 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QDnsLookup::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QDnsLookup::Type>::target_type & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QHostAddress &arg3 = gsi::arg_reader<const QHostAddress & >() (args, heap);
+  quint16 arg4 = gsi::arg_reader<quint16 >() (args, heap);
+  QObject *arg5 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ret.write<QDnsLookup_Adaptor *> (new QDnsLookup_Adaptor (qt_gsi::QtToCppAdaptor<QDnsLookup::Type>(arg1).cref(), arg2, arg3, arg4, arg5));
 }
 
 
@@ -1008,6 +1133,7 @@ static gsi::Methods methods_QDnsLookup_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDnsLookup::QDnsLookup(QObject *parent)\nThis method creates an object of class QDnsLookup.", &_init_ctor_QDnsLookup_Adaptor_1302, &_call_ctor_QDnsLookup_Adaptor_1302);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDnsLookup::QDnsLookup(QDnsLookup::Type type, const QString &name, QObject *parent)\nThis method creates an object of class QDnsLookup.", &_init_ctor_QDnsLookup_Adaptor_5089, &_call_ctor_QDnsLookup_Adaptor_5089);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDnsLookup::QDnsLookup(QDnsLookup::Type type, const QString &name, const QHostAddress &nameserver, QObject *parent)\nThis method creates an object of class QDnsLookup.", &_init_ctor_QDnsLookup_Adaptor_7499, &_call_ctor_QDnsLookup_Adaptor_7499);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDnsLookup::QDnsLookup(QDnsLookup::Type type, const QString &name, const QHostAddress &nameserver, quint16 port, QObject *parent)\nThis method creates an object of class QDnsLookup.", &_init_ctor_QDnsLookup_Adaptor_8491, &_call_ctor_QDnsLookup_Adaptor_8491);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QDnsLookup::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QDnsLookup::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
@@ -1052,7 +1178,8 @@ static gsi::Enum<QDnsLookup::Error> decl_QDnsLookup_Error_Enum ("QtNetwork", "QD
     gsi::enum_const ("InvalidReplyError", QDnsLookup::InvalidReplyError, "@brief Enum constant QDnsLookup::InvalidReplyError") +
     gsi::enum_const ("ServerFailureError", QDnsLookup::ServerFailureError, "@brief Enum constant QDnsLookup::ServerFailureError") +
     gsi::enum_const ("ServerRefusedError", QDnsLookup::ServerRefusedError, "@brief Enum constant QDnsLookup::ServerRefusedError") +
-    gsi::enum_const ("NotFoundError", QDnsLookup::NotFoundError, "@brief Enum constant QDnsLookup::NotFoundError"),
+    gsi::enum_const ("NotFoundError", QDnsLookup::NotFoundError, "@brief Enum constant QDnsLookup::NotFoundError") +
+    gsi::enum_const ("TimeoutError", QDnsLookup::TimeoutError, "@brief Enum constant QDnsLookup::TimeoutError"),
   "@qt\n@brief This class represents the QDnsLookup::Error enum");
 
 static gsi::QFlagsClass<QDnsLookup::Error > decl_QDnsLookup_Error_Enums ("QtNetwork", "QDnsLookup_QFlags_Error",

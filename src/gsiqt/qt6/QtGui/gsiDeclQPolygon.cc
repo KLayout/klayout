@@ -29,6 +29,7 @@
 
 #include <QPolygon>
 #include <QPoint>
+#include <QPolygonF>
 #include <QRect>
 #include "gsiQt.h"
 #include "gsiQtGuiCommon.h"
@@ -492,6 +493,21 @@ static void _call_f_swap_1443 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+// QPolygonF QPolygon::toPolygonF()
+
+
+static void _init_f_toPolygonF_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QPolygonF > ();
+}
+
+static void _call_f_toPolygonF_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QPolygonF > ((QPolygonF)((QPolygon *)cls)->toPolygonF ());
+}
+
+
 // void QPolygon::translate(int dx, int dy)
 
 
@@ -622,6 +638,7 @@ static gsi::Methods methods_QPolygon () {
   methods += new qt_gsi::GenericMethod ("setPoints", "@brief Method void QPolygon::setPoints(int nPoints, int firstx, int firsty, ...)\n", false, &_init_f_setPoints_2085, &_call_f_setPoints_2085);
   methods += new qt_gsi::GenericMethod ("subtracted", "@brief Method QPolygon QPolygon::subtracted(const QPolygon &r)\n", true, &_init_f_subtracted_c2138, &_call_f_subtracted_c2138);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QPolygon::swap(QPolygon &other)\n", false, &_init_f_swap_1443, &_call_f_swap_1443);
+  methods += new qt_gsi::GenericMethod ("toPolygonF", "@brief Method QPolygonF QPolygon::toPolygonF()\n", true, &_init_f_toPolygonF_c0, &_call_f_toPolygonF_c0);
   methods += new qt_gsi::GenericMethod ("translate", "@brief Method void QPolygon::translate(int dx, int dy)\n", false, &_init_f_translate_1426, &_call_f_translate_1426);
   methods += new qt_gsi::GenericMethod ("translate", "@brief Method void QPolygon::translate(const QPoint &offset)\n", false, &_init_f_translate_1916, &_call_f_translate_1916);
   methods += new qt_gsi::GenericMethod ("translated", "@brief Method QPolygon QPolygon::translated(int dx, int dy)\n", true, &_init_f_translated_c1426, &_call_f_translated_c1426);

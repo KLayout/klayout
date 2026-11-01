@@ -29,6 +29,7 @@
 
 #include <QJsonObject>
 #include <QJsonObject>
+#include <QJsonValueConstRef>
 #include <QJsonValueRef>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
@@ -304,15 +305,30 @@ static void _call_f_operator_minus__eq__1442 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// QJsonValueRef *QJsonObject::iterator::operator->()
+// const QJsonValueConstRef *QJsonObject::iterator::operator->()
 
 
 static void _init_f_operator_minus__gt__c0 (qt_gsi::GenericMethod *decl)
 {
-  decl->set_return<QJsonValueRef * > ();
+  decl->set_return<const QJsonValueConstRef * > ();
 }
 
 static void _call_f_operator_minus__gt__c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<const QJsonValueConstRef * > ((const QJsonValueConstRef *)((QJsonObject::iterator *)cls)->operator-> ());
+}
+
+
+// QJsonValueRef *QJsonObject::iterator::operator->()
+
+
+static void _init_f_operator_minus__gt__0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QJsonValueRef * > ();
+}
+
+static void _call_f_operator_minus__gt__0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QJsonValueRef * > ((QJsonValueRef *)((QJsonObject::iterator *)cls)->operator-> ());
@@ -338,22 +354,22 @@ static void _call_f_operator_eq__3393 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// const QJsonValueRef QJsonObject::iterator::operator[](qsizetype j)
+// QJsonValueRef QJsonObject::iterator::operator[](qsizetype j)
 
 
-static void _init_f_operator_index__1442 (qt_gsi::GenericMethod *decl)
+static void _init_f_operator_index__c1442 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("j");
   decl->add_arg<qsizetype > (argspec_0);
-  decl->set_return<const QJsonValueRef > ();
+  decl->set_return<QJsonValueRef > ();
 }
 
-static void _call_f_operator_index__1442 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_operator_index__c1442 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   qsizetype arg1 = gsi::arg_reader<qsizetype >() (args, heap);
-  ret.write<const QJsonValueRef > ((const QJsonValueRef)((QJsonObject::iterator *)cls)->operator[] (arg1));
+  ret.write<QJsonValueRef > ((QJsonValueRef)((QJsonObject::iterator *)cls)->operator[] (arg1));
 }
 
 
@@ -392,9 +408,10 @@ static gsi::Methods methods_QJsonObject_Iterator () {
   methods += new qt_gsi::GenericMethod ("--", "@brief Method QJsonObject::iterator &QJsonObject::iterator::operator--()\n", false, &_init_f_operator_minus__minus__0, &_call_f_operator_minus__minus__0);
   methods += new qt_gsi::GenericMethod ("--", "@brief Method QJsonObject::iterator QJsonObject::iterator::operator--(int)\n", false, &_init_f_operator_minus__minus__767, &_call_f_operator_minus__minus__767);
   methods += new qt_gsi::GenericMethod ("-=", "@brief Method QJsonObject::iterator &QJsonObject::iterator::operator-=(qsizetype j)\n", false, &_init_f_operator_minus__eq__1442, &_call_f_operator_minus__eq__1442);
-  methods += new qt_gsi::GenericMethod ("->", "@brief Method QJsonValueRef *QJsonObject::iterator::operator->()\n", true, &_init_f_operator_minus__gt__c0, &_call_f_operator_minus__gt__c0);
+  methods += new qt_gsi::GenericMethod ("->", "@brief Method const QJsonValueConstRef *QJsonObject::iterator::operator->()\n", true, &_init_f_operator_minus__gt__c0, &_call_f_operator_minus__gt__c0);
+  methods += new qt_gsi::GenericMethod ("->", "@brief Method QJsonValueRef *QJsonObject::iterator::operator->()\n", false, &_init_f_operator_minus__gt__0, &_call_f_operator_minus__gt__0);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QJsonObject::iterator &QJsonObject::iterator::operator=(const QJsonObject::iterator &other)\n", false, &_init_f_operator_eq__3393, &_call_f_operator_eq__3393);
-  methods += new qt_gsi::GenericMethod ("[]", "@brief Method const QJsonValueRef QJsonObject::iterator::operator[](qsizetype j)\n", false, &_init_f_operator_index__1442, &_call_f_operator_index__1442);
+  methods += new qt_gsi::GenericMethod ("[]", "@brief Method QJsonValueRef QJsonObject::iterator::operator[](qsizetype j)\n", true, &_init_f_operator_index__c1442, &_call_f_operator_index__c1442);
   methods += new qt_gsi::GenericMethod ("value", "@brief Method QJsonValueRef QJsonObject::iterator::value()\n", true, &_init_f_value_c0, &_call_f_value_c0);
   return methods;
 }

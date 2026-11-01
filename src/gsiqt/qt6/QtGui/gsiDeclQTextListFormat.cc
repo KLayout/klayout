@@ -181,6 +181,26 @@ static void _call_f_setNumberSuffix_2025 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
+// void QTextListFormat::setStart(int indent)
+
+
+static void _init_f_setStart_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("indent");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setStart_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QTextListFormat *)cls)->setStart (arg1);
+}
+
+
 // void QTextListFormat::setStyle(QTextListFormat::Style style)
 
 
@@ -198,6 +218,21 @@ static void _call_f_setStyle_2612 (const qt_gsi::GenericMethod * /*decl*/, void 
   const qt_gsi::Converter<QTextListFormat::Style>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTextListFormat::Style>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextListFormat *)cls)->setStyle (qt_gsi::QtToCppAdaptor<QTextListFormat::Style>(arg1).cref());
+}
+
+
+// int QTextListFormat::start()
+
+
+static void _init_f_start_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<int > ();
+}
+
+static void _call_f_start_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<int > ((int)((QTextListFormat *)cls)->start ());
 }
 
 
@@ -230,7 +265,9 @@ static gsi::Methods methods_QTextListFormat () {
   methods += new qt_gsi::GenericMethod ("setIndent|indent=", "@brief Method void QTextListFormat::setIndent(int indent)\n", false, &_init_f_setIndent_767, &_call_f_setIndent_767);
   methods += new qt_gsi::GenericMethod ("setNumberPrefix|numberPrefix=", "@brief Method void QTextListFormat::setNumberPrefix(const QString &numberPrefix)\n", false, &_init_f_setNumberPrefix_2025, &_call_f_setNumberPrefix_2025);
   methods += new qt_gsi::GenericMethod ("setNumberSuffix|numberSuffix=", "@brief Method void QTextListFormat::setNumberSuffix(const QString &numberSuffix)\n", false, &_init_f_setNumberSuffix_2025, &_call_f_setNumberSuffix_2025);
+  methods += new qt_gsi::GenericMethod ("setStart", "@brief Method void QTextListFormat::setStart(int indent)\n", false, &_init_f_setStart_767, &_call_f_setStart_767);
   methods += new qt_gsi::GenericMethod ("setStyle|style=", "@brief Method void QTextListFormat::setStyle(QTextListFormat::Style style)\n", false, &_init_f_setStyle_2612, &_call_f_setStyle_2612);
+  methods += new qt_gsi::GenericMethod ("start", "@brief Method int QTextListFormat::start()\n", true, &_init_f_start_c0, &_call_f_start_c0);
   methods += new qt_gsi::GenericMethod (":style", "@brief Method QTextListFormat::Style QTextListFormat::style()\n", true, &_init_f_style_c0, &_call_f_style_c0);
   return methods;
 }

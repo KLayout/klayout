@@ -875,6 +875,38 @@ static void _call_f_perspective_3556 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
+// void QMatrix4x4::projectedRotate(float angle, float x, float y, float z, float distanceToPlane)
+
+
+static void _init_f_projectedRotate_4418 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("angle");
+  decl->add_arg<float > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("x");
+  decl->add_arg<float > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("y");
+  decl->add_arg<float > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("z");
+  decl->add_arg<float > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("distanceToPlane");
+  decl->add_arg<float > (argspec_4);
+  decl->set_return<void > ();
+}
+
+static void _call_f_projectedRotate_4418 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  float arg2 = gsi::arg_reader<float >() (args, heap);
+  float arg3 = gsi::arg_reader<float >() (args, heap);
+  float arg4 = gsi::arg_reader<float >() (args, heap);
+  float arg5 = gsi::arg_reader<float >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QMatrix4x4 *)cls)->projectedRotate (arg1, arg2, arg3, arg4, arg5);
+}
+
+
 // void QMatrix4x4::projectedRotate(float angle, float x, float y, float z)
 
 
@@ -1415,6 +1447,7 @@ static gsi::Methods methods_QMatrix4x4 () {
   methods += new qt_gsi::GenericMethod ("ortho", "@brief Method void QMatrix4x4::ortho(const QRectF &rect)\n", false, &_init_f_ortho_1862, &_call_f_ortho_1862);
   methods += new qt_gsi::GenericMethod ("ortho", "@brief Method void QMatrix4x4::ortho(float left, float right, float bottom, float top, float nearPlane, float farPlane)\n", false, &_init_f_ortho_5280, &_call_f_ortho_5280);
   methods += new qt_gsi::GenericMethod ("perspective", "@brief Method void QMatrix4x4::perspective(float verticalAngle, float aspectRatio, float nearPlane, float farPlane)\n", false, &_init_f_perspective_3556, &_call_f_perspective_3556);
+  methods += new qt_gsi::GenericMethod ("projectedRotate", "@brief Method void QMatrix4x4::projectedRotate(float angle, float x, float y, float z, float distanceToPlane)\n", false, &_init_f_projectedRotate_4418, &_call_f_projectedRotate_4418);
   methods += new qt_gsi::GenericMethod ("projectedRotate", "@brief Method void QMatrix4x4::projectedRotate(float angle, float x, float y, float z)\n", false, &_init_f_projectedRotate_3556, &_call_f_projectedRotate_3556);
   methods += new qt_gsi::GenericMethod ("rotate", "@brief Method void QMatrix4x4::rotate(float angle, const QVector3D &vector)\n", false, &_init_f_rotate_3002, &_call_f_rotate_3002);
   methods += new qt_gsi::GenericMethod ("rotate", "@brief Method void QMatrix4x4::rotate(float angle, float x, float y, float z)\n", false, &_init_f_rotate_3556, &_call_f_rotate_3556);

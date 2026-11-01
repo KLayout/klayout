@@ -28,6 +28,7 @@
 */
 
 #include <QValidator>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QLocale>

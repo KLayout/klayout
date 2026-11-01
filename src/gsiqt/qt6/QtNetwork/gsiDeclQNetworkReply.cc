@@ -28,6 +28,7 @@
 */
 
 #include <QNetworkReply>
+#include <QAnyStringView>
 #include <QEvent>
 #include <QMetaMethod>
 #include <QNetworkAccessManager>
@@ -352,6 +353,22 @@ static void _call_f_request_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
+// void QNetworkReply::requestSent()
+
+
+static void _init_f_requestSent_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_f_requestSent_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QNetworkReply *)cls)->requestSent ();
+}
+
+
 // void QNetworkReply::setReadBufferSize(qint64 size)
 
 
@@ -389,6 +406,22 @@ static void _call_f_setSslConfiguration_3068 (const qt_gsi::GenericMethod * /*de
   const QSslConfiguration &arg1 = gsi::arg_reader<const QSslConfiguration & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkReply *)cls)->setSslConfiguration (arg1);
+}
+
+
+// void QNetworkReply::socketStartedConnecting()
+
+
+static void _init_f_socketStartedConnecting_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_f_socketStartedConnecting_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QNetworkReply *)cls)->socketStartedConnecting ();
 }
 
 
@@ -472,8 +505,10 @@ static gsi::Methods methods_QNetworkReply () {
   methods += new qt_gsi::GenericMethod ("rawHeaderPairs", "@brief Method const QList<QNetworkReply::RawHeaderPair> &QNetworkReply::rawHeaderPairs()\n", true, &_init_f_rawHeaderPairs_c0, &_call_f_rawHeaderPairs_c0);
   methods += new qt_gsi::GenericMethod (":readBufferSize", "@brief Method qint64 QNetworkReply::readBufferSize()\n", true, &_init_f_readBufferSize_c0, &_call_f_readBufferSize_c0);
   methods += new qt_gsi::GenericMethod ("request", "@brief Method QNetworkRequest QNetworkReply::request()\n", true, &_init_f_request_c0, &_call_f_request_c0);
+  methods += new qt_gsi::GenericMethod ("requestSent", "@brief Method void QNetworkReply::requestSent()\n", false, &_init_f_requestSent_0, &_call_f_requestSent_0);
   methods += new qt_gsi::GenericMethod ("setReadBufferSize|readBufferSize=", "@brief Method void QNetworkReply::setReadBufferSize(qint64 size)\n", false, &_init_f_setReadBufferSize_986, &_call_f_setReadBufferSize_986);
   methods += new qt_gsi::GenericMethod ("setSslConfiguration|sslConfiguration=", "@brief Method void QNetworkReply::setSslConfiguration(const QSslConfiguration &configuration)\n", false, &_init_f_setSslConfiguration_3068, &_call_f_setSslConfiguration_3068);
+  methods += new qt_gsi::GenericMethod ("socketStartedConnecting", "@brief Method void QNetworkReply::socketStartedConnecting()\n", false, &_init_f_socketStartedConnecting_0, &_call_f_socketStartedConnecting_0);
   methods += new qt_gsi::GenericMethod (":sslConfiguration", "@brief Method QSslConfiguration QNetworkReply::sslConfiguration()\n", true, &_init_f_sslConfiguration_c0, &_call_f_sslConfiguration_c0);
   methods += new qt_gsi::GenericMethod ("url", "@brief Method QUrl QNetworkReply::url()\n", true, &_init_f_url_c0, &_call_f_url_c0);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QNetworkReply::aboutToClose()\nYou can bind a procedure to this signal.");

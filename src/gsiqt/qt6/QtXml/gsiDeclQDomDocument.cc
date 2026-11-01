@@ -28,6 +28,7 @@
 */
 
 #include <QDomDocument>
+#include <QAnyStringView>
 #include <QDomAttr>
 #include <QDomCDATASection>
 #include <QDomCharacterData>
@@ -551,7 +552,7 @@ static void _init_f_setContent_4941 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("text");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("errorMsg", true, "nullptr");
+  static gsi::ArgSpecBase argspec_1 ("errorMsg");
   decl->add_arg<QString * > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("errorLine", true, "nullptr");
   decl->add_arg<int * > (argspec_2);
@@ -565,7 +566,7 @@ static void _call_f_setContent_4941 (const qt_gsi::GenericMethod * /*decl*/, voi
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  QString *arg2 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (nullptr, heap);
+  QString *arg2 = gsi::arg_reader<QString * >() (args, heap);
   int *arg3 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
   int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
   ret.write<bool > ((bool)((QDomDocument *)cls)->setContent (arg1, arg2, arg3, arg4));
@@ -579,7 +580,7 @@ static void _init_f_setContent_4363 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("dev");
   decl->add_arg<QIODevice * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("errorMsg", true, "nullptr");
+  static gsi::ArgSpecBase argspec_1 ("errorMsg");
   decl->add_arg<QString * > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("errorLine", true, "nullptr");
   decl->add_arg<int * > (argspec_2);
@@ -593,7 +594,7 @@ static void _call_f_setContent_4363 (const qt_gsi::GenericMethod * /*decl*/, voi
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
-  QString *arg2 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (nullptr, heap);
+  QString *arg2 = gsi::arg_reader<QString * >() (args, heap);
   int *arg3 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
   int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
   ret.write<bool > ((bool)((QDomDocument *)cls)->setContent (arg1, arg2, arg3, arg4));
@@ -628,6 +629,72 @@ static void _call_f_setContent_5895 (const qt_gsi::GenericMethod * /*decl*/, voi
   int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
   int *arg5 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
   ret.write<bool > ((bool)((QDomDocument *)cls)->setContent (arg1, arg2, arg3, arg4, arg5));
+}
+
+
+// QDomDocument::ParseResult QDomDocument::setContent(QAnyStringView data, QFlags<QDomDocument::ParseOption> options)
+
+
+static void _init_f_setContent_5335 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("data");
+  decl->add_arg<QAnyStringView > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("options", true, "QDomDocument::ParseOption::Default");
+  decl->add_arg<QFlags<QDomDocument::ParseOption> > (argspec_1);
+  decl->set_return<QDomDocument::ParseResult > ();
+}
+
+static void _call_f_setContent_5335 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
+  QFlags<QDomDocument::ParseOption> arg2 = args ? gsi::arg_reader<QFlags<QDomDocument::ParseOption> >() (args, heap) : gsi::arg_maker<QFlags<QDomDocument::ParseOption> >() (QDomDocument::ParseOption::Default, heap);
+  ret.write<QDomDocument::ParseResult > ((QDomDocument::ParseResult)((QDomDocument *)cls)->setContent (arg1, arg2));
+}
+
+
+// QDomDocument::ParseResult QDomDocument::setContent(QIODevice *device, QFlags<QDomDocument::ParseOption> options)
+
+
+static void _init_f_setContent_4927 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("device");
+  decl->add_arg<QIODevice * > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("options", true, "QDomDocument::ParseOption::Default");
+  decl->add_arg<QFlags<QDomDocument::ParseOption> > (argspec_1);
+  decl->set_return<QDomDocument::ParseResult > ();
+}
+
+static void _call_f_setContent_4927 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
+  QFlags<QDomDocument::ParseOption> arg2 = args ? gsi::arg_reader<QFlags<QDomDocument::ParseOption> >() (args, heap) : gsi::arg_maker<QFlags<QDomDocument::ParseOption> >() (QDomDocument::ParseOption::Default, heap);
+  ret.write<QDomDocument::ParseResult > ((QDomDocument::ParseResult)((QDomDocument *)cls)->setContent (arg1, arg2));
+}
+
+
+// QDomDocument::ParseResult QDomDocument::setContent(QXmlStreamReader *reader, QFlags<QDomDocument::ParseOption> options)
+
+
+static void _init_f_setContent_5703 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("reader");
+  decl->add_arg<QXmlStreamReader * > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("options", true, "QDomDocument::ParseOption::Default");
+  decl->add_arg<QFlags<QDomDocument::ParseOption> > (argspec_1);
+  decl->set_return<QDomDocument::ParseResult > ();
+}
+
+static void _call_f_setContent_5703 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QXmlStreamReader *arg1 = gsi::arg_reader<QXmlStreamReader * >() (args, heap);
+  QFlags<QDomDocument::ParseOption> arg2 = args ? gsi::arg_reader<QFlags<QDomDocument::ParseOption> >() (args, heap) : gsi::arg_maker<QFlags<QDomDocument::ParseOption> >() (QDomDocument::ParseOption::Default, heap);
+  ret.write<QDomDocument::ParseResult > ((QDomDocument::ParseResult)((QDomDocument *)cls)->setContent (arg1, arg2));
 }
 
 
@@ -703,6 +770,9 @@ static gsi::Methods methods_QDomDocument () {
   methods += new qt_gsi::GenericMethod ("setContent", "@brief Method bool QDomDocument::setContent(const QString &text, QString *errorMsg, int *errorLine, int *errorColumn)\n", false, &_init_f_setContent_4941, &_call_f_setContent_4941);
   methods += new qt_gsi::GenericMethod ("setContent", "@brief Method bool QDomDocument::setContent(QIODevice *dev, QString *errorMsg, int *errorLine, int *errorColumn)\n", false, &_init_f_setContent_4363, &_call_f_setContent_4363);
   methods += new qt_gsi::GenericMethod ("setContent", "@brief Method bool QDomDocument::setContent(QXmlStreamReader *reader, bool namespaceProcessing, QString *errorMsg, int *errorLine, int *errorColumn)\n", false, &_init_f_setContent_5895, &_call_f_setContent_5895);
+  methods += new qt_gsi::GenericMethod ("setContent", "@brief Method QDomDocument::ParseResult QDomDocument::setContent(QAnyStringView data, QFlags<QDomDocument::ParseOption> options)\n", false, &_init_f_setContent_5335, &_call_f_setContent_5335);
+  methods += new qt_gsi::GenericMethod ("setContent", "@brief Method QDomDocument::ParseResult QDomDocument::setContent(QIODevice *device, QFlags<QDomDocument::ParseOption> options)\n", false, &_init_f_setContent_4927, &_call_f_setContent_4927);
+  methods += new qt_gsi::GenericMethod ("setContent", "@brief Method QDomDocument::ParseResult QDomDocument::setContent(QXmlStreamReader *reader, QFlags<QDomDocument::ParseOption> options)\n", false, &_init_f_setContent_5703, &_call_f_setContent_5703);
   methods += new qt_gsi::GenericMethod ("toByteArray", "@brief Method QByteArray QDomDocument::toByteArray(int)\n", true, &_init_f_toByteArray_c767, &_call_f_toByteArray_c767);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QDomDocument::toString(int)\n", true, &_init_f_toString_c767, &_call_f_toString_c767);
   return methods;
@@ -716,6 +786,25 @@ gsi::Class<QDomDocument> decl_QDomDocument (qtdecl_QDomNode (), "QtXml", "QDomDo
 
 
 GSI_QTXML_PUBLIC gsi::Class<QDomDocument> &qtdecl_QDomDocument () { return decl_QDomDocument; }
+
+}
+
+
+//  Implementation of the enum wrapper class for QDomDocument::ParseOption
+namespace qt_gsi
+{
+
+static gsi::Enum<QDomDocument::ParseOption> decl_QDomDocument_ParseOption_Enum ("QtXml", "QDomDocument_ParseOption",
+    gsi::enum_const ("Default", QDomDocument::ParseOption::Default, "@brief Enum constant QDomDocument::ParseOption::Default") +
+    gsi::enum_const ("UseNamespaceProcessing", QDomDocument::ParseOption::UseNamespaceProcessing, "@brief Enum constant QDomDocument::ParseOption::UseNamespaceProcessing") +
+    gsi::enum_const ("PreserveSpacingOnlyNodes", QDomDocument::ParseOption::PreserveSpacingOnlyNodes, "@brief Enum constant QDomDocument::ParseOption::PreserveSpacingOnlyNodes"),
+  "@qt\n@brief This class represents the QDomDocument::ParseOption enum");
+
+static gsi::QFlagsClass<QDomDocument::ParseOption > decl_QDomDocument_ParseOption_Enums ("QtXml", "QDomDocument_QFlags_ParseOption",
+  "@qt\n@brief This class represents the QFlags<QDomDocument::ParseOption> flag set");
+
+static gsi::ClassExt<QDomDocument> decl_QDomDocument_ParseOption_Enum_as_child (decl_QDomDocument_ParseOption_Enum, "ParseOption");
+static gsi::ClassExt<QDomDocument> decl_QDomDocument_ParseOption_Enums_as_child (decl_QDomDocument_ParseOption_Enums, "QFlags_ParseOption");
 
 }
 

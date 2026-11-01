@@ -902,6 +902,52 @@ static void _call_f_setTextAlignment_1426 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
+// void QTreeWidgetItem::setTextAlignment(int column, Qt::AlignmentFlag alignment)
+
+
+static void _init_f_setTextAlignment_2713 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("column");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("alignment");
+  decl->add_arg<const qt_gsi::Converter<Qt::AlignmentFlag>::target_type & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setTextAlignment_2713 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::AlignmentFlag>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::AlignmentFlag>::target_type & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QTreeWidgetItem *)cls)->setTextAlignment (arg1, qt_gsi::QtToCppAdaptor<Qt::AlignmentFlag>(arg2).cref());
+}
+
+
+// void QTreeWidgetItem::setTextAlignment(int column, QFlags<Qt::AlignmentFlag> alignment)
+
+
+static void _init_f_setTextAlignment_3409 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("column");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("alignment");
+  decl->add_arg<QFlags<Qt::AlignmentFlag> > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setTextAlignment_3409 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QFlags<Qt::AlignmentFlag> arg2 = gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QTreeWidgetItem *)cls)->setTextAlignment (arg1, arg2);
+}
+
+
 // void QTreeWidgetItem::setToolTip(int column, const QString &toolTip)
 
 
@@ -1218,6 +1264,8 @@ static gsi::Methods methods_QTreeWidgetItem () {
   methods += new qt_gsi::GenericMethod ("setStatusTip", "@brief Method void QTreeWidgetItem::setStatusTip(int column, const QString &statusTip)\n", false, &_init_f_setStatusTip_2684, &_call_f_setStatusTip_2684);
   methods += new qt_gsi::GenericMethod ("setText", "@brief Method void QTreeWidgetItem::setText(int column, const QString &text)\n", false, &_init_f_setText_2684, &_call_f_setText_2684);
   methods += new qt_gsi::GenericMethod ("setTextAlignment", "@brief Method void QTreeWidgetItem::setTextAlignment(int column, int alignment)\n", false, &_init_f_setTextAlignment_1426, &_call_f_setTextAlignment_1426);
+  methods += new qt_gsi::GenericMethod ("setTextAlignment", "@brief Method void QTreeWidgetItem::setTextAlignment(int column, Qt::AlignmentFlag alignment)\n", false, &_init_f_setTextAlignment_2713, &_call_f_setTextAlignment_2713);
+  methods += new qt_gsi::GenericMethod ("setTextAlignment", "@brief Method void QTreeWidgetItem::setTextAlignment(int column, QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_setTextAlignment_3409, &_call_f_setTextAlignment_3409);
   methods += new qt_gsi::GenericMethod ("setToolTip", "@brief Method void QTreeWidgetItem::setToolTip(int column, const QString &toolTip)\n", false, &_init_f_setToolTip_2684, &_call_f_setToolTip_2684);
   methods += new qt_gsi::GenericMethod ("setWhatsThis", "@brief Method void QTreeWidgetItem::setWhatsThis(int column, const QString &whatsThis)\n", false, &_init_f_setWhatsThis_2684, &_call_f_setWhatsThis_2684);
   methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method QSize QTreeWidgetItem::sizeHint(int column)\n", true, &_init_f_sizeHint_c767, &_call_f_sizeHint_c767);

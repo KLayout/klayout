@@ -28,6 +28,7 @@
 */
 
 #include <QLocalServer>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QLocalSocket>
@@ -169,6 +170,21 @@ static void _call_f_listen_3614 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
+// int QLocalServer::listenBacklogSize()
+
+
+static void _init_f_listenBacklogSize_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<int > ();
+}
+
+static void _call_f_listenBacklogSize_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<int > ((int)((QLocalServer *)cls)->listenBacklogSize ());
+}
+
+
 // int QLocalServer::maxPendingConnections()
 
 
@@ -226,6 +242,26 @@ static void _call_f_serverName_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QString > ((QString)((QLocalServer *)cls)->serverName ());
+}
+
+
+// void QLocalServer::setListenBacklogSize(int size)
+
+
+static void _init_f_setListenBacklogSize_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("size");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setListenBacklogSize_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QLocalServer *)cls)->setListenBacklogSize (arg1);
 }
 
 
@@ -378,10 +414,12 @@ static gsi::Methods methods_QLocalServer () {
   methods += new qt_gsi::GenericMethod ("isListening?", "@brief Method bool QLocalServer::isListening()\n", true, &_init_f_isListening_c0, &_call_f_isListening_c0);
   methods += new qt_gsi::GenericMethod ("listen", "@brief Method bool QLocalServer::listen(const QString &name)\n", false, &_init_f_listen_2025, &_call_f_listen_2025);
   methods += new qt_gsi::GenericMethod ("listen", "@brief Method bool QLocalServer::listen(QIntegerForSizeof<void *>::Signed socketDescriptor)\n", false, &_init_f_listen_3614, &_call_f_listen_3614);
+  methods += new qt_gsi::GenericMethod ("listenBacklogSize", "@brief Method int QLocalServer::listenBacklogSize()\n", true, &_init_f_listenBacklogSize_c0, &_call_f_listenBacklogSize_c0);
   methods += new qt_gsi::GenericMethod (":maxPendingConnections", "@brief Method int QLocalServer::maxPendingConnections()\n", true, &_init_f_maxPendingConnections_c0, &_call_f_maxPendingConnections_c0);
   methods += new qt_gsi::GenericMethod ("nextPendingConnection", "@brief Method QLocalSocket *QLocalServer::nextPendingConnection()\n", false, &_init_f_nextPendingConnection_0, &_call_f_nextPendingConnection_0);
   methods += new qt_gsi::GenericMethod ("serverError", "@brief Method QAbstractSocket::SocketError QLocalServer::serverError()\n", true, &_init_f_serverError_c0, &_call_f_serverError_c0);
   methods += new qt_gsi::GenericMethod ("serverName", "@brief Method QString QLocalServer::serverName()\n", true, &_init_f_serverName_c0, &_call_f_serverName_c0);
+  methods += new qt_gsi::GenericMethod ("setListenBacklogSize", "@brief Method void QLocalServer::setListenBacklogSize(int size)\n", false, &_init_f_setListenBacklogSize_767, &_call_f_setListenBacklogSize_767);
   methods += new qt_gsi::GenericMethod ("setMaxPendingConnections|maxPendingConnections=", "@brief Method void QLocalServer::setMaxPendingConnections(int numConnections)\n", false, &_init_f_setMaxPendingConnections_767, &_call_f_setMaxPendingConnections_767);
   methods += new qt_gsi::GenericMethod ("setSocketOptions|socketOptions=", "@brief Method void QLocalServer::setSocketOptions(QFlags<QLocalServer::SocketOption> options)\n", false, &_init_f_setSocketOptions_3701, &_call_f_setSocketOptions_3701);
   methods += new qt_gsi::GenericMethod ("socketDescriptor", "@brief Method QIntegerForSizeof<void *>::Signed QLocalServer::socketDescriptor()\n", true, &_init_f_socketDescriptor_c0, &_call_f_socketDescriptor_c0);

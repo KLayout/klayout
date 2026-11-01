@@ -28,6 +28,7 @@
 */
 
 #include <QObject>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>
@@ -339,6 +340,21 @@ static void _call_f_installEventFilter_1302 (const qt_gsi::GenericMethod * /*dec
 }
 
 
+// bool QObject::isQuickItemType()
+
+
+static void _init_f_isQuickItemType_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isQuickItemType_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QObject *)cls)->isQuickItemType ());
+}
+
+
 // bool QObject::isWidgetType()
 
 
@@ -478,21 +494,21 @@ static void _call_f_removeEventFilter_1302 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// void QObject::setObjectName(const QString &name)
+// void QObject::setObjectName(QAnyStringView name)
 
 
-static void _init_f_setObjectName_2025 (qt_gsi::GenericMethod *decl)
+static void _init_f_setObjectName_1855 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_setObjectName_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_setObjectName_1855 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QObject *)cls)->setObjectName (arg1);
 }
@@ -778,6 +794,7 @@ static gsi::Methods methods_QObject () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Method bool QObject::eventFilter(QObject *watched, QEvent *event)\n", false, &_init_f_eventFilter_2411, &_call_f_eventFilter_2411);
   methods += new qt_gsi::GenericMethod ("inherits", "@brief Method bool QObject::inherits(const char *classname)\n", true, &_init_f_inherits_c1731, &_call_f_inherits_c1731);
   methods += new qt_gsi::GenericMethod ("installEventFilter", "@brief Method void QObject::installEventFilter(QObject *filterObj)\n", false, &_init_f_installEventFilter_1302, &_call_f_installEventFilter_1302);
+  methods += new qt_gsi::GenericMethod ("isQuickItemType?", "@brief Method bool QObject::isQuickItemType()\n", true, &_init_f_isQuickItemType_c0, &_call_f_isQuickItemType_c0);
   methods += new qt_gsi::GenericMethod ("isWidgetType?", "@brief Method bool QObject::isWidgetType()\n", true, &_init_f_isWidgetType_c0, &_call_f_isWidgetType_c0);
   methods += new qt_gsi::GenericMethod ("isWindowType?", "@brief Method bool QObject::isWindowType()\n", true, &_init_f_isWindowType_c0, &_call_f_isWindowType_c0);
   methods += new qt_gsi::GenericMethod ("killTimer", "@brief Method void QObject::killTimer(int id)\n", false, &_init_f_killTimer_767, &_call_f_killTimer_767);
@@ -786,7 +803,7 @@ static gsi::Methods methods_QObject () {
   methods += new qt_gsi::GenericMethod (":parent", "@brief Method QObject *QObject::parent()\n", true, &_init_f_parent_c0, &_call_f_parent_c0);
   methods += new qt_gsi::GenericMethod ("property", "@brief Method QVariant QObject::property(const char *name)\n", true, &_init_f_property_c1731, &_call_f_property_c1731);
   methods += new qt_gsi::GenericMethod ("removeEventFilter", "@brief Method void QObject::removeEventFilter(QObject *obj)\n", false, &_init_f_removeEventFilter_1302, &_call_f_removeEventFilter_1302);
-  methods += new qt_gsi::GenericMethod ("setObjectName|objectName=", "@brief Method void QObject::setObjectName(const QString &name)\n", false, &_init_f_setObjectName_2025, &_call_f_setObjectName_2025);
+  methods += new qt_gsi::GenericMethod ("setObjectName|objectName=", "@brief Method void QObject::setObjectName(QAnyStringView name)\n", false, &_init_f_setObjectName_1855, &_call_f_setObjectName_1855);
   methods += new qt_gsi::GenericMethod ("setParent|parent=", "@brief Method void QObject::setParent(QObject *parent)\n", false, &_init_f_setParent_1302, &_call_f_setParent_1302);
   methods += new qt_gsi::GenericMethod ("setProperty", "@brief Method bool QObject::setProperty(const char *name, const QVariant &value)\n", false, &_init_f_setProperty_3742, &_call_f_setProperty_3742);
   methods += new qt_gsi::GenericMethod ("signalsBlocked", "@brief Method bool QObject::signalsBlocked()\n", true, &_init_f_signalsBlocked_c0, &_call_f_signalsBlocked_c0);

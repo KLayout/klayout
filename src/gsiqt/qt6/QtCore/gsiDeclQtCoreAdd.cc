@@ -43,6 +43,16 @@ class QVariant_Namespace { };
 namespace gsi_qt
 {
 
+// ------------------------------------------------------------
+//  Qt::Disambiguated_t implementation
+
+gsi::Class<Qt::Disambiguated_t> decl_Qt_Disambiguated ("QtCore", "Qt_Disambiguated_t",
+  gsi::Methods (),
+  "@qt\\n@brief Binding for the Qt::Disambiguator_t dummy argument, used for separating overloads from different Qt versions"
+);
+
+static gsi::ClassExt<Qt_Namespace> decl_Qt_Disambiguated_in_Qt (decl_Qt_Disambiguated, "Disambiguated_t");
+
 // ---------------------------------------------------------------------------
 //  QVariant::Type implementation
 //  (this type is not created automatically since QVariant is implemented implicitly)

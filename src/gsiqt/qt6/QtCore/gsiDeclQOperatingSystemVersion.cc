@@ -238,9 +238,7 @@ static gsi::Methods methods_QOperatingSystemVersion () {
   return methods;
 }
 
-gsi::Class<QOperatingSystemVersionUnexported> &qtdecl_QOperatingSystemVersionUnexported ();
-
-gsi::Class<QOperatingSystemVersion> decl_QOperatingSystemVersion (qtdecl_QOperatingSystemVersionUnexported (), "QtCore", "QOperatingSystemVersion",
+gsi::Class<QOperatingSystemVersion> decl_QOperatingSystemVersion ("QtCore", "QOperatingSystemVersion",
   methods_QOperatingSystemVersion (),
   "@qt\n@brief Binding of QOperatingSystemVersion");
 

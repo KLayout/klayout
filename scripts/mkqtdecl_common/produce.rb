@@ -1932,7 +1932,7 @@ END
       end
     end
 
-    base_classes = (struct.base_classes || []).select { |b| conf.imported?(cls, b.class_id.to_s) }
+    base_classes = (struct.base_classes || []).select { |b| conf.imported?(cls, b.class_id.to_s) && !conf.is_class_dropped?(b.class_id.to_s) }
     base_cls = base_classes[0] && base_classes[0].class_id.to_s
     base_clsn = base_cls && make_cls_name(base_cls)
 

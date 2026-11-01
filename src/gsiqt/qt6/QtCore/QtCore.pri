@@ -96,8 +96,6 @@ SOURCES += \
   $$PWD/gsiDeclQMetaMethodArgument.cc \
   $$PWD/gsiDeclQMetaMethodReturnArgument.cc \
   $$PWD/gsiDeclQMetaObject.cc \
-  $$PWD/gsiDeclQMetaObject_SuperData.cc \
-  $$PWD/gsiDeclQMetaObject_Data.cc \
   $$PWD/gsiDeclQMetaObject_Connection.cc \
   $$PWD/gsiDeclQMetaProperty.cc \
   $$PWD/gsiDeclQMetaSequence.cc \

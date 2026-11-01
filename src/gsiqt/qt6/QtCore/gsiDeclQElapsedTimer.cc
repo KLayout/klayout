@@ -50,40 +50,6 @@ static void _call_ctor_QElapsedTimer_0 (const qt_gsi::GenericStaticMethod * /*de
 }
 
 
-// QElapsedTimer::Duration QElapsedTimer::durationElapsed()
-
-
-static void _init_f_durationElapsed_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QElapsedTimer::Duration > ();
-}
-
-static void _call_f_durationElapsed_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QElapsedTimer::Duration > ((QElapsedTimer::Duration)((QElapsedTimer *)cls)->durationElapsed ());
-}
-
-
-// QElapsedTimer::Duration QElapsedTimer::durationTo(const QElapsedTimer &other)
-
-
-static void _init_f_durationTo_c2609 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QElapsedTimer & > (argspec_0);
-  decl->set_return<QElapsedTimer::Duration > ();
-}
-
-static void _call_f_durationTo_c2609 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QElapsedTimer &arg1 = gsi::arg_reader<const QElapsedTimer & >() (args, heap);
-  ret.write<QElapsedTimer::Duration > ((QElapsedTimer::Duration)((QElapsedTimer *)cls)->durationTo (arg1));
-}
-
-
 // qint64 QElapsedTimer::elapsed()
 
 
@@ -295,8 +261,6 @@ namespace gsi
 static gsi::Methods methods_QElapsedTimer () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QElapsedTimer::QElapsedTimer()\nThis method creates an object of class QElapsedTimer.", &_init_ctor_QElapsedTimer_0, &_call_ctor_QElapsedTimer_0);
-  methods += new qt_gsi::GenericMethod ("durationElapsed", "@brief Method QElapsedTimer::Duration QElapsedTimer::durationElapsed()\n", true, &_init_f_durationElapsed_c0, &_call_f_durationElapsed_c0);
-  methods += new qt_gsi::GenericMethod ("durationTo", "@brief Method QElapsedTimer::Duration QElapsedTimer::durationTo(const QElapsedTimer &other)\n", true, &_init_f_durationTo_c2609, &_call_f_durationTo_c2609);
   methods += new qt_gsi::GenericMethod ("elapsed", "@brief Method qint64 QElapsedTimer::elapsed()\n", true, &_init_f_elapsed_c0, &_call_f_elapsed_c0);
   methods += new qt_gsi::GenericMethod ("hasExpired", "@brief Method bool QElapsedTimer::hasExpired(qint64 timeout)\n", true, &_init_f_hasExpired_c986, &_call_f_hasExpired_c986);
   methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method void QElapsedTimer::invalidate()\n", false, &_init_f_invalidate_0, &_call_f_invalidate_0);

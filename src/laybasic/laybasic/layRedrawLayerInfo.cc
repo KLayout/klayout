@@ -41,6 +41,7 @@ RedrawLayerInfo::RedrawLayerInfo (const lay::LayerProperties &lp)
   hier_levels      = lp.hier_levels ();
   prop_sel         = lp.prop_sel ();
   inverse_prop_sel = lp.inverse_prop_sel ();
+  hidden_cells     = lp.source (true).hidden_cells ();
   enabled          = true;
 }
 

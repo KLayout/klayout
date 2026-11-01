@@ -822,6 +822,22 @@ public:
   }
 
   /**
+   *  @brief Gets the cells (by cell index) in which this layer is not drawn
+   */
+  const std::vector<db::cell_index_type> &hidden_cells () const
+  {
+    return m_hidden_cells;
+  }
+
+  /**
+   *  @brief Sets the cells (by cell index) in which this layer is not drawn
+   */
+  void set_hidden_cells (const std::vector<db::cell_index_type> &cells)
+  {
+    m_hidden_cells = cells;
+  }
+
+  /**
    *  @brief The hierarchy level specification
    *
    *  The returned structure describes if and which hierarchy level display selector is set.
@@ -899,6 +915,7 @@ private:
   int m_cv_index;
   std::vector<db::DCplxTrans> m_trans;
   CellSelector m_cell_sel;
+  std::vector<db::cell_index_type> m_hidden_cells;
   PropertySelector m_property_sel;
   HierarchyLevelSelection m_hier_levels;
 

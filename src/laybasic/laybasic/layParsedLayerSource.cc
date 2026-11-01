@@ -965,6 +965,7 @@ ParsedLayerSource::operator= (const ParsedLayerSource &d)
     m_trans             = d.m_trans;
     m_property_sel      = d.m_property_sel;
     m_cell_sel          = d.m_cell_sel;
+    m_hidden_cells      = d.m_hidden_cells;
     m_hier_levels       = d.m_hier_levels;
   }
   return *this;
@@ -1000,6 +1001,8 @@ ParsedLayerSource::operator+= (const ParsedLayerSource &d)
   if (m_cell_sel.is_empty ()) {
     m_cell_sel = d.m_cell_sel;
   }
+
+  m_hidden_cells.insert (m_hidden_cells.end (), d.m_hidden_cells.begin (), d.m_hidden_cells.end ());
 
   m_property_sel.join (d.m_property_sel);
 
@@ -1118,6 +1121,13 @@ ParsedLayerSource::to_string () const
     r += "{";
     r += m_cell_sel.to_string ();
     r += "}";
+  }
+
+  for (std::vector<db::cell_index_type>::const_iterator c = m_hidden_cells.begin (); c != m_hidden_cells.end (); ++c) {
+    if (! r.empty ()) {
+      r += " ";
+    }
+    r += "-" + tl::to_string (*c);
   }
 
   if (! m_trans.empty () && (m_trans.size () > 1 || m_trans[0] != db::DCplxTrans ())) {
@@ -1253,6 +1263,9 @@ ParsedLayerSource::operator== (const ParsedLayerSource &d) const
   if (m_cell_sel != d.m_cell_sel) {
     return false;
   }
+  if (m_hidden_cells != d.m_hidden_cells) {
+    return false;
+  }
   if (m_property_sel != d.m_property_sel) {
     return false;
   }
@@ -1297,6 +1310,9 @@ ParsedLayerSource::operator< (const ParsedLayerSource &d) const
   }
   if (m_cell_sel != d.m_cell_sel) {
     return m_cell_sel < d.m_cell_sel;
+  }
+  if (m_hidden_cells != d.m_hidden_cells) {
+    return m_hidden_cells < d.m_hidden_cells;
   }
   if (m_property_sel != d.m_property_sel) {
     return m_property_sel < d.m_property_sel;
@@ -1347,6 +1363,7 @@ ParsedLayerSource::parse_from_string (const char *cp)
   m_has_name = false;
   m_trans.clear ();
   m_cell_sel = CellSelector ();
+  m_hidden_cells.clear ();
 
   unsigned int v = 0;
 
@@ -1499,6 +1516,11 @@ ParsedLayerSource::parse_from_string (const char *cp)
 
       m_cell_sel.parse (x);
       x.expect ("}");
+
+    } else if (x.test ("-")) {
+
+      x.read (v);
+      m_hidden_cells.push_back (v);
 
     } else if (x.test ("*")) {
 

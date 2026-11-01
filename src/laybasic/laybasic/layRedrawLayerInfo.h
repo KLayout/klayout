@@ -118,6 +118,11 @@ struct RedrawLayerInfo
   bool inverse_prop_sel;
 
   /**
+   *  @brief Cells (by cell index) in which this layer is not drawn (set by the constructor)
+   */
+  std::vector<db::cell_index_type> hidden_cells;
+
+  /**
    *  @brief Returns true, if the layer needs to be drawn
    */
   bool needs_drawing () const

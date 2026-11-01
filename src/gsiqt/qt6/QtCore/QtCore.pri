@@ -122,7 +122,6 @@ SOURCES += \
   $$PWD/gsiDeclQPoint.cc \
   $$PWD/gsiDeclQPointF.cc \
   $$PWD/gsiDeclQProcess.cc \
-  $$PWD/gsiDeclQProcess_UnixProcessParameters.cc \
   $$PWD/gsiDeclQProcessEnvironment.cc \
   $$PWD/gsiDeclQPropertyAnimation.cc \
   $$PWD/gsiDeclQPropertyBindingError.cc \

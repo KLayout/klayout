@@ -611,46 +611,6 @@ static void _call_f_setStandardOutputProcess_1438 (const qt_gsi::GenericMethod *
 }
 
 
-// void QProcess::setUnixProcessParameters(const QProcess::UnixProcessParameters &params)
-
-
-static void _init_f_setUnixProcessParameters_4444 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("params");
-  decl->add_arg<const QProcess::UnixProcessParameters & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_setUnixProcessParameters_4444 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QProcess::UnixProcessParameters &arg1 = gsi::arg_reader<const QProcess::UnixProcessParameters & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QProcess *)cls)->setUnixProcessParameters (arg1);
-}
-
-
-// void QProcess::setUnixProcessParameters(QFlags<QProcess::UnixProcessFlag> flagsOnly)
-
-
-static void _init_f_setUnixProcessParameters_3597 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("flagsOnly");
-  decl->add_arg<QFlags<QProcess::UnixProcessFlag> > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_setUnixProcessParameters_3597 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QFlags<QProcess::UnixProcessFlag> arg1 = gsi::arg_reader<QFlags<QProcess::UnixProcessFlag> >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QProcess *)cls)->setUnixProcessParameters (arg1);
-}
-
-
 // void QProcess::setWorkingDirectory(const QString &dir)
 
 
@@ -787,21 +747,6 @@ static void _call_f_terminate_0 (const qt_gsi::GenericMethod * /*decl*/, void *c
   __SUPPRESS_UNUSED_WARNING(args);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QProcess *)cls)->terminate ();
-}
-
-
-// QProcess::UnixProcessParameters QProcess::unixProcessParameters()
-
-
-static void _init_f_unixProcessParameters_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QProcess::UnixProcessParameters > ();
-}
-
-static void _call_f_unixProcessParameters_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QProcess::UnixProcessParameters > ((QProcess::UnixProcessParameters)((QProcess *)cls)->unixProcessParameters ());
 }
 
 
@@ -1040,8 +985,6 @@ static gsi::Methods methods_QProcess () {
   methods += new qt_gsi::GenericMethod ("setStandardInputFile", "@brief Method void QProcess::setStandardInputFile(const QString &fileName)\n", false, &_init_f_setStandardInputFile_2025, &_call_f_setStandardInputFile_2025);
   methods += new qt_gsi::GenericMethod ("setStandardOutputFile", "@brief Method void QProcess::setStandardOutputFile(const QString &fileName, QFlags<QIODeviceBase::OpenModeFlag> mode)\n", false, &_init_f_setStandardOutputFile_5538, &_call_f_setStandardOutputFile_5538);
   methods += new qt_gsi::GenericMethod ("setStandardOutputProcess", "@brief Method void QProcess::setStandardOutputProcess(QProcess *destination)\n", false, &_init_f_setStandardOutputProcess_1438, &_call_f_setStandardOutputProcess_1438);
-  methods += new qt_gsi::GenericMethod ("setUnixProcessParameters", "@brief Method void QProcess::setUnixProcessParameters(const QProcess::UnixProcessParameters &params)\n", false, &_init_f_setUnixProcessParameters_4444, &_call_f_setUnixProcessParameters_4444);
-  methods += new qt_gsi::GenericMethod ("setUnixProcessParameters", "@brief Method void QProcess::setUnixProcessParameters(QFlags<QProcess::UnixProcessFlag> flagsOnly)\n", false, &_init_f_setUnixProcessParameters_3597, &_call_f_setUnixProcessParameters_3597);
   methods += new qt_gsi::GenericMethod ("setWorkingDirectory|workingDirectory=", "@brief Method void QProcess::setWorkingDirectory(const QString &dir)\n", false, &_init_f_setWorkingDirectory_2025, &_call_f_setWorkingDirectory_2025);
   methods += new qt_gsi::GenericMethod ("start", "@brief Method void QProcess::start(const QString &program, const QStringList &arguments, QFlags<QIODeviceBase::OpenModeFlag> mode)\n", false, &_init_f_start_7867, &_call_f_start_7867);
   methods += new qt_gsi::GenericMethod ("start", "@brief Method void QProcess::start(QFlags<QIODeviceBase::OpenModeFlag> mode)\n", false, &_init_f_start_3621, &_call_f_start_3621);
@@ -1049,7 +992,6 @@ static gsi::Methods methods_QProcess () {
   methods += new qt_gsi::GenericMethod ("startDetached", "@brief Method bool QProcess::startDetached(qint64 *pid)\n", false, &_init_f_startDetached_1172, &_call_f_startDetached_1172);
   methods += new qt_gsi::GenericMethod ("state", "@brief Method QProcess::ProcessState QProcess::state()\n", true, &_init_f_state_c0, &_call_f_state_c0);
   methods += new qt_gsi::GenericMethod ("terminate", "@brief Method void QProcess::terminate()\n", false, &_init_f_terminate_0, &_call_f_terminate_0);
-  methods += new qt_gsi::GenericMethod ("unixProcessParameters", "@brief Method QProcess::UnixProcessParameters QProcess::unixProcessParameters()\n", true, &_init_f_unixProcessParameters_c0, &_call_f_unixProcessParameters_c0);
   methods += new qt_gsi::GenericMethod ("waitForBytesWritten", "@brief Method bool QProcess::waitForBytesWritten(int msecs)\nThis is a reimplementation of QIODevice::waitForBytesWritten", false, &_init_f_waitForBytesWritten_767, &_call_f_waitForBytesWritten_767);
   methods += new qt_gsi::GenericMethod ("waitForFinished", "@brief Method bool QProcess::waitForFinished(int msecs)\n", false, &_init_f_waitForFinished_767, &_call_f_waitForFinished_767);
   methods += new qt_gsi::GenericMethod ("waitForReadyRead", "@brief Method bool QProcess::waitForReadyRead(int msecs)\nThis is a reimplementation of QIODevice::waitForReadyRead", false, &_init_f_waitForReadyRead_767, &_call_f_waitForReadyRead_767);
@@ -1213,26 +1155,6 @@ static gsi::QFlagsClass<QProcess::ProcessState > decl_QProcess_ProcessState_Enum
 static gsi::ClassExt<QProcess> inject_QProcess_ProcessState_Enum_in_parent (decl_QProcess_ProcessState_Enum.defs ());
 static gsi::ClassExt<QProcess> decl_QProcess_ProcessState_Enum_as_child (decl_QProcess_ProcessState_Enum, "ProcessState");
 static gsi::ClassExt<QProcess> decl_QProcess_ProcessState_Enums_as_child (decl_QProcess_ProcessState_Enums, "QFlags_ProcessState");
-
-}
-
-
-//  Implementation of the enum wrapper class for QProcess::UnixProcessFlag
-namespace qt_gsi
-{
-
-static gsi::Enum<QProcess::UnixProcessFlag> decl_QProcess_UnixProcessFlag_Enum ("QtCore", "QProcess_UnixProcessFlag",
-    gsi::enum_const ("ResetSignalHandlers", QProcess::UnixProcessFlag::ResetSignalHandlers, "@brief Enum constant QProcess::UnixProcessFlag::ResetSignalHandlers") +
-    gsi::enum_const ("IgnoreSigPipe", QProcess::UnixProcessFlag::IgnoreSigPipe, "@brief Enum constant QProcess::UnixProcessFlag::IgnoreSigPipe") +
-    gsi::enum_const ("CloseFileDescriptors", QProcess::UnixProcessFlag::CloseFileDescriptors, "@brief Enum constant QProcess::UnixProcessFlag::CloseFileDescriptors") +
-    gsi::enum_const ("UseVFork", QProcess::UnixProcessFlag::UseVFork, "@brief Enum constant QProcess::UnixProcessFlag::UseVFork"),
-  "@qt\n@brief This class represents the QProcess::UnixProcessFlag enum");
-
-static gsi::QFlagsClass<QProcess::UnixProcessFlag > decl_QProcess_UnixProcessFlag_Enums ("QtCore", "QProcess_QFlags_UnixProcessFlag",
-  "@qt\n@brief This class represents the QFlags<QProcess::UnixProcessFlag> flag set");
-
-static gsi::ClassExt<QProcess> decl_QProcess_UnixProcessFlag_Enum_as_child (decl_QProcess_UnixProcessFlag_Enum, "UnixProcessFlag");
-static gsi::ClassExt<QProcess> decl_QProcess_UnixProcessFlag_Enums_as_child (decl_QProcess_UnixProcessFlag_Enums, "QFlags_UnixProcessFlag");
 
 }
 

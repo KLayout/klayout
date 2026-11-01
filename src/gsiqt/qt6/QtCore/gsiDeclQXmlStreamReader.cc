@@ -28,6 +28,7 @@
 */
 
 #include <QXmlStreamReader>
+#include <QAnyStringView>
 #include <QIODevice>
 #include <QXmlStreamAttributes>
 #include <QXmlStreamEntityDeclaration>
@@ -75,79 +76,40 @@ static void _call_ctor_QXmlStreamReader_1447 (const qt_gsi::GenericStaticMethod 
 }
 
 
-//  Constructor QXmlStreamReader::QXmlStreamReader(const QByteArray &data)
+//  Constructor QXmlStreamReader::QXmlStreamReader(QAnyStringView data)
 
 
-static void _init_ctor_QXmlStreamReader_2309 (qt_gsi::GenericStaticMethod *decl)
+static void _init_ctor_QXmlStreamReader_1855 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("data");
-  decl->add_arg<const QByteArray & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   decl->set_return_new<QXmlStreamReader> ();
 }
 
-static void _call_ctor_QXmlStreamReader_2309 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_ctor_QXmlStreamReader_1855 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   ret.write<QXmlStreamReader *> (new QXmlStreamReader (arg1));
 }
 
 
-//  Constructor QXmlStreamReader::QXmlStreamReader(const QString &data)
+// void QXmlStreamReader::addData(QAnyStringView data)
 
 
-static void _init_ctor_QXmlStreamReader_2025 (qt_gsi::GenericStaticMethod *decl)
+static void _init_f_addData_1855 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("data");
-  decl->add_arg<const QString & > (argspec_0);
-  decl->set_return_new<QXmlStreamReader> ();
-}
-
-static void _call_ctor_QXmlStreamReader_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  ret.write<QXmlStreamReader *> (new QXmlStreamReader (arg1));
-}
-
-
-// void QXmlStreamReader::addData(const QByteArray &data)
-
-
-static void _init_f_addData_2309 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("data");
-  decl->add_arg<const QByteArray & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_addData_2309 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_addData_1855 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QXmlStreamReader *)cls)->addData (arg1);
-}
-
-
-// void QXmlStreamReader::addData(const QString &data)
-
-
-static void _init_f_addData_2025 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("data");
-  decl->add_arg<const QString & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_addData_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamReader *)cls)->addData (arg1);
 }
@@ -371,6 +333,21 @@ static void _call_f_hasError_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<bool > ((bool)((QXmlStreamReader *)cls)->hasError ());
+}
+
+
+// bool QXmlStreamReader::hasStandaloneDeclaration()
+
+
+static void _init_f_hasStandaloneDeclaration_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_hasStandaloneDeclaration_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QXmlStreamReader *)cls)->hasStandaloneDeclaration ());
 }
 
 
@@ -817,10 +794,8 @@ static gsi::Methods methods_QXmlStreamReader () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamReader::QXmlStreamReader()\nThis method creates an object of class QXmlStreamReader.", &_init_ctor_QXmlStreamReader_0, &_call_ctor_QXmlStreamReader_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamReader::QXmlStreamReader(QIODevice *device)\nThis method creates an object of class QXmlStreamReader.", &_init_ctor_QXmlStreamReader_1447, &_call_ctor_QXmlStreamReader_1447);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamReader::QXmlStreamReader(const QByteArray &data)\nThis method creates an object of class QXmlStreamReader.", &_init_ctor_QXmlStreamReader_2309, &_call_ctor_QXmlStreamReader_2309);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamReader::QXmlStreamReader(const QString &data)\nThis method creates an object of class QXmlStreamReader.", &_init_ctor_QXmlStreamReader_2025, &_call_ctor_QXmlStreamReader_2025);
-  methods += new qt_gsi::GenericMethod ("addData", "@brief Method void QXmlStreamReader::addData(const QByteArray &data)\n", false, &_init_f_addData_2309, &_call_f_addData_2309);
-  methods += new qt_gsi::GenericMethod ("addData", "@brief Method void QXmlStreamReader::addData(const QString &data)\n", false, &_init_f_addData_2025, &_call_f_addData_2025);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamReader::QXmlStreamReader(QAnyStringView data)\nThis method creates an object of class QXmlStreamReader.", &_init_ctor_QXmlStreamReader_1855, &_call_ctor_QXmlStreamReader_1855);
+  methods += new qt_gsi::GenericMethod ("addData", "@brief Method void QXmlStreamReader::addData(QAnyStringView data)\n", false, &_init_f_addData_1855, &_call_f_addData_1855);
   methods += new qt_gsi::GenericMethod ("addExtraNamespaceDeclaration", "@brief Method void QXmlStreamReader::addExtraNamespaceDeclaration(const QXmlStreamNamespaceDeclaration &extraNamespaceDeclaraction)\n", false, &_init_f_addExtraNamespaceDeclaration_4354, &_call_f_addExtraNamespaceDeclaration_4354);
   methods += new qt_gsi::GenericMethod ("addExtraNamespaceDeclarations", "@brief Method void QXmlStreamReader::addExtraNamespaceDeclarations(const QList<QXmlStreamNamespaceDeclaration> &extraNamespaceDeclaractions)\n", false, &_init_f_addExtraNamespaceDeclarations_4969, &_call_f_addExtraNamespaceDeclarations_4969);
   methods += new qt_gsi::GenericMethod ("atEnd", "@brief Method bool QXmlStreamReader::atEnd()\n", true, &_init_f_atEnd_c0, &_call_f_atEnd_c0);
@@ -835,6 +810,7 @@ static gsi::Methods methods_QXmlStreamReader () {
   methods += new qt_gsi::GenericMethod ("error", "@brief Method QXmlStreamReader::Error QXmlStreamReader::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QXmlStreamReader::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
   methods += new qt_gsi::GenericMethod ("hasError", "@brief Method bool QXmlStreamReader::hasError()\n", true, &_init_f_hasError_c0, &_call_f_hasError_c0);
+  methods += new qt_gsi::GenericMethod ("hasStandaloneDeclaration", "@brief Method bool QXmlStreamReader::hasStandaloneDeclaration()\n", true, &_init_f_hasStandaloneDeclaration_c0, &_call_f_hasStandaloneDeclaration_c0);
   methods += new qt_gsi::GenericMethod ("isCDATA?", "@brief Method bool QXmlStreamReader::isCDATA()\n", true, &_init_f_isCDATA_c0, &_call_f_isCDATA_c0);
   methods += new qt_gsi::GenericMethod ("isCharacters?", "@brief Method bool QXmlStreamReader::isCharacters()\n", true, &_init_f_isCharacters_c0, &_call_f_isCharacters_c0);
   methods += new qt_gsi::GenericMethod ("isComment?", "@brief Method bool QXmlStreamReader::isComment()\n", true, &_init_f_isComment_c0, &_call_f_isComment_c0);

@@ -28,6 +28,7 @@
 */
 
 #include <QNetworkDiskCache>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QIODevice>

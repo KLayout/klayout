@@ -18,6 +18,7 @@ SOURCES = \
   dbCellInst.cc \
   dbCellInstanceSetHasher.cc \
   dbCellMapping.cc \
+  dbCellSelector.cc \
   dbClipboard.cc \
   dbClipboardData.cc \
   dbClip.cc \
@@ -261,6 +262,7 @@ HEADERS = \
   dbCellInst.h \
   dbCellInstanceSetHasher.h \
   dbCellMapping.h \
+  dbCellSelector.h \
   dbClipboardData.h \
   dbClipboard.h \
   dbClip.h \

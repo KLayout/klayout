@@ -278,6 +278,21 @@ static void _call_f_size_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
+// QSvgGenerator::SvgVersion QSvgGenerator::svgVersion()
+
+
+static void _init_f_svgVersion_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<qt_gsi::Converter<QSvgGenerator::SvgVersion>::target_type > ();
+}
+
+static void _call_f_svgVersion_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<qt_gsi::Converter<QSvgGenerator::SvgVersion>::target_type > ((qt_gsi::Converter<QSvgGenerator::SvgVersion>::target_type)qt_gsi::CppToQtAdaptor<QSvgGenerator::SvgVersion>(((QSvgGenerator *)cls)->svgVersion ()));
+}
+
+
 // QString QSvgGenerator::title()
 
 
@@ -341,6 +356,7 @@ static gsi::Methods methods_QSvgGenerator () {
   methods += new qt_gsi::GenericMethod ("setViewBox|viewBox=", "@brief Method void QSvgGenerator::setViewBox(const QRect &viewBox)\n", false, &_init_f_setViewBox_1792, &_call_f_setViewBox_1792);
   methods += new qt_gsi::GenericMethod ("setViewBox|viewBox=", "@brief Method void QSvgGenerator::setViewBox(const QRectF &viewBox)\n", false, &_init_f_setViewBox_1862, &_call_f_setViewBox_1862);
   methods += new qt_gsi::GenericMethod (":size", "@brief Method QSize QSvgGenerator::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
+  methods += new qt_gsi::GenericMethod ("svgVersion", "@brief Method QSvgGenerator::SvgVersion QSvgGenerator::svgVersion()\n", true, &_init_f_svgVersion_c0, &_call_f_svgVersion_c0);
   methods += new qt_gsi::GenericMethod (":title", "@brief Method QString QSvgGenerator::title()\n", true, &_init_f_title_c0, &_call_f_title_c0);
   methods += new qt_gsi::GenericMethod (":viewBox", "@brief Method QRect QSvgGenerator::viewBox()\n", true, &_init_f_viewBox_c0, &_call_f_viewBox_c0);
   methods += new qt_gsi::GenericMethod ("viewBoxF", "@brief Method QRectF QSvgGenerator::viewBoxF()\n", true, &_init_f_viewBoxF_c0, &_call_f_viewBoxF_c0);
@@ -366,6 +382,12 @@ public:
 
   //  [adaptor ctor] QSvgGenerator::QSvgGenerator()
   QSvgGenerator_Adaptor() : QSvgGenerator()
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
+  //  [adaptor ctor] QSvgGenerator::QSvgGenerator(QSvgGenerator::SvgVersion version)
+  QSvgGenerator_Adaptor(QSvgGenerator::SvgVersion version) : QSvgGenerator(version)
   {
     qt_gsi::QtObjectBase::init (this);
   }
@@ -465,6 +487,24 @@ static void _call_ctor_QSvgGenerator_Adaptor_0 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QSvgGenerator_Adaptor *> (new QSvgGenerator_Adaptor ());
+}
+
+
+//  Constructor QSvgGenerator::QSvgGenerator(QSvgGenerator::SvgVersion version) (adaptor class)
+
+static void _init_ctor_QSvgGenerator_Adaptor_2918 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("version");
+  decl->add_arg<const qt_gsi::Converter<QSvgGenerator::SvgVersion>::target_type & > (argspec_0);
+  decl->set_return_new<QSvgGenerator_Adaptor> ();
+}
+
+static void _call_ctor_QSvgGenerator_Adaptor_2918 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QSvgGenerator::SvgVersion>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSvgGenerator::SvgVersion>::target_type & >() (args, heap);
+  ret.write<QSvgGenerator_Adaptor *> (new QSvgGenerator_Adaptor (qt_gsi::QtToCppAdaptor<QSvgGenerator::SvgVersion>(arg1).cref()));
 }
 
 
@@ -584,6 +624,7 @@ gsi::Class<QSvgGenerator> &qtdecl_QSvgGenerator ();
 static gsi::Methods methods_QSvgGenerator_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSvgGenerator::QSvgGenerator()\nThis method creates an object of class QSvgGenerator.", &_init_ctor_QSvgGenerator_Adaptor_0, &_call_ctor_QSvgGenerator_Adaptor_0);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSvgGenerator::QSvgGenerator(QSvgGenerator::SvgVersion version)\nThis method creates an object of class QSvgGenerator.", &_init_ctor_QSvgGenerator_Adaptor_2918, &_call_ctor_QSvgGenerator_Adaptor_2918);
   methods += new qt_gsi::GenericMethod ("*initPainter", "@brief Virtual method void QSvgGenerator::initPainter(QPainter *painter)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0);
   methods += new qt_gsi::GenericMethod ("*initPainter", "@hide", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0, &_set_callback_cbs_initPainter_c1426_0);
   methods += new qt_gsi::GenericMethod ("*metric", "@brief Virtual method int QSvgGenerator::metric(QPaintDevice::PaintDeviceMetric metric)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0);
@@ -600,6 +641,24 @@ static gsi::Methods methods_QSvgGenerator_Adaptor () {
 gsi::Class<QSvgGenerator_Adaptor> decl_QSvgGenerator_Adaptor (qtdecl_QSvgGenerator (), "QtSvg", "QSvgGenerator",
   methods_QSvgGenerator_Adaptor (),
   "@qt\n@brief Binding of QSvgGenerator");
+
+}
+
+
+//  Implementation of the enum wrapper class for QSvgGenerator::SvgVersion
+namespace qt_gsi
+{
+
+static gsi::Enum<QSvgGenerator::SvgVersion> decl_QSvgGenerator_SvgVersion_Enum ("QtSvg", "QSvgGenerator_SvgVersion",
+    gsi::enum_const ("SvgTiny12", QSvgGenerator::SvgVersion::SvgTiny12, "@brief Enum constant QSvgGenerator::SvgVersion::SvgTiny12") +
+    gsi::enum_const ("Svg11", QSvgGenerator::SvgVersion::Svg11, "@brief Enum constant QSvgGenerator::SvgVersion::Svg11"),
+  "@qt\n@brief This class represents the QSvgGenerator::SvgVersion enum");
+
+static gsi::QFlagsClass<QSvgGenerator::SvgVersion > decl_QSvgGenerator_SvgVersion_Enums ("QtSvg", "QSvgGenerator_QFlags_SvgVersion",
+  "@qt\n@brief This class represents the QFlags<QSvgGenerator::SvgVersion> flag set");
+
+static gsi::ClassExt<QSvgGenerator> decl_QSvgGenerator_SvgVersion_Enum_as_child (decl_QSvgGenerator_SvgVersion_Enum, "SvgVersion");
+static gsi::ClassExt<QSvgGenerator> decl_QSvgGenerator_SvgVersion_Enums_as_child (decl_QSvgGenerator_SvgVersion_Enums, "QFlags_SvgVersion");
 
 }
 

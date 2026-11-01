@@ -361,6 +361,31 @@ static void _call_f_formats_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
+// QList<QGlyphRun> QTextLayout::glyphRuns(int from, int length, QFlags<QTextLayout::GlyphRunRetrievalFlag> flags)
+
+
+static void _init_f_glyphRuns_c5851 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("from");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("length");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("flags");
+  decl->add_arg<QFlags<QTextLayout::GlyphRunRetrievalFlag> > (argspec_2);
+  decl->set_return<QList<QGlyphRun> > ();
+}
+
+static void _call_f_glyphRuns_c5851 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  QFlags<QTextLayout::GlyphRunRetrievalFlag> arg3 = gsi::arg_reader<QFlags<QTextLayout::GlyphRunRetrievalFlag> >() (args, heap);
+  ret.write<QList<QGlyphRun> > ((QList<QGlyphRun>)((QTextLayout *)cls)->glyphRuns (arg1, arg2, arg3));
+}
+
+
 // QList<QGlyphRun> QTextLayout::glyphRuns(int from, int length)
 
 
@@ -868,6 +893,7 @@ static gsi::Methods methods_QTextLayout () {
   methods += new qt_gsi::GenericMethod ("endLayout", "@brief Method void QTextLayout::endLayout()\n", false, &_init_f_endLayout_0, &_call_f_endLayout_0);
   methods += new qt_gsi::GenericMethod (":font", "@brief Method QFont QTextLayout::font()\n", true, &_init_f_font_c0, &_call_f_font_c0);
   methods += new qt_gsi::GenericMethod (":formats", "@brief Method QList<QTextLayout::FormatRange> QTextLayout::formats()\n", true, &_init_f_formats_c0, &_call_f_formats_c0);
+  methods += new qt_gsi::GenericMethod ("glyphRuns", "@brief Method QList<QGlyphRun> QTextLayout::glyphRuns(int from, int length, QFlags<QTextLayout::GlyphRunRetrievalFlag> flags)\n", true, &_init_f_glyphRuns_c5851, &_call_f_glyphRuns_c5851);
   methods += new qt_gsi::GenericMethod ("glyphRuns", "@brief Method QList<QGlyphRun> QTextLayout::glyphRuns(int from, int length)\n", true, &_init_f_glyphRuns_c1426, &_call_f_glyphRuns_c1426);
   methods += new qt_gsi::GenericMethod ("isValidCursorPosition?", "@brief Method bool QTextLayout::isValidCursorPosition(int pos)\n", true, &_init_f_isValidCursorPosition_c767, &_call_f_isValidCursorPosition_c767);
   methods += new qt_gsi::GenericMethod ("leftCursorPosition", "@brief Method int QTextLayout::leftCursorPosition(int oldPos)\n", true, &_init_f_leftCursorPosition_c767, &_call_f_leftCursorPosition_c767);
@@ -923,6 +949,30 @@ static gsi::QFlagsClass<QTextLayout::CursorMode > decl_QTextLayout_CursorMode_En
 static gsi::ClassExt<QTextLayout> inject_QTextLayout_CursorMode_Enum_in_parent (decl_QTextLayout_CursorMode_Enum.defs ());
 static gsi::ClassExt<QTextLayout> decl_QTextLayout_CursorMode_Enum_as_child (decl_QTextLayout_CursorMode_Enum, "CursorMode");
 static gsi::ClassExt<QTextLayout> decl_QTextLayout_CursorMode_Enums_as_child (decl_QTextLayout_CursorMode_Enums, "QFlags_CursorMode");
+
+}
+
+
+//  Implementation of the enum wrapper class for QTextLayout::GlyphRunRetrievalFlag
+namespace qt_gsi
+{
+
+static gsi::Enum<QTextLayout::GlyphRunRetrievalFlag> decl_QTextLayout_GlyphRunRetrievalFlag_Enum ("QtGui", "QTextLayout_GlyphRunRetrievalFlag",
+    gsi::enum_const ("RetrieveGlyphIndexes", QTextLayout::RetrieveGlyphIndexes, "@brief Enum constant QTextLayout::RetrieveGlyphIndexes") +
+    gsi::enum_const ("RetrieveGlyphPositions", QTextLayout::RetrieveGlyphPositions, "@brief Enum constant QTextLayout::RetrieveGlyphPositions") +
+    gsi::enum_const ("RetrieveStringIndexes", QTextLayout::RetrieveStringIndexes, "@brief Enum constant QTextLayout::RetrieveStringIndexes") +
+    gsi::enum_const ("RetrieveString", QTextLayout::RetrieveString, "@brief Enum constant QTextLayout::RetrieveString") +
+    gsi::enum_const ("DefaultRetrievalFlags", QTextLayout::DefaultRetrievalFlags, "@brief Enum constant QTextLayout::DefaultRetrievalFlags") +
+    gsi::enum_const ("RetrieveAll", QTextLayout::RetrieveAll, "@brief Enum constant QTextLayout::RetrieveAll"),
+  "@qt\n@brief This class represents the QTextLayout::GlyphRunRetrievalFlag enum");
+
+static gsi::QFlagsClass<QTextLayout::GlyphRunRetrievalFlag > decl_QTextLayout_GlyphRunRetrievalFlag_Enums ("QtGui", "QTextLayout_QFlags_GlyphRunRetrievalFlag",
+  "@qt\n@brief This class represents the QFlags<QTextLayout::GlyphRunRetrievalFlag> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QTextLayout> inject_QTextLayout_GlyphRunRetrievalFlag_Enum_in_parent (decl_QTextLayout_GlyphRunRetrievalFlag_Enum.defs ());
+static gsi::ClassExt<QTextLayout> decl_QTextLayout_GlyphRunRetrievalFlag_Enum_as_child (decl_QTextLayout_GlyphRunRetrievalFlag_Enum, "GlyphRunRetrievalFlag");
+static gsi::ClassExt<QTextLayout> decl_QTextLayout_GlyphRunRetrievalFlag_Enums_as_child (decl_QTextLayout_GlyphRunRetrievalFlag_Enums, "QFlags_GlyphRunRetrievalFlag");
 
 }
 

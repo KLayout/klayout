@@ -623,6 +623,26 @@ static void _call_f_setValue_2119 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
+// void QSqlField::swap(QSqlField &other)
+
+
+static void _init_f_swap_1487 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<QSqlField & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_swap_1487 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QSqlField &arg1 = gsi::arg_reader<QSqlField & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QSqlField *)cls)->swap (arg1);
+}
+
+
 // QString QSqlField::tableName()
 
 
@@ -721,6 +741,7 @@ static gsi::Methods methods_QSqlField () {
   methods += new qt_gsi::GenericMethod ("setTableName|tableName=", "@brief Method void QSqlField::setTableName(const QString &tableName)\n", false, &_init_f_setTableName_2025, &_call_f_setTableName_2025);
   methods += new qt_gsi::GenericMethod ("setType|type=", "@brief Method void QSqlField::setType(QVariant::Type type)\n", false, &_init_f_setType_1776, &_call_f_setType_1776);
   methods += new qt_gsi::GenericMethod ("setValue|value=", "@brief Method void QSqlField::setValue(const QVariant &value)\n", false, &_init_f_setValue_2119, &_call_f_setValue_2119);
+  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QSqlField::swap(QSqlField &other)\n", false, &_init_f_swap_1487, &_call_f_swap_1487);
   methods += new qt_gsi::GenericMethod (":tableName", "@brief Method QString QSqlField::tableName()\n", true, &_init_f_tableName_c0, &_call_f_tableName_c0);
   methods += new qt_gsi::GenericMethod (":type", "@brief Method QVariant::Type QSqlField::type()\n", true, &_init_f_type_c0, &_call_f_type_c0);
   methods += new qt_gsi::GenericMethod ("typeID", "@brief Method int QSqlField::typeID()\n", true, &_init_f_typeID_c0, &_call_f_typeID_c0);

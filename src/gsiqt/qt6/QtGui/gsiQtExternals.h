@@ -77,6 +77,10 @@ class QAccessibleObject;
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAccessibleObject> &qtdecl_QAccessibleObject (); }
 
+class QAccessibleSelectionInterface;
+
+namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAccessibleSelectionInterface> &qtdecl_QAccessibleSelectionInterface (); }
+
 class QAccessibleStateChangeEvent;
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAccessibleStateChangeEvent> &qtdecl_QAccessibleStateChangeEvent (); }

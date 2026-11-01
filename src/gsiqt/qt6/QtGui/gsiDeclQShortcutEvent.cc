@@ -29,6 +29,7 @@
 
 #include <QShortcutEvent>
 #include <QKeySequence>
+#include <QShortcut>
 #include "gsiQt.h"
 #include "gsiQtGuiCommon.h"
 #include <memory>
@@ -121,6 +122,24 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
+  //  [adaptor ctor] QShortcutEvent::QShortcutEvent(const QKeySequence &key, const QShortcut *shortcut, bool ambiguous)
+  QShortcutEvent_Adaptor(const QKeySequence &key) : QShortcutEvent(key)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
+  //  [adaptor ctor] QShortcutEvent::QShortcutEvent(const QKeySequence &key, const QShortcut *shortcut, bool ambiguous)
+  QShortcutEvent_Adaptor(const QKeySequence &key, const QShortcut *shortcut) : QShortcutEvent(key, shortcut)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
+  //  [adaptor ctor] QShortcutEvent::QShortcutEvent(const QKeySequence &key, const QShortcut *shortcut, bool ambiguous)
+  QShortcutEvent_Adaptor(const QKeySequence &key, const QShortcut *shortcut, bool ambiguous) : QShortcutEvent(key, shortcut, ambiguous)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
   //  [adaptor impl] void QShortcutEvent::setAccepted(bool accepted)
   void cbs_setAccepted_864_0(bool accepted)
   {
@@ -165,6 +184,30 @@ static void _call_ctor_QShortcutEvent_Adaptor_3931 (const qt_gsi::GenericStaticM
 }
 
 
+//  Constructor QShortcutEvent::QShortcutEvent(const QKeySequence &key, const QShortcut *shortcut, bool ambiguous) (adaptor class)
+
+static void _init_ctor_QShortcutEvent_Adaptor_5422 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<const QKeySequence & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("shortcut", true, "nullptr");
+  decl->add_arg<const QShortcut * > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("ambiguous", true, "false");
+  decl->add_arg<bool > (argspec_2);
+  decl->set_return_new<QShortcutEvent_Adaptor> ();
+}
+
+static void _call_ctor_QShortcutEvent_Adaptor_5422 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QKeySequence &arg1 = gsi::arg_reader<const QKeySequence & >() (args, heap);
+  const QShortcut *arg2 = args ? gsi::arg_reader<const QShortcut * >() (args, heap) : gsi::arg_maker<const QShortcut * >() (nullptr, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (false, heap);
+  ret.write<QShortcutEvent_Adaptor *> (new QShortcutEvent_Adaptor (arg1, arg2, arg3));
+}
+
+
 // void QShortcutEvent::setAccepted(bool accepted)
 
 static void _init_cbs_setAccepted_864_0 (qt_gsi::GenericMethod *decl)
@@ -197,6 +240,7 @@ gsi::Class<QShortcutEvent> &qtdecl_QShortcutEvent ();
 static gsi::Methods methods_QShortcutEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QShortcutEvent::QShortcutEvent(const QKeySequence &key, int id, bool ambiguous)\nThis method creates an object of class QShortcutEvent.", &_init_ctor_QShortcutEvent_Adaptor_3931, &_call_ctor_QShortcutEvent_Adaptor_3931);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QShortcutEvent::QShortcutEvent(const QKeySequence &key, const QShortcut *shortcut, bool ambiguous)\nThis method creates an object of class QShortcutEvent.", &_init_ctor_QShortcutEvent_Adaptor_5422, &_call_ctor_QShortcutEvent_Adaptor_5422);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Virtual method void QShortcutEvent::setAccepted(bool accepted)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@hide", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0, &_set_callback_cbs_setAccepted_864_0);
   return methods;

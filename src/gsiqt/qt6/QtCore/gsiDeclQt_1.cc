@@ -38,6 +38,28 @@
 class Qt_Namespace { };
 
 
+//  Implementation of the enum wrapper class for Qt::DateFormat
+namespace qt_gsi
+{
+
+static gsi::Enum<Qt::DateFormat> decl_Qt_DateFormat_Enum ("QtCore", "Qt_DateFormat",
+    gsi::enum_const ("TextDate", Qt::TextDate, "@brief Enum constant Qt::TextDate") +
+    gsi::enum_const ("ISODate", Qt::ISODate, "@brief Enum constant Qt::ISODate") +
+    gsi::enum_const ("RFC2822Date", Qt::RFC2822Date, "@brief Enum constant Qt::RFC2822Date") +
+    gsi::enum_const ("ISODateWithMs", Qt::ISODateWithMs, "@brief Enum constant Qt::ISODateWithMs"),
+  "@qt\n@brief This class represents the Qt::DateFormat enum");
+
+static gsi::QFlagsClass<Qt::DateFormat > decl_Qt_DateFormat_Enums ("QtCore", "Qt_QFlags_DateFormat",
+  "@qt\n@brief This class represents the QFlags<Qt::DateFormat> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<Qt_Namespace> inject_Qt_DateFormat_Enum_in_parent (decl_Qt_DateFormat_Enum.defs ());
+static gsi::ClassExt<Qt_Namespace> decl_Qt_DateFormat_Enum_as_child (decl_Qt_DateFormat_Enum, "DateFormat");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_DateFormat_Enums_as_child (decl_Qt_DateFormat_Enums, "QFlags_DateFormat");
+
+}
+
+
 //  Implementation of the enum wrapper class for Qt::DayOfWeek
 namespace qt_gsi
 {
@@ -489,47 +511,6 @@ static gsi::QFlagsClass<Qt::Initialization > decl_Qt_Initialization_Enums ("QtCo
 
 static gsi::ClassExt<Qt_Namespace> decl_Qt_Initialization_Enum_as_child (decl_Qt_Initialization_Enum, "Initialization");
 static gsi::ClassExt<Qt_Namespace> decl_Qt_Initialization_Enums_as_child (decl_Qt_Initialization_Enums, "QFlags_Initialization");
-
-}
-
-
-//  Implementation of the enum wrapper class for Qt::InputMethodHint
-namespace qt_gsi
-{
-
-static gsi::Enum<Qt::InputMethodHint> decl_Qt_InputMethodHint_Enum ("QtCore", "Qt_InputMethodHint",
-    gsi::enum_const ("ImhNone", Qt::ImhNone, "@brief Enum constant Qt::ImhNone") +
-    gsi::enum_const ("ImhHiddenText", Qt::ImhHiddenText, "@brief Enum constant Qt::ImhHiddenText") +
-    gsi::enum_const ("ImhSensitiveData", Qt::ImhSensitiveData, "@brief Enum constant Qt::ImhSensitiveData") +
-    gsi::enum_const ("ImhNoAutoUppercase", Qt::ImhNoAutoUppercase, "@brief Enum constant Qt::ImhNoAutoUppercase") +
-    gsi::enum_const ("ImhPreferNumbers", Qt::ImhPreferNumbers, "@brief Enum constant Qt::ImhPreferNumbers") +
-    gsi::enum_const ("ImhPreferUppercase", Qt::ImhPreferUppercase, "@brief Enum constant Qt::ImhPreferUppercase") +
-    gsi::enum_const ("ImhPreferLowercase", Qt::ImhPreferLowercase, "@brief Enum constant Qt::ImhPreferLowercase") +
-    gsi::enum_const ("ImhNoPredictiveText", Qt::ImhNoPredictiveText, "@brief Enum constant Qt::ImhNoPredictiveText") +
-    gsi::enum_const ("ImhDate", Qt::ImhDate, "@brief Enum constant Qt::ImhDate") +
-    gsi::enum_const ("ImhTime", Qt::ImhTime, "@brief Enum constant Qt::ImhTime") +
-    gsi::enum_const ("ImhPreferLatin", Qt::ImhPreferLatin, "@brief Enum constant Qt::ImhPreferLatin") +
-    gsi::enum_const ("ImhMultiLine", Qt::ImhMultiLine, "@brief Enum constant Qt::ImhMultiLine") +
-    gsi::enum_const ("ImhNoEditMenu", Qt::ImhNoEditMenu, "@brief Enum constant Qt::ImhNoEditMenu") +
-    gsi::enum_const ("ImhNoTextHandles", Qt::ImhNoTextHandles, "@brief Enum constant Qt::ImhNoTextHandles") +
-    gsi::enum_const ("ImhDigitsOnly", Qt::ImhDigitsOnly, "@brief Enum constant Qt::ImhDigitsOnly") +
-    gsi::enum_const ("ImhFormattedNumbersOnly", Qt::ImhFormattedNumbersOnly, "@brief Enum constant Qt::ImhFormattedNumbersOnly") +
-    gsi::enum_const ("ImhUppercaseOnly", Qt::ImhUppercaseOnly, "@brief Enum constant Qt::ImhUppercaseOnly") +
-    gsi::enum_const ("ImhLowercaseOnly", Qt::ImhLowercaseOnly, "@brief Enum constant Qt::ImhLowercaseOnly") +
-    gsi::enum_const ("ImhDialableCharactersOnly", Qt::ImhDialableCharactersOnly, "@brief Enum constant Qt::ImhDialableCharactersOnly") +
-    gsi::enum_const ("ImhEmailCharactersOnly", Qt::ImhEmailCharactersOnly, "@brief Enum constant Qt::ImhEmailCharactersOnly") +
-    gsi::enum_const ("ImhUrlCharactersOnly", Qt::ImhUrlCharactersOnly, "@brief Enum constant Qt::ImhUrlCharactersOnly") +
-    gsi::enum_const ("ImhLatinOnly", Qt::ImhLatinOnly, "@brief Enum constant Qt::ImhLatinOnly") +
-    gsi::enum_const ("ImhExclusiveInputMask", Qt::ImhExclusiveInputMask, "@brief Enum constant Qt::ImhExclusiveInputMask"),
-  "@qt\n@brief This class represents the Qt::InputMethodHint enum");
-
-static gsi::QFlagsClass<Qt::InputMethodHint > decl_Qt_InputMethodHint_Enums ("QtCore", "Qt_QFlags_InputMethodHint",
-  "@qt\n@brief This class represents the QFlags<Qt::InputMethodHint> flag set");
-
-//  Inject the declarations into the parent
-static gsi::ClassExt<Qt_Namespace> inject_Qt_InputMethodHint_Enum_in_parent (decl_Qt_InputMethodHint_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_InputMethodHint_Enum_as_child (decl_Qt_InputMethodHint_Enum, "InputMethodHint");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_InputMethodHint_Enums_as_child (decl_Qt_InputMethodHint_Enums, "QFlags_InputMethodHint");
 
 }
 

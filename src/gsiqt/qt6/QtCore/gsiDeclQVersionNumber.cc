@@ -28,6 +28,7 @@
 */
 
 #include <QVersionNumber>
+#include <QAnyStringView>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
 #include <memory>
@@ -244,37 +245,37 @@ static void _call_f_normalized_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// int QVersionNumber::segmentAt(int index)
+// int QVersionNumber::segmentAt(qsizetype index)
 
 
-static void _init_f_segmentAt_c767 (qt_gsi::GenericMethod *decl)
+static void _init_f_segmentAt_c1442 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("index");
-  decl->add_arg<int > (argspec_0);
+  decl->add_arg<qsizetype > (argspec_0);
   decl->set_return<int > ();
 }
 
-static void _call_f_segmentAt_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_segmentAt_c1442 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
+  qsizetype arg1 = gsi::arg_reader<qsizetype >() (args, heap);
   ret.write<int > ((int)((QVersionNumber *)cls)->segmentAt (arg1));
 }
 
 
-// int QVersionNumber::segmentCount()
+// qsizetype QVersionNumber::segmentCount()
 
 
 static void _init_f_segmentCount_c0 (qt_gsi::GenericMethod *decl)
 {
-  decl->set_return<int > ();
+  decl->set_return<qsizetype > ();
 }
 
 static void _call_f_segmentCount_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<int > ((int)((QVersionNumber *)cls)->segmentCount ());
+  ret.write<qsizetype > ((qsizetype)((QVersionNumber *)cls)->segmentCount ());
 }
 
 
@@ -352,24 +353,24 @@ static void _call_f_compare_5398 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 }
 
 
-// static QVersionNumber QVersionNumber::fromString(const QString &string, int *suffixIndex)
+// static QVersionNumber QVersionNumber::fromString(QAnyStringView string, qsizetype *suffixIndex)
 
 
-static void _init_f_fromString_2870 (qt_gsi::GenericStaticMethod *decl)
+static void _init_f_fromString_3375 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("string");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<QAnyStringView > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("suffixIndex", true, "nullptr");
-  decl->add_arg<int * > (argspec_1);
+  decl->add_arg<qsizetype * > (argspec_1);
   decl->set_return<QVersionNumber > ();
 }
 
-static void _call_f_fromString_2870 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_fromString_3375 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  int *arg2 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
+  QAnyStringView arg1 = gsi::arg_reader<QAnyStringView >() (args, heap);
+  qsizetype *arg2 = args ? gsi::arg_reader<qsizetype * >() (args, heap) : gsi::arg_maker<qsizetype * >() (nullptr, heap);
   ret.write<QVersionNumber > ((QVersionNumber)QVersionNumber::fromString (arg1, arg2));
 }
 
@@ -422,13 +423,13 @@ static gsi::Methods methods_QVersionNumber () {
   methods += new qt_gsi::GenericMethod ("microVersion", "@brief Method int QVersionNumber::microVersion()\n", true, &_init_f_microVersion_c0, &_call_f_microVersion_c0);
   methods += new qt_gsi::GenericMethod ("minorVersion", "@brief Method int QVersionNumber::minorVersion()\n", true, &_init_f_minorVersion_c0, &_call_f_minorVersion_c0);
   methods += new qt_gsi::GenericMethod ("normalized", "@brief Method QVersionNumber QVersionNumber::normalized()\n", true, &_init_f_normalized_c0, &_call_f_normalized_c0);
-  methods += new qt_gsi::GenericMethod ("segmentAt", "@brief Method int QVersionNumber::segmentAt(int index)\n", true, &_init_f_segmentAt_c767, &_call_f_segmentAt_c767);
-  methods += new qt_gsi::GenericMethod ("segmentCount", "@brief Method int QVersionNumber::segmentCount()\n", true, &_init_f_segmentCount_c0, &_call_f_segmentCount_c0);
+  methods += new qt_gsi::GenericMethod ("segmentAt", "@brief Method int QVersionNumber::segmentAt(qsizetype index)\n", true, &_init_f_segmentAt_c1442, &_call_f_segmentAt_c1442);
+  methods += new qt_gsi::GenericMethod ("segmentCount", "@brief Method qsizetype QVersionNumber::segmentCount()\n", true, &_init_f_segmentCount_c0, &_call_f_segmentCount_c0);
   methods += new qt_gsi::GenericMethod ("segments", "@brief Method QList<int> QVersionNumber::segments()\n", true, &_init_f_segments_c0, &_call_f_segments_c0);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QVersionNumber::toString()\n", true, &_init_f_toString_c0, &_call_f_toString_c0);
   methods += new qt_gsi::GenericStaticMethod ("commonPrefix", "@brief Static method QVersionNumber QVersionNumber::commonPrefix(const QVersionNumber &v1, const QVersionNumber &v2)\nThis method is static and can be called without an instance.", &_init_f_commonPrefix_5398, &_call_f_commonPrefix_5398);
   methods += new qt_gsi::GenericStaticMethod ("compare", "@brief Static method int QVersionNumber::compare(const QVersionNumber &v1, const QVersionNumber &v2)\nThis method is static and can be called without an instance.", &_init_f_compare_5398, &_call_f_compare_5398);
-  methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QVersionNumber QVersionNumber::fromString(const QString &string, int *suffixIndex)\nThis method is static and can be called without an instance.", &_init_f_fromString_2870, &_call_f_fromString_2870);
+  methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QVersionNumber QVersionNumber::fromString(QAnyStringView string, qsizetype *suffixIndex)\nThis method is static and can be called without an instance.", &_init_f_fromString_3375, &_call_f_fromString_3375);
   methods += gsi::method_ext(">", &::op_QVersionNumber_operator_gt__5398, gsi::arg ("rhs"), "@brief Operator bool ::operator>(const QVersionNumber &lhs, const QVersionNumber &rhs)\nThis is the mapping of the global operator to the instance method.");
   methods += gsi::method_ext(">=", &::op_QVersionNumber_operator_gt__eq__5398, gsi::arg ("rhs"), "@brief Operator bool ::operator>=(const QVersionNumber &lhs, const QVersionNumber &rhs)\nThis is the mapping of the global operator to the instance method.");
   methods += gsi::method_ext("<", &::op_QVersionNumber_operator_lt__5398, gsi::arg ("rhs"), "@brief Operator bool ::operator<(const QVersionNumber &lhs, const QVersionNumber &rhs)\nThis is the mapping of the global operator to the instance method.");

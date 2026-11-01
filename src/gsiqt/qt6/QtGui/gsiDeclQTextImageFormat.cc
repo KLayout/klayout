@@ -167,7 +167,7 @@ static void _call_f_setName_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 
 static void _init_f_setQuality_767 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("quality", true, "100");
+  static gsi::ArgSpecBase argspec_0 ("quality");
   decl->add_arg<int > (argspec_0);
   decl->set_return<void > ();
 }
@@ -176,9 +176,25 @@ static void _call_f_setQuality_767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (100, heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextImageFormat *)cls)->setQuality (arg1);
+}
+
+
+// void QTextImageFormat::setQuality()
+
+
+static void _init_f_setQuality_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_f_setQuality_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QTextImageFormat *)cls)->setQuality ();
 }
 
 
@@ -231,6 +247,7 @@ static gsi::Methods methods_QTextImageFormat () {
   methods += new qt_gsi::GenericMethod ("setHeight|height=", "@brief Method void QTextImageFormat::setHeight(double height)\n", false, &_init_f_setHeight_1071, &_call_f_setHeight_1071);
   methods += new qt_gsi::GenericMethod ("setName|name=", "@brief Method void QTextImageFormat::setName(const QString &name)\n", false, &_init_f_setName_2025, &_call_f_setName_2025);
   methods += new qt_gsi::GenericMethod ("setQuality|quality=", "@brief Method void QTextImageFormat::setQuality(int quality)\n", false, &_init_f_setQuality_767, &_call_f_setQuality_767);
+  methods += new qt_gsi::GenericMethod ("setQuality", "@brief Method void QTextImageFormat::setQuality()\n", false, &_init_f_setQuality_0, &_call_f_setQuality_0);
   methods += new qt_gsi::GenericMethod ("setWidth|width=", "@brief Method void QTextImageFormat::setWidth(double width)\n", false, &_init_f_setWidth_1071, &_call_f_setWidth_1071);
   methods += new qt_gsi::GenericMethod (":width", "@brief Method double QTextImageFormat::width()\n", true, &_init_f_width_c0, &_call_f_width_c0);
   return methods;

@@ -28,6 +28,7 @@
 */
 
 #include <QPointingDevice>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QEventPoint>

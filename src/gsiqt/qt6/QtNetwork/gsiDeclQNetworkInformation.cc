@@ -28,6 +28,7 @@
 */
 
 #include <QNetworkInformation>
+#include <QAnyStringView>
 #include <QEvent>
 #include <QMetaMethod>
 #include <QObject>
@@ -82,6 +83,41 @@ static void _call_f_isBehindCaptivePortal_c0 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// bool QNetworkInformation::isMetered()
+
+
+static void _init_f_isMetered_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isMetered_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QNetworkInformation *)cls)->isMetered ());
+}
+
+
+// void QNetworkInformation::isMeteredChanged(bool isMetered)
+
+
+static void _init_f_isMeteredChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("isMetered");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_isMeteredChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QNetworkInformation *)cls)->isMeteredChanged (arg1);
+}
+
+
 // QNetworkInformation::Reachability QNetworkInformation::reachability()
 
 
@@ -94,6 +130,21 @@ static void _call_f_reachability_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qt_gsi::Converter<QNetworkInformation::Reachability>::target_type > ((qt_gsi::Converter<QNetworkInformation::Reachability>::target_type)qt_gsi::CppToQtAdaptor<QNetworkInformation::Reachability>(((QNetworkInformation *)cls)->reachability ()));
+}
+
+
+// QFlags<QNetworkInformation::Feature> QNetworkInformation::supportedFeatures()
+
+
+static void _init_f_supportedFeatures_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QFlags<QNetworkInformation::Feature> > ();
+}
+
+static void _call_f_supportedFeatures_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QFlags<QNetworkInformation::Feature> > ((QFlags<QNetworkInformation::Feature>)((QNetworkInformation *)cls)->supportedFeatures ());
 }
 
 
@@ -113,6 +164,41 @@ static void _call_f_supports_c3949 (const qt_gsi::GenericMethod * /*decl*/, void
   tl::Heap heap;
   QFlags<QNetworkInformation::Feature> arg1 = gsi::arg_reader<QFlags<QNetworkInformation::Feature> >() (args, heap);
   ret.write<bool > ((bool)((QNetworkInformation *)cls)->supports (arg1));
+}
+
+
+// QNetworkInformation::TransportMedium QNetworkInformation::transportMedium()
+
+
+static void _init_f_transportMedium_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<qt_gsi::Converter<QNetworkInformation::TransportMedium>::target_type > ();
+}
+
+static void _call_f_transportMedium_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<qt_gsi::Converter<QNetworkInformation::TransportMedium>::target_type > ((qt_gsi::Converter<QNetworkInformation::TransportMedium>::target_type)qt_gsi::CppToQtAdaptor<QNetworkInformation::TransportMedium>(((QNetworkInformation *)cls)->transportMedium ()));
+}
+
+
+// void QNetworkInformation::transportMediumChanged(QNetworkInformation::TransportMedium current)
+
+
+static void _init_f_transportMediumChanged_4119 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("current");
+  decl->add_arg<const qt_gsi::Converter<QNetworkInformation::TransportMedium>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_transportMediumChanged_4119 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QNetworkInformation::TransportMedium>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QNetworkInformation::TransportMedium>::target_type & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QNetworkInformation *)cls)->transportMediumChanged (qt_gsi::QtToCppAdaptor<QNetworkInformation::TransportMedium>(arg1).cref());
 }
 
 
@@ -165,6 +251,40 @@ static void _call_f_load_3949 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi
 }
 
 
+// static bool QNetworkInformation::loadBackendByFeatures(QFlags<QNetworkInformation::Feature> features)
+
+
+static void _init_f_loadBackendByFeatures_3949 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("features");
+  decl->add_arg<QFlags<QNetworkInformation::Feature> > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_loadBackendByFeatures_3949 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QFlags<QNetworkInformation::Feature> arg1 = gsi::arg_reader<QFlags<QNetworkInformation::Feature> >() (args, heap);
+  ret.write<bool > ((bool)QNetworkInformation::loadBackendByFeatures (arg1));
+}
+
+
+// static bool QNetworkInformation::loadDefaultBackend()
+
+
+static void _init_f_loadDefaultBackend_0 (qt_gsi::GenericStaticMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_loadDefaultBackend_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)QNetworkInformation::loadDefaultBackend ());
+}
+
+
 // static QString QNetworkInformation::tr(const char *s, const char *c, int n)
 
 
@@ -199,8 +319,13 @@ static gsi::Methods methods_QNetworkInformation () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("backendName", "@brief Method QString QNetworkInformation::backendName()\n", true, &_init_f_backendName_c0, &_call_f_backendName_c0);
   methods += new qt_gsi::GenericMethod ("isBehindCaptivePortal?|:isBehindCaptivePortal", "@brief Method bool QNetworkInformation::isBehindCaptivePortal()\n", true, &_init_f_isBehindCaptivePortal_c0, &_call_f_isBehindCaptivePortal_c0);
+  methods += new qt_gsi::GenericMethod ("isMetered?", "@brief Method bool QNetworkInformation::isMetered()\n", true, &_init_f_isMetered_c0, &_call_f_isMetered_c0);
+  methods += new qt_gsi::GenericMethod ("isMeteredChanged?", "@brief Method void QNetworkInformation::isMeteredChanged(bool isMetered)\n", false, &_init_f_isMeteredChanged_864, &_call_f_isMeteredChanged_864);
   methods += new qt_gsi::GenericMethod (":reachability", "@brief Method QNetworkInformation::Reachability QNetworkInformation::reachability()\n", true, &_init_f_reachability_c0, &_call_f_reachability_c0);
+  methods += new qt_gsi::GenericMethod ("supportedFeatures", "@brief Method QFlags<QNetworkInformation::Feature> QNetworkInformation::supportedFeatures()\n", true, &_init_f_supportedFeatures_c0, &_call_f_supportedFeatures_c0);
   methods += new qt_gsi::GenericMethod ("supports", "@brief Method bool QNetworkInformation::supports(QFlags<QNetworkInformation::Feature> features)\n", true, &_init_f_supports_c3949, &_call_f_supports_c3949);
+  methods += new qt_gsi::GenericMethod ("transportMedium", "@brief Method QNetworkInformation::TransportMedium QNetworkInformation::transportMedium()\n", true, &_init_f_transportMedium_c0, &_call_f_transportMedium_c0);
+  methods += new qt_gsi::GenericMethod ("transportMediumChanged", "@brief Method void QNetworkInformation::transportMediumChanged(QNetworkInformation::TransportMedium current)\n", false, &_init_f_transportMediumChanged_4119, &_call_f_transportMediumChanged_4119);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QNetworkInformation::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("isBehindCaptivePortalChanged(bool)", "isBehindCaptivePortalChanged?", gsi::arg("state"), "@brief Signal declaration for QNetworkInformation::isBehindCaptivePortalChanged(bool state)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QNetworkInformation::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
@@ -208,6 +333,8 @@ static gsi::Methods methods_QNetworkInformation () {
   methods += new qt_gsi::GenericStaticMethod ("availableBackends", "@brief Static method QStringList QNetworkInformation::availableBackends()\nThis method is static and can be called without an instance.", &_init_f_availableBackends_0, &_call_f_availableBackends_0);
   methods += new qt_gsi::GenericStaticMethod ("instance", "@brief Static method QNetworkInformation *QNetworkInformation::instance()\nThis method is static and can be called without an instance.", &_init_f_instance_0, &_call_f_instance_0);
   methods += new qt_gsi::GenericStaticMethod ("load", "@brief Static method bool QNetworkInformation::load(QFlags<QNetworkInformation::Feature> features)\nThis method is static and can be called without an instance.", &_init_f_load_3949, &_call_f_load_3949);
+  methods += new qt_gsi::GenericStaticMethod ("loadBackendByFeatures", "@brief Static method bool QNetworkInformation::loadBackendByFeatures(QFlags<QNetworkInformation::Feature> features)\nThis method is static and can be called without an instance.", &_init_f_loadBackendByFeatures_3949, &_call_f_loadBackendByFeatures_3949);
+  methods += new qt_gsi::GenericStaticMethod ("loadDefaultBackend", "@brief Static method bool QNetworkInformation::loadDefaultBackend()\nThis method is static and can be called without an instance.", &_init_f_loadDefaultBackend_0, &_call_f_loadDefaultBackend_0);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QNetworkInformation::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
 }
@@ -230,7 +357,9 @@ namespace qt_gsi
 
 static gsi::Enum<QNetworkInformation::Feature> decl_QNetworkInformation_Feature_Enum ("QtNetwork", "QNetworkInformation_Feature",
     gsi::enum_const ("Reachability", QNetworkInformation::Feature::Reachability, "@brief Enum constant QNetworkInformation::Feature::Reachability") +
-    gsi::enum_const ("CaptivePortal", QNetworkInformation::Feature::CaptivePortal, "@brief Enum constant QNetworkInformation::Feature::CaptivePortal"),
+    gsi::enum_const ("CaptivePortal", QNetworkInformation::Feature::CaptivePortal, "@brief Enum constant QNetworkInformation::Feature::CaptivePortal") +
+    gsi::enum_const ("TransportMedium", QNetworkInformation::Feature::TransportMedium, "@brief Enum constant QNetworkInformation::Feature::TransportMedium") +
+    gsi::enum_const ("Metered", QNetworkInformation::Feature::Metered, "@brief Enum constant QNetworkInformation::Feature::Metered"),
   "@qt\n@brief This class represents the QNetworkInformation::Feature enum");
 
 static gsi::QFlagsClass<QNetworkInformation::Feature > decl_QNetworkInformation_Feature_Enums ("QtNetwork", "QNetworkInformation_QFlags_Feature",
@@ -259,6 +388,27 @@ static gsi::QFlagsClass<QNetworkInformation::Reachability > decl_QNetworkInforma
 
 static gsi::ClassExt<QNetworkInformation> decl_QNetworkInformation_Reachability_Enum_as_child (decl_QNetworkInformation_Reachability_Enum, "Reachability");
 static gsi::ClassExt<QNetworkInformation> decl_QNetworkInformation_Reachability_Enums_as_child (decl_QNetworkInformation_Reachability_Enums, "QFlags_Reachability");
+
+}
+
+
+//  Implementation of the enum wrapper class for QNetworkInformation::TransportMedium
+namespace qt_gsi
+{
+
+static gsi::Enum<QNetworkInformation::TransportMedium> decl_QNetworkInformation_TransportMedium_Enum ("QtNetwork", "QNetworkInformation_TransportMedium",
+    gsi::enum_const ("Unknown", QNetworkInformation::TransportMedium::Unknown, "@brief Enum constant QNetworkInformation::TransportMedium::Unknown") +
+    gsi::enum_const ("Ethernet", QNetworkInformation::TransportMedium::Ethernet, "@brief Enum constant QNetworkInformation::TransportMedium::Ethernet") +
+    gsi::enum_const ("Cellular", QNetworkInformation::TransportMedium::Cellular, "@brief Enum constant QNetworkInformation::TransportMedium::Cellular") +
+    gsi::enum_const ("WiFi", QNetworkInformation::TransportMedium::WiFi, "@brief Enum constant QNetworkInformation::TransportMedium::WiFi") +
+    gsi::enum_const ("Bluetooth", QNetworkInformation::TransportMedium::Bluetooth, "@brief Enum constant QNetworkInformation::TransportMedium::Bluetooth"),
+  "@qt\n@brief This class represents the QNetworkInformation::TransportMedium enum");
+
+static gsi::QFlagsClass<QNetworkInformation::TransportMedium > decl_QNetworkInformation_TransportMedium_Enums ("QtNetwork", "QNetworkInformation_QFlags_TransportMedium",
+  "@qt\n@brief This class represents the QFlags<QNetworkInformation::TransportMedium> flag set");
+
+static gsi::ClassExt<QNetworkInformation> decl_QNetworkInformation_TransportMedium_Enum_as_child (decl_QNetworkInformation_TransportMedium_Enum, "TransportMedium");
+static gsi::ClassExt<QNetworkInformation> decl_QNetworkInformation_TransportMedium_Enums_as_child (decl_QNetworkInformation_TransportMedium_Enums, "QFlags_TransportMedium");
 
 }
 

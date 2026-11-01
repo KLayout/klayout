@@ -211,6 +211,21 @@ static void _call_ctor_QPalette_2113 (const qt_gsi::GenericStaticMethod * /*decl
 }
 
 
+// const QBrush &QPalette::accent()
+
+
+static void _init_f_accent_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<const QBrush & > ();
+}
+
+static void _call_f_accent_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<const QBrush & > ((const QBrush &)((QPalette *)cls)->accent ());
+}
+
+
 // const QBrush &QPalette::alternateBase()
 
 
@@ -995,6 +1010,7 @@ static gsi::Methods methods_QPalette () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPalette::QPalette(const QBrush &windowText, const QBrush &button, const QBrush &light, const QBrush &dark, const QBrush &mid, const QBrush &text, const QBrush &bright_text, const QBrush &base, const QBrush &window)\nThis method creates an object of class QPalette.", &_init_ctor_QPalette_16326, &_call_ctor_QPalette_16326);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPalette::QPalette(const QColor &windowText, const QColor &window, const QColor &light, const QColor &dark, const QColor &mid, const QColor &text, const QColor &base)\nThis method creates an object of class QPalette.", &_init_ctor_QPalette_12687, &_call_ctor_QPalette_12687);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPalette::QPalette(const QPalette &palette)\nThis method creates an object of class QPalette.", &_init_ctor_QPalette_2113, &_call_ctor_QPalette_2113);
+  methods += new qt_gsi::GenericMethod ("accent", "@brief Method const QBrush &QPalette::accent()\n", true, &_init_f_accent_c0, &_call_f_accent_c0);
   methods += new qt_gsi::GenericMethod ("alternateBase", "@brief Method const QBrush &QPalette::alternateBase()\n", true, &_init_f_alternateBase_c0, &_call_f_alternateBase_c0);
   methods += new qt_gsi::GenericMethod ("base", "@brief Method const QBrush &QPalette::base()\n", true, &_init_f_base_c0, &_call_f_base_c0);
   methods += new qt_gsi::GenericMethod ("brightText", "@brief Method const QBrush &QPalette::brightText()\n", true, &_init_f_brightText_c0, &_call_f_brightText_c0);
@@ -1101,6 +1117,7 @@ static gsi::Enum<QPalette::ColorRole> decl_QPalette_ColorRole_Enum ("QtGui", "QP
     gsi::enum_const ("ToolTipBase", QPalette::ToolTipBase, "@brief Enum constant QPalette::ToolTipBase") +
     gsi::enum_const ("ToolTipText", QPalette::ToolTipText, "@brief Enum constant QPalette::ToolTipText") +
     gsi::enum_const ("PlaceholderText", QPalette::PlaceholderText, "@brief Enum constant QPalette::PlaceholderText") +
+    gsi::enum_const ("Accent", QPalette::Accent, "@brief Enum constant QPalette::Accent") +
     gsi::enum_const ("NColorRoles", QPalette::NColorRoles, "@brief Enum constant QPalette::NColorRoles"),
   "@qt\n@brief This class represents the QPalette::ColorRole enum");
 

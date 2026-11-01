@@ -454,6 +454,26 @@ static void _call_f_setRightToLeft_864 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
+// void QGlyphRun::setSourceString(const QString &sourceString)
+
+
+static void _init_f_setSourceString_2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("sourceString");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setSourceString_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QGlyphRun *)cls)->setSourceString (arg1);
+}
+
+
 // void QGlyphRun::setStrikeOut(bool strikeOut)
 
 
@@ -471,6 +491,26 @@ static void _call_f_setStrikeOut_864 (const qt_gsi::GenericMethod * /*decl*/, vo
   bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGlyphRun *)cls)->setStrikeOut (arg1);
+}
+
+
+// void QGlyphRun::setStringIndexes(const QList<qsizetype> &stringIndexes)
+
+
+static void _init_f_setStringIndexes_2934 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("stringIndexes");
+  decl->add_arg<const QList<qsizetype> & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setStringIndexes_2934 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QList<qsizetype> &arg1 = gsi::arg_reader<const QList<qsizetype> & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QGlyphRun *)cls)->setStringIndexes (arg1);
 }
 
 
@@ -494,6 +534,21 @@ static void _call_f_setUnderline_864 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
+// QString QGlyphRun::sourceString()
+
+
+static void _init_f_sourceString_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QString > ();
+}
+
+static void _call_f_sourceString_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QString > ((QString)((QGlyphRun *)cls)->sourceString ());
+}
+
+
 // bool QGlyphRun::strikeOut()
 
 
@@ -506,6 +561,21 @@ static void _call_f_strikeOut_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<bool > ((bool)((QGlyphRun *)cls)->strikeOut ());
+}
+
+
+// QList<qsizetype> QGlyphRun::stringIndexes()
+
+
+static void _init_f_stringIndexes_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QList<qsizetype> > ();
+}
+
+static void _call_f_stringIndexes_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QList<qsizetype> > ((QList<qsizetype>)((QGlyphRun *)cls)->stringIndexes ());
 }
 
 
@@ -573,9 +643,13 @@ static gsi::Methods methods_QGlyphRun () {
   methods += new qt_gsi::GenericMethod ("setRawData", "@brief Method void QGlyphRun::setRawData(const quint32 *glyphIndexArray, const QPointF *glyphPositionArray, int size)\n", false, &_init_f_setRawData_4520, &_call_f_setRawData_4520);
   methods += new qt_gsi::GenericMethod ("setRawFont|rawFont=", "@brief Method void QGlyphRun::setRawFont(const QRawFont &rawFont)\n", false, &_init_f_setRawFont_2099, &_call_f_setRawFont_2099);
   methods += new qt_gsi::GenericMethod ("setRightToLeft|rightToLeft=", "@brief Method void QGlyphRun::setRightToLeft(bool on)\n", false, &_init_f_setRightToLeft_864, &_call_f_setRightToLeft_864);
+  methods += new qt_gsi::GenericMethod ("setSourceString", "@brief Method void QGlyphRun::setSourceString(const QString &sourceString)\n", false, &_init_f_setSourceString_2025, &_call_f_setSourceString_2025);
   methods += new qt_gsi::GenericMethod ("setStrikeOut|strikeOut=", "@brief Method void QGlyphRun::setStrikeOut(bool strikeOut)\n", false, &_init_f_setStrikeOut_864, &_call_f_setStrikeOut_864);
+  methods += new qt_gsi::GenericMethod ("setStringIndexes", "@brief Method void QGlyphRun::setStringIndexes(const QList<qsizetype> &stringIndexes)\n", false, &_init_f_setStringIndexes_2934, &_call_f_setStringIndexes_2934);
   methods += new qt_gsi::GenericMethod ("setUnderline|underline=", "@brief Method void QGlyphRun::setUnderline(bool underline)\n", false, &_init_f_setUnderline_864, &_call_f_setUnderline_864);
+  methods += new qt_gsi::GenericMethod ("sourceString", "@brief Method QString QGlyphRun::sourceString()\n", true, &_init_f_sourceString_c0, &_call_f_sourceString_c0);
   methods += new qt_gsi::GenericMethod (":strikeOut", "@brief Method bool QGlyphRun::strikeOut()\n", true, &_init_f_strikeOut_c0, &_call_f_strikeOut_c0);
+  methods += new qt_gsi::GenericMethod ("stringIndexes", "@brief Method QList<qsizetype> QGlyphRun::stringIndexes()\n", true, &_init_f_stringIndexes_c0, &_call_f_stringIndexes_c0);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QGlyphRun::swap(QGlyphRun &other)\n", false, &_init_f_swap_1524, &_call_f_swap_1524);
   methods += new qt_gsi::GenericMethod (":underline", "@brief Method bool QGlyphRun::underline()\n", true, &_init_f_underline_c0, &_call_f_underline_c0);
   return methods;

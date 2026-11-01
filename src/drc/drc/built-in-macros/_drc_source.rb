@@ -422,7 +422,7 @@ CODE
     # you need to enable properties on input:
     #
     # @code
-    # input1_with_props = input(1, 0, enable_props)
+    # input1_with_props = source.input(1, 0, enable_props)
     # @/code
     #
     # You can also filter or map property keys, similar to the functions available on
@@ -430,7 +430,7 @@ CODE
     # property values with key 17 (numerical) only, use:
     #
     # @code
-    # input1_with_props = input(1, 0, select_props(17))
+    # input1_with_props = source.input(1, 0, select_props(17))
     # @/code
     #
     # Use the global version of "input" without a source object to address the default source.

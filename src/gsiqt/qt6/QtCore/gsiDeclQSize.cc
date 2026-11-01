@@ -29,6 +29,7 @@
 
 #include <QSize>
 #include <QMargins>
+#include <QSizeF>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
 #include <memory>
@@ -451,6 +452,21 @@ static void _call_f_shrunkBy_c1238 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
+// QSizeF QSize::toSizeF()
+
+
+static void _init_f_toSizeF_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QSizeF > ();
+}
+
+static void _call_f_toSizeF_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QSizeF > ((QSizeF)((QSize *)cls)->toSizeF ());
+}
+
+
 // void QSize::transpose()
 
 
@@ -555,6 +571,7 @@ static gsi::Methods methods_QSize () {
   methods += new qt_gsi::GenericMethod ("setHeight|height=", "@brief Method void QSize::setHeight(int h)\n", false, &_init_f_setHeight_767, &_call_f_setHeight_767);
   methods += new qt_gsi::GenericMethod ("setWidth|width=", "@brief Method void QSize::setWidth(int w)\n", false, &_init_f_setWidth_767, &_call_f_setWidth_767);
   methods += new qt_gsi::GenericMethod ("shrunkBy", "@brief Method QSize QSize::shrunkBy(QMargins m)\n", true, &_init_f_shrunkBy_c1238, &_call_f_shrunkBy_c1238);
+  methods += new qt_gsi::GenericMethod ("toSizeF", "@brief Method QSizeF QSize::toSizeF()\n", true, &_init_f_toSizeF_c0, &_call_f_toSizeF_c0);
   methods += new qt_gsi::GenericMethod ("transpose", "@brief Method void QSize::transpose()\n", false, &_init_f_transpose_0, &_call_f_transpose_0);
   methods += new qt_gsi::GenericMethod ("transposed", "@brief Method QSize QSize::transposed()\n", true, &_init_f_transposed_c0, &_call_f_transposed_c0);
   methods += new qt_gsi::GenericMethod (":width", "@brief Method int QSize::width()\n", true, &_init_f_width_c0, &_call_f_width_c0);

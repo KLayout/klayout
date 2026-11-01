@@ -28,6 +28,7 @@
 */
 
 #include <QMediaDevices>
+#include <QAnyStringView>
 #include <QAudioDevice>
 #include <QCameraDevice>
 #include <QChildEvent>

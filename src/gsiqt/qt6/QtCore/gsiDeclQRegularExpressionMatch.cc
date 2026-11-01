@@ -237,6 +237,44 @@ static void _call_f_capturedTexts_c0 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
+// bool QRegularExpressionMatch::hasCaptured(const QString &name)
+
+
+static void _init_f_hasCaptured_c2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("name");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_hasCaptured_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ret.write<bool > ((bool)((QRegularExpressionMatch *)cls)->hasCaptured (arg1));
+}
+
+
+// bool QRegularExpressionMatch::hasCaptured(int nth)
+
+
+static void _init_f_hasCaptured_c767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("nth");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_hasCaptured_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ret.write<bool > ((bool)((QRegularExpressionMatch *)cls)->hasCaptured (arg1));
+}
+
+
 // bool QRegularExpressionMatch::hasMatch()
 
 
@@ -398,6 +436,8 @@ static gsi::Methods methods_QRegularExpressionMatch () {
   methods += new qt_gsi::GenericMethod ("capturedStart", "@brief Method qsizetype QRegularExpressionMatch::capturedStart(int nth)\n", true, &_init_f_capturedStart_c767, &_call_f_capturedStart_c767);
   methods += new qt_gsi::GenericMethod ("capturedStart", "@brief Method qsizetype QRegularExpressionMatch::capturedStart(const QString &name)\n", true, &_init_f_capturedStart_c2025, &_call_f_capturedStart_c2025);
   methods += new qt_gsi::GenericMethod ("capturedTexts", "@brief Method QStringList QRegularExpressionMatch::capturedTexts()\n", true, &_init_f_capturedTexts_c0, &_call_f_capturedTexts_c0);
+  methods += new qt_gsi::GenericMethod ("hasCaptured", "@brief Method bool QRegularExpressionMatch::hasCaptured(const QString &name)\n", true, &_init_f_hasCaptured_c2025, &_call_f_hasCaptured_c2025);
+  methods += new qt_gsi::GenericMethod ("hasCaptured", "@brief Method bool QRegularExpressionMatch::hasCaptured(int nth)\n", true, &_init_f_hasCaptured_c767, &_call_f_hasCaptured_c767);
   methods += new qt_gsi::GenericMethod ("hasMatch", "@brief Method bool QRegularExpressionMatch::hasMatch()\n", true, &_init_f_hasMatch_c0, &_call_f_hasMatch_c0);
   methods += new qt_gsi::GenericMethod ("hasPartialMatch", "@brief Method bool QRegularExpressionMatch::hasPartialMatch()\n", true, &_init_f_hasPartialMatch_c0, &_call_f_hasPartialMatch_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QRegularExpressionMatch::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);

@@ -22,6 +22,7 @@ SOURCES += \
   $$PWD/gsiDeclQAccessibleImageInterface.cc \
   $$PWD/gsiDeclQAccessibleInterface.cc \
   $$PWD/gsiDeclQAccessibleObject.cc \
+  $$PWD/gsiDeclQAccessibleSelectionInterface.cc \
   $$PWD/gsiDeclQAccessibleStateChangeEvent.cc \
   $$PWD/gsiDeclQAccessibleTableCellInterface.cc \
   $$PWD/gsiDeclQAccessibleTableInterface.cc \

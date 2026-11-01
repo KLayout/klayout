@@ -8,7 +8,7 @@
 # about the translation.
 #
 # By default, the script will take the Qt headers from /opt/qt/4.6.3, /opt/qt/5.5.1
-# and /opt/qt/6.2.1 for Qt4, Qt5 and Qt6 respectively.
+# and /opt/qt/6.6.1 for Qt4, Qt5 and Qt6 respectively.
 #
 # Call it from project level as
 #
@@ -44,7 +44,7 @@ diff=0
 reuse=0
 qt="/opt/qt/4.6.3/include"
 qt5="/opt/qt/5.12.12/include"
-qt6="/opt/qt/6.2.1/include"
+qt6="/opt/qt/6.6.1/include"
 inst_dir_common=`pwd`/scripts/mkqtdecl_common
 inst_dir4=`pwd`/scripts/mkqtdecl4
 inst_dir5=`pwd`/scripts/mkqtdecl5

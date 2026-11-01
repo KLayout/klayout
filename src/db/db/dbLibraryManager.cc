@@ -82,14 +82,16 @@ LibraryManager::rename (lib_id_type lib_id, const std::string &name)
 
     std::string org_name = lib->get_name ();
 
-    for (auto it = m_lib_by_name.find (org_name);it != m_lib_by_name.end () && it->first == org_name; ++it) {
+    for (auto it = m_lib_by_name.lower_bound (org_name); it != m_lib_by_name.end () && it->first == org_name; ++it) {
       if (it->second == lib_id) {
         m_lib_by_name.erase (it);
         break;
       }
     }
 
-    m_lib_by_name.insert (std::make_pair (name, lib_id));
+    //  insert new lib as first of this name
+    auto l = m_lib_by_name.lower_bound (name);
+    m_lib_by_name.insert (l, std::make_pair (name, lib_id));
     lib->set_name (name);
   }
 
@@ -109,7 +111,7 @@ LibraryManager::lib_by_name (const std::string &name, const std::set<std::string
 
   if (! for_technologies.empty ()) {
 
-    l = m_lib_by_name.find (name);
+    l = m_lib_by_name.lower_bound (name);
     while (l != m_lib_by_name.end () && l->first == name) {
       const db::Library *lptr = lib_internal (l->second);
       bool found = lptr->for_technologies ();
@@ -127,7 +129,7 @@ LibraryManager::lib_by_name (const std::string &name, const std::set<std::string
   }
 
   //  fallback: technology-unspecific libs
-  l = m_lib_by_name.find (name);
+  l = m_lib_by_name.lower_bound (name);
   while (l != m_lib_by_name.end () && l->first == name) {
     if (! lib_internal (l->second)->for_technologies ()) {
       return std::make_pair (true, l->second);
@@ -207,7 +209,7 @@ LibraryManager::register_lib (Library *library)
 
     //  if the new library replaces the old one, remap existing library proxies before deleting the library
     //  (replacement is done only when all technologies are substituted)
-    lib_name_map::iterator l = m_lib_by_name.find (library->get_name ());
+    lib_name_map::iterator l = m_lib_by_name.lower_bound (library->get_name ());
     bool found = false;
     while (l != m_lib_by_name.end () && l->first == library->get_name ()) {
       if (m_libs [l->second] && m_libs [l->second]->get_technologies () == library->get_technologies ()) {
@@ -224,7 +226,7 @@ LibraryManager::register_lib (Library *library)
     }
 
     //  insert new lib as first of this name
-    l = m_lib_by_name.find (library->get_name ());
+    l = m_lib_by_name.lower_bound (library->get_name ());
     m_lib_by_name.insert (l, std::make_pair (library->get_name (), id));
   }
 

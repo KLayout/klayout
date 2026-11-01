@@ -28,6 +28,7 @@
 */
 
 #include <QStyle>
+#include <QAnyStringView>
 #include <QApplication>
 #include <QChildEvent>
 #include <QEvent>
@@ -2785,6 +2786,7 @@ static gsi::Enum<QStyle::PixelMetric> decl_QStyle_PixelMetric_Enum ("QtWidgets",
     gsi::enum_const ("PM_TitleBarButtonIconSize", QStyle::PM_TitleBarButtonIconSize, "@brief Enum constant QStyle::PM_TitleBarButtonIconSize") +
     gsi::enum_const ("PM_TitleBarButtonSize", QStyle::PM_TitleBarButtonSize, "@brief Enum constant QStyle::PM_TitleBarButtonSize") +
     gsi::enum_const ("PM_LineEditIconSize", QStyle::PM_LineEditIconSize, "@brief Enum constant QStyle::PM_LineEditIconSize") +
+    gsi::enum_const ("PM_LineEditIconMargin", QStyle::PM_LineEditIconMargin, "@brief Enum constant QStyle::PM_LineEditIconMargin") +
     gsi::enum_const ("PM_CustomBase", QStyle::PM_CustomBase, "@brief Enum constant QStyle::PM_CustomBase"),
   "@qt\n@brief This class represents the QStyle::PixelMetric enum");
 
@@ -2952,6 +2954,8 @@ static gsi::Enum<QStyle::StandardPixmap> decl_QStyle_StandardPixmap_Enum ("QtWid
     gsi::enum_const ("SP_DialogRetryButton", QStyle::SP_DialogRetryButton, "@brief Enum constant QStyle::SP_DialogRetryButton") +
     gsi::enum_const ("SP_DialogIgnoreButton", QStyle::SP_DialogIgnoreButton, "@brief Enum constant QStyle::SP_DialogIgnoreButton") +
     gsi::enum_const ("SP_RestoreDefaultsButton", QStyle::SP_RestoreDefaultsButton, "@brief Enum constant QStyle::SP_RestoreDefaultsButton") +
+    gsi::enum_const ("SP_TabCloseButton", QStyle::SP_TabCloseButton, "@brief Enum constant QStyle::SP_TabCloseButton") +
+    gsi::enum_const ("NStandardPixmap", QStyle::NStandardPixmap, "@brief Enum constant QStyle::NStandardPixmap") +
     gsi::enum_const ("SP_CustomBase", QStyle::SP_CustomBase, "@brief Enum constant QStyle::SP_CustomBase"),
   "@qt\n@brief This class represents the QStyle::StandardPixmap enum");
 
@@ -3089,6 +3093,8 @@ static gsi::Enum<QStyle::StyleHint> decl_QStyle_StyleHint_Enum ("QtWidgets", "QS
     gsi::enum_const ("SH_SpinBox_ButtonsInsideFrame", QStyle::SH_SpinBox_ButtonsInsideFrame, "@brief Enum constant QStyle::SH_SpinBox_ButtonsInsideFrame") +
     gsi::enum_const ("SH_SpinBox_StepModifier", QStyle::SH_SpinBox_StepModifier, "@brief Enum constant QStyle::SH_SpinBox_StepModifier") +
     gsi::enum_const ("SH_TabBar_AllowWheelScrolling", QStyle::SH_TabBar_AllowWheelScrolling, "@brief Enum constant QStyle::SH_TabBar_AllowWheelScrolling") +
+    gsi::enum_const ("SH_Table_AlwaysDrawLeftTopGridLines", QStyle::SH_Table_AlwaysDrawLeftTopGridLines, "@brief Enum constant QStyle::SH_Table_AlwaysDrawLeftTopGridLines") +
+    gsi::enum_const ("SH_SpinBox_SelectOnStep", QStyle::SH_SpinBox_SelectOnStep, "@brief Enum constant QStyle::SH_SpinBox_SelectOnStep") +
     gsi::enum_const ("SH_CustomBase", QStyle::SH_CustomBase, "@brief Enum constant QStyle::SH_CustomBase"),
   "@qt\n@brief This class represents the QStyle::StyleHint enum");
 

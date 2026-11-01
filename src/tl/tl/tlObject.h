@@ -115,6 +115,11 @@ public:
    */
   void release_object ();
 
+  /**
+   *  @brief Diagnostic: gets the number of references
+   */
+  size_t ref_count () const;
+
 protected:
   /**
    *  @brief Detach this object from all events it was registered as listener

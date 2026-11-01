@@ -28,6 +28,7 @@
 */
 
 #include <QInputDevice>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>
@@ -217,6 +218,21 @@ static void _call_f_primaryKeyboard_2025 (const qt_gsi::GenericStaticMethod * /*
 }
 
 
+// static QStringList QInputDevice::seatNames()
+
+
+static void _init_f_seatNames_0 (qt_gsi::GenericStaticMethod *decl)
+{
+  decl->set_return<QStringList > ();
+}
+
+static void _call_f_seatNames_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QStringList > ((QStringList)QInputDevice::seatNames ());
+}
+
+
 // static QString QInputDevice::tr(const char *s, const char *c, int n)
 
 
@@ -261,6 +277,7 @@ static gsi::Methods methods_QInputDevice () {
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QInputDevice::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("devices", "@brief Static method QList<const QInputDevice *> QInputDevice::devices()\nThis method is static and can be called without an instance.", &_init_f_devices_0, &_call_f_devices_0);
   methods += new qt_gsi::GenericStaticMethod ("primaryKeyboard", "@brief Static method const QInputDevice *QInputDevice::primaryKeyboard(const QString &seatName)\nThis method is static and can be called without an instance.", &_init_f_primaryKeyboard_2025, &_call_f_primaryKeyboard_2025);
+  methods += new qt_gsi::GenericStaticMethod ("seatNames", "@brief Static method QStringList QInputDevice::seatNames()\nThis method is static and can be called without an instance.", &_init_f_seatNames_0, &_call_f_seatNames_0);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QInputDevice::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
 }

@@ -401,7 +401,7 @@ static void _call_f_daysTo_c899 (const qt_gsi::GenericMethod * /*decl*/, void *c
 
 static void _init_f_endOfDay_c2202 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("spec", true, "Qt::LocalTime");
+  static gsi::ArgSpecBase argspec_0 ("spec");
   decl->add_arg<const qt_gsi::Converter<Qt::TimeSpec>::target_type & > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("offsetSeconds", true, "0");
   decl->add_arg<int > (argspec_1);
@@ -412,7 +412,7 @@ static void _call_f_endOfDay_c2202 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::TimeSpec>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::TimeSpec>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::TimeSpec>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::TimeSpec>(heap, Qt::LocalTime), heap);
+  const qt_gsi::Converter<Qt::TimeSpec>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::TimeSpec>::target_type & >() (args, heap);
   int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<QDateTime > ((QDateTime)((QDate *)cls)->endOfDay (qt_gsi::QtToCppAdaptor<Qt::TimeSpec>(arg1).cref(), arg2));
 }
@@ -434,6 +434,21 @@ static void _call_f_endOfDay_c2205 (const qt_gsi::GenericMethod * /*decl*/, void
   tl::Heap heap;
   const QTimeZone &arg1 = gsi::arg_reader<const QTimeZone & >() (args, heap);
   ret.write<QDateTime > ((QDateTime)((QDate *)cls)->endOfDay (arg1));
+}
+
+
+// QDateTime QDate::endOfDay()
+
+
+static void _init_f_endOfDay_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QDateTime > ();
+}
+
+static void _call_f_endOfDay_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QDateTime > ((QDateTime)((QDate *)cls)->endOfDay ());
 }
 
 
@@ -585,7 +600,7 @@ static void _call_f_setDate_3288 (const qt_gsi::GenericMethod * /*decl*/, void *
 
 static void _init_f_startOfDay_c2202 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("spec", true, "Qt::LocalTime");
+  static gsi::ArgSpecBase argspec_0 ("spec");
   decl->add_arg<const qt_gsi::Converter<Qt::TimeSpec>::target_type & > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("offsetSeconds", true, "0");
   decl->add_arg<int > (argspec_1);
@@ -596,7 +611,7 @@ static void _call_f_startOfDay_c2202 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::TimeSpec>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::TimeSpec>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::TimeSpec>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::TimeSpec>(heap, Qt::LocalTime), heap);
+  const qt_gsi::Converter<Qt::TimeSpec>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::TimeSpec>::target_type & >() (args, heap);
   int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<QDateTime > ((QDateTime)((QDate *)cls)->startOfDay (qt_gsi::QtToCppAdaptor<Qt::TimeSpec>(arg1).cref(), arg2));
 }
@@ -618,6 +633,21 @@ static void _call_f_startOfDay_c2205 (const qt_gsi::GenericMethod * /*decl*/, vo
   tl::Heap heap;
   const QTimeZone &arg1 = gsi::arg_reader<const QTimeZone & >() (args, heap);
   ret.write<QDateTime > ((QDateTime)((QDate *)cls)->startOfDay (arg1));
+}
+
+
+// QDateTime QDate::startOfDay()
+
+
+static void _init_f_startOfDay_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QDateTime > ();
+}
+
+static void _call_f_startOfDay_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QDateTime > ((QDateTime)((QDate *)cls)->startOfDay ());
 }
 
 
@@ -912,6 +942,7 @@ static gsi::Methods methods_QDate () {
   methods += new qt_gsi::GenericMethod ("daysTo", "@brief Method qint64 QDate::daysTo(QDate d)\n", true, &_init_f_daysTo_c899, &_call_f_daysTo_c899);
   methods += new qt_gsi::GenericMethod ("endOfDay", "@brief Method QDateTime QDate::endOfDay(Qt::TimeSpec spec, int offsetSeconds)\n", true, &_init_f_endOfDay_c2202, &_call_f_endOfDay_c2202);
   methods += new qt_gsi::GenericMethod ("endOfDay", "@brief Method QDateTime QDate::endOfDay(const QTimeZone &zone)\n", true, &_init_f_endOfDay_c2205, &_call_f_endOfDay_c2205);
+  methods += new qt_gsi::GenericMethod ("endOfDay", "@brief Method QDateTime QDate::endOfDay()\n", true, &_init_f_endOfDay_c0, &_call_f_endOfDay_c0);
   methods += new qt_gsi::GenericMethod ("getDate", "@brief Method void QDate::getDate(int *year, int *month, int *day)\n", true, &_init_f_getDate_c2643, &_call_f_getDate_c2643);
   methods += new qt_gsi::GenericMethod ("isNull?", "@brief Method bool QDate::isNull()\n", true, &_init_f_isNull_c0, &_call_f_isNull_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QDate::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
@@ -921,6 +952,7 @@ static gsi::Methods methods_QDate () {
   methods += new qt_gsi::GenericMethod ("setDate", "@brief Method bool QDate::setDate(int year, int month, int day, QCalendar cal)\n", false, &_init_f_setDate_3288, &_call_f_setDate_3288);
   methods += new qt_gsi::GenericMethod ("startOfDay", "@brief Method QDateTime QDate::startOfDay(Qt::TimeSpec spec, int offsetSeconds)\n", true, &_init_f_startOfDay_c2202, &_call_f_startOfDay_c2202);
   methods += new qt_gsi::GenericMethod ("startOfDay", "@brief Method QDateTime QDate::startOfDay(const QTimeZone &zone)\n", true, &_init_f_startOfDay_c2205, &_call_f_startOfDay_c2205);
+  methods += new qt_gsi::GenericMethod ("startOfDay", "@brief Method QDateTime QDate::startOfDay()\n", true, &_init_f_startOfDay_c0, &_call_f_startOfDay_c0);
   methods += new qt_gsi::GenericMethod ("toJulianDay", "@brief Method qint64 QDate::toJulianDay()\n", true, &_init_f_toJulianDay_c0, &_call_f_toJulianDay_c0);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QDate::toString(Qt::DateFormat format)\n", true, &_init_f_toString_c1748, &_call_f_toString_c1748);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QDate::toString(const QString &format, QCalendar cal)\n", true, &_init_f_toString_c3228, &_call_f_toString_c3228);

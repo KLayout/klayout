@@ -33,6 +33,7 @@
 #include <QAbstractItemView>
 #include <QAction>
 #include <QActionEvent>
+#include <QAnyStringView>
 #include <QBackingStore>
 #include <QBitmap>
 #include <QChildEvent>
@@ -125,6 +126,25 @@ static void _call_f_currentFont_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
+// std::optional<QFont> QFontComboBox::displayFont(const QString &fontFamily)
+
+
+static void _init_f_displayFont_c2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("fontFamily");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<std::optional<QFont> > ();
+}
+
+static void _call_f_displayFont_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ret.write<std::optional<QFont> > ((std::optional<QFont>)((QFontComboBox *)cls)->displayFont (arg1));
+}
+
+
 // QFlags<QFontComboBox::FontFilter> QFontComboBox::fontFilters()
 
 
@@ -137,6 +157,44 @@ static void _call_f_fontFilters_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QFlags<QFontComboBox::FontFilter> > ((QFlags<QFontComboBox::FontFilter>)((QFontComboBox *)cls)->fontFilters ());
+}
+
+
+// QString QFontComboBox::sampleTextForFont(const QString &fontFamily)
+
+
+static void _init_f_sampleTextForFont_c2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("fontFamily");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<QString > ();
+}
+
+static void _call_f_sampleTextForFont_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ret.write<QString > ((QString)((QFontComboBox *)cls)->sampleTextForFont (arg1));
+}
+
+
+// QString QFontComboBox::sampleTextForSystem(QFontDatabase::WritingSystem writingSystem)
+
+
+static void _init_f_sampleTextForSystem_c3214 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("writingSystem");
+  decl->add_arg<const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & > (argspec_0);
+  decl->set_return<QString > ();
+}
+
+static void _call_f_sampleTextForSystem_c3214 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & >() (args, heap);
+  ret.write<QString > ((QString)((QFontComboBox *)cls)->sampleTextForSystem (qt_gsi::QtToCppAdaptor<QFontDatabase::WritingSystem>(arg1).cref()));
 }
 
 
@@ -160,6 +218,29 @@ static void _call_f_setCurrentFont_1801 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
+// void QFontComboBox::setDisplayFont(const QString &fontFamily, const QFont &font)
+
+
+static void _init_f_setDisplayFont_3718 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("fontFamily");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("font");
+  decl->add_arg<const QFont & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setDisplayFont_3718 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QFont &arg2 = gsi::arg_reader<const QFont & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QFontComboBox *)cls)->setDisplayFont (arg1, arg2);
+}
+
+
 // void QFontComboBox::setFontFilters(QFlags<QFontComboBox::FontFilter> filters)
 
 
@@ -177,6 +258,52 @@ static void _call_f_setFontFilters_3550 (const qt_gsi::GenericMethod * /*decl*/,
   QFlags<QFontComboBox::FontFilter> arg1 = gsi::arg_reader<QFlags<QFontComboBox::FontFilter> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFontComboBox *)cls)->setFontFilters (arg1);
+}
+
+
+// void QFontComboBox::setSampleTextForFont(const QString &fontFamily, const QString &sampleText)
+
+
+static void _init_f_setSampleTextForFont_3942 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("fontFamily");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("sampleText");
+  decl->add_arg<const QString & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setSampleTextForFont_3942 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QFontComboBox *)cls)->setSampleTextForFont (arg1, arg2);
+}
+
+
+// void QFontComboBox::setSampleTextForSystem(QFontDatabase::WritingSystem writingSystem, const QString &sampleText)
+
+
+static void _init_f_setSampleTextForSystem_5131 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("writingSystem");
+  decl->add_arg<const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("sampleText");
+  decl->add_arg<const QString & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setSampleTextForSystem_5131 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QFontComboBox *)cls)->setSampleTextForSystem (qt_gsi::QtToCppAdaptor<QFontDatabase::WritingSystem>(arg1).cref(), arg2);
 }
 
 
@@ -262,9 +389,15 @@ static gsi::Methods methods_QFontComboBox () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":currentFont", "@brief Method QFont QFontComboBox::currentFont()\n", true, &_init_f_currentFont_c0, &_call_f_currentFont_c0);
+  methods += new qt_gsi::GenericMethod ("displayFont", "@brief Method std::optional<QFont> QFontComboBox::displayFont(const QString &fontFamily)\n", true, &_init_f_displayFont_c2025, &_call_f_displayFont_c2025);
   methods += new qt_gsi::GenericMethod (":fontFilters", "@brief Method QFlags<QFontComboBox::FontFilter> QFontComboBox::fontFilters()\n", true, &_init_f_fontFilters_c0, &_call_f_fontFilters_c0);
+  methods += new qt_gsi::GenericMethod ("sampleTextForFont", "@brief Method QString QFontComboBox::sampleTextForFont(const QString &fontFamily)\n", true, &_init_f_sampleTextForFont_c2025, &_call_f_sampleTextForFont_c2025);
+  methods += new qt_gsi::GenericMethod ("sampleTextForSystem", "@brief Method QString QFontComboBox::sampleTextForSystem(QFontDatabase::WritingSystem writingSystem)\n", true, &_init_f_sampleTextForSystem_c3214, &_call_f_sampleTextForSystem_c3214);
   methods += new qt_gsi::GenericMethod ("setCurrentFont|currentFont=", "@brief Method void QFontComboBox::setCurrentFont(const QFont &f)\n", false, &_init_f_setCurrentFont_1801, &_call_f_setCurrentFont_1801);
+  methods += new qt_gsi::GenericMethod ("setDisplayFont", "@brief Method void QFontComboBox::setDisplayFont(const QString &fontFamily, const QFont &font)\n", false, &_init_f_setDisplayFont_3718, &_call_f_setDisplayFont_3718);
   methods += new qt_gsi::GenericMethod ("setFontFilters|fontFilters=", "@brief Method void QFontComboBox::setFontFilters(QFlags<QFontComboBox::FontFilter> filters)\n", false, &_init_f_setFontFilters_3550, &_call_f_setFontFilters_3550);
+  methods += new qt_gsi::GenericMethod ("setSampleTextForFont", "@brief Method void QFontComboBox::setSampleTextForFont(const QString &fontFamily, const QString &sampleText)\n", false, &_init_f_setSampleTextForFont_3942, &_call_f_setSampleTextForFont_3942);
+  methods += new qt_gsi::GenericMethod ("setSampleTextForSystem", "@brief Method void QFontComboBox::setSampleTextForSystem(QFontDatabase::WritingSystem writingSystem, const QString &sampleText)\n", false, &_init_f_setSampleTextForSystem_5131, &_call_f_setSampleTextForSystem_5131);
   methods += new qt_gsi::GenericMethod ("setWritingSystem|writingSystem=", "@brief Method void QFontComboBox::setWritingSystem(QFontDatabase::WritingSystem)\n", false, &_init_f_setWritingSystem_3214, &_call_f_setWritingSystem_3214);
   methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QFontComboBox::sizeHint()\nThis is a reimplementation of QComboBox::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":writingSystem", "@brief Method QFontDatabase::WritingSystem QFontComboBox::writingSystem()\n", true, &_init_f_writingSystem_c0, &_call_f_writingSystem_c0);

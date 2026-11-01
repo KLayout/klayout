@@ -64,6 +64,7 @@ static bool applies (const lay::RedrawLayerInfo &in_cache, const lay::RedrawLaye
       needed.cellview_index != in_cache.cellview_index ||
       needed.hier_levels != in_cache.hier_levels ||
       needed.prop_sel != in_cache.prop_sel ||
+      needed.cell_sel != in_cache.cell_sel ||
       needed.inverse_prop_sel != in_cache.inverse_prop_sel) {
     return false;
   }

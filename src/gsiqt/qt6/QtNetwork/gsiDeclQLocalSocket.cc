@@ -28,6 +28,7 @@
 */
 
 #include <QLocalSocket>
+#include <QAnyStringView>
 #include <QEvent>
 #include <QMetaMethod>
 #include <QObject>

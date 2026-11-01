@@ -395,6 +395,7 @@ LayerProperties::flat () const
   r.m_hier_levels = m_hier_levels;
   r.m_prop_set = m_prop_set;
   r.m_inv_prop_set = m_inv_prop_set;
+  r.m_cell_sel = m_cell_sel;
   r.m_realize_needed_source = r.m_realize_needed_visual = false;
 
   return r;
@@ -606,6 +607,7 @@ LayerProperties::do_realize (const LayoutViewBase *view) const
   m_inv_prop_set = true;
   m_prop_set.clear ();
   m_hier_levels = m_source_real.hier_levels ();
+  m_cell_sel = db::CellSelector ();
 
   if (view) {
 
@@ -620,6 +622,10 @@ LayerProperties::do_realize (const LayoutViewBase *view) const
     if (m_cellview_index >= 0) {
 
       const lay::CellView &cv = view->cellview (m_cellview_index);
+
+      //  ensure the cell selector is valid
+      m_cell_sel = m_source_real.cell_selector ();
+      m_cell_sel.ensure_valid (&cv->layout (), cv.cell_index ());
 
       //  retrieve the property selector, if one is present
       if (! m_source_real.property_selector ().is_null ()) {

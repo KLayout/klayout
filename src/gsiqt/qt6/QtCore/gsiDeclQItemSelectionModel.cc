@@ -29,6 +29,7 @@
 
 #include <QItemSelectionModel>
 #include <QAbstractItemModel>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QItemSelection>

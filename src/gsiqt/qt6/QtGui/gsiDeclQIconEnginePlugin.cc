@@ -28,6 +28,7 @@
 */
 
 #include <QIconEnginePlugin>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QIconEngine>

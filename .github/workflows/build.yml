@@ -55,7 +55,7 @@ jobs:
             cibuild: "*macosx*"
             cibw_arch: "macos_x86_64"
             macos-arch: "x86_64"
-          - os: "macos-14"  # M1 runner
+          - os: "macos-15"  # ARM runner
             cibuild: "*macosx*"
             cibw_arch: "macos_arm64"
             macos-arch: "arm64"
@@ -158,7 +158,7 @@ jobs:
         merge-multiple: true
         path: dist
 
-    - uses: pypa/gh-action-pypi-publish@v1.14.2
+    - uses: pypa/gh-action-pypi-publish@v1.14.3
       continue-on-error: true   # might fail if we don't bump the version
       with:
         user: __token__
@@ -175,7 +175,7 @@ jobs:
         merge-multiple: true
         path: dist
 
-    - uses: pypa/gh-action-pypi-publish@v1.14.2
+    - uses: pypa/gh-action-pypi-publish@v1.14.3
       with:
         user: __token__
         password: ${{ secrets.pypi_password }}

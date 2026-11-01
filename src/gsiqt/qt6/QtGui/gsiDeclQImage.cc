@@ -207,6 +207,25 @@ static void _call_f_colorTable_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
+// QImage QImage::colorTransformed(const QColorTransform &transform)
+
+
+static void _init_f_colorTransformed_cr2861 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("transform");
+  decl->add_arg<const QColorTransform & > (argspec_0);
+  decl->set_return<QImage > ();
+}
+
+static void _call_f_colorTransformed_cr2861 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QColorTransform &arg1 = gsi::arg_reader<const QColorTransform & >() (args, heap);
+  ret.write<QImage > ((QImage)((QImage *)cls)->colorTransformed (arg1));
+}
+
+
 // const unsigned char *QImage::constBits()
 
 
@@ -1948,6 +1967,7 @@ static gsi::Methods methods_QImage () {
   methods += new qt_gsi::GenericMethod (":colorCount", "@brief Method int QImage::colorCount()\n", true, &_init_f_colorCount_c0, &_call_f_colorCount_c0);
   methods += new qt_gsi::GenericMethod (":colorSpace", "@brief Method QColorSpace QImage::colorSpace()\n", true, &_init_f_colorSpace_c0, &_call_f_colorSpace_c0);
   methods += new qt_gsi::GenericMethod (":colorTable", "@brief Method QList<QRgb> QImage::colorTable()\n", true, &_init_f_colorTable_c0, &_call_f_colorTable_c0);
+  methods += new qt_gsi::GenericMethod ("colorTransformed", "@brief Method QImage QImage::colorTransformed(const QColorTransform &transform)\n", true, &_init_f_colorTransformed_cr2861, &_call_f_colorTransformed_cr2861);
   methods += new qt_gsi::GenericMethod ("constBits", "@brief Method const unsigned char *QImage::constBits()\n", true, &_init_f_constBits_c0, &_call_f_constBits_c0);
   methods += new qt_gsi::GenericMethod ("constScanLine", "@brief Method const unsigned char *QImage::constScanLine(int)\n", true, &_init_f_constScanLine_c767, &_call_f_constScanLine_c767);
   methods += new qt_gsi::GenericMethod ("convertTo", "@brief Method void QImage::convertTo(QImage::Format f, QFlags<Qt::ImageConversionFlag> flags)\n", false, &_init_f_convertTo_4993, &_call_f_convertTo_4993);
@@ -2152,6 +2172,11 @@ public:
   //  [expose] bool QImage::convertToFormat_inplace(QImage::Format format, QFlags<Qt::ImageConversionFlag> flags)
   bool fp_QImage_convertToFormat_inplace_4993 (const qt_gsi::Converter<QImage::Format>::target_type & format, QFlags<Qt::ImageConversionFlag> flags) {
     return QImage::convertToFormat_inplace(qt_gsi::QtToCppAdaptor<QImage::Format>(format).cref(), flags);
+  }
+
+  //  [expose] void QImage::detachMetadata(bool invalidateCache)
+  void fp_QImage_detachMetadata_864 (bool invalidateCache) {
+    QImage::detachMetadata(invalidateCache);
   }
 
   //  [expose] QImage QImage::mirrored_helper(bool horizontal, bool vertical)
@@ -2403,6 +2428,25 @@ static void _call_fp_convertToFormat_inplace_4993 (const qt_gsi::GenericMethod *
 }
 
 
+// exposed void QImage::detachMetadata(bool invalidateCache)
+
+static void _init_fp_detachMetadata_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("invalidateCache", true, "false");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_fp_detachMetadata_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (false, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QImage_Adaptor *)cls)->fp_QImage_detachMetadata_864 (arg1);
+}
+
+
 // void QImage::initPainter(QPainter *painter)
 
 static void _init_cbs_initPainter_c1426_0 (qt_gsi::GenericMethod *decl)
@@ -2618,6 +2662,7 @@ static gsi::Methods methods_QImage_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QImage::QImage(const QImage &)\nThis method creates an object of class QImage.", &_init_ctor_QImage_Adaptor_1877, &_call_ctor_QImage_Adaptor_1877);
   methods += new qt_gsi::GenericMethod ("*convertToFormat_helper", "@brief Method QImage QImage::convertToFormat_helper(QImage::Format format, QFlags<Qt::ImageConversionFlag> flags)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_convertToFormat_helper_c4993, &_call_fp_convertToFormat_helper_c4993);
   methods += new qt_gsi::GenericMethod ("*convertToFormat_inplace", "@brief Method bool QImage::convertToFormat_inplace(QImage::Format format, QFlags<Qt::ImageConversionFlag> flags)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_convertToFormat_inplace_4993, &_call_fp_convertToFormat_inplace_4993);
+  methods += new qt_gsi::GenericMethod ("*detachMetadata", "@brief Method void QImage::detachMetadata(bool invalidateCache)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_detachMetadata_864, &_call_fp_detachMetadata_864);
   methods += new qt_gsi::GenericMethod ("*initPainter", "@brief Virtual method void QImage::initPainter(QPainter *painter)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0);
   methods += new qt_gsi::GenericMethod ("*initPainter", "@hide", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0, &_set_callback_cbs_initPainter_c1426_0);
   methods += new qt_gsi::GenericMethod ("*metric", "@brief Virtual method int QImage::metric(QPaintDevice::PaintDeviceMetric metric)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0);

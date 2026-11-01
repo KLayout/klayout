@@ -28,6 +28,7 @@
 */
 
 #include <QMargins>
+#include <QMarginsF>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
 #include <memory>
@@ -370,6 +371,21 @@ static void _call_f_setTop_767 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
+// QMarginsF QMargins::toMarginsF()
+
+
+static void _init_f_toMarginsF_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QMarginsF > ();
+}
+
+static void _call_f_toMarginsF_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QMarginsF > ((QMarginsF)((QMargins *)cls)->toMarginsF ());
+}
+
+
 // int QMargins::top()
 
 
@@ -479,6 +495,7 @@ static gsi::Methods methods_QMargins () {
   methods += new qt_gsi::GenericMethod ("setLeft|left=", "@brief Method void QMargins::setLeft(int left)\n", false, &_init_f_setLeft_767, &_call_f_setLeft_767);
   methods += new qt_gsi::GenericMethod ("setRight|right=", "@brief Method void QMargins::setRight(int right)\n", false, &_init_f_setRight_767, &_call_f_setRight_767);
   methods += new qt_gsi::GenericMethod ("setTop|top=", "@brief Method void QMargins::setTop(int top)\n", false, &_init_f_setTop_767, &_call_f_setTop_767);
+  methods += new qt_gsi::GenericMethod ("toMarginsF", "@brief Method QMarginsF QMargins::toMarginsF()\n", true, &_init_f_toMarginsF_c0, &_call_f_toMarginsF_c0);
   methods += new qt_gsi::GenericMethod (":top", "@brief Method int QMargins::top()\n", true, &_init_f_top_c0, &_call_f_top_c0);
   methods += gsi::method_ext("+", &::op_QMargins_operator_plus__4122, gsi::arg ("m2"), "@brief Operator QMargins ::operator+(const QMargins &m1, const QMargins &m2)\nThis is the mapping of the global operator to the instance method.");
   methods += gsi::method_ext("-", &::op_QMargins_operator_minus__4122, gsi::arg ("m2"), "@brief Operator QMargins ::operator-(const QMargins &m1, const QMargins &m2)\nThis is the mapping of the global operator to the instance method.");

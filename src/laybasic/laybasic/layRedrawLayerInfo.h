@@ -27,6 +27,7 @@
 #include <vector>
 #include "dbTrans.h"
 #include "dbPropertiesRepository.h"
+#include "dbCellSelector.h"
 #include "layParsedLayerSource.h"
 
 namespace lay {
@@ -110,7 +111,14 @@ struct RedrawLayerInfo
    */
   std::set <db::properties_id_type> prop_sel;
 
-  /** 
+  /**
+   *  @brief The cell selection applicable for this layer
+   *
+   *  This member is set by the constructor.
+   */
+  db::CellSelector cell_sel;
+
+  /**
    *  @brief Invert the property selection
    *
    *  This member is set by the constructor.

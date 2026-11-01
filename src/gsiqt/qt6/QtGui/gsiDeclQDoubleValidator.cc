@@ -28,6 +28,7 @@
 */
 
 #include <QDoubleValidator>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QLocale>
@@ -82,6 +83,26 @@ static void _call_f_decimals_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<int > ((int)((QDoubleValidator *)cls)->decimals ());
+}
+
+
+// void QDoubleValidator::fixup(QString &input)
+
+
+static void _init_f_fixup_c1330 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("input");
+  decl->add_arg<QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_fixup_c1330 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QString &arg1 = gsi::arg_reader<QString & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QDoubleValidator *)cls)->fixup (arg1);
 }
 
 
@@ -169,7 +190,7 @@ static void _init_f_setRange_2693 (qt_gsi::GenericMethod *decl)
   decl->add_arg<double > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("top");
   decl->add_arg<double > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("decimals", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("decimals");
   decl->add_arg<int > (argspec_2);
   decl->set_return<void > ();
 }
@@ -180,9 +201,32 @@ static void _call_f_setRange_2693 (const qt_gsi::GenericMethod * /*decl*/, void 
   tl::Heap heap;
   double arg1 = gsi::arg_reader<double >() (args, heap);
   double arg2 = gsi::arg_reader<double >() (args, heap);
-  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleValidator *)cls)->setRange (arg1, arg2, arg3);
+}
+
+
+// void QDoubleValidator::setRange(double bottom, double top)
+
+
+static void _init_f_setRange_2034 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("bottom");
+  decl->add_arg<double > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("top");
+  decl->add_arg<double > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setRange_2034 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QDoubleValidator *)cls)->setRange (arg1, arg2);
 }
 
 
@@ -276,11 +320,13 @@ static gsi::Methods methods_QDoubleValidator () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":bottom", "@brief Method double QDoubleValidator::bottom()\n", true, &_init_f_bottom_c0, &_call_f_bottom_c0);
   methods += new qt_gsi::GenericMethod (":decimals", "@brief Method int QDoubleValidator::decimals()\n", true, &_init_f_decimals_c0, &_call_f_decimals_c0);
+  methods += new qt_gsi::GenericMethod ("fixup", "@brief Method void QDoubleValidator::fixup(QString &input)\nThis is a reimplementation of QValidator::fixup", true, &_init_f_fixup_c1330, &_call_f_fixup_c1330);
   methods += new qt_gsi::GenericMethod (":notation", "@brief Method QDoubleValidator::Notation QDoubleValidator::notation()\n", true, &_init_f_notation_c0, &_call_f_notation_c0);
   methods += new qt_gsi::GenericMethod ("setBottom|bottom=", "@brief Method void QDoubleValidator::setBottom(double)\n", false, &_init_f_setBottom_1071, &_call_f_setBottom_1071);
   methods += new qt_gsi::GenericMethod ("setDecimals|decimals=", "@brief Method void QDoubleValidator::setDecimals(int)\n", false, &_init_f_setDecimals_767, &_call_f_setDecimals_767);
   methods += new qt_gsi::GenericMethod ("setNotation|notation=", "@brief Method void QDoubleValidator::setNotation(QDoubleValidator::Notation)\n", false, &_init_f_setNotation_3014, &_call_f_setNotation_3014);
   methods += new qt_gsi::GenericMethod ("setRange", "@brief Method void QDoubleValidator::setRange(double bottom, double top, int decimals)\n", false, &_init_f_setRange_2693, &_call_f_setRange_2693);
+  methods += new qt_gsi::GenericMethod ("setRange", "@brief Method void QDoubleValidator::setRange(double bottom, double top)\n", false, &_init_f_setRange_2034, &_call_f_setRange_2034);
   methods += new qt_gsi::GenericMethod ("setTop|top=", "@brief Method void QDoubleValidator::setTop(double)\n", false, &_init_f_setTop_1071, &_call_f_setTop_1071);
   methods += new qt_gsi::GenericMethod (":top", "@brief Method double QDoubleValidator::top()\n", true, &_init_f_top_c0, &_call_f_top_c0);
   methods += new qt_gsi::GenericMethod ("validate", "@brief Method QValidator::State QDoubleValidator::validate(QString &, int &)\nThis is a reimplementation of QValidator::validate", true, &_init_f_validate_c2171, &_call_f_validate_c2171);
@@ -410,18 +456,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDoubleValidator::fixup(QString &)
-  void cbs_fixup_c1330_0(QString &arg1) const
+  //  [adaptor impl] void QDoubleValidator::fixup(QString &input)
+  void cbs_fixup_c1330_0(QString &input) const
   {
-    QDoubleValidator::fixup(arg1);
+    QDoubleValidator::fixup(input);
   }
 
-  virtual void fixup(QString &arg1) const
+  virtual void fixup(QString &input) const
   {
     if (cb_fixup_c1330_0.can_issue()) {
-      cb_fixup_c1330_0.issue<QDoubleValidator_Adaptor, QString &>(&QDoubleValidator_Adaptor::cbs_fixup_c1330_0, arg1);
+      cb_fixup_c1330_0.issue<QDoubleValidator_Adaptor, QString &>(&QDoubleValidator_Adaptor::cbs_fixup_c1330_0, input);
     } else {
-      QDoubleValidator::fixup(arg1);
+      QDoubleValidator::fixup(input);
     }
   }
 
@@ -765,11 +811,11 @@ static void _set_callback_cbs_eventFilter_2411_0 (void *cls, const gsi::Callback
 }
 
 
-// void QDoubleValidator::fixup(QString &)
+// void QDoubleValidator::fixup(QString &input)
 
 static void _init_cbs_fixup_c1330_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("input");
   decl->add_arg<QString & > (argspec_0);
   decl->set_return<void > ();
 }
@@ -980,7 +1026,7 @@ static gsi::Methods methods_QDoubleValidator_Adaptor () {
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QDoubleValidator::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("fixup", "@brief Virtual method void QDoubleValidator::fixup(QString &)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_fixup_c1330_0, &_call_cbs_fixup_c1330_0);
+  methods += new qt_gsi::GenericMethod ("fixup", "@brief Virtual method void QDoubleValidator::fixup(QString &input)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_fixup_c1330_0, &_call_cbs_fixup_c1330_0);
   methods += new qt_gsi::GenericMethod ("fixup", "@hide", true, &_init_cbs_fixup_c1330_0, &_call_cbs_fixup_c1330_0, &_set_callback_cbs_fixup_c1330_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QDoubleValidator::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("emit_notationChanged", "@brief Emitter for signal void QDoubleValidator::notationChanged(QDoubleValidator::Notation notation)\nCall this method to emit this signal.", false, &_init_emitter_notationChanged_3014, &_call_emitter_notationChanged_3014);

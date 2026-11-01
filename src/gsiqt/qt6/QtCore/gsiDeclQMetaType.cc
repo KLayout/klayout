@@ -298,6 +298,51 @@ static void _call_f_id_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
+// bool QMetaType::isCopyConstructible()
+
+
+static void _init_f_isCopyConstructible_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isCopyConstructible_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QMetaType *)cls)->isCopyConstructible ());
+}
+
+
+// bool QMetaType::isDefaultConstructible()
+
+
+static void _init_f_isDefaultConstructible_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isDefaultConstructible_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QMetaType *)cls)->isDefaultConstructible ());
+}
+
+
+// bool QMetaType::isDestructible()
+
+
+static void _init_f_isDestructible_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isDestructible_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QMetaType *)cls)->isDestructible ());
+}
+
+
 // bool QMetaType::isEqualityComparable()
 
 
@@ -310,6 +355,21 @@ static void _call_f_isEqualityComparable_c0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<bool > ((bool)((QMetaType *)cls)->isEqualityComparable ());
+}
+
+
+// bool QMetaType::isMoveConstructible()
+
+
+static void _init_f_isMoveConstructible_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isMoveConstructible_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QMetaType *)cls)->isMoveConstructible ());
 }
 
 
@@ -429,6 +489,21 @@ static void _call_f_sizeOf_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qsizetype > ((qsizetype)((QMetaType *)cls)->sizeOf ());
+}
+
+
+// QMetaType QMetaType::underlyingType()
+
+
+static void _init_f_underlyingType_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QMetaType > ();
+}
+
+static void _call_f_underlyingType_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QMetaType > ((QMetaType)((QMetaType *)cls)->underlyingType ());
 }
 
 
@@ -1099,7 +1174,11 @@ static gsi::Methods methods_QMetaType () {
   methods += new qt_gsi::GenericMethod ("hasRegisteredDataStreamOperators", "@brief Method bool QMetaType::hasRegisteredDataStreamOperators()\n", true, &_init_f_hasRegisteredDataStreamOperators_c0, &_call_f_hasRegisteredDataStreamOperators_c0);
   methods += new qt_gsi::GenericMethod ("hasRegisteredDebugStreamOperator", "@brief Method bool QMetaType::hasRegisteredDebugStreamOperator()\n", true, &_init_f_hasRegisteredDebugStreamOperator_c0, &_call_f_hasRegisteredDebugStreamOperator_c0);
   methods += new qt_gsi::GenericMethod ("id", "@brief Method int QMetaType::id(int)\n", true, &_init_f_id_c767, &_call_f_id_c767);
+  methods += new qt_gsi::GenericMethod ("isCopyConstructible?", "@brief Method bool QMetaType::isCopyConstructible()\n", true, &_init_f_isCopyConstructible_c0, &_call_f_isCopyConstructible_c0);
+  methods += new qt_gsi::GenericMethod ("isDefaultConstructible?", "@brief Method bool QMetaType::isDefaultConstructible()\n", true, &_init_f_isDefaultConstructible_c0, &_call_f_isDefaultConstructible_c0);
+  methods += new qt_gsi::GenericMethod ("isDestructible?", "@brief Method bool QMetaType::isDestructible()\n", true, &_init_f_isDestructible_c0, &_call_f_isDestructible_c0);
   methods += new qt_gsi::GenericMethod ("isEqualityComparable?", "@brief Method bool QMetaType::isEqualityComparable()\n", true, &_init_f_isEqualityComparable_c0, &_call_f_isEqualityComparable_c0);
+  methods += new qt_gsi::GenericMethod ("isMoveConstructible?", "@brief Method bool QMetaType::isMoveConstructible()\n", true, &_init_f_isMoveConstructible_c0, &_call_f_isMoveConstructible_c0);
   methods += new qt_gsi::GenericMethod ("isOrdered?", "@brief Method bool QMetaType::isOrdered()\n", true, &_init_f_isOrdered_c0, &_call_f_isOrdered_c0);
   methods += new qt_gsi::GenericMethod ("isRegistered?", "@brief Method bool QMetaType::isRegistered()\n", true, &_init_f_isRegistered_c0, &_call_f_isRegistered_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QMetaType::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
@@ -1107,6 +1186,7 @@ static gsi::Methods methods_QMetaType () {
   methods += new qt_gsi::GenericMethod ("name", "@brief Method const char *QMetaType::name()\n", true, &_init_f_name_c0, &_call_f_name_c0);
   methods += new qt_gsi::GenericMethod ("save", "@brief Method bool QMetaType::save(QDataStream &stream, const void *data)\n", true, &_init_f_save_c3340, &_call_f_save_c3340);
   methods += new qt_gsi::GenericMethod ("sizeOf", "@brief Method qsizetype QMetaType::sizeOf()\n", true, &_init_f_sizeOf_c0, &_call_f_sizeOf_c0);
+  methods += new qt_gsi::GenericMethod ("underlyingType", "@brief Method QMetaType QMetaType::underlyingType()\n", true, &_init_f_underlyingType_c0, &_call_f_underlyingType_c0);
   methods += new qt_gsi::GenericStaticMethod ("canConvert", "@brief Static method bool QMetaType::canConvert(QMetaType fromType, QMetaType toType)\nThis method is static and can be called without an instance.", &_init_f_canConvert_2544, &_call_f_canConvert_2544);
   methods += new qt_gsi::GenericStaticMethod ("canView", "@brief Static method bool QMetaType::canView(QMetaType fromType, QMetaType toType)\nThis method is static and can be called without an instance.", &_init_f_canView_2544, &_call_f_canView_2544);
   methods += new qt_gsi::GenericStaticMethod ("compare", "@brief Static method bool QMetaType::compare(const void *lhs, const void *rhs, int typeId, int *result)\nThis method is static and can be called without an instance.", &_init_f_compare_4898, &_call_f_compare_4898);
@@ -1169,7 +1249,9 @@ static gsi::Enum<QMetaType::TypeFlag> decl_QMetaType_TypeFlag_Enum ("QtCore", "Q
     gsi::enum_const ("PointerToGadget", QMetaType::PointerToGadget, "@brief Enum constant QMetaType::PointerToGadget") +
     gsi::enum_const ("IsPointer", QMetaType::IsPointer, "@brief Enum constant QMetaType::IsPointer") +
     gsi::enum_const ("IsQmlList", QMetaType::IsQmlList, "@brief Enum constant QMetaType::IsQmlList") +
-    gsi::enum_const ("IsConst", QMetaType::IsConst, "@brief Enum constant QMetaType::IsConst"),
+    gsi::enum_const ("IsConst", QMetaType::IsConst, "@brief Enum constant QMetaType::IsConst") +
+    gsi::enum_const ("NeedsCopyConstruction", QMetaType::NeedsCopyConstruction, "@brief Enum constant QMetaType::NeedsCopyConstruction") +
+    gsi::enum_const ("NeedsMoveConstruction", QMetaType::NeedsMoveConstruction, "@brief Enum constant QMetaType::NeedsMoveConstruction"),
   "@qt\n@brief This class represents the QMetaType::TypeFlag enum");
 
 static gsi::QFlagsClass<QMetaType::TypeFlag > decl_QMetaType_TypeFlag_Enums ("QtCore", "QMetaType_QFlags_TypeFlag",

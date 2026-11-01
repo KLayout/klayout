@@ -88,6 +88,25 @@ static void _call_ctor_QAnyStringView_2025 (const qt_gsi::GenericStaticMethod * 
 }
 
 
+//  Constructor QAnyStringView::QAnyStringView(QLatin1StringView str)
+
+
+static void _init_ctor_QAnyStringView_2112 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("str");
+  decl->add_arg<QLatin1StringView > (argspec_0);
+  decl->set_return_new<QAnyStringView> ();
+}
+
+static void _call_ctor_QAnyStringView_2112 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QLatin1StringView arg1 = gsi::arg_reader<QLatin1StringView >() (args, heap);
+  ret.write<QAnyStringView *> (new QAnyStringView (arg1));
+}
+
+
 //  Constructor QAnyStringView::QAnyStringView(const QChar &c)
 
 
@@ -122,6 +141,45 @@ static void _call_f_back_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
+// void QAnyStringView::chop(qsizetype n)
+
+
+static void _init_f_chop_1442 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("n");
+  decl->add_arg<qsizetype > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_chop_1442 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qsizetype arg1 = gsi::arg_reader<qsizetype >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QAnyStringView *)cls)->chop (arg1);
+}
+
+
+// QAnyStringView QAnyStringView::chopped(qsizetype n)
+
+
+static void _init_f_chopped_c1442 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("n");
+  decl->add_arg<qsizetype > (argspec_0);
+  decl->set_return<QAnyStringView > ();
+}
+
+static void _call_f_chopped_c1442 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qsizetype arg1 = gsi::arg_reader<qsizetype >() (args, heap);
+  ret.write<QAnyStringView > ((QAnyStringView)((QAnyStringView *)cls)->chopped (arg1));
+}
+
+
 // const void *QAnyStringView::data()
 
 
@@ -149,6 +207,25 @@ static void _call_f_empty_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<bool > ((bool)((QAnyStringView *)cls)->empty ());
+}
+
+
+// QAnyStringView QAnyStringView::first(qsizetype n)
+
+
+static void _init_f_first_c1442 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("n");
+  decl->add_arg<qsizetype > (argspec_0);
+  decl->set_return<QAnyStringView > ();
+}
+
+static void _call_f_first_c1442 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qsizetype arg1 = gsi::arg_reader<qsizetype >() (args, heap);
+  ret.write<QAnyStringView > ((QAnyStringView)((QAnyStringView *)cls)->first (arg1));
 }
 
 
@@ -197,6 +274,44 @@ static void _call_f_isNull_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+// QAnyStringView QAnyStringView::last(qsizetype n)
+
+
+static void _init_f_last_c1442 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("n");
+  decl->add_arg<qsizetype > (argspec_0);
+  decl->set_return<QAnyStringView > ();
+}
+
+static void _call_f_last_c1442 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qsizetype arg1 = gsi::arg_reader<qsizetype >() (args, heap);
+  ret.write<QAnyStringView > ((QAnyStringView)((QAnyStringView *)cls)->last (arg1));
+}
+
+
+// QAnyStringView QAnyStringView::left(qsizetype n)
+
+
+static void _init_f_left_c1442 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("n");
+  decl->add_arg<qsizetype > (argspec_0);
+  decl->set_return<QAnyStringView > ();
+}
+
+static void _call_f_left_c1442 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qsizetype arg1 = gsi::arg_reader<qsizetype >() (args, heap);
+  ret.write<QAnyStringView > ((QAnyStringView)((QAnyStringView *)cls)->left (arg1));
+}
+
+
 // qsizetype QAnyStringView::length()
 
 
@@ -209,6 +324,47 @@ static void _call_f_length_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qsizetype > ((qsizetype)((QAnyStringView *)cls)->length ());
+}
+
+
+// QAnyStringView QAnyStringView::mid(qsizetype pos, qsizetype n)
+
+
+static void _init_f_mid_c2776 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("pos");
+  decl->add_arg<qsizetype > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("n", true, "-1");
+  decl->add_arg<qsizetype > (argspec_1);
+  decl->set_return<QAnyStringView > ();
+}
+
+static void _call_f_mid_c2776 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qsizetype arg1 = gsi::arg_reader<qsizetype >() (args, heap);
+  qsizetype arg2 = args ? gsi::arg_reader<qsizetype >() (args, heap) : gsi::arg_maker<qsizetype >() (-1, heap);
+  ret.write<QAnyStringView > ((QAnyStringView)((QAnyStringView *)cls)->mid (arg1, arg2));
+}
+
+
+// QAnyStringView QAnyStringView::right(qsizetype n)
+
+
+static void _init_f_right_c1442 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("n");
+  decl->add_arg<qsizetype > (argspec_0);
+  decl->set_return<QAnyStringView > ();
+}
+
+static void _call_f_right_c1442 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qsizetype arg1 = gsi::arg_reader<qsizetype >() (args, heap);
+  ret.write<QAnyStringView > ((QAnyStringView)((QAnyStringView *)cls)->right (arg1));
 }
 
 
@@ -242,6 +398,47 @@ static void _call_f_size_bytes_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
+// QAnyStringView QAnyStringView::sliced(qsizetype pos)
+
+
+static void _init_f_sliced_c1442 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("pos");
+  decl->add_arg<qsizetype > (argspec_0);
+  decl->set_return<QAnyStringView > ();
+}
+
+static void _call_f_sliced_c1442 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qsizetype arg1 = gsi::arg_reader<qsizetype >() (args, heap);
+  ret.write<QAnyStringView > ((QAnyStringView)((QAnyStringView *)cls)->sliced (arg1));
+}
+
+
+// QAnyStringView QAnyStringView::sliced(qsizetype pos, qsizetype n)
+
+
+static void _init_f_sliced_c2776 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("pos");
+  decl->add_arg<qsizetype > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("n");
+  decl->add_arg<qsizetype > (argspec_1);
+  decl->set_return<QAnyStringView > ();
+}
+
+static void _call_f_sliced_c2776 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qsizetype arg1 = gsi::arg_reader<qsizetype >() (args, heap);
+  qsizetype arg2 = gsi::arg_reader<qsizetype >() (args, heap);
+  ret.write<QAnyStringView > ((QAnyStringView)((QAnyStringView *)cls)->sliced (arg1, arg2));
+}
+
+
 // QString QAnyStringView::toString()
 
 
@@ -254,6 +451,26 @@ static void _call_f_toString_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QString > ((QString)((QAnyStringView *)cls)->toString ());
+}
+
+
+// void QAnyStringView::truncate(qsizetype n)
+
+
+static void _init_f_truncate_1442 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("n");
+  decl->add_arg<qsizetype > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_truncate_1442 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qsizetype arg1 = gsi::arg_reader<qsizetype >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QAnyStringView *)cls)->truncate (arg1);
 }
 
 
@@ -343,17 +560,28 @@ static gsi::Methods methods_QAnyStringView () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAnyStringView::QAnyStringView()\nThis method creates an object of class QAnyStringView.", &_init_ctor_QAnyStringView_0, &_call_ctor_QAnyStringView_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAnyStringView::QAnyStringView(const QByteArray &str)\nThis method creates an object of class QAnyStringView.", &_init_ctor_QAnyStringView_2309, &_call_ctor_QAnyStringView_2309);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAnyStringView::QAnyStringView(const QString &str)\nThis method creates an object of class QAnyStringView.", &_init_ctor_QAnyStringView_2025, &_call_ctor_QAnyStringView_2025);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAnyStringView::QAnyStringView(QLatin1StringView str)\nThis method creates an object of class QAnyStringView.", &_init_ctor_QAnyStringView_2112, &_call_ctor_QAnyStringView_2112);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAnyStringView::QAnyStringView(const QChar &c)\nThis method creates an object of class QAnyStringView.", &_init_ctor_QAnyStringView_1776, &_call_ctor_QAnyStringView_1776);
   methods += new qt_gsi::GenericMethod ("back", "@brief Method QChar QAnyStringView::back()\n", true, &_init_f_back_c0, &_call_f_back_c0);
+  methods += new qt_gsi::GenericMethod ("chop", "@brief Method void QAnyStringView::chop(qsizetype n)\n", false, &_init_f_chop_1442, &_call_f_chop_1442);
+  methods += new qt_gsi::GenericMethod ("chopped", "@brief Method QAnyStringView QAnyStringView::chopped(qsizetype n)\n", true, &_init_f_chopped_c1442, &_call_f_chopped_c1442);
   methods += new qt_gsi::GenericMethod ("data", "@brief Method const void *QAnyStringView::data()\n", true, &_init_f_data_c0, &_call_f_data_c0);
   methods += new qt_gsi::GenericMethod ("empty", "@brief Method bool QAnyStringView::empty()\n", true, &_init_f_empty_c0, &_call_f_empty_c0);
+  methods += new qt_gsi::GenericMethod ("first", "@brief Method QAnyStringView QAnyStringView::first(qsizetype n)\n", true, &_init_f_first_c1442, &_call_f_first_c1442);
   methods += new qt_gsi::GenericMethod ("front", "@brief Method QChar QAnyStringView::front()\n", true, &_init_f_front_c0, &_call_f_front_c0);
   methods += new qt_gsi::GenericMethod ("isEmpty?", "@brief Method bool QAnyStringView::isEmpty()\n", true, &_init_f_isEmpty_c0, &_call_f_isEmpty_c0);
   methods += new qt_gsi::GenericMethod ("isNull?", "@brief Method bool QAnyStringView::isNull()\n", true, &_init_f_isNull_c0, &_call_f_isNull_c0);
+  methods += new qt_gsi::GenericMethod ("last", "@brief Method QAnyStringView QAnyStringView::last(qsizetype n)\n", true, &_init_f_last_c1442, &_call_f_last_c1442);
+  methods += new qt_gsi::GenericMethod ("left", "@brief Method QAnyStringView QAnyStringView::left(qsizetype n)\n", true, &_init_f_left_c1442, &_call_f_left_c1442);
   methods += new qt_gsi::GenericMethod ("length", "@brief Method qsizetype QAnyStringView::length()\n", true, &_init_f_length_c0, &_call_f_length_c0);
+  methods += new qt_gsi::GenericMethod ("mid", "@brief Method QAnyStringView QAnyStringView::mid(qsizetype pos, qsizetype n)\n", true, &_init_f_mid_c2776, &_call_f_mid_c2776);
+  methods += new qt_gsi::GenericMethod ("right", "@brief Method QAnyStringView QAnyStringView::right(qsizetype n)\n", true, &_init_f_right_c1442, &_call_f_right_c1442);
   methods += new qt_gsi::GenericMethod ("size", "@brief Method qsizetype QAnyStringView::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
   methods += new qt_gsi::GenericMethod ("size_bytes", "@brief Method qsizetype QAnyStringView::size_bytes()\n", true, &_init_f_size_bytes_c0, &_call_f_size_bytes_c0);
+  methods += new qt_gsi::GenericMethod ("sliced", "@brief Method QAnyStringView QAnyStringView::sliced(qsizetype pos)\n", true, &_init_f_sliced_c1442, &_call_f_sliced_c1442);
+  methods += new qt_gsi::GenericMethod ("sliced", "@brief Method QAnyStringView QAnyStringView::sliced(qsizetype pos, qsizetype n)\n", true, &_init_f_sliced_c2776, &_call_f_sliced_c2776);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QAnyStringView::toString()\n", true, &_init_f_toString_c0, &_call_f_toString_c0);
+  methods += new qt_gsi::GenericMethod ("truncate", "@brief Method void QAnyStringView::truncate(qsizetype n)\n", false, &_init_f_truncate_1442, &_call_f_truncate_1442);
   methods += new qt_gsi::GenericStaticMethod ("compare", "@brief Static method int QAnyStringView::compare(QAnyStringView lhs, QAnyStringView rhs, Qt::CaseSensitivity cs)\nThis method is static and can be called without an instance.", &_init_f_compare_5818, &_call_f_compare_5818);
   methods += new qt_gsi::GenericStaticMethod ("equal", "@brief Static method bool QAnyStringView::equal(QAnyStringView lhs, QAnyStringView rhs)\nThis method is static and can be called without an instance.", &_init_f_equal_3602, &_call_f_equal_3602);
   methods += gsi::method_ext("==", &::op_QAnyStringView_operator_eq__eq__3602, gsi::arg ("rhs"), "@brief Operator bool ::operator==(QAnyStringView lhs, QAnyStringView rhs)\nThis is the mapping of the global operator to the instance method.");

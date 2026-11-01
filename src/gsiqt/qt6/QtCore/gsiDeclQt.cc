@@ -374,6 +374,25 @@ static gsi::ClassExt<Qt_Namespace> decl_Qt_ClipOperation_Enums_as_child (decl_Qt
 }
 
 
+//  Implementation of the enum wrapper class for Qt::ColorScheme
+namespace qt_gsi
+{
+
+static gsi::Enum<Qt::ColorScheme> decl_Qt_ColorScheme_Enum ("QtCore", "Qt_ColorScheme",
+    gsi::enum_const ("Unknown", Qt::ColorScheme::Unknown, "@brief Enum constant Qt::ColorScheme::Unknown") +
+    gsi::enum_const ("Light", Qt::ColorScheme::Light, "@brief Enum constant Qt::ColorScheme::Light") +
+    gsi::enum_const ("Dark", Qt::ColorScheme::Dark, "@brief Enum constant Qt::ColorScheme::Dark"),
+  "@qt\n@brief This class represents the Qt::ColorScheme enum");
+
+static gsi::QFlagsClass<Qt::ColorScheme > decl_Qt_ColorScheme_Enums ("QtCore", "Qt_QFlags_ColorScheme",
+  "@qt\n@brief This class represents the QFlags<Qt::ColorScheme> flag set");
+
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ColorScheme_Enum_as_child (decl_Qt_ColorScheme_Enum, "ColorScheme");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ColorScheme_Enums_as_child (decl_Qt_ColorScheme_Enums, "QFlags_ColorScheme");
+
+}
+
+
 //  Implementation of the enum wrapper class for Qt::ConnectionType
 namespace qt_gsi
 {
@@ -522,28 +541,6 @@ static gsi::QFlagsClass<Qt::CursorShape > decl_Qt_CursorShape_Enums ("QtCore", "
 static gsi::ClassExt<Qt_Namespace> inject_Qt_CursorShape_Enum_in_parent (decl_Qt_CursorShape_Enum.defs ());
 static gsi::ClassExt<Qt_Namespace> decl_Qt_CursorShape_Enum_as_child (decl_Qt_CursorShape_Enum, "CursorShape");
 static gsi::ClassExt<Qt_Namespace> decl_Qt_CursorShape_Enums_as_child (decl_Qt_CursorShape_Enums, "QFlags_CursorShape");
-
-}
-
-
-//  Implementation of the enum wrapper class for Qt::DateFormat
-namespace qt_gsi
-{
-
-static gsi::Enum<Qt::DateFormat> decl_Qt_DateFormat_Enum ("QtCore", "Qt_DateFormat",
-    gsi::enum_const ("TextDate", Qt::TextDate, "@brief Enum constant Qt::TextDate") +
-    gsi::enum_const ("ISODate", Qt::ISODate, "@brief Enum constant Qt::ISODate") +
-    gsi::enum_const ("RFC2822Date", Qt::RFC2822Date, "@brief Enum constant Qt::RFC2822Date") +
-    gsi::enum_const ("ISODateWithMs", Qt::ISODateWithMs, "@brief Enum constant Qt::ISODateWithMs"),
-  "@qt\n@brief This class represents the Qt::DateFormat enum");
-
-static gsi::QFlagsClass<Qt::DateFormat > decl_Qt_DateFormat_Enums ("QtCore", "Qt_QFlags_DateFormat",
-  "@qt\n@brief This class represents the QFlags<Qt::DateFormat> flag set");
-
-//  Inject the declarations into the parent
-static gsi::ClassExt<Qt_Namespace> inject_Qt_DateFormat_Enum_in_parent (decl_Qt_DateFormat_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_DateFormat_Enum_as_child (decl_Qt_DateFormat_Enum, "DateFormat");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_DateFormat_Enums_as_child (decl_Qt_DateFormat_Enums, "QFlags_DateFormat");
 
 }
 

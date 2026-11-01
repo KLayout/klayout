@@ -28,6 +28,7 @@
 */
 
 #include <QImageCapture>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QImage>

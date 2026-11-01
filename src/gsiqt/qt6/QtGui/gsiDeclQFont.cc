@@ -178,6 +178,22 @@ static void _call_f_capitalization_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
+// void QFont::clearFeatures()
+
+
+static void _init_f_clearFeatures_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_f_clearFeatures_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QFont *)cls)->clearFeatures ();
+}
+
+
 // QString QFont::defaultFamily()
 
 
@@ -1386,6 +1402,7 @@ static gsi::Methods methods_QFont () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QFont::QFont(const QFont &font)\nThis method creates an object of class QFont.", &_init_ctor_QFont_1801, &_call_ctor_QFont_1801);
   methods += new qt_gsi::GenericMethod (":bold", "@brief Method bool QFont::bold()\n", true, &_init_f_bold_c0, &_call_f_bold_c0);
   methods += new qt_gsi::GenericMethod (":capitalization", "@brief Method QFont::Capitalization QFont::capitalization()\n", true, &_init_f_capitalization_c0, &_call_f_capitalization_c0);
+  methods += new qt_gsi::GenericMethod ("clearFeatures", "@brief Method void QFont::clearFeatures()\n", false, &_init_f_clearFeatures_0, &_call_f_clearFeatures_0);
   methods += new qt_gsi::GenericMethod ("defaultFamily", "@brief Method QString QFont::defaultFamily()\n", true, &_init_f_defaultFamily_c0, &_call_f_defaultFamily_c0);
   methods += new qt_gsi::GenericMethod ("exactMatch", "@brief Method bool QFont::exactMatch()\n", true, &_init_f_exactMatch_c0, &_call_f_exactMatch_c0);
   methods += new qt_gsi::GenericMethod (":families", "@brief Method QStringList QFont::families()\n", true, &_init_f_families_c0, &_call_f_families_c0);

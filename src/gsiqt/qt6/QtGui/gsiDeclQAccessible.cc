@@ -419,7 +419,8 @@ static gsi::Enum<QAccessible::InterfaceType> decl_QAccessible_InterfaceType_Enum
     gsi::enum_const ("ImageInterface", QAccessible::ImageInterface, "@brief Enum constant QAccessible::ImageInterface") +
     gsi::enum_const ("TableInterface", QAccessible::TableInterface, "@brief Enum constant QAccessible::TableInterface") +
     gsi::enum_const ("TableCellInterface", QAccessible::TableCellInterface, "@brief Enum constant QAccessible::TableCellInterface") +
-    gsi::enum_const ("HyperlinkInterface", QAccessible::HyperlinkInterface, "@brief Enum constant QAccessible::HyperlinkInterface"),
+    gsi::enum_const ("HyperlinkInterface", QAccessible::HyperlinkInterface, "@brief Enum constant QAccessible::HyperlinkInterface") +
+    gsi::enum_const ("SelectionInterface", QAccessible::SelectionInterface, "@brief Enum constant QAccessible::SelectionInterface"),
   "@qt\n@brief This class represents the QAccessible::InterfaceType enum");
 
 static gsi::QFlagsClass<QAccessible::InterfaceType > decl_QAccessible_InterfaceType_Enums ("QtGui", "QAccessible_QFlags_InterfaceType",
@@ -442,6 +443,10 @@ static gsi::Enum<QAccessible::RelationFlag> decl_QAccessible_RelationFlag_Enum (
     gsi::enum_const ("Labelled", QAccessible::Labelled, "@brief Enum constant QAccessible::Labelled") +
     gsi::enum_const ("Controller", QAccessible::Controller, "@brief Enum constant QAccessible::Controller") +
     gsi::enum_const ("Controlled", QAccessible::Controlled, "@brief Enum constant QAccessible::Controlled") +
+    gsi::enum_const ("DescriptionFor", QAccessible::DescriptionFor, "@brief Enum constant QAccessible::DescriptionFor") +
+    gsi::enum_const ("Described", QAccessible::Described, "@brief Enum constant QAccessible::Described") +
+    gsi::enum_const ("FlowsFrom", QAccessible::FlowsFrom, "@brief Enum constant QAccessible::FlowsFrom") +
+    gsi::enum_const ("FlowsTo", QAccessible::FlowsTo, "@brief Enum constant QAccessible::FlowsTo") +
     gsi::enum_const ("AllRelations", QAccessible::AllRelations, "@brief Enum constant QAccessible::AllRelations"),
   "@qt\n@brief This class represents the QAccessible::RelationFlag enum");
 

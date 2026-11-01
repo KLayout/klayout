@@ -204,6 +204,40 @@ static void _call_f_debug_c2935 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
+// QDebug QMessageLogger::fatal()
+
+
+static void _init_f_fatal_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QDebug > ();
+}
+
+static void _call_f_fatal_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QDebug > ((QDebug)((QMessageLogger *)cls)->fatal ());
+}
+
+
+// QDebug QMessageLogger::fatal(const QLoggingCategory &cat)
+
+
+static void _init_f_fatal_c2935 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("cat");
+  decl->add_arg<const QLoggingCategory & > (argspec_0);
+  decl->set_return<QDebug > ();
+}
+
+static void _call_f_fatal_c2935 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QLoggingCategory &arg1 = gsi::arg_reader<const QLoggingCategory & >() (args, heap);
+  ret.write<QDebug > ((QDebug)((QMessageLogger *)cls)->fatal (arg1));
+}
+
+
 // QDebug QMessageLogger::info()
 
 
@@ -300,6 +334,8 @@ static gsi::Methods methods_QMessageLogger () {
   methods += new qt_gsi::GenericMethod ("critical", "@brief Method QDebug QMessageLogger::critical(const QLoggingCategory &cat)\n", true, &_init_f_critical_c2935, &_call_f_critical_c2935);
   methods += new qt_gsi::GenericMethod ("debug", "@brief Method QDebug QMessageLogger::debug()\n", true, &_init_f_debug_c0, &_call_f_debug_c0);
   methods += new qt_gsi::GenericMethod ("debug", "@brief Method QDebug QMessageLogger::debug(const QLoggingCategory &cat)\n", true, &_init_f_debug_c2935, &_call_f_debug_c2935);
+  methods += new qt_gsi::GenericMethod ("fatal", "@brief Method QDebug QMessageLogger::fatal()\n", true, &_init_f_fatal_c0, &_call_f_fatal_c0);
+  methods += new qt_gsi::GenericMethod ("fatal", "@brief Method QDebug QMessageLogger::fatal(const QLoggingCategory &cat)\n", true, &_init_f_fatal_c2935, &_call_f_fatal_c2935);
   methods += new qt_gsi::GenericMethod ("info", "@brief Method QDebug QMessageLogger::info()\n", true, &_init_f_info_c0, &_call_f_info_c0);
   methods += new qt_gsi::GenericMethod ("info", "@brief Method QDebug QMessageLogger::info(const QLoggingCategory &cat)\n", true, &_init_f_info_c2935, &_call_f_info_c2935);
   methods += new qt_gsi::GenericMethod ("noDebug", "@brief Method QNoDebug QMessageLogger::noDebug()\n", true, &_init_f_noDebug_c0, &_call_f_noDebug_c0);

@@ -30,6 +30,7 @@
 #include <QCalendarWidget>
 #include <QAction>
 #include <QActionEvent>
+#include <QAnyStringView>
 #include <QBackingStore>
 #include <QBitmap>
 #include <QCalendar>
@@ -117,6 +118,38 @@ static void _call_f_calendar_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QCalendar > ((QCalendar)((QCalendarWidget *)cls)->calendar ());
+}
+
+
+// void QCalendarWidget::clearMaximumDate()
+
+
+static void _init_f_clearMaximumDate_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_f_clearMaximumDate_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QCalendarWidget *)cls)->clearMaximumDate ();
+}
+
+
+// void QCalendarWidget::clearMinimumDate()
+
+
+static void _init_f_clearMinimumDate_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_f_clearMinimumDate_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QCalendarWidget *)cls)->clearMinimumDate ();
 }
 
 
@@ -893,6 +926,8 @@ static gsi::Methods methods_QCalendarWidget () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":calendar", "@brief Method QCalendar QCalendarWidget::calendar()\n", true, &_init_f_calendar_c0, &_call_f_calendar_c0);
+  methods += new qt_gsi::GenericMethod ("clearMaximumDate", "@brief Method void QCalendarWidget::clearMaximumDate()\n", false, &_init_f_clearMaximumDate_0, &_call_f_clearMaximumDate_0);
+  methods += new qt_gsi::GenericMethod ("clearMinimumDate", "@brief Method void QCalendarWidget::clearMinimumDate()\n", false, &_init_f_clearMinimumDate_0, &_call_f_clearMinimumDate_0);
   methods += new qt_gsi::GenericMethod (":dateEditAcceptDelay", "@brief Method int QCalendarWidget::dateEditAcceptDelay()\n", true, &_init_f_dateEditAcceptDelay_c0, &_call_f_dateEditAcceptDelay_c0);
   methods += new qt_gsi::GenericMethod ("dateTextFormat", "@brief Method QMap<QDate, QTextCharFormat> QCalendarWidget::dateTextFormat()\n", true, &_init_f_dateTextFormat_c0, &_call_f_dateTextFormat_c0);
   methods += new qt_gsi::GenericMethod ("dateTextFormat", "@brief Method QTextCharFormat QCalendarWidget::dateTextFormat(QDate date)\n", true, &_init_f_dateTextFormat_c899, &_call_f_dateTextFormat_c899);

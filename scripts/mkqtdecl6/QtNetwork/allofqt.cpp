@@ -12,10 +12,10 @@
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QHostInfo>
 #include <QtNetwork/QHstsPolicy>
+#include <QtNetwork/QHttp1Configuration>
 #include <QtNetwork/QHttp2Configuration>
 #include <QtNetwork/QHttpMultiPart>
 #include <QtNetwork/QHttpPart>
-#include <QtNetwork/Q_IPV6ADDR>
 #include <QtNetwork/QIPv6Address>
 #include <QtNetwork/QLocalServer>
 #include <QtNetwork/QLocalSocket>
@@ -35,8 +35,6 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QOcspResponse>
 #include <QtNetwork/QPasswordDigestor>
-#include <QtNetwork/QSctpServer>
-#include <QtNetwork/QSctpSocket>
 #include <QtNetwork/QSsl>
 #include <QtNetwork/QSslCertificate>
 #include <QtNetwork/QSslCertificateExtension>
@@ -47,6 +45,7 @@
 #include <QtNetwork/QSslError>
 #include <QtNetwork/QSslKey>
 #include <QtNetwork/QSslPreSharedKeyAuthenticator>
+#include <QtNetwork/QSslServer>
 #include <QtNetwork/QSslSocket>
 #include <QtNetwork/QTcpServer>
 #include <QtNetwork/QTcpSocket>
@@ -54,3 +53,4 @@
 //#include <QtNetwork/QtNetworkDepends>
 #include <QtNetwork/QtNetworkVersion>
 #include <QtNetwork/QUdpSocket>
+#include <QtNetwork/Q_IPV6ADDR>

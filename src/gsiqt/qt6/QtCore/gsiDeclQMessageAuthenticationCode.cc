@@ -36,24 +36,24 @@
 // -----------------------------------------------------------------------
 // class QMessageAuthenticationCode
 
-//  Constructor QMessageAuthenticationCode::QMessageAuthenticationCode(QCryptographicHash::Algorithm method, const QByteArray &key)
+//  Constructor QMessageAuthenticationCode::QMessageAuthenticationCode(QCryptographicHash::Algorithm method, QByteArrayView key)
 
 
-static void _init_ctor_QMessageAuthenticationCode_5532 (qt_gsi::GenericStaticMethod *decl)
+static void _init_ctor_QMessageAuthenticationCode_5066 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("method");
   decl->add_arg<const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("key", true, "QByteArray()");
-  decl->add_arg<const QByteArray & > (argspec_1);
+  static gsi::ArgSpecBase argspec_1 ("key", true, "{}");
+  decl->add_arg<QByteArrayView > (argspec_1);
   decl->set_return_new<QMessageAuthenticationCode> ();
 }
 
-static void _call_ctor_QMessageAuthenticationCode_5532 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_ctor_QMessageAuthenticationCode_5066 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & >() (args, heap);
-  const QByteArray &arg2 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
+  QByteArrayView arg2 = args ? gsi::arg_reader<QByteArrayView >() (args, heap) : gsi::arg_maker<QByteArrayView >() ({}, heap);
   ret.write<QMessageAuthenticationCode *> (new QMessageAuthenticationCode (qt_gsi::QtToCppAdaptor<QCryptographicHash::Algorithm>(arg1).cref(), arg2));
 }
 
@@ -81,21 +81,21 @@ static void _call_f_addData_3065 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// void QMessageAuthenticationCode::addData(const QByteArray &data)
+// void QMessageAuthenticationCode::addData(QByteArrayView data)
 
 
-static void _init_f_addData_2309 (qt_gsi::GenericMethod *decl)
+static void _init_f_addData_1843 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("data");
-  decl->add_arg<const QByteArray & > (argspec_0);
+  decl->add_arg<QByteArrayView > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_addData_2309 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_addData_1843 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  QByteArrayView arg1 = gsi::arg_reader<QByteArrayView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageAuthenticationCode *)cls)->addData (arg1);
 }
@@ -151,46 +151,81 @@ static void _call_f_result_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// void QMessageAuthenticationCode::setKey(const QByteArray &key)
+// QByteArrayView QMessageAuthenticationCode::resultView()
 
 
-static void _init_f_setKey_2309 (qt_gsi::GenericMethod *decl)
+static void _init_f_resultView_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QByteArrayView > ();
+}
+
+static void _call_f_resultView_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QByteArrayView > ((QByteArrayView)((QMessageAuthenticationCode *)cls)->resultView ());
+}
+
+
+// void QMessageAuthenticationCode::setKey(QByteArrayView key)
+
+
+static void _init_f_setKey_1843 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<const QByteArray & > (argspec_0);
+  decl->add_arg<QByteArrayView > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_setKey_2309 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_setKey_1843 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  QByteArrayView arg1 = gsi::arg_reader<QByteArrayView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageAuthenticationCode *)cls)->setKey (arg1);
 }
 
 
-// static QByteArray QMessageAuthenticationCode::hash(const QByteArray &message, const QByteArray &key, QCryptographicHash::Algorithm method)
+// void QMessageAuthenticationCode::swap(QMessageAuthenticationCode &other)
 
 
-static void _init_f_hash_7733 (qt_gsi::GenericStaticMethod *decl)
+static void _init_f_swap_3259 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<QMessageAuthenticationCode & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_swap_3259 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QMessageAuthenticationCode &arg1 = gsi::arg_reader<QMessageAuthenticationCode & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QMessageAuthenticationCode *)cls)->swap (arg1);
+}
+
+
+// static QByteArray QMessageAuthenticationCode::hash(QByteArrayView message, QByteArrayView key, QCryptographicHash::Algorithm method)
+
+
+static void _init_f_hash_6801 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("message");
-  decl->add_arg<const QByteArray & > (argspec_0);
+  decl->add_arg<QByteArrayView > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("key");
-  decl->add_arg<const QByteArray & > (argspec_1);
+  decl->add_arg<QByteArrayView > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("method");
   decl->add_arg<const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & > (argspec_2);
   decl->set_return<QByteArray > ();
 }
 
-static void _call_f_hash_7733 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_hash_6801 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
-  const QByteArray &arg2 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  QByteArrayView arg1 = gsi::arg_reader<QByteArrayView >() (args, heap);
+  QByteArrayView arg2 = gsi::arg_reader<QByteArrayView >() (args, heap);
   const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & >() (args, heap);
   ret.write<QByteArray > ((QByteArray)QMessageAuthenticationCode::hash (arg1, arg2, qt_gsi::QtToCppAdaptor<QCryptographicHash::Algorithm>(arg3).cref()));
 }
@@ -202,14 +237,16 @@ namespace gsi
 
 static gsi::Methods methods_QMessageAuthenticationCode () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMessageAuthenticationCode::QMessageAuthenticationCode(QCryptographicHash::Algorithm method, const QByteArray &key)\nThis method creates an object of class QMessageAuthenticationCode.", &_init_ctor_QMessageAuthenticationCode_5532, &_call_ctor_QMessageAuthenticationCode_5532);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMessageAuthenticationCode::QMessageAuthenticationCode(QCryptographicHash::Algorithm method, QByteArrayView key)\nThis method creates an object of class QMessageAuthenticationCode.", &_init_ctor_QMessageAuthenticationCode_5066, &_call_ctor_QMessageAuthenticationCode_5066);
   methods += new qt_gsi::GenericMethod ("addData", "@brief Method void QMessageAuthenticationCode::addData(const char *data, qsizetype length)\n", false, &_init_f_addData_3065, &_call_f_addData_3065);
-  methods += new qt_gsi::GenericMethod ("addData", "@brief Method void QMessageAuthenticationCode::addData(const QByteArray &data)\n", false, &_init_f_addData_2309, &_call_f_addData_2309);
+  methods += new qt_gsi::GenericMethod ("addData", "@brief Method void QMessageAuthenticationCode::addData(QByteArrayView data)\n", false, &_init_f_addData_1843, &_call_f_addData_1843);
   methods += new qt_gsi::GenericMethod ("addData", "@brief Method bool QMessageAuthenticationCode::addData(QIODevice *device)\n", false, &_init_f_addData_1447, &_call_f_addData_1447);
   methods += new qt_gsi::GenericMethod ("reset", "@brief Method void QMessageAuthenticationCode::reset()\n", false, &_init_f_reset_0, &_call_f_reset_0);
   methods += new qt_gsi::GenericMethod ("result", "@brief Method QByteArray QMessageAuthenticationCode::result()\n", true, &_init_f_result_c0, &_call_f_result_c0);
-  methods += new qt_gsi::GenericMethod ("setKey", "@brief Method void QMessageAuthenticationCode::setKey(const QByteArray &key)\n", false, &_init_f_setKey_2309, &_call_f_setKey_2309);
-  methods += new qt_gsi::GenericStaticMethod ("hash", "@brief Static method QByteArray QMessageAuthenticationCode::hash(const QByteArray &message, const QByteArray &key, QCryptographicHash::Algorithm method)\nThis method is static and can be called without an instance.", &_init_f_hash_7733, &_call_f_hash_7733);
+  methods += new qt_gsi::GenericMethod ("resultView", "@brief Method QByteArrayView QMessageAuthenticationCode::resultView()\n", true, &_init_f_resultView_c0, &_call_f_resultView_c0);
+  methods += new qt_gsi::GenericMethod ("setKey", "@brief Method void QMessageAuthenticationCode::setKey(QByteArrayView key)\n", false, &_init_f_setKey_1843, &_call_f_setKey_1843);
+  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QMessageAuthenticationCode::swap(QMessageAuthenticationCode &other)\n", false, &_init_f_swap_3259, &_call_f_swap_3259);
+  methods += new qt_gsi::GenericStaticMethod ("hash", "@brief Static method QByteArray QMessageAuthenticationCode::hash(QByteArrayView message, QByteArrayView key, QCryptographicHash::Algorithm method)\nThis method is static and can be called without an instance.", &_init_f_hash_6801, &_call_f_hash_6801);
   return methods;
 }
 

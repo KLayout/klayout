@@ -168,6 +168,16 @@ static void _call_f_topRow_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+//  bool ::operator==(const QTableWidgetSelectionRange &lhs, const QTableWidgetSelectionRange &rhs)
+static bool op_QTableWidgetSelectionRange_operator_eq__eq__7734(const QTableWidgetSelectionRange *_self, const QTableWidgetSelectionRange &rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(const QTableWidgetSelectionRange &lhs, const QTableWidgetSelectionRange &rhs)
+static bool op_QTableWidgetSelectionRange_operator_excl__eq__7734(const QTableWidgetSelectionRange *_self, const QTableWidgetSelectionRange &rhs) {
+  return operator!=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -182,6 +192,8 @@ static gsi::Methods methods_QTableWidgetSelectionRange () {
   methods += new qt_gsi::GenericMethod ("rightColumn", "@brief Method int QTableWidgetSelectionRange::rightColumn()\n", true, &_init_f_rightColumn_c0, &_call_f_rightColumn_c0);
   methods += new qt_gsi::GenericMethod ("rowCount", "@brief Method int QTableWidgetSelectionRange::rowCount()\n", true, &_init_f_rowCount_c0, &_call_f_rowCount_c0);
   methods += new qt_gsi::GenericMethod ("topRow", "@brief Method int QTableWidgetSelectionRange::topRow()\n", true, &_init_f_topRow_c0, &_call_f_topRow_c0);
+  methods += gsi::method_ext("==", &::op_QTableWidgetSelectionRange_operator_eq__eq__7734, gsi::arg ("rhs"), "@brief Operator bool ::operator==(const QTableWidgetSelectionRange &lhs, const QTableWidgetSelectionRange &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QTableWidgetSelectionRange_operator_excl__eq__7734, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(const QTableWidgetSelectionRange &lhs, const QTableWidgetSelectionRange &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

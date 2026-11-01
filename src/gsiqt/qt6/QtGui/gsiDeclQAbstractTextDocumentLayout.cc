@@ -28,6 +28,7 @@
 */
 
 #include <QAbstractTextDocumentLayout>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

@@ -198,6 +198,25 @@ for p in $plugins; do
 done
 
 # ----------------------------------------------------------
+# Tcl dependencies
+
+tclpath=$(echo 'foreach p $auto_path { puts $p }' | tclsh)
+
+cp=
+for p in ${tclpath[@]}; do
+  cp+=" $(cygpath $p)"
+done
+for p in $(find $cp -name "tclIndex" | sed 's&/tclIndex&&' | sort -u); do
+  if [[ $p == "$mingw_inst"* ]] && [ -e "$p" ]; then
+    rp=${p/"$mingw_inst/"}
+    rm -rf $target/$rp
+    mkdir -p $target/$rp
+    rmdir $target/$rp
+    cp -vR $p $target/$rp | sed -u 's/.*/echo -n ./' | sh
+  fi
+done
+
+# ----------------------------------------------------------
 # Ruby dependencies
 
 rubys=$($ruby -e 'puts $:' | sort | awk '{print $1}')

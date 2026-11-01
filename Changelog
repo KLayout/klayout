@@ -1,3 +1,36 @@
+0.30.13          (2026-11-02):
+* Bugfix: %GITHUB%/issues/2525 Device terminal defined with several polygons connects to only one of them
+* Bugfix: %GITHUB%/issues/2524 OutputZLibFile leaks a FILE* stream per gzip file on Windows
+* Bugfix: %GITHUB%/issues/2518 KLayout crash exposed by a libc++ 22 behavior change
+  This patch also includes a fix for a use-after-destruction problem in the 
+  expression parser.
+* Enhancement: %GITHUB%/issues/2515 Support of Qt 6.12.0
+* Bugfix: %GITHUB%/issues/2496 LayoutToNetlist.shapes_of_terminal: time per call grows with the number of devices
+* Bugfix: %GITHUB%/issues/2495 Python API: EdgeNeighborhoodVisitor.on_edge leaks its arguments
+* Bugfix: %GITHUB%/issues/2494 Combination of AS/PS and AD/PD parameters may be incorrect when source/drain are swapped
+* Bugfix: %GITHUB%/issues/2493 Same cell reference across libraries breaks hierarchical LVS
+* Bugfix: %GITHUB%/issues/2492 TilingOperator fill_region creates duplicate AREFs
+* Bugfix: %GITHUB%/issues/2469 Region#sized degenerates at acute corners
+* Bugfix: %GITHUB%/issues/2451 DRC: "with_angle" bug for very short edges
+* Bugfix: %GITHUB%/issues/2450 Include "tkinter" Python module in Windows installer
+* Bugfix: %GITHUB%/issues/2447 Add option to use layer names in DXF export (#2439)
+* Bugfix: %GITHUB%/issues/2443 PEX ERROR: src/db/db/dbPLCTriangulation.cc,480,next_edge == 0
+* Bugfix: %GITHUB%/issues/2441 Polygons that contain coincident internal edges not flagged as odd_polygonsbug
+  With this patch, hole stitch lines are generated in a way avoiding coincident
+  edges where possible. Also certain situations were invalid stitch lines were generated
+  are fixed now.
+* Bugfix: %GITHUB%/issues/2438 KLayout stalls reading Magic files with partial layer mapping
+* Enhancement: %GITHUB%/issues/2383 Qt (6.5+) bindings for QStyleHints::colorScheme and Qt::ColorScheme
+* Enhancement: Layer source specifications now feature an optional cell filter
+  that allows enabling or disabling cells on a per-layer (or per-group) basis
+* Bugfix: box drawn with Ctrl is not a square when snapping vertically to an edge
+* Enhancement: Compatibility with Python 3.15
+* Bugfix: Edges#moved and EdgePairs#move did not accept dy as a keyword argument
+* Various contributed bug fixes and enhancements included: 
+  PR #2447, PR #2452, PR #2455, PR #2463, PR #2464, PR #2465, PR #2470, 
+  PR #2472, PR #2473, PR #2474, PR #2476, PR #2477, PR #2480, PR #2486,
+  PR #2489, PR #2495, PR #2498, PR #2510 
+
 0.30.12          (2026-08-26):
 * Bugfix: %GITHUB%/issues/2434 Application crashes with Ruby PCell
 

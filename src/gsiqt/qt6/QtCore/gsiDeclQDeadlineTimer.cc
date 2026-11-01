@@ -35,12 +35,27 @@
 // -----------------------------------------------------------------------
 // class QDeadlineTimer
 
+//  Constructor QDeadlineTimer::QDeadlineTimer()
+
+
+static void _init_ctor_QDeadlineTimer_0 (qt_gsi::GenericStaticMethod *decl)
+{
+  decl->set_return_new<QDeadlineTimer> ();
+}
+
+static void _call_ctor_QDeadlineTimer_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QDeadlineTimer *> (new QDeadlineTimer ());
+}
+
+
 //  Constructor QDeadlineTimer::QDeadlineTimer(Qt::TimerType type_)
 
 
 static void _init_ctor_QDeadlineTimer_1680 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("type_", true, "Qt::CoarseTimer");
+  static gsi::ArgSpecBase argspec_0 ("type_");
   decl->add_arg<const qt_gsi::Converter<Qt::TimerType>::target_type & > (argspec_0);
   decl->set_return_new<QDeadlineTimer> ();
 }
@@ -49,7 +64,7 @@ static void _call_ctor_QDeadlineTimer_1680 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::TimerType>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::TimerType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::TimerType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::TimerType>(heap, Qt::CoarseTimer), heap);
+  const qt_gsi::Converter<Qt::TimerType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::TimerType>::target_type & >() (args, heap);
   ret.write<QDeadlineTimer *> (new QDeadlineTimer (qt_gsi::QtToCppAdaptor<Qt::TimerType>(arg1).cref()));
 }
 
@@ -466,6 +481,7 @@ namespace gsi
 
 static gsi::Methods methods_QDeadlineTimer () {
   gsi::Methods methods;
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDeadlineTimer::QDeadlineTimer()\nThis method creates an object of class QDeadlineTimer.", &_init_ctor_QDeadlineTimer_0, &_call_ctor_QDeadlineTimer_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDeadlineTimer::QDeadlineTimer(Qt::TimerType type_)\nThis method creates an object of class QDeadlineTimer.", &_init_ctor_QDeadlineTimer_1680, &_call_ctor_QDeadlineTimer_1680);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDeadlineTimer::QDeadlineTimer(QDeadlineTimer::ForeverConstant, Qt::TimerType type_)\nThis method creates an object of class QDeadlineTimer.", &_init_ctor_QDeadlineTimer_5079, &_call_ctor_QDeadlineTimer_5079);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDeadlineTimer::QDeadlineTimer(qint64 msecs, Qt::TimerType type)\nThis method creates an object of class QDeadlineTimer.", &_init_ctor_QDeadlineTimer_2558, &_call_ctor_QDeadlineTimer_2558);
@@ -512,14 +528,12 @@ namespace qt_gsi
 {
 
 static gsi::Enum<QDeadlineTimer::ForeverConstant> decl_QDeadlineTimer_ForeverConstant_Enum ("QtCore", "QDeadlineTimer_ForeverConstant",
-    gsi::enum_const ("Forever", QDeadlineTimer::Forever, "@brief Enum constant QDeadlineTimer::Forever"),
+    gsi::enum_const ("Forever", QDeadlineTimer::ForeverConstant::Forever, "@brief Enum constant QDeadlineTimer::ForeverConstant::Forever"),
   "@qt\n@brief This class represents the QDeadlineTimer::ForeverConstant enum");
 
 static gsi::QFlagsClass<QDeadlineTimer::ForeverConstant > decl_QDeadlineTimer_ForeverConstant_Enums ("QtCore", "QDeadlineTimer_QFlags_ForeverConstant",
   "@qt\n@brief This class represents the QFlags<QDeadlineTimer::ForeverConstant> flag set");
 
-//  Inject the declarations into the parent
-static gsi::ClassExt<QDeadlineTimer> inject_QDeadlineTimer_ForeverConstant_Enum_in_parent (decl_QDeadlineTimer_ForeverConstant_Enum.defs ());
 static gsi::ClassExt<QDeadlineTimer> decl_QDeadlineTimer_ForeverConstant_Enum_as_child (decl_QDeadlineTimer_ForeverConstant_Enum, "ForeverConstant");
 static gsi::ClassExt<QDeadlineTimer> decl_QDeadlineTimer_ForeverConstant_Enums_as_child (decl_QDeadlineTimer_ForeverConstant_Enums, "QFlags_ForeverConstant");
 

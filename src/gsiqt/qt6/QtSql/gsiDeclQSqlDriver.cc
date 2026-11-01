@@ -28,6 +28,7 @@
 */
 
 #include <QSqlDriver>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>
@@ -2164,7 +2165,8 @@ static gsi::Enum<QSqlDriver::DbmsType> decl_QSqlDriver_DbmsType_Enum ("QtSql", "
     gsi::enum_const ("Sybase", QSqlDriver::Sybase, "@brief Enum constant QSqlDriver::Sybase") +
     gsi::enum_const ("SQLite", QSqlDriver::SQLite, "@brief Enum constant QSqlDriver::SQLite") +
     gsi::enum_const ("Interbase", QSqlDriver::Interbase, "@brief Enum constant QSqlDriver::Interbase") +
-    gsi::enum_const ("DB2", QSqlDriver::DB2, "@brief Enum constant QSqlDriver::DB2"),
+    gsi::enum_const ("DB2", QSqlDriver::DB2, "@brief Enum constant QSqlDriver::DB2") +
+    gsi::enum_const ("MimerSQL", QSqlDriver::MimerSQL, "@brief Enum constant QSqlDriver::MimerSQL"),
   "@qt\n@brief This class represents the QSqlDriver::DbmsType enum");
 
 static gsi::QFlagsClass<QSqlDriver::DbmsType > decl_QSqlDriver_DbmsType_Enums ("QtSql", "QSqlDriver_QFlags_DbmsType",

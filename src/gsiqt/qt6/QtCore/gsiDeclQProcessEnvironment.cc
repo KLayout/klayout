@@ -56,6 +56,25 @@ static void _call_ctor_QProcessEnvironment_0 (const qt_gsi::GenericStaticMethod 
 }
 
 
+//  Constructor QProcessEnvironment::QProcessEnvironment(QProcessEnvironment::Initialization)
+
+
+static void _init_ctor_QProcessEnvironment_4021 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<const qt_gsi::Converter<QProcessEnvironment::Initialization>::target_type & > (argspec_0);
+  decl->set_return_new<QProcessEnvironment> ();
+}
+
+static void _call_ctor_QProcessEnvironment_4021 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QProcessEnvironment::Initialization>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QProcessEnvironment::Initialization>::target_type & >() (args, heap);
+  ret.write<QProcessEnvironment *> (new QProcessEnvironment (qt_gsi::QtToCppAdaptor<QProcessEnvironment::Initialization>(arg1).cref()));
+}
+
+
 //  Constructor QProcessEnvironment::QProcessEnvironment(const QProcessEnvironment &other)
 
 
@@ -107,6 +126,21 @@ static void _call_f_contains_c2025 (const qt_gsi::GenericMethod * /*decl*/, void
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QProcessEnvironment *)cls)->contains (arg1));
+}
+
+
+// bool QProcessEnvironment::inheritsFromParent()
+
+
+static void _init_f_inheritsFromParent_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_inheritsFromParent_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QProcessEnvironment *)cls)->inheritsFromParent ());
 }
 
 
@@ -301,9 +335,11 @@ namespace gsi
 static gsi::Methods methods_QProcessEnvironment () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QProcessEnvironment::QProcessEnvironment()\nThis method creates an object of class QProcessEnvironment.", &_init_ctor_QProcessEnvironment_0, &_call_ctor_QProcessEnvironment_0);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QProcessEnvironment::QProcessEnvironment(QProcessEnvironment::Initialization)\nThis method creates an object of class QProcessEnvironment.", &_init_ctor_QProcessEnvironment_4021, &_call_ctor_QProcessEnvironment_4021);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QProcessEnvironment::QProcessEnvironment(const QProcessEnvironment &other)\nThis method creates an object of class QProcessEnvironment.", &_init_ctor_QProcessEnvironment_3302, &_call_ctor_QProcessEnvironment_3302);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QProcessEnvironment::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
   methods += new qt_gsi::GenericMethod ("contains", "@brief Method bool QProcessEnvironment::contains(const QString &name)\n", true, &_init_f_contains_c2025, &_call_f_contains_c2025);
+  methods += new qt_gsi::GenericMethod ("inheritsFromParent", "@brief Method bool QProcessEnvironment::inheritsFromParent()\n", true, &_init_f_inheritsFromParent_c0, &_call_f_inheritsFromParent_c0);
   methods += new qt_gsi::GenericMethod ("insert", "@brief Method void QProcessEnvironment::insert(const QString &name, const QString &value)\n", false, &_init_f_insert_3942, &_call_f_insert_3942);
   methods += new qt_gsi::GenericMethod ("insert", "@brief Method void QProcessEnvironment::insert(const QProcessEnvironment &e)\n", false, &_init_f_insert_3302, &_call_f_insert_3302);
   methods += new qt_gsi::GenericMethod ("isEmpty?", "@brief Method bool QProcessEnvironment::isEmpty()\n", true, &_init_f_isEmpty_c0, &_call_f_isEmpty_c0);
@@ -326,6 +362,25 @@ gsi::Class<QProcessEnvironment> decl_QProcessEnvironment ("QtCore", "QProcessEnv
 
 
 GSI_QTCORE_PUBLIC gsi::Class<QProcessEnvironment> &qtdecl_QProcessEnvironment () { return decl_QProcessEnvironment; }
+
+}
+
+
+//  Implementation of the enum wrapper class for QProcessEnvironment::Initialization
+namespace qt_gsi
+{
+
+static gsi::Enum<QProcessEnvironment::Initialization> decl_QProcessEnvironment_Initialization_Enum ("QtCore", "QProcessEnvironment_Initialization",
+    gsi::enum_const ("InheritFromParent", QProcessEnvironment::InheritFromParent, "@brief Enum constant QProcessEnvironment::InheritFromParent"),
+  "@qt\n@brief This class represents the QProcessEnvironment::Initialization enum");
+
+static gsi::QFlagsClass<QProcessEnvironment::Initialization > decl_QProcessEnvironment_Initialization_Enums ("QtCore", "QProcessEnvironment_QFlags_Initialization",
+  "@qt\n@brief This class represents the QFlags<QProcessEnvironment::Initialization> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QProcessEnvironment> inject_QProcessEnvironment_Initialization_Enum_in_parent (decl_QProcessEnvironment_Initialization_Enum.defs ());
+static gsi::ClassExt<QProcessEnvironment> decl_QProcessEnvironment_Initialization_Enum_as_child (decl_QProcessEnvironment_Initialization_Enum, "Initialization");
+static gsi::ClassExt<QProcessEnvironment> decl_QProcessEnvironment_Initialization_Enums_as_child (decl_QProcessEnvironment_Initialization_Enums, "QFlags_Initialization");
 
 }
 

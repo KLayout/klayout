@@ -95,6 +95,51 @@ static void _call_ctor_QVideoFrameFormat_3005 (const qt_gsi::GenericStaticMethod
 }
 
 
+// QVideoFrameFormat::ColorRange QVideoFrameFormat::colorRange()
+
+
+static void _init_f_colorRange_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<qt_gsi::Converter<QVideoFrameFormat::ColorRange>::target_type > ();
+}
+
+static void _call_f_colorRange_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<qt_gsi::Converter<QVideoFrameFormat::ColorRange>::target_type > ((qt_gsi::Converter<QVideoFrameFormat::ColorRange>::target_type)qt_gsi::CppToQtAdaptor<QVideoFrameFormat::ColorRange>(((QVideoFrameFormat *)cls)->colorRange ()));
+}
+
+
+// QVideoFrameFormat::ColorSpace QVideoFrameFormat::colorSpace()
+
+
+static void _init_f_colorSpace_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<qt_gsi::Converter<QVideoFrameFormat::ColorSpace>::target_type > ();
+}
+
+static void _call_f_colorSpace_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<qt_gsi::Converter<QVideoFrameFormat::ColorSpace>::target_type > ((qt_gsi::Converter<QVideoFrameFormat::ColorSpace>::target_type)qt_gsi::CppToQtAdaptor<QVideoFrameFormat::ColorSpace>(((QVideoFrameFormat *)cls)->colorSpace ()));
+}
+
+
+// QVideoFrameFormat::ColorTransfer QVideoFrameFormat::colorTransfer()
+
+
+static void _init_f_colorTransfer_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<qt_gsi::Converter<QVideoFrameFormat::ColorTransfer>::target_type > ();
+}
+
+static void _call_f_colorTransfer_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<qt_gsi::Converter<QVideoFrameFormat::ColorTransfer>::target_type > ((qt_gsi::Converter<QVideoFrameFormat::ColorTransfer>::target_type)qt_gsi::CppToQtAdaptor<QVideoFrameFormat::ColorTransfer>(((QVideoFrameFormat *)cls)->colorTransfer ()));
+}
+
+
 // void QVideoFrameFormat::detach()
 
 
@@ -216,6 +261,21 @@ static void _call_f_isValid_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
+// float QVideoFrameFormat::maxLuminance()
+
+
+static void _init_f_maxLuminance_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<float > ();
+}
+
+static void _call_f_maxLuminance_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<float > ((float)((QVideoFrameFormat *)cls)->maxLuminance ());
+}
+
+
 // bool QVideoFrameFormat::operator!=(const QVideoFrameFormat &format)
 
 
@@ -318,6 +378,66 @@ static void _call_f_scanLineDirection_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
+// void QVideoFrameFormat::setColorRange(QVideoFrameFormat::ColorRange range)
+
+
+static void _init_f_setColorRange_3248 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("range");
+  decl->add_arg<const qt_gsi::Converter<QVideoFrameFormat::ColorRange>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setColorRange_3248 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QVideoFrameFormat::ColorRange>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QVideoFrameFormat::ColorRange>::target_type & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QVideoFrameFormat *)cls)->setColorRange (qt_gsi::QtToCppAdaptor<QVideoFrameFormat::ColorRange>(arg1).cref());
+}
+
+
+// void QVideoFrameFormat::setColorSpace(QVideoFrameFormat::ColorSpace colorSpace)
+
+
+static void _init_f_setColorSpace_3247 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("colorSpace");
+  decl->add_arg<const qt_gsi::Converter<QVideoFrameFormat::ColorSpace>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setColorSpace_3247 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QVideoFrameFormat::ColorSpace>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QVideoFrameFormat::ColorSpace>::target_type & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QVideoFrameFormat *)cls)->setColorSpace (qt_gsi::QtToCppAdaptor<QVideoFrameFormat::ColorSpace>(arg1).cref());
+}
+
+
+// void QVideoFrameFormat::setColorTransfer(QVideoFrameFormat::ColorTransfer colorTransfer)
+
+
+static void _init_f_setColorTransfer_3592 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("colorTransfer");
+  decl->add_arg<const qt_gsi::Converter<QVideoFrameFormat::ColorTransfer>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setColorTransfer_3592 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QVideoFrameFormat::ColorTransfer>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QVideoFrameFormat::ColorTransfer>::target_type & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QVideoFrameFormat *)cls)->setColorTransfer (qt_gsi::QtToCppAdaptor<QVideoFrameFormat::ColorTransfer>(arg1).cref());
+}
+
+
 // void QVideoFrameFormat::setFrameRate(double rate)
 
 
@@ -378,6 +498,26 @@ static void _call_f_setFrameSize_1426 (const qt_gsi::GenericMethod * /*decl*/, v
   int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoFrameFormat *)cls)->setFrameSize (arg1, arg2);
+}
+
+
+// void QVideoFrameFormat::setMaxLuminance(float lum)
+
+
+static void _init_f_setMaxLuminance_970 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("lum");
+  decl->add_arg<float > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setMaxLuminance_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QVideoFrameFormat *)cls)->setMaxLuminance (arg1);
 }
 
 
@@ -621,6 +761,9 @@ static gsi::Methods methods_QVideoFrameFormat () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QVideoFrameFormat::QVideoFrameFormat()\nThis method creates an object of class QVideoFrameFormat.", &_init_ctor_QVideoFrameFormat_0, &_call_ctor_QVideoFrameFormat_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QVideoFrameFormat::QVideoFrameFormat(const QSize &size, QVideoFrameFormat::PixelFormat pixelFormat)\nThis method creates an object of class QVideoFrameFormat.", &_init_ctor_QVideoFrameFormat_5072, &_call_ctor_QVideoFrameFormat_5072);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QVideoFrameFormat::QVideoFrameFormat(const QVideoFrameFormat &format)\nThis method creates an object of class QVideoFrameFormat.", &_init_ctor_QVideoFrameFormat_3005, &_call_ctor_QVideoFrameFormat_3005);
+  methods += new qt_gsi::GenericMethod ("colorRange", "@brief Method QVideoFrameFormat::ColorRange QVideoFrameFormat::colorRange()\n", true, &_init_f_colorRange_c0, &_call_f_colorRange_c0);
+  methods += new qt_gsi::GenericMethod ("colorSpace", "@brief Method QVideoFrameFormat::ColorSpace QVideoFrameFormat::colorSpace()\n", true, &_init_f_colorSpace_c0, &_call_f_colorSpace_c0);
+  methods += new qt_gsi::GenericMethod ("colorTransfer", "@brief Method QVideoFrameFormat::ColorTransfer QVideoFrameFormat::colorTransfer()\n", true, &_init_f_colorTransfer_c0, &_call_f_colorTransfer_c0);
   methods += new qt_gsi::GenericMethod ("detach", "@brief Method void QVideoFrameFormat::detach()\n", false, &_init_f_detach_0, &_call_f_detach_0);
   methods += new qt_gsi::GenericMethod ("fragmentShaderFileName", "@brief Method QString QVideoFrameFormat::fragmentShaderFileName()\n", true, &_init_f_fragmentShaderFileName_c0, &_call_f_fragmentShaderFileName_c0);
   methods += new qt_gsi::GenericMethod ("frameHeight", "@brief Method int QVideoFrameFormat::frameHeight()\n", true, &_init_f_frameHeight_c0, &_call_f_frameHeight_c0);
@@ -629,15 +772,20 @@ static gsi::Methods methods_QVideoFrameFormat () {
   methods += new qt_gsi::GenericMethod ("frameWidth", "@brief Method int QVideoFrameFormat::frameWidth()\n", true, &_init_f_frameWidth_c0, &_call_f_frameWidth_c0);
   methods += new qt_gsi::GenericMethod ("isMirrored?|:mirrored", "@brief Method bool QVideoFrameFormat::isMirrored()\n", true, &_init_f_isMirrored_c0, &_call_f_isMirrored_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QVideoFrameFormat::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
+  methods += new qt_gsi::GenericMethod ("maxLuminance", "@brief Method float QVideoFrameFormat::maxLuminance()\n", true, &_init_f_maxLuminance_c0, &_call_f_maxLuminance_c0);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QVideoFrameFormat::operator!=(const QVideoFrameFormat &format)\n", true, &_init_f_operator_excl__eq__c3005, &_call_f_operator_excl__eq__c3005);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QVideoFrameFormat &QVideoFrameFormat::operator=(const QVideoFrameFormat &format)\n", false, &_init_f_operator_eq__3005, &_call_f_operator_eq__3005);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QVideoFrameFormat::operator==(const QVideoFrameFormat &format)\n", true, &_init_f_operator_eq__eq__c3005, &_call_f_operator_eq__eq__c3005);
   methods += new qt_gsi::GenericMethod ("pixelFormat", "@brief Method QVideoFrameFormat::PixelFormat QVideoFrameFormat::pixelFormat()\n", true, &_init_f_pixelFormat_c0, &_call_f_pixelFormat_c0);
   methods += new qt_gsi::GenericMethod ("planeCount", "@brief Method int QVideoFrameFormat::planeCount()\n", true, &_init_f_planeCount_c0, &_call_f_planeCount_c0);
   methods += new qt_gsi::GenericMethod (":scanLineDirection", "@brief Method QVideoFrameFormat::Direction QVideoFrameFormat::scanLineDirection()\n", true, &_init_f_scanLineDirection_c0, &_call_f_scanLineDirection_c0);
+  methods += new qt_gsi::GenericMethod ("setColorRange", "@brief Method void QVideoFrameFormat::setColorRange(QVideoFrameFormat::ColorRange range)\n", false, &_init_f_setColorRange_3248, &_call_f_setColorRange_3248);
+  methods += new qt_gsi::GenericMethod ("setColorSpace", "@brief Method void QVideoFrameFormat::setColorSpace(QVideoFrameFormat::ColorSpace colorSpace)\n", false, &_init_f_setColorSpace_3247, &_call_f_setColorSpace_3247);
+  methods += new qt_gsi::GenericMethod ("setColorTransfer", "@brief Method void QVideoFrameFormat::setColorTransfer(QVideoFrameFormat::ColorTransfer colorTransfer)\n", false, &_init_f_setColorTransfer_3592, &_call_f_setColorTransfer_3592);
   methods += new qt_gsi::GenericMethod ("setFrameRate|frameRate=", "@brief Method void QVideoFrameFormat::setFrameRate(double rate)\n", false, &_init_f_setFrameRate_1071, &_call_f_setFrameRate_1071);
   methods += new qt_gsi::GenericMethod ("setFrameSize|frameSize=", "@brief Method void QVideoFrameFormat::setFrameSize(const QSize &size)\n", false, &_init_f_setFrameSize_1805, &_call_f_setFrameSize_1805);
   methods += new qt_gsi::GenericMethod ("setFrameSize", "@brief Method void QVideoFrameFormat::setFrameSize(int width, int height)\n", false, &_init_f_setFrameSize_1426, &_call_f_setFrameSize_1426);
+  methods += new qt_gsi::GenericMethod ("setMaxLuminance", "@brief Method void QVideoFrameFormat::setMaxLuminance(float lum)\n", false, &_init_f_setMaxLuminance_970, &_call_f_setMaxLuminance_970);
   methods += new qt_gsi::GenericMethod ("setMirrored|mirrored=", "@brief Method void QVideoFrameFormat::setMirrored(bool mirrored)\n", false, &_init_f_setMirrored_864, &_call_f_setMirrored_864);
   methods += new qt_gsi::GenericMethod ("setScanLineDirection|scanLineDirection=", "@brief Method void QVideoFrameFormat::setScanLineDirection(QVideoFrameFormat::Direction direction)\n", false, &_init_f_setScanLineDirection_3173, &_call_f_setScanLineDirection_3173);
   methods += new qt_gsi::GenericMethod ("setViewport|viewport=", "@brief Method void QVideoFrameFormat::setViewport(const QRect &viewport)\n", false, &_init_f_setViewport_1792, &_call_f_setViewport_1792);
@@ -659,6 +807,76 @@ gsi::Class<QVideoFrameFormat> decl_QVideoFrameFormat ("QtMultimedia", "QVideoFra
 
 
 GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QVideoFrameFormat> &qtdecl_QVideoFrameFormat () { return decl_QVideoFrameFormat; }
+
+}
+
+
+//  Implementation of the enum wrapper class for QVideoFrameFormat::ColorRange
+namespace qt_gsi
+{
+
+static gsi::Enum<QVideoFrameFormat::ColorRange> decl_QVideoFrameFormat_ColorRange_Enum ("QtMultimedia", "QVideoFrameFormat_ColorRange",
+    gsi::enum_const ("ColorRange_Unknown", QVideoFrameFormat::ColorRange_Unknown, "@brief Enum constant QVideoFrameFormat::ColorRange_Unknown") +
+    gsi::enum_const ("ColorRange_Video", QVideoFrameFormat::ColorRange_Video, "@brief Enum constant QVideoFrameFormat::ColorRange_Video") +
+    gsi::enum_const ("ColorRange_Full", QVideoFrameFormat::ColorRange_Full, "@brief Enum constant QVideoFrameFormat::ColorRange_Full"),
+  "@qt\n@brief This class represents the QVideoFrameFormat::ColorRange enum");
+
+static gsi::QFlagsClass<QVideoFrameFormat::ColorRange > decl_QVideoFrameFormat_ColorRange_Enums ("QtMultimedia", "QVideoFrameFormat_QFlags_ColorRange",
+  "@qt\n@brief This class represents the QFlags<QVideoFrameFormat::ColorRange> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QVideoFrameFormat> inject_QVideoFrameFormat_ColorRange_Enum_in_parent (decl_QVideoFrameFormat_ColorRange_Enum.defs ());
+static gsi::ClassExt<QVideoFrameFormat> decl_QVideoFrameFormat_ColorRange_Enum_as_child (decl_QVideoFrameFormat_ColorRange_Enum, "ColorRange");
+static gsi::ClassExt<QVideoFrameFormat> decl_QVideoFrameFormat_ColorRange_Enums_as_child (decl_QVideoFrameFormat_ColorRange_Enums, "QFlags_ColorRange");
+
+}
+
+
+//  Implementation of the enum wrapper class for QVideoFrameFormat::ColorSpace
+namespace qt_gsi
+{
+
+static gsi::Enum<QVideoFrameFormat::ColorSpace> decl_QVideoFrameFormat_ColorSpace_Enum ("QtMultimedia", "QVideoFrameFormat_ColorSpace",
+    gsi::enum_const ("ColorSpace_Undefined", QVideoFrameFormat::ColorSpace_Undefined, "@brief Enum constant QVideoFrameFormat::ColorSpace_Undefined") +
+    gsi::enum_const ("ColorSpace_BT601", QVideoFrameFormat::ColorSpace_BT601, "@brief Enum constant QVideoFrameFormat::ColorSpace_BT601") +
+    gsi::enum_const ("ColorSpace_BT709", QVideoFrameFormat::ColorSpace_BT709, "@brief Enum constant QVideoFrameFormat::ColorSpace_BT709") +
+    gsi::enum_const ("ColorSpace_AdobeRgb", QVideoFrameFormat::ColorSpace_AdobeRgb, "@brief Enum constant QVideoFrameFormat::ColorSpace_AdobeRgb") +
+    gsi::enum_const ("ColorSpace_BT2020", QVideoFrameFormat::ColorSpace_BT2020, "@brief Enum constant QVideoFrameFormat::ColorSpace_BT2020"),
+  "@qt\n@brief This class represents the QVideoFrameFormat::ColorSpace enum");
+
+static gsi::QFlagsClass<QVideoFrameFormat::ColorSpace > decl_QVideoFrameFormat_ColorSpace_Enums ("QtMultimedia", "QVideoFrameFormat_QFlags_ColorSpace",
+  "@qt\n@brief This class represents the QFlags<QVideoFrameFormat::ColorSpace> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QVideoFrameFormat> inject_QVideoFrameFormat_ColorSpace_Enum_in_parent (decl_QVideoFrameFormat_ColorSpace_Enum.defs ());
+static gsi::ClassExt<QVideoFrameFormat> decl_QVideoFrameFormat_ColorSpace_Enum_as_child (decl_QVideoFrameFormat_ColorSpace_Enum, "ColorSpace");
+static gsi::ClassExt<QVideoFrameFormat> decl_QVideoFrameFormat_ColorSpace_Enums_as_child (decl_QVideoFrameFormat_ColorSpace_Enums, "QFlags_ColorSpace");
+
+}
+
+
+//  Implementation of the enum wrapper class for QVideoFrameFormat::ColorTransfer
+namespace qt_gsi
+{
+
+static gsi::Enum<QVideoFrameFormat::ColorTransfer> decl_QVideoFrameFormat_ColorTransfer_Enum ("QtMultimedia", "QVideoFrameFormat_ColorTransfer",
+    gsi::enum_const ("ColorTransfer_Unknown", QVideoFrameFormat::ColorTransfer_Unknown, "@brief Enum constant QVideoFrameFormat::ColorTransfer_Unknown") +
+    gsi::enum_const ("ColorTransfer_BT709", QVideoFrameFormat::ColorTransfer_BT709, "@brief Enum constant QVideoFrameFormat::ColorTransfer_BT709") +
+    gsi::enum_const ("ColorTransfer_BT601", QVideoFrameFormat::ColorTransfer_BT601, "@brief Enum constant QVideoFrameFormat::ColorTransfer_BT601") +
+    gsi::enum_const ("ColorTransfer_Linear", QVideoFrameFormat::ColorTransfer_Linear, "@brief Enum constant QVideoFrameFormat::ColorTransfer_Linear") +
+    gsi::enum_const ("ColorTransfer_Gamma22", QVideoFrameFormat::ColorTransfer_Gamma22, "@brief Enum constant QVideoFrameFormat::ColorTransfer_Gamma22") +
+    gsi::enum_const ("ColorTransfer_Gamma28", QVideoFrameFormat::ColorTransfer_Gamma28, "@brief Enum constant QVideoFrameFormat::ColorTransfer_Gamma28") +
+    gsi::enum_const ("ColorTransfer_ST2084", QVideoFrameFormat::ColorTransfer_ST2084, "@brief Enum constant QVideoFrameFormat::ColorTransfer_ST2084") +
+    gsi::enum_const ("ColorTransfer_STD_B67", QVideoFrameFormat::ColorTransfer_STD_B67, "@brief Enum constant QVideoFrameFormat::ColorTransfer_STD_B67"),
+  "@qt\n@brief This class represents the QVideoFrameFormat::ColorTransfer enum");
+
+static gsi::QFlagsClass<QVideoFrameFormat::ColorTransfer > decl_QVideoFrameFormat_ColorTransfer_Enums ("QtMultimedia", "QVideoFrameFormat_QFlags_ColorTransfer",
+  "@qt\n@brief This class represents the QFlags<QVideoFrameFormat::ColorTransfer> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QVideoFrameFormat> inject_QVideoFrameFormat_ColorTransfer_Enum_in_parent (decl_QVideoFrameFormat_ColorTransfer_Enum.defs ());
+static gsi::ClassExt<QVideoFrameFormat> decl_QVideoFrameFormat_ColorTransfer_Enum_as_child (decl_QVideoFrameFormat_ColorTransfer_Enum, "ColorTransfer");
+static gsi::ClassExt<QVideoFrameFormat> decl_QVideoFrameFormat_ColorTransfer_Enums_as_child (decl_QVideoFrameFormat_ColorTransfer_Enums, "QFlags_ColorTransfer");
 
 }
 
@@ -718,7 +936,8 @@ static gsi::Enum<QVideoFrameFormat::PixelFormat> decl_QVideoFrameFormat_PixelFor
     gsi::enum_const ("Format_P016", QVideoFrameFormat::Format_P016, "@brief Enum constant QVideoFrameFormat::Format_P016") +
     gsi::enum_const ("Format_SamplerExternalOES", QVideoFrameFormat::Format_SamplerExternalOES, "@brief Enum constant QVideoFrameFormat::Format_SamplerExternalOES") +
     gsi::enum_const ("Format_Jpeg", QVideoFrameFormat::Format_Jpeg, "@brief Enum constant QVideoFrameFormat::Format_Jpeg") +
-    gsi::enum_const ("Format_SamplerRect", QVideoFrameFormat::Format_SamplerRect, "@brief Enum constant QVideoFrameFormat::Format_SamplerRect"),
+    gsi::enum_const ("Format_SamplerRect", QVideoFrameFormat::Format_SamplerRect, "@brief Enum constant QVideoFrameFormat::Format_SamplerRect") +
+    gsi::enum_const ("Format_YUV420P10", QVideoFrameFormat::Format_YUV420P10, "@brief Enum constant QVideoFrameFormat::Format_YUV420P10"),
   "@qt\n@brief This class represents the QVideoFrameFormat::PixelFormat enum");
 
 static gsi::QFlagsClass<QVideoFrameFormat::PixelFormat > decl_QVideoFrameFormat_PixelFormat_Enums ("QtMultimedia", "QVideoFrameFormat_QFlags_PixelFormat",
@@ -742,7 +961,8 @@ static gsi::Enum<QVideoFrameFormat::YCbCrColorSpace> decl_QVideoFrameFormat_YCbC
     gsi::enum_const ("YCbCr_BT709", QVideoFrameFormat::YCbCr_BT709, "@brief Enum constant QVideoFrameFormat::YCbCr_BT709") +
     gsi::enum_const ("YCbCr_xvYCC601", QVideoFrameFormat::YCbCr_xvYCC601, "@brief Enum constant QVideoFrameFormat::YCbCr_xvYCC601") +
     gsi::enum_const ("YCbCr_xvYCC709", QVideoFrameFormat::YCbCr_xvYCC709, "@brief Enum constant QVideoFrameFormat::YCbCr_xvYCC709") +
-    gsi::enum_const ("YCbCr_JPEG", QVideoFrameFormat::YCbCr_JPEG, "@brief Enum constant QVideoFrameFormat::YCbCr_JPEG"),
+    gsi::enum_const ("YCbCr_JPEG", QVideoFrameFormat::YCbCr_JPEG, "@brief Enum constant QVideoFrameFormat::YCbCr_JPEG") +
+    gsi::enum_const ("YCbCr_BT2020", QVideoFrameFormat::YCbCr_BT2020, "@brief Enum constant QVideoFrameFormat::YCbCr_BT2020"),
   "@qt\n@brief This class represents the QVideoFrameFormat::YCbCrColorSpace enum");
 
 static gsi::QFlagsClass<QVideoFrameFormat::YCbCrColorSpace > decl_QVideoFrameFormat_YCbCrColorSpace_Enums ("QtMultimedia", "QVideoFrameFormat_QFlags_YCbCrColorSpace",

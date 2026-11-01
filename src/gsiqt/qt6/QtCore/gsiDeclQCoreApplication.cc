@@ -31,6 +31,7 @@
 #include <QAbstractEventDispatcher>
 #include <QAbstractNativeEventFilter>
 #include <QTranslator>
+#include <QPermission>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
 #include <memory>
@@ -48,6 +49,25 @@ static void _init_smo (qt_gsi::GenericStaticMethod *decl)
 static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, gsi::SerialArgs &ret) 
 {
   ret.write<const QMetaObject &> (QCoreApplication::staticMetaObject);
+}
+
+
+// Qt::PermissionStatus QCoreApplication::checkPermission(const QPermission &permission)
+
+
+static void _init_f_checkPermission_2459 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("permission");
+  decl->add_arg<const QPermission & > (argspec_0);
+  decl->set_return<qt_gsi::Converter<Qt::PermissionStatus>::target_type > ();
+}
+
+static void _call_f_checkPermission_2459 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QPermission &arg1 = gsi::arg_reader<const QPermission & >() (args, heap);
+  ret.write<qt_gsi::Converter<Qt::PermissionStatus>::target_type > ((qt_gsi::Converter<Qt::PermissionStatus>::target_type)qt_gsi::CppToQtAdaptor<Qt::PermissionStatus>(((QCoreApplication *)cls)->checkPermission (arg1)));
 }
 
 
@@ -844,6 +864,7 @@ namespace gsi
 static gsi::Methods methods_QCoreApplication () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
+  methods += new qt_gsi::GenericMethod ("checkPermission", "@brief Method Qt::PermissionStatus QCoreApplication::checkPermission(const QPermission &permission)\n", false, &_init_f_checkPermission_2459, &_call_f_checkPermission_2459);
   methods += new qt_gsi::GenericMethod ("installNativeEventFilter", "@brief Method void QCoreApplication::installNativeEventFilter(QAbstractNativeEventFilter *filterObj)\n", false, &_init_f_installNativeEventFilter_3266, &_call_f_installNativeEventFilter_3266);
   methods += new qt_gsi::GenericMethod ("removeNativeEventFilter", "@brief Method void QCoreApplication::removeNativeEventFilter(QAbstractNativeEventFilter *filterObj)\n", false, &_init_f_removeNativeEventFilter_3266, &_call_f_removeNativeEventFilter_3266);
   methods += gsi::qt_signal ("aboutToQuit()", "aboutToQuit", "@brief Signal declaration for QCoreApplication::aboutToQuit()\nYou can bind a procedure to this signal.");

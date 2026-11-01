@@ -28,6 +28,7 @@
 */
 
 #include <QStyleHints>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>
@@ -51,6 +52,41 @@ static void _init_smo (qt_gsi::GenericStaticMethod *decl)
 static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, gsi::SerialArgs &ret) 
 {
   ret.write<const QMetaObject &> (QStyleHints::staticMetaObject);
+}
+
+
+// Qt::ColorScheme QStyleHints::colorScheme()
+
+
+static void _init_f_colorScheme_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<qt_gsi::Converter<Qt::ColorScheme>::target_type > ();
+}
+
+static void _call_f_colorScheme_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<qt_gsi::Converter<Qt::ColorScheme>::target_type > ((qt_gsi::Converter<Qt::ColorScheme>::target_type)qt_gsi::CppToQtAdaptor<Qt::ColorScheme>(((QStyleHints *)cls)->colorScheme ()));
+}
+
+
+// void QStyleHints::colorSchemeChanged(Qt::ColorScheme colorScheme)
+
+
+static void _init_f_colorSchemeChanged_1857 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("colorScheme");
+  decl->add_arg<const qt_gsi::Converter<Qt::ColorScheme>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_colorSchemeChanged_1857 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<Qt::ColorScheme>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::ColorScheme>::target_type & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QStyleHints *)cls)->colorSchemeChanged (qt_gsi::QtToCppAdaptor<Qt::ColorScheme>(arg1).cref());
 }
 
 
@@ -96,6 +132,21 @@ static void _call_f_keyboardAutoRepeatRate_c0 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<int > ((int)((QStyleHints *)cls)->keyboardAutoRepeatRate ());
+}
+
+
+// double QStyleHints::keyboardAutoRepeatRateF()
+
+
+static void _init_f_keyboardAutoRepeatRateF_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<double > ();
+}
+
+static void _call_f_keyboardAutoRepeatRateF_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<double > ((double)((QStyleHints *)cls)->keyboardAutoRepeatRateF ());
 }
 
 
@@ -650,9 +701,12 @@ namespace gsi
 static gsi::Methods methods_QStyleHints () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
+  methods += new qt_gsi::GenericMethod ("colorScheme", "@brief Method Qt::ColorScheme QStyleHints::colorScheme()\n", true, &_init_f_colorScheme_c0, &_call_f_colorScheme_c0);
+  methods += new qt_gsi::GenericMethod ("colorSchemeChanged", "@brief Method void QStyleHints::colorSchemeChanged(Qt::ColorScheme colorScheme)\n", false, &_init_f_colorSchemeChanged_1857, &_call_f_colorSchemeChanged_1857);
   methods += new qt_gsi::GenericMethod (":cursorFlashTime", "@brief Method int QStyleHints::cursorFlashTime()\n", true, &_init_f_cursorFlashTime_c0, &_call_f_cursorFlashTime_c0);
   methods += new qt_gsi::GenericMethod (":fontSmoothingGamma", "@brief Method double QStyleHints::fontSmoothingGamma()\n", true, &_init_f_fontSmoothingGamma_c0, &_call_f_fontSmoothingGamma_c0);
   methods += new qt_gsi::GenericMethod (":keyboardAutoRepeatRate", "@brief Method int QStyleHints::keyboardAutoRepeatRate()\n", true, &_init_f_keyboardAutoRepeatRate_c0, &_call_f_keyboardAutoRepeatRate_c0);
+  methods += new qt_gsi::GenericMethod ("keyboardAutoRepeatRateF", "@brief Method double QStyleHints::keyboardAutoRepeatRateF()\n", true, &_init_f_keyboardAutoRepeatRateF_c0, &_call_f_keyboardAutoRepeatRateF_c0);
   methods += new qt_gsi::GenericMethod (":keyboardInputInterval", "@brief Method int QStyleHints::keyboardInputInterval()\n", true, &_init_f_keyboardInputInterval_c0, &_call_f_keyboardInputInterval_c0);
   methods += new qt_gsi::GenericMethod (":mouseDoubleClickDistance", "@brief Method int QStyleHints::mouseDoubleClickDistance()\n", true, &_init_f_mouseDoubleClickDistance_c0, &_call_f_mouseDoubleClickDistance_c0);
   methods += new qt_gsi::GenericMethod (":mouseDoubleClickInterval", "@brief Method int QStyleHints::mouseDoubleClickInterval()\n", true, &_init_f_mouseDoubleClickInterval_c0, &_call_f_mouseDoubleClickInterval_c0);

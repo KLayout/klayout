@@ -38,6 +38,48 @@
 class Qt_Namespace { };
 
 
+//  Implementation of the enum wrapper class for Qt::ToolBarAreaSizes
+namespace qt_gsi
+{
+
+static gsi::Enum<Qt::ToolBarAreaSizes> decl_Qt_ToolBarAreaSizes_Enum ("QtCore", "Qt_ToolBarAreaSizes",
+    gsi::enum_const ("NToolBarAreas", Qt::NToolBarAreas, "@brief Enum constant Qt::NToolBarAreas"),
+  "@qt\n@brief This class represents the Qt::ToolBarAreaSizes enum");
+
+static gsi::QFlagsClass<Qt::ToolBarAreaSizes > decl_Qt_ToolBarAreaSizes_Enums ("QtCore", "Qt_QFlags_ToolBarAreaSizes",
+  "@qt\n@brief This class represents the QFlags<Qt::ToolBarAreaSizes> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<Qt_Namespace> inject_Qt_ToolBarAreaSizes_Enum_in_parent (decl_Qt_ToolBarAreaSizes_Enum.defs ());
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolBarAreaSizes_Enum_as_child (decl_Qt_ToolBarAreaSizes_Enum, "ToolBarAreaSizes");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolBarAreaSizes_Enums_as_child (decl_Qt_ToolBarAreaSizes_Enums, "QFlags_ToolBarAreaSizes");
+
+}
+
+
+//  Implementation of the enum wrapper class for Qt::ToolButtonStyle
+namespace qt_gsi
+{
+
+static gsi::Enum<Qt::ToolButtonStyle> decl_Qt_ToolButtonStyle_Enum ("QtCore", "Qt_ToolButtonStyle",
+    gsi::enum_const ("ToolButtonIconOnly", Qt::ToolButtonIconOnly, "@brief Enum constant Qt::ToolButtonIconOnly") +
+    gsi::enum_const ("ToolButtonTextOnly", Qt::ToolButtonTextOnly, "@brief Enum constant Qt::ToolButtonTextOnly") +
+    gsi::enum_const ("ToolButtonTextBesideIcon", Qt::ToolButtonTextBesideIcon, "@brief Enum constant Qt::ToolButtonTextBesideIcon") +
+    gsi::enum_const ("ToolButtonTextUnderIcon", Qt::ToolButtonTextUnderIcon, "@brief Enum constant Qt::ToolButtonTextUnderIcon") +
+    gsi::enum_const ("ToolButtonFollowStyle", Qt::ToolButtonFollowStyle, "@brief Enum constant Qt::ToolButtonFollowStyle"),
+  "@qt\n@brief This class represents the Qt::ToolButtonStyle enum");
+
+static gsi::QFlagsClass<Qt::ToolButtonStyle > decl_Qt_ToolButtonStyle_Enums ("QtCore", "Qt_QFlags_ToolButtonStyle",
+  "@qt\n@brief This class represents the QFlags<Qt::ToolButtonStyle> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<Qt_Namespace> inject_Qt_ToolButtonStyle_Enum_in_parent (decl_Qt_ToolButtonStyle_Enum.defs ());
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolButtonStyle_Enum_as_child (decl_Qt_ToolButtonStyle_Enum, "ToolButtonStyle");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolButtonStyle_Enums_as_child (decl_Qt_ToolButtonStyle_Enums, "QFlags_ToolButtonStyle");
+
+}
+
+
 //  Implementation of the enum wrapper class for Qt::TouchPointState
 namespace qt_gsi
 {

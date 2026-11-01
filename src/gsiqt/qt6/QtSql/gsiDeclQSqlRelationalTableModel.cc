@@ -28,6 +28,7 @@
 */
 
 #include <QSqlRelationalTableModel>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QDataStream>
 #include <QEvent>
@@ -340,7 +341,7 @@ static gsi::Methods methods_QSqlRelationalTableModel () {
   methods += gsi::qt_signal<const QModelIndex &, int, int, const QModelIndex &, int > ("columnsAboutToBeMoved(const QModelIndex &, int, int, const QModelIndex &, int)", "columnsAboutToBeMoved", gsi::arg("sourceParent"), gsi::arg("sourceStart"), gsi::arg("sourceEnd"), gsi::arg("destinationParent"), gsi::arg("destinationColumn"), "@brief Signal declaration for QSqlRelationalTableModel::columnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QModelIndex &, int, int > ("columnsAboutToBeRemoved(const QModelIndex &, int, int)", "columnsAboutToBeRemoved", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QSqlRelationalTableModel::columnsAboutToBeRemoved(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QModelIndex &, int, int > ("columnsInserted(const QModelIndex &, int, int)", "columnsInserted", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QSqlRelationalTableModel::columnsInserted(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
-  methods += gsi::qt_signal<const QModelIndex &, int, int, const QModelIndex &, int > ("columnsMoved(const QModelIndex &, int, int, const QModelIndex &, int)", "columnsMoved", gsi::arg("parent"), gsi::arg("start"), gsi::arg("end"), gsi::arg("destination"), gsi::arg("column"), "@brief Signal declaration for QSqlRelationalTableModel::columnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int, const QModelIndex &, int > ("columnsMoved(const QModelIndex &, int, int, const QModelIndex &, int)", "columnsMoved", gsi::arg("sourceParent"), gsi::arg("sourceStart"), gsi::arg("sourceEnd"), gsi::arg("destinationParent"), gsi::arg("destinationColumn"), "@brief Signal declaration for QSqlRelationalTableModel::columnsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QModelIndex &, int, int > ("columnsRemoved(const QModelIndex &, int, int)", "columnsRemoved", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QSqlRelationalTableModel::columnsRemoved(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QModelIndex &, const QModelIndex &, const QList<int> & > ("dataChanged(const QModelIndex &, const QModelIndex &, const QList<int> &)", "dataChanged", gsi::arg("topLeft"), gsi::arg("bottomRight"), gsi::arg("roles"), "@brief Signal declaration for QSqlRelationalTableModel::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QSqlRelationalTableModel::destroyed(QObject *)\nYou can bind a procedure to this signal.");
@@ -355,7 +356,7 @@ static gsi::Methods methods_QSqlRelationalTableModel () {
   methods += gsi::qt_signal<const QModelIndex &, int, int, const QModelIndex &, int > ("rowsAboutToBeMoved(const QModelIndex &, int, int, const QModelIndex &, int)", "rowsAboutToBeMoved", gsi::arg("sourceParent"), gsi::arg("sourceStart"), gsi::arg("sourceEnd"), gsi::arg("destinationParent"), gsi::arg("destinationRow"), "@brief Signal declaration for QSqlRelationalTableModel::rowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QModelIndex &, int, int > ("rowsAboutToBeRemoved(const QModelIndex &, int, int)", "rowsAboutToBeRemoved", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QSqlRelationalTableModel::rowsAboutToBeRemoved(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QModelIndex &, int, int > ("rowsInserted(const QModelIndex &, int, int)", "rowsInserted", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QSqlRelationalTableModel::rowsInserted(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
-  methods += gsi::qt_signal<const QModelIndex &, int, int, const QModelIndex &, int > ("rowsMoved(const QModelIndex &, int, int, const QModelIndex &, int)", "rowsMoved", gsi::arg("parent"), gsi::arg("start"), gsi::arg("end"), gsi::arg("destination"), gsi::arg("row"), "@brief Signal declaration for QSqlRelationalTableModel::rowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int, const QModelIndex &, int > ("rowsMoved(const QModelIndex &, int, int, const QModelIndex &, int)", "rowsMoved", gsi::arg("sourceParent"), gsi::arg("sourceStart"), gsi::arg("sourceEnd"), gsi::arg("destinationParent"), gsi::arg("destinationRow"), "@brief Signal declaration for QSqlRelationalTableModel::rowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QModelIndex &, int, int > ("rowsRemoved(const QModelIndex &, int, int)", "rowsRemoved", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QSqlRelationalTableModel::rowsRemoved(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QSqlRelationalTableModel::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
@@ -536,11 +537,6 @@ public:
     QSqlRelationalTableModel::setPrimaryKey(key);
   }
 
-  //  [expose] void QSqlRelationalTableModel::setQuery(const QSqlQuery &query)
-  void fp_QSqlRelationalTableModel_setQuery_2232 (const QSqlQuery &query) {
-    QSqlRelationalTableModel::setQuery(query);
-  }
-
   //  [emitter impl] void QSqlRelationalTableModel::beforeDelete(int row)
   void emitter_QSqlRelationalTableModel_beforeDelete_767(int row)
   {
@@ -687,15 +683,15 @@ public:
     throw tl::Exception ("Can't emit private signal 'void QSqlRelationalTableModel::columnsInserted(const QModelIndex &parent, int first, int last)'");
   }
 
-  //  [emitter impl] void QSqlRelationalTableModel::columnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)
-  void emitter_QSqlRelationalTableModel_columnsMoved_10318(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)
+  //  [emitter impl] void QSqlRelationalTableModel::columnsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)
+  void emitter_QSqlRelationalTableModel_columnsMoved_10318(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)
   {
-    __SUPPRESS_UNUSED_WARNING (parent);
-    __SUPPRESS_UNUSED_WARNING (start);
-    __SUPPRESS_UNUSED_WARNING (end);
-    __SUPPRESS_UNUSED_WARNING (destination);
-    __SUPPRESS_UNUSED_WARNING (column);
-    throw tl::Exception ("Can't emit private signal 'void QSqlRelationalTableModel::columnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)'");
+    __SUPPRESS_UNUSED_WARNING (sourceParent);
+    __SUPPRESS_UNUSED_WARNING (sourceStart);
+    __SUPPRESS_UNUSED_WARNING (sourceEnd);
+    __SUPPRESS_UNUSED_WARNING (destinationParent);
+    __SUPPRESS_UNUSED_WARNING (destinationColumn);
+    throw tl::Exception ("Can't emit private signal 'void QSqlRelationalTableModel::columnsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)'");
   }
 
   //  [emitter impl] void QSqlRelationalTableModel::columnsRemoved(const QModelIndex &parent, int first, int last)
@@ -1160,15 +1156,15 @@ public:
     throw tl::Exception ("Can't emit private signal 'void QSqlRelationalTableModel::rowsInserted(const QModelIndex &parent, int first, int last)'");
   }
 
-  //  [emitter impl] void QSqlRelationalTableModel::rowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)
-  void emitter_QSqlRelationalTableModel_rowsMoved_10318(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)
+  //  [emitter impl] void QSqlRelationalTableModel::rowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)
+  void emitter_QSqlRelationalTableModel_rowsMoved_10318(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)
   {
-    __SUPPRESS_UNUSED_WARNING (parent);
-    __SUPPRESS_UNUSED_WARNING (start);
-    __SUPPRESS_UNUSED_WARNING (end);
-    __SUPPRESS_UNUSED_WARNING (destination);
-    __SUPPRESS_UNUSED_WARNING (row);
-    throw tl::Exception ("Can't emit private signal 'void QSqlRelationalTableModel::rowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)'");
+    __SUPPRESS_UNUSED_WARNING (sourceParent);
+    __SUPPRESS_UNUSED_WARNING (sourceStart);
+    __SUPPRESS_UNUSED_WARNING (sourceEnd);
+    __SUPPRESS_UNUSED_WARNING (destinationParent);
+    __SUPPRESS_UNUSED_WARNING (destinationRow);
+    throw tl::Exception ("Can't emit private signal 'void QSqlRelationalTableModel::rowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)'");
   }
 
   //  [emitter impl] void QSqlRelationalTableModel::rowsRemoved(const QModelIndex &parent, int first, int last)
@@ -2232,19 +2228,19 @@ static void _call_emitter_columnsInserted_7372 (const qt_gsi::GenericMethod * /*
 }
 
 
-// emitter void QSqlRelationalTableModel::columnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)
+// emitter void QSqlRelationalTableModel::columnsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)
 
 static void _init_emitter_columnsMoved_10318 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent");
+  static gsi::ArgSpecBase argspec_0 ("sourceParent");
   decl->add_arg<const QModelIndex & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("start");
+  static gsi::ArgSpecBase argspec_1 ("sourceStart");
   decl->add_arg<int > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("end");
+  static gsi::ArgSpecBase argspec_2 ("sourceEnd");
   decl->add_arg<int > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("destination");
+  static gsi::ArgSpecBase argspec_3 ("destinationParent");
   decl->add_arg<const QModelIndex & > (argspec_3);
-  static gsi::ArgSpecBase argspec_4 ("column");
+  static gsi::ArgSpecBase argspec_4 ("destinationColumn");
   decl->add_arg<int > (argspec_4);
   decl->set_return<void > ();
 }
@@ -3646,19 +3642,19 @@ static void _call_emitter_rowsInserted_7372 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// emitter void QSqlRelationalTableModel::rowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)
+// emitter void QSqlRelationalTableModel::rowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)
 
 static void _init_emitter_rowsMoved_10318 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent");
+  static gsi::ArgSpecBase argspec_0 ("sourceParent");
   decl->add_arg<const QModelIndex & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("start");
+  static gsi::ArgSpecBase argspec_1 ("sourceStart");
   decl->add_arg<int > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("end");
+  static gsi::ArgSpecBase argspec_2 ("sourceEnd");
   decl->add_arg<int > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("destination");
+  static gsi::ArgSpecBase argspec_3 ("destinationParent");
   decl->add_arg<const QModelIndex & > (argspec_3);
-  static gsi::ArgSpecBase argspec_4 ("row");
+  static gsi::ArgSpecBase argspec_4 ("destinationRow");
   decl->add_arg<int > (argspec_4);
   decl->set_return<void > ();
 }
@@ -3959,25 +3955,6 @@ static void _call_fp_setPrimaryKey_2202 (const qt_gsi::GenericMethod * /*decl*/,
   const QSqlIndex &arg1 = gsi::arg_reader<const QSqlIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlRelationalTableModel_Adaptor *)cls)->fp_QSqlRelationalTableModel_setPrimaryKey_2202 (arg1);
-}
-
-
-// exposed void QSqlRelationalTableModel::setQuery(const QSqlQuery &query)
-
-static void _init_fp_setQuery_2232 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("query");
-  decl->add_arg<const QSqlQuery & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_fp_setQuery_2232 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QSqlQuery &arg1 = gsi::arg_reader<const QSqlQuery & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSqlRelationalTableModel_Adaptor *)cls)->fp_QSqlRelationalTableModel_setQuery_2232 (arg1);
 }
 
 
@@ -4283,7 +4260,7 @@ static gsi::Methods methods_QSqlRelationalTableModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_columnsAboutToBeMoved", "@brief Emitter for signal void QSqlRelationalTableModel::columnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)\nCall this method to emit this signal.", false, &_init_emitter_columnsAboutToBeMoved_10318, &_call_emitter_columnsAboutToBeMoved_10318);
   methods += new qt_gsi::GenericMethod ("emit_columnsAboutToBeRemoved", "@brief Emitter for signal void QSqlRelationalTableModel::columnsAboutToBeRemoved(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_columnsAboutToBeRemoved_7372, &_call_emitter_columnsAboutToBeRemoved_7372);
   methods += new qt_gsi::GenericMethod ("emit_columnsInserted", "@brief Emitter for signal void QSqlRelationalTableModel::columnsInserted(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_columnsInserted_7372, &_call_emitter_columnsInserted_7372);
-  methods += new qt_gsi::GenericMethod ("emit_columnsMoved", "@brief Emitter for signal void QSqlRelationalTableModel::columnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)\nCall this method to emit this signal.", false, &_init_emitter_columnsMoved_10318, &_call_emitter_columnsMoved_10318);
+  methods += new qt_gsi::GenericMethod ("emit_columnsMoved", "@brief Emitter for signal void QSqlRelationalTableModel::columnsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)\nCall this method to emit this signal.", false, &_init_emitter_columnsMoved_10318, &_call_emitter_columnsMoved_10318);
   methods += new qt_gsi::GenericMethod ("emit_columnsRemoved", "@brief Emitter for signal void QSqlRelationalTableModel::columnsRemoved(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_columnsRemoved_7372, &_call_emitter_columnsRemoved_7372);
   methods += new qt_gsi::GenericMethod ("*createIndex", "@brief Method QModelIndex QSqlRelationalTableModel::createIndex(int row, int column, const void *data)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_createIndex_c3069, &_call_fp_createIndex_c3069);
   methods += new qt_gsi::GenericMethod ("*createIndex", "@brief Method QModelIndex QSqlRelationalTableModel::createIndex(int row, int column, quintptr id)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_createIndex_c2657, &_call_fp_createIndex_c2657);
@@ -4377,7 +4354,7 @@ static gsi::Methods methods_QSqlRelationalTableModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_rowsAboutToBeMoved", "@brief Emitter for signal void QSqlRelationalTableModel::rowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)\nCall this method to emit this signal.", false, &_init_emitter_rowsAboutToBeMoved_10318, &_call_emitter_rowsAboutToBeMoved_10318);
   methods += new qt_gsi::GenericMethod ("emit_rowsAboutToBeRemoved", "@brief Emitter for signal void QSqlRelationalTableModel::rowsAboutToBeRemoved(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_rowsAboutToBeRemoved_7372, &_call_emitter_rowsAboutToBeRemoved_7372);
   methods += new qt_gsi::GenericMethod ("emit_rowsInserted", "@brief Emitter for signal void QSqlRelationalTableModel::rowsInserted(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_rowsInserted_7372, &_call_emitter_rowsInserted_7372);
-  methods += new qt_gsi::GenericMethod ("emit_rowsMoved", "@brief Emitter for signal void QSqlRelationalTableModel::rowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)\nCall this method to emit this signal.", false, &_init_emitter_rowsMoved_10318, &_call_emitter_rowsMoved_10318);
+  methods += new qt_gsi::GenericMethod ("emit_rowsMoved", "@brief Emitter for signal void QSqlRelationalTableModel::rowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)\nCall this method to emit this signal.", false, &_init_emitter_rowsMoved_10318, &_call_emitter_rowsMoved_10318);
   methods += new qt_gsi::GenericMethod ("emit_rowsRemoved", "@brief Emitter for signal void QSqlRelationalTableModel::rowsRemoved(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_rowsRemoved_7372, &_call_emitter_rowsRemoved_7372);
   methods += new qt_gsi::GenericMethod ("select", "@brief Virtual method bool QSqlRelationalTableModel::select()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_select_0_0, &_call_cbs_select_0_0);
   methods += new qt_gsi::GenericMethod ("select", "@hide", false, &_init_cbs_select_0_0, &_call_cbs_select_0_0, &_set_callback_cbs_select_0_0);
@@ -4399,7 +4376,6 @@ static gsi::Methods methods_QSqlRelationalTableModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("setItemData", "@hide", false, &_init_cbs_setItemData_5414_0, &_call_cbs_setItemData_5414_0, &_set_callback_cbs_setItemData_5414_0);
   methods += new qt_gsi::GenericMethod ("*setLastError", "@brief Method void QSqlRelationalTableModel::setLastError(const QSqlError &error)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_setLastError_2220, &_call_fp_setLastError_2220);
   methods += new qt_gsi::GenericMethod ("*setPrimaryKey", "@brief Method void QSqlRelationalTableModel::setPrimaryKey(const QSqlIndex &key)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_setPrimaryKey_2202, &_call_fp_setPrimaryKey_2202);
-  methods += new qt_gsi::GenericMethod ("*setQuery", "@brief Method void QSqlRelationalTableModel::setQuery(const QSqlQuery &query)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_setQuery_2232, &_call_fp_setQuery_2232);
   methods += new qt_gsi::GenericMethod ("setRelation", "@brief Virtual method void QSqlRelationalTableModel::setRelation(int column, const QSqlRelation &relation)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setRelation_3187_0, &_call_cbs_setRelation_3187_0);
   methods += new qt_gsi::GenericMethod ("setRelation", "@hide", false, &_init_cbs_setRelation_3187_0, &_call_cbs_setRelation_3187_0, &_set_callback_cbs_setRelation_3187_0);
   methods += new qt_gsi::GenericMethod ("setSort", "@brief Virtual method void QSqlRelationalTableModel::setSort(int column, Qt::SortOrder order)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setSort_2340_0, &_call_cbs_setSort_2340_0);

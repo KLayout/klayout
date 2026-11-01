@@ -254,6 +254,11 @@ public:
     return obj;
   }
 
+  virtual void detach_proxy (tl::Object * /*obj*/) const
+  {
+    //  No proxy, no detach
+  }
+
   virtual const gsi::ClassBase *gsi_cls () const
   { 
     return 0; 

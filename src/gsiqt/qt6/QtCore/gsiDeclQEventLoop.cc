@@ -28,6 +28,7 @@
 */
 
 #include <QEventLoop>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>
@@ -718,7 +719,8 @@ static gsi::Enum<QEventLoop::ProcessEventsFlag> decl_QEventLoop_ProcessEventsFla
     gsi::enum_const ("WaitForMoreEvents", QEventLoop::WaitForMoreEvents, "@brief Enum constant QEventLoop::WaitForMoreEvents") +
     gsi::enum_const ("X11ExcludeTimers", QEventLoop::X11ExcludeTimers, "@brief Enum constant QEventLoop::X11ExcludeTimers") +
     gsi::enum_const ("EventLoopExec", QEventLoop::EventLoopExec, "@brief Enum constant QEventLoop::EventLoopExec") +
-    gsi::enum_const ("DialogExec", QEventLoop::DialogExec, "@brief Enum constant QEventLoop::DialogExec"),
+    gsi::enum_const ("DialogExec", QEventLoop::DialogExec, "@brief Enum constant QEventLoop::DialogExec") +
+    gsi::enum_const ("ApplicationExec", QEventLoop::ApplicationExec, "@brief Enum constant QEventLoop::ApplicationExec"),
   "@qt\n@brief This class represents the QEventLoop::ProcessEventsFlag enum");
 
 static gsi::QFlagsClass<QEventLoop::ProcessEventsFlag > decl_QEventLoop_ProcessEventsFlag_Enums ("QtCore", "QEventLoop_QFlags_ProcessEventsFlag",

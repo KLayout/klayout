@@ -171,7 +171,8 @@ module QualifiedNameResolver
     # Add other children, for example contributed by base classes
     if self.respond_to?(:other_children)
       self.other_children.each do |d|
-        d.myself && (@id2obj[d.myself] = d)
+        # NOTE: "other_children" includes self, which has priority
+        d.myself && (d == self || !@id2obj[d.myself]) && (@id2obj[d.myself] = d)
       end
     end
   end
@@ -409,7 +410,10 @@ class CPPStructDeclaration
     self.struct.body_decl << d
   end
 
-  def other_children
+  def other_children(except = {})
+
+    ex = except.dup
+    ex[self] = true
 
     # add base classes both as sub-namespace and individual parts
     # and add self so scoping is possible into ourself 
@@ -424,10 +428,10 @@ class CPPStructDeclaration
         # since we do a half-hearted job of resolving template variants, this may happen
         # if we derive a template specialization from another one (specifically 
         # "template<class T> struct is_default_constructible : is_default_constructible<> { .. }"
-        if bc_obj != self && bc_obj.is_a?(CPPStructDeclaration)
+        if !ex[bc_obj] && bc_obj.is_a?(CPPStructDeclaration)
           c << bc_obj
           c += bc_obj.children
-          c += bc_obj.other_children
+          c += bc_obj.other_children(ex)
         end
       end
     end

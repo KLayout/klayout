@@ -78,21 +78,21 @@ static void _call_f_addData_3065 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// void QCryptographicHash::addData(const QByteArray &data)
+// void QCryptographicHash::addData(QByteArrayView data)
 
 
-static void _init_f_addData_2309 (qt_gsi::GenericMethod *decl)
+static void _init_f_addData_1843 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("data");
-  decl->add_arg<const QByteArray & > (argspec_0);
+  decl->add_arg<QByteArrayView > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_addData_2309 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_addData_1843 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  QByteArrayView arg1 = gsi::arg_reader<QByteArrayView >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCryptographicHash *)cls)->addData (arg1);
 }
@@ -114,6 +114,21 @@ static void _call_f_addData_1447 (const qt_gsi::GenericMethod * /*decl*/, void *
   tl::Heap heap;
   QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   ret.write<bool > ((bool)((QCryptographicHash *)cls)->addData (arg1));
+}
+
+
+// QCryptographicHash::Algorithm QCryptographicHash::algorithm()
+
+
+static void _init_f_algorithm_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type > ();
+}
+
+static void _call_f_algorithm_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type > ((qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type)qt_gsi::CppToQtAdaptor<QCryptographicHash::Algorithm>(((QCryptographicHash *)cls)->algorithm ()));
 }
 
 
@@ -148,23 +163,58 @@ static void _call_f_result_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// static QByteArray QCryptographicHash::hash(const QByteArray &data, QCryptographicHash::Algorithm method)
+// QByteArrayView QCryptographicHash::resultView()
 
 
-static void _init_f_hash_5532 (qt_gsi::GenericStaticMethod *decl)
+static void _init_f_resultView_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QByteArrayView > ();
+}
+
+static void _call_f_resultView_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QByteArrayView > ((QByteArrayView)((QCryptographicHash *)cls)->resultView ());
+}
+
+
+// void QCryptographicHash::swap(QCryptographicHash &other)
+
+
+static void _init_f_swap_2462 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<QCryptographicHash & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_swap_2462 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QCryptographicHash &arg1 = gsi::arg_reader<QCryptographicHash & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QCryptographicHash *)cls)->swap (arg1);
+}
+
+
+// static QByteArray QCryptographicHash::hash(QByteArrayView data, QCryptographicHash::Algorithm method)
+
+
+static void _init_f_hash_5066 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("data");
-  decl->add_arg<const QByteArray & > (argspec_0);
+  decl->add_arg<QByteArrayView > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("method");
   decl->add_arg<const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & > (argspec_1);
   decl->set_return<QByteArray > ();
 }
 
-static void _call_f_hash_5532 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_hash_5066 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  QByteArrayView arg1 = gsi::arg_reader<QByteArrayView >() (args, heap);
   const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & >() (args, heap);
   ret.write<QByteArray > ((QByteArray)QCryptographicHash::hash (arg1, qt_gsi::QtToCppAdaptor<QCryptographicHash::Algorithm>(arg2).cref()));
 }
@@ -189,6 +239,25 @@ static void _call_f_hashLength_3331 (const qt_gsi::GenericStaticMethod * /*decl*
 }
 
 
+// static bool QCryptographicHash::supportsAlgorithm(QCryptographicHash::Algorithm method)
+
+
+static void _init_f_supportsAlgorithm_3331 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("method");
+  decl->add_arg<const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_supportsAlgorithm_3331 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & >() (args, heap);
+  ret.write<bool > ((bool)QCryptographicHash::supportsAlgorithm (qt_gsi::QtToCppAdaptor<QCryptographicHash::Algorithm>(arg1).cref()));
+}
+
+
 
 namespace gsi
 {
@@ -197,12 +266,16 @@ static gsi::Methods methods_QCryptographicHash () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCryptographicHash::QCryptographicHash(QCryptographicHash::Algorithm method)\nThis method creates an object of class QCryptographicHash.", &_init_ctor_QCryptographicHash_3331, &_call_ctor_QCryptographicHash_3331);
   methods += new qt_gsi::GenericMethod ("addData", "@brief Method void QCryptographicHash::addData(const char *data, qsizetype length)\n", false, &_init_f_addData_3065, &_call_f_addData_3065);
-  methods += new qt_gsi::GenericMethod ("addData", "@brief Method void QCryptographicHash::addData(const QByteArray &data)\n", false, &_init_f_addData_2309, &_call_f_addData_2309);
+  methods += new qt_gsi::GenericMethod ("addData", "@brief Method void QCryptographicHash::addData(QByteArrayView data)\n", false, &_init_f_addData_1843, &_call_f_addData_1843);
   methods += new qt_gsi::GenericMethod ("addData", "@brief Method bool QCryptographicHash::addData(QIODevice *device)\n", false, &_init_f_addData_1447, &_call_f_addData_1447);
+  methods += new qt_gsi::GenericMethod ("algorithm", "@brief Method QCryptographicHash::Algorithm QCryptographicHash::algorithm()\n", true, &_init_f_algorithm_c0, &_call_f_algorithm_c0);
   methods += new qt_gsi::GenericMethod ("reset", "@brief Method void QCryptographicHash::reset()\n", false, &_init_f_reset_0, &_call_f_reset_0);
   methods += new qt_gsi::GenericMethod ("result", "@brief Method QByteArray QCryptographicHash::result()\n", true, &_init_f_result_c0, &_call_f_result_c0);
-  methods += new qt_gsi::GenericStaticMethod ("hash", "@brief Static method QByteArray QCryptographicHash::hash(const QByteArray &data, QCryptographicHash::Algorithm method)\nThis method is static and can be called without an instance.", &_init_f_hash_5532, &_call_f_hash_5532);
+  methods += new qt_gsi::GenericMethod ("resultView", "@brief Method QByteArrayView QCryptographicHash::resultView()\n", true, &_init_f_resultView_c0, &_call_f_resultView_c0);
+  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QCryptographicHash::swap(QCryptographicHash &other)\n", false, &_init_f_swap_2462, &_call_f_swap_2462);
+  methods += new qt_gsi::GenericStaticMethod ("hash", "@brief Static method QByteArray QCryptographicHash::hash(QByteArrayView data, QCryptographicHash::Algorithm method)\nThis method is static and can be called without an instance.", &_init_f_hash_5066, &_call_f_hash_5066);
   methods += new qt_gsi::GenericStaticMethod ("hashLength", "@brief Static method int QCryptographicHash::hashLength(QCryptographicHash::Algorithm method)\nThis method is static and can be called without an instance.", &_init_f_hashLength_3331, &_call_f_hashLength_3331);
+  methods += new qt_gsi::GenericStaticMethod ("supportsAlgorithm", "@brief Static method bool QCryptographicHash::supportsAlgorithm(QCryptographicHash::Algorithm method)\nThis method is static and can be called without an instance.", &_init_f_supportsAlgorithm_3331, &_call_f_supportsAlgorithm_3331);
   return methods;
 }
 
@@ -247,7 +320,8 @@ static gsi::Enum<QCryptographicHash::Algorithm> decl_QCryptographicHash_Algorith
     gsi::enum_const ("Blake2s_128", QCryptographicHash::Blake2s_128, "@brief Enum constant QCryptographicHash::Blake2s_128") +
     gsi::enum_const ("Blake2s_160", QCryptographicHash::Blake2s_160, "@brief Enum constant QCryptographicHash::Blake2s_160") +
     gsi::enum_const ("Blake2s_224", QCryptographicHash::Blake2s_224, "@brief Enum constant QCryptographicHash::Blake2s_224") +
-    gsi::enum_const ("Blake2s_256", QCryptographicHash::Blake2s_256, "@brief Enum constant QCryptographicHash::Blake2s_256"),
+    gsi::enum_const ("Blake2s_256", QCryptographicHash::Blake2s_256, "@brief Enum constant QCryptographicHash::Blake2s_256") +
+    gsi::enum_const ("NumAlgorithms", QCryptographicHash::NumAlgorithms, "@brief Enum constant QCryptographicHash::NumAlgorithms"),
   "@qt\n@brief This class represents the QCryptographicHash::Algorithm enum");
 
 static gsi::QFlagsClass<QCryptographicHash::Algorithm > decl_QCryptographicHash_Algorithm_Enums ("QtCore", "QCryptographicHash_QFlags_Algorithm",

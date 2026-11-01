@@ -23,6 +23,7 @@ SOURCES += \
   $$PWD/gsiDeclQHostAddress.cc \
   $$PWD/gsiDeclQHostInfo.cc \
   $$PWD/gsiDeclQHstsPolicy.cc \
+  $$PWD/gsiDeclQHttp1Configuration.cc \
   $$PWD/gsiDeclQHttp2Configuration.cc \
   $$PWD/gsiDeclQHttpMultiPart.cc \
   $$PWD/gsiDeclQHttpPart.cc \
@@ -56,6 +57,7 @@ SOURCES += \
   $$PWD/gsiDeclQSslError.cc \
   $$PWD/gsiDeclQSslKey.cc \
   $$PWD/gsiDeclQSslPreSharedKeyAuthenticator.cc \
+  $$PWD/gsiDeclQSslServer.cc \
   $$PWD/gsiDeclQSslSocket.cc \
   $$PWD/gsiDeclQTcpServer.cc \
   $$PWD/gsiDeclQTcpSocket.cc \

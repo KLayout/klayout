@@ -249,6 +249,21 @@ static void _call_f_isAvailable_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
+// bool QMediaPlayer::isPlaying()
+
+
+static void _init_f_isPlaying_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isPlaying_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QMediaPlayer *)cls)->isPlaying ());
+}
+
+
 // bool QMediaPlayer::isSeekable()
 
 
@@ -368,6 +383,26 @@ static void _call_f_playbackState_c0 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qt_gsi::Converter<QMediaPlayer::PlaybackState>::target_type > ((qt_gsi::Converter<QMediaPlayer::PlaybackState>::target_type)qt_gsi::CppToQtAdaptor<QMediaPlayer::PlaybackState>(((QMediaPlayer *)cls)->playbackState ()));
+}
+
+
+// void QMediaPlayer::playingChanged(bool playing)
+
+
+static void _init_f_playingChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("playing");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_playingChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QMediaPlayer *)cls)->playingChanged (arg1);
 }
 
 
@@ -759,6 +794,7 @@ static gsi::Methods methods_QMediaPlayer () {
   methods += new qt_gsi::GenericMethod (":hasAudio", "@brief Method bool QMediaPlayer::hasAudio()\n", true, &_init_f_hasAudio_c0, &_call_f_hasAudio_c0);
   methods += new qt_gsi::GenericMethod (":hasVideo", "@brief Method bool QMediaPlayer::hasVideo()\n", true, &_init_f_hasVideo_c0, &_call_f_hasVideo_c0);
   methods += new qt_gsi::GenericMethod ("isAvailable?", "@brief Method bool QMediaPlayer::isAvailable()\n", true, &_init_f_isAvailable_c0, &_call_f_isAvailable_c0);
+  methods += new qt_gsi::GenericMethod ("isPlaying?", "@brief Method bool QMediaPlayer::isPlaying()\n", true, &_init_f_isPlaying_c0, &_call_f_isPlaying_c0);
   methods += new qt_gsi::GenericMethod ("isSeekable?|:seekable", "@brief Method bool QMediaPlayer::isSeekable()\n", true, &_init_f_isSeekable_c0, &_call_f_isSeekable_c0);
   methods += new qt_gsi::GenericMethod (":loops", "@brief Method int QMediaPlayer::loops()\n", true, &_init_f_loops_c0, &_call_f_loops_c0);
   methods += new qt_gsi::GenericMethod (":mediaStatus", "@brief Method QMediaPlayer::MediaStatus QMediaPlayer::mediaStatus()\n", true, &_init_f_mediaStatus_c0, &_call_f_mediaStatus_c0);
@@ -767,6 +803,7 @@ static gsi::Methods methods_QMediaPlayer () {
   methods += new qt_gsi::GenericMethod ("play", "@brief Method void QMediaPlayer::play()\n", false, &_init_f_play_0, &_call_f_play_0);
   methods += new qt_gsi::GenericMethod (":playbackRate", "@brief Method double QMediaPlayer::playbackRate()\n", true, &_init_f_playbackRate_c0, &_call_f_playbackRate_c0);
   methods += new qt_gsi::GenericMethod (":playbackState", "@brief Method QMediaPlayer::PlaybackState QMediaPlayer::playbackState()\n", true, &_init_f_playbackState_c0, &_call_f_playbackState_c0);
+  methods += new qt_gsi::GenericMethod ("playingChanged", "@brief Method void QMediaPlayer::playingChanged(bool playing)\n", false, &_init_f_playingChanged_864, &_call_f_playingChanged_864);
   methods += new qt_gsi::GenericMethod (":position", "@brief Method qint64 QMediaPlayer::position()\n", true, &_init_f_position_c0, &_call_f_position_c0);
   methods += new qt_gsi::GenericMethod ("setActiveAudioTrack|activeAudioTrack=", "@brief Method void QMediaPlayer::setActiveAudioTrack(int index)\n", false, &_init_f_setActiveAudioTrack_767, &_call_f_setActiveAudioTrack_767);
   methods += new qt_gsi::GenericMethod ("setActiveSubtitleTrack|activeSubtitleTrack=", "@brief Method void QMediaPlayer::setActiveSubtitleTrack(int index)\n", false, &_init_f_setActiveSubtitleTrack_767, &_call_f_setActiveSubtitleTrack_767);

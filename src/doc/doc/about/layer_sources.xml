@@ -5,6 +5,13 @@
 
   <title>About Layer Sources</title>
 
+  <keyword>Layer sources</keyword>
+  <keyword>Source database layer</keyword>
+  <keyword>Transformations</keyword>
+  <keyword>Property filter</keyword>
+  <keyword>Cell filter</keyword>
+  <keyword>Hierarchy levels</keyword>
+
   <p>
   KLayout implements a concept of "layer views". The layer list is made up of such layer views.
   A "view" is basically a specification of what is shown how.
@@ -23,6 +30,7 @@
     <li>Transform the layout before it is drawn</li>
     <li>Property filter: draw only shapes whose user properties match a given expression</li>
     <li>Override the hierarchy levels on which the shapes are drawn</li>
+    <li>Cell filter: turn on or off certain cells are cells with their child hierarchy</li>
   </ul>
 
   <h2>Specifying the source layer</h2>
@@ -131,6 +139,53 @@
 
   <p>
   For more information refer to <link href="/manual/explicit_hier_levels.xml"/>.
+  </p>
+
+  <h2>Cell filters</h2>
+
+  <p>
+  Cell filters are specified in curly brackets. Cell filters are a sequence of on/off statements,
+  separated by blanks. A statement beginning with a "-" is an "off" statement while one beginning
+  with a "+" is an "on" statement. The "-" or "+" is follwed by a cell name expression which is 
+  either a glob pattern, a literal cell name or "@" for the top cell.
+  Here is an example:
+  </p>
+
+  <p>
+  <tt>{-@ +NET1}</tt>
+  </p>
+
+  <p>
+  This statement makes the layer only show cell "NET1", including the hierarchy below that cell.
+  </p>
+
+  <p>
+  The way the cell filters work is this: Think of switches that get triggered 
+  while you traverse a hierarchy from top to bottom and which enable or disable drawing. 
+  The traversal starts with "enabled on". 
+  An "off" statement (like "-X") will turn "enabled" off, if the selection filter matches the current cell. 
+  An "on" statement (like "+X") turns "enabled" on. 
+  The filter can be:
+  </p>
+
+  <ul>
+    <li><tt>@</tt> for the current top cell.</li>
+    <li>a glob expression (like <tt>*</tt> for all cells, or <tt>C*</tt> for all cells starting with an upper case "C").</li>
+    <li>a literal cell name (like <tt>NET1</tt>). If you put the cell name in single quotes, it will be taken as is, so <tt>'C*'</tt> is a cell called "C*".</li>
+  </ul>
+
+  <p>
+  So <tt>{-@ +NET1}</tt> will turn off "enabled" initially because of <tt>-@</tt>. 
+  When the traversal reaches a cell called "NET1", the enabled flag is turned on 
+  and stays on for all cells below. 
+  Essentially this means to enable the whole cell tree below and including <tt>NET1</tt>.
+  </p>
+
+  <p>
+  Correspondingly, <tt>{-* +NET1}</tt> will only enable cell "NET1", but not any subcells. 
+  That is because the first statement turns off the enabled flag for all cells, 
+  except for "NET1". Any subcells of "NET1" - which cannot be named "NET1" as this would create
+  a recursive hierarchy - get turned off.
   </p>
 
 </doc>

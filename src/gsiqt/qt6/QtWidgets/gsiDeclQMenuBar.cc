@@ -30,6 +30,7 @@
 #include <QMenuBar>
 #include <QAction>
 #include <QActionEvent>
+#include <QAnyStringView>
 #include <QBackingStore>
 #include <QBitmap>
 #include <QChildEvent>
@@ -154,70 +155,6 @@ static void _call_f_activeAction_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QAction * > ((QAction *)((QMenuBar *)cls)->activeAction ());
-}
-
-
-// void QMenuBar::addAction(QAction *action)
-
-
-static void _init_f_addAction_1309 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("action");
-  decl->add_arg<QAction * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_addAction_1309 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMenuBar *)cls)->addAction (arg1);
-}
-
-
-// QAction *QMenuBar::addAction(const QString &text)
-
-
-static void _init_f_addAction_2025 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("text");
-  decl->add_arg<const QString & > (argspec_0);
-  decl->set_return<QAction * > ();
-}
-
-static void _call_f_addAction_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  ret.write<QAction * > ((QAction *)((QMenuBar *)cls)->addAction (arg1));
-}
-
-
-// QAction *QMenuBar::addAction(const QString &text, const QObject *receiver, const char *member)
-
-
-static void _init_f_addAction_5537 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("text");
-  decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("receiver");
-  decl->add_arg<const QObject * > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("member");
-  decl->add_arg<const char * > (argspec_2);
-  decl->set_return<QAction * > ();
-}
-
-static void _call_f_addAction_5537 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QObject *arg2 = gsi::arg_reader<const QObject * >() (args, heap);
-  const char *arg3 = gsi::arg_reader<const char * >() (args, heap);
-  ret.write<QAction * > ((QAction *)((QMenuBar *)cls)->addAction (arg1, arg2, arg3));
 }
 
 
@@ -588,9 +525,6 @@ static gsi::Methods methods_QMenuBar () {
   methods += new qt_gsi::GenericMethod ("actionAt", "@brief Method QAction *QMenuBar::actionAt(const QPoint &)\n", true, &_init_f_actionAt_c1916, &_call_f_actionAt_c1916);
   methods += new qt_gsi::GenericMethod ("actionGeometry", "@brief Method QRect QMenuBar::actionGeometry(QAction *)\n", true, &_init_f_actionGeometry_c1309, &_call_f_actionGeometry_c1309);
   methods += new qt_gsi::GenericMethod (":activeAction", "@brief Method QAction *QMenuBar::activeAction()\n", true, &_init_f_activeAction_c0, &_call_f_activeAction_c0);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method void QMenuBar::addAction(QAction *action)\n", false, &_init_f_addAction_1309, &_call_f_addAction_1309);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QMenuBar::addAction(const QString &text)\n", false, &_init_f_addAction_2025, &_call_f_addAction_2025);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QMenuBar::addAction(const QString &text, const QObject *receiver, const char *member)\n", false, &_init_f_addAction_5537, &_call_f_addAction_5537);
   methods += new qt_gsi::GenericMethod ("addMenu", "@brief Method QAction *QMenuBar::addMenu(QMenu *menu)\n", false, &_init_f_addMenu_1108, &_call_f_addMenu_1108);
   methods += new qt_gsi::GenericMethod ("addMenu", "@brief Method QMenu *QMenuBar::addMenu(const QString &title)\n", false, &_init_f_addMenu_2025, &_call_f_addMenu_2025);
   methods += new qt_gsi::GenericMethod ("addMenu", "@brief Method QMenu *QMenuBar::addMenu(const QIcon &icon, const QString &title)\n", false, &_init_f_addMenu_3704, &_call_f_addMenu_3704);

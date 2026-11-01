@@ -28,6 +28,7 @@
 */
 
 #include <QGridLayout>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QLayout>

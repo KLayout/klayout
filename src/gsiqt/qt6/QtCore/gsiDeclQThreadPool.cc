@@ -28,6 +28,7 @@
 */
 
 #include <QThreadPool>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>
@@ -285,6 +286,26 @@ static void _call_f_start_2185 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
+// void QThreadPool::startOnReservedThread(QRunnable *runnable)
+
+
+static void _init_f_startOnReservedThread_1526 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("runnable");
+  decl->add_arg<QRunnable * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_startOnReservedThread_1526 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QRunnable *arg1 = gsi::arg_reader<QRunnable * >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QThreadPool *)cls)->startOnReservedThread (arg1);
+}
+
+
 // QThread::Priority QThreadPool::threadPriority()
 
 
@@ -416,6 +437,7 @@ static gsi::Methods methods_QThreadPool () {
   methods += new qt_gsi::GenericMethod ("setThreadPriority|threadPriority=", "@brief Method void QThreadPool::setThreadPriority(QThread::Priority priority)\n", false, &_init_f_setThreadPriority_2099, &_call_f_setThreadPriority_2099);
   methods += new qt_gsi::GenericMethod (":stackSize", "@brief Method unsigned int QThreadPool::stackSize()\n", true, &_init_f_stackSize_c0, &_call_f_stackSize_c0);
   methods += new qt_gsi::GenericMethod ("start", "@brief Method void QThreadPool::start(QRunnable *runnable, int priority)\n", false, &_init_f_start_2185, &_call_f_start_2185);
+  methods += new qt_gsi::GenericMethod ("startOnReservedThread", "@brief Method void QThreadPool::startOnReservedThread(QRunnable *runnable)\n", false, &_init_f_startOnReservedThread_1526, &_call_f_startOnReservedThread_1526);
   methods += new qt_gsi::GenericMethod (":threadPriority", "@brief Method QThread::Priority QThreadPool::threadPriority()\n", true, &_init_f_threadPriority_c0, &_call_f_threadPriority_c0);
   methods += new qt_gsi::GenericMethod ("tryStart", "@brief Method bool QThreadPool::tryStart(QRunnable *runnable)\n", false, &_init_f_tryStart_1526, &_call_f_tryStart_1526);
   methods += new qt_gsi::GenericMethod ("tryTake", "@brief Method bool QThreadPool::tryTake(QRunnable *runnable)\n", false, &_init_f_tryTake_1526, &_call_f_tryTake_1526);

@@ -28,6 +28,7 @@
 */
 
 #include <QBuffer>
+#include <QAnyStringView>
 #include <QEvent>
 #include <QMetaMethod>
 #include <QObject>
@@ -277,24 +278,24 @@ static void _call_f_setData_2309 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// void QBuffer::setData(const char *data, int len)
+// void QBuffer::setData(const char *data, qsizetype len)
 
 
-static void _init_f_setData_2390 (qt_gsi::GenericMethod *decl)
+static void _init_f_setData_3065 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("data");
   decl->add_arg<const char * > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("len");
-  decl->add_arg<int > (argspec_1);
+  decl->add_arg<qsizetype > (argspec_1);
   decl->set_return<void > ();
 }
 
-static void _call_f_setData_2390 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_setData_3065 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
-  int arg2 = gsi::arg_reader<int >() (args, heap);
+  qsizetype arg2 = gsi::arg_reader<qsizetype >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBuffer *)cls)->setData (arg1, arg2);
 }
@@ -360,7 +361,7 @@ static gsi::Methods methods_QBuffer () {
   methods += new qt_gsi::GenericMethod ("seek", "@brief Method bool QBuffer::seek(qint64 off)\nThis is a reimplementation of QIODevice::seek", false, &_init_f_seek_986, &_call_f_seek_986);
   methods += new qt_gsi::GenericMethod ("setBuffer", "@brief Method void QBuffer::setBuffer(QByteArray *a)\n", false, &_init_f_setBuffer_1618, &_call_f_setBuffer_1618);
   methods += new qt_gsi::GenericMethod ("setData|data=", "@brief Method void QBuffer::setData(const QByteArray &data)\n", false, &_init_f_setData_2309, &_call_f_setData_2309);
-  methods += new qt_gsi::GenericMethod ("setData", "@brief Method void QBuffer::setData(const char *data, int len)\n", false, &_init_f_setData_2390, &_call_f_setData_2390);
+  methods += new qt_gsi::GenericMethod ("setData", "@brief Method void QBuffer::setData(const char *data, qsizetype len)\n", false, &_init_f_setData_3065, &_call_f_setData_3065);
   methods += new qt_gsi::GenericMethod ("size", "@brief Method qint64 QBuffer::size()\nThis is a reimplementation of QIODevice::size", true, &_init_f_size_c0, &_call_f_size_c0);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QBuffer::aboutToClose()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("bytesWritten(qint64)", "bytesWritten", gsi::arg("bytes"), "@brief Signal declaration for QBuffer::bytesWritten(qint64 bytes)\nYou can bind a procedure to this signal.");

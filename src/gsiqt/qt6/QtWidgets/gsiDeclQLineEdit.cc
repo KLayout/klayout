@@ -30,6 +30,7 @@
 #include <QLineEdit>
 #include <QAction>
 #include <QActionEvent>
+#include <QAnyStringView>
 #include <QBackingStore>
 #include <QBitmap>
 #include <QChildEvent>
@@ -103,26 +104,6 @@ static void _init_smo (qt_gsi::GenericStaticMethod *decl)
 static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, gsi::SerialArgs &ret) 
 {
   ret.write<const QMetaObject &> (QLineEdit::staticMetaObject);
-}
-
-
-// void QLineEdit::addAction(QAction *action)
-
-
-static void _init_f_addAction_1309 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("action");
-  decl->add_arg<QAction * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_addAction_1309 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QLineEdit *)cls)->addAction (arg1);
 }
 
 
@@ -1399,7 +1380,6 @@ namespace gsi
 static gsi::Methods methods_QLineEdit () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method void QLineEdit::addAction(QAction *action)\n", false, &_init_f_addAction_1309, &_call_f_addAction_1309);
   methods += new qt_gsi::GenericMethod ("addAction", "@brief Method void QLineEdit::addAction(QAction *action, QLineEdit::ActionPosition position)\n", false, &_init_f_addAction_4075, &_call_f_addAction_4075);
   methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QLineEdit::addAction(const QIcon &icon, QLineEdit::ActionPosition position)\n", false, &_init_f_addAction_4553, &_call_f_addAction_4553);
   methods += new qt_gsi::GenericMethod (":alignment", "@brief Method QFlags<Qt::AlignmentFlag> QLineEdit::alignment()\n", true, &_init_f_alignment_c0, &_call_f_alignment_c0);

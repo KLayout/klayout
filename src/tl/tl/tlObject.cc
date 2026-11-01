@@ -145,6 +145,17 @@ void Object::release_object ()
   }
 }
 
+size_t Object::ref_count () const
+{
+  WeakOrSharedPtr *ptrs = (WeakOrSharedPtr *)(size_t (mp_ptrs) & ~size_t (1));
+
+  size_t n = 0;
+  for (WeakOrSharedPtr *p = ptrs; p; p = p->mp_next) {
+    ++n;
+  }
+  return n;
+}
+
 // ---------------------------------------------------------------------
 //  WeakOrSharedPtr implementation
 

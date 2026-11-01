@@ -28,6 +28,7 @@
 */
 
 #include <QAudioDecoder>
+#include <QAnyStringView>
 #include <QAudioBuffer>
 #include <QAudioFormat>
 #include <QChildEvent>

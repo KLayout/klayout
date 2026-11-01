@@ -38,6 +38,10 @@
   </p>
 
   <p>
+  Read more about layer source specifications here: <topic href="/about/layer_sources.xml"/>.
+  </p>
+
+  <p>
   The layer list can be cleaned up to remove layer views that do not correspond to
   actual layout layers using the function "Clean up views" from the context menu.
   Similar, layers that are present in the layout but for which there is no view can

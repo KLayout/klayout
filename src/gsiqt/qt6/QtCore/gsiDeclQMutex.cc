@@ -28,6 +28,7 @@
 */
 
 #include <QMutex>
+#include <QDeadlineTimer>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
 #include <memory>
@@ -84,6 +85,25 @@ static void _call_f_tryLock_767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
+// bool QMutex::tryLock(QDeadlineTimer timeout)
+
+
+static void _init_f_tryLock_1820 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("timeout");
+  decl->add_arg<QDeadlineTimer > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_tryLock_1820 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QDeadlineTimer arg1 = gsi::arg_reader<QDeadlineTimer >() (args, heap);
+  ret.write<bool > ((bool)((QMutex *)cls)->tryLock (arg1));
+}
+
+
 // bool QMutex::try_lock()
 
 
@@ -108,6 +128,7 @@ static gsi::Methods methods_QMutex () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMutex::QMutex()\nThis method creates an object of class QMutex.", &_init_ctor_QMutex_0, &_call_ctor_QMutex_0);
   methods += new qt_gsi::GenericMethod ("tryLock", "@brief Method bool QMutex::tryLock()\n", false, &_init_f_tryLock_0, &_call_f_tryLock_0);
   methods += new qt_gsi::GenericMethod ("tryLock", "@brief Method bool QMutex::tryLock(int timeout)\n", false, &_init_f_tryLock_767, &_call_f_tryLock_767);
+  methods += new qt_gsi::GenericMethod ("tryLock", "@brief Method bool QMutex::tryLock(QDeadlineTimer timeout)\n", false, &_init_f_tryLock_1820, &_call_f_tryLock_1820);
   methods += new qt_gsi::GenericMethod ("try_lock", "@brief Method bool QMutex::try_lock()\n", false, &_init_f_try_lock_0, &_call_f_try_lock_0);
   return methods;
 }

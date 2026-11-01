@@ -126,7 +126,7 @@ LayoutLayers::delete_layer (unsigned int n)
 {
   const db::LayerProperties &lp = m_layer_props [n];
   if (! lp.is_null ()) {
-    for (auto i = m_layers_by_props.find (lp); i != m_layers_by_props.end () && i->first.log_equal (lp); ++i) {
+    for (auto i = m_layers_by_props.lower_bound (lp); i != m_layers_by_props.end () && i->first.log_equal (lp); ++i) {
       if (i->second == n) {
         m_layers_by_props.erase (i);
         break;
@@ -163,7 +163,7 @@ LayoutLayers::get_layer_maybe (const db::LayerProperties &lp) const
   if (lp.is_null ()) {
     return -1;
   } else {
-    auto i = m_layers_by_props.find (lp);
+    auto i = m_layers_by_props.lower_bound (lp);
     if (i != m_layers_by_props.end () && i->first.log_equal (lp)) {
       return int (i->second);
     } else {
@@ -290,7 +290,7 @@ LayoutLayers::set_properties (unsigned int n, const LayerProperties &props)
 
   const db::LayerProperties &lp = m_layer_props [n];
   if (! lp.is_null ()) {
-    for (auto i = m_layers_by_props.find (lp); i != m_layers_by_props.end () && i->first.log_equal (lp); ++i) {
+    for (auto i = m_layers_by_props.lower_bound (lp); i != m_layers_by_props.end () && i->first.log_equal (lp); ++i) {
       if (i->second == n) {
         m_layers_by_props.erase (i);
         break;

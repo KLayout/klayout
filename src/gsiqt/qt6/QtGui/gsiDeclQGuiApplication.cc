@@ -130,6 +130,26 @@ static void _call_f_sessionKey_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
+// void QGuiApplication::setBadgeNumber(qint64 number)
+
+
+static void _init_f_setBadgeNumber_986 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("number");
+  decl->add_arg<qint64 > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setBadgeNumber_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QGuiApplication *)cls)->setBadgeNumber (arg1);
+}
+
+
 // static QList<QWindow *> QGuiApplication::allWindows()
 
 
@@ -876,6 +896,7 @@ static gsi::Methods methods_QGuiApplication () {
   methods += new qt_gsi::GenericMethod ("isSessionRestored?", "@brief Method bool QGuiApplication::isSessionRestored()\n", true, &_init_f_isSessionRestored_c0, &_call_f_isSessionRestored_c0);
   methods += new qt_gsi::GenericMethod ("sessionId", "@brief Method QString QGuiApplication::sessionId()\n", true, &_init_f_sessionId_c0, &_call_f_sessionId_c0);
   methods += new qt_gsi::GenericMethod ("sessionKey", "@brief Method QString QGuiApplication::sessionKey()\n", true, &_init_f_sessionKey_c0, &_call_f_sessionKey_c0);
+  methods += new qt_gsi::GenericMethod ("setBadgeNumber", "@brief Method void QGuiApplication::setBadgeNumber(qint64 number)\n", false, &_init_f_setBadgeNumber_986, &_call_f_setBadgeNumber_986);
   methods += gsi::qt_signal ("aboutToQuit()", "aboutToQuit", "@brief Signal declaration for QGuiApplication::aboutToQuit()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("applicationDisplayNameChanged()", "applicationDisplayNameChanged", "@brief Signal declaration for QGuiApplication::applicationDisplayNameChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("applicationNameChanged()", "applicationNameChanged", "@brief Signal declaration for QGuiApplication::applicationNameChanged()\nYou can bind a procedure to this signal.");

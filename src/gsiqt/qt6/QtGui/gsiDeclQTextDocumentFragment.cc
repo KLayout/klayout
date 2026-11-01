@@ -158,6 +158,25 @@ static void _call_f_toHtml_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+// QString QTextDocumentFragment::toMarkdown(QFlags<QTextDocument::MarkdownFeature> features)
+
+
+static void _init_f_toMarkdown_c4132 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("features", true, "QTextDocument::MarkdownDialectGitHub");
+  decl->add_arg<QFlags<QTextDocument::MarkdownFeature> > (argspec_0);
+  decl->set_return<QString > ();
+}
+
+static void _call_f_toMarkdown_c4132 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QFlags<QTextDocument::MarkdownFeature> arg1 = args ? gsi::arg_reader<QFlags<QTextDocument::MarkdownFeature> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::MarkdownFeature> >() (QTextDocument::MarkdownDialectGitHub, heap);
+  ret.write<QString > ((QString)((QTextDocumentFragment *)cls)->toMarkdown (arg1));
+}
+
+
 // QString QTextDocumentFragment::toPlainText()
 
 
@@ -170,6 +189,21 @@ static void _call_f_toPlainText_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QString > ((QString)((QTextDocumentFragment *)cls)->toPlainText ());
+}
+
+
+// QString QTextDocumentFragment::toRawText()
+
+
+static void _init_f_toRawText_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QString > ();
+}
+
+static void _call_f_toRawText_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QString > ((QString)((QTextDocumentFragment *)cls)->toRawText ());
 }
 
 
@@ -192,6 +226,28 @@ static void _call_f_fromHtml_4567 (const qt_gsi::GenericStaticMethod * /*decl*/,
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   const QTextDocument *arg2 = args ? gsi::arg_reader<const QTextDocument * >() (args, heap) : gsi::arg_maker<const QTextDocument * >() (nullptr, heap);
   ret.write<QTextDocumentFragment > ((QTextDocumentFragment)QTextDocumentFragment::fromHtml (arg1, arg2));
+}
+
+
+// static QTextDocumentFragment QTextDocumentFragment::fromMarkdown(const QString &markdown, QFlags<QTextDocument::MarkdownFeature> features)
+
+
+static void _init_f_fromMarkdown_6049 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("markdown");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("features", true, "QTextDocument::MarkdownDialectGitHub");
+  decl->add_arg<QFlags<QTextDocument::MarkdownFeature> > (argspec_1);
+  decl->set_return<QTextDocumentFragment > ();
+}
+
+static void _call_f_fromMarkdown_6049 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QTextDocument::MarkdownFeature> arg2 = args ? gsi::arg_reader<QFlags<QTextDocument::MarkdownFeature> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::MarkdownFeature> >() (QTextDocument::MarkdownDialectGitHub, heap);
+  ret.write<QTextDocumentFragment > ((QTextDocumentFragment)QTextDocumentFragment::fromMarkdown (arg1, arg2));
 }
 
 
@@ -227,8 +283,11 @@ static gsi::Methods methods_QTextDocumentFragment () {
   methods += new qt_gsi::GenericMethod ("isEmpty?", "@brief Method bool QTextDocumentFragment::isEmpty()\n", true, &_init_f_isEmpty_c0, &_call_f_isEmpty_c0);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QTextDocumentFragment &QTextDocumentFragment::operator=(const QTextDocumentFragment &rhs)\n", false, &_init_f_operator_eq__3466, &_call_f_operator_eq__3466);
   methods += new qt_gsi::GenericMethod ("toHtml", "@brief Method QString QTextDocumentFragment::toHtml()\n", true, &_init_f_toHtml_c0, &_call_f_toHtml_c0);
+  methods += new qt_gsi::GenericMethod ("toMarkdown", "@brief Method QString QTextDocumentFragment::toMarkdown(QFlags<QTextDocument::MarkdownFeature> features)\n", true, &_init_f_toMarkdown_c4132, &_call_f_toMarkdown_c4132);
   methods += new qt_gsi::GenericMethod ("toPlainText", "@brief Method QString QTextDocumentFragment::toPlainText()\n", true, &_init_f_toPlainText_c0, &_call_f_toPlainText_c0);
+  methods += new qt_gsi::GenericMethod ("toRawText", "@brief Method QString QTextDocumentFragment::toRawText()\n", true, &_init_f_toRawText_c0, &_call_f_toRawText_c0);
   methods += new qt_gsi::GenericStaticMethod ("fromHtml", "@brief Static method QTextDocumentFragment QTextDocumentFragment::fromHtml(const QString &html, const QTextDocument *resourceProvider)\nThis method is static and can be called without an instance.", &_init_f_fromHtml_4567, &_call_f_fromHtml_4567);
+  methods += new qt_gsi::GenericStaticMethod ("fromMarkdown", "@brief Static method QTextDocumentFragment QTextDocumentFragment::fromMarkdown(const QString &markdown, QFlags<QTextDocument::MarkdownFeature> features)\nThis method is static and can be called without an instance.", &_init_f_fromMarkdown_6049, &_call_f_fromMarkdown_6049);
   methods += new qt_gsi::GenericStaticMethod ("fromPlainText", "@brief Static method QTextDocumentFragment QTextDocumentFragment::fromPlainText(const QString &plainText)\nThis method is static and can be called without an instance.", &_init_f_fromPlainText_2025, &_call_f_fromPlainText_2025);
   return methods;
 }

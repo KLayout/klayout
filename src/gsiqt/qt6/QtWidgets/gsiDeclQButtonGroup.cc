@@ -29,6 +29,7 @@
 
 #include <QButtonGroup>
 #include <QAbstractButton>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

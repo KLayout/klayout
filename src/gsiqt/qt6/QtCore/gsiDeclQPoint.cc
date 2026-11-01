@@ -287,6 +287,21 @@ static void _call_f_setY_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
+// QPointF QPoint::toPointF()
+
+
+static void _init_f_toPointF_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QPointF > ();
+}
+
+static void _call_f_toPointF_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QPointF > ((QPointF)((QPoint *)cls)->toPointF ());
+}
+
+
 // QPoint QPoint::transposed()
 
 
@@ -424,6 +439,7 @@ static gsi::Methods methods_QPoint () {
   methods += new qt_gsi::GenericMethod ("ry", "@brief Method int &QPoint::ry()\n", false, &_init_f_ry_0, &_call_f_ry_0);
   methods += new qt_gsi::GenericMethod ("setX|x=", "@brief Method void QPoint::setX(int x)\n", false, &_init_f_setX_767, &_call_f_setX_767);
   methods += new qt_gsi::GenericMethod ("setY|y=", "@brief Method void QPoint::setY(int y)\n", false, &_init_f_setY_767, &_call_f_setY_767);
+  methods += new qt_gsi::GenericMethod ("toPointF", "@brief Method QPointF QPoint::toPointF()\n", true, &_init_f_toPointF_c0, &_call_f_toPointF_c0);
   methods += new qt_gsi::GenericMethod ("transposed", "@brief Method QPoint QPoint::transposed()\n", true, &_init_f_transposed_c0, &_call_f_transposed_c0);
   methods += new qt_gsi::GenericMethod (":x", "@brief Method int QPoint::x()\n", true, &_init_f_x_c0, &_call_f_x_c0);
   methods += new qt_gsi::GenericMethod (":y", "@brief Method int QPoint::y()\n", true, &_init_f_y_c0, &_call_f_y_c0);

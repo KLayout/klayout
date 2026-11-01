@@ -21,17 +21,21 @@ SOURCES += \
   $$PWD/gsiDeclQBasicMutex.cc \
   $$PWD/gsiDeclQBasicTimer.cc \
   $$PWD/gsiDeclQBindingStatus.cc \
+  $$PWD/gsiDeclQBluetoothPermission.cc \
   $$PWD/gsiDeclQBuffer.cc \
   $$PWD/gsiDeclQByteArrayMatcher.cc \
   $$PWD/gsiDeclQCalendar.cc \
   $$PWD/gsiDeclQCalendar_YearMonthDay.cc \
   $$PWD/gsiDeclQCalendar_SystemId.cc \
+  $$PWD/gsiDeclQCalendarPermission.cc \
+  $$PWD/gsiDeclQCameraPermission.cc \
   $$PWD/gsiDeclQChildEvent.cc \
   $$PWD/gsiDeclQCollator.cc \
   $$PWD/gsiDeclQCollatorSortKey.cc \
   $$PWD/gsiDeclQCommandLineOption.cc \
   $$PWD/gsiDeclQCommandLineParser.cc \
   $$PWD/gsiDeclQConcatenateTablesProxyModel.cc \
+  $$PWD/gsiDeclQContactsPermission.cc \
   $$PWD/gsiDeclQCoreApplication.cc \
   $$PWD/gsiDeclQCryptographicHash.cc \
   $$PWD/gsiDeclQDataStream.cc \
@@ -67,13 +71,16 @@ SOURCES += \
   $$PWD/gsiDeclQJsonObject_Iterator.cc \
   $$PWD/gsiDeclQJsonParseError.cc \
   $$PWD/gsiDeclQJsonValue.cc \
+  $$PWD/gsiDeclQJsonValueConstRef.cc \
   $$PWD/gsiDeclQJsonValueRef.cc \
   $$PWD/gsiDeclQKeyCombination.cc \
+  $$PWD/gsiDeclQLatin1StringMatcher.cc \
   $$PWD/gsiDeclQLibrary.cc \
   $$PWD/gsiDeclQLibraryInfo.cc \
   $$PWD/gsiDeclQLine.cc \
   $$PWD/gsiDeclQLineF.cc \
   $$PWD/gsiDeclQLocale.cc \
+  $$PWD/gsiDeclQLocationPermission.cc \
   $$PWD/gsiDeclQLockFile.cc \
   $$PWD/gsiDeclQLoggingCategory.cc \
   $$PWD/gsiDeclQMargins.cc \
@@ -86,14 +93,15 @@ SOURCES += \
   $$PWD/gsiDeclQMetaContainer.cc \
   $$PWD/gsiDeclQMetaEnum.cc \
   $$PWD/gsiDeclQMetaMethod.cc \
+  $$PWD/gsiDeclQMetaMethodArgument.cc \
+  $$PWD/gsiDeclQMetaMethodReturnArgument.cc \
   $$PWD/gsiDeclQMetaObject.cc \
-  $$PWD/gsiDeclQMetaObject_SuperData.cc \
-  $$PWD/gsiDeclQMetaObject_Data.cc \
   $$PWD/gsiDeclQMetaObject_Connection.cc \
   $$PWD/gsiDeclQMetaProperty.cc \
   $$PWD/gsiDeclQMetaSequence.cc \
   $$PWD/gsiDeclQMetaType.cc \
   $$PWD/gsiDeclQMethodRawArguments.cc \
+  $$PWD/gsiDeclQMicrophonePermission.cc \
   $$PWD/gsiDeclQMimeData.cc \
   $$PWD/gsiDeclQMimeDatabase.cc \
   $$PWD/gsiDeclQMimeType.cc \
@@ -101,15 +109,16 @@ SOURCES += \
   $$PWD/gsiDeclQModelRoleData.cc \
   $$PWD/gsiDeclQModelRoleDataSpan.cc \
   $$PWD/gsiDeclQMutex.cc \
+  $$PWD/gsiDeclQNativeIpcKey.cc \
   $$PWD/gsiDeclQNoDebug.cc \
   $$PWD/gsiDeclQObject.cc \
   $$PWD/gsiDeclQOperatingSystemVersion.cc \
   $$PWD/gsiDeclQParallelAnimationGroup.cc \
   $$PWD/gsiDeclQPartialOrdering.cc \
   $$PWD/gsiDeclQPauseAnimation.cc \
+  $$PWD/gsiDeclQPermission.cc \
   $$PWD/gsiDeclQPersistentModelIndex.cc \
   $$PWD/gsiDeclQPluginLoader.cc \
-  $$PWD/gsiDeclQPluginMetaData.cc \
   $$PWD/gsiDeclQPoint.cc \
   $$PWD/gsiDeclQPointF.cc \
   $$PWD/gsiDeclQProcess.cc \
@@ -134,6 +143,7 @@ SOURCES += \
   $$PWD/gsiDeclQResource.cc \
   $$PWD/gsiDeclQRunnable.cc \
   $$PWD/gsiDeclQSaveFile.cc \
+  $$PWD/gsiDeclQScopedPropertyUpdateGroup.cc \
   $$PWD/gsiDeclQSemaphore.cc \
   $$PWD/gsiDeclQSemaphoreReleaser.cc \
   $$PWD/gsiDeclQSequentialAnimationGroup.cc \

@@ -32,6 +32,7 @@
 #include <QAbstractItemModel>
 #include <QAction>
 #include <QActionEvent>
+#include <QAnyStringView>
 #include <QBackingStore>
 #include <QBitmap>
 #include <QChildEvent>
@@ -1339,23 +1340,19 @@ static void _call_f_textElideMode_c0 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// void QAbstractItemView::update(const QRegion &)
+// void QAbstractItemView::update()
 
 
-static void _init_f_update_2006 (qt_gsi::GenericMethod *decl)
+static void _init_f_update_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<const QRegion & > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_update_2006 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_update_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAbstractItemView *)cls)->update (arg1);
+  ((QAbstractItemView *)cls)->update ();
 }
 
 
@@ -1512,7 +1509,7 @@ static gsi::Methods methods_QAbstractItemView () {
   methods += new qt_gsi::GenericMethod ("sizeHintForRow", "@brief Method int QAbstractItemView::sizeHintForRow(int row)\n", true, &_init_f_sizeHintForRow_c767, &_call_f_sizeHintForRow_c767);
   methods += new qt_gsi::GenericMethod (":tabKeyNavigation", "@brief Method bool QAbstractItemView::tabKeyNavigation()\n", true, &_init_f_tabKeyNavigation_c0, &_call_f_tabKeyNavigation_c0);
   methods += new qt_gsi::GenericMethod (":textElideMode", "@brief Method Qt::TextElideMode QAbstractItemView::textElideMode()\n", true, &_init_f_textElideMode_c0, &_call_f_textElideMode_c0);
-  methods += new qt_gsi::GenericMethod ("update", "@brief Method void QAbstractItemView::update(const QRegion &)\n", false, &_init_f_update_2006, &_call_f_update_2006);
+  methods += new qt_gsi::GenericMethod ("update", "@brief Method void QAbstractItemView::update()\n", false, &_init_f_update_0, &_call_f_update_0);
   methods += new qt_gsi::GenericMethod ("update", "@brief Method void QAbstractItemView::update(const QModelIndex &index)\n", false, &_init_f_update_2395, &_call_f_update_2395);
   methods += new qt_gsi::GenericMethod (":verticalScrollMode", "@brief Method QAbstractItemView::ScrollMode QAbstractItemView::verticalScrollMode()\n", true, &_init_f_verticalScrollMode_c0, &_call_f_verticalScrollMode_c0);
   methods += new qt_gsi::GenericMethod ("visualRect", "@brief Method QRect QAbstractItemView::visualRect(const QModelIndex &index)\n", true, &_init_f_visualRect_c2395, &_call_f_visualRect_c2395);

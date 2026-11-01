@@ -28,6 +28,7 @@
 */
 
 #include <QSemaphore>
+#include <QDeadlineTimer>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
 #include <memory>
@@ -150,6 +151,43 @@ static void _call_f_tryAcquire_1426 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
+// bool QSemaphore::tryAcquire(int n, QDeadlineTimer timeout)
+
+
+static void _init_f_tryAcquire_2479 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("n");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("timeout");
+  decl->add_arg<QDeadlineTimer > (argspec_1);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_tryAcquire_2479 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QDeadlineTimer arg2 = gsi::arg_reader<QDeadlineTimer >() (args, heap);
+  ret.write<bool > ((bool)((QSemaphore *)cls)->tryAcquire (arg1, arg2));
+}
+
+
+// bool QSemaphore::try_acquire()
+
+
+static void _init_f_try_acquire_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_try_acquire_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QSemaphore *)cls)->try_acquire ());
+}
+
+
 
 namespace gsi
 {
@@ -162,6 +200,8 @@ static gsi::Methods methods_QSemaphore () {
   methods += new qt_gsi::GenericMethod ("release", "@brief Method void QSemaphore::release(int n)\n", false, &_init_f_release_767, &_call_f_release_767);
   methods += new qt_gsi::GenericMethod ("tryAcquire", "@brief Method bool QSemaphore::tryAcquire(int n)\n", false, &_init_f_tryAcquire_767, &_call_f_tryAcquire_767);
   methods += new qt_gsi::GenericMethod ("tryAcquire", "@brief Method bool QSemaphore::tryAcquire(int n, int timeout)\n", false, &_init_f_tryAcquire_1426, &_call_f_tryAcquire_1426);
+  methods += new qt_gsi::GenericMethod ("tryAcquire", "@brief Method bool QSemaphore::tryAcquire(int n, QDeadlineTimer timeout)\n", false, &_init_f_tryAcquire_2479, &_call_f_tryAcquire_2479);
+  methods += new qt_gsi::GenericMethod ("try_acquire", "@brief Method bool QSemaphore::try_acquire()\n", false, &_init_f_try_acquire_0, &_call_f_try_acquire_0);
   return methods;
 }
 

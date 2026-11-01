@@ -28,9 +28,11 @@
 */
 
 #include <QSharedMemory>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>
+#include <QNativeIpcKey>
 #include <QObject>
 #include <QThread>
 #include <QTimerEvent>
@@ -230,6 +232,21 @@ static void _call_f_lock_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
+// QNativeIpcKey QSharedMemory::nativeIpcKey()
+
+
+static void _init_f_nativeIpcKey_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QNativeIpcKey > ();
+}
+
+static void _call_f_nativeIpcKey_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QNativeIpcKey > ((QNativeIpcKey)((QSharedMemory *)cls)->nativeIpcKey ());
+}
+
+
 // QString QSharedMemory::nativeKey()
 
 
@@ -265,23 +282,46 @@ static void _call_f_setKey_2025 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// void QSharedMemory::setNativeKey(const QString &key)
+// void QSharedMemory::setNativeKey(const QNativeIpcKey &key)
 
 
-static void _init_f_setNativeKey_2025 (qt_gsi::GenericMethod *decl)
+static void _init_f_setNativeKey_2590 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<const QString & > (argspec_0);
+  decl->add_arg<const QNativeIpcKey & > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_setNativeKey_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_setNativeKey_2590 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QNativeIpcKey &arg1 = gsi::arg_reader<const QNativeIpcKey & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QSharedMemory *)cls)->setNativeKey (arg1);
+}
+
+
+// void QSharedMemory::setNativeKey(const QString &key, QNativeIpcKey::Type type)
+
+
+static void _init_f_setNativeKey_4164 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("type", true, "QNativeIpcKey::legacyDefaultTypeForOs()");
+  decl->add_arg<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setNativeKey_4164 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QNativeIpcKey::Type>(heap, QNativeIpcKey::legacyDefaultTypeForOs()), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSharedMemory *)cls)->setNativeKey (arg1);
+  ((QSharedMemory *)cls)->setNativeKey (arg1, qt_gsi::QtToCppAdaptor<QNativeIpcKey::Type>(arg2).cref());
 }
 
 
@@ -312,6 +352,69 @@ static void _call_f_unlock_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<bool > ((bool)((QSharedMemory *)cls)->unlock ());
+}
+
+
+// static bool QSharedMemory::isKeyTypeSupported(QNativeIpcKey::Type type)
+
+
+static void _init_f_isKeyTypeSupported_2247 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("type");
+  decl->add_arg<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isKeyTypeSupported_2247 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & >() (args, heap);
+  ret.write<bool > ((bool)QSharedMemory::isKeyTypeSupported (qt_gsi::QtToCppAdaptor<QNativeIpcKey::Type>(arg1).cref()));
+}
+
+
+// static QNativeIpcKey QSharedMemory::legacyNativeKey(const QString &key, QNativeIpcKey::Type type)
+
+
+static void _init_f_legacyNativeKey_4164 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("type", true, "QNativeIpcKey::legacyDefaultTypeForOs()");
+  decl->add_arg<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & > (argspec_1);
+  decl->set_return<QNativeIpcKey > ();
+}
+
+static void _call_f_legacyNativeKey_4164 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QNativeIpcKey::Type>(heap, QNativeIpcKey::legacyDefaultTypeForOs()), heap);
+  ret.write<QNativeIpcKey > ((QNativeIpcKey)QSharedMemory::legacyNativeKey (arg1, qt_gsi::QtToCppAdaptor<QNativeIpcKey::Type>(arg2).cref()));
+}
+
+
+// static QNativeIpcKey QSharedMemory::platformSafeKey(const QString &key, QNativeIpcKey::Type type)
+
+
+static void _init_f_platformSafeKey_4164 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("type", true, "QNativeIpcKey::DefaultTypeForOs");
+  decl->add_arg<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & > (argspec_1);
+  decl->set_return<QNativeIpcKey > ();
+}
+
+static void _call_f_platformSafeKey_4164 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QNativeIpcKey::Type>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QNativeIpcKey::Type>(heap, QNativeIpcKey::DefaultTypeForOs), heap);
+  ret.write<QNativeIpcKey > ((QNativeIpcKey)QSharedMemory::platformSafeKey (arg1, qt_gsi::QtToCppAdaptor<QNativeIpcKey::Type>(arg2).cref()));
 }
 
 
@@ -357,13 +460,18 @@ static gsi::Methods methods_QSharedMemory () {
   methods += new qt_gsi::GenericMethod ("isAttached?", "@brief Method bool QSharedMemory::isAttached()\n", true, &_init_f_isAttached_c0, &_call_f_isAttached_c0);
   methods += new qt_gsi::GenericMethod (":key", "@brief Method QString QSharedMemory::key()\n", true, &_init_f_key_c0, &_call_f_key_c0);
   methods += new qt_gsi::GenericMethod ("lock", "@brief Method bool QSharedMemory::lock()\n", false, &_init_f_lock_0, &_call_f_lock_0);
+  methods += new qt_gsi::GenericMethod ("nativeIpcKey", "@brief Method QNativeIpcKey QSharedMemory::nativeIpcKey()\n", true, &_init_f_nativeIpcKey_c0, &_call_f_nativeIpcKey_c0);
   methods += new qt_gsi::GenericMethod (":nativeKey", "@brief Method QString QSharedMemory::nativeKey()\n", true, &_init_f_nativeKey_c0, &_call_f_nativeKey_c0);
   methods += new qt_gsi::GenericMethod ("setKey|key=", "@brief Method void QSharedMemory::setKey(const QString &key)\n", false, &_init_f_setKey_2025, &_call_f_setKey_2025);
-  methods += new qt_gsi::GenericMethod ("setNativeKey|nativeKey=", "@brief Method void QSharedMemory::setNativeKey(const QString &key)\n", false, &_init_f_setNativeKey_2025, &_call_f_setNativeKey_2025);
+  methods += new qt_gsi::GenericMethod ("setNativeKey|nativeKey=", "@brief Method void QSharedMemory::setNativeKey(const QNativeIpcKey &key)\n", false, &_init_f_setNativeKey_2590, &_call_f_setNativeKey_2590);
+  methods += new qt_gsi::GenericMethod ("setNativeKey", "@brief Method void QSharedMemory::setNativeKey(const QString &key, QNativeIpcKey::Type type)\n", false, &_init_f_setNativeKey_4164, &_call_f_setNativeKey_4164);
   methods += new qt_gsi::GenericMethod ("size", "@brief Method qsizetype QSharedMemory::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
   methods += new qt_gsi::GenericMethod ("unlock", "@brief Method bool QSharedMemory::unlock()\n", false, &_init_f_unlock_0, &_call_f_unlock_0);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QSharedMemory::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QSharedMemory::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += new qt_gsi::GenericStaticMethod ("isKeyTypeSupported?", "@brief Static method bool QSharedMemory::isKeyTypeSupported(QNativeIpcKey::Type type)\nThis method is static and can be called without an instance.", &_init_f_isKeyTypeSupported_2247, &_call_f_isKeyTypeSupported_2247);
+  methods += new qt_gsi::GenericStaticMethod ("legacyNativeKey", "@brief Static method QNativeIpcKey QSharedMemory::legacyNativeKey(const QString &key, QNativeIpcKey::Type type)\nThis method is static and can be called without an instance.", &_init_f_legacyNativeKey_4164, &_call_f_legacyNativeKey_4164);
+  methods += new qt_gsi::GenericStaticMethod ("platformSafeKey", "@brief Static method QNativeIpcKey QSharedMemory::platformSafeKey(const QString &key, QNativeIpcKey::Type type)\nThis method is static and can be called without an instance.", &_init_f_platformSafeKey_4164, &_call_f_platformSafeKey_4164);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QSharedMemory::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
 }
@@ -393,6 +501,18 @@ public:
 
   //  [adaptor ctor] QSharedMemory::QSharedMemory(QObject *parent)
   QSharedMemory_Adaptor(QObject *parent) : QSharedMemory(parent)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
+  //  [adaptor ctor] QSharedMemory::QSharedMemory(const QNativeIpcKey &key, QObject *parent)
+  QSharedMemory_Adaptor(const QNativeIpcKey &key) : QSharedMemory(key)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
+  //  [adaptor ctor] QSharedMemory::QSharedMemory(const QNativeIpcKey &key, QObject *parent)
+  QSharedMemory_Adaptor(const QNativeIpcKey &key, QObject *parent) : QSharedMemory(key, parent)
   {
     qt_gsi::QtObjectBase::init (this);
   }
@@ -557,6 +677,27 @@ static void _call_ctor_QSharedMemory_Adaptor_1302 (const qt_gsi::GenericStaticMe
   tl::Heap heap;
   QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QSharedMemory_Adaptor *> (new QSharedMemory_Adaptor (arg1));
+}
+
+
+//  Constructor QSharedMemory::QSharedMemory(const QNativeIpcKey &key, QObject *parent) (adaptor class)
+
+static void _init_ctor_QSharedMemory_Adaptor_3784 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<const QNativeIpcKey & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_1);
+  decl->set_return_new<QSharedMemory_Adaptor> ();
+}
+
+static void _call_ctor_QSharedMemory_Adaptor_3784 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QNativeIpcKey &arg1 = gsi::arg_reader<const QNativeIpcKey & >() (args, heap);
+  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ret.write<QSharedMemory_Adaptor *> (new QSharedMemory_Adaptor (arg1, arg2));
 }
 
 
@@ -834,6 +975,7 @@ gsi::Class<QSharedMemory> &qtdecl_QSharedMemory ();
 static gsi::Methods methods_QSharedMemory_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSharedMemory::QSharedMemory(QObject *parent)\nThis method creates an object of class QSharedMemory.", &_init_ctor_QSharedMemory_Adaptor_1302, &_call_ctor_QSharedMemory_Adaptor_1302);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSharedMemory::QSharedMemory(const QNativeIpcKey &key, QObject *parent)\nThis method creates an object of class QSharedMemory.", &_init_ctor_QSharedMemory_Adaptor_3784, &_call_ctor_QSharedMemory_Adaptor_3784);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSharedMemory::QSharedMemory(const QString &key, QObject *parent)\nThis method creates an object of class QSharedMemory.", &_init_ctor_QSharedMemory_Adaptor_3219, &_call_ctor_QSharedMemory_Adaptor_3219);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QSharedMemory::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);

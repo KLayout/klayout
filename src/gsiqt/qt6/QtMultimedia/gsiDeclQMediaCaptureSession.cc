@@ -28,6 +28,7 @@
 */
 
 #include <QMediaCaptureSession>
+#include <QAnyStringView>
 #include <QAudioInput>
 #include <QAudioOutput>
 #include <QCamera>
@@ -37,9 +38,11 @@
 #include <QMediaRecorder>
 #include <QMetaMethod>
 #include <QObject>
+#include <QScreenCapture>
 #include <QThread>
 #include <QTimerEvent>
 #include <QVideoSink>
+#include <QWindowCapture>
 #include "gsiQt.h"
 #include "gsiQtMultimediaCommon.h"
 #include <memory>
@@ -132,6 +135,37 @@ static void _call_f_recorder_0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QMediaRecorder * > ((QMediaRecorder *)((QMediaCaptureSession *)cls)->recorder ());
+}
+
+
+// QScreenCapture *QMediaCaptureSession::screenCapture()
+
+
+static void _init_f_screenCapture_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QScreenCapture * > ();
+}
+
+static void _call_f_screenCapture_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QScreenCapture * > ((QScreenCapture *)((QMediaCaptureSession *)cls)->screenCapture ());
+}
+
+
+// void QMediaCaptureSession::screenCaptureChanged()
+
+
+static void _init_f_screenCaptureChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_f_screenCaptureChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QMediaCaptureSession *)cls)->screenCaptureChanged ();
 }
 
 
@@ -235,6 +269,26 @@ static void _call_f_setRecorder_2005 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
+// void QMediaCaptureSession::setScreenCapture(QScreenCapture *screenCapture)
+
+
+static void _init_f_setScreenCapture_2035 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("screenCapture");
+  decl->add_arg<QScreenCapture * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setScreenCapture_2035 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QScreenCapture *arg1 = gsi::arg_reader<QScreenCapture * >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QMediaCaptureSession *)cls)->setScreenCapture (arg1);
+}
+
+
 // void QMediaCaptureSession::setVideoOutput(QObject *output)
 
 
@@ -275,6 +329,26 @@ static void _call_f_setVideoSink_1611 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
+// void QMediaCaptureSession::setWindowCapture(QWindowCapture *windowCapture)
+
+
+static void _init_f_setWindowCapture_2059 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("windowCapture");
+  decl->add_arg<QWindowCapture * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setWindowCapture_2059 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QWindowCapture *arg1 = gsi::arg_reader<QWindowCapture * >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QMediaCaptureSession *)cls)->setWindowCapture (arg1);
+}
+
+
 // QObject *QMediaCaptureSession::videoOutput()
 
 
@@ -302,6 +376,37 @@ static void _call_f_videoSink_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QVideoSink * > ((QVideoSink *)((QMediaCaptureSession *)cls)->videoSink ());
+}
+
+
+// QWindowCapture *QMediaCaptureSession::windowCapture()
+
+
+static void _init_f_windowCapture_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QWindowCapture * > ();
+}
+
+static void _call_f_windowCapture_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QWindowCapture * > ((QWindowCapture *)((QMediaCaptureSession *)cls)->windowCapture ());
+}
+
+
+// void QMediaCaptureSession::windowCaptureChanged()
+
+
+static void _init_f_windowCaptureChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_f_windowCaptureChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QMediaCaptureSession *)cls)->windowCaptureChanged ();
 }
 
 
@@ -341,15 +446,21 @@ static gsi::Methods methods_QMediaCaptureSession () {
   methods += new qt_gsi::GenericMethod (":camera", "@brief Method QCamera *QMediaCaptureSession::camera()\n", true, &_init_f_camera_c0, &_call_f_camera_c0);
   methods += new qt_gsi::GenericMethod (":imageCapture", "@brief Method QImageCapture *QMediaCaptureSession::imageCapture()\n", false, &_init_f_imageCapture_0, &_call_f_imageCapture_0);
   methods += new qt_gsi::GenericMethod (":recorder", "@brief Method QMediaRecorder *QMediaCaptureSession::recorder()\n", false, &_init_f_recorder_0, &_call_f_recorder_0);
+  methods += new qt_gsi::GenericMethod ("screenCapture", "@brief Method QScreenCapture *QMediaCaptureSession::screenCapture()\n", false, &_init_f_screenCapture_0, &_call_f_screenCapture_0);
+  methods += new qt_gsi::GenericMethod ("screenCaptureChanged", "@brief Method void QMediaCaptureSession::screenCaptureChanged()\n", false, &_init_f_screenCaptureChanged_0, &_call_f_screenCaptureChanged_0);
   methods += new qt_gsi::GenericMethod ("setAudioInput|audioInput=", "@brief Method void QMediaCaptureSession::setAudioInput(QAudioInput *input)\n", false, &_init_f_setAudioInput_1729, &_call_f_setAudioInput_1729);
   methods += new qt_gsi::GenericMethod ("setAudioOutput|audioOutput=", "@brief Method void QMediaCaptureSession::setAudioOutput(QAudioOutput *output)\n", false, &_init_f_setAudioOutput_1858, &_call_f_setAudioOutput_1858);
   methods += new qt_gsi::GenericMethod ("setCamera|camera=", "@brief Method void QMediaCaptureSession::setCamera(QCamera *camera)\n", false, &_init_f_setCamera_1288, &_call_f_setCamera_1288);
   methods += new qt_gsi::GenericMethod ("setImageCapture|imageCapture=", "@brief Method void QMediaCaptureSession::setImageCapture(QImageCapture *imageCapture)\n", false, &_init_f_setImageCapture_1910, &_call_f_setImageCapture_1910);
   methods += new qt_gsi::GenericMethod ("setRecorder|recorder=", "@brief Method void QMediaCaptureSession::setRecorder(QMediaRecorder *recorder)\n", false, &_init_f_setRecorder_2005, &_call_f_setRecorder_2005);
+  methods += new qt_gsi::GenericMethod ("setScreenCapture", "@brief Method void QMediaCaptureSession::setScreenCapture(QScreenCapture *screenCapture)\n", false, &_init_f_setScreenCapture_2035, &_call_f_setScreenCapture_2035);
   methods += new qt_gsi::GenericMethod ("setVideoOutput|videoOutput=", "@brief Method void QMediaCaptureSession::setVideoOutput(QObject *output)\n", false, &_init_f_setVideoOutput_1302, &_call_f_setVideoOutput_1302);
   methods += new qt_gsi::GenericMethod ("setVideoSink|videoSink=", "@brief Method void QMediaCaptureSession::setVideoSink(QVideoSink *sink)\n", false, &_init_f_setVideoSink_1611, &_call_f_setVideoSink_1611);
+  methods += new qt_gsi::GenericMethod ("setWindowCapture", "@brief Method void QMediaCaptureSession::setWindowCapture(QWindowCapture *windowCapture)\n", false, &_init_f_setWindowCapture_2059, &_call_f_setWindowCapture_2059);
   methods += new qt_gsi::GenericMethod (":videoOutput", "@brief Method QObject *QMediaCaptureSession::videoOutput()\n", true, &_init_f_videoOutput_c0, &_call_f_videoOutput_c0);
   methods += new qt_gsi::GenericMethod (":videoSink", "@brief Method QVideoSink *QMediaCaptureSession::videoSink()\n", true, &_init_f_videoSink_c0, &_call_f_videoSink_c0);
+  methods += new qt_gsi::GenericMethod ("windowCapture", "@brief Method QWindowCapture *QMediaCaptureSession::windowCapture()\n", false, &_init_f_windowCapture_0, &_call_f_windowCapture_0);
+  methods += new qt_gsi::GenericMethod ("windowCaptureChanged", "@brief Method void QMediaCaptureSession::windowCaptureChanged()\n", false, &_init_f_windowCaptureChanged_0, &_call_f_windowCaptureChanged_0);
   methods += gsi::qt_signal ("audioInputChanged()", "audioInputChanged", "@brief Signal declaration for QMediaCaptureSession::audioInputChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("audioOutputChanged()", "audioOutputChanged", "@brief Signal declaration for QMediaCaptureSession::audioOutputChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("cameraChanged()", "cameraChanged", "@brief Signal declaration for QMediaCaptureSession::cameraChanged()\nYou can bind a procedure to this signal.");

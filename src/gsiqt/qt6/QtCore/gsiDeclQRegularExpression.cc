@@ -533,7 +533,8 @@ namespace qt_gsi
 
 static gsi::Enum<QRegularExpression::WildcardConversionOption> decl_QRegularExpression_WildcardConversionOption_Enum ("QtCore", "QRegularExpression_WildcardConversionOption",
     gsi::enum_const ("DefaultWildcardConversion", QRegularExpression::DefaultWildcardConversion, "@brief Enum constant QRegularExpression::DefaultWildcardConversion") +
-    gsi::enum_const ("UnanchoredWildcardConversion", QRegularExpression::UnanchoredWildcardConversion, "@brief Enum constant QRegularExpression::UnanchoredWildcardConversion"),
+    gsi::enum_const ("UnanchoredWildcardConversion", QRegularExpression::UnanchoredWildcardConversion, "@brief Enum constant QRegularExpression::UnanchoredWildcardConversion") +
+    gsi::enum_const ("NonPathWildcardConversion", QRegularExpression::NonPathWildcardConversion, "@brief Enum constant QRegularExpression::NonPathWildcardConversion"),
   "@qt\n@brief This class represents the QRegularExpression::WildcardConversionOption enum");
 
 static gsi::QFlagsClass<QRegularExpression::WildcardConversionOption > decl_QRegularExpression_WildcardConversionOption_Enums ("QtCore", "QRegularExpression_QFlags_WildcardConversionOption",

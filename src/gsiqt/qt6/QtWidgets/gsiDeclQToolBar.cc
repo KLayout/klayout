@@ -30,6 +30,7 @@
 #include <QToolBar>
 #include <QAction>
 #include <QActionEvent>
+#include <QAnyStringView>
 #include <QBackingStore>
 #include <QBitmap>
 #include <QChildEvent>
@@ -160,120 +161,6 @@ static void _call_f_actionGeometry_c1309 (const qt_gsi::GenericMethod * /*decl*/
   tl::Heap heap;
   QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
   ret.write<QRect > ((QRect)((QToolBar *)cls)->actionGeometry (arg1));
-}
-
-
-// void QToolBar::addAction(QAction *action)
-
-
-static void _init_f_addAction_1309 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("action");
-  decl->add_arg<QAction * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_addAction_1309 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QToolBar *)cls)->addAction (arg1);
-}
-
-
-// QAction *QToolBar::addAction(const QString &text)
-
-
-static void _init_f_addAction_2025 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("text");
-  decl->add_arg<const QString & > (argspec_0);
-  decl->set_return<QAction * > ();
-}
-
-static void _call_f_addAction_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  ret.write<QAction * > ((QAction *)((QToolBar *)cls)->addAction (arg1));
-}
-
-
-// QAction *QToolBar::addAction(const QIcon &icon, const QString &text)
-
-
-static void _init_f_addAction_3704 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("icon");
-  decl->add_arg<const QIcon & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("text");
-  decl->add_arg<const QString & > (argspec_1);
-  decl->set_return<QAction * > ();
-}
-
-static void _call_f_addAction_3704 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
-  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
-  ret.write<QAction * > ((QAction *)((QToolBar *)cls)->addAction (arg1, arg2));
-}
-
-
-// QAction *QToolBar::addAction(const QString &text, const QObject *receiver, const char *member)
-
-
-static void _init_f_addAction_5537 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("text");
-  decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("receiver");
-  decl->add_arg<const QObject * > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("member");
-  decl->add_arg<const char * > (argspec_2);
-  decl->set_return<QAction * > ();
-}
-
-static void _call_f_addAction_5537 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QObject *arg2 = gsi::arg_reader<const QObject * >() (args, heap);
-  const char *arg3 = gsi::arg_reader<const char * >() (args, heap);
-  ret.write<QAction * > ((QAction *)((QToolBar *)cls)->addAction (arg1, arg2, arg3));
-}
-
-
-// QAction *QToolBar::addAction(const QIcon &icon, const QString &text, const QObject *receiver, const char *member)
-
-
-static void _init_f_addAction_7216 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("icon");
-  decl->add_arg<const QIcon & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("text");
-  decl->add_arg<const QString & > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("receiver");
-  decl->add_arg<const QObject * > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("member");
-  decl->add_arg<const char * > (argspec_3);
-  decl->set_return<QAction * > ();
-}
-
-static void _call_f_addAction_7216 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
-  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
-  const QObject *arg3 = gsi::arg_reader<const QObject * >() (args, heap);
-  const char *arg4 = gsi::arg_reader<const char * >() (args, heap);
-  ret.write<QAction * > ((QAction *)((QToolBar *)cls)->addAction (arg1, arg2, arg3, arg4));
 }
 
 
@@ -680,11 +567,6 @@ static gsi::Methods methods_QToolBar () {
   methods += new qt_gsi::GenericMethod ("actionAt", "@brief Method QAction *QToolBar::actionAt(const QPoint &p)\n", true, &_init_f_actionAt_c1916, &_call_f_actionAt_c1916);
   methods += new qt_gsi::GenericMethod ("actionAt", "@brief Method QAction *QToolBar::actionAt(int x, int y)\n", true, &_init_f_actionAt_c1426, &_call_f_actionAt_c1426);
   methods += new qt_gsi::GenericMethod ("actionGeometry", "@brief Method QRect QToolBar::actionGeometry(QAction *action)\n", true, &_init_f_actionGeometry_c1309, &_call_f_actionGeometry_c1309);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method void QToolBar::addAction(QAction *action)\n", false, &_init_f_addAction_1309, &_call_f_addAction_1309);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QToolBar::addAction(const QString &text)\n", false, &_init_f_addAction_2025, &_call_f_addAction_2025);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QToolBar::addAction(const QIcon &icon, const QString &text)\n", false, &_init_f_addAction_3704, &_call_f_addAction_3704);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QToolBar::addAction(const QString &text, const QObject *receiver, const char *member)\n", false, &_init_f_addAction_5537, &_call_f_addAction_5537);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QToolBar::addAction(const QIcon &icon, const QString &text, const QObject *receiver, const char *member)\n", false, &_init_f_addAction_7216, &_call_f_addAction_7216);
   methods += new qt_gsi::GenericMethod ("addSeparator", "@brief Method QAction *QToolBar::addSeparator()\n", false, &_init_f_addSeparator_0, &_call_f_addSeparator_0);
   methods += new qt_gsi::GenericMethod ("addWidget", "@brief Method QAction *QToolBar::addWidget(QWidget *widget)\n", false, &_init_f_addWidget_1315, &_call_f_addWidget_1315);
   methods += new qt_gsi::GenericMethod (":allowedAreas", "@brief Method QFlags<Qt::ToolBarArea> QToolBar::allowedAreas()\n", true, &_init_f_allowedAreas_c0, &_call_f_allowedAreas_c0);

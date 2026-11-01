@@ -44,6 +44,25 @@
     return !(*a == b);
   }
 
+//  Constructor QJsonValueRef::QJsonValueRef(const QJsonValueRef &)
+
+
+static void _init_ctor_QJsonValueRef_2598 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<const QJsonValueRef & > (argspec_0);
+  decl->set_return_new<QJsonValueRef> ();
+}
+
+static void _call_ctor_QJsonValueRef_2598 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QJsonValueRef &arg1 = gsi::arg_reader<const QJsonValueRef & >() (args, heap);
+  ret.write<QJsonValueRef *> (new QJsonValueRef (arg1));
+}
+
+
 //  Constructor QJsonValueRef::QJsonValueRef(QJsonArray *array, qsizetype idx)
 
 
@@ -85,25 +104,6 @@ static void _call_ctor_QJsonValueRef_3046 (const qt_gsi::GenericStaticMethod * /
   QJsonObject *arg1 = gsi::arg_reader<QJsonObject * >() (args, heap);
   qsizetype arg2 = gsi::arg_reader<qsizetype >() (args, heap);
   ret.write<QJsonValueRef *> (new QJsonValueRef (arg1, arg2));
-}
-
-
-//  Constructor QJsonValueRef::QJsonValueRef(const QJsonValueRef &)
-
-
-static void _init_ctor_QJsonValueRef_2598 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<const QJsonValueRef & > (argspec_0);
-  decl->set_return_new<QJsonValueRef> ();
-}
-
-static void _call_ctor_QJsonValueRef_2598 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QJsonValueRef &arg1 = gsi::arg_reader<const QJsonValueRef & >() (args, heap);
-  ret.write<QJsonValueRef *> (new QJsonValueRef (arg1));
 }
 
 
@@ -247,6 +247,25 @@ static void _call_f_operator_eq__2598 (const qt_gsi::GenericMethod * /*decl*/, v
   tl::Heap heap;
   const QJsonValueRef &arg1 = gsi::arg_reader<const QJsonValueRef & >() (args, heap);
   ret.write<QJsonValueRef & > ((QJsonValueRef &)((QJsonValueRef *)cls)->operator = (arg1));
+}
+
+
+// const QJsonValue QJsonValueRef::operator[](QLatin1StringView key)
+
+
+static void _init_f_operator_index__c2112 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<QLatin1StringView > (argspec_0);
+  decl->set_return<const QJsonValue > ();
+}
+
+static void _call_f_operator_index__c2112 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QLatin1StringView arg1 = gsi::arg_reader<QLatin1StringView >() (args, heap);
+  ret.write<const QJsonValue > ((const QJsonValue)((QJsonValueRef *)cls)->operator[] (arg1));
 }
 
 
@@ -424,15 +443,35 @@ static void _call_f_type_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
+//  bool ::operator==(const QJsonValueRef &lhs, const QJsonValueConstRef &rhs)
+static bool op_QJsonValueRef_operator_eq__eq__5607u1(const QJsonValueRef *_self, const QJsonValueConstRef &rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(const QJsonValueRef &lhs, const QJsonValueConstRef &rhs)
+static bool op_QJsonValueRef_operator_excl__eq__5607u1(const QJsonValueRef *_self, const QJsonValueConstRef &rhs) {
+  return operator!=(*_self, rhs);
+}
+
+//  bool ::operator==(const QJsonValueRef &lhs, const QJsonValueRef &rhs)
+static bool op_QJsonValueRef_operator_eq__eq__5088(const QJsonValueRef *_self, const QJsonValueRef &rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(const QJsonValueRef &lhs, const QJsonValueRef &rhs)
+static bool op_QJsonValueRef_operator_excl__eq__5088(const QJsonValueRef *_self, const QJsonValueRef &rhs) {
+  return operator!=(*_self, rhs);
+}
+
 
 namespace gsi
 {
 
 static gsi::Methods methods_QJsonValueRef () {
   gsi::Methods methods;
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QJsonValueRef::QJsonValueRef(const QJsonValueRef &)\nThis method creates an object of class QJsonValueRef.", &_init_ctor_QJsonValueRef_2598, &_call_ctor_QJsonValueRef_2598);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QJsonValueRef::QJsonValueRef(QJsonArray *array, qsizetype idx)\nThis method creates an object of class QJsonValueRef.", &_init_ctor_QJsonValueRef_2958, &_call_ctor_QJsonValueRef_2958);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QJsonValueRef::QJsonValueRef(QJsonObject *object, qsizetype idx)\nThis method creates an object of class QJsonValueRef.", &_init_ctor_QJsonValueRef_3046, &_call_ctor_QJsonValueRef_3046);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QJsonValueRef::QJsonValueRef(const QJsonValueRef &)\nThis method creates an object of class QJsonValueRef.", &_init_ctor_QJsonValueRef_2598, &_call_ctor_QJsonValueRef_2598);
   methods += new qt_gsi::GenericMethod ("isArray?", "@brief Method bool QJsonValueRef::isArray()\n", true, &_init_f_isArray_c0, &_call_f_isArray_c0);
   methods += new qt_gsi::GenericMethod ("isBool?", "@brief Method bool QJsonValueRef::isBool()\n", true, &_init_f_isBool_c0, &_call_f_isBool_c0);
   methods += new qt_gsi::GenericMethod ("isDouble?", "@brief Method bool QJsonValueRef::isDouble()\n", true, &_init_f_isDouble_c0, &_call_f_isDouble_c0);
@@ -442,6 +481,7 @@ static gsi::Methods methods_QJsonValueRef () {
   methods += new qt_gsi::GenericMethod ("isUndefined?", "@brief Method bool QJsonValueRef::isUndefined()\n", true, &_init_f_isUndefined_c0, &_call_f_isUndefined_c0);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QJsonValueRef &QJsonValueRef::operator =(const QJsonValue &val)\n", false, &_init_f_operator_eq__2313, &_call_f_operator_eq__2313);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QJsonValueRef &QJsonValueRef::operator =(const QJsonValueRef &val)\n", false, &_init_f_operator_eq__2598, &_call_f_operator_eq__2598);
+  methods += new qt_gsi::GenericMethod ("[]", "@brief Method const QJsonValue QJsonValueRef::operator[](QLatin1StringView key)\n", true, &_init_f_operator_index__c2112, &_call_f_operator_index__c2112);
   methods += new qt_gsi::GenericMethod ("[]", "@brief Method const QJsonValue QJsonValueRef::operator[](qsizetype i)\n", true, &_init_f_operator_index__c1442, &_call_f_operator_index__c1442);
   methods += new qt_gsi::GenericMethod ("toArray", "@brief Method QJsonArray QJsonValueRef::toArray()\n", true, &_init_f_toArray_c0, &_call_f_toArray_c0);
   methods += new qt_gsi::GenericMethod ("toBool", "@brief Method bool QJsonValueRef::toBool(bool defaultValue)\n", true, &_init_f_toBool_c864, &_call_f_toBool_c864);
@@ -452,10 +492,16 @@ static gsi::Methods methods_QJsonValueRef () {
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QJsonValueRef::toString(const QString &defaultValue)\n", true, &_init_f_toString_c2025, &_call_f_toString_c2025);
   methods += new qt_gsi::GenericMethod ("toVariant", "@brief Method QVariant QJsonValueRef::toVariant()\n", true, &_init_f_toVariant_c0, &_call_f_toVariant_c0);
   methods += new qt_gsi::GenericMethod ("type", "@brief Method QJsonValue::Type QJsonValueRef::type()\n", true, &_init_f_type_c0, &_call_f_type_c0);
+  methods += gsi::method_ext("==", &::op_QJsonValueRef_operator_eq__eq__5607u1, gsi::arg ("rhs"), "@brief Operator bool ::operator==(const QJsonValueRef &lhs, const QJsonValueConstRef &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QJsonValueRef_operator_excl__eq__5607u1, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(const QJsonValueRef &lhs, const QJsonValueConstRef &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("==", &::op_QJsonValueRef_operator_eq__eq__5088, gsi::arg ("rhs"), "@brief Operator bool ::operator==(const QJsonValueRef &lhs, const QJsonValueRef &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QJsonValueRef_operator_excl__eq__5088, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(const QJsonValueRef &lhs, const QJsonValueRef &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 
-gsi::Class<QJsonValueRef> decl_QJsonValueRef ("QtCore", "QJsonValueRef",
+gsi::Class<QJsonValueConstRef> &qtdecl_QJsonValueConstRef ();
+
+gsi::Class<QJsonValueRef> decl_QJsonValueRef (qtdecl_QJsonValueConstRef (), "QtCore", "QJsonValueRef",
   gsi::method_ext("==", &QJsonValueRef_operator_eq, gsi::arg ("other"), "@brief Method bool QJsonValueRef::operator==(const QJsonValueRef &) const") +
   gsi::method_ext("!=", &QJsonValueRef_operator_ne, gsi::arg ("other"), "@brief Method bool QJsonValueRef::operator!=(const QJsonValueRef &) const") 
 +

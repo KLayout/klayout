@@ -71,6 +71,21 @@ static void _call_ctor_QColorTransform_2861 (const qt_gsi::GenericStaticMethod *
 }
 
 
+// bool QColorTransform::isIdentity()
+
+
+static void _init_f_isIdentity_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isIdentity_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QColorTransform *)cls)->isIdentity ());
+}
+
+
 // unsigned int QColorTransform::map(unsigned int argb)
 
 
@@ -167,6 +182,16 @@ static void _call_f_swap_2166 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+//  bool ::operator==(const QColorTransform &ct1, const QColorTransform &ct2)
+static bool op_QColorTransform_operator_eq__eq__5614(const QColorTransform *_self, const QColorTransform &ct2) {
+  return operator==(*_self, ct2);
+}
+
+//  bool ::operator!=(const QColorTransform &ct1, const QColorTransform &ct2)
+static bool op_QColorTransform_operator_excl__eq__5614(const QColorTransform *_self, const QColorTransform &ct2) {
+  return operator!=(*_self, ct2);
+}
+
 
 namespace gsi
 {
@@ -175,11 +200,14 @@ static gsi::Methods methods_QColorTransform () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QColorTransform::QColorTransform()\nThis method creates an object of class QColorTransform.", &_init_ctor_QColorTransform_0, &_call_ctor_QColorTransform_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QColorTransform::QColorTransform(const QColorTransform &colorTransform)\nThis method creates an object of class QColorTransform.", &_init_ctor_QColorTransform_2861, &_call_ctor_QColorTransform_2861);
+  methods += new qt_gsi::GenericMethod ("isIdentity?", "@brief Method bool QColorTransform::isIdentity()\n", true, &_init_f_isIdentity_c0, &_call_f_isIdentity_c0);
   methods += new qt_gsi::GenericMethod ("map", "@brief Method unsigned int QColorTransform::map(unsigned int argb)\n", true, &_init_f_map_c1772, &_call_f_map_c1772);
   methods += new qt_gsi::GenericMethod ("map", "@brief Method QRgba64 QColorTransform::map(QRgba64 rgba64)\n", true, &_init_f_map_c1003, &_call_f_map_c1003);
   methods += new qt_gsi::GenericMethod ("map", "@brief Method QColor QColorTransform::map(const QColor &color)\n", true, &_init_f_map_c1905, &_call_f_map_c1905);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QColorTransform &QColorTransform::operator=(const QColorTransform &other)\n", false, &_init_f_operator_eq__2861, &_call_f_operator_eq__2861);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QColorTransform::swap(QColorTransform &other)\n", false, &_init_f_swap_2166, &_call_f_swap_2166);
+  methods += gsi::method_ext("==", &::op_QColorTransform_operator_eq__eq__5614, gsi::arg ("ct2"), "@brief Operator bool ::operator==(const QColorTransform &ct1, const QColorTransform &ct2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QColorTransform_operator_excl__eq__5614, gsi::arg ("ct2"), "@brief Operator bool ::operator!=(const QColorTransform &ct1, const QColorTransform &ct2)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

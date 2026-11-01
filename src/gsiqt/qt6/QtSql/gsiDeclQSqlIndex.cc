@@ -252,6 +252,26 @@ static void _call_f_setName_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
+// void QSqlIndex::swap(QSqlIndex &other)
+
+
+static void _init_f_swap_1507 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<QSqlIndex & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_swap_1507 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QSqlIndex &arg1 = gsi::arg_reader<QSqlIndex & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QSqlIndex *)cls)->swap (arg1);
+}
+
+
 
 namespace gsi
 {
@@ -269,6 +289,7 @@ static gsi::Methods methods_QSqlIndex () {
   methods += new qt_gsi::GenericMethod ("setCursorName|cursorName=", "@brief Method void QSqlIndex::setCursorName(const QString &cursorName)\n", false, &_init_f_setCursorName_2025, &_call_f_setCursorName_2025);
   methods += new qt_gsi::GenericMethod ("setDescending", "@brief Method void QSqlIndex::setDescending(int i, bool desc)\n", false, &_init_f_setDescending_1523, &_call_f_setDescending_1523);
   methods += new qt_gsi::GenericMethod ("setName|name=", "@brief Method void QSqlIndex::setName(const QString &name)\n", false, &_init_f_setName_2025, &_call_f_setName_2025);
+  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QSqlIndex::swap(QSqlIndex &other)\n", false, &_init_f_swap_1507, &_call_f_swap_1507);
   return methods;
 }
 

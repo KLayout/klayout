@@ -29,6 +29,7 @@
 
 #include <QGraphicsProxyWidget>
 #include <QAction>
+#include <QAnyStringView>
 #include <QChildEvent>
 #include <QCloseEvent>
 #include <QCursor>

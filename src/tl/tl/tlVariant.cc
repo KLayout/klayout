@@ -2920,21 +2920,33 @@ bool Variant::user_is_ref () const
 
 void Variant::user_destroy ()
 {
-  tl_assert (is_user ());
-  void *obj = to_user ();
+  const auto *cls = user_cls ();
+  void *obj = user_take ();
   if (obj) {
-    user_cls ()->destroy (obj);
-    m_type = t_nil;
+    tl_assert (cls);
+    cls->destroy (obj);
   }
 }
 
 void *Variant::user_take ()
 {
   tl_assert (is_user ());
+
   void *obj = to_user ();
   if (obj) {
-    m_type = t_nil;
+
+    //  Resets the reference so we really own the tl::Object that is returned
+    if (m_type == t_user_ref) {
+      tl::WeakOrSharedPtr *wptr = const_cast<tl::WeakOrSharedPtr *> (reinterpret_cast <const tl::WeakOrSharedPtr *> (m_var.mp_user_ref.ptr));
+      tl::Object *obj = wptr->get ();
+      wptr->unshare ();
+      *wptr = tl::WeakOrSharedPtr ();
+      user_cls ()->detach_proxy (obj);
+    }
+
   }
+
+  m_type = t_nil;
   return obj;
 }
 

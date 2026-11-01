@@ -63,7 +63,7 @@ static void _init_ctor_QDateTime_3801 (qt_gsi::GenericStaticMethod *decl)
   decl->add_arg<QDate > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("time");
   decl->add_arg<QTime > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("spec", true, "Qt::LocalTime");
+  static gsi::ArgSpecBase argspec_2 ("spec");
   decl->add_arg<const qt_gsi::Converter<Qt::TimeSpec>::target_type & > (argspec_2);
   static gsi::ArgSpecBase argspec_3 ("offsetSeconds", true, "0");
   decl->add_arg<int > (argspec_3);
@@ -76,7 +76,7 @@ static void _call_ctor_QDateTime_3801 (const qt_gsi::GenericStaticMethod * /*dec
   tl::Heap heap;
   QDate arg1 = gsi::arg_reader<QDate >() (args, heap);
   QTime arg2 = gsi::arg_reader<QTime >() (args, heap);
-  const qt_gsi::Converter<Qt::TimeSpec>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::TimeSpec>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::TimeSpec>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::TimeSpec>(heap, Qt::LocalTime), heap);
+  const qt_gsi::Converter<Qt::TimeSpec>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<Qt::TimeSpec>::target_type & >() (args, heap);
   int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<QDateTime *> (new QDateTime (arg1, arg2, qt_gsi::QtToCppAdaptor<Qt::TimeSpec>(arg3).cref(), arg4));
 }
@@ -104,6 +104,28 @@ static void _call_ctor_QDateTime_3804 (const qt_gsi::GenericStaticMethod * /*dec
   QTime arg2 = gsi::arg_reader<QTime >() (args, heap);
   const QTimeZone &arg3 = gsi::arg_reader<const QTimeZone & >() (args, heap);
   ret.write<QDateTime *> (new QDateTime (arg1, arg2, arg3));
+}
+
+
+//  Constructor QDateTime::QDateTime(QDate date, QTime time)
+
+
+static void _init_ctor_QDateTime_1707 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("date");
+  decl->add_arg<QDate > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("time");
+  decl->add_arg<QTime > (argspec_1);
+  decl->set_return_new<QDateTime> ();
+}
+
+static void _call_ctor_QDateTime_1707 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QDate arg1 = gsi::arg_reader<QDate >() (args, heap);
+  QTime arg2 = gsi::arg_reader<QTime >() (args, heap);
+  ret.write<QDateTime *> (new QDateTime (arg1, arg2));
 }
 
 
@@ -547,6 +569,21 @@ static void _call_f_time_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
+// QTimeZone QDateTime::timeRepresentation()
+
+
+static void _init_f_timeRepresentation_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QTimeZone > ();
+}
+
+static void _call_f_timeRepresentation_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QTimeZone > ((QTimeZone)((QDateTime *)cls)->timeRepresentation ());
+}
+
+
 // Qt::TimeSpec QDateTime::timeSpec()
 
 
@@ -750,6 +787,25 @@ static void _call_f_toUTC_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
+// static QDateTime QDateTime::currentDateTime(const QTimeZone &zone)
+
+
+static void _init_f_currentDateTime_2205 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("zone");
+  decl->add_arg<const QTimeZone & > (argspec_0);
+  decl->set_return<QDateTime > ();
+}
+
+static void _call_f_currentDateTime_2205 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QTimeZone &arg1 = gsi::arg_reader<const QTimeZone & >() (args, heap);
+  ret.write<QDateTime > ((QDateTime)QDateTime::currentDateTime (arg1));
+}
+
+
 // static QDateTime QDateTime::currentDateTime()
 
 
@@ -817,7 +873,7 @@ static void _init_f_fromMSecsSinceEpoch_3080 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("msecs");
   decl->add_arg<qint64 > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("spec", true, "Qt::LocalTime");
+  static gsi::ArgSpecBase argspec_1 ("spec");
   decl->add_arg<const qt_gsi::Converter<Qt::TimeSpec>::target_type & > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("offsetFromUtc", true, "0");
   decl->add_arg<int > (argspec_2);
@@ -829,7 +885,7 @@ static void _call_f_fromMSecsSinceEpoch_3080 (const qt_gsi::GenericStaticMethod 
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
-  const qt_gsi::Converter<Qt::TimeSpec>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::TimeSpec>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::TimeSpec>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::TimeSpec>(heap, Qt::LocalTime), heap);
+  const qt_gsi::Converter<Qt::TimeSpec>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::TimeSpec>::target_type & >() (args, heap);
   int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<QDateTime > ((QDateTime)QDateTime::fromMSecsSinceEpoch (arg1, qt_gsi::QtToCppAdaptor<Qt::TimeSpec>(arg2).cref(), arg3));
 }
@@ -857,6 +913,25 @@ static void _call_f_fromMSecsSinceEpoch_3083 (const qt_gsi::GenericStaticMethod 
 }
 
 
+// static QDateTime QDateTime::fromMSecsSinceEpoch(qint64 msecs)
+
+
+static void _init_f_fromMSecsSinceEpoch_986 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("msecs");
+  decl->add_arg<qint64 > (argspec_0);
+  decl->set_return<QDateTime > ();
+}
+
+static void _call_f_fromMSecsSinceEpoch_986 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
+  ret.write<QDateTime > ((QDateTime)QDateTime::fromMSecsSinceEpoch (arg1));
+}
+
+
 // static QDateTime QDateTime::fromSecsSinceEpoch(qint64 secs, Qt::TimeSpec spec, int offsetFromUtc)
 
 
@@ -864,7 +939,7 @@ static void _init_f_fromSecsSinceEpoch_3080 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("secs");
   decl->add_arg<qint64 > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("spec", true, "Qt::LocalTime");
+  static gsi::ArgSpecBase argspec_1 ("spec");
   decl->add_arg<const qt_gsi::Converter<Qt::TimeSpec>::target_type & > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("offsetFromUtc", true, "0");
   decl->add_arg<int > (argspec_2);
@@ -876,7 +951,7 @@ static void _call_f_fromSecsSinceEpoch_3080 (const qt_gsi::GenericStaticMethod *
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
-  const qt_gsi::Converter<Qt::TimeSpec>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::TimeSpec>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::TimeSpec>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::TimeSpec>(heap, Qt::LocalTime), heap);
+  const qt_gsi::Converter<Qt::TimeSpec>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::TimeSpec>::target_type & >() (args, heap);
   int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<QDateTime > ((QDateTime)QDateTime::fromSecsSinceEpoch (arg1, qt_gsi::QtToCppAdaptor<Qt::TimeSpec>(arg2).cref(), arg3));
 }
@@ -901,6 +976,25 @@ static void _call_f_fromSecsSinceEpoch_3083 (const qt_gsi::GenericStaticMethod *
   qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   const QTimeZone &arg2 = gsi::arg_reader<const QTimeZone & >() (args, heap);
   ret.write<QDateTime > ((QDateTime)QDateTime::fromSecsSinceEpoch (arg1, arg2));
+}
+
+
+// static QDateTime QDateTime::fromSecsSinceEpoch(qint64 secs)
+
+
+static void _init_f_fromSecsSinceEpoch_986 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("secs");
+  decl->add_arg<qint64 > (argspec_0);
+  decl->set_return<QDateTime > ();
+}
+
+static void _call_f_fromSecsSinceEpoch_986 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
+  ret.write<QDateTime > ((QDateTime)QDateTime::fromSecsSinceEpoch (arg1));
 }
 
 
@@ -990,6 +1084,7 @@ static gsi::Methods methods_QDateTime () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDateTime::QDateTime()\nThis method creates an object of class QDateTime.", &_init_ctor_QDateTime_0, &_call_ctor_QDateTime_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDateTime::QDateTime(QDate date, QTime time, Qt::TimeSpec spec, int offsetSeconds)\nThis method creates an object of class QDateTime.", &_init_ctor_QDateTime_3801, &_call_ctor_QDateTime_3801);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDateTime::QDateTime(QDate date, QTime time, const QTimeZone &timeZone)\nThis method creates an object of class QDateTime.", &_init_ctor_QDateTime_3804, &_call_ctor_QDateTime_3804);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDateTime::QDateTime(QDate date, QTime time)\nThis method creates an object of class QDateTime.", &_init_ctor_QDateTime_1707, &_call_ctor_QDateTime_1707);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDateTime::QDateTime(const QDateTime &other)\nThis method creates an object of class QDateTime.", &_init_ctor_QDateTime_2175, &_call_ctor_QDateTime_2175);
   methods += new qt_gsi::GenericMethod ("addDays", "@brief Method QDateTime QDateTime::addDays(qint64 days)\n", true, &_init_f_addDays_c986, &_call_f_addDays_c986);
   methods += new qt_gsi::GenericMethod ("addMSecs", "@brief Method QDateTime QDateTime::addMSecs(qint64 msecs)\n", true, &_init_f_addMSecs_c986, &_call_f_addMSecs_c986);
@@ -1014,6 +1109,7 @@ static gsi::Methods methods_QDateTime () {
   methods += new qt_gsi::GenericMethod ("setTimeZone|timeZone=", "@brief Method void QDateTime::setTimeZone(const QTimeZone &toZone)\n", false, &_init_f_setTimeZone_2205, &_call_f_setTimeZone_2205);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QDateTime::swap(QDateTime &other)\n", false, &_init_f_swap_1480, &_call_f_swap_1480);
   methods += new qt_gsi::GenericMethod (":time", "@brief Method QTime QDateTime::time()\n", true, &_init_f_time_c0, &_call_f_time_c0);
+  methods += new qt_gsi::GenericMethod ("timeRepresentation", "@brief Method QTimeZone QDateTime::timeRepresentation()\n", true, &_init_f_timeRepresentation_c0, &_call_f_timeRepresentation_c0);
   methods += new qt_gsi::GenericMethod (":timeSpec", "@brief Method Qt::TimeSpec QDateTime::timeSpec()\n", true, &_init_f_timeSpec_c0, &_call_f_timeSpec_c0);
   methods += new qt_gsi::GenericMethod (":timeZone", "@brief Method QTimeZone QDateTime::timeZone()\n", true, &_init_f_timeZone_c0, &_call_f_timeZone_c0);
   methods += new qt_gsi::GenericMethod ("timeZoneAbbreviation", "@brief Method QString QDateTime::timeZoneAbbreviation()\n", true, &_init_f_timeZoneAbbreviation_c0, &_call_f_timeZoneAbbreviation_c0);
@@ -1026,14 +1122,17 @@ static gsi::Methods methods_QDateTime () {
   methods += new qt_gsi::GenericMethod ("toTimeSpec", "@brief Method QDateTime QDateTime::toTimeSpec(Qt::TimeSpec spec)\n", true, &_init_f_toTimeSpec_c1543, &_call_f_toTimeSpec_c1543);
   methods += new qt_gsi::GenericMethod ("toTimeZone", "@brief Method QDateTime QDateTime::toTimeZone(const QTimeZone &toZone)\n", true, &_init_f_toTimeZone_c2205, &_call_f_toTimeZone_c2205);
   methods += new qt_gsi::GenericMethod ("toUTC", "@brief Method QDateTime QDateTime::toUTC()\n", true, &_init_f_toUTC_c0, &_call_f_toUTC_c0);
+  methods += new qt_gsi::GenericStaticMethod ("currentDateTime", "@brief Static method QDateTime QDateTime::currentDateTime(const QTimeZone &zone)\nThis method is static and can be called without an instance.", &_init_f_currentDateTime_2205, &_call_f_currentDateTime_2205);
   methods += new qt_gsi::GenericStaticMethod ("currentDateTime", "@brief Static method QDateTime QDateTime::currentDateTime()\nThis method is static and can be called without an instance.", &_init_f_currentDateTime_0, &_call_f_currentDateTime_0);
   methods += new qt_gsi::GenericStaticMethod ("currentDateTimeUtc", "@brief Static method QDateTime QDateTime::currentDateTimeUtc()\nThis method is static and can be called without an instance.", &_init_f_currentDateTimeUtc_0, &_call_f_currentDateTimeUtc_0);
   methods += new qt_gsi::GenericStaticMethod ("currentMSecsSinceEpoch", "@brief Static method qint64 QDateTime::currentMSecsSinceEpoch()\nThis method is static and can be called without an instance.", &_init_f_currentMSecsSinceEpoch_0, &_call_f_currentMSecsSinceEpoch_0);
   methods += new qt_gsi::GenericStaticMethod ("currentSecsSinceEpoch", "@brief Static method qint64 QDateTime::currentSecsSinceEpoch()\nThis method is static and can be called without an instance.", &_init_f_currentSecsSinceEpoch_0, &_call_f_currentSecsSinceEpoch_0);
   methods += new qt_gsi::GenericStaticMethod ("fromMSecsSinceEpoch", "@brief Static method QDateTime QDateTime::fromMSecsSinceEpoch(qint64 msecs, Qt::TimeSpec spec, int offsetFromUtc)\nThis method is static and can be called without an instance.", &_init_f_fromMSecsSinceEpoch_3080, &_call_f_fromMSecsSinceEpoch_3080);
   methods += new qt_gsi::GenericStaticMethod ("fromMSecsSinceEpoch", "@brief Static method QDateTime QDateTime::fromMSecsSinceEpoch(qint64 msecs, const QTimeZone &timeZone)\nThis method is static and can be called without an instance.", &_init_f_fromMSecsSinceEpoch_3083, &_call_f_fromMSecsSinceEpoch_3083);
+  methods += new qt_gsi::GenericStaticMethod ("fromMSecsSinceEpoch", "@brief Static method QDateTime QDateTime::fromMSecsSinceEpoch(qint64 msecs)\nThis method is static and can be called without an instance.", &_init_f_fromMSecsSinceEpoch_986, &_call_f_fromMSecsSinceEpoch_986);
   methods += new qt_gsi::GenericStaticMethod ("fromSecsSinceEpoch", "@brief Static method QDateTime QDateTime::fromSecsSinceEpoch(qint64 secs, Qt::TimeSpec spec, int offsetFromUtc)\nThis method is static and can be called without an instance.", &_init_f_fromSecsSinceEpoch_3080, &_call_f_fromSecsSinceEpoch_3080);
   methods += new qt_gsi::GenericStaticMethod ("fromSecsSinceEpoch", "@brief Static method QDateTime QDateTime::fromSecsSinceEpoch(qint64 secs, const QTimeZone &timeZone)\nThis method is static and can be called without an instance.", &_init_f_fromSecsSinceEpoch_3083, &_call_f_fromSecsSinceEpoch_3083);
+  methods += new qt_gsi::GenericStaticMethod ("fromSecsSinceEpoch", "@brief Static method QDateTime QDateTime::fromSecsSinceEpoch(qint64 secs)\nThis method is static and can be called without an instance.", &_init_f_fromSecsSinceEpoch_986, &_call_f_fromSecsSinceEpoch_986);
   methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QDateTime QDateTime::fromString(const QString &string, Qt::DateFormat format)\nThis method is static and can be called without an instance.", &_init_f_fromString_3665, &_call_f_fromString_3665);
   methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QDateTime QDateTime::fromString(const QString &string, const QString &format, QCalendar cal)\nThis method is static and can be called without an instance.", &_init_f_fromString_5145, &_call_f_fromString_5145);
   methods += gsi::method_ext("==", &::op_QDateTime_operator_eq__eq__4242, gsi::arg ("rhs"), "@brief Operator bool ::operator==(const QDateTime &lhs, const QDateTime &rhs)\nThis is the mapping of the global operator to the instance method.");

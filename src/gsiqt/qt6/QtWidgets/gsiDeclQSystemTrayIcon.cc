@@ -28,7 +28,6 @@
 */
 
 #include <QSystemTrayIcon>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QIcon>

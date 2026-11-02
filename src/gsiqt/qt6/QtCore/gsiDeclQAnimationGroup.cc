@@ -29,7 +29,6 @@
 
 #include <QAnimationGroup>
 #include <QAbstractAnimation>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

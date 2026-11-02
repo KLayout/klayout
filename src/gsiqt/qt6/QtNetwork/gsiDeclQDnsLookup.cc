@@ -28,7 +28,6 @@
 */
 
 #include <QDnsLookup>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QDnsDomainNameRecord>
 #include <QDnsHostAddressRecord>

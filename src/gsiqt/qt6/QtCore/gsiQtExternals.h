@@ -69,10 +69,6 @@ class QAnimationGroup;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QAnimationGroup> &qtdecl_QAnimationGroup (); }
 
-class QAnyStringView;
-
-namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QAnyStringView> &qtdecl_QAnyStringView (); }
-
 class QBasicMutex;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QBasicMutex> &qtdecl_QBasicMutex (); }

@@ -28,7 +28,6 @@
 */
 
 #include <QGesture>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

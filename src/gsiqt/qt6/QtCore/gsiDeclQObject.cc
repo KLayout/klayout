@@ -28,7 +28,6 @@
 */
 
 #include <QObject>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

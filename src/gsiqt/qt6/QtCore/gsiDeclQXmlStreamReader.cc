@@ -28,7 +28,6 @@
 */
 
 #include <QXmlStreamReader>
-#include <QAnyStringView>
 #include <QIODevice>
 #include <QXmlStreamAttributes>
 #include <QXmlStreamEntityDeclaration>

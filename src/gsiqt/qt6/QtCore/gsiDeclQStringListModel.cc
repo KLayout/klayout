@@ -28,7 +28,6 @@
 */
 
 #include <QStringListModel>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QDataStream>
 #include <QEvent>

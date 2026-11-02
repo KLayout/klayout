@@ -29,7 +29,6 @@
 
 #include <QTextDocument>
 #include <QAbstractTextDocumentLayout>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QFont>

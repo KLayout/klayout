@@ -28,7 +28,6 @@
 */
 
 #include <QPluginLoader>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QJsonObject>

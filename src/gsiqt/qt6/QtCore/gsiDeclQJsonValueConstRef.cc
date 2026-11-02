@@ -37,12 +37,6 @@
 
 // -----------------------------------------------------------------------
 // class QJsonValueConstRef
-  static bool QJsonValueConstRef_operator_eq(const QJsonValueConstRef *a, const QJsonValueConstRef &b) {
-    return *a == b;
-  }
-  static bool QJsonValueConstRef_operator_ne(const QJsonValueConstRef *a, const QJsonValueConstRef &b) {
-    return !(*a == b);
-  }
 
 //  Constructor QJsonValueConstRef::QJsonValueConstRef(const QJsonValueConstRef &)
 
@@ -402,9 +396,6 @@ static gsi::Methods methods_QJsonValueConstRef () {
 }
 
 gsi::Class<QJsonValueConstRef> decl_QJsonValueConstRef ("QtCore", "QJsonValueConstRef",
-  gsi::method_ext("==", &QJsonValueConstRef_operator_eq, gsi::arg ("other"), "@brief Method bool QJsonValueConstRef::operator==(const QJsonValueConstRef &) const") +
-  gsi::method_ext("!=", &QJsonValueConstRef_operator_ne, gsi::arg ("other"), "@brief Method bool QJsonValueConstRef::operator!=(const QJsonValueConstRef &) const") 
-+
   methods_QJsonValueConstRef (),
   "@qt\n@brief Binding of QJsonValueConstRef");
 

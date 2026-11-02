@@ -28,7 +28,6 @@
 */
 
 #include <QWindowCapture>
-#include <QAnyStringView>
 #include <QCapturableWindow>
 #include <QChildEvent>
 #include <QEvent>

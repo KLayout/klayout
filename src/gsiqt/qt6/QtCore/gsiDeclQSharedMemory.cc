@@ -28,7 +28,6 @@
 */
 
 #include <QSharedMemory>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

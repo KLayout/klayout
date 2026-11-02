@@ -30,7 +30,6 @@
 #include <QSequentialAnimationGroup>
 #include <QAbstractAnimation>
 #include <QAnimationGroup>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

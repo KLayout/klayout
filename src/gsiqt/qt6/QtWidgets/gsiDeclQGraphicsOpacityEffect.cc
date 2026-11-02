@@ -28,7 +28,6 @@
 */
 
 #include <QGraphicsOpacityEffect>
-#include <QAnyStringView>
 #include <QBrush>
 #include <QChildEvent>
 #include <QEvent>

@@ -28,7 +28,6 @@
 */
 
 #include <QMediaCaptureSession>
-#include <QAnyStringView>
 #include <QAudioInput>
 #include <QAudioOutput>
 #include <QCamera>

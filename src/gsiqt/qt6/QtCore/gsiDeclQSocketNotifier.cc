@@ -28,7 +28,6 @@
 */
 
 #include <QSocketNotifier>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

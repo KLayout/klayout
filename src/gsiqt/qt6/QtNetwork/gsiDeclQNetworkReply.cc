@@ -28,7 +28,6 @@
 */
 
 #include <QNetworkReply>
-#include <QAnyStringView>
 #include <QEvent>
 #include <QMetaMethod>
 #include <QNetworkAccessManager>

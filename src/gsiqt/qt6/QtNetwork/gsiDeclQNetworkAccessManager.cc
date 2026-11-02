@@ -29,7 +29,6 @@
 
 #include <QNetworkAccessManager>
 #include <QAbstractNetworkCache>
-#include <QAnyStringView>
 #include <QAuthenticator>
 #include <QChildEvent>
 #include <QEvent>

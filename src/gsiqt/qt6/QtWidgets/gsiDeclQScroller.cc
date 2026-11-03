@@ -500,25 +500,6 @@ static void _call_f_scroller_1302 (const qt_gsi::GenericStaticMethod * /*decl*/,
 }
 
 
-// static const QScroller *QScroller::scroller(const QObject *target)
-
-
-static void _init_f_scroller_1997 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("target");
-  decl->add_arg<const QObject * > (argspec_0);
-  decl->set_return<const QScroller * > ();
-}
-
-static void _call_f_scroller_1997 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QObject *arg1 = gsi::arg_reader<const QObject * >() (args, heap);
-  ret.write<const QScroller * > ((const QScroller *)QScroller::scroller (arg1));
-}
-
-
 // static QString QScroller::tr(const char *s, const char *c, int n)
 
 
@@ -598,7 +579,6 @@ static gsi::Methods methods_QScroller () {
   methods += new qt_gsi::GenericStaticMethod ("grabbedGesture", "@brief Static method Qt::GestureType QScroller::grabbedGesture(QObject *target)\nThis method is static and can be called without an instance.", &_init_f_grabbedGesture_1302, &_call_f_grabbedGesture_1302);
   methods += new qt_gsi::GenericStaticMethod ("hasScroller", "@brief Static method bool QScroller::hasScroller(QObject *target)\nThis method is static and can be called without an instance.", &_init_f_hasScroller_1302, &_call_f_hasScroller_1302);
   methods += new qt_gsi::GenericStaticMethod ("scroller", "@brief Static method QScroller *QScroller::scroller(QObject *target)\nThis method is static and can be called without an instance.", &_init_f_scroller_1302, &_call_f_scroller_1302);
-  methods += new qt_gsi::GenericStaticMethod ("scroller", "@brief Static method const QScroller *QScroller::scroller(const QObject *target)\nThis method is static and can be called without an instance.", &_init_f_scroller_1997, &_call_f_scroller_1997);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QScroller::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("ungrabGesture", "@brief Static method void QScroller::ungrabGesture(QObject *target)\nThis method is static and can be called without an instance.", &_init_f_ungrabGesture_1302, &_call_f_ungrabGesture_1302);
   return methods;

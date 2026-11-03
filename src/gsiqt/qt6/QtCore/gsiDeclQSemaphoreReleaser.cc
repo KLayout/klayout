@@ -51,28 +51,6 @@ static void _call_ctor_QSemaphoreReleaser_0 (const qt_gsi::GenericStaticMethod *
 }
 
 
-//  Constructor QSemaphoreReleaser::QSemaphoreReleaser(QSemaphore &sem, int n)
-
-
-static void _init_ctor_QSemaphoreReleaser_2290 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("sem");
-  decl->add_arg<QSemaphore & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("n", true, "1");
-  decl->add_arg<int > (argspec_1);
-  decl->set_return_new<QSemaphoreReleaser> ();
-}
-
-static void _call_ctor_QSemaphoreReleaser_2290 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QSemaphore &arg1 = gsi::arg_reader<QSemaphore & >() (args, heap);
-  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1, heap);
-  ret.write<QSemaphoreReleaser *> (new QSemaphoreReleaser (arg1, arg2));
-}
-
-
 //  Constructor QSemaphoreReleaser::QSemaphoreReleaser(QSemaphore *sem, int n)
 
 
@@ -152,7 +130,6 @@ namespace gsi
 static gsi::Methods methods_QSemaphoreReleaser () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSemaphoreReleaser::QSemaphoreReleaser()\nThis method creates an object of class QSemaphoreReleaser.", &_init_ctor_QSemaphoreReleaser_0, &_call_ctor_QSemaphoreReleaser_0);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSemaphoreReleaser::QSemaphoreReleaser(QSemaphore &sem, int n)\nThis method creates an object of class QSemaphoreReleaser.", &_init_ctor_QSemaphoreReleaser_2290, &_call_ctor_QSemaphoreReleaser_2290);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSemaphoreReleaser::QSemaphoreReleaser(QSemaphore *sem, int n)\nThis method creates an object of class QSemaphoreReleaser.", &_init_ctor_QSemaphoreReleaser_2294, &_call_ctor_QSemaphoreReleaser_2294);
   methods += new qt_gsi::GenericMethod ("cancel", "@brief Method QSemaphore *QSemaphoreReleaser::cancel()\n", false, &_init_f_cancel_0, &_call_f_cancel_0);
   methods += new qt_gsi::GenericMethod ("semaphore", "@brief Method QSemaphore *QSemaphoreReleaser::semaphore()\n", true, &_init_f_semaphore_c0, &_call_f_semaphore_c0);

@@ -909,7 +909,7 @@ private:
 #if QT_VERSION >= 0x60000
 
 /**
- *  @brief Specialization for QString
+ *  @brief Specialization for QStringView
  */
 template <>
 class GSI_PUBLIC StringAdaptorImpl<QStringView>
@@ -982,6 +982,159 @@ private:
   bool m_is_const;
   QStringView m_s;
   mutable QByteArray m_s_utf8;
+};
+
+/**
+ *  @brief Specialization for QAnyStringView
+ */
+template <>
+class GSI_PUBLIC StringAdaptorImpl<QAnyStringView>
+  : public StringAdaptor
+{
+public:
+  StringAdaptorImpl (QAnyStringView *s)
+    : mp_s (s), m_is_const (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  StringAdaptorImpl (const QAnyStringView *s)
+    : mp_s (const_cast<QAnyStringView *> (s)), m_is_const (true)
+  {
+    //  .. nothing yet ..
+  }
+
+  StringAdaptorImpl (const QAnyStringView &s)
+    : m_is_const (false), m_s (s)
+  {
+    mp_s = &m_s;
+  }
+
+  StringAdaptorImpl ()
+    : m_is_const (false)
+  {
+    mp_s = &m_s;
+  }
+
+  virtual ~StringAdaptorImpl ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual size_t size () const
+  {
+    return mp_s->toString ().toUtf8 ().size ();
+  }
+
+  virtual const char *c_str () const
+  {
+    m_s_utf8 = mp_s->toString ().toUtf8 ();
+    return m_s_utf8.constData ();
+  }
+
+  virtual void set (const char *c_str, size_t s, tl::Heap &heap)
+  {
+    if (! m_is_const) {
+      QString *hstr = heap.create<QString> ();
+      *hstr = QString::fromUtf8 (c_str, int (s));
+      *mp_s = QAnyStringView (*hstr);
+    }
+  }
+
+  virtual void copy_to (AdaptorBase *target, tl::Heap &heap) const
+  {
+    StringAdaptorImpl<QAnyStringView> *s = dynamic_cast<StringAdaptorImpl<QAnyStringView> *>(target);
+    if (s) {
+      QString *hstr = heap.create<QString> ();
+      *hstr = mp_s->toString ();
+      *s->mp_s = QAnyStringView (*hstr);
+    } else {
+      StringAdaptor::copy_to (target, heap);
+    }
+  }
+
+private:
+  QAnyStringView *mp_s;
+  bool m_is_const;
+  QAnyStringView m_s;
+  mutable QByteArray m_s_utf8;
+};
+
+/**
+ *  @brief Specialization for QUtf8StringView
+ *
+ *  Note that QUtf8StringView is a read-only source for strings and
+ *  can't be written.
+ */
+template <>
+class GSI_PUBLIC StringAdaptorImpl<QUtf8StringView>
+  : public StringAdaptor
+{
+public:
+  StringAdaptorImpl (QUtf8StringView *s)
+    : mp_s (s), m_is_const (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  StringAdaptorImpl (const QUtf8StringView *s)
+    : mp_s (const_cast<QUtf8StringView *> (s)), m_is_const (true)
+  {
+    //  .. nothing yet ..
+  }
+
+  StringAdaptorImpl (const QUtf8StringView &s)
+    : m_is_const (false), m_s (s)
+  {
+    mp_s = &m_s;
+  }
+
+  StringAdaptorImpl ()
+    : m_is_const (false)
+  {
+    mp_s = &m_s;
+  }
+
+  virtual ~StringAdaptorImpl ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual size_t size () const
+  {
+    return mp_s->size ();
+  }
+
+  virtual const char *c_str () const
+  {
+    return mp_s->data ();
+  }
+
+  virtual void set (const char *c_str, size_t s, tl::Heap &heap)
+  {
+    if (! m_is_const) {
+      QByteArray *hstr = heap.create<QByteArray> ();
+      *hstr = QByteArray (c_str, s);
+      *mp_s = QUtf8StringView (hstr->constData (), hstr->size ());
+    }
+  }
+
+  virtual void copy_to (AdaptorBase *target, tl::Heap &heap) const
+  {
+    StringAdaptorImpl<QUtf8StringView> *s = dynamic_cast<StringAdaptorImpl<QUtf8StringView> *>(target);
+    if (s) {
+      QByteArray *hstr = heap.create<QByteArray> ();
+      *hstr = QByteArray (mp_s->data (), mp_s->size ());
+      *s->mp_s = QUtf8StringView (hstr->constData (), hstr->size ());
+    } else {
+      StringAdaptor::copy_to (target, heap);
+    }
+  }
+
+private:
+  QUtf8StringView *mp_s;
+  bool m_is_const;
+  QUtf8StringView m_s;
 };
 
 #endif

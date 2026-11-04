@@ -28,7 +28,6 @@
 */
 
 #include <QLocalServer>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QLocalSocket>

@@ -28,7 +28,6 @@
 */
 
 #include <QDtls>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QHostAddress>

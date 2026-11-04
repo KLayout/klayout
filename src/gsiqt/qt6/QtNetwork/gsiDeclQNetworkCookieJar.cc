@@ -28,7 +28,6 @@
 */
 
 #include <QNetworkCookieJar>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

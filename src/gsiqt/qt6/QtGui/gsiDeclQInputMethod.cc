@@ -28,7 +28,6 @@
 */
 
 #include <QInputMethod>
-#include <QAnyStringView>
 #include <QEvent>
 #include <QLocale>
 #include <QMetaMethod>

@@ -28,7 +28,6 @@
 */
 
 #include <QShortcut>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QKeySequence>

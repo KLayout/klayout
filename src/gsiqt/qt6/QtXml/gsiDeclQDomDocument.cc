@@ -28,7 +28,6 @@
 */
 
 #include <QDomDocument>
-#include <QAnyStringView>
 #include <QDomAttr>
 #include <QDomCDATASection>
 #include <QDomCharacterData>

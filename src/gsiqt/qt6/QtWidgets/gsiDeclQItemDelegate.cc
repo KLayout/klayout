@@ -30,7 +30,6 @@
 #include <QItemDelegate>
 #include <QAbstractItemModel>
 #include <QAbstractItemView>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QFont>

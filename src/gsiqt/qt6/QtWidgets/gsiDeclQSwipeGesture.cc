@@ -28,7 +28,6 @@
 */
 
 #include <QSwipeGesture>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

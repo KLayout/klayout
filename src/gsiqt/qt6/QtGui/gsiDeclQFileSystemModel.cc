@@ -29,7 +29,6 @@
 
 #include <QFileSystemModel>
 #include <QAbstractFileIconProvider>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QDataStream>
 #include <QDateTime>

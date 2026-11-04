@@ -28,7 +28,6 @@
 */
 
 #include <QCalendar>
-#include <QAnyStringView>
 #include <QDate>
 #include <QLocale>
 #include "gsiQt.h"

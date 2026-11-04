@@ -28,7 +28,6 @@
 */
 
 #include <QSignalMapper>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

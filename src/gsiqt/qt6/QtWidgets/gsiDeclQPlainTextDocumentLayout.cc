@@ -28,7 +28,6 @@
 */
 
 #include <QPlainTextDocumentLayout>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

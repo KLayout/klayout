@@ -28,7 +28,6 @@
 */
 
 #include <QGraphicsScale>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMatrix4x4>

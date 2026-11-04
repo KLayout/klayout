@@ -69,25 +69,6 @@ static void _call_ctor_QByteArrayMatcher_2309 (const qt_gsi::GenericStaticMethod
 }
 
 
-//  Constructor QByteArrayMatcher::QByteArrayMatcher(QByteArrayView pattern)
-
-
-static void _init_ctor_QByteArrayMatcher_1843 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("pattern");
-  decl->add_arg<QByteArrayView > (argspec_0);
-  decl->set_return_new<QByteArrayMatcher> ();
-}
-
-static void _call_ctor_QByteArrayMatcher_1843 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QByteArrayView arg1 = gsi::arg_reader<QByteArrayView >() (args, heap);
-  ret.write<QByteArrayMatcher *> (new QByteArrayMatcher (arg1));
-}
-
-
 //  Constructor QByteArrayMatcher::QByteArrayMatcher(const char *pattern, qsizetype length)
 
 
@@ -238,7 +219,6 @@ static gsi::Methods methods_QByteArrayMatcher () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QByteArrayMatcher::QByteArrayMatcher()\nThis method creates an object of class QByteArrayMatcher.", &_init_ctor_QByteArrayMatcher_0, &_call_ctor_QByteArrayMatcher_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QByteArrayMatcher::QByteArrayMatcher(const QByteArray &pattern)\nThis method creates an object of class QByteArrayMatcher.", &_init_ctor_QByteArrayMatcher_2309, &_call_ctor_QByteArrayMatcher_2309);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QByteArrayMatcher::QByteArrayMatcher(QByteArrayView pattern)\nThis method creates an object of class QByteArrayMatcher.", &_init_ctor_QByteArrayMatcher_1843, &_call_ctor_QByteArrayMatcher_1843);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QByteArrayMatcher::QByteArrayMatcher(const char *pattern, qsizetype length)\nThis method creates an object of class QByteArrayMatcher.", &_init_ctor_QByteArrayMatcher_3065, &_call_ctor_QByteArrayMatcher_3065);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QByteArrayMatcher::QByteArrayMatcher(const QByteArrayMatcher &other)\nThis method creates an object of class QByteArrayMatcher.", &_init_ctor_QByteArrayMatcher_3017, &_call_ctor_QByteArrayMatcher_3017);
   methods += new qt_gsi::GenericMethod ("indexIn", "@brief Method qsizetype QByteArrayMatcher::indexIn(const char *str, qsizetype len, qsizetype from)\n", true, &_init_f_indexIn_c4399, &_call_f_indexIn_c4399);

@@ -30,7 +30,6 @@
 #include <QDataWidgetMapper>
 #include <QAbstractItemDelegate>
 #include <QAbstractItemModel>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

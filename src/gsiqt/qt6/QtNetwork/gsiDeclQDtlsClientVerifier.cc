@@ -28,7 +28,6 @@
 */
 
 #include <QDtlsClientVerifier>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QHostAddress>

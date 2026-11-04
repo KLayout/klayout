@@ -29,7 +29,6 @@
 
 #include <QSortFilterProxyModel>
 #include <QAbstractItemModel>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QDataStream>
 #include <QEvent>

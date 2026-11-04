@@ -28,7 +28,6 @@
 */
 
 #include <QGraphicsItemAnimation>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QGraphicsItem>

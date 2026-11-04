@@ -1636,6 +1636,28 @@ connected_clusters<T>::rename_connection (const ClusterInstance &inst, typename 
 
 }
 
+//  joins of lists up to this size scan the target linearly; bigger lists get a set
+//  built over the target (cheaper than the scans from roughly this size on)
+static constexpr size_t join_scan_limit = 64;
+
+//  membership test against the first "limit" entries of the target list
+static bool
+connections_contain (const tl::slist<db::ClusterInstance> &connections, const db::ClusterInstance &inst, size_t limit)
+{
+  //  NOTE: no std::any_of - slist iterators do not model the standard iterator requirements (void difference_type)
+  size_t n = 0;
+  for (const auto &c : connections) {
+    if (n == limit) {
+      break;
+    }
+    ++n;
+    if (c == inst) {
+      return true;
+    }
+  }
+  return false;
+}
+
 template <class T>
 void
 connected_clusters<T>::join_cluster_with (typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id)
@@ -1665,12 +1687,30 @@ connected_clusters<T>::join_cluster_with (typename local_cluster<T>::id_type id,
 
     } else if (! to_join.empty ()) {
 
-      //  Join while removing duplicates
-      std::set<connections_type::value_type> in_target (target.begin (), target.end ());
-      for (auto j = to_join.begin (); j != to_join.end (); ++j) {
-        if (in_target.find (*j) == in_target.end ()) {
-          target.push_back (*j);
+      //  Join while removing duplicates. The decision is taken against the physical
+      //  target list, not against m_rev_connections: the reverse map does not have an
+      //  entry for every list element after renames left duplicates behind.
+      if (to_join.size () <= join_scan_limit) {
+
+        //  small "to_join": one pass is cheaper than the set. The membership
+        //  scan covers the original target only, so duplicates inside
+        //  "to_join" are kept like in the original implementation.
+        const size_t target_size = target.size ();
+        for (const auto &c : to_join) {
+          if (! connections_contain (target, c, target_size)) {
+            target.push_back (c);
+          }
         }
+
+      } else {
+
+        std::set<connections_type::value_type> in_target (target.begin (), target.end ());
+        for (const auto &c : to_join) {
+          if (in_target.find (c) == in_target.end ()) {
+            target.push_back (c);
+          }
+        }
+
       }
 
     }
@@ -1721,7 +1761,9 @@ connected_clusters<T>::join_clusters_with (typename local_cluster<T>::id_type id
 
       } else if (! to_join.empty ()) {
 
-        //  Join while removing duplicates
+        //  Join while removing duplicates. The membership set is built over the
+        //  target once per this call and also takes up the joined connections,
+        //  so duplicates are dropped across the "with" lists as well as inside them.
         if (! target_set_valid) {
           target_set.insert (target.begin (), target.end ());
           target_set_valid = true;

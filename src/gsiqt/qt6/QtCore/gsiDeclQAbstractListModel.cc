@@ -28,7 +28,6 @@
 */
 
 #include <QAbstractListModel>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QDataStream>
 #include <QEvent>

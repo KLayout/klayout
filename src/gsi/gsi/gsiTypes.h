@@ -56,6 +56,8 @@
 #if QT_VERSION >= 0x60000
 #  include <QByteArrayView>
 #  include <QStringView>
+#  include <QAnyStringView>
+#  include <QUtf8StringView>
 #endif
 #endif
 
@@ -458,6 +460,8 @@ template <typename T> struct type_traits<QPointer<T> >      : generic_type_trait
 template <> struct type_traits<QLatin1String>               : generic_type_traits<string_tag, StringAdaptor, T_string> { };
 #endif
 #if QT_VERSION >= 0x60000
+template <> struct type_traits<QAnyStringView>              : generic_type_traits<string_tag, StringAdaptor, T_string> { };
+template <> struct type_traits<QUtf8StringView>             : generic_type_traits<string_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QStringView>                 : generic_type_traits<string_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QByteArrayView>              : generic_type_traits<byte_array_tag, StringAdaptor, T_byte_array> { };
 #endif
@@ -502,6 +506,8 @@ template <typename T> struct type_traits<const QPointer<T> &>   : generic_type_t
 template <> struct type_traits<const QLatin1String &>       : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
 #endif
 #if QT_VERSION >= 0x60000
+template <> struct type_traits<const QAnyStringView &>      : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
+template <> struct type_traits<const QUtf8StringView &>     : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const QStringView &>         : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const QByteArrayView &>      : generic_type_traits<byte_array_cref_tag, StringAdaptor, T_byte_array> { };
 #endif
@@ -543,6 +549,8 @@ template <typename T> struct type_traits<QPointer<T> &>     : generic_type_trait
 template <> struct type_traits<QLatin1String &>             : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
 #endif
 #if QT_VERSION >= 0x60000
+template <> struct type_traits<QAnyStringView &>            : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
+template <> struct type_traits<QUtf8StringView &>           : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QStringView &>               : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QByteArrayView &>            : generic_type_traits<byte_array_ref_tag, StringAdaptor, T_byte_array> { };
 #endif
@@ -585,6 +593,8 @@ template <typename T> struct type_traits<const QPointer<T> *>   : generic_type_t
 template <> struct type_traits<const QLatin1String *>       : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
 #endif
 #if QT_VERSION >= 0x60000
+template <> struct type_traits<const QAnyStringView *>      : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
+template <> struct type_traits<const QUtf8StringView *>     : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const QStringView *>         : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const QByteArrayView *>      : generic_type_traits<byte_array_cptr_tag, StringAdaptor, T_byte_array> { };
 #endif
@@ -627,6 +637,8 @@ template <typename T> struct type_traits<QPointer<T> *>     : generic_type_trait
 template <> struct type_traits<QLatin1String *>             : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
 #endif
 #if QT_VERSION >= 0x60000
+template <> struct type_traits<QAnyStringView *>            : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
+template <> struct type_traits<QUtf8StringView *>           : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QStringView *>               : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QByteArrayView *>            : generic_type_traits<byte_array_ptr_tag, StringAdaptor, T_byte_array> { };
 #endif

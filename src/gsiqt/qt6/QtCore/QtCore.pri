@@ -17,7 +17,6 @@ SOURCES += \
   $$PWD/gsiDeclQAbstractTableModel.cc \
   $$PWD/gsiDeclQAnimationDriver.cc \
   $$PWD/gsiDeclQAnimationGroup.cc \
-  $$PWD/gsiDeclQAnyStringView.cc \
   $$PWD/gsiDeclQBasicMutex.cc \
   $$PWD/gsiDeclQBasicTimer.cc \
   $$PWD/gsiDeclQBindingStatus.cc \

@@ -28,7 +28,6 @@
 */
 
 #include <QStyle>
-#include <QAnyStringView>
 #include <QApplication>
 #include <QChildEvent>
 #include <QEvent>

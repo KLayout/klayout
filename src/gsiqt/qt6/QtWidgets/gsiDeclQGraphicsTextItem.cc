@@ -28,7 +28,6 @@
 */
 
 #include <QGraphicsTextItem>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QColor>
 #include <QCursor>

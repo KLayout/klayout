@@ -28,7 +28,6 @@
 */
 
 #include <QFile>
-#include <QAnyStringView>
 #include <QDateTime>
 #include <QEvent>
 #include <QMetaMethod>

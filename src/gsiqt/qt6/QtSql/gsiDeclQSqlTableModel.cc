@@ -28,7 +28,6 @@
 */
 
 #include <QSqlTableModel>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QDataStream>
 #include <QEvent>

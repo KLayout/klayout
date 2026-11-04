@@ -28,7 +28,6 @@
 */
 
 #include <QFileDevice>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QDateTime>
 #include <QEvent>

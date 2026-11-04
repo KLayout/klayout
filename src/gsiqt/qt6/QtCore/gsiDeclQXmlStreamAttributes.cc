@@ -28,7 +28,6 @@
 */
 
 #include <QXmlStreamAttributes>
-#include <QAnyStringView>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
 #include <memory>

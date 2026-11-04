@@ -3918,7 +3918,7 @@ class CellMapping:
     r"""
     @brief A constant indicating the request to drop a cell
 
-    If used as a pseudo-target for the cell mapping, this index indicates that the cell shall be dropped rather than created on the target side or skipped by flattening. Instead, all shapes of this cell are discarded and its children are not translated unless explicitly requested or if required are children for other cells.
+    If used as a pseudo-target for the cell mapping, this index indicates that the cell shall be dropped rather than created on the target side or skipped by flattening. Instead, all shapes of this cell are discarded and its children are not translated unless explicitly requested or if required as children for other cells.
 
     This constant has been introduced in version 0.25.
     """
@@ -4077,19 +4077,20 @@ class CellMapping:
         """
         ...
     @overload
-    def for_multi_cells_full(self, cell_a: Sequence[Cell], cell_b: Sequence[Cell]) -> List[int]:
+    def for_multi_cells_full(self, cell_a: Sequence[Cell], cell_b: Sequence[Cell], preserve_library_references: Optional[bool] = ...) -> List[int]:
         r"""
         @brief Initializes the cell mapping for top-level identity in full mapping mode
 
         @param cell_a A list of target cells.
         @param cell_b A list of source cells.
+        @param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.
         @return A list of indexes of cells created.
 
-        This is a convenience version which uses cell references instead of layout/cell index combinations. It has been introduced in version 0.28.
+        This is a convenience version which uses cell references instead of layout/cell index combinations. It has been introduced in version 0.28. The optional 'preserve_library_references' parameter was introduced in version 0.30.13.
         """
         ...
     @overload
-    def for_multi_cells_full(self, layout_a: Layout, cell_indexes_a: Sequence[int], layout_b: Layout, cell_indexes_b: Sequence[int]) -> List[int]:
+    def for_multi_cells_full(self, layout_a: Layout, cell_indexes_a: Sequence[int], layout_b: Layout, cell_indexes_b: Sequence[int], preserve_library_references: Optional[bool] = ...) -> List[int]:
         r"""
         @brief Initializes the cell mapping for top-level identity in full mapping mode
 
@@ -4097,10 +4098,11 @@ class CellMapping:
         @param cell_indexes_a A list of cell indexes for the target cells.
         @param layout_b The source layout.
         @param cell_indexes_b A list of cell indexes for the source cells (same number of indexes than \cell_indexes_a).
+        @param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.
 
         The cell mapping is created for cells from cell_indexes_b to cell from cell_indexes_a in the respective layouts. This method clears the mapping and creates one for each cell pair from cell_indexes_b vs. cell_indexes_a. In addition and in contrast to \for_multi_cells, this method completes the mapping by adding all the child cells of all cells in cell_indexes_b to layout_a and creating the proper instances.
 
-        This method has been introduced in version 0.27.
+        This method has been introduced in version 0.27. The optional 'preserve_library_references' parameter was introduced in version 0.30.13.
         """
         ...
     @overload
@@ -4133,19 +4135,20 @@ class CellMapping:
         """
         ...
     @overload
-    def for_single_cell_full(self, cell_a: Cell, cell_b: Cell) -> List[int]:
+    def for_single_cell_full(self, cell_a: Cell, cell_b: Cell, preserve_library_references: Optional[bool] = ...) -> List[int]:
         r"""
         @brief Initializes the cell mapping for top-level identity in full mapping mode
 
         @param cell_a The target cell.
         @param cell_b The source cell.
+        @param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.
         @return A list of indexes of cells created.
 
         This is a convenience version which uses cell references instead of layout/cell index combinations. It has been introduced in version 0.28.
         """
         ...
     @overload
-    def for_single_cell_full(self, layout_a: Layout, cell_index_a: int, layout_b: Layout, cell_index_b: int) -> List[int]:
+    def for_single_cell_full(self, layout_a: Layout, cell_index_a: int, layout_b: Layout, cell_index_b: int, preserve_library_references: Optional[bool] = ...) -> List[int]:
         r"""
         @brief Initializes the cell mapping for top-level identity in full mapping mode
 
@@ -4153,10 +4156,11 @@ class CellMapping:
         @param cell_index_a The index of the target cell.
         @param layout_b The source layout.
         @param cell_index_b The index of the source cell.
+        @param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.
 
         The cell mapping is created for cell_b to cell_a in the respective layouts. This method clears the mapping and creates one for the single cell pair. In addition and in contrast to \for_single_cell, this method completes the mapping by adding all the child cells of cell_b to layout_a and creating the proper instances.
 
-        This method has been introduced in version 0.23.
+        This method has been introduced in version 0.23. The optional 'preserve_library_references' parameter was introduced in version 0.30.13.
         """
         ...
     @overload
@@ -4188,19 +4192,20 @@ class CellMapping:
         """
         ...
     @overload
-    def from_geometry_full(self, cell_a: Cell, cell_b: Cell) -> List[int]:
+    def from_geometry_full(self, cell_a: Cell, cell_b: Cell, preserve_library_references: Optional[bool] = ...) -> List[int]:
         r"""
         @brief Initializes the cell mapping using the geometrical identity in full mapping mode
 
         @param cell_a The target cell.
         @param cell_b The source cell.
+        @param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.
         @return A list of indexes of cells created.
 
-        This is a convenience version which uses cell references instead of layout/cell index combinations. It has been introduced in version 0.28.
+        This is a convenience version which uses cell references instead of layout/cell index combinations. It has been introduced in version 0.28. The optional 'preserve_library_references' parameter was introduced in version 0.30.13.
         """
         ...
     @overload
-    def from_geometry_full(self, layout_a: Layout, cell_index_a: int, layout_b: Layout, cell_index_b: int) -> List[int]:
+    def from_geometry_full(self, layout_a: Layout, cell_index_a: int, layout_b: Layout, cell_index_b: int, preserve_library_references: Optional[bool] = ...) -> List[int]:
         r"""
         @brief Initializes the cell mapping using the geometrical identity in full mapping mode
 
@@ -4208,6 +4213,7 @@ class CellMapping:
         @param cell_index_a The index of the target starting cell.
         @param layout_b The source layout.
         @param cell_index_b The index of the source starting cell.
+        @param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.
         @return A list of indexes of cells created.
 
         The cell mapping is created for cells below cell_a and cell_b in the respective layouts. This method employs geometrical identity to derive mappings for the child cells of the starting cell in layout A and B.
@@ -4215,7 +4221,7 @@ class CellMapping:
 
         Full mapping means that cells which are not found in the target layout A are created there plus their corresponding instances are created as well. The returned list will contain the indexes of all cells created for that reason.
 
-        This method has been introduced in version 0.23.
+        This method has been introduced in version 0.23. The optional 'preserve_library_references' parameter was introduced in version 0.30.13.
         """
         ...
     @overload
@@ -4247,19 +4253,20 @@ class CellMapping:
         """
         ...
     @overload
-    def from_names_full(self, cell_a: Cell, cell_b: Cell) -> List[int]:
+    def from_names_full(self, cell_a: Cell, cell_b: Cell, preserve_library_references: Optional[bool] = ...) -> List[int]:
         r"""
         @brief Initializes the cell mapping using the name identity in full mapping mode
 
         @param cell_a The target cell.
         @param cell_b The source cell.
+        @param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.
         @return A list of indexes of cells created.
 
-        This is a convenience version which uses cell references instead of layout/cell index combinations. It has been introduced in version 0.28.
+        This is a convenience version which uses cell references instead of layout/cell index combinations. It has been introduced in version 0.28. The optional 'preserve_library_references' parameter was introduced in version 0.30.13.
         """
         ...
     @overload
-    def from_names_full(self, layout_a: Layout, cell_index_a: int, layout_b: Layout, cell_index_b: int) -> List[int]:
+    def from_names_full(self, layout_a: Layout, cell_index_a: int, layout_b: Layout, cell_index_b: int, preserve_library_references: Optional[bool] = ...) -> List[int]:
         r"""
         @brief Initializes the cell mapping using the name identity in full mapping mode
 
@@ -4267,6 +4274,7 @@ class CellMapping:
         @param cell_index_a The index of the target starting cell.
         @param layout_b The source layout.
         @param cell_index_b The index of the source starting cell.
+        @param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.
         @return A list of indexes of cells created.
 
         The cell mapping is created for cells below cell_a and cell_b in the respective layouts.
@@ -4274,7 +4282,7 @@ class CellMapping:
 
         Full mapping means that cells which are not found in the target layout A are created there plus their corresponding instances are created as well. The returned list will contain the indexes of all cells created for that reason.
 
-        This method has been introduced in version 0.23.
+        This method has been introduced in version 0.23. The optional 'preserve_library_references' parameter was introduced in version 0.30.13.
         """
         ...
     def has_mapping(self, cell_index_b: int) -> bool:
@@ -16160,8 +16168,7 @@ class DText:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: float
     r"""
@@ -26992,7 +26999,7 @@ class EdgePairs(ShapeCollection):
         """
         ...
     @overload
-    def move(self, dx: int, dy: int) -> EdgePairs:
+    def move(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> EdgePairs:
         r"""
         @brief Moves the edge pair collection
 
@@ -32009,7 +32016,7 @@ class Edges(ShapeCollection):
         """
         ...
     @overload
-    def moved(self, dx: Optional[int] = ..., dv: Optional[int] = ...) -> Edges:
+    def moved(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Edges:
         r"""
         @brief Returns the moved edge collection (does not modify self)
 
@@ -36513,11 +36520,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'b' axis in micrometer units
+    @brief Sets the displacement vector for the 'b' axis
 
-    Like \b= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
+    If the instance was not an array instance before it is made one.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
     """
     cell: Cell
     r"""
@@ -36549,10 +36556,10 @@ class Instance:
     Getter:
     @brief Gets the basic \CellInstArray object associated with this instance reference.
     Setter:
-    @brief Changes the \CellInstArray object to the given one.
-    This method replaces the instance by the given CellInstArray object.
+    @brief Returns the basic cell instance array object by giving a micrometer unit object.
+    This method replaces the instance by the given CellInstArray object and it internally transformed into database units.
 
-    This method has been introduced in version 0.22
+    This method has been introduced in version 0.25
     """
     cplx_trans: ICplxTrans
     r"""
@@ -36691,10 +36698,9 @@ class Instance:
     @brief Gets the transformation of the instance or the first instance in the array
     The transformation returned is only valid if the array does not represent a complex transformation array
     Setter:
-    @brief Sets the transformation of the instance or the first instance in the array (in micrometer units)
-    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
+    @brief Sets the transformation of the instance or the first instance in the array
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     @classmethod
     def new(cls) -> Instance:
@@ -37057,7 +37063,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This method has been introduced in version 0.22.
+        This const version of the method has been introduced in version 0.25.
         """
         ...
     @overload
@@ -37065,7 +37071,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This const version of the method has been introduced in version 0.25.
+        This method has been introduced in version 0.22.
         """
         ...
     def pcell_declaration(self) -> PCellDeclaration_Native:
@@ -49007,15 +49013,15 @@ class NetTerminalRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this terminal reference is attached to.
         """
         ...
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to.
+        @brief Gets the net this terminal reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     def terminal_def(self) -> DeviceTerminalDefinition:
@@ -50095,24 +50101,17 @@ class Netlist:
     @overload
     def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits bottom-up (const version)
-        Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
-
-        This constness variant has been introduced in version 0.26.8.
-        """
-        ...
-    @overload
-    def each_circuit_bottom_up(self) -> Iterator[Circuit]:
-        r"""
         @brief Iterates over the circuits bottom-up
         Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
         """
         ...
     @overload
-    def each_circuit_top_down(self) -> Iterator[Circuit]:
+    def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits top-down
-        Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
+        @brief Iterates over the circuits bottom-up (const version)
+        Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
@@ -50122,6 +50121,13 @@ class Netlist:
         Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
 
         This constness variant has been introduced in version 0.26.8.
+        """
+        ...
+    @overload
+    def each_circuit_top_down(self) -> Iterator[Circuit]:
+        r"""
+        @brief Iterates over the circuits top-down
+        Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
         """
         ...
     @overload
@@ -60561,7 +60567,7 @@ class RecursiveShapeIterator:
         r"""
         @brief Unselects the given cells.
 
-        This method will sets the "selected" mark on the given cells. That means that these cells or their child cells are visited, unless they are marked as "unselected" again with the \unselect_cells method.
+        This method sets the "selected" mark on the given cells. That means that these cells or their child cells are visited, unless they are marked as "unselected" again with the \unselect_cells method.
 
         The cells are given as a list of cell indexes.
 
@@ -60575,7 +60581,7 @@ class RecursiveShapeIterator:
         r"""
         @brief Unselects the given cells.
 
-        This method will sets the "selected" mark on the given cells. That means that these cells or their child cells are visited, unless they are marked as "unselected" again with the \unselect_cells method.
+        This method sets the "selected" mark on the given cells. That means that these cells or their child cells are visited, unless they are marked as "unselected" again with the \unselect_cells method.
 
         The cells are given as a glob pattern.
         A glob pattern follows the syntax of file names on the shell (i.e. "A*" are all cells starting with a letter "A").
@@ -60626,7 +60632,7 @@ class RecursiveShapeIterator:
         r"""
         @brief Unselects the given cells.
 
-        This method will sets the "unselected" mark on the given cells. That means that these cells or their child cells will not be visited, unless they are marked as "selected" again with the \select_cells method.
+        This method sets the "unselected" mark on the given cells. That means that these cells or their child cells will not be visited, unless they are marked as "selected" again with the \select_cells method.
 
         The cells are given as a list of cell indexes.
 
@@ -60640,7 +60646,7 @@ class RecursiveShapeIterator:
         r"""
         @brief Unselects the given cells.
 
-        This method will sets the "unselected" mark on the given cells. That means that these cells or their child cells will not be visited, unless they are marked as "selected" again with the \select_cells method.
+        This method sets the "unselected" mark on the given cells. That means that these cells or their child cells will not be visited, unless they are marked as "selected" again with the \select_cells method.
 
         The cells are given as a glob pattern.
         A glob pattern follows the syntax of file names on the shell (i.e. "A*" are all cells starting with a letter "A").
@@ -70909,17 +70915,17 @@ class SubCircuit(NetlistObject):
     @overload
     def net_for_pin(self, pin_id: int) -> Net:
         r"""
-        @brief Gets the net connected to the specified pin of the subcircuit (non-const version).
+        @brief Gets the net connected to the specified pin of the subcircuit.
         If the pin is not connected, nil is returned for the net.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def net_for_pin(self, pin_id: int) -> Net:
         r"""
-        @brief Gets the net connected to the specified pin of the subcircuit.
+        @brief Gets the net connected to the specified pin of the subcircuit (non-const version).
         If the pin is not connected, nil is returned for the net.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     ...

@@ -28,7 +28,6 @@
 */
 
 #include <QVersionNumber>
-#include <QAnyStringView>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
 #include <memory>

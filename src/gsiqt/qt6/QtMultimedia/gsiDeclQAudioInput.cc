@@ -28,7 +28,6 @@
 */
 
 #include <QAudioInput>
-#include <QAnyStringView>
 #include <QAudioDevice>
 #include <QChildEvent>
 #include <QEvent>

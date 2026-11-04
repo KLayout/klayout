@@ -28,7 +28,6 @@
 */
 
 #include <QVBoxLayout>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QLayout>

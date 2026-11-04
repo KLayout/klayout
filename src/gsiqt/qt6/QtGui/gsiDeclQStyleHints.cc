@@ -28,7 +28,6 @@
 */
 
 #include <QStyleHints>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

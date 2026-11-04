@@ -29,7 +29,6 @@
 
 #include <QUndoGroup>
 #include <QAction>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>

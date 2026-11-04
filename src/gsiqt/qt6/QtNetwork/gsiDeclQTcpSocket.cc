@@ -28,7 +28,6 @@
 */
 
 #include <QTcpSocket>
-#include <QAnyStringView>
 #include <QAuthenticator>
 #include <QEvent>
 #include <QHostAddress>

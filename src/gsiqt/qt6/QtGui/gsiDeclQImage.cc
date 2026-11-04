@@ -803,28 +803,6 @@ static void _call_f_load_3648 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// bool QImage::loadFromData(QByteArrayView data, const char *format)
-
-
-static void _init_f_loadFromData_3466 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("data");
-  decl->add_arg<QByteArrayView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format", true, "nullptr");
-  decl->add_arg<const char * > (argspec_1);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_loadFromData_3466 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QByteArrayView arg1 = gsi::arg_reader<QByteArrayView >() (args, heap);
-  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
-  ret.write<bool > ((bool)((QImage *)cls)->loadFromData (arg1, arg2));
-}
-
-
 // bool QImage::loadFromData(const unsigned char *buf, int len, const char *format)
 
 
@@ -1820,28 +1798,6 @@ static void _call_f_width_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// static QImage QImage::fromData(QByteArrayView data, const char *format)
-
-
-static void _init_f_fromData_3466 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("data");
-  decl->add_arg<QByteArrayView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format", true, "nullptr");
-  decl->add_arg<const char * > (argspec_1);
-  decl->set_return<QImage > ();
-}
-
-static void _call_f_fromData_3466 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QByteArrayView arg1 = gsi::arg_reader<QByteArrayView >() (args, heap);
-  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
-  ret.write<QImage > ((QImage)QImage::fromData (arg1, arg2));
-}
-
-
 // static QImage QImage::fromData(const unsigned char *data, int size, const char *format)
 
 
@@ -1999,7 +1955,6 @@ static gsi::Methods methods_QImage () {
   methods += new qt_gsi::GenericMethod ("isNull?", "@brief Method bool QImage::isNull()\n", true, &_init_f_isNull_c0, &_call_f_isNull_c0);
   methods += new qt_gsi::GenericMethod ("load", "@brief Method bool QImage::load(QIODevice *device, const char *format)\n", false, &_init_f_load_3070, &_call_f_load_3070);
   methods += new qt_gsi::GenericMethod ("load", "@brief Method bool QImage::load(const QString &fileName, const char *format)\n", false, &_init_f_load_3648, &_call_f_load_3648);
-  methods += new qt_gsi::GenericMethod ("loadFromData", "@brief Method bool QImage::loadFromData(QByteArrayView data, const char *format)\n", false, &_init_f_loadFromData_3466, &_call_f_loadFromData_3466);
   methods += new qt_gsi::GenericMethod ("loadFromData", "@brief Method bool QImage::loadFromData(const unsigned char *buf, int len, const char *format)\n", false, &_init_f_loadFromData_5018, &_call_f_loadFromData_5018);
   methods += new qt_gsi::GenericMethod ("loadFromData", "@brief Method bool QImage::loadFromData(const QByteArray &data, const char *format)\n", false, &_init_f_loadFromData_3932, &_call_f_loadFromData_3932);
   methods += new qt_gsi::GenericMethod ("mirror", "@brief Method void QImage::mirror(bool horizontally, bool vertically)\n", false, &_init_f_mirror_1620, &_call_f_mirror_1620);
@@ -2049,7 +2004,6 @@ static gsi::Methods methods_QImage () {
   methods += new qt_gsi::GenericMethod ("valid", "@brief Method bool QImage::valid(int x, int y)\n", true, &_init_f_valid_c1426, &_call_f_valid_c1426);
   methods += new qt_gsi::GenericMethod ("valid", "@brief Method bool QImage::valid(const QPoint &pt)\n", true, &_init_f_valid_c1916, &_call_f_valid_c1916);
   methods += new qt_gsi::GenericMethod ("width", "@brief Method int QImage::width()\n", true, &_init_f_width_c0, &_call_f_width_c0);
-  methods += new qt_gsi::GenericStaticMethod ("fromData", "@brief Static method QImage QImage::fromData(QByteArrayView data, const char *format)\nThis method is static and can be called without an instance.", &_init_f_fromData_3466, &_call_f_fromData_3466);
   methods += new qt_gsi::GenericStaticMethod ("fromData", "@brief Static method QImage QImage::fromData(const unsigned char *data, int size, const char *format)\nThis method is static and can be called without an instance.", &_init_f_fromData_5018, &_call_f_fromData_5018);
   methods += new qt_gsi::GenericStaticMethod ("fromData", "@brief Static method QImage QImage::fromData(const QByteArray &data, const char *format)\nThis method is static and can be called without an instance.", &_init_f_fromData_3932, &_call_f_fromData_3932);
   methods += new qt_gsi::GenericStaticMethod ("toImageFormat", "@brief Static method QImage::Format QImage::toImageFormat(QPixelFormat format)\nThis method is static and can be called without an instance.", &_init_f_toImageFormat_1648, &_call_f_toImageFormat_1648);

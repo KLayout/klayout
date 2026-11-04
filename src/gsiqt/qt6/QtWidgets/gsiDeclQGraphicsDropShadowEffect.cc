@@ -28,7 +28,6 @@
 */
 
 #include <QGraphicsDropShadowEffect>
-#include <QAnyStringView>
 #include <QChildEvent>
 #include <QColor>
 #include <QEvent>

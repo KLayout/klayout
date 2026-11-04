@@ -167,16 +167,16 @@
   This patch contains some other enhancements which improve performance of DRC, 
   although in certain cases only.
 * Enhancement: %GITHUB%/issues/2300 More options to set layout format, specifically on LEF/DEF
-* Bugfix: %GITHUB%/2301 UI freezes permanently with open Macro Development window and event listening plugin
+* Bugfix: %GITHUB%/issues/2301 UI freezes permanently with open Macro Development window and event listening plugin
 * Bugfix: %GITHUB%/issues/2305 Library reloading problems
-* Enhancement: %GITHUB%/2306 Feature Request: API-access to a setter for the selected entry in the Netlist Database Browser
-* Bugfix: %GITHUB%/2311 Tip window is shown although running in non-GUI modebug
-* Bugfix: %GITHUB%/2315 Edit/Layout/Scale causes confusing
-* Enhancement: %GITHUB%/2316 Edit/Selection/Make Array: support both pitch and spacing
-* Bugfix: %GITHUB%/2320 Failure to read OASIS files with large property strings
-* Enhancement: %GITHUB%/2322 Options(text): split text scaling and rotation into two separate options
-* Enhancement: %GITHUB%/2326 Fit shouldn't take bbox of "empty" struct into account
-* Bugfix: %GITHUB%/2331 Screen size error (Assertion tlPixelBuffer.cc:260 n < m_height was not true)
+* Enhancement: %GITHUB%/issues/2306 Feature Request: API-access to a setter for the selected entry in the Netlist Database Browser
+* Bugfix: %GITHUB%/issues/2311 Tip window is shown although running in non-GUI modebug
+* Bugfix: %GITHUB%/issues/2315 Edit/Layout/Scale causes confusing
+* Enhancement: %GITHUB%/issues/2316 Edit/Selection/Make Array: support both pitch and spacing
+* Bugfix: %GITHUB%/issues/2320 Failure to read OASIS files with large property strings
+* Enhancement: %GITHUB%/issues/2322 Options(text): split text scaling and rotation into two separate options
+* Enhancement: %GITHUB%/issues/2326 Fit shouldn't take bbox of "empty" struct into account
+* Bugfix: %GITHUB%/issues/2331 Screen size error (Assertion tlPixelBuffer.cc:260 n < m_height was not true)
 * Enhancement: "strmrun" now can run DRC and LVS scripts
 * Enhancement: "Library#library_by_name" now can be used with "*" for technology 
 * Bugfix: PCell "coerce_parameters" and "callback" was called with the client layout
@@ -620,7 +620,7 @@
 * Bugfix: Properly transferring ownership for variant to Python/Ruby translation.
   This is required for some Python and Ruby bindings, when objects are
   transferred through generic arrays.
-* Enhancement: Added Region#being_shapes_rec and Region#begin_merged_shapes_rec.
+* Enhancement: Added Region#begin_shapes_rec and Region#begin_merged_shapes_rec.
   Mainly for being able to retrieve shapes with properties from Region#nets
 * Enhancement: Convenience methods Shape#properties, Layout#properties, Cell#properties, Instance#properties.
   These method will obtain all properties as a hash.

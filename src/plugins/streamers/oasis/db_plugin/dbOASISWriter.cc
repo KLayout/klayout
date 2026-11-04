@@ -26,6 +26,7 @@
 
 #include "tlDeflate.h"
 #include "tlMath.h"
+#include "tlStream.h"
 #include "tlUniqueName.h"
 
 #include <math.h>

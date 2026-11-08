@@ -405,8 +405,8 @@ AsIfFlatTexts::selected_interacting_generic (const Region &other, bool inverse) 
 {
   //  shortcuts
   if (other.empty () || empty ()) {
-    return new EmptyTexts ();
-  }
+		return inverse ? clone () : new EmptyTexts ();
+	}
 
   db::box_scanner2<db::Text, size_t, db::Polygon, size_t> scanner (report_progress (), progress_desc ());
 

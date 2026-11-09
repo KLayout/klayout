@@ -1588,12 +1588,6 @@ void pull_with_text_local_operation<TS, TI, TR>::do_compute_local (db::Layout *l
   simple_result_inserter<TR> inserter (result);
   region_to_text_interaction_filter<TS, TI, simple_result_inserter<TR> > filter (inserter, false);
 
-  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-    for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-      scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
-    }
-  }
-
   std::set<unsigned int> intruder_ids;
   for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
     for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {

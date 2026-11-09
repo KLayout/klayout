@@ -279,7 +279,8 @@ public:
    *
    *  The object's pointer is stored, so the object must remain valid until the 
    *  scanner does not need it any longer. An additional property can be attached to 
-   *  the object which will be stored along with the object.
+   *  the object which will be stored along with the object. An object inserted
+   *  twice counts as two entries, each with its own property.
    */
   void insert (const Obj *obj, const Prop &prop)
   {
@@ -387,7 +388,10 @@ private:
 
     } else {
 
-      std::set<std::pair<const Obj *, const Obj *> > seen;
+      //  Instead of remembering reported pairs, a pair is reported only in the band where it is
+      //  first tested. That is the band where the upper element enters, which after the first band
+      //  means bottom > y. The partition never drops an element that can still overlap a later one.
+      bool first_band = true;
 
       std::sort (m_pp.begin (), m_pp.end (), bottom_side_compare_func (bc));
 
@@ -412,12 +416,6 @@ private:
 
         while (cc != current) {
           rec.finish (cc->first, cc->second);
-          auto s = seen.lower_bound (std::make_pair (cc->first, (const Obj *)0));
-          auto s0 = s;
-          while (s != seen.end () && s->first == cc->first) {
-            ++s;
-          }
-          seen.erase (s0, s);
           ++cc;
         }
 
@@ -460,18 +458,14 @@ private:
           }
 
           for (iterator_type i = f0; i != f; ++i) {
+            box_type bi = bc (*i);
+            bool i_new = first_band || bi.bottom () > y;
             for (iterator_type j = c; j < i; ++j) {
-              if (bs_boxes_overlap (bc (*i), bc (*j), enl)) {
-                std::pair<const Obj *, const Obj *> k (i->first, j->first);
-                if (k.first < k.second) {
-                  std::swap (k.first, k.second);
-                }
-                if (seen.find (k) == seen.end ()) {
-                  seen.insert (k);
-                  rec.add (i->first, i->second, j->first, j->second);
-                  if (rec.stop ()) {
-                    return false;
-                  }
+              box_type bj = bc (*j);
+              if ((i_new || bj.bottom () > y) && bs_boxes_overlap (bi, bj, enl)) {
+                rec.add (i->first, i->second, j->first, j->second);
+                if (rec.stop ()) {
+                  return false;
                 }
               }
             }
@@ -482,6 +476,7 @@ private:
         }
 
         y = yy;
+        first_band = false;
 
       }
 
@@ -731,7 +726,8 @@ public:
    *
    *  The object's pointer is stored, so the object must remain valid until the
    *  scanner does not need it any longer. An additional property can be attached to
-   *  the object which will be stored along with the object.
+   *  the object which will be stored along with the object. An object inserted
+   *  twice counts as two entries, each with its own property.
    */
   void insert1 (const Obj1 *obj, const Prop1 &prop)
   {
@@ -743,7 +739,8 @@ public:
    *
    *  The object's pointer is stored, so the object must remain valid until the
    *  scanner does not need it any longer. An additional property can be attached to
-   *  the object which will be stored along with the object.
+   *  the object which will be stored along with the object. An object inserted
+   *  twice counts as two entries, each with its own property.
    */
   void insert2 (const Obj2 *obj, const Prop2 &prop)
   {
@@ -888,8 +885,11 @@ private:
 
     } else {
 
-      std::set<std::pair<const Obj1 *, const Obj2 *> > seen1;
-      std::set<std::pair<const Obj2 *, const Obj1 *> > seen2;
+      //  Instead of remembering reported pairs, a pair is reported only where it is first tested.
+      //  That is the band where the upper element enters, which after the first band means
+      //  bottom > y, and inside that band the window where the right element enters. The
+      //  partitions never drop an element that can still overlap a later one.
+      bool first_band = true;
 
       std::sort (m_pp1.begin (), m_pp1.end (), bottom_side_compare_func1 (bc1));
       std::sort (m_pp2.begin (), m_pp2.end (), bottom_side_compare_func2 (bc2));
@@ -919,23 +919,11 @@ private:
 
         while (cc1 != current1) {
           rec.finish1 (cc1->first, cc1->second);
-          auto s = seen1.lower_bound (std::make_pair (cc1->first, (const Obj2 *)0));
-          auto s0 = s;
-          while (s != seen1.end () && s->first == cc1->first) {
-            ++s;
-          }
-          seen1.erase (s0, s);
           ++cc1;
         }
 
         while (cc2 != current2) {
           rec.finish2 (cc2->first, cc2->second);
-          auto s = seen2.lower_bound (std::make_pair (cc2->first, (const Obj1 *)0));
-          auto s0 = s;
-          while (s != seen2.end () && s->first == cc2->first) {
-            ++s;
-          }
-          seen2.erase (s0, s);
           ++cc2;
         }
 
@@ -975,6 +963,11 @@ private:
             c1 = std::partition (c1, f1, left_func1 (bc1, x + 1 - enl));
             c2 = std::partition (c2, f2, left_func2 (bc2, x + 1 - enl));
 
+            //  Everything before f10 and f20 was in an earlier window. The partitions only reorder
+            //  that part, so the elements added below are always the ones from f10 and f20 on.
+            iterator_type1 f10 = f1;
+            iterator_type2 f20 = f2;
+
             //  add at least the required items per band
             size_t min_box_size = size_t ((f1 - c1) * m_fill_factor) + size_t ((f2 - c2) * m_fill_factor);
             coord_type xx = x;
@@ -996,14 +989,15 @@ private:
 
             if (c1 != f1 && c2 != f2) {
               for (iterator_type1 i = c1; i != f1; ++i) {
-                for (iterator_type2 j = c2; j < f2; ++j) {
-                  if (bs_boxes_overlap (bc1 (*i), bc2 (*j), enl)) {
-                    if (seen1.insert (std::make_pair (i->first, j->first)).second) {
-                      seen2.insert (std::make_pair (j->first, i->first));
-                      rec.add (i->first, i->second, j->first, j->second);
-                      if (rec.stop ()) {
-                        return false;
-                      }
+                box_type bi = bc1 (*i);
+                bool i_new = first_band || bi.bottom () > y;
+                //  pairs of two elements from earlier windows were tested there already
+                for (iterator_type2 j = (i < f10 ? f20 : c2); j < f2; ++j) {
+                  box_type bj = bc2 (*j);
+                  if ((i_new || bj.bottom () > y) && bs_boxes_overlap (bi, bj, enl)) {
+                    rec.add (i->first, i->second, j->first, j->second);
+                    if (rec.stop ()) {
+                      return false;
                     }
                   }
                 }
@@ -1021,6 +1015,7 @@ private:
         }
 
         y = yy;
+        first_band = false;
 
       }
 

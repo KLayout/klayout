@@ -1452,3 +1452,58 @@ TEST(sweep_two_matches_brute_force)
 
   EXPECT_EQ (failed, std::string ());
 }
+
+//  An object inserted twice with different properties is two entries, with or without the sweep
+TEST(sweep_two_keeps_objects_inserted_twice)
+{
+  db::Box a (0, 0, 100, 100);
+  db::Box b (50, 50, 150, 150);
+  db::Box c (500, 500, 600, 600);
+
+  for (int sweep = 0; sweep < 2; ++sweep) {
+
+    db::box_scanner2<db::Box, size_t, db::Box, size_t> bs;
+    bs.insert1 (&a, 0);
+    bs.insert1 (&c, 1);
+    bs.insert2 (&b, 0);
+    bs.insert2 (&b, 1);
+    if (sweep) {
+      bs.set_scanner_threshold (0);
+      bs.set_scanner_threshold1 (0);
+    }
+
+    BoxScannerPairCounterTwo rec;
+    bs.process (rec, 0, db::box_convert<db::Box> (), db::box_convert<db::Box> ());
+
+    EXPECT_EQ (rec.counts.size (), size_t (2));
+    EXPECT_EQ (rec.counts [std::make_pair (size_t (0), size_t (0))], 1);
+    EXPECT_EQ (rec.counts [std::make_pair (size_t (0), size_t (1))], 1);
+
+  }
+}
+
+TEST(sweep_keeps_objects_inserted_twice)
+{
+  db::Box a (0, 0, 100, 100);
+  db::Box b (50, 50, 150, 150);
+
+  for (int sweep = 0; sweep < 2; ++sweep) {
+
+    db::box_scanner<db::Box, size_t> bs;
+    bs.insert (&a, 0);
+    bs.insert (&a, 1);
+    bs.insert (&b, 2);
+    if (sweep) {
+      bs.set_scanner_threshold (0);
+    }
+
+    BoxScannerPairCounter rec;
+    bs.process (rec, 0, db::box_convert<db::Box> ());
+
+    EXPECT_EQ (rec.counts.size (), size_t (3));
+    EXPECT_EQ (rec.counts [std::make_pair (size_t (0), size_t (1))], 1);
+    EXPECT_EQ (rec.counts [std::make_pair (size_t (0), size_t (2))], 1);
+    EXPECT_EQ (rec.counts [std::make_pair (size_t (1), size_t (2))], 1);
+
+  }
+}

@@ -1182,3 +1182,273 @@ TEST(two_2k)
   run_test2_two(_this, 1000, 3, 0.0, 1000);
   run_test2_two(_this, 1000, 3, 0.0, 1000, true, false /*sub-threshold*/);
 }
+
+namespace
+{
+
+struct BoxScannerPairCounter
+{
+  void finish (const db::Box *, size_t p)
+  {
+    if (! finished.insert (p).second) {
+      finished_twice = true;
+    }
+  }
+  bool stop () const { return false; }
+  void initialize () { }
+  void finalize (bool) { }
+
+  void add (const db::Box *, size_t p1, const db::Box *, size_t p2)
+  {
+    if (finished.find (p1) != finished.end () || finished.find (p2) != finished.end ()) {
+      add_after_finish = true;
+    }
+    counts [std::make_pair (std::min (p1, p2), std::max (p1, p2))] += 1;
+  }
+
+  std::map<std::pair<size_t, size_t>, int> counts;
+  std::set<size_t> finished;
+  bool add_after_finish = false;
+  bool finished_twice = false;
+};
+
+struct BoxScannerPairCounterTwo
+{
+  void finish1 (const db::Box *, size_t p)
+  {
+    if (! finished1.insert (p).second) {
+      finished_twice = true;
+    }
+  }
+
+  void finish2 (const db::Box *, size_t p)
+  {
+    if (! finished2.insert (p).second) {
+      finished_twice = true;
+    }
+  }
+  bool stop () const { return false; }
+  void initialize () { }
+  void finalize (bool) { }
+
+  void add (const db::Box *, size_t p1, const db::Box *, size_t p2)
+  {
+    if (finished1.find (p1) != finished1.end () || finished2.find (p2) != finished2.end ()) {
+      add_after_finish = true;
+    }
+    counts [std::make_pair (p1, p2)] += 1;
+  }
+
+  std::map<std::pair<size_t, size_t>, int> counts;
+  std::set<size_t> finished1, finished2;
+  bool add_after_finish = false;
+  bool finished_twice = false;
+};
+
+//  A small random input for the scanners. The entries index into the boxes, so an object
+//  can be inserted more than once.
+struct RandomCase
+{
+  std::vector<db::Box> boxes;
+  std::vector<size_t> set1, set2;
+  db::Coord enl;
+  double fill_factor;
+
+  std::string to_string () const
+  {
+    std::string s = "enl=" + tl::to_string (enl) + " fill_factor=" + tl::to_string (fill_factor) + " set1:";
+    for (auto i = set1.begin (); i != set1.end (); ++i) {
+      s += " " + boxes [*i].to_string ();
+    }
+    s += " set2:";
+    for (auto i = set2.begin (); i != set2.end (); ++i) {
+      s += " " + boxes [*i].to_string ();
+    }
+    return s;
+  }
+};
+
+unsigned int random_below (unsigned int &seed, unsigned int n)
+{
+  seed = seed * 1103515245u + 12345u;
+  return (seed >> 8) % n;
+}
+
+//  The grid is coarse, so many edges coincide. Some boxes are empty, some are lines or
+//  points and some span the whole grid.
+RandomCase random_case (unsigned int &seed)
+{
+  static const db::Coord grids [] = { 2, 4, 8, 30, 200 };
+  static const db::Coord enls [] = { 0, 0, 0, 1, 1, 2, 5, -1 };
+  static const double fill_factors [] = { 0.0, 0.0, 0.5, 1.0, 2.0, 10.0 };
+
+  RandomCase c;
+  db::Coord grid = grids [random_below (seed, 5)];
+  db::Coord max_size = 1 + db::Coord (random_below (seed, (unsigned int) grid / 2 + 1));
+  c.enl = enls [random_below (seed, 8)];
+  c.fill_factor = fill_factors [random_below (seed, 6)];
+
+  unsigned int n = 1 + random_below (seed, random_below (seed, 2) ? 12 : 70);
+  for (unsigned int i = 0; i < n; ++i) {
+    if (random_below (seed, 40) == 0) {
+      c.boxes.push_back (db::Box ());
+    } else {
+      db::Coord x = db::Coord (random_below (seed, grid));
+      db::Coord y = db::Coord (random_below (seed, grid));
+      db::Coord w = random_below (seed, 15) == 0 ? grid : db::Coord (random_below (seed, max_size + 1));
+      db::Coord h = random_below (seed, 15) == 0 ? grid : db::Coord (random_below (seed, max_size + 1));
+      c.boxes.push_back (db::Box (x, y, x + w, y + h));
+    }
+  }
+
+  for (int s = 0; s < 2; ++s) {
+    std::vector<size_t> &set = s == 0 ? c.set1 : c.set2;
+    unsigned int ne = random_below (seed, 2 * n);
+    for (unsigned int i = 0; i < ne; ++i) {
+      set.push_back (random_below (seed, 3) == 0 ? random_below (seed, n) : i % n);
+    }
+  }
+
+  return c;
+}
+
+}
+
+//  one set below the other, with some tall boxes of the lower set reaching into the upper one,
+//  so that bands and windows often hold elements of one set only
+static void run_test_two_apart (tl::TestBase *_this, bool in_x)
+{
+  std::vector<db::Box> bb1, bb2;
+  for (int i = 0; i < 40; ++i) {
+    db::Coord c = (i % 10) * 100, d = (i / 10) * 100;
+    bb1.push_back (db::Box (c, d, c + 50, d + (i % 7 == 0 ? 1500 : 50)));
+    bb2.push_back (db::Box (c + 20, d + 1000, c + 70, d + 1050));
+  }
+  if (in_x) {
+    for (size_t i = 0; i < bb1.size (); ++i) {
+      bb1 [i].transform (db::Trans (db::Trans::m45));
+      bb2 [i].transform (db::Trans (db::Trans::m45));
+    }
+  }
+
+  for (db::Coord enl = 0; enl < 2; ++enl) {
+
+    db::box_scanner2<db::Box, size_t, db::Box, size_t> bs;
+    for (size_t i = 0; i < bb1.size (); ++i) {
+      bs.insert1 (&bb1 [i], i);
+    }
+    for (size_t i = 0; i < bb2.size (); ++i) {
+      bs.insert2 (&bb2 [i], i);
+    }
+    bs.set_fill_factor (0.0);
+    bs.set_scanner_threshold (0);
+    bs.set_scanner_threshold1 (0);
+
+    BoxScannerPairCounterTwo rec;
+    bs.process (rec, enl, db::box_convert<db::Box> (), db::box_convert<db::Box> ());
+
+    std::map<std::pair<size_t, size_t>, int> expected;
+    for (size_t i = 0; i < bb1.size (); ++i) {
+      for (size_t j = 0; j < bb2.size (); ++j) {
+        if (db::bs_boxes_overlap (bb1 [i], bb2 [j], enl)) {
+          expected [std::make_pair (i, j)] = 1;
+        }
+      }
+    }
+
+    EXPECT_EQ (expected.empty (), false);
+    EXPECT_EQ (rec.counts == expected, true);
+
+  }
+}
+
+TEST(sweep_two_sets_apart_in_y)
+{
+  run_test_two_apart (_this, false);
+}
+
+TEST(sweep_two_sets_apart_in_x)
+{
+  run_test_two_apart (_this, true);
+}
+
+//  Property test: on many small random inputs the sweep reports the same pairs as brute force,
+//  each once, and finishes every element once and after all of its pairs
+TEST(sweep_matches_brute_force)
+{
+  unsigned int seed = 1;
+  std::string failed;
+
+  for (int n = 0; n < 5000 && failed.empty (); ++n) {
+
+    RandomCase c = random_case (seed);
+
+    db::box_scanner<db::Box, size_t> bs;
+    for (size_t i = 0; i < c.set1.size (); ++i) {
+      bs.insert (&c.boxes [c.set1 [i]], i);
+    }
+    bs.set_fill_factor (c.fill_factor);
+    bs.set_scanner_threshold (0);
+
+    BoxScannerPairCounter rec;
+    bs.process (rec, c.enl, db::box_convert<db::Box> ());
+
+    std::map<std::pair<size_t, size_t>, int> expected;
+    for (size_t i = 0; i < c.set1.size (); ++i) {
+      for (size_t j = i + 1; j < c.set1.size (); ++j) {
+        if (db::bs_boxes_overlap (c.boxes [c.set1 [i]], c.boxes [c.set1 [j]], c.enl)) {
+          expected [std::make_pair (i, j)] = 1;
+        }
+      }
+    }
+
+    if (rec.counts != expected || rec.add_after_finish || rec.finished_twice || rec.finished.size () != c.set1.size ()) {
+      failed = c.to_string ();
+    }
+
+  }
+
+  EXPECT_EQ (failed, std::string ());
+}
+
+TEST(sweep_two_matches_brute_force)
+{
+  unsigned int seed = 1;
+  std::string failed;
+
+  for (int n = 0; n < 5000 && failed.empty (); ++n) {
+
+    RandomCase c = random_case (seed);
+
+    db::box_scanner2<db::Box, size_t, db::Box, size_t> bs;
+    for (size_t i = 0; i < c.set1.size (); ++i) {
+      bs.insert1 (&c.boxes [c.set1 [i]], i);
+    }
+    for (size_t i = 0; i < c.set2.size (); ++i) {
+      bs.insert2 (&c.boxes [c.set2 [i]], i);
+    }
+    bs.set_fill_factor (c.fill_factor);
+    bs.set_scanner_threshold (0);
+    bs.set_scanner_threshold1 (0);
+
+    BoxScannerPairCounterTwo rec;
+    bs.process (rec, c.enl, db::box_convert<db::Box> (), db::box_convert<db::Box> ());
+
+    std::map<std::pair<size_t, size_t>, int> expected;
+    for (size_t i = 0; i < c.set1.size (); ++i) {
+      for (size_t j = 0; j < c.set2.size (); ++j) {
+        if (db::bs_boxes_overlap (c.boxes [c.set1 [i]], c.boxes [c.set2 [j]], c.enl)) {
+          expected [std::make_pair (i, j)] = 1;
+        }
+      }
+    }
+
+    if (rec.counts != expected || rec.add_after_finish || rec.finished_twice ||
+        rec.finished1.size () != c.set1.size () || rec.finished2.size () != c.set2.size ()) {
+      failed = c.to_string ();
+    }
+
+  }
+
+  EXPECT_EQ (failed, std::string ());
+}

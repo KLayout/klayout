@@ -101,6 +101,15 @@ EqualDeviceParameters::EqualDeviceParameters (size_t parameter_id, double absolu
   m_compare_set.push_back (std::make_pair (parameter_id, std::make_pair (std::max (0.0, absolute), std::max (0.0, relative))));
 }
 
+std::vector<size_t> EqualDeviceParameters::parameter_ids () const
+{
+  std::vector<size_t> ids;
+  for (std::vector<std::pair<size_t, std::pair<double, double> > >::const_iterator c = m_compare_set.begin (); c != m_compare_set.end (); ++c) {
+    ids.push_back (c->first);
+  }
+  return ids;
+}
+
 std::string EqualDeviceParameters::to_string () const
 {
   std::string res;

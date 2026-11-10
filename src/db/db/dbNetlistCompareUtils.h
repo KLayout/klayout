@@ -32,6 +32,10 @@
 #include <limits>
 #include <map>
 #include <set>
+#include <vector>
+#include <deque>
+#include <unordered_map>
+#include <cstdint>
 
 namespace db
 {
@@ -41,6 +45,7 @@ class Net;
 class SubCircuit;
 class Device;
 class DeviceClass;
+class EqualDeviceParameters;
 class Circuit;
 class SubCircuit;
 class NetGraph;
@@ -137,6 +142,32 @@ struct DB_PUBLIC DeviceCompare
    *  @brief Three-way compare: returns -1 if d1 is less than d2, 1 if d2 is less than d1 and 0 if both are equal
    */
   int compare (const std::pair<const db::Device *, size_t> &d1, const std::pair<const db::Device *, size_t> &d2) const;
+};
+
+// --------------------------------------------------------------------------------------------------------------------
+//  DeviceSignature definition
+
+/**
+ *  @brief The parameter values of a device, shared by all devices of the same class with identical values
+ *
+ *  The built-in compare delegates look at nothing but the parameter values, so for them the result for two
+ *  devices only depends on their signatures. It is computed once per pair of signatures. Signatures are not
+ *  merged by tolerance, as the tolerance compare is not transitive.
+ */
+class DeviceSignature
+{
+public:
+  DeviceSignature (const db::Device *representative, size_t category, size_t index);
+
+  /**
+   *  @brief Same as DeviceCompare::compare for the devices behind the signatures, but computed only once per pair
+   */
+  int compare (const DeviceSignature &other) const;
+
+private:
+  std::pair<const db::Device *, size_t> m_device;
+  size_t m_index;
+  mutable std::vector<signed char> m_results;
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -343,6 +374,24 @@ public:
   void same_class (const db::DeviceClass *ca, const db::DeviceClass *cb);
   size_t cat_for_device (const db::Device *device);
 
+  /**
+   *  @brief Gets the signature for the device or nullptr if there is none
+   *
+   *  Devices have no signature if the compare delegate is not a built-in one, if the category already holds
+   *  devices of another primary class or if there are too many different parameter sets. The signatures are
+   *  valid until the next call of "clear_signatures".
+   */
+  const DeviceSignature *signature_for_device (const db::Device *device, size_t category);
+
+  void clear_signatures ()
+  {
+    m_signature_index.clear ();
+    m_signatures.clear ();
+    m_device_signatures.clear ();
+    m_category_primary_class.clear ();
+    m_key_parameters.clear ();
+  }
+
   bool has_cat_for_device_class (const db::DeviceClass *cls)
   {
     return generic_categorizer<db::DeviceClass>::has_cat_for (cls);
@@ -364,6 +413,15 @@ public:
 
 private:
   std::set<size_t> m_strict_device_categories;
+  std::map<std::vector<uint64_t>, size_t> m_signature_index;
+  std::deque<DeviceSignature> m_signatures;
+  std::vector<uint64_t> m_key;
+  std::unordered_map<const db::Device *, const DeviceSignature *> m_device_signatures;
+  std::map<size_t, const db::DeviceClass *> m_category_primary_class;
+  std::map<const db::DeviceClass *, std::vector<size_t> > m_key_parameters;
+
+  const DeviceSignature *make_signature (const db::Device *device, size_t category);
+  const std::vector<size_t> &key_parameters (const db::DeviceClass *primary_class, const db::EqualDeviceParameters *delegate);
 };
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -34,6 +34,9 @@
 namespace db
 {
 
+//  the transitions are sorted a lot, so their size matters
+static_assert (sizeof (void *) != 8 || sizeof (Transition) <= 32, "Transition should stay at 32 bytes");
+
 // --------------------------------------------------------------------------------------------------------------------
 
 static bool is_non_trivial_net (const db::Net *net)
@@ -49,29 +52,38 @@ static size_t translate_terminal_id (size_t tid, const db::Device *device)
 // --------------------------------------------------------------------------------------------------------------------
 //  Transition implementation
 
-Transition::Transition (const db::Device *device, size_t device_category, size_t terminal1_id, size_t terminal2_id)
+//  the category and IDs are kept in 32 bit to make room for the signature pointer
+static uint32_t to_id32 (size_t id)
+{
+  tl_assert (id <= std::numeric_limits<uint32_t>::max ());
+  return static_cast<uint32_t> (id);
+}
+
+Transition::Transition (const db::Device *device, size_t device_category, size_t terminal1_id, size_t terminal2_id, const DeviceSignature *signature)
 {
   m_ptr = (void *) device;
-  m_cat = device_category;
-  tl_assert (terminal1_id < std::numeric_limits<size_t>::max () / 2);
-  m_id1 = terminal1_id;
-  m_id2 = terminal2_id;
+  mp_signature = signature;
+  m_cat = to_id32 (device_category);
+  tl_assert (terminal1_id < std::numeric_limits<uint32_t>::max () / 2);
+  m_id1 = to_id32 (terminal1_id);
+  m_id2 = to_id32 (terminal2_id);
 }
 
 Transition::Transition (const db::SubCircuit *subcircuit, size_t subcircuit_category, size_t pin1_id, size_t pin2_id)
 {
   m_ptr = (void *) subcircuit;
-  m_cat = subcircuit_category;
+  mp_signature = nullptr;
+  m_cat = to_id32 (subcircuit_category);
   //  m_id1 between max/2 and max indicates subcircuit
-  tl_assert (pin1_id < std::numeric_limits<size_t>::max () / 2);
-  m_id1 = std::numeric_limits<size_t>::max () - pin1_id;
-  m_id2 = pin2_id;
+  tl_assert (pin1_id < std::numeric_limits<uint32_t>::max () / 2);
+  m_id1 = std::numeric_limits<uint32_t>::max () - to_id32 (pin1_id);
+  m_id2 = to_id32 (pin2_id);
 }
 
 size_t
 Transition::first_unique_pin_id ()
 {
-  return std::numeric_limits<size_t>::max () / 4;
+  return std::numeric_limits<uint32_t>::max () / 4;
 }
 
 CatAndIds
@@ -81,6 +93,15 @@ Transition::make_key () const
     return CatAndIds (m_cat, m_id1, size_t (0));
   } else {
     return CatAndIds (m_cat, m_id1, m_id2);
+  }
+}
+
+static int compare_devices (const Transition &a, const Transition &b)
+{
+  if (a.signature () && b.signature ()) {
+    return a.signature ()->compare (*b.signature ());
+  } else {
+    return DeviceCompare ().compare (std::make_pair (a.device (), a.cat ()), std::make_pair (b.device (), b.cat ()));
   }
 }
 
@@ -113,7 +134,7 @@ Transition::operator< (const Transition &other) const
     }
 
     if (device () != 0) {
-      int c = DeviceCompare ().compare (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ()));
+      int c = compare_devices (*this, other);
       if (c != 0) {
         return c < 0;
       }
@@ -156,7 +177,7 @@ Transition::operator== (const Transition &other) const
     }
 
     if (device () != 0) {
-      if (DeviceCompare ().compare (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ())) != 0) {
+      if (compare_devices (*this, other) != 0) {
         return false;
       }
     }
@@ -271,6 +292,7 @@ NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_catego
     }
 
     bool is_strict = device_categorizer.is_strict_device_category (device_cat);
+    const DeviceSignature *signature = device_categorizer.signature_for_device (d, device_cat);
 
     //  strict device checking means no terminal swapping
     size_t terminal1_id = is_strict ? i->terminal_id () : translate_terminal_id (i->terminal_id (), d);
@@ -281,7 +303,7 @@ NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_catego
       if (it->id () != i->terminal_id ()) {
 
         size_t terminal2_id = is_strict ? it->id () : translate_terminal_id (it->id (), d);
-        Transition ed2 (d, device_cat, terminal1_id, terminal2_id);
+        Transition ed2 (d, device_cat, terminal1_id, terminal2_id, signature);
 
         const db::Net *net2 = d->net_for_terminal (it->id ());
         if (! net2) {

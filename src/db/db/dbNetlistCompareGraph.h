@@ -26,6 +26,7 @@
 #include "dbCommon.h"
 #include "dbNetlistCompareUtils.h"
 
+#include <cstdint>
 #include <string>
 #include <limits>
 #include <vector>
@@ -81,7 +82,7 @@ private:
 class DB_PUBLIC Transition
 {
 public:
-  Transition (const db::Device *device, size_t device_category, size_t terminal1_id, size_t terminal2_id);
+  Transition (const db::Device *device, size_t device_category, size_t terminal1_id, size_t terminal2_id, const DeviceSignature *signature = nullptr);
   Transition (const db::SubCircuit *subcircuit, size_t subcircuit_category, size_t pin1_id, size_t pin2_id);
 
   static size_t first_unique_pin_id ();
@@ -94,7 +95,7 @@ public:
 
   inline bool is_for_subcircuit () const
   {
-    return m_id1 > std::numeric_limits<size_t>::max () / 2;
+    return m_id1 > std::numeric_limits<uint32_t>::max () / 2;
   }
 
   const db::Device *device () const
@@ -112,6 +113,11 @@ public:
     return m_cat;
   }
 
+  const DeviceSignature *signature () const
+  {
+    return mp_signature;
+  }
+
   size_t id1 () const
   {
     return m_id1;
@@ -124,8 +130,9 @@ public:
 
 private:
   void *m_ptr;
-  size_t m_cat;
-  size_t m_id1, m_id2;
+  const DeviceSignature *mp_signature;
+  uint32_t m_cat;
+  uint32_t m_id1, m_id2;
 };
 
 /**

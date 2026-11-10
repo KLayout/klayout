@@ -343,6 +343,11 @@ public:
 
   virtual bool less (const db::Device &a, const db::Device &b) const;
 
+  /**
+   *  @brief Gets the IDs of the parameters with explicit compare settings
+   */
+  std::vector<size_t> parameter_ids () const;
+
   //  for test purposes
   std::string to_string () const;
 

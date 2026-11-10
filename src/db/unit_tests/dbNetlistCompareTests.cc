@@ -21,6 +21,7 @@
 */
 
 #include "tlUnitTest.h"
+#include "tlString.h"
 #include "dbNetlistDeviceClasses.h"
 #include "dbNetlistCompare.h"
 #include "dbNetlistCrossReference.h"
@@ -5643,4 +5644,319 @@ TEST(41_ResistorStarParameterMismatch)
     "end_circuit STAR STAR NOMATCH"
   );
   EXPECT_EQ (good, false);
+}
+
+//  More distinct parameter sets than the compare keeps track of
+static bool compare_star_with_many_values (int offset_at)
+{
+  const int n = 1200;
+
+  std::string nls1 = "circuit STAR ($0=C);\n";
+  std::string nls2 = "circuit STAR ($0=C);\n";
+
+  for (int i = 0; i < n; ++i) {
+    int j = (i * 7) % n;
+    nls1 += tl::sprintf ("  device RES $%d (A=C,B=N%d) (R=%d);\n", i + 1, i + 1, 1 + i);
+    nls2 += tl::sprintf ("  device RES $%d (A=C,B=M%d) (R=%d);\n", j + 1, j + 1, 1 + j + (j == offset_at ? 5000 : 0));
+  }
+
+  nls1 += "end;\n";
+  nls2 += "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1.c_str ());
+  prep_nl (nl2, nls2.c_str ());
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
+
+  return comp.compare (&nl1, &nl2);
+}
+
+TEST(42_ResistorStarManyParameterSets)
+{
+  EXPECT_EQ (compare_star_with_many_values (-1), true);
+  EXPECT_EQ (compare_star_with_many_values (1100), false);
+}
+
+//  Behaves like the built-in delegate, but is not one, so no signatures are used
+class UncachedEqualDeviceParameters
+  : public db::EqualDeviceParameters
+{
+public:
+  UncachedEqualDeviceParameters (const db::EqualDeviceParameters &other)
+    : db::EqualDeviceParameters (other)
+  { }
+};
+
+static db::DeviceClass *res_class (db::Netlist &nl)
+{
+  for (db::Netlist::device_class_iterator dc = nl.begin_device_classes (); dc != nl.end_device_classes (); ++dc) {
+    if (dc->name () == "RES") {
+      return &*dc;
+    }
+  }
+  return nullptr;
+}
+
+//  a star of n resistors, where resistor i has the value values (i)
+template <class F>
+static void make_res_star (db::Netlist &nl, int n, F values)
+{
+  std::string nls = "circuit STAR ($0=C);\n";
+  for (int i = 0; i < n; ++i) {
+    nls += tl::sprintf ("  device RES $%d (A=C,B=N%d) (R=%.12g);\n", i + 1, i % 5, values (i));
+  }
+  nls += "end;\n";
+  prep_nl (nl, nls.c_str ());
+}
+
+static std::vector<const db::Device *> star_devices (db::Netlist &nl)
+{
+  std::vector<const db::Device *> devices;
+  db::Circuit *c = nl.circuit_by_name ("STAR");
+  for (db::Circuit::device_iterator d = c->begin_devices (); d != c->end_devices (); ++d) {
+    devices.push_back (&*d);
+  }
+  return devices;
+}
+
+TEST(43_SignatureCap)
+{
+  //  1100 different values, then two repeats of earlier ones
+  db::Netlist nl;
+  make_res_star (nl, 1102, [] (int i) { return i < 1100 ? 1.0 + i : (i == 1100 ? 6.0 : 1100.0); });
+  std::vector<const db::Device *> devices = star_devices (nl);
+
+  db::DeviceCategorizer dc;
+  std::vector<const db::DeviceSignature *> sigs;
+  for (auto d : devices) {
+    sigs.push_back (dc.signature_for_device (d, dc.cat_for_device (d)));
+  }
+
+  std::set<const db::DeviceSignature *> distinct;
+  size_t with_signature = 0;
+  for (size_t i = 0; i < 1100; ++i) {
+    if (sigs [i]) {
+      ++with_signature;
+      distinct.insert (sigs [i]);
+    }
+  }
+  EXPECT_EQ (with_signature, size_t (1024));
+  EXPECT_EQ (distinct.size (), size_t (1024));
+  EXPECT_EQ (sigs [1023] != nullptr, true);
+  EXPECT_EQ (sigs [1024] == nullptr, true);
+  EXPECT_EQ (sigs [1099] == nullptr, true);
+
+  //  a known value still finds its signature when the table is full, a new one does not get one
+  EXPECT_EQ (sigs [1100] == sigs [5], true);
+  EXPECT_EQ (sigs [1101] == nullptr, true);
+  EXPECT_EQ (dc.signature_for_device (devices [0], dc.cat_for_device (devices [0])) == sigs [0], true);
+
+  //  clearing makes room again
+  dc.clear_signatures ();
+  EXPECT_EQ (dc.signature_for_device (devices [1099], dc.cat_for_device (devices [1099])) != nullptr, true);
+}
+
+TEST(44_SignatureCompareAcrossCap)
+{
+  //  values 1.0, 1.04, 1.08 .. with a 5% tolerance make non-transitive chains,
+  //  and the filler values before them push some of them past the cap
+  const int filler = 1018;
+  const int n = filler + 12;
+
+  db::Netlist nl;
+  make_res_star (nl, n, [] (int i) { return i < filler ? 1000.0 + i : 1.0 + 0.04 * (i - filler); });
+  res_class (nl)->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassResistor::param_id_R, 0.0, 0.05));
+  std::vector<const db::Device *> devices = star_devices (nl);
+
+  db::DeviceCategorizer dc;
+  std::vector<const db::DeviceSignature *> sigs;
+  for (auto d : devices) {
+    sigs.push_back (dc.signature_for_device (d, dc.cat_for_device (d)));
+  }
+  EXPECT_EQ (sigs [filler + 5] != nullptr, true);
+  EXPECT_EQ (sigs [filler + 6] == nullptr, true);
+
+  std::string failed;
+  for (int i = filler; i < n; ++i) {
+    for (int j = filler; j < n; ++j) {
+
+      size_t ci = dc.cat_for_device (devices [i]), cj = dc.cat_for_device (devices [j]);
+      int expected = db::DeviceCompare ().compare (std::make_pair (devices [i], ci), std::make_pair (devices [j], cj));
+
+      db::Transition ti (devices [i], ci, 0, 1, sigs [i]), tj (devices [j], cj, 0, 1, sigs [j]);
+      if ((ti < tj) != (expected < 0) || (ti == tj) != (expected == 0)) {
+        failed += tl::sprintf ("%d-%d ", i - filler, j - filler);
+      }
+
+    }
+  }
+  EXPECT_EQ (failed, std::string ());
+}
+
+static std::string star_graph_text (int n, double tolerance, bool uncached)
+{
+  db::Netlist nl;
+  make_res_star (nl, n, [] (int i) { return 1.0 + 0.01 * ((i * 7) % 1200); });
+
+  db::EqualDeviceParameters ep (db::DeviceClassResistor::param_id_R, 0.0, tolerance);
+  if (uncached) {
+    res_class (nl)->set_parameter_compare_delegate (new UncachedEqualDeviceParameters (ep));
+  } else {
+    res_class (nl)->set_parameter_compare_delegate (new db::EqualDeviceParameters (ep));
+  }
+
+  return graph_text (nl, "STAR");
+}
+
+TEST(45_GraphOrderWithAndWithoutSignatures)
+{
+  //  below and above the cap, with and without a tolerance that makes the compare non-transitive
+  EXPECT_EQ (star_graph_text (50, 0.0, false), star_graph_text (50, 0.0, true));
+  EXPECT_EQ (star_graph_text (50, 0.025, false), star_graph_text (50, 0.025, true));
+  EXPECT_EQ (star_graph_text (1200, 0.0, false), star_graph_text (1200, 0.0, true));
+  EXPECT_EQ (star_graph_text (1200, 0.025, false), star_graph_text (1200, 0.025, true));
+}
+
+static db::DeviceClass *class_by_name (db::Netlist &nl, const std::string &name)
+{
+  for (db::Netlist::device_class_iterator dc = nl.begin_device_classes (); dc != nl.end_device_classes (); ++dc) {
+    if (dc->name () == name) {
+      return &*dc;
+    }
+  }
+  return nullptr;
+}
+
+static std::vector<const db::Device *> circuit_devices (db::Netlist &nl, const char *circuit_name)
+{
+  std::vector<const db::Device *> devices;
+  db::Circuit *c = nl.circuit_by_name (circuit_name);
+  for (db::Circuit::device_iterator d = c->begin_devices (); d != c->end_devices (); ++d) {
+    devices.push_back (&*d);
+  }
+  return devices;
+}
+
+TEST(46_SignatureKeyOnlyComparedParameters)
+{
+  const char *nls =
+    "circuit C ();\n"
+    "  device NMOS4 $1 (S=A,G=B,D=C,B=D) (L=1,W=1,AS=1,AD=1,PS=4,PD=4);\n"
+    "  device NMOS4 $2 (S=A,G=B,D=C,B=D) (L=1,W=1,AS=2,AD=3,PS=6,PD=7);\n"
+    "  device NMOS4 $3 (S=A,G=B,D=C,B=D) (L=1,W=2,AS=1,AD=1,PS=4,PD=4);\n"
+    "end;\n";
+
+  db::Netlist nl;
+  prep_nl (nl, nls);
+  std::vector<const db::Device *> d = circuit_devices (nl, "C");
+  db::DeviceClass *cls = class_by_name (nl, "NMOS4");
+
+  //  the default compare only looks at L and W, so AS, AD, PS and PD do not split the signatures
+  {
+    db::DeviceCategorizer dc;
+    size_t cat = dc.cat_for_device (d [0]);
+    EXPECT_EQ (dc.signature_for_device (d [0], cat) != nullptr, true);
+    EXPECT_EQ (dc.signature_for_device (d [0], cat) == dc.signature_for_device (d [1], cat), true);
+    EXPECT_EQ (dc.signature_for_device (d [0], cat) == dc.signature_for_device (d [2], cat), false);
+  }
+
+  //  with explicit settings for AS, AS is part of the key
+  cls->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassMOS4Transistor::param_id_AS));
+  {
+    db::DeviceCategorizer dc;
+    size_t cat = dc.cat_for_device (d [0]);
+    EXPECT_EQ (dc.signature_for_device (d [0], cat) == dc.signature_for_device (d [1], cat), false);
+  }
+
+  //  AllDeviceParametersAreEqual looks at all parameters
+  cls->set_parameter_compare_delegate (new db::AllDeviceParametersAreEqual (0.0));
+  {
+    db::DeviceCategorizer dc;
+    size_t cat = dc.cat_for_device (d [0]);
+    EXPECT_EQ (dc.signature_for_device (d [0], cat) != nullptr, true);
+    EXPECT_EQ (dc.signature_for_device (d [0], cat) == dc.signature_for_device (d [1], cat), false);
+  }
+}
+
+TEST(47_SignatureCategoryWithTwoPrimaryClasses)
+{
+  const char *nls =
+    "circuit C ();\n"
+    "  device NMOS4 $1 (S=A,G=B,D=C,B=D) (L=1,W=1);\n"
+    "  device PMOS4 $2 (S=A,G=B,D=C,B=D) (L=1,W=1);\n"
+    "end;\n";
+
+  db::Netlist nl;
+  prep_nl (nl, nls);
+  std::vector<const db::Device *> d = circuit_devices (nl, "C");
+  db::DeviceClass *nmos = class_by_name (nl, "NMOS4");
+  db::DeviceClass *pmos = class_by_name (nl, "PMOS4");
+
+  //  two primary classes in one category may compare through different delegates, so only the first gets signatures
+  {
+    db::DeviceCategorizer dc;
+    dc.same_class (nmos, pmos);
+    size_t cat = dc.cat_for_device (d [0]);
+    EXPECT_EQ (dc.cat_for_device (d [1]), cat);
+    EXPECT_EQ (dc.signature_for_device (d [0], cat) != nullptr, true);
+    EXPECT_EQ (dc.signature_for_device (d [1], cat) == nullptr, true);
+  }
+
+  //  with a common primary class both get one, but different ones, as the classes differ
+  pmos->set_primary_class (nmos);
+  {
+    db::DeviceCategorizer dc;
+    dc.same_class (nmos, pmos);
+    size_t cat = dc.cat_for_device (d [0]);
+    const db::DeviceSignature *s0 = dc.signature_for_device (d [0], cat);
+    const db::DeviceSignature *s1 = dc.signature_for_device (d [1], cat);
+    EXPECT_EQ (s0 != nullptr && s1 != nullptr, true);
+    EXPECT_EQ (s0 == s1, false);
+    EXPECT_EQ (db::Transition (d [0], cat, 0, 1, s0) == db::Transition (d [1], cat, 0, 1, s1), true);
+  }
+  pmos->set_primary_class (0);
+}
+
+TEST(48_SignatureCompareWithReducedKey)
+{
+  //  W in 4% steps with a 5% tolerance on W, and AS which the delegate ignores
+  std::string nls = "circuit C ();\n";
+  int n = 0;
+  for (int w = 0; w < 5; ++w) {
+    for (int as = 0; as < 3; ++as) {
+      ++n;
+      nls += tl::sprintf ("  device NMOS4 $%d (S=A,G=B,D=C,B=D) (L=1,W=%s,AS=%d);\n", n, tl::to_string (1.0 + 0.04 * w), as + 1);
+    }
+  }
+  nls += "end;\n";
+
+  db::Netlist nl;
+  prep_nl (nl, nls.c_str ());
+  class_by_name (nl, "NMOS4")->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassMOS4Transistor::param_id_W, 0.0, 0.05));
+  std::vector<const db::Device *> d = circuit_devices (nl, "C");
+
+  db::DeviceCategorizer dc;
+  std::vector<const db::DeviceSignature *> sigs;
+  for (auto i : d) {
+    sigs.push_back (dc.signature_for_device (i, dc.cat_for_device (i)));
+  }
+
+  std::set<const db::DeviceSignature *> distinct (sigs.begin (), sigs.end ());
+  EXPECT_EQ (distinct.size (), size_t (5));
+
+  std::string failed;
+  for (size_t i = 0; i < d.size (); ++i) {
+    for (size_t j = 0; j < d.size (); ++j) {
+      size_t ci = dc.cat_for_device (d [i]), cj = dc.cat_for_device (d [j]);
+      int expected = db::DeviceCompare ().compare (std::make_pair (d [i], ci), std::make_pair (d [j], cj));
+      db::Transition ti (d [i], ci, 0, 1, sigs [i]), tj (d [j], cj, 0, 1, sigs [j]);
+      if ((ti < tj) != (expected < 0) || (ti == tj) != (expected == 0)) {
+        failed += tl::sprintf ("%d-%d ", int (i), int (j));
+      }
+    }
+  }
+  EXPECT_EQ (failed, std::string ());
 }

@@ -133,8 +133,7 @@ EdgeNeighborhoodVisitor::to_edge_local_trans (const db::Edge &edge)
 EdgeNeighborhoodCompoundOperationNode::EdgeNeighborhoodCompoundOperationNode (const std::vector<CompoundRegionOperationNode *> &children, EdgeNeighborhoodVisitor *visitor, db::Coord bext, db::Coord eext, db::Coord din, db::Coord dout)
   : CompoundRegionMultiInputOperationNode (children), m_bext (bext), m_eext (eext), m_din (din), m_dout (dout), mp_visitor (visitor)
 {
-  tl_assert (visitor != 0);
-  visitor->keep ();
+	//  .. nothing yet ..
 }
 
 db::Coord
@@ -155,7 +154,7 @@ class EdgeCollectorReceiver
   : public db::box_scanner_receiver2<db::EdgeWithProperties, unsigned int, db::PolygonWithProperties, unsigned int>
 {
 public:
-  EdgeCollectorReceiver (db::EdgeNeighborhoodVisitor *visitor, const db::Layout *layout, const db::Cell *cell,
+	EdgeCollectorReceiver (const tl::weak_ptr<db::EdgeNeighborhoodVisitor> &visitor, const db::Layout *layout, const db::Cell *cell,
                          db::Coord bext, db::Coord eext, db::Coord din, db::Coord dout)
     : mp_visitor (visitor), mp_layout (layout), mp_cell (cell),
       m_bext (bext), m_eext (eext), m_din (din), m_dout (dout)
@@ -185,7 +184,7 @@ public:
 private:
   std::map<unsigned int, std::map<unsigned int, std::vector<const db::PolygonWithProperties *> > > m_edge_neighbors;
   std::vector<db::EdgeWithProperties> m_edges;
-  db::EdgeNeighborhoodVisitor *mp_visitor;
+	tl::weak_ptr<db::EdgeNeighborhoodVisitor> mp_visitor;
   const db::Layout *mp_layout;
   const db::Cell *mp_cell;
   db::Coord m_bext, m_eext, m_din, m_dout;
@@ -318,7 +317,9 @@ private:
 
     }
 
-    mp_visitor->on_edge (mp_layout, mp_cell, edge, binned_neighbors);
+		if (mp_visitor) {
+			const_cast<db::EdgeNeighborhoodVisitor *> (mp_visitor.get ())->on_edge (mp_layout, mp_cell, edge, binned_neighbors);
+		}
   }
 };
 
@@ -327,7 +328,7 @@ private:
 void
 EdgeNeighborhoodCompoundOperationNode::do_collect_neighbors (db::box_scanner2<db::EdgeWithProperties, unsigned int, db::PolygonWithProperties, unsigned int> &scanner, const db::Layout *layout, const db::Cell *cell) const
 {
-  EdgeCollectorReceiver rec (const_cast<db::EdgeNeighborhoodVisitor *> (mp_visitor.get ()), layout, cell, m_bext, m_eext, m_din, m_dout);
+	EdgeCollectorReceiver rec (mp_visitor, layout, cell, m_bext, m_eext, m_din, m_dout);
   scanner.process (rec, computed_dist (), db::box_convert<db::EdgeWithProperties> (), db::box_convert<db::PolygonWithProperties> ());
 }
 

@@ -223,7 +223,9 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
     circuits.insert (std::make_pair (c->cell_index (), c.operator-> ()));
   }
 
+	std::vector<db::cell_index_type> device_abstract_cells;
   std::map<db::cell_index_type, std::map<size_t, size_t> > pins_per_cluster_per_cell;
+
   for (db::Layout::bottom_up_const_iterator cid = mp_layout->begin_bottom_up (); cid != mp_layout->end_bottom_up (); ++cid) {
 
     const db::Cell &cell = mp_layout->cell (*cid);
@@ -249,9 +251,8 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
 
     db::DeviceAbstract *dm = nl.device_abstract_by_cell_index (*cid);
     if (dm) {
-      //  This is a device abstract cell:
-      //  make the terminal to cluster ID connections for the device abstract from the device cells
-      make_device_abstract_connections (dm, per_cell_clusters);
+			//  This is a device abstract cell: treat later in a second pass
+			device_abstract_cells.push_back (*cid);
       continue;
     }
 
@@ -350,6 +351,19 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
     }
 
   }
+
+	//  In a second pass make the cluster ID connections for the device abstract from the device cells.
+	//  NOTE: we do this after the first pass as there cluster may get rearranged - for example because
+	//  of cross-device cluster joining (issue #2541).
+
+	for (auto cid = device_abstract_cells.begin (); cid != device_abstract_cells.end (); ++cid) {
+
+		db::DeviceAbstract *dm = nl.device_abstract_by_cell_index (*cid);
+		tl_assert (dm != 0);
+
+		make_device_abstract_connections (dm, mp_clusters->clusters_per_cell (*cid));
+
+	}
 }
 
 void
@@ -459,6 +473,8 @@ NetlistExtractor::make_device_abstract_connections (db::DeviceAbstract *dm, conn
 
   if (m_terminal_annot_name_id.first) {
 
+		std::map<size_t, std::set<size_t> > clusters_per_terminal;
+
     for (connected_clusters_type::iterator dc = clusters.begin (); dc != clusters.end (); ++dc) {
 
       std::set<size_t> ids;
@@ -488,7 +504,7 @@ NetlistExtractor::make_device_abstract_connections (db::DeviceAbstract *dm, conn
                 join = true;
               }
 
-              dm->set_cluster_id_for_terminal (terminal_id, dc->id ());
+							clusters_per_terminal [terminal_id].insert (dc->id ());
 
             }
 
@@ -504,6 +520,19 @@ NetlistExtractor::make_device_abstract_connections (db::DeviceAbstract *dm, conn
       }
 
     }
+
+		for (auto cpt = clusters_per_terminal.begin (); cpt != clusters_per_terminal.end (); ++cpt) {
+
+			//  join clusters with same terminal (issue #2541)
+			auto c = cpt->second.begin ();
+			auto cc = c;
+			for (++cc; cc != cpt->second.end (); ++cc) {
+				clusters.join_cluster_with (*c, *cc);
+			}
+
+			dm->set_cluster_id_for_terminal (cpt->first, *c);
+
+		}
 
   }
 

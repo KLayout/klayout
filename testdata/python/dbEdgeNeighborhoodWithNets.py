@@ -22,6 +22,7 @@ import pya
 import unittest
 import sys
 import os
+import weakref
 
 class EdgeNeighborhoodWithNetsVisitor(pya.EdgeNeighborhoodVisitor):
 
@@ -302,6 +303,20 @@ Polygon: (-9500,0;-9500,15000;0,15000;0,0;-5000,0;-5000,12000;-6500,12000;-6500,
   0.0,15000.0 -> 3: (0,1500;0,4500;15000,4500;15000,1500) props={'net'=>'net2'}
   15000.0,15001.0 -> 3: (15000,1500;15000,4500;15001,4500;15001,1500) props={'net'=>'net2'}
 """)
+
+  # issue-2542
+  def test_2_Ownership(self):
+
+    visitor = EdgeNeighborhoodWithNetsVisitor()
+    visitor_weakref = weakref.ref(visitor)
+
+    node = pya.CompoundRegionOperationNode.new_edge_neighborhood([], visitor, 0, 0, 0, 0)
+
+    visitor = None
+    node._destroy()
+
+    # no leaking reference to visitor
+    self.assertEqual(visitor_weakref() is None, True)
 
 
 # run unit tests

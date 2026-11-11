@@ -248,6 +248,8 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   vbh_tab->addWidget (enh_tab_widget->menu_button ());
 
   connect (mp_tab_bar, SIGNAL (currentChanged (int)), this, SLOT (view_selected (int)));
+  mp_tab_bar->setMovable (true);
+  connect (mp_tab_bar, SIGNAL (tabMoved (int, int)), this, SLOT (tab_moved (int, int)));
 #if QT_VERSION >= 0x040500
   mp_tab_bar->setTabsClosable (true);
   connect (mp_tab_bar, SIGNAL (tabCloseRequested (int)), this, SLOT (tab_close_requested (int)));
@@ -2729,6 +2731,43 @@ void
 MainWindow::tab_close_requested (int index)
 {
   interactive_close_view (index, index + 1, false, true);
+}
+
+void
+MainWindow::tab_moved (int from, int to)
+{
+  if (from == to || from < 0 || to < 0 || from >= int (mp_views.size ()) || to >= int (mp_views.size ())) {
+    return;
+  }
+
+  //  The tab bar already reflects the new order. Reorder the backing view list
+  //  and all parallel widget stacks so that positional indices stay in sync with
+  //  the tab positions.
+  lay::LayoutViewWidget *w = mp_views [from];
+  mp_views.erase (mp_views.begin () + from);
+  mp_views.insert (mp_views.begin () + to, w);
+
+  mp_view_stack->move_widget (from, to);
+  mp_lp_stack->move_widget (from, to);
+  mp_layer_toolbox_stack->move_widget (from, to);
+  mp_hp_stack->move_widget (from, to);
+  mp_libs_stack->move_widget (from, to);
+  mp_eo_stack->move_widget (from, to);
+  mp_bm_stack->move_widget (from, to);
+
+  //  Qt emits tabMoved before currentChanged, so a subsequent view_selected will
+  //  operate on the already-reordered stacks. Re-raise the current widgets here to
+  //  cover the case where the current tab index did not change (no currentChanged).
+  int ci = mp_tab_bar->currentIndex ();
+  if (ci >= 0 && ci < int (mp_views.size ())) {
+    mp_view_stack->raise_widget (ci);
+    mp_lp_stack->raise_widget (ci);
+    mp_layer_toolbox_stack->raise_widget (ci);
+    mp_hp_stack->raise_widget (ci);
+    mp_libs_stack->raise_widget (ci);
+    mp_eo_stack->raise_widget (ci);
+    mp_bm_stack->raise_widget (ci);
+  }
 }
 
 void

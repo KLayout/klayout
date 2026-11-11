@@ -24,6 +24,8 @@
 #include "dbNetlist.h"
 #include "dbNetlistDeviceClasses.h"
 
+#include "dbDevice.h"
+#include "dbDeviceClass.h"
 #include "tlEnv.h"
 
 namespace db
@@ -198,6 +200,18 @@ DeviceCompare::equals (const std::pair<const db::Device *, size_t> &d1, const st
     return false;
   }
   return db::DeviceClass::equal (*d1.first, *d2.first);
+}
+
+int
+DeviceCompare::compare (const std::pair<const db::Device *, size_t> &d1, const std::pair<const db::Device *, size_t> &d2) const
+{
+  if (d1.second != d2.second) {
+    return d1.second < d2.second ? -1 : 1;
+  }
+  if (d1.first == d2.first) {
+    return 0;
+  }
+  return db::DeviceClass::compare (*d1.first, *d2.first);
 }
 
 // --------------------------------------------------------------------------------------------------------------------

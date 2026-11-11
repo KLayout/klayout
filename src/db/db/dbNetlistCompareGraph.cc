@@ -113,9 +113,9 @@ Transition::operator< (const Transition &other) const
     }
 
     if (device () != 0) {
-      DeviceCompare dc;
-      if (! dc.equals (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ()))) {
-        return dc (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ()));
+      int c = DeviceCompare ().compare (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ()));
+      if (c != 0) {
+        return c < 0;
       }
     }
 
@@ -156,8 +156,7 @@ Transition::operator== (const Transition &other) const
     }
 
     if (device () != 0) {
-      DeviceCompare dc;
-      if (! dc.equals (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ()))) {
+      if (DeviceCompare ().compare (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ())) != 0) {
         return false;
       }
     }

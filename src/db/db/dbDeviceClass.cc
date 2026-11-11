@@ -335,6 +335,25 @@ bool DeviceClass::equal (const db::Device &a, const db::Device &b)
   return ! pcd->less (a, b) && ! pcd->less (b, a);
 }
 
+int DeviceClass::compare (const db::Device &a, const db::Device &b)
+{
+  tl_assert (a.device_class () != 0);
+  tl_assert (b.device_class () != 0);
+
+  const db::DeviceParameterCompareDelegate *pcd = primary_device_class (a, b)->parameter_compare_delegate ();
+  if (! pcd) {
+    pcd = &default_compare;
+  }
+
+  if (pcd->less (a, b)) {
+    return -1;
+  } else if (pcd->less (b, a)) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
 // --------------------------------------------------------------------------------
 //  DeviceClassTemplateBase class implementation
 

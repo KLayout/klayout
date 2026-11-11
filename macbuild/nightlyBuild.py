@@ -1,4 +1,4 @@
-#!/Applications/anaconda3/bin/python3
+#!/opt/local/bin/python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -439,9 +439,9 @@ def Parse_CommandLine_Arguments():
         print(Usage)
         sys.exit(0)
 
-    myPlatform = Test_My_Platform( [ '', 'Monterey', 'Ventura', 'Sonoma', 'Sequoia', 'Tahoe' ] )
+    myPlatform = Test_My_Platform( [ '', 'Monterey', 'Ventura', 'Sonoma', 'Sequoia', 'Tahoe', 'GoldenGate' ] )
     if myPlatform == "":
-        print( "! Current platform is not [ 'Monterey', 'Ventura', 'Sonoma', 'Sequoia', 'Tahoe' ]" )
+        print( "! Current platform is not [ 'Monterey', 'Ventura', 'Sonoma', 'Sequoia', 'Tahoe', 'GoldenGate' ]" )
         print(Usage)
         sys.exit(0)
 

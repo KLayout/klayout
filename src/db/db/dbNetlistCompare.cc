@@ -901,6 +901,9 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   db::NetGraph g1, g2;
 
+  //  the graphs of the previous circuits are gone, so their signatures can be dropped
+  device_categorizer.clear_signatures ();
+
   size_t unique_pin_id = Transition::first_unique_pin_id ();
 
   //  NOTE: for normalization we map all subcircuits of c1 to c2.

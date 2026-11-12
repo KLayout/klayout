@@ -343,6 +343,11 @@ public:
 
   virtual bool less (const db::Device &a, const db::Device &b) const;
 
+  /**
+   *  @brief Gets the IDs of the parameters with explicit compare settings
+   */
+  std::vector<size_t> parameter_ids () const;
+
   //  for test purposes
   std::string to_string () const;
 
@@ -701,6 +706,14 @@ public:
    *  the classes features a delegate, the one with the delegate is employed.
    */
   static bool equal (const db::Device &a, const db::Device &b);
+
+  /**
+   *  @brief Compares the parameters of two devices in one step
+   *
+   *  Returns -1 if a is less than b, 1 if b is less than a and 0 if both are equal. It is the same
+   *  as "less" in both directions, but finds the compare delegate only once.
+   */
+  static int compare (const db::Device &a, const db::Device &b);
 
   /**
    *  @brief Registers a compare delegate

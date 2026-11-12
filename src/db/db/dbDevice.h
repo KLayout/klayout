@@ -286,6 +286,15 @@ public:
   double parameter_value (size_t param_id) const;
 
   /**
+   *  @brief Gets the number of parameter values stored explicitly in the device
+   *  Parameters beyond this count are taken from the defaults of the device class.
+   */
+  size_t parameter_value_count () const
+  {
+    return m_parameters.size ();
+  }
+
+  /**
    *  @brief Sets the value for the parameter with the given ID
    */
   void set_parameter_value (size_t param_id, double v);

@@ -218,6 +218,11 @@ Timer::memory_size ()
   
   return taskinfo.pti_resident_size;
   
+#elif defined(__EMSCRIPTEN__)
+
+  //  WebAssembly has no /proc and no way to query the resident set size
+  return 0;
+
 #elif defined(__linux__)
     
   unsigned long memsize = 0;

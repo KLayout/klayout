@@ -1016,13 +1016,18 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
 
   CRONOLOGY_COLLECTION_BRACKET(event_compute_contexts_unlocked)
   std::map<unsigned int, const db::Shapes *> intruder_shapes;
-  if (intruder_cell) {
 
-    for (std::vector<unsigned int>::const_iterator l = contexts.intruder_layers ().begin (); l != contexts.intruder_layers ().end (); ++l) {
-      const db::Shapes *s = &intruder_cell->shapes (contexts.actual_intruder_layer (*l));
+  for (std::vector<unsigned int>::const_iterator l = contexts.intruder_layers ().begin (); l != contexts.intruder_layers ().end (); ++l) {
+
+    unsigned int ail = contexts.actual_intruder_layer (*l);
+    const db::Cell *aic = contexts.intruder_is_subject (*l) ? subject_cell : intruder_cell;
+    if (aic) {
+
+      const db::Shapes *s = &aic->shapes (ail);
       if (! s->empty ()) {
         intruder_shapes.insert (std::make_pair (*l, s));
       }
+
     }
 
   }
@@ -1066,10 +1071,13 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
           d = std::min (d, od->second);
         }
 
-        db::box_convert <db::CellInstArray, true> inst_bci (*mp_intruder_layout, contexts.actual_intruder_layer (*il));
+        unsigned int ail = contexts.actual_intruder_layer (*il);
+        const db::Layout *aily = contexts.intruder_is_subject (*il) ? mp_subject_layout : mp_intruder_layout;
+
+        db::box_convert <db::CellInstArray, true> inst_bci (*aily, ail);
 
         db::box_scanner2<db::CellInstArray, int, db::CellInstArray, int> scanner;
-        interaction_registration_inst2inst<TS, TI, TR> rec (mp_subject_layout, contexts.subject_layer (), mp_intruder_layout, contexts.actual_intruder_layer (*il), contexts.is_foreign (*il), d, &interactions);
+        interaction_registration_inst2inst<TS, TI, TR> rec (mp_subject_layout, contexts.subject_layer (), aily, ail, contexts.is_foreign (*il), d, &interactions);
 
         unsigned int id = 0;
 
@@ -1446,17 +1454,20 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
     }
 
     unsigned int ail = contexts.actual_intruder_layer (*il);
-    bool foreign = contexts.is_foreign (*il);
+    const db::Cell *aic = contexts.intruder_is_subject (*il) ? subject_cell : intruder_cell;
+    const db::Layout *aily = contexts.intruder_is_subject (*il) ? mp_subject_layout : mp_intruder_layout;
+
+    bool is_subject = contexts.is_subject (*il);
 
     const db::Shapes *intruder_shapes = 0;
     if (intruder_cell) {
-      intruder_shapes = &intruder_cell->shapes (ail);
+      intruder_shapes = &aic->shapes (ail);
       if (intruder_shapes->empty ()) {
         intruder_shapes = 0;
       }
     }
 
-    db::box_convert<db::CellInstArray, true> inst_bci (*mp_intruder_layout, ail);
+    db::box_convert<db::CellInstArray, true> inst_bci (*aily, ail);
 
     typename std::map<unsigned int, std::set<TI> >::const_iterator ipl = intruders.second.find (*il);
     static std::set<TI> empty_intruders;
@@ -1465,7 +1476,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
     if (! top_down () && ! subject_shapes->empty () && (intruder_shapes || ipl != intruders.second.end ())) {
 
-      if (subject_cell == intruder_cell && contexts.subject_layer () == ail && !foreign) {
+      if (subject_cell == intruder_cell && is_subject) {
 
         scan_shape2shape_same_layer<TS, TI> () (subject_shapes, subject_id0, ipl == intruders.second.end () ? empty_intruders : ipl->second, il_index, interactions, dist);
 
@@ -1484,7 +1495,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
       db::box_scanner2<TS, int, db::CellInstArray, int> scanner;
       db::addressable_object_from_shape<TS> heap;
-      interaction_registration_shape2inst<TS, TI> rec (mp_subject_layout, mp_intruder_layout, ail, il_index, dist, &interactions);
+      interaction_registration_shape2inst<TS, TI> rec (mp_subject_layout, aily, ail, il_index, dist, &interactions);
 
       unsigned int id = subject_id0;
       for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<TS> ()); !i.at_end (); ++i) {
@@ -1493,7 +1504,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
       unsigned int inst_id = 0;
 
-      if (! top_down () && subject_cell == intruder_cell && contexts.subject_layer () == ail && !foreign) {
+      if (! top_down () && subject_cell == intruder_cell && is_subject) {
 
         //  Same cell, same layer -> no shape to child instance interactions because this will be taken care of
         //  by the instances themselves (and their intruders). This also means, we prefer to deal with

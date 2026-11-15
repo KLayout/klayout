@@ -314,11 +314,20 @@ public:
     //  .. nothing yet ..
   }
 
+  void clear ()
+  {
+    db::CellMapping::clear ();
+
+    m_skipped_variants.clear ();
+    m_into_generation_id = m_from_generation_id = 0;
+  }
+
   void swap (CellMappingWithGenerationIds &other)
   {
     db::CellMapping::swap (other);
     std::swap (m_into_generation_id, other.m_into_generation_id);
     std::swap (m_from_generation_id, other.m_from_generation_id);
+    std::swap (m_skipped_variants, other.m_skipped_variants);
   }
 
   bool is_valid (const db::Layout &into_layout, const db::Layout &from_layout) const
@@ -332,8 +341,19 @@ public:
     m_from_generation_id = from_layout.hier_generation_id ();
   }
 
+  std::map<db::cell_index_type, db::HierarchyBuilder::CellMapKey> &skipped_variants ()
+  {
+    return m_skipped_variants;
+  }
+
+  const std::map<db::cell_index_type, db::HierarchyBuilder::CellMapKey> &skipped_variants () const
+  {
+    return m_skipped_variants;
+  }
+
 private:
   size_t m_into_generation_id, m_from_generation_id;
+  std::map<db::cell_index_type, db::HierarchyBuilder::CellMapKey> m_skipped_variants;
 };
 
 /**
@@ -886,25 +906,14 @@ private:
   {
     //  NOTE: we shouldn't keep pointers here as the layouts may get deleted and recreated with the same address.
     //  But as we don't access these objects that's fairly safe.
-    DeliveryMappingCacheKey (unsigned int _from_index, tl::id_type _into_layout, db::cell_index_type _into_cell, const std::set<db::cell_index_type> *_excluded, const std::set<db::cell_index_type> *_included)
+    DeliveryMappingCacheKey (unsigned int _from_index, tl::id_type _into_layout, db::cell_index_type _into_cell)
       : from_index (_from_index), into_layout (_into_layout), into_cell (_into_cell)
     {
-      if (_excluded) {
-        excluded = *_excluded;
-      }
-      if (_included) {
-        included = *_included;
-      }
+      //  .. nothing yet ..
     }
 
     bool operator< (const DeliveryMappingCacheKey &other) const
     {
-      if (excluded != other.excluded) {
-        return excluded < other.excluded;
-      }
-      if (included != other.included) {
-        return included < other.included;
-      }
       if (from_index != other.from_index) {
         return from_index < other.from_index;
       }
@@ -917,10 +926,10 @@ private:
     unsigned int from_index;
     tl::id_type into_layout;
     db::cell_index_type into_cell;
-    std::set<db::cell_index_type> excluded, included;
   };
 
   std::map<DeliveryMappingCacheKey, CellMappingWithGenerationIds> m_delivery_mapping_cache;
+  std::set<std::pair<tl::id_type, db::cell_index_type> > m_deleted_cells;
   std::map<std::pair<unsigned int, unsigned int>, CellMappingWithGenerationIds> m_internal_mapping_cache;
 };
 

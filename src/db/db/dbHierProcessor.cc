@@ -1456,8 +1456,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
     unsigned int ail = contexts.actual_intruder_layer (*il);
     const db::Cell *aic = contexts.intruder_is_subject (*il) ? subject_cell : intruder_cell;
     const db::Layout *aily = contexts.intruder_is_subject (*il) ? mp_subject_layout : mp_intruder_layout;
-
-    bool is_subject = contexts.is_subject (*il);
+    bool foreign = contexts.is_foreign (*il);
 
     const db::Shapes *intruder_shapes = 0;
     if (intruder_cell) {
@@ -1476,7 +1475,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
     if (! top_down () && ! subject_shapes->empty () && (intruder_shapes || ipl != intruders.second.end ())) {
 
-      if (subject_cell == intruder_cell && is_subject) {
+      if (subject_cell == intruder_cell && contexts.subject_layer () == ail && !foreign) {
 
         scan_shape2shape_same_layer<TS, TI> () (subject_shapes, subject_id0, ipl == intruders.second.end () ? empty_intruders : ipl->second, il_index, interactions, dist);
 
@@ -1504,14 +1503,14 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
       unsigned int inst_id = 0;
 
-      if (! top_down () && subject_cell == intruder_cell && is_subject) {
+      if (! top_down () && subject_cell == intruder_cell && contexts.subject_layer () == ail && !foreign) {
 
         //  Same cell, same layer -> no shape to child instance interactions because this will be taken care of
         //  by the instances themselves (and their intruders). This also means, we prefer to deal with
         //  interactions low in the hierarchy.
 
       } else if (intruder_cell) {
-  //  TODO: can we confine this search to the subject's (sized) bounding box?
+        //  TODO: can we confine this search to the subject's (sized) bounding box?
         for (db::Cell::const_iterator i = intruder_cell->begin (); !i.at_end (); ++i) {
           if (! inst_bci (i->cell_inst ()).empty () && ! intruder_cell_is_breakout (i->cell_index ())) {
             scanner.insert2 (&i->cell_inst (), ++inst_id);
@@ -1519,7 +1518,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
         }
       }
 
-  //  TODO: can we confine this search to the subject's (sized) bounding box?
+      //  TODO: can we confine this search to the subject's (sized) bounding box?
       for (std::set<db::CellInstArray>::const_iterator i = intruders.first.begin (); i != intruders.first.end (); ++i) {
         if (! inst_bci (*i).empty ()) {
           scanner.insert2 (i.operator-> (), ++inst_id);

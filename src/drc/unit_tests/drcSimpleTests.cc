@@ -2165,3 +2165,14 @@ TEST(153d_issue_2423)
 {
   run_test (_this, "153", true);
 }
+
+// issue #2553
+TEST(154_issue_2553)
+{
+  run_test (_this, "154", false, true /*oasis*/);
+}
+
+TEST(154d_issue_2553)
+{
+  run_test (_this, "154", true, true /*oasis*/);
+}

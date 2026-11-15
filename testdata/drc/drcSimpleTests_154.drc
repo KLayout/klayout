@@ -1,0 +1,21 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+clip(6674.dbu, 6750.dbu, 11126.dbu, 11250.dbu)
+
+l1 = polygons(11, 0)
+l2 = polygons(14, 0)
+
+l1.output(11, 0)
+l2.output(14, 0)
+
+err = l1.enclosing(l2, 3.dbu)
+err.polygons.output(100, 0)
+
+
+

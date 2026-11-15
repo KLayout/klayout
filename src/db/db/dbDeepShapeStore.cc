@@ -1185,7 +1185,7 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
   //  Derive a cell mapping for source to target. We reuse any existing mapping for returning the
   //  shapes into the original layout.
 
-  DeliveryMappingCacheKey key (layout_index, tl::id_of (into_layout), into_cell);
+  DeliveryMappingCacheKey key (layout_index, tl::id_of (into_layout), into_cell, excluded_cells, included_cells);
 
   std::map<DeliveryMappingCacheKey, CellMappingWithGenerationIds>::iterator cm = m_delivery_mapping_cache.find (key);
   if (cm != m_delivery_mapping_cache.end () && cm->second.is_valid (*into_layout, *source_layout)) {
@@ -1249,7 +1249,7 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
 
   //  Add new cells for the variants and (possible) devices which are cells added during the device
   //  extraction process
-  std::vector<std::pair<db::cell_index_type, db::cell_index_type> > new_pairs = cm->second.create_missing_mapping2 (*into_layout, *source_layout, source_top, excluded_cells, included_cells);
+  std::vector<std::pair<db::cell_index_type, db::cell_index_type> > new_pairs = cm->second.create_missing_mapping2 (*into_layout, *source_layout, source_top, excluded_cells, included_cells, false, true /*skip empty cells*/);
 
   if (! new_pairs.empty ()) {
 
@@ -1393,7 +1393,7 @@ namespace
     : public ShapesTransformer
   {
   public:
-    DeepShapeStoreToShapeTransformer (const DeepShapeStore &dss, const db::Layout &layout)
+    DeepShapeStoreToShapeTransformer (const DeepShapeStore &dss, const db::Layout & /*layout*/)
     {
       //  gets the text annotation property ID -
       //  this is how the texts are passed for annotating the net names
@@ -1470,6 +1470,7 @@ DeepShapeStore::insert (const DeepLayer &deep_layer, db::Layout *into_layout, db
   std::map<unsigned int, unsigned int> lm;
   lm.insert (std::make_pair (deep_layer.layer (), into_layer));
 
+// @@@ exclude empty cells??
   //  prepare a cell mapping
   const db::CellMapping &cm = cell_mapping_to_original (deep_layer.layout_index (), into_layout, into_cell);
 

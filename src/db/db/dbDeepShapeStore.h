@@ -886,26 +886,38 @@ private:
   {
     //  NOTE: we shouldn't keep pointers here as the layouts may get deleted and recreated with the same address.
     //  But as we don't access these objects that's fairly safe.
-    DeliveryMappingCacheKey (unsigned int _from_index, tl::id_type _into_layout, db::cell_index_type _into_cell)
+    DeliveryMappingCacheKey (unsigned int _from_index, tl::id_type _into_layout, db::cell_index_type _into_cell, const std::set<db::cell_index_type> *_excluded, const std::set<db::cell_index_type> *_included)
       : from_index (_from_index), into_layout (_into_layout), into_cell (_into_cell)
     {
-      //  .. nothing yet ..
+      if (_excluded) {
+        excluded = *_excluded;
+      }
+      if (_included) {
+        included = *_included;
+      }
     }
 
     bool operator< (const DeliveryMappingCacheKey &other) const
     {
+      if (excluded != other.excluded) {
+        return excluded < other.excluded;
+      }
+      if (included != other.included) {
+        return included < other.included;
+      }
       if (from_index != other.from_index) {
         return from_index < other.from_index;
       }
       if (into_layout != other.into_layout) {
         return into_layout < other.into_layout;
       }
-      return into_cell <other.into_cell;
+      return into_cell < other.into_cell;
     }
 
     unsigned int from_index;
     tl::id_type into_layout;
     db::cell_index_type into_cell;
+    std::set<db::cell_index_type> excluded, included;
   };
 
   std::map<DeliveryMappingCacheKey, CellMappingWithGenerationIds> m_delivery_mapping_cache;

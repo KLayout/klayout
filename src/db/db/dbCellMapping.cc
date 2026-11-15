@@ -484,23 +484,23 @@ CellMapping::create_from_names (const db::Layout &layout_a, db::cell_index_type 
 }
 
 std::vector<db::cell_index_type> 
-CellMapping::create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, bool skip_same_library_cells)
+CellMapping::create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, bool skip_same_library_cells, bool skip_empty_cells)
 {
   std::vector<db::cell_index_type> new_cells;
-  do_create_missing_mapping (layout_a, layout_b, cell_index_b, exclude_cells, include_cells, &new_cells, 0, skip_same_library_cells);
+  do_create_missing_mapping (layout_a, layout_b, cell_index_b, exclude_cells, include_cells, &new_cells, 0, skip_same_library_cells, skip_empty_cells);
   return new_cells;
 }
 
 std::vector<std::pair<db::cell_index_type, db::cell_index_type> >
-CellMapping::create_missing_mapping2 (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, bool skip_same_library_cells)
+CellMapping::create_missing_mapping2 (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, bool skip_same_library_cells, bool skip_empty_cells)
 {
   std::vector<std::pair<db::cell_index_type, db::cell_index_type> > cell_pairs;
-  do_create_missing_mapping (layout_a, layout_b, cell_index_b, exclude_cells, include_cells, 0, &cell_pairs, skip_same_library_cells);
+  do_create_missing_mapping (layout_a, layout_b, cell_index_b, exclude_cells, include_cells, 0, &cell_pairs, skip_same_library_cells, skip_empty_cells);
   return cell_pairs;
 }
 
 void
-CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, std::vector<db::cell_index_type> *new_cells_ptr, std::vector<std::pair<db::cell_index_type, db::cell_index_type> > *mapped_pairs, bool skip_same_library_cells)
+CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, std::vector<db::cell_index_type> *new_cells_ptr, std::vector<std::pair<db::cell_index_type, db::cell_index_type> > *mapped_pairs, bool skip_same_library_cells, bool skip_empty_cells)
 {
   std::vector<db::cell_index_type> new_cells_int;
   std::vector<db::cell_index_type> &new_cells = *(new_cells_ptr ? new_cells_ptr : &new_cells_int);
@@ -557,8 +557,25 @@ CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &
 
   }
 
+  //  collect empty cells if required
+  std::set<db::cell_index_type> empty_cells_to_skip;
+
+  bool any = skip_empty_cells;
+  while (any) {
+
+    any = false;
+    for (std::set<db::cell_index_type>::const_iterator b = called_b.begin (); b != called_b.end (); ++b) {
+      if (empty_cells_to_skip.find (*b) == empty_cells_to_skip.end () && layout_b.cell (*b).empty (empty_cells_to_skip)) {
+        any = true;
+        empty_cells_to_skip.insert (*b);
+      }
+    }
+
+  }
+
   for (std::set<db::cell_index_type>::const_iterator b = called_b.begin (); b != called_b.end (); ++b) {
     if (m_b2a_mapping.find (*b) == m_b2a_mapping.end ()
+        && (! skip_empty_cells || empty_cells_to_skip.find (*b) == empty_cells_to_skip.end ())
         && (! exclude_cells || exclude_cells->find (*b) == exclude_cells->end ())
         && (! include_cells || include_cells->find (*b) != include_cells->end ())) {
 

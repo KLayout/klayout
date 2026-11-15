@@ -450,9 +450,11 @@ class DBTrans_TestClass < TestBase
     im_old = im.dup
 
     assert_equal( im.to_s, "r0 *0.5 0,0" )
+    assert_equal( im.trans( RBA::Point::new( 5, -7 )).to_s, "3,-4" )
+
+    im = RBA::ICplxTrans::new(RBA::ICplxTrans::R180, 1.5, RBA::Point::new(5,-7))
     assert_equal( RBA::ICplxTrans::from_s(im.to_s).to_s, im.to_s )
     assert_equal( RBA::ICplxTrans::from_bytes(im.to_bytes).to_s, im.to_s )
-    assert_equal( im.trans( RBA::Point::new( 5, -7 )).to_s, "3,-4" )
 
     im = RBA::ICplxTrans::new(m)
     assert_equal( im.to_s, "r0 *1.1 0,0" )

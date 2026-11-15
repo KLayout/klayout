@@ -1188,63 +1188,77 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
   DeliveryMappingCacheKey key (layout_index, tl::id_of (into_layout), into_cell);
 
   std::map<DeliveryMappingCacheKey, CellMappingWithGenerationIds>::iterator cm = m_delivery_mapping_cache.find (key);
-  if (cm != m_delivery_mapping_cache.end () && cm->second.is_valid (*into_layout, *source_layout)) {
-    return cm->second;
-  }
+  if (cm == m_delivery_mapping_cache.end () || ! cm->second.is_valid (*into_layout, *source_layout)) {
 
-  cm = m_delivery_mapping_cache.insert (std::make_pair (key, CellMappingWithGenerationIds ())).first;
-  cm->second.clear ();
-
-  //  Not found in cache - compute a fresh mapping
-
-  //  collects the cell mappings we skip because they are variants (variant building or box variants)
-  std::map<db::cell_index_type, db::HierarchyBuilder::CellMapKey> cm_skipped_variants;
-
-  if (into_layout == original_builder.source ().layout () && &into_layout->cell (into_cell) == original_builder.source ().top_cell () && original_builder.source ().global_trans ().is_unity ()) {
-
-    //  This is the case of mapping back to the original. In this case we can use the information
-    //  provided inside the original hierarchy builders. They list the source cells and the target cells
-    //  create from them. We need to consider however, that the hierarchy builder is allowed to create
-    //  variants which we cannot map.
-
-    for (HierarchyBuilder::cell_map_type::const_iterator m = original_builder.begin_cell_map (); m != original_builder.end_cell_map (); ) {
-
-      HierarchyBuilder::cell_map_type::const_iterator mm = m;
-      ++mm;
-      bool skip = original_builder.is_variant (m->second);   //  skip variant cells
-      while (mm != original_builder.end_cell_map () && mm->first.original_cell == m->first.original_cell) {
-        //  we have cell (box) variants and cannot simply map
+    cm = m_delivery_mapping_cache.insert (std::make_pair (key, CellMappingWithGenerationIds ())).first;
+    cm->second.clear ();
+  
+    //  Not found in cache - compute a fresh mapping
+  
+    const db::RecursiveShapeIterator &source_iter = original_builder.source ();
+    bool has_clip = (source_iter.region () != db::Box::world () || source_iter.has_complex_region ());
+  
+    if (into_layout == source_iter.layout ()
+        && &into_layout->cell (into_cell) == source_iter.top_cell ()
+        && source_iter.global_trans ().is_unity ()
+        && ! has_clip) {
+  
+      //  This is the case of mapping back to the original. In this case we can use the information
+      //  provided inside the original hierarchy builders. They list the source cells and the target cells
+      //  created from them. We need to consider however, that the hierarchy builder is allowed to create
+      //  variants which we cannot map.
+  
+      for (HierarchyBuilder::cell_map_type::const_iterator m = original_builder.begin_cell_map (); m != original_builder.end_cell_map (); ) {
+  
+        HierarchyBuilder::cell_map_type::const_iterator mm = m;
         ++mm;
-        skip = true;
-      }
-
-      if (! skip) {
-        cm->second.map (m->second, m->first.original_cell);
-      } else {
-        for (HierarchyBuilder::cell_map_type::const_iterator n = m; n != mm; ++n) {
-          tl_assert (cm_skipped_variants.find (n->second) == cm_skipped_variants.end ());
-          cm_skipped_variants [n->second] = n->first;
+        bool skip = original_builder.is_variant (m->second);   //  skip variant cells
+        while (mm != original_builder.end_cell_map () && mm->first.original_cell == m->first.original_cell) {
+          //  we have cell (box) variants and cannot simply map
+          ++mm;
+          skip = true;
         }
+  
+        if (! skip) {
+          cm->second.map (m->second, m->first.original_cell);
+        } else {
+          for (HierarchyBuilder::cell_map_type::const_iterator n = m; n != mm; ++n) {
+            tl_assert (cm->second.skipped_variants ().find (n->second) == cm->second.skipped_variants ().end ());
+            cm->second.skipped_variants () [n->second] = n->first;
+          }
+        }
+  
+        m = mm;
+  
       }
-
-      m = mm;
-
+  
+    } else if (into_layout->cells () == 1) {
+  
+      //  Another simple case is mapping into an empty (or single-top-cell-only) layout, where we can use "create_from_single_full".
+      cm->second.create_single_mapping (*into_layout, into_cell, *source_layout, source_top);
+  
+    } else {
+  
+      cm->second.create_from_geometry (*into_layout, into_cell, *source_layout, source_top);
+  
     }
-
-  } else if (into_layout->cells () == 1) {
-
-    //  Another simple case is mapping into an empty (or single-top-cell-only) layout, where we can use "create_from_single_full".
-    cm->second.create_single_mapping (*into_layout, into_cell, *source_layout, source_top);
-
-  } else {
-
-    cm->second.create_from_geometry (*into_layout, into_cell, *source_layout, source_top);
 
   }
 
   //  Add new cells for the variants and (possible) devices which are cells added during the device
-  //  extraction process
-  std::vector<std::pair<db::cell_index_type, db::cell_index_type> > new_pairs = cm->second.create_missing_mapping2 (*into_layout, *source_layout, source_top, excluded_cells, included_cells);
+  //  extraction process.
+  //  NOTE: we do that outside the cache, as emptiness may change and also the excluded/included
+  //  cells set. Those features add more pairs to the cached mapping.
+
+  std::vector<std::pair<db::cell_index_type, db::cell_index_type> > new_pairs;
+  new_pairs = cm->second.create_missing_mapping2 (*into_layout,
+                                                  *source_layout,
+                                                  source_top,
+                                                  excluded_cells,
+                                                  included_cells,
+                                                  false,      //  preserve library references
+                                                  true        //  skip empty cells
+                                                  );
 
   if (! new_pairs.empty ()) {
 
@@ -1256,12 +1270,18 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
 
       db::cell_index_type var_org = original_builder.original_target_for_variant (np->first);
 
-      std::map<db::cell_index_type, db::HierarchyBuilder::CellMapKey>::const_iterator icm = cm_skipped_variants.find (var_org);
-      if (icm != cm_skipped_variants.end ()) {
+      std::map<db::cell_index_type, db::HierarchyBuilder::CellMapKey>::const_iterator icm = cm->second.skipped_variants ().find (var_org);
+      if (icm != cm->second.skipped_variants ().end ()) {
 
         //  create the variant clone in the original layout too
-        VariantsCollectorBase::copy_shapes (*into_layout, np->second, icm->second.original_cell);
-        new_variants.push_back (std::make_pair (np->second, icm->second.original_cell));
+
+        //  Unless the original cell got deleted, copy the shapes and remember the cell for instance copy.
+        //  When the cell was deleted already (may happen because other DSS member layouts already resolved
+        //  the original cell into variants), we just add new cells as overlays.
+        if (m_deleted_cells.find (std::make_pair (tl::id_of (into_layout), icm->second.original_cell)) == m_deleted_cells.end ()) {
+          VariantsCollectorBase::copy_shapes (*into_layout, np->second, icm->second.original_cell);
+          new_variants.push_back (std::make_pair (np->second, icm->second.original_cell));
+        }
 
         //  forget the original cell (now separated into variants) and map the variants back into the
         //  DSS layout
@@ -1371,7 +1391,15 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
       }
 
       if (! cells_to_delete.empty ()) {
+
+        //  mark the cells as deleted, as other cached deliver maps may still need it.
+        auto lid = tl::id_of (into_layout);
+        for (auto c = cells_to_delete.begin (); c != cells_to_delete.end (); ++c) {
+          m_deleted_cells.insert (std::make_pair (lid, *c));
+        }
+
         into_layout->delete_cells (cells_to_delete);
+
       }
 
     }
@@ -1388,7 +1416,7 @@ namespace
     : public ShapesTransformer
   {
   public:
-    DeepShapeStoreToShapeTransformer (const DeepShapeStore &dss, const db::Layout &layout)
+    DeepShapeStoreToShapeTransformer (const DeepShapeStore &dss, const db::Layout & /*layout*/)
     {
       //  gets the text annotation property ID -
       //  this is how the texts are passed for annotating the net names
@@ -1455,6 +1483,11 @@ DeepShapeStore::insert (const DeepLayer &deep_layer, db::Layout *into_layout, db
   const db::Layout &source_layout = deep_layer.layout ();
   if (source_layout.begin_top_down () == source_layout.end_top_cells ()) {
     //  empty source - nothing to do.
+    return;
+  }
+
+  if (db::RecursiveShapeIterator (source_layout, source_layout.cell (*source_layout.begin_top_down()), deep_layer.layer ()).at_end ()) {
+    //  empty source layer - nothing to do
     return;
   }
 

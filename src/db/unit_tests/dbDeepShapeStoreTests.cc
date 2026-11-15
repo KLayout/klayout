@@ -307,30 +307,58 @@ TEST(7_RestoreWithCellSelection2)
     reader.read (ly);
   }
 
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
   unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l100 = ly.get_layer (db::LayerProperties (100, 0));
+  unsigned int l101 = ly.get_layer (db::LayerProperties (101, 0));
+  unsigned int l102 = ly.get_layer (db::LayerProperties (102, 0));
+  unsigned int l200 = ly.get_layer (db::LayerProperties (200, 0));
+  unsigned int l201 = ly.get_layer (db::LayerProperties (201, 0));
+  unsigned int l202 = ly.get_layer (db::LayerProperties (202, 0));
 
   db::Cell &top_cell = ly.cell (*ly.begin_top_down ());
 
-  db::RecursiveShapeIterator in_it (ly, top_cell, l2);
-  db::RecursiveShapeIterator other_it (ly, top_cell, l2);
-
   std::set<db::cell_index_type> us;
   us.insert (ly.cell_by_name ("X").second);
-  in_it.unselect_cells (us);
 
   std::set<db::cell_index_type> us2;
   us2.insert (top_cell.cell_index ());
-  other_it.unselect_cells (us2);
-  other_it.select_cells (us);
 
   db::DeepShapeStore dss;
 
-  db::Region in_region (in_it, dss);
-  db::Region other_region (other_it, dss);
-  in_region += other_region;
+  db::RecursiveShapeIterator in_it1 (ly, top_cell, l1);
+  in_it1.unselect_cells (us);
 
-  ly.clear_layer (l2);
-  in_region.insert_into (&ly, top_cell.cell_index (), l2);
+  db::RecursiveShapeIterator other_it1 (ly, top_cell, l1);
+  other_it1.unselect_cells (us2);
+  other_it1.select_cells (us);
+
+  db::Region in_region1 (in_it1, dss);
+  db::Region other_region1 (other_it1, dss);
+
+  ly.clear_layer (l100);
+  ly.clear_layer (l101);
+  ly.clear_layer (l102);
+  (in_region1 + other_region1).insert_into (&ly, top_cell.cell_index (), l100);
+  in_region1.insert_into (&ly, top_cell.cell_index (), l101);
+  other_region1.insert_into (&ly, top_cell.cell_index (), l102);
+
+  db::RecursiveShapeIterator in_it2 (ly, top_cell, l2);
+  in_it2.unselect_cells (us);
+
+  db::RecursiveShapeIterator other_it2 (ly, top_cell, l2);
+  other_it2.unselect_cells (us2);
+  other_it2.select_cells (us);
+
+  db::Region in_region2 (in_it2, dss);
+  db::Region other_region2 (other_it2, dss);
+
+  ly.clear_layer (l200);
+  ly.clear_layer (l201);
+  ly.clear_layer (l202);
+  (in_region2 + other_region2).insert_into (&ly, top_cell.cell_index (), l200);
+  in_region2.insert_into (&ly, top_cell.cell_index (), l201);
+  other_region2.insert_into (&ly, top_cell.cell_index (), l202);
 
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/dss_bug2_au.gds");
 }
@@ -347,31 +375,59 @@ TEST(8_RestoreWithCellSelection3)
     reader.read (ly);
   }
 
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
   unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l100 = ly.get_layer (db::LayerProperties (100, 0));
+  unsigned int l101 = ly.get_layer (db::LayerProperties (101, 0));
+  unsigned int l102 = ly.get_layer (db::LayerProperties (102, 0));
+  unsigned int l200 = ly.get_layer (db::LayerProperties (200, 0));
+  unsigned int l201 = ly.get_layer (db::LayerProperties (201, 0));
+  unsigned int l202 = ly.get_layer (db::LayerProperties (202, 0));
 
   db::Cell &top_cell = ly.cell (*ly.begin_top_down ());
-
-  db::RecursiveShapeIterator in_it (ly, top_cell, l2);
-  db::RecursiveShapeIterator other_it (ly, top_cell, l2);
 
   std::set<db::cell_index_type> us;
   us.insert (ly.cell_by_name ("X").second);
   us.insert (ly.cell_by_name ("C3").second);
-  in_it.unselect_cells (us);
 
   std::set<db::cell_index_type> us2;
   us2.insert (top_cell.cell_index ());
-  other_it.unselect_cells (us2);
-  other_it.select_cells (us);
 
   db::DeepShapeStore dss;
 
-  db::Region in_region (in_it, dss);
-  db::Region other_region (other_it, dss);
-  in_region += other_region;
+  db::RecursiveShapeIterator in_it1 (ly, top_cell, l1);
+  in_it1.unselect_cells (us);
 
-  ly.clear_layer (l2);
-  in_region.insert_into (&ly, top_cell.cell_index (), l2);
+  db::RecursiveShapeIterator other_it1 (ly, top_cell, l1);
+  other_it1.unselect_cells (us2);
+  other_it1.select_cells (us);
+
+  db::Region in_region1 (in_it1, dss);
+  db::Region other_region1 (other_it1, dss);
+
+  ly.clear_layer (l100);
+  ly.clear_layer (l101);
+  ly.clear_layer (l102);
+  (in_region1 + other_region1).insert_into (&ly, top_cell.cell_index (), l100);
+  in_region1.insert_into (&ly, top_cell.cell_index (), l101);
+  other_region1.insert_into (&ly, top_cell.cell_index (), l102);
+
+  db::RecursiveShapeIterator in_it2 (ly, top_cell, l2);
+  in_it2.unselect_cells (us);
+
+  db::RecursiveShapeIterator other_it2 (ly, top_cell, l2);
+  other_it2.unselect_cells (us2);
+  other_it2.select_cells (us);
+
+  db::Region in_region2 (in_it2, dss);
+  db::Region other_region2 (other_it2, dss);
+
+  ly.clear_layer (l200);
+  ly.clear_layer (l201);
+  ly.clear_layer (l202);
+  (in_region2 + other_region2).insert_into (&ly, top_cell.cell_index (), l200);
+  in_region2.insert_into (&ly, top_cell.cell_index (), l201);
+  other_region2.insert_into (&ly, top_cell.cell_index (), l202);
 
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/dss_bug3_au.gds");
 }

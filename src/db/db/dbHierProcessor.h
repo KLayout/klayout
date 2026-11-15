@@ -330,16 +330,26 @@ public:
 
   inline unsigned int actual_intruder_layer (unsigned int l) const
   {
-    if (l == foreign_idlayer () || l == subject_idlayer ()) {
+    if (intruder_is_subject (l)) {
       return m_subject_layer;
     } else {
       return l;
     }
   }
 
+  inline bool intruder_is_subject (unsigned int l) const
+  {
+    return l == foreign_idlayer () || l == subject_idlayer ();
+  }
+
   inline bool is_foreign (unsigned int l) const
   {
     return l == foreign_idlayer ();
+  }
+
+  inline bool is_subject (unsigned int l) const
+  {
+    return l == subject_idlayer ();
   }
 
   tl::Mutex &lock () const

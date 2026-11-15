@@ -314,11 +314,20 @@ public:
     //  .. nothing yet ..
   }
 
+  void clear ()
+  {
+    db::CellMapping::clear ();
+
+    m_skipped_variants.clear ();
+    m_into_generation_id = m_from_generation_id = 0;
+  }
+
   void swap (CellMappingWithGenerationIds &other)
   {
     db::CellMapping::swap (other);
     std::swap (m_into_generation_id, other.m_into_generation_id);
     std::swap (m_from_generation_id, other.m_from_generation_id);
+    std::swap (m_skipped_variants, other.m_skipped_variants);
   }
 
   bool is_valid (const db::Layout &into_layout, const db::Layout &from_layout) const
@@ -332,8 +341,19 @@ public:
     m_from_generation_id = from_layout.hier_generation_id ();
   }
 
+  std::map<db::cell_index_type, db::HierarchyBuilder::CellMapKey> &skipped_variants ()
+  {
+    return m_skipped_variants;
+  }
+
+  const std::map<db::cell_index_type, db::HierarchyBuilder::CellMapKey> &skipped_variants () const
+  {
+    return m_skipped_variants;
+  }
+
 private:
   size_t m_into_generation_id, m_from_generation_id;
+  std::map<db::cell_index_type, db::HierarchyBuilder::CellMapKey> m_skipped_variants;
 };
 
 /**
@@ -900,7 +920,7 @@ private:
       if (into_layout != other.into_layout) {
         return into_layout < other.into_layout;
       }
-      return into_cell <other.into_cell;
+      return into_cell < other.into_cell;
     }
 
     unsigned int from_index;
@@ -909,6 +929,7 @@ private:
   };
 
   std::map<DeliveryMappingCacheKey, CellMappingWithGenerationIds> m_delivery_mapping_cache;
+  std::set<std::pair<tl::id_type, db::cell_index_type> > m_deleted_cells;
   std::map<std::pair<unsigned int, unsigned int>, CellMappingWithGenerationIds> m_internal_mapping_cache;
 };
 

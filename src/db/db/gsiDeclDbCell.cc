@@ -3248,7 +3248,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "CAUTION: this method may be expensive!\n"
   ) +
-  gsi::method ("is_empty?", &db::Cell::empty,
+	gsi::method ("is_empty?", static_cast<bool (db::Cell::*) () const> (&db::Cell::empty),
     "@brief Returns a value indicating whether the cell is empty\n"
     "\n"
     "An empty cell is a cell not containing instances nor any shapes.\n"

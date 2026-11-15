@@ -986,6 +986,13 @@ public:
   bool empty () const;
 
   /**
+   *  @brief Returns a value indicating whether the cell is empty or only has empty children
+   *
+   *  A cell is empty if it does not have shapes and only children from the "empty_children" list.
+   */
+  bool empty (const std::set<db::cell_index_type> &empty_children) const;
+
+  /**
    *  @brief Invalidate the instances bounding box (to be called by the instances container)
    */
   void invalidate_insts ();

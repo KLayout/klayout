@@ -24,7 +24,23 @@
 #include "dbNetlist.h"
 #include "dbNetlistDeviceClasses.h"
 
+#include "dbDevice.h"
+#include "dbDeviceClass.h"
 #include "tlEnv.h"
+
+#include <algorithm>
+#include <cstdint>
+#include <cstring>
+#include <typeinfo>
+
+#if defined(__has_include)
+#  if __has_include(<version>)
+#    include <version>
+#  endif
+#endif
+#if defined(__cpp_lib_bit_cast) && __cpp_lib_bit_cast >= 201806L
+#  include <bit>
+#endif
 
 namespace db
 {
@@ -198,6 +214,46 @@ DeviceCompare::equals (const std::pair<const db::Device *, size_t> &d1, const st
     return false;
   }
   return db::DeviceClass::equal (*d1.first, *d2.first);
+}
+
+int
+DeviceCompare::compare (const std::pair<const db::Device *, size_t> &d1, const std::pair<const db::Device *, size_t> &d2) const
+{
+  if (d1.second != d2.second) {
+    return d1.second < d2.second ? -1 : 1;
+  }
+  if (d1.first == d2.first) {
+    return 0;
+  }
+  return db::DeviceClass::compare (*d1.first, *d2.first);
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+//  DeviceSignature implementation
+
+DeviceSignature::DeviceSignature (const db::Device *representative, size_t category, size_t index)
+  : m_device (representative, category), m_index (index)
+{
+  //  .. nothing yet ..
+}
+
+int
+DeviceSignature::compare (const DeviceSignature &other) const
+{
+  if (this == &other) {
+    return 0;
+  }
+
+  const signed char not_computed = 2;
+  if (m_results.size () <= other.m_index) {
+    m_results.resize (other.m_index + 1, not_computed);
+  }
+
+  signed char &r = m_results [other.m_index];
+  if (r == not_computed) {
+    r = static_cast<signed char> (DeviceCompare ().compare (m_device, other.m_device));
+  }
+  return r;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -472,6 +528,113 @@ DeviceCategorizer::cat_for_device (const db::Device *device)
   }
 
   return cat_for_device_class (cls);
+}
+
+static inline uint64_t
+double_bits (double v)
+{
+#if defined(__cpp_lib_bit_cast) && __cpp_lib_bit_cast >= 201806L
+  return std::bit_cast<uint64_t> (v);
+#else
+  static_assert (sizeof (double) == sizeof (uint64_t), "double must be 64 bits");
+  uint64_t b;
+  std::memcpy (&b, &v, sizeof (b));
+  return b;
+#endif
+}
+
+const DeviceSignature *
+DeviceCategorizer::signature_for_device (const db::Device *device, size_t category)
+{
+  //  a device has one signature per graph build, but is asked for it once per terminal
+  auto d = m_device_signatures.find (device);
+  if (d != m_device_signatures.end ()) {
+    return d->second;
+  }
+
+  const DeviceSignature *signature = make_signature (device, category);
+  m_device_signatures.emplace (device, signature);
+  return signature;
+}
+
+const std::vector<size_t> &
+DeviceCategorizer::key_parameters (const db::DeviceClass *primary_class, const db::EqualDeviceParameters *delegate)
+{
+  auto k = m_key_parameters.find (primary_class);
+  if (k != m_key_parameters.end ()) {
+    return k->second;
+  }
+
+  //  EqualDeviceParameters looks at the parameters it has settings for, and at the primary ones of the primary class
+  std::vector<size_t> ids;
+  if (delegate) {
+    ids = delegate->parameter_ids ();
+  }
+  const std::vector<db::DeviceParameterDefinition> &pd = primary_class->parameter_definitions ();
+  for (auto p = pd.begin (); p != pd.end (); ++p) {
+    if (p->is_primary ()) {
+      ids.push_back (p->id ());
+    }
+  }
+  std::sort (ids.begin (), ids.end ());
+  ids.erase (std::unique (ids.begin (), ids.end ()), ids.end ());
+
+  return m_key_parameters.emplace (primary_class, ids).first->second;
+}
+
+const DeviceSignature *
+DeviceCategorizer::make_signature (const db::Device *device, size_t category)
+{
+  //  the cap keeps the tables small. Devices beyond it are compared directly
+  constexpr size_t max_signatures = 1024;
+
+  const db::DeviceClass *cls = device->device_class ();
+  if (! cls) {
+    return nullptr;
+  }
+
+  //  only the built-in delegates are known to look at nothing but the parameter values
+  const db::DeviceClass *pc = cls->primary_class () ? cls->primary_class () : cls;
+  const db::DeviceParameterCompareDelegate *pcd = pc->parameter_compare_delegate ();
+  const bool all_parameters = pcd && typeid (*pcd) == typeid (db::AllDeviceParametersAreEqual);
+  if (pcd && ! all_parameters && typeid (*pcd) != typeid (db::EqualDeviceParameters)) {
+    return nullptr;
+  }
+
+  //  two devices are compared through the delegate of their primary class. A cached result is only valid
+  //  if every pair of the category ends up with the same one, so other primary classes get no signature.
+  auto cp = m_category_primary_class.emplace (category, pc).first;
+  if (cp->second != pc) {
+    return nullptr;
+  }
+
+  m_key.clear ();
+  m_key.push_back (reinterpret_cast<uintptr_t> (cls));
+
+  if (all_parameters) {
+    //  includes the explicit values beyond the parameters of the class
+    size_t n = std::max (cls->parameter_definitions ().size (), device->parameter_value_count ());
+    for (size_t i = 0; i < n; ++i) {
+      m_key.push_back (double_bits (device->parameter_value (i)));
+    }
+  } else {
+    //  parameters the delegate does not look at must not split the signatures
+    const std::vector<size_t> &ids = key_parameters (pc, static_cast<const db::EqualDeviceParameters *> (pcd));
+    for (auto i = ids.begin (); i != ids.end (); ++i) {
+      m_key.push_back (double_bits (device->parameter_value (*i)));
+    }
+  }
+
+  auto k = m_signature_index.find (m_key);
+  if (k != m_signature_index.end ()) {
+    return &m_signatures [k->second];
+  } else if (m_signatures.size () < max_signatures) {
+    m_signature_index.emplace (m_key, m_signatures.size ());
+    m_signatures.emplace_back (device, category, m_signatures.size ());
+    return &m_signatures.back ();
+  } else {
+    return nullptr;
+  }
 }
 
 void

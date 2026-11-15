@@ -1655,8 +1655,6 @@ public:
    *
    *  @param m The matrix to take the rotation part of the transformation from
    *  @param u The displacement
-   *
-   *  The matrix must not contain shear components.
    */
   complex_trans (double mag, double rot, bool mirrx, const displacement_type &u)
     : m_u (u)
@@ -1699,7 +1697,7 @@ public:
    *  @param mirrx True, if mirrored at x axis
    *  @param u The displacement
    */
-  complex_trans (const Matrix2d &m, const vector<I> &u)
+  complex_trans (const Matrix2d &m, const vector<R> &u)
     : m_u (u)
   {
     tl_assert (! m.has_shear ());
@@ -2034,6 +2032,14 @@ public:
   displacement_type disp () const
   {
     return displacement_type (m_u);
+  }
+
+  /**
+   *  @brief Gets the displacement in internal representation (i.e. db::vector<R>)
+   */
+  const db::vector<R> &disp_int () const
+  {
+    return m_u;
   }
 
   /** 

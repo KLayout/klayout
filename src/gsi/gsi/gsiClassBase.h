@@ -589,6 +589,17 @@ public:
   void add_method (MethodBase *method, bool base_class = false);
 
   /**
+   *  @brief Gets the generation number
+   *
+   *  The generation number starts with 0 and is incremented whenever the class
+   *  object is re-initialized - i.e. methods are added or similar.
+   */
+  size_t generation () const
+  {
+    return m_generation;
+  }
+
+  /**
    *  @brief Sets the per-client data for the given client index 
    *  This method is const to preserve the general const semantics of the class 
    *  while allowing clients to register information.
@@ -654,6 +665,7 @@ private:
   std::string m_name;
   std::string m_module;
   tl::weak_collection<ClassBase> m_child_classes, m_subclasses;
+  size_t m_generation;
   mutable std::unique_ptr<PerClassClientSpecificData> mp_data[ClientIndex::MaxClientIndex];
 
   static class_collection *mp_class_collection;

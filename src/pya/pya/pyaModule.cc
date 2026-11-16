@@ -236,13 +236,15 @@ public:
     if (cls->name ().empty ()) {
       //  got an extension
       tl_assert (cls->parent ());
-      m_extensions_for [cls->parent ()->declaration ()].push_back (cls->declaration ());
+      auto &exts = m_extensions_for [cls->parent ()->declaration ()];
+      if (std::find (exts.begin (), exts.end (), cls->declaration ()) == exts.end ()) {
+        exts.push_back (cls->declaration ());
+      }
     }
   }
 
   PyTypeObject *make_class (const gsi::ClassBase *cls, bool as_static)
   {
-    //  drop non-standard names
     if (tl::verbosity () >= 40) {
       tl::info << tl::sprintf (tl::to_string (tr ("Creating class %s.%s")), PyModule_GetName (mp_module->module ()), cls->name ());
     }
@@ -327,7 +329,7 @@ public:
       try {
       	check_error ();
       } catch (tl::Exception &ex) {
-	tl::error << ex.msg ();
+        tl::error << ex.msg ();
       }
       tl_assert (false);
     }
@@ -364,6 +366,23 @@ public:
       PyModule_AddObject (mp_module->module (), cls->name ().c_str (), (PyObject *) type);
     }
 
+    build_type_attrs (type, cls, as_static);
+
+    return type;
+  }
+
+  void rebuild_type_attrs (PyTypeObject *type, const gsi::ClassBase *cls, bool as_static)
+  {
+    //  regenerate the method table
+    MethodTable *mt = MethodTable::method_table_by_class (cls);
+    *mt = MethodTable (cls, mp_module);
+
+    build_type_attrs (type, cls, as_static);
+  }
+
+private:
+  void build_type_attrs (PyTypeObject *type, const gsi::ClassBase *cls, bool as_static)
+  {
     //  produce the child classes
 
     for (auto cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
@@ -680,11 +699,8 @@ public:
     }
 
     mt->finish ();
-
-    return type;
   }
 
-private:
   PythonModule *mp_module;
   PyObject *m_all_list;
   std::map<const gsi::ClassBase *, std::vector<const gsi::ClassBase *> > m_extensions_for;
@@ -743,7 +759,7 @@ PythonModule::make_classes (const char *mod_name)
   }
 
   //  first pass: register the extensions using all available classes
-  for (std::list<const gsi::ClassBase *>::const_iterator c = sorted_classes.begin (); c != sorted_classes.end (); ++c) {
+  for (auto c = sorted_classes.begin (); c != sorted_classes.end (); ++c) {
     if ((*c)->declaration () != *c) {
       gen.register_extension (*c);
     }
@@ -754,6 +770,38 @@ PythonModule::make_classes (const char *mod_name)
     if ((*c)->declaration () == *c && (! mod_name || (*c)->module () == mod_name)) {
       gen.make_class (*c, false);
     }
+  }
+
+  //  Check whether all other classes are still up to date:
+  //  classes may become outdated since this module may register extensions to existing classes.
+  //  In this case we need to regenerate the method table and type attributes.
+
+  for (auto c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
+
+    if (c->declaration () == c.operator-> ()) {
+
+      PyTypeObject *pt = PythonClassClientData::py_type (*c, false);
+      if (pt != 0) {
+
+        PythonClassClientData *cd = dynamic_cast<PythonClassClientData *>(c->data (gsi::ClientIndex::Python));
+        tl_assert (cd != 0);
+        if (cd->py_generation < c->generation ()) {
+
+          if (tl::verbosity () >= 40) {
+            tl::info << tl::to_string (tr ("Class already initialized and updating methods: ")) << c->name ();
+          }
+
+          //  rebuild method table
+          gen.rebuild_type_attrs (pt, c.operator-> (), false);
+
+          cd->py_generation = c->generation ();
+
+        }
+
+      }
+
+    }
+
   }
 }
 

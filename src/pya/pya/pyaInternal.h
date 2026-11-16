@@ -307,6 +307,7 @@ struct PythonClassClientData
   PythonPtr py_type_object;
   PythonPtr py_type_object_static;
   MethodTable method_table;
+  size_t py_generation;
 
   static PyTypeObject *py_type (const gsi::ClassBase &cls_decl, bool as_static);
   static const gsi::ClassBase *cls_for_type (PyTypeObject *);

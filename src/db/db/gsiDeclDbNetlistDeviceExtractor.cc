@@ -398,11 +398,11 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
 		"This convenience version of the ID-based \\define_terminal methods allows using names for terminal and layer.\n"
 		"It has been introduced in version 0.28."
   ) +
-	gsi::method_ext ("define_terminal", &define_terminal_by_names<db::Polygon>,
-		gsi::arg ("device"), gsi::arg ("terminal_name"), gsi::arg ("layer_name"), gsi::arg ("shape"),
+  gsi::method_ext ("define_terminal", &define_terminal_by_names<db::Region>,
+    gsi::arg ("device"), gsi::arg ("terminal_name"), gsi::arg ("layer_name"), gsi::arg ("shapes"),
 		"@brief Defines a device terminal using names for terminal and layer.\n"
 		"\n"
-		"This convenience version of the ID-based \\define_terminal methods allows using names for terminal and layer.\n"
+    "This convenience version of the ID-based \\define_terminal methods allows using names for terminal and layer and a Region object for the terminal shapes.\n"
 		"It has been introduced in version 0.30.14."
 	) +
 	gsi::method_ext ("define_terminal", &define_terminal_by_names<db::Box>,

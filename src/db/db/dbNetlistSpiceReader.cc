@@ -688,12 +688,12 @@ SpiceCircuitDict::read_card ()
       }
     }
 
-  } else if (ex.test_without_case (".subckt")) {
+  } else if (ex.test_without_case (".subckt") || ex.test_without_case (".subcircuit")) {
 
     std::string nc = read_name (ex, mp_netlist);
     read_circuit (ex, nc);
 
-  } else if (ex.test_without_case (".options")) {
+  } else if (ex.test_without_case (".options") || ex.test_without_case (".option")) {
 
     read_options (ex);
 
@@ -772,10 +772,14 @@ SpiceCircuitDict::read_options (tl::Extractor &ex)
     ex.read_word_or_quoted (n, allowed_name_chars);
     n = tl::to_lower_case (n);
 
-    double v = 0.0;
-    std::string w;
+    tl::Variant value;
+
     if (ex.test ("=")) {
-      if (ex.try_read (v)) {
+
+      NetlistSpiceReaderExpressionParser::variables_type variables;
+      NetlistSpiceReaderExpressionParser expr_parser (&variables);
+
+      if (expr_parser.try_read (ex, value)) {
         //  take value
       } else {
         //  skip until end or next space
@@ -784,30 +788,77 @@ SpiceCircuitDict::read_options (tl::Extractor &ex)
           ++ex;
         }
       }
+
     }
 
     //  TODO: further options?
     const double min_value = 1e-18;
+
     if (n == "scale") {
+
+      if (! value.is_double ()) {
+        throw tl::Exception (tl::to_string (tr ("'scale' option requires a numerical value")));
+      }
+
+      double v = value.to_double ();
       if (v > min_value) {
         mp_delegate->options ().scale = v;
+      } else {
+        warn (tl::to_string (tr ("Not a valid 'scale' value: ")) + tl::to_string (v));
       }
+
     } else if (n == "defad") {
+
+      if (! value.is_double ()) {
+        throw tl::Exception (tl::to_string (tr ("'defad' option requires a numerical value")));
+      }
+
+      double v = value.to_double ();
       if (v > min_value) {
         mp_delegate->options ().defad = v;
+      } else {
+        warn (tl::to_string (tr ("Not a valid 'defad' value: ")) + tl::to_string (v));
       }
+
     } else if (n == "defas") {
+
+      if (! value.is_double ()) {
+        throw tl::Exception (tl::to_string (tr ("'defas' option requires a numerical value")));
+      }
+
+      double v = value.to_double ();
       if (v > min_value) {
         mp_delegate->options ().defas = v;
+      } else {
+        warn (tl::to_string (tr ("Not a valid 'defas' value: ")) + tl::to_string (v));
       }
+
     } else if (n == "defl") {
+
+      if (! value.is_double ()) {
+        throw tl::Exception (tl::to_string (tr ("'defl' option requires a numerical value")));
+      }
+
+      double v = value.to_double ();
       if (v > min_value) {
         mp_delegate->options ().defl = v;
+      } else {
+        warn (tl::to_string (tr ("Not a valid 'defl' value: ")) + tl::to_string (v));
       }
+
     } else if (n == "defw") {
+
+      if (! value.is_double ()) {
+        throw tl::Exception (tl::to_string (tr ("'defw' option requires a numerical value")));
+      }
+
+      double v = value.to_double ();
       if (v > min_value) {
         mp_delegate->options ().defw = v;
+      } else {
+        warn (tl::to_string (tr ("Not a valid 'defw' value: ")) + tl::to_string (v));
       }
+
     }
 
   }

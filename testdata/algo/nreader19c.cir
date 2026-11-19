@@ -1,0 +1,19 @@
+* Test
+
+.option scale=2u
+.option defl=0.15
+.option defw=0.29
+.option defas=0.22
+.option defad=0.4
+
+.model sky130_fd_pr__pfet_01v8 NMOS level=8 version=3.3.0
+.model sky130_fd_pr__nfet_01v8 NMOS level=8 version=3.3.0
+
+Mpmos Q I VDD VDD pmos4_standard v=1.5 l=0.18 w=0.45
+Mnmos Q I VSS VSS nmos4_standard v=1.5 
+MDUMMY0 VSS VSS VSS VSS nmos4_standard v=1.5 l=0.18 w=0.45
+MDUMMY1 VSS VSS VSS VSS nmos4_standard v=1.5 w=0.45
+MDUMMY2 VDD VDD VDD VDD pmos4_standard v=1.5
+MDUMMY3 VDD VDD VDD VDD pmos4_standard v=1.5
+
+.end

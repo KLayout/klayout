@@ -787,6 +787,29 @@ TEST(19b_ngspice_ref)
   );
 }
 
+//  options
+TEST(19c_options)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader19c.cir");
+
+  db::NetlistSpiceReader reader;
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit .TOP ();\n"
+    "  device PMOS4_STANDARD PMOS (S=VDD,G=I,D=Q,B=VDD) (L=0.36,W=0.9,AS=0.88,AD=1.6,PS=0,PD=0);\n"
+    "  device NMOS4_STANDARD NMOS (S=VSS,G=I,D=Q,B=VSS) (L=0.3,W=0.58,AS=0.88,AD=1.6,PS=0,PD=0);\n"
+    "  device NMOS4_STANDARD DUMMY0 (S=VSS,G=VSS,D=VSS,B=VSS) (L=0.36,W=0.9,AS=0.88,AD=1.6,PS=0,PD=0);\n"
+    "  device NMOS4_STANDARD DUMMY1 (S=VSS,G=VSS,D=VSS,B=VSS) (L=0.3,W=0.9,AS=0.88,AD=1.6,PS=0,PD=0);\n"
+    "  device PMOS4_STANDARD DUMMY2 (S=VDD,G=VDD,D=VDD,B=VDD) (L=0.3,W=0.58,AS=0.88,AD=1.6,PS=0,PD=0);\n"
+    "  device PMOS4_STANDARD DUMMY3 (S=VDD,G=VDD,D=VDD,B=VDD) (L=0.3,W=0.58,AS=0.88,AD=1.6,PS=0,PD=0);\n"
+    "end;\n"
+  );
+}
+
 //  issue #1319, clarification
 TEST(20_precendence)
 {

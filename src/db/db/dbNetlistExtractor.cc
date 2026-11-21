@@ -308,9 +308,6 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
       //  make subcircuit connections (also make the subcircuits if required) from the connections of the clusters
       make_and_connect_subcircuits (circuit, per_cell_clusters, *c, net, subcircuits, circuits, pins_per_cluster_per_cell);
 
-      //  connect devices
-      connect_devices (circuit, per_cell_clusters, *c, net);
-
       //  collect labels to net names
       std::set<std::string> net_names;
       collect_labels (per_cell_clusters, *c, net_names);
@@ -362,6 +359,20 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
     tl_assert (dm != 0);
 
     make_device_abstract_connections (dm, *cid);
+
+  }
+
+  //  Only after that connect the devices
+
+  for (auto c = circuits.begin (); c != circuits.end (); ++c) {
+
+    auto &per_cell_clusters = mp_clusters->clusters_per_cell (c->first);
+
+    db::Circuit *circuit = c->second;
+    for (auto n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
+      db::Net *net = n.operator-> ();
+      connect_devices (circuit, per_cell_clusters, net->cluster_id (), net);
+    }
 
   }
 }

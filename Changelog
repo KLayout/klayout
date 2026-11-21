@@ -1,3 +1,26 @@
+0.30.14          (2026-11-22):
+* Bugfix: %GITHUB%/issues/2554 ICplxTrans' to_bytes and from_bytes use different primitive data types
+* Bugfix: %GITHUB%/issues/2553 DRC functions not working properly with clip in place
+* Bugfix: %GITHUB%/issues/2551 TilingProcessor: ReportDatabase overload not available in Python
+* Bugfix: %GITHUB%/issues/2542 Python API: edge neighborhood nodes retain visitors after leaving scope
+* Bugfix: %GITHUB%/issues/2541 LVS: retain all terminal polygons after multi-polygon net joining
+* Enhancement: %GITHUB%/issues/2540 SPICE reader: recognize .option scale and suffixed scale factors
+* Bugfix: %GITHUB%/issues/2536 Texts#not_interacting with an empty Region returns no texts in flat mode
+* Enhancement: DeviceExtractor#define_terminal now also takes a Region object
+* Enhancement: CellMapping#create_cell_mapping and related methods
+  now have a parameter "skip_empty_cells".
+* Bugfix: Fixing a display bug for false-color data mapping in 
+  images - color was not correctly displayed in certain cases
+* Enhancement: layer matching now follows layer names if 
+  only one of the layers if named. E.g. "11/0 METAL1" was not
+  matching "METAL1" before. Now it does.
+* Bugfix: Fill dialog shows better error messages on incorrect
+  step vectors
+* Enhancement: tl::Variant maintains unknown objects on deserialization
+  in a special "UnknownUserClass" object. This enhances interoperability
+  between different versions of KLayout.
+* 
+
 0.30.13          (2026-11-02):
 * Bugfix: %GITHUB%/issues/2525 Device terminal defined with several polygons connects to only one of them
 * Bugfix: %GITHUB%/issues/2524 OutputZLibFile leaks a FILE* stream per gzip file on Windows

@@ -93,6 +93,7 @@ PYMODTEST (pya_tests, "pya_tests.py")
 
 //  others
 PYMODTEST (issue1327, "issue1327.py")
+PYMODTEST (issue2551, "issue2551.py")
 
 #if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
 

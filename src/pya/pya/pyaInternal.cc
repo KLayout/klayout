@@ -872,7 +872,7 @@ MethodTable::method_table_by_class (const gsi::ClassBase *cls_decl)
 static std::map<PyTypeObject *, const gsi::ClassBase *> s_type2cls;
 
 PythonClassClientData::PythonClassClientData (const gsi::ClassBase *_cls, PyTypeObject *_py_type, PyTypeObject *_py_type_static, PythonModule *module)
-  : py_type_object ((PyObject *) _py_type), py_type_object_static ((PyObject *) _py_type_static), method_table (_cls, module)
+  : py_type_object ((PyObject *) _py_type), py_type_object_static ((PyObject *) _py_type_static), method_table (_cls, module), py_generation (0)
 {
   if (_py_type != NULL) {
     s_type2cls.insert (std::make_pair (_py_type, _cls));
@@ -923,8 +923,11 @@ PythonClassClientData::initialize (const gsi::ClassBase &cls_decl, PyTypeObject 
       cd->py_type_object = (PyObject *) py_type;
     }
   } else {
-    cls_decl.set_data (gsi::ClientIndex::Python, new PythonClassClientData (&cls_decl, as_static ? NULL : py_type, as_static ? py_type : NULL, module));
+    cd = new PythonClassClientData (&cls_decl, as_static ? NULL : py_type, as_static ? py_type : NULL, module);
+    cls_decl.set_data (gsi::ClientIndex::Python, cd);
   }
+
+  cd->py_generation = cls_decl.generation ();
 }
 
 }

@@ -59,7 +59,7 @@ typedef std::map<std::string, const ClassBase *> tname_to_class_map_t;
 static tname_to_class_map_t *sp_tname_to_class = 0;
 
 ClassBase::ClassBase (const std::string &doc, const Methods &mm, bool do_register)
-  : m_initialized (false), mp_base (0), mp_parent (0), m_doc (doc), m_methods (mm)
+  : m_initialized (false), mp_base (0), mp_parent (0), m_doc (doc), m_methods (mm), m_generation (0)
 { 
   if (do_register) {
 
@@ -863,6 +863,8 @@ ClassBase::initialize ()
   if (m_initialized) {
     return;
   }
+
+  ++m_generation;
 
   m_methods.initialize ();
 

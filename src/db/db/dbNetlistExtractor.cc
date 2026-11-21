@@ -215,6 +215,7 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
   mp_clusters->build (*mp_layout, *mp_cell, conn, &net_name_equivalence);
 
   //  reverse lookup for Circuit vs. cell index
+  std::vector<db::cell_index_type> device_abstract_cells;
   std::map<db::cell_index_type, db::Circuit *> circuits;
 
   //  some circuits may be there because of device extraction
@@ -224,6 +225,7 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
   }
 
   std::map<db::cell_index_type, std::map<size_t, size_t> > pins_per_cluster_per_cell;
+
   for (db::Layout::bottom_up_const_iterator cid = mp_layout->begin_bottom_up (); cid != mp_layout->end_bottom_up (); ++cid) {
 
     const db::Cell &cell = mp_layout->cell (*cid);
@@ -249,9 +251,8 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
 
     db::DeviceAbstract *dm = nl.device_abstract_by_cell_index (*cid);
     if (dm) {
-      //  This is a device abstract cell:
-      //  make the terminal to cluster ID connections for the device abstract from the device cells
-      make_device_abstract_connections (dm, per_cell_clusters);
+      //  This is a device abstract cell: treat later in a second pass
+      device_abstract_cells.push_back (*cid);
       continue;
     }
 
@@ -270,7 +271,7 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
 
     //  join clusters that attach to the same device terminal in case of multi-polygon
     //  terminals.
-    join_clusters_at_same_device_terminal (per_cell_clusters, circuit);
+    join_clusters_at_same_device_terminal (*cid, circuit);
 
     std::map<size_t, size_t> &c2p = pins_per_cluster_per_cell [*cid];
 
@@ -306,9 +307,6 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
 
       //  make subcircuit connections (also make the subcircuits if required) from the connections of the clusters
       make_and_connect_subcircuits (circuit, per_cell_clusters, *c, net, subcircuits, circuits, pins_per_cluster_per_cell);
-
-      //  connect devices
-      connect_devices (circuit, per_cell_clusters, *c, net);
 
       //  collect labels to net names
       std::set<std::string> net_names;
@@ -350,6 +348,33 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
     }
 
   }
+
+  //  In a second pass make the cluster ID connections for the device abstract from the device cells.
+  //  NOTE: we do this after the first pass as there cluster may get rearranged - for example because
+  //  of cross-device cluster joining (issue #2541).
+
+  for (auto cid = device_abstract_cells.begin (); cid != device_abstract_cells.end (); ++cid) {
+
+    db::DeviceAbstract *dm = nl.device_abstract_by_cell_index (*cid);
+    tl_assert (dm != 0);
+
+    make_device_abstract_connections (dm, *cid);
+
+  }
+
+  //  Only after that connect the devices
+
+  for (auto c = circuits.begin (); c != circuits.end (); ++c) {
+
+    auto &per_cell_clusters = mp_clusters->clusters_per_cell (c->first);
+
+    db::Circuit *circuit = c->second;
+    for (auto n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
+      db::Net *net = n.operator-> ();
+      connect_devices (circuit, per_cell_clusters, net->cluster_id (), net);
+    }
+
+  }
 }
 
 void
@@ -388,12 +413,68 @@ collect_soft_connected_clusters (size_t from_id, const NetlistExtractor::connect
   }
 }
 
+template <class Iter>
 void
-NetlistExtractor::join_clusters_at_same_device_terminal (connected_clusters_type &clusters, db::Circuit *circuit)
+NetlistExtractor::join_clusters_with (db::cell_index_type cell_index, size_t id, Iter with_from, Iter with_to)
+{
+  if (with_from == with_to) {
+    return;
+  }
+
+  connected_clusters_type &clusters = mp_clusters->clusters_per_cell (cell_index);
+  clusters.join_clusters_with (id, with_from, with_to);
+
+  //  fix upstream connections
+  const db::Cell &cc = mp_layout->cell (cell_index);
+
+  for (db::Cell::parent_inst_iterator p = cc.begin_parent_insts (); ! p.at_end (); ++p) {
+
+    connected_clusters<db::NetShape> &pclusters = mp_clusters->clusters_per_cell (p->parent_cell_index ());
+
+    db::CellInstArray ci = p->child_inst ().cell_inst ();
+    for (db::CellInstArray::iterator ia = ci.begin (); ! ia.at_end(); ++ia) {
+
+      db::ClusterInstance cli (0, ci.object ().cell_index (), ci.complex_trans (*ia), p->child_inst ().prop_id ());
+      for (Iter w = with_from; w != with_to; ++w) {
+        cli.set_id (*w);
+        pclusters.rename_connection (cli, id);
+      }
+
+    }
+
+  }
+}
+
+void
+NetlistExtractor::join_cluster_with (db::cell_index_type cell_index, size_t id, size_t with_id)
+{
+  connected_clusters_type &clusters = mp_clusters->clusters_per_cell (cell_index);
+  clusters.join_cluster_with (id, with_id);
+
+  //  fix upstream connections
+  const db::Cell &cc = mp_layout->cell (cell_index);
+
+  for (db::Cell::parent_inst_iterator p = cc.begin_parent_insts (); ! p.at_end (); ++p) {
+
+    connected_clusters<db::NetShape> &pclusters = mp_clusters->clusters_per_cell (p->parent_cell_index ());
+
+    db::CellInstArray ci = p->child_inst ().cell_inst ();
+    for (db::CellInstArray::iterator ia = ci.begin (); ! ia.at_end(); ++ia) {
+      db::ClusterInstance cli (with_id, ci.object ().cell_index (), ci.complex_trans (*ia), p->child_inst ().prop_id ());
+      pclusters.rename_connection (cli, id);
+    }
+
+  }
+}
+
+void
+NetlistExtractor::join_clusters_at_same_device_terminal (db::cell_index_type device_cell_index, db::Circuit *circuit)
 {
   if (! m_terminal_annot_name_id.first) {
     return;
   }
+
+  auto &clusters = mp_clusters->clusters_per_cell (device_cell_index);
 
   std::map<size_t, std::set<size_t> > to_join;
   std::map<std::pair<const db::Device *, db::DeviceClass::terminal_id_type>, size_t> primary_cluster_for_terminal;
@@ -448,16 +529,19 @@ NetlistExtractor::join_clusters_at_same_device_terminal (connected_clusters_type
   }
 
   for (auto j = to_join.begin (); j != to_join.end (); ++j) {
-    clusters.join_clusters_with (j->first, j->second.begin (), j->second.end ());
+    join_clusters_with (device_cell_index, j->first, j->second.begin (), j->second.end ());
   }
 }
 
 void
-NetlistExtractor::make_device_abstract_connections (db::DeviceAbstract *dm, connected_clusters_type &clusters)
+NetlistExtractor::make_device_abstract_connections (db::DeviceAbstract *dm, db::cell_index_type device_cell_index)
 {
-  //  make the terminal to cluster ID connections for the device abstract from the device cells
+  auto &clusters = mp_clusters->clusters_per_cell (device_cell_index);
 
+  //  make the terminal to cluster ID connections for the device abstract from the device cells
   if (m_terminal_annot_name_id.first) {
+
+    std::map<size_t, std::set<size_t> > clusters_per_terminal;
 
     for (connected_clusters_type::iterator dc = clusters.begin (); dc != clusters.end (); ++dc) {
 
@@ -467,7 +551,6 @@ NetlistExtractor::make_device_abstract_connections (db::DeviceAbstract *dm, conn
       for (auto id = ids.begin (); id != ids.end (); ++id) {
 
         const local_cluster_type &lc = clusters.cluster_by_id (*id);
-        bool join = false;
 
         for (local_cluster_type::attr_iterator a = lc.begin_attr (); a != lc.end_attr (); ++a) {
 
@@ -485,10 +568,10 @@ NetlistExtractor::make_device_abstract_connections (db::DeviceAbstract *dm, conn
               size_t terminal_id = db::property_value (j->second).to<size_t> ();
               if (*id != dc->id ()) {
                 tl::warn << tl::sprintf (tl::to_string (tr ("Ignoring soft connection at device terminal %s for device %s")), dm->device_class ()->terminal_definition (terminal_id)->name (), dm->device_class ()->name ());
-                join = true;
+                clusters_per_terminal [terminal_id].insert (dc->id ());
               }
 
-              dm->set_cluster_id_for_terminal (terminal_id, dc->id ());
+              clusters_per_terminal [terminal_id].insert (*id);
 
             }
 
@@ -496,12 +579,18 @@ NetlistExtractor::make_device_abstract_connections (db::DeviceAbstract *dm, conn
 
         }
 
-        if (join) {
-          //  copy the terminal attributes and shapes so we attach the terminal here in the device connection step
-          clusters.join_cluster_with (dc->id (), *id);
-        }
-
       }
+
+    }
+
+    for (auto cpt = clusters_per_terminal.begin (); cpt != clusters_per_terminal.end (); ++cpt) {
+
+      //  join clusters with same terminal (issue #2541)
+      auto c = cpt->second.begin ();
+      auto cc = c;
+      join_clusters_with (device_cell_index, *c, ++cc, cpt->second.end ());
+
+      dm->set_cluster_id_for_terminal (cpt->first, *c);
 
     }
 

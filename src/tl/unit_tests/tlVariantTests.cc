@@ -1600,7 +1600,7 @@ TEST(15)
 }
 
 //  the move ctor and assignment must be noexcept so that std::vector growth moves
-TEST(15)
+TEST(16)
 {
   tl::Variant a ("hello");
 

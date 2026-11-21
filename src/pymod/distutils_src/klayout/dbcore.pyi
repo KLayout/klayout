@@ -4077,20 +4077,21 @@ class CellMapping:
         """
         ...
     @overload
-    def for_multi_cells_full(self, cell_a: Sequence[Cell], cell_b: Sequence[Cell], preserve_library_references: Optional[bool] = ...) -> List[int]:
+    def for_multi_cells_full(self, cell_a: Sequence[Cell], cell_b: Sequence[Cell], preserve_library_references: Optional[bool] = ..., skip_empty_cells: Optional[bool] = ...) -> List[int]:
         r"""
         @brief Initializes the cell mapping for top-level identity in full mapping mode
 
         @param cell_a A list of target cells.
         @param cell_b A list of source cells.
         @param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.
+        @param skip_empty_cells If set to true, empty cells (and cells only referencing empty cells) are not mirrored into the target layout
         @return A list of indexes of cells created.
 
-        This is a convenience version which uses cell references instead of layout/cell index combinations. It has been introduced in version 0.28. The optional 'preserve_library_references' parameter was introduced in version 0.30.13.
+        This is a convenience version which uses cell references instead of layout/cell index combinations. It has been introduced in version 0.28. The optional 'preserve_library_references' parameter was introduced in version 0.30.13. The optional 'skip_empty_cells' parameter was introduced in version 0.30.13.
         """
         ...
     @overload
-    def for_multi_cells_full(self, layout_a: Layout, cell_indexes_a: Sequence[int], layout_b: Layout, cell_indexes_b: Sequence[int], preserve_library_references: Optional[bool] = ...) -> List[int]:
+    def for_multi_cells_full(self, layout_a: Layout, cell_indexes_a: Sequence[int], layout_b: Layout, cell_indexes_b: Sequence[int], preserve_library_references: Optional[bool] = ..., skip_empty_cells: Optional[bool] = ...) -> List[int]:
         r"""
         @brief Initializes the cell mapping for top-level identity in full mapping mode
 
@@ -4099,10 +4100,11 @@ class CellMapping:
         @param layout_b The source layout.
         @param cell_indexes_b A list of cell indexes for the source cells (same number of indexes than \cell_indexes_a).
         @param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.
+        @param skip_empty_cells If set to true, empty cells (and cells only referencing empty cells) are not mirrored into the target layout
 
         The cell mapping is created for cells from cell_indexes_b to cell from cell_indexes_a in the respective layouts. This method clears the mapping and creates one for each cell pair from cell_indexes_b vs. cell_indexes_a. In addition and in contrast to \for_multi_cells, this method completes the mapping by adding all the child cells of all cells in cell_indexes_b to layout_a and creating the proper instances.
 
-        This method has been introduced in version 0.27. The optional 'preserve_library_references' parameter was introduced in version 0.30.13.
+        This method has been introduced in version 0.27. The optional 'preserve_library_references' parameter was introduced in version 0.30.13. The optional 'skip_empty_cells' parameter was introduced in version 0.30.13.
         """
         ...
     @overload
@@ -4135,20 +4137,21 @@ class CellMapping:
         """
         ...
     @overload
-    def for_single_cell_full(self, cell_a: Cell, cell_b: Cell, preserve_library_references: Optional[bool] = ...) -> List[int]:
+    def for_single_cell_full(self, cell_a: Cell, cell_b: Cell, preserve_library_references: Optional[bool] = ..., skip_empty_cells: Optional[bool] = ...) -> List[int]:
         r"""
         @brief Initializes the cell mapping for top-level identity in full mapping mode
 
         @param cell_a The target cell.
         @param cell_b The source cell.
         @param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.
+        @param skip_empty_cells If set to true, empty cells (and cells only referencing empty cells) are not mirrored into the target layout
         @return A list of indexes of cells created.
 
         This is a convenience version which uses cell references instead of layout/cell index combinations. It has been introduced in version 0.28.
         """
         ...
     @overload
-    def for_single_cell_full(self, layout_a: Layout, cell_index_a: int, layout_b: Layout, cell_index_b: int, preserve_library_references: Optional[bool] = ...) -> List[int]:
+    def for_single_cell_full(self, layout_a: Layout, cell_index_a: int, layout_b: Layout, cell_index_b: int, preserve_library_references: Optional[bool] = ..., skip_empty_cells: Optional[bool] = ...) -> List[int]:
         r"""
         @brief Initializes the cell mapping for top-level identity in full mapping mode
 
@@ -4157,10 +4160,11 @@ class CellMapping:
         @param layout_b The source layout.
         @param cell_index_b The index of the source cell.
         @param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.
+        @param skip_empty_cells If set to true, empty cells (and cells only referencing empty cells) are not mirrored into the target layout
 
         The cell mapping is created for cell_b to cell_a in the respective layouts. This method clears the mapping and creates one for the single cell pair. In addition and in contrast to \for_single_cell, this method completes the mapping by adding all the child cells of cell_b to layout_a and creating the proper instances.
 
-        This method has been introduced in version 0.23. The optional 'preserve_library_references' parameter was introduced in version 0.30.13.
+        This method has been introduced in version 0.23. The optional 'preserve_library_references' parameter was introduced in version 0.30.13. The optional 'skip_empty_cells' parameter was introduced in version 0.30.13.
         """
         ...
     @overload
@@ -4192,20 +4196,21 @@ class CellMapping:
         """
         ...
     @overload
-    def from_geometry_full(self, cell_a: Cell, cell_b: Cell, preserve_library_references: Optional[bool] = ...) -> List[int]:
+    def from_geometry_full(self, cell_a: Cell, cell_b: Cell, preserve_library_references: Optional[bool] = ..., skip_empty_cells: Optional[bool] = ...) -> List[int]:
         r"""
         @brief Initializes the cell mapping using the geometrical identity in full mapping mode
 
         @param cell_a The target cell.
         @param cell_b The source cell.
         @param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.
+        @param skip_empty_cells If set to true, empty cells (and cells only referencing empty cells) are not mirrored into the target layout
         @return A list of indexes of cells created.
 
-        This is a convenience version which uses cell references instead of layout/cell index combinations. It has been introduced in version 0.28. The optional 'preserve_library_references' parameter was introduced in version 0.30.13.
+        This is a convenience version which uses cell references instead of layout/cell index combinations. It has been introduced in version 0.28. The optional 'preserve_library_references' parameter was introduced in version 0.30.13. The optional 'skip_empty_cells' parameter was introduced in version 0.30.13.
         """
         ...
     @overload
-    def from_geometry_full(self, layout_a: Layout, cell_index_a: int, layout_b: Layout, cell_index_b: int, preserve_library_references: Optional[bool] = ...) -> List[int]:
+    def from_geometry_full(self, layout_a: Layout, cell_index_a: int, layout_b: Layout, cell_index_b: int, preserve_library_references: Optional[bool] = ..., skip_empty_cells: Optional[bool] = ...) -> List[int]:
         r"""
         @brief Initializes the cell mapping using the geometrical identity in full mapping mode
 
@@ -4214,6 +4219,7 @@ class CellMapping:
         @param layout_b The source layout.
         @param cell_index_b The index of the source starting cell.
         @param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.
+        @param skip_empty_cells If set to true, empty cells (and cells only referencing empty cells) are not mirrored into the target layout
         @return A list of indexes of cells created.
 
         The cell mapping is created for cells below cell_a and cell_b in the respective layouts. This method employs geometrical identity to derive mappings for the child cells of the starting cell in layout A and B.
@@ -4221,7 +4227,7 @@ class CellMapping:
 
         Full mapping means that cells which are not found in the target layout A are created there plus their corresponding instances are created as well. The returned list will contain the indexes of all cells created for that reason.
 
-        This method has been introduced in version 0.23. The optional 'preserve_library_references' parameter was introduced in version 0.30.13.
+        This method has been introduced in version 0.23. The optional 'preserve_library_references' parameter was introduced in version 0.30.13. The optional 'skip_empty_cells' parameter was introduced in version 0.30.13.
         """
         ...
     @overload
@@ -4253,20 +4259,21 @@ class CellMapping:
         """
         ...
     @overload
-    def from_names_full(self, cell_a: Cell, cell_b: Cell, preserve_library_references: Optional[bool] = ...) -> List[int]:
+    def from_names_full(self, cell_a: Cell, cell_b: Cell, preserve_library_references: Optional[bool] = ..., skip_empty_cells: Optional[bool] = ...) -> List[int]:
         r"""
         @brief Initializes the cell mapping using the name identity in full mapping mode
 
         @param cell_a The target cell.
         @param cell_b The source cell.
         @param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.
+        @param skip_empty_cells If set to true, empty cells (and cells only referencing empty cells) are not mirrored into the target layout
         @return A list of indexes of cells created.
 
-        This is a convenience version which uses cell references instead of layout/cell index combinations. It has been introduced in version 0.28. The optional 'preserve_library_references' parameter was introduced in version 0.30.13.
+        This is a convenience version which uses cell references instead of layout/cell index combinations. It has been introduced in version 0.28. The optional 'preserve_library_references' parameter was introduced in version 0.30.13. The optional 'skip_empty_cells' parameter was introduced in version 0.30.13.
         """
         ...
     @overload
-    def from_names_full(self, layout_a: Layout, cell_index_a: int, layout_b: Layout, cell_index_b: int, preserve_library_references: Optional[bool] = ...) -> List[int]:
+    def from_names_full(self, layout_a: Layout, cell_index_a: int, layout_b: Layout, cell_index_b: int, preserve_library_references: Optional[bool] = ..., skip_empty_cells: Optional[bool] = ...) -> List[int]:
         r"""
         @brief Initializes the cell mapping using the name identity in full mapping mode
 
@@ -4275,6 +4282,7 @@ class CellMapping:
         @param layout_b The source layout.
         @param cell_index_b The index of the source starting cell.
         @param preserve_library_references If set to true, existing references to same library cells in layout_a are reused.
+        @param skip_empty_cells If set to true, empty cells (and cells only referencing empty cells) are not mirrored into the target layout
         @return A list of indexes of cells created.
 
         The cell mapping is created for cells below cell_a and cell_b in the respective layouts.
@@ -4282,7 +4290,7 @@ class CellMapping:
 
         Full mapping means that cells which are not found in the target layout A are created there plus their corresponding instances are created as well. The returned list will contain the indexes of all cells created for that reason.
 
-        This method has been introduced in version 0.23. The optional 'preserve_library_references' parameter was introduced in version 0.30.13.
+        This method has been introduced in version 0.23. The optional 'preserve_library_references' parameter was introduced in version 0.30.13. The optional 'skip_empty_cells' parameter was introduced in version 0.30.13.
         """
         ...
     def has_mapping(self, cell_index_b: int) -> bool:
@@ -16132,7 +16140,8 @@ class DText:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: float
     r"""
@@ -16168,7 +16177,8 @@ class DText:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: float
     r"""
@@ -19114,7 +19124,7 @@ class Device(NetlistObject):
     @overload
     def net_for_terminal(self, terminal_name: str) -> Net:
         r"""
-        @brief Gets the net connected to the specified terminal.
+        @brief Gets the net connected to the specified terminal (non-const version).
         If the terminal is not connected, nil is returned for the net.
 
         This convenience method has been introduced in version 0.27.3.
@@ -19123,7 +19133,7 @@ class Device(NetlistObject):
     @overload
     def net_for_terminal(self, terminal_name: str) -> Net:
         r"""
-        @brief Gets the net connected to the specified terminal (non-const version).
+        @brief Gets the net connected to the specified terminal.
         If the terminal is not connected, nil is returned for the net.
 
         This convenience method has been introduced in version 0.27.3.
@@ -19176,7 +19186,7 @@ class Device(NetlistObject):
     @overload
     def terminal_ref(self, terminal_name: str) -> NetTerminalRef:
         r"""
-        @brief Gets the terminal refeference for a specific terminal where the terminal is given by name.
+        @brief Gets the terminal refeference for a specific terminal where the terminal is given by name (non-const version).
         The terminal ref is the connector between a net and a device terminal. It knows the net the terminal is connected to and is useful to obtain the shapes making the terminal of the device. If the terminal is not connected, nil is returned for the net.
 
         This method has been introduced in version 0.30.
@@ -19185,7 +19195,7 @@ class Device(NetlistObject):
     @overload
     def terminal_ref(self, terminal_name: str) -> NetTerminalRef:
         r"""
-        @brief Gets the terminal refeference for a specific terminal where the terminal is given by name (non-const version).
+        @brief Gets the terminal refeference for a specific terminal where the terminal is given by name.
         The terminal ref is the connector between a net and a device terminal. It knows the net the terminal is connected to and is useful to obtain the shapes making the terminal of the device. If the terminal is not connected, nil is returned for the net.
 
         This method has been introduced in version 0.30.
@@ -33401,6 +33411,19 @@ class GenericDeviceExtractor(DeviceExtractorBase):
         """
         ...
     @overload
+    def define_terminal(self, device: Device, terminal_id: int, layer_index: int, region: Region) -> None:
+        r"""
+        @brief Defines a device terminal.
+        This method will define a terminal to the given device and the given terminal ID. 
+        The terminal will be placed on the layer given by "layer_index". The layer index 
+        is the index of the layer during layer definition. The first layer is 0, the second layer 1 etc.
+
+        This version produces a terminal with potentially multiple shapes given by a region.
+
+        This variant has been introduced in version 0.30.14.
+        """
+        ...
+    @overload
     def define_terminal(self, device: Device, terminal_id: int, layer_index: int, shape: Box) -> None:
         r"""
         @brief Defines a device terminal.
@@ -33449,6 +33472,15 @@ class GenericDeviceExtractor(DeviceExtractorBase):
 
         This convenience version of the ID-based \define_terminal methods allows using names for terminal and layer.
         It has been introduced in version 0.28.
+        """
+        ...
+    @overload
+    def define_terminal(self, device: Device, terminal_name: str, layer_name: str, shapes: Region) -> None:
+        r"""
+        @brief Defines a device terminal using names for terminal and layer.
+
+        This convenience version of the ID-based \define_terminal methods allows using names for terminal and layer and a Region object for the terminal shapes.
+        It has been introduced in version 0.30.14.
         """
         ...
     @overload
@@ -36507,11 +36539,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'a' axis in micrometer units
+    @brief Sets the displacement vector for the 'a' axis
 
-    Like \a= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
+    If the instance was not an array instance before it is made one.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
     """
     b: Vector
     r"""
@@ -36520,11 +36552,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'b' axis
+    @brief Sets the displacement vector for the 'b' axis in micrometer units
 
-    If the instance was not an array instance before it is made one.
+    Like \b= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
 
-    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
+    This method has been introduced in version 0.25.
     """
     cell: Cell
     r"""
@@ -36567,9 +36599,10 @@ class Instance:
     @brief Gets the complex transformation of the instance or the first instance in the array
     This method is always valid compared to \trans, since simple transformations can be expressed as complex transformations as well.
     Setter:
-    @brief Sets the complex transformation of the instance or the first instance in the array
+    @brief Sets the complex transformation of the instance or the first instance in the array (in micrometer units)
+    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     da: DVector
     r"""
@@ -36698,9 +36731,10 @@ class Instance:
     @brief Gets the transformation of the instance or the first instance in the array
     The transformation returned is only valid if the array does not represent a complex transformation array
     Setter:
-    @brief Sets the transformation of the instance or the first instance in the array
+    @brief Sets the transformation of the instance or the first instance in the array (in micrometer units)
+    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     @classmethod
     def new(cls) -> Instance:
@@ -37063,7 +37097,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This const version of the method has been introduced in version 0.25.
+        This method has been introduced in version 0.22.
         """
         ...
     @overload
@@ -37071,7 +37105,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This method has been introduced in version 0.22.
+        This const version of the method has been introduced in version 0.25.
         """
         ...
     def pcell_declaration(self) -> PCellDeclaration_Native:
@@ -48980,17 +49014,17 @@ class NetTerminalRef:
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference (non-const version).
+        @brief Gets the device reference.
         Gets the device object that this connection is made to.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference.
+        @brief Gets the device reference (non-const version).
         Gets the device object that this connection is made to.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     def device_class(self) -> DeviceClass:
@@ -50018,22 +50052,22 @@ class Netlist:
     @overload
     def circuits_by_name(self, name_pattern: str, case_sensitive: Optional[Any] = ...) -> List[Circuit]:
         r"""
+        @brief Gets the circuit objects for a given name filter (const version).
+        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
+        The 'case_sensitive' argument will control whether the name is looked up in a case sensitive way or not. Note that with case insensitive search on a netlist that is case sensitive, the same name may render more than one hit. By default, case sensitivity is taken from the netlist.
+
+        This constness variant has been introduced in version 0.26.8.The 'case_sensitive' argument has been added in version 0.30.2.
+        """
+        ...
+    @overload
+    def circuits_by_name(self, name_pattern: str, case_sensitive: Optional[Any] = ...) -> List[Circuit]:
+        r"""
         @brief Gets the circuit objects for a given name filter.
         The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
         The 'case_sensitive' argument will control whether the name is looked up in a case sensitive way or not. Note that with case insensitive search on a netlist that is case sensitive, the same name may render more than one hit. By default, case sensitivity is taken from the netlist.
 
         This method has been introduced in version 0.26.4.
         The 'case_sensitive' argument has been added in version 0.30.2.
-        """
-        ...
-    @overload
-    def circuits_by_name(self, name_pattern: str, case_sensitive: Optional[Any] = ...) -> List[Circuit]:
-        r"""
-        @brief Gets the circuit objects for a given name filter (const version).
-        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
-        The 'case_sensitive' argument will control whether the name is looked up in a case sensitive way or not. Note that with case insensitive search on a netlist that is case sensitive, the same name may render more than one hit. By default, case sensitivity is taken from the netlist.
-
-        This constness variant has been introduced in version 0.26.8.The 'case_sensitive' argument has been added in version 0.30.2.
         """
         ...
     def combine_devices(self) -> None:
@@ -50117,17 +50151,17 @@ class Netlist:
     @overload
     def each_circuit_top_down(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits top-down (const version)
+        @brief Iterates over the circuits top-down
         Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
-
-        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
     def each_circuit_top_down(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits top-down
+        @brief Iterates over the circuits top-down (const version)
         Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
@@ -50202,22 +50236,22 @@ class Netlist:
     @overload
     def nets_by_name(self, name_pattern: str, case_sensitive: Optional[Any] = ...) -> List[Net]:
         r"""
+        @brief Gets the net objects for a given name filter (const version).
+        The name filter is a glob pattern. This method will return all \Net objects matching the glob pattern.
+        The 'case_sensitive' argument will control whether the name is looked up in a case sensitive way or not. Note that with case insensitive search on a netlist that is case sensitive, the same name may render more than one hit. By default, case sensitivity is taken from the netlist.
+
+        This constness variant has been introduced in version 0.28.4.The 'case_sensitive' argument has been added in version 0.30.2.
+        """
+        ...
+    @overload
+    def nets_by_name(self, name_pattern: str, case_sensitive: Optional[Any] = ...) -> List[Net]:
+        r"""
         @brief Gets the net objects for a given name filter.
         The name filter is a glob pattern. This method will return all \Net objects matching the glob pattern.
         The 'case_sensitive' argument will control whether the name is looked up in a case sensitive way or not. Note that with case insensitive search on a netlist that is case sensitive, the same name may render more than one hit. By default, case sensitivity is taken from the netlist.
 
         This method has been introduced in version 0.28.4.
         The 'case_sensitive' argument has been added in version 0.30.2.
-        """
-        ...
-    @overload
-    def nets_by_name(self, name_pattern: str, case_sensitive: Optional[Any] = ...) -> List[Net]:
-        r"""
-        @brief Gets the net objects for a given name filter (const version).
-        The name filter is a glob pattern. This method will return all \Net objects matching the glob pattern.
-        The 'case_sensitive' argument will control whether the name is looked up in a case sensitive way or not. Note that with case insensitive search on a netlist that is case sensitive, the same name may render more than one hit. By default, case sensitivity is taken from the netlist.
-
-        This constness variant has been introduced in version 0.28.4.The 'case_sensitive' argument has been added in version 0.30.2.
         """
         ...
     def purge(self) -> None:
@@ -50282,7 +50316,7 @@ class Netlist:
     @overload
     def top_circuit(self) -> Circuit:
         r"""
-        @brief Gets the top circuit.
+        @brief Gets the top circuit (const version).
         This method will return nil, if there is no top circuit. It will raise an error, if there is more than a single top circuit.
 
         This convenience method has been added in version 0.29.5.
@@ -50291,7 +50325,7 @@ class Netlist:
     @overload
     def top_circuit(self) -> Circuit:
         r"""
-        @brief Gets the top circuit (const version).
+        @brief Gets the top circuit.
         This method will return nil, if there is no top circuit. It will raise an error, if there is more than a single top circuit.
 
         This convenience method has been added in version 0.29.5.
@@ -66427,11 +66461,10 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a path.
     Setter:
-    @brief Replaces the shape by the given path object
-    This method replaces the shape by the given path object. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given path (in micrometer units)
+    This method replaces the shape by the given path, like \path= with a \Path argument does. This version translates the path from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     path_bgnext: int
     r"""
@@ -70844,17 +70877,23 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in.
+        @brief Gets the circuit the subcircuit lives in (non-const version).
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in (non-const version).
+        @brief Gets the circuit the subcircuit lives in.
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
-
-        This constness variant has been introduced in version 0.26.8
+        """
+        ...
+    @overload
+    def circuit_ref(self) -> Circuit:
+        r"""
+        @brief Gets the circuit referenced by the subcircuit.
         """
         ...
     @overload
@@ -70864,12 +70903,6 @@ class SubCircuit(NetlistObject):
 
 
         This constness variant has been introduced in version 0.26.8
-        """
-        ...
-    @overload
-    def circuit_ref(self) -> Circuit:
-        r"""
-        @brief Gets the circuit referenced by the subcircuit.
         """
         ...
     @overload
@@ -70915,17 +70948,17 @@ class SubCircuit(NetlistObject):
     @overload
     def net_for_pin(self, pin_id: int) -> Net:
         r"""
-        @brief Gets the net connected to the specified pin of the subcircuit.
+        @brief Gets the net connected to the specified pin of the subcircuit (non-const version).
         If the pin is not connected, nil is returned for the net.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def net_for_pin(self, pin_id: int) -> Net:
         r"""
-        @brief Gets the net connected to the specified pin of the subcircuit (non-const version).
+        @brief Gets the net connected to the specified pin of the subcircuit.
         If the pin is not connected, nil is returned for the net.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     ...
@@ -71539,7 +71572,8 @@ class Text:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: int
     r"""

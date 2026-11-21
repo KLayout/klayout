@@ -198,13 +198,25 @@ TEST(7)
     EXPECT_EQ (tcopy.to_string (), "('abc',r0 100,-200)");
   }
 
-  {
+	{
+		db::Texts tcopy = texts;
+		tcopy.select_interacting (db::Region ());
+		EXPECT_EQ (tcopy.to_string (), "");
+	}
+
+	{
     db::Texts tcopy = texts;
     tcopy.select_not_interacting (region);
     EXPECT_EQ (tcopy.to_string (), "('uvw',r0 110,210)");
   }
 
-  db::Region region_out;
+	{
+		db::Texts tcopy = texts;
+		tcopy.select_not_interacting (db::Region ());
+		EXPECT_EQ (tcopy.to_string (), "('abc',r0 100,-200);('uvw',r0 110,210)");
+	}
+
+	db::Region region_out;
   texts.pull_interacting (region_out, region);
   EXPECT_EQ (region_out.to_string (), "(50,-300;50,-100;150,-100;150,-300)");
 }

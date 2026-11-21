@@ -233,12 +233,31 @@ private:
   /**
    *  @brief Makes the terminal to cluster ID connections of the device abstract
    */
-  void make_device_abstract_connections (db::DeviceAbstract *dm, connected_clusters_type &clusters);
+  void make_device_abstract_connections (db::DeviceAbstract *dm, db::cell_index_type device_cell_index);
 
   /**
    *  @brief Joins clusters that are indirectly connected through a device with a multi-polygon terminal
    */
-  void join_clusters_at_same_device_terminal (connected_clusters_type &clusters, Circuit *circuit);
+  void join_clusters_at_same_device_terminal (db::cell_index_type device_cell_index, Circuit *circuit);
+
+  /**
+   *  @brief Joins clusters at the given cell
+   *
+   *  @param cell_index The cell where to join the clusters
+   *  @param id The cluster that stays
+   *  @param with_id The cluster that is joined into "id"
+   *
+   *  This method will take care of properly handling upstream connections too.
+   */
+  void join_cluster_with (db::cell_index_type cell_index, size_t id, size_t with_id);
+
+  /**
+   *  @brief Joins clusters at the given cell
+   *
+   *  This version allows joining a range of clusters
+   */
+  template <class Iter>
+  void join_clusters_with (db::cell_index_type cell_index, size_t id, Iter with_from, Iter with_to);
 };
 
 }

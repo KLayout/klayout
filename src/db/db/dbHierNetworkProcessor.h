@@ -871,6 +871,14 @@ public:
   }
 
   /**
+   *  @brief Sets the cluster ID
+   */
+  void set_id (size_t id)
+  {
+    m_id = id;
+  }
+
+  /**
    *  @brief Equality
    */
   bool operator== (const ClusterInstance &other) const

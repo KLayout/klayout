@@ -304,7 +304,7 @@ TEST(40_DeviceExtractorErrors)
 //  Basic soft connection
 TEST(50_BasicSoftConnection)
 {
-  // @@@ run_test (_this, "soft_connect1", "soft_connect1.gds", true, false /*no LVS*/);
+  run_test (_this, "soft_connect1", "soft_connect1.gds", true, false /*no LVS*/);
   //  issue #1691
   run_test (_this, "soft_connect1a", "soft_connect1.gds", true, false /*no LVS*/);
 }

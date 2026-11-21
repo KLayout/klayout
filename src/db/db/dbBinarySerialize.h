@@ -181,8 +181,8 @@ tl::BinaryOutputStream &operator<< (tl::BinaryOutputStream &s, const db::simple_
 template<class C, class D, class R>
 tl::BinaryOutputStream &operator<< (tl::BinaryOutputStream &s, const db::complex_trans<C, D, R> &t)
 {
-  s << (uint16_t) 1; // version
-  write_binary (s, t.disp ());
+  s << (uint16_t) 2; // version
+  write_binary (s, t.disp_int ());
   return s << (double) t.msin () << (double) t.mcos () << (double) (t.is_mirror () ? -t.mag () : t.mag ());
 }
 
@@ -477,12 +477,19 @@ tl::BinaryInputStream &operator>> (tl::BinaryInputStream &s, db::complex_trans<C
 {
   uint16_t fmt = 0;
   s >> fmt;
-  if (fmt > 1) {
+  if (fmt > 2) {
     throw FutureBinarySerializationFormatException ();
   }
 
   db::vector<R> d;
-  read_binary (s, d);
+  if (fmt == 1) {
+    //  issue #2554
+    db::vector<D> dd;
+    read_binary (s, dd);
+    d = db::vector<R> (dd);
+  } else {
+    read_binary (s, d);
+  }
 
   double asin, acos, mag;
   s >> asin >> acos >> mag;

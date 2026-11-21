@@ -74,8 +74,8 @@ class DBRegionTest(unittest.TestCase):
     for cell in ly_new.each_cell():
       s1[cell.name] = cell.shapes(l1).size()
       s2[cell.name] = cell.shapes(l2).size()
-    self.assertEqual(s1, {"INV2": 1, "TOP": 0, "TRANS": 0})
-    self.assertEqual(s2, {"INV2": 0, "TOP": 10, "TRANS": 0})
+    self.assertEqual(s1, {"INV2": 1, "TOP": 0})
+    self.assertEqual(s2, {"INV2": 0, "TOP": 10})
 
     # force destroy, so the unit tests pass on the next iteration
     dss = None

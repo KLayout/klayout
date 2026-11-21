@@ -180,7 +180,27 @@ Cell::empty () const
   return true;
 }
 
-void 
+bool
+Cell::empty (const std::set<db::cell_index_type> &empty_children) const
+{
+  for (shapes_map::const_iterator s = m_shapes_map.begin (); s != m_shapes_map.end (); ++s) {
+    if (! s->second.empty ()) {
+      return false;
+    }
+  }
+
+  if (! m_instances.empty ()) {
+    for (auto c = begin_child_cells (); ! c.at_end (); ++c) {
+      if (empty_children.find (*c) == empty_children.end ()) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+void
 Cell::clear (unsigned int index)
 {
   check_locked ();

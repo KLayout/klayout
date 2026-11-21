@@ -1294,7 +1294,7 @@ TEST(XORTool)
 
   std::string fna (tl::combine_path (tl::testdata_private (), "xor/a.gds.gz"));
   std::string fnb (tl::combine_path (tl::testdata_private (), "xor/b.gds.gz"));
-  std::string fn_au (tl::combine_path (tl::testdata_private (), "xor/xor_au.oas.gz"));
+  std::string fn_au (tl::combine_path (tl::testdata_private (), "xor/xor_au2.oas.gz"));
 
   db::Layout lya, lyb;
 

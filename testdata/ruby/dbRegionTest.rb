@@ -1191,8 +1191,8 @@ class DBRegion_TestClass < TestBase
       s1[cell.name] = cell.shapes(l1).size
       s2[cell.name] = cell.shapes(l2).size
     end
-    assert_equal(s1, {"INV2"=>1, "TOP"=>0, "TRANS"=>0})
-    assert_equal(s2, {"INV2"=>0, "TOP"=>10, "TRANS"=>0})
+    assert_equal(s1, {"INV2"=>1, "TOP"=>0})
+    assert_equal(s2, {"INV2"=>0, "TOP"=>10})
 
     target = RBA::Layout::new
     target_top = target.add_cell("TOP")
@@ -1200,10 +1200,9 @@ class DBRegion_TestClass < TestBase
     r.insert_into(target, target_top, target_li)
     cells = []
     target.each_cell { |c| cells << c.name }
-    assert_equal(cells.join(","), "TOP,INV2,TRANS")
+    assert_equal(cells.join(","), "TOP,INV2")
     assert_equal(RBA::Region::new(target.cell("TOP").shapes(target_li)).to_s, "")
     assert_equal(RBA::Region::new(target.cell("INV2").shapes(target_li)).to_s, "(-1400,1800;-1400,3800;1400,3800;1400,1800)")
-    assert_equal(RBA::Region::new(target.cell("TRANS").shapes(target_li)).to_s, "")
 
     r.flatten
     assert_equal(r.is_deep?, true)

@@ -406,19 +406,23 @@ public:
   Net (const std::string &name);
 
   /**
-   *  @brief Copy constructor
-   */
-  Net (const Net &other);
-
-  /**
    *  @brief Destructor
    */
   ~Net ();
 
   /**
-   *  @brief Assignment
+   *  @brief Alias for the hidden assignment operator
+   *
+   *  The assignment operator is hidden to prevent unintended copies
+   *  which break consistency of the netlist object. For testing
+   *  purposes, this public interface is provided.
+   *
+   *  Beware of side effects.
    */
-  Net &operator= (const Net &other);
+  void assign (const Net &other)
+  {
+    operator= (other);
+  }
 
   /**
    *  @brief Gets the circuit the net lives in
@@ -709,6 +713,16 @@ private:
   Circuit *mp_circuit;
 
   void set_circuit (Circuit *circuit);
+
+  /**
+   *  @brief Copy constructor
+   */
+  Net (const Net &other);
+
+  /**
+   *  @brief Assignment
+   */
+  Net &operator= (const Net &other);
 };
 
 /**

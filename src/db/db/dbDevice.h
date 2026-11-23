@@ -118,19 +118,23 @@ public:
   Device (DeviceClass *device_class, DeviceAbstract *device_abstract, const std::string &name = std::string ());
 
   /**
-   *  @brief Copy constructor
-   */
-  Device (const Device &other);
-
-  /**
-   *  @brief Assignment
-   */
-  Device &operator= (const Device &other);
-
-  /**
    *  @brief Destructor
    */
   ~Device ();
+
+  /**
+   *  @brief Assignes the attributes of another device to this device
+   *
+   *  This copies the device attributes, including device class and abstract, but
+   *  does not change the ownership of the object.
+   *
+   *  This is an alias for the hidden assignment operator that prevents
+   *  generation of unwanted copies in GSI for example.
+   */
+  void assign (const Device &other)
+  {
+    operator= (other);
+  }
 
   /**
    *  @brief Gets the device class
@@ -438,6 +442,16 @@ private:
 
   void add_others_terminals (unsigned int this_terminal, db::Device *other, unsigned int other_terminal);
   void init_terminal_routes ();
+
+  /**
+   *  @brief Copy constructor
+   */
+  Device (const Device &other);
+
+  /**
+   *  @brief Assignment
+   */
+  Device &operator= (const Device &other);
 };
 
 /**

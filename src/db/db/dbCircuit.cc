@@ -248,8 +248,8 @@ void Circuit::clear ()
   m_name.clear ();
   m_pins.clear ();
   m_pin_by_id.clear ();
-  m_nets.clear ();
   m_devices.clear ();
+  m_nets.clear ();
   m_subcircuits.clear ();
   m_boundary.clear ();
 }

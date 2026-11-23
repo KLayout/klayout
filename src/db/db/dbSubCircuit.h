@@ -55,16 +55,6 @@ public:
   SubCircuit ();
 
   /**
-   *  @brief Copy constructor
-   */
-  SubCircuit (const SubCircuit &other);
-
-  /**
-   *  @brief Assignment
-   */
-  SubCircuit &operator= (const SubCircuit &other);
-
-  /**
    *  @brief Creates a subcircuit reference to the given circuit
    */
   SubCircuit (Circuit *circuit_ref, const std::string &name = std::string ());
@@ -73,6 +63,20 @@ public:
    *  @brief Destructor
    */
   ~SubCircuit ();
+
+  /**
+   *  @brief Alias for the hidden assignment operator
+   *
+   *  The assignment operator is hidden to prevent unintended copies
+   *  which break consistency of the netlist object. For testing
+   *  purposes, this public interface is provided.
+   *
+   *  Beware of side effects.
+   */
+  void assign (const SubCircuit &other)
+  {
+    operator= (other);
+  }
 
   /**
    *  @brief Gets the subcircuit ID
@@ -250,6 +254,16 @@ private:
   {
     m_id = id;
   }
+
+  /**
+   *  @brief Copy constructor
+   */
+  SubCircuit (const SubCircuit &other);
+
+  /**
+   *  @brief Assignment
+   */
+  SubCircuit &operator= (const SubCircuit &other);
 };
 
 /**

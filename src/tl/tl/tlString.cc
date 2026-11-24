@@ -212,7 +212,10 @@ inline bool safe_isspace (char c)
 }
 
 // -------------------------------------------------------------------------
-//  Utility: skip a newline
+
+/**
+ *  @brief Utility: skip a newline
+ */
 
 bool skip_newline (const char *&cp)
 {
@@ -228,7 +231,12 @@ bool skip_newline (const char *&cp)
 }
 
 // -------------------------------------------------------------------------
-//  Utility: case-insensitive compare of the first characters
+
+/**
+ *  @brief Utility: case-insensitive compare of the first characters
+ *
+ *  @return True, if the first characters of s1 are equal to the null-terminated string s2.
+ */
 
 static bool local_compare (const char *s1, const char *s2)
 {
@@ -239,11 +247,14 @@ static bool local_compare (const char *s1, const char *s2)
       return false;
     }
   }
-  return true;
+  return !*s2;
 }
 
 // -------------------------------------------------------------------------
-//  Utility: a strtod version that is independent of the locale
+
+/**
+ *  @brief Utility: a strtod version that is independent of the locale
+ */
 
 static std::string inf_string = "inf";
 static std::string ninf_string = "-inf";

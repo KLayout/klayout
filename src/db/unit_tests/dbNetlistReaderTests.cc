@@ -956,6 +956,28 @@ TEST(26_comments)
   );
 }
 
+TEST(27_ExpressionParserTests)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader27.cir");
+
+  db::NetlistSpiceReader reader;
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit .TOP ();\n"
+    "  subcircuit 'PMOS(ISO=XWELL,N=2,W=7U)' '1' (B=NET1,D=NET2,G=NET3,S=NET4);\n"
+    "end;\n"
+    "circuit 'PMOS(ISO=XWELL,N=2,W=7U)' (B=B,D=D,G=G,S=S);\n"
+    "  subcircuit 'BASIC_PMOS(ISO=XWELL,N=2,W=7.2U)' P ('1'=D,'2'=G,'3'=S,'4'=B);\n"
+    "end;\n"
+    "circuit 'BASIC_PMOS(ISO=XWELL,N=2,W=7.2U)' ('1'='1','2'='2','3'='3','4'='4');\n"
+    "end;\n"
+  );
+}
+
 TEST(100_ExpressionParser)
 {
   std::map<std::string, tl::Variant> vars;
@@ -1081,3 +1103,4 @@ TEST(101_ExpressionParserWithDefScale)
   EXPECT_EQ (parser.read ("1.75k").to_string (), "1750");
   EXPECT_EQ (parser.read ("2*A").to_string (), "0.035");
 }
+

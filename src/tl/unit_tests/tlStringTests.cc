@@ -672,6 +672,22 @@ TEST(16)
   EXPECT_EQ (tl::to_string (x), "nan");
   EXPECT_EQ (ex.try_read (x), true);
   EXPECT_EQ (tl::to_string (x), "-inf");
+
+  //  issue #2564
+  s = "   n";
+  EXPECT_EQ (ex.try_read (x), false);
+  s = "   na";
+  EXPECT_EQ (ex.try_read (x), false);
+  s = "   i";
+  EXPECT_EQ (ex.try_read (x), false);
+  s = "   in";
+  EXPECT_EQ (ex.try_read (x), false);
+  s = "   -";
+  EXPECT_EQ (ex.try_read (x), false);
+  s = "   -i";
+  EXPECT_EQ (ex.try_read (x), false);
+  s = "   -in";
+  EXPECT_EQ (ex.try_read (x), false);
 }
 
 //  border cases of int values: round trip value->string->value

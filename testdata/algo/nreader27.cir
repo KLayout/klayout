@@ -1,0 +1,7 @@
+
+.SUBCKT pmos b d g s w=1 n=1 iso=pn
+XP d g s b basic_pmos iso=iso w=w+0.2u n=n
+.ENDS
+
+X1 net1 net2 net3 net4 pmos iso=xwell n=2 w=7u
+ 

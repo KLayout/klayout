@@ -811,7 +811,7 @@ TEST(5_SubCircuit)
   sc.set_trans (db::DCplxTrans (2.5));
   EXPECT_EQ (sc.trans ().to_string (), "r0 *2.5 0,0");
 
-  sc2 = sc;
+  sc2.assign (sc);
   EXPECT_EQ (sc2.name (), "sc");
   EXPECT_EQ (sc2.trans ().to_string (), "r0 *2.5 0,0");
 }
@@ -825,7 +825,7 @@ TEST(6_Net)
   n.set_cluster_id (17);
   EXPECT_EQ (int (n.cluster_id ()), 17);
 
-  n2 = n;
+  n2.assign (n);
   EXPECT_EQ (n2.name (), "n");
   EXPECT_EQ (int (n2.cluster_id ()), 17);
   EXPECT_EQ (n2.expanded_name (), "n");
@@ -1091,16 +1091,16 @@ TEST(11_NetlistCircuitRefs)
   EXPECT_EQ (refs2string (c2), "sc1,sc2");
   c1->add_subcircuit (sc2);
 
-  *sc2 = db::SubCircuit ();
+  sc2->assign (db::SubCircuit ());
   EXPECT_EQ (refs2string (c2), "sc1");
 
   db::SubCircuit sc3 (c2);
   sc3.set_name ("sc3");
-  *sc2 = sc3;
+  sc2->assign (sc3);
   sc2->set_name ("sc2");
   EXPECT_EQ (refs2string (c2), "sc1,sc3,sc2");
 
-  sc3 = db::SubCircuit ();
+  sc3.assign (db::SubCircuit ());
   EXPECT_EQ (refs2string (c2), "sc1,sc2");
 }
 
@@ -1194,7 +1194,8 @@ TEST(12_NetlistTopology)
   EXPECT_EQ (td2string (nl.get ()), "c1,c3,c2");
   EXPECT_EQ (bu2string (nl.get ()), "c2,c3,c1");
 
-  db::SubCircuit *sc4 = new db::SubCircuit (*sc2);
+  db::SubCircuit *sc4 = new db::SubCircuit ();
+  sc4->assign (*sc2);
   sc4->set_name ("sc4");
   c3->add_subcircuit (sc4);
 
@@ -1636,14 +1637,15 @@ TEST(24_NetlistObject)
   EXPECT_EQ (net.property ("key").to_string (), "nil");
   EXPECT_EQ (net.property (1).to_string (), "hello");
 
-  db::Net net2 (net);
+  db::Net net2;
+  net2.assign (net);
   EXPECT_EQ (net.property ("key").to_string (), "nil");
   EXPECT_EQ (net.property (1).to_string (), "hello");
 
   db::Net net3;
   EXPECT_EQ (net3.property ("key").to_string (), "nil");
   EXPECT_EQ (net3.property (1).to_string (), "nil");
-  net3 = net2;
+  net3.assign (net2);
   EXPECT_EQ (net3.property (1).to_string (), "hello");
 
   db::SubCircuit sc;
@@ -1651,14 +1653,15 @@ TEST(24_NetlistObject)
   EXPECT_EQ (sc.property ("key").to_string (), "nil");
   EXPECT_EQ (sc.property (1).to_string (), "hello");
 
-  db::SubCircuit sc2 (sc);
+  db::SubCircuit sc2;
+  sc2.assign (sc);
   EXPECT_EQ (sc.property ("key").to_string (), "nil");
   EXPECT_EQ (sc.property (1).to_string (), "hello");
 
   db::SubCircuit sc3;
   EXPECT_EQ (sc3.property ("key").to_string (), "nil");
   EXPECT_EQ (sc3.property (1).to_string (), "nil");
-  sc3 = sc2;
+  sc3.assign (sc2);
   EXPECT_EQ (sc3.property (1).to_string (), "hello");
 
   db::Device dev;
@@ -1666,14 +1669,15 @@ TEST(24_NetlistObject)
   EXPECT_EQ (dev.property ("key").to_string (), "nil");
   EXPECT_EQ (dev.property (1).to_string (), "hello");
 
-  db::Device dev2 (dev);
+  db::Device dev2;
+  dev2.assign (dev);
   EXPECT_EQ (dev.property ("key").to_string (), "nil");
   EXPECT_EQ (dev.property (1).to_string (), "hello");
 
   db::Device dev3;
   EXPECT_EQ (dev3.property ("key").to_string (), "nil");
   EXPECT_EQ (dev3.property (1).to_string (), "nil");
-  dev3 = dev2;
+  dev3.assign (dev2);
   EXPECT_EQ (dev3.property (1).to_string (), "hello");
 
   db::Circuit circuit;

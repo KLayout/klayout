@@ -431,7 +431,8 @@ void NetlistDeviceExtractor::push_cached_devices (const tl::vector<db::Device *>
     db::Device *cached_device = *d;
     db::Vector disp = dbu_inv * cached_device->trans ().disp () - disp_cache;
 
-    db::Device *device = new db::Device (*cached_device);
+    db::Device *device = new db::Device ();
+    device->assign (*cached_device);
     mp_circuit->add_device (device);
     device->set_trans (db::DCplxTrans (device->trans ().disp () + dbu * (new_disp - disp_cache)));
 

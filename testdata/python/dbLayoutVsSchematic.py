@@ -175,6 +175,22 @@ class DBLayoutVsSchematicTests(unittest.TestCase):
     lvs2.read_l2n(tmp)
     self.assertEqual(",".join(lvs2.layer_names()), "bulk,nwell,poly,poly_lbl,diff_cont,poly_cont,metal1,metal1_lbl,via1,metal2,metal2_lbl,ntie,psd,ptie,nsd")
 
+  def test_4_Issue2560(self):
+
+    ut_testsrc = os.getenv("TESTSRC")
+    ut_testtmp = os.getenv("TESTTMP", "")
+
+    lvs = pya.LayoutVsSchematic()
+
+    infile = os.path.join(ut_testsrc, "testdata", "lvs", "inv2.lvsdb")
+    lvs.read(infile)
+
+    pair = list(lvs.xref().each_circuit_pair())[0]
+    nets = list(pair.first().each_net())
+
+    # that crashed
+    lvs._destroy()
+
 # run unit tests
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(DBLayoutVsSchematicTests)

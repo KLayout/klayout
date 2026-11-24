@@ -181,6 +181,11 @@ jobs:
   steps:
     - checkout: none #skip checking out the default repository resource
     - task: DownloadBuildArtifacts@0
+      displayName: 'Download Build Artifacts wheel-3.15.x64'
+      inputs:
+        artifactName: 'wheel-3.15.x64'
+        downloadPath: '$(System.DefaultWorkingDirectory)'
+    - task: DownloadBuildArtifacts@0
       displayName: 'Download Build Artifacts wheel-3.14.x64'
       inputs:
         artifactName: 'wheel-3.14.x64'
@@ -204,6 +209,11 @@ jobs:
       displayName: 'Download Build Artifacts wheel-3.10.x64'
       inputs:
         artifactName: 'wheel-3.10.x64'
+        downloadPath: '$(System.DefaultWorkingDirectory)'
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Build Artifacts wheel-3.15.x86'
+      inputs:
+        artifactName: 'wheel-3.15.x86'
         downloadPath: '$(System.DefaultWorkingDirectory)'
     - task: DownloadBuildArtifacts@0
       displayName: 'Download Build Artifacts wheel-3.14.x86'

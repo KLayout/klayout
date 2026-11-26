@@ -2636,18 +2636,28 @@ tl::Variant::find (const tl::Variant &k) const
 std::string 
 Variant::to_parsable_string () const
 {
-  if (is_long ()) {
-    return "#" + tl::to_string (to_long ());
+  if (is_longlong () || is_long ()) {
+    long long ll = to_longlong ();
+    //  upon serialization, "l" is reserved for >32bit to be serialization-compatible with old Windows versions
+    //  that use 32bit for long and don't have dynamic sizing
+    if (ll > (long long) std::numeric_limits<int32_t>::max () || ll < (long long) std::numeric_limits<int32_t>::min ()) {
+      return "#l" + tl::to_string (ll);
+    } else {
+      return "#" + tl::to_string (ll);
+    }
+  } else if (is_ulonglong () || is_ulong ()) {
+    unsigned long long ull = to_ulonglong ();
+    //  upon serialization, "ul" is reserved for >32bit to be serialization-compatible with old Windows versions
+    //  that use 32bit for long and don't have dynamic sizing
+    if (ull > (unsigned long long) std::numeric_limits<uint32_t>::max ()) {
+      return "#ul" + tl::to_string (ull);
+    } else {
+      return "#u" + tl::to_string (ull);
+    }
 #if defined(HAVE_64BIT_COORD)
   } else if (is_int128 ()) {
     return "#ll" + tl::to_string (to_int128 ());
 #endif
-  } else if (is_longlong ()) {
-    return "#l" + tl::to_string (to_longlong ());
-  } else if (is_ulong ()) {
-    return "#u" + tl::to_string (to_ulong ());
-  } else if (is_ulonglong ()) {
-    return "#lu" + tl::to_string (to_ulonglong ());
   } else if (is_double ()) {
     return "##" + tl::to_string (to_double (), 15);
   } else if (is_bool ()) {
@@ -3023,32 +3033,40 @@ TL_PUBLIC bool test_extractor_impl (tl::Extractor &ex, tl::Variant &v)
 
 #endif
 
-  } else if (ex.test ("#lu")) {
+  } else if (ex.test ("#ul") || ex.test ("#u")) {
 
     unsigned long long x = 0;
     ex.read (x);
-    v = x;
+
+    //  dynamically pick unsigned long long, unsigned long (Windows) or uint32_t
+    if (x <= (unsigned long long) std::numeric_limits<uint32_t>::max ()) {
+      if (sizeof (unsigned long) == 4) {
+        v = (unsigned long) x;
+      } else {
+        v = (uint32_t) x;
+      }
+    } else {
+      v = x;
+    }
+
     return true;
 
-  } else if (ex.test ("#l")) {
+  } else if (ex.test ("#l") || ex.test ("#")) {
 
     long long x = 0;
     ex.read (x);
-    v = x;
-    return true;
 
-  } else if (ex.test ("#u")) {
+    //  dynamically pick long long, long (Windows) or int32_t
+    if (x <= (long long) std::numeric_limits<int32_t>::max () && x >= (long long) std::numeric_limits<int32_t>::min ()) {
+      if (sizeof (long) == 4) {
+        v = (long) x;
+      } else {
+        v = (int32_t) x;
+      }
+    } else {
+      v = x;
+    }
 
-    unsigned long x = 0;
-    ex.read (x);
-    v = x;
-    return true;
-
-  } else if (ex.test ("#")) {
-
-    long x = 0;
-    ex.read (x);
-    v = x;
     return true;
 
   } else if (ex.test ("nil")) {

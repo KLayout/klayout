@@ -445,8 +445,8 @@ TEST(1)
   EXPECT_EQ (vx == v, true);
   EXPECT_EQ (vx.is_long (), true);
   EXPECT_EQ (vx.is_ulong (), false);
-  EXPECT_EQ (vx.is<long> (), true);
-  EXPECT_EQ (vx.is<unsigned long> (), false);
+  EXPECT_EQ (vx.is<int32_t> (), true);
+  EXPECT_EQ (vx.is<uint32_t> (), false);
   EXPECT_EQ (v.is<short> (), true);
   EXPECT_EQ (*(long *)vx.native_ptr(), 2);
   EXPECT_EQ (*(short *)v.native_ptr(), 2);
@@ -643,7 +643,7 @@ TEST(1)
   {
   tl::Variant v ((long long) 17);
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#l17");
+  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#17");
 #endif
   EXPECT_EQ (v.is_nil (), false);
   EXPECT_EQ (v.is_list (), false);
@@ -656,7 +656,7 @@ TEST(1)
   EXPECT_EQ (v.is_cstring (), false);
   EXPECT_EQ (v.is_double (), false);
   EXPECT_EQ (v.to_string (), "17");
-  EXPECT_EQ (v.to_parsable_string (), "#l17");
+  EXPECT_EQ (v.to_parsable_string (), "#17");
   tl::Variant vx;
   std::string s (v.to_parsable_string ());
   tl::Extractor ex (s.c_str ());
@@ -668,7 +668,7 @@ TEST(1)
   {
   tl::Variant v ((unsigned long long) 17);
 #if defined(HAVE_QT)
-  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#lu17");
+  EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#u17");
 #endif
   EXPECT_EQ (v.is_nil (), false);
   EXPECT_EQ (v.is_list (), false);
@@ -681,7 +681,7 @@ TEST(1)
   EXPECT_EQ (v.is_cstring (), false);
   EXPECT_EQ (v.is_double (), false);
   EXPECT_EQ (v.to_string (), "17");
-  EXPECT_EQ (v.to_parsable_string (), "#lu17");
+  EXPECT_EQ (v.to_parsable_string (), "#u17");
   tl::Variant vx;
   std::string s (v.to_parsable_string ());
   tl::Extractor ex (s.c_str ());
@@ -1611,4 +1611,124 @@ TEST(16)
 
   EXPECT_EQ (b.to_string (), std::string ("hello"));
   EXPECT_EQ (a.is_nil (), true);
+}
+
+//  serialization and deserialization of int with 32 and 64 bit (issue #2566)
+TEST(17)
+{
+  tl::Variant v;
+
+  v = tl::Variant ((int64_t) 1234567890123456789ll);
+  EXPECT_EQ (v.to_parsable_string (), "#l1234567890123456789");
+  v = tl::Variant ((int64_t) -1234567890123456789ll);
+  EXPECT_EQ (v.to_parsable_string (), "#l-1234567890123456789");
+  v = tl::Variant ((uint64_t) 1234567890123456789ll);
+  EXPECT_EQ (v.to_parsable_string (), "#ul1234567890123456789");
+
+  //  serialization picks integer size prefix dynamically
+  v = tl::Variant ((int64_t) 123456789l);
+  EXPECT_EQ (v.to_parsable_string (), "#123456789");
+  v = tl::Variant ((int64_t) 0x80000000l);
+  EXPECT_EQ (v.to_parsable_string (), "#l2147483648");
+  v = tl::Variant ((int64_t) 0x7fffffffl);
+  EXPECT_EQ (v.to_parsable_string (), "#2147483647");
+  v = tl::Variant (-(int64_t) 0x80000000l);
+  EXPECT_EQ (v.to_parsable_string (), "#-2147483648");
+  v = tl::Variant (-(int64_t) 0x80000001l);
+  EXPECT_EQ (v.to_parsable_string (), "#l-2147483649");
+  v = tl::Variant ((int64_t) -123456789l);
+  EXPECT_EQ (v.to_parsable_string (), "#-123456789");
+  v = tl::Variant ((uint64_t) 123456789l);
+  EXPECT_EQ (v.to_parsable_string (), "#u123456789");
+  v = tl::Variant ((int32_t) 123456789l);
+  EXPECT_EQ (v.to_parsable_string (), "#123456789");
+  v = tl::Variant ((int32_t) -123456789l);
+  EXPECT_EQ (v.to_parsable_string (), "#-123456789");
+  v = tl::Variant ((uint32_t) 123456789l);
+  EXPECT_EQ (v.to_parsable_string (), "#u123456789");
+
+  //  small types
+  v = tl::Variant ((int16_t) 12345);
+  EXPECT_EQ (v.to_parsable_string (), "#12345");
+  v = tl::Variant ((int16_t) -12345);
+  EXPECT_EQ (v.to_parsable_string (), "#-12345");
+  v = tl::Variant ((uint16_t) 12345);
+  EXPECT_EQ (v.to_parsable_string (), "#u12345");
+  v = tl::Variant ((int8_t) 123);
+  EXPECT_EQ (v.to_parsable_string (), "#123");
+  v = tl::Variant ((int8_t) -123);
+  EXPECT_EQ (v.to_parsable_string (), "#-123");
+  v = tl::Variant ((uint8_t) 123);
+  EXPECT_EQ (v.to_parsable_string (), "#u123");
+
+  //  deserialization ignores size prefix and chooses size dynamically
+  std::string s;
+
+  s = "#l1234567890123456789";
+  v = tl::Variant ();
+  tl::Extractor (s.c_str ()).read (v);
+  EXPECT_EQ (v.to_longlong (), 1234567890123456789l);
+  EXPECT_EQ (v.type_code () == tl::Variant::t_longlong, true);
+
+  s = "#1234567890123456789";
+  v = tl::Variant ();
+  tl::Extractor (s.c_str ()).read (v);
+  EXPECT_EQ (v.to_longlong (), 1234567890123456789l);
+  EXPECT_EQ (v.type_code () == tl::Variant::t_longlong, true);
+
+  s = "#u1234567890123456789";
+  v = tl::Variant ();
+  tl::Extractor (s.c_str ()).read (v);
+  EXPECT_EQ (v.to_longlong (), 1234567890123456789l);
+  EXPECT_EQ (v.type_code () == tl::Variant::t_ulonglong, true);
+
+  s = "#ul1234567890123456789";
+  v = tl::Variant ();
+  tl::Extractor (s.c_str ()).read (v);
+  EXPECT_EQ (v.to_longlong (), 1234567890123456789l);
+  EXPECT_EQ (v.type_code () == tl::Variant::t_ulonglong, true);
+
+  s = "#l123456789";
+  v = tl::Variant ();
+  tl::Extractor (s.c_str ()).read (v);
+  EXPECT_EQ (v.to_longlong (), 123456789);
+  EXPECT_EQ (v.to_long (), 123456789);
+  if (sizeof (long) == 4) {
+    EXPECT_EQ (v.type_code () == tl::Variant::t_long, true);
+  } else {
+    EXPECT_EQ (v.type_code () == tl::Variant::t_int, true);
+  }
+
+  s = "#123456789";
+  v = tl::Variant ();
+  tl::Extractor (s.c_str ()).read (v);
+  EXPECT_EQ (v.to_longlong (), 123456789);
+  EXPECT_EQ (v.to_long (), 123456789);
+  if (sizeof (long) == 4) {
+    EXPECT_EQ (v.type_code () == tl::Variant::t_long, true);
+  } else {
+    EXPECT_EQ (v.type_code () == tl::Variant::t_int, true);
+  }
+
+  s = "#ul123456789";
+  v = tl::Variant ();
+  tl::Extractor (s.c_str ()).read (v);
+  EXPECT_EQ (v.to_ulonglong (), 123456789);
+  EXPECT_EQ (v.to_ulong (), 123456789);
+  if (sizeof (long) == 4) {
+    EXPECT_EQ (v.type_code () == tl::Variant::t_ulong, true);
+  } else {
+    EXPECT_EQ (v.type_code () == tl::Variant::t_uint, true);
+  }
+
+  s = "#u123456789";
+  v = tl::Variant ();
+  tl::Extractor (s.c_str ()).read (v);
+  EXPECT_EQ (v.to_ulonglong (), 123456789);
+  EXPECT_EQ (v.to_ulong (), 123456789);
+  if (sizeof (long) == 4) {
+    EXPECT_EQ (v.type_code () == tl::Variant::t_ulong, true);
+  } else {
+    EXPECT_EQ (v.type_code () == tl::Variant::t_uint, true);
+  }
 }

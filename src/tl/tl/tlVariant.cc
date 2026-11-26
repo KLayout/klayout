@@ -2647,10 +2647,10 @@ Variant::to_parsable_string () const
     }
   } else if (is_ulonglong () || is_ulong ()) {
     unsigned long long ull = to_ulonglong ();
-    //  upon serialization, "ul" is reserved for >32bit to be serialization-compatible with old Windows versions
+    //  upon serialization, "lu" is reserved for >32bit to be serialization-compatible with old Windows versions
     //  that use 32bit for long and don't have dynamic sizing
     if (ull > (unsigned long long) std::numeric_limits<uint32_t>::max ()) {
-      return "#ul" + tl::to_string (ull);
+      return "#lu" + tl::to_string (ull);
     } else {
       return "#u" + tl::to_string (ull);
     }
@@ -3033,7 +3033,7 @@ TL_PUBLIC bool test_extractor_impl (tl::Extractor &ex, tl::Variant &v)
 
 #endif
 
-  } else if (ex.test ("#ul") || ex.test ("#u")) {
+  } else if (ex.test ("#lu") || ex.test ("#u")) {
 
     unsigned long long x = 0;
     ex.read (x);

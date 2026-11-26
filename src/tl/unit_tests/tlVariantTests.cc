@@ -1623,7 +1623,7 @@ TEST(17)
   v = tl::Variant ((int64_t) -1234567890123456789ll);
   EXPECT_EQ (v.to_parsable_string (), "#l-1234567890123456789");
   v = tl::Variant ((uint64_t) 1234567890123456789ll);
-  EXPECT_EQ (v.to_parsable_string (), "#ul1234567890123456789");
+  EXPECT_EQ (v.to_parsable_string (), "#lu1234567890123456789");
 
   //  serialization picks integer size prefix dynamically
   v = tl::Variant ((int64_t) 123456789l);
@@ -1679,13 +1679,13 @@ TEST(17)
   s = "#u1234567890123456789";
   v = tl::Variant ();
   tl::Extractor (s.c_str ()).read (v);
-  EXPECT_EQ (v.to_longlong (), 1234567890123456789l);
+  EXPECT_EQ (v.to_ulonglong (), 1234567890123456789ul);
   EXPECT_EQ (v.type_code () == tl::Variant::t_ulonglong, true);
 
-  s = "#ul1234567890123456789";
+  s = "#lu1234567890123456789";
   v = tl::Variant ();
   tl::Extractor (s.c_str ()).read (v);
-  EXPECT_EQ (v.to_longlong (), 1234567890123456789l);
+  EXPECT_EQ (v.to_ulonglong (), 1234567890123456789ul);
   EXPECT_EQ (v.type_code () == tl::Variant::t_ulonglong, true);
 
   s = "#l123456789";
@@ -1710,11 +1710,11 @@ TEST(17)
     EXPECT_EQ (v.type_code () == tl::Variant::t_int, true);
   }
 
-  s = "#ul123456789";
+  s = "#lu123456789";
   v = tl::Variant ();
   tl::Extractor (s.c_str ()).read (v);
-  EXPECT_EQ (v.to_ulonglong (), 123456789);
-  EXPECT_EQ (v.to_ulong (), 123456789);
+  EXPECT_EQ (v.to_ulonglong (), 123456789u);
+  EXPECT_EQ (v.to_ulong (), 123456789u);
   if (sizeof (long) == 4) {
     EXPECT_EQ (v.type_code () == tl::Variant::t_ulong, true);
   } else {
@@ -1724,8 +1724,8 @@ TEST(17)
   s = "#u123456789";
   v = tl::Variant ();
   tl::Extractor (s.c_str ()).read (v);
-  EXPECT_EQ (v.to_ulonglong (), 123456789);
-  EXPECT_EQ (v.to_ulong (), 123456789);
+  EXPECT_EQ (v.to_ulonglong (), 123456789u);
+  EXPECT_EQ (v.to_ulong (), 123456789u);
   if (sizeof (long) == 4) {
     EXPECT_EQ (v.type_code () == tl::Variant::t_ulong, true);
   } else {

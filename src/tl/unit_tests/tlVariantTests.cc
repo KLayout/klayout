@@ -443,19 +443,32 @@ TEST(1)
   ex.read (vx);
   ex.expect_end ();
   EXPECT_EQ (vx == v, true);
-  EXPECT_EQ (vx.is_long (), true);
   EXPECT_EQ (vx.is_ulong (), false);
   EXPECT_EQ (vx.is<int32_t> (), true);
   EXPECT_EQ (vx.is<uint32_t> (), false);
   EXPECT_EQ (v.is<short> (), true);
-  EXPECT_EQ (*(long *)vx.native_ptr(), 2);
+  EXPECT_EQ (*(int32_t *)vx.native_ptr(), 2);
   EXPECT_EQ (*(short *)v.native_ptr(), 2);
   v.morph<long>();
   EXPECT_EQ (vx == v, true);
-  EXPECT_EQ (vx.is_long (), true);
+  EXPECT_EQ (vx.is<int32_t> (), true);
   EXPECT_EQ (v.is_long (), true);
-  EXPECT_EQ (*(long *)vx.native_ptr(), 2);
+  EXPECT_EQ (*(int32_t *)vx.native_ptr(), 2);
   EXPECT_EQ (*(long *)v.native_ptr(), 2);
+  v.morph<long long>();
+  EXPECT_EQ (vx == v, true);
+  EXPECT_EQ (vx.is<int32_t> (), true);
+  EXPECT_EQ (v.is_long (), false);
+  EXPECT_EQ (v.is_longlong (), true);
+  EXPECT_EQ (*(int32_t *)vx.native_ptr(), 2);
+  EXPECT_EQ (*(long long *)v.native_ptr(), 2);
+  v.morph<unsigned long>();
+  EXPECT_EQ (vx == v, true);
+  EXPECT_EQ (vx.is<int32_t> (), true);
+  EXPECT_EQ (v.is_long (), false);
+  EXPECT_EQ (v.is_ulong (), true);
+  EXPECT_EQ (*(int32_t *)vx.native_ptr(), 2);
+  EXPECT_EQ (*(unsigned long *)v.native_ptr(), 2);
   }
 
   {

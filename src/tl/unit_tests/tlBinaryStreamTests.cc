@@ -345,8 +345,8 @@ TEST(BinaryStreamsVariants)
      << tl::Variant ((unsigned int) 43)
      << tl::Variant ((long) 19)
      << tl::Variant ((unsigned long) 44)
-     << tl::Variant ((long long) 20)
-     << tl::Variant ((unsigned long long) 45)
+     << tl::Variant ((long long) -1234567890123456789)
+     << tl::Variant ((unsigned long long) 1234567890123456789)
      << tl::Variant ((size_t) 202, true /*id*/);
 
   os.flush ();
@@ -374,8 +374,8 @@ TEST(BinaryStreamsVariants)
   EXPECT_EQ (v12.to_parsable_string (), "#u43");
   EXPECT_EQ (v13.to_parsable_string (), "#19");
   EXPECT_EQ (v14.to_parsable_string (), "#u44");
-  EXPECT_EQ (v15.to_parsable_string (), "#l20");
-  EXPECT_EQ (v16.to_parsable_string (), "#lu45");
+  EXPECT_EQ (v15.to_parsable_string (), "#l-1234567890123456789");
+  EXPECT_EQ (v16.to_parsable_string (), "#lu1234567890123456789");
   EXPECT_EQ (v17.to_parsable_string (), "[id202]");
 }
 

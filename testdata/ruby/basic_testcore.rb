@@ -3180,11 +3180,7 @@ class Basic_TestClass < TestBase
       # Ruby 2 can't pass a hash to a function's argument
       assert_equal(RBA::A::var2s({ 1 => 'one', 'two' => 17 }), "{#1=>'one','two'=>#17}")
     end
-    if RBA::A::l_size == 4
-      assert_equal(RBA::A::var2s(100000000000), "#l100000000000")
-    else
-      assert_equal(RBA::A::var2s(100000000000), "#100000000000")
-    end
+    assert_equal(RBA::A::var2s(100000000000), "#l100000000000")
 
   end
 
